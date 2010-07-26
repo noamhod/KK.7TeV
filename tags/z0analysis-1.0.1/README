@@ -1,0 +1,46 @@
+Compile & run  (partially manual, full description)
+
+go to the analysis folder (THIS FOLDER)
+	cd /path/to/here/
+
+compile the GRL lib:
+	check the latest tag in:
+		https://svnweb.cern.ch/cern/wsvn/atlasoff/DataQuality/GoodRunsLists/tags/
+	cheout the latest tag:
+		svn co svn+ssh://svn.cern.ch/reps/atlasoff/DataQuality/GoodRunsLists/tags/GoodRunsLists-XX-XX-XX
+	cd GoodRunsLists-XX-XX-XX/cmt
+	make -f Makefile.Standalone
+	the GRL lib is in:
+		GoodRunsLists-XX-XX-XX/StandAlone/libGoodRunsLists.so
+
+make the list (dataset.list)
+	*** ONLY WHEN A NEW DATA SET IS TO BE DEFINED AND USED. OTHERWISE, SKIP THIS POINT ***
+	cp makeList.sh /path/to/datasets/
+	cd /path/to/datasets/
+	source makeList.sh
+	cd -
+	cp /path/to/datasets/dataset.list .
+
+make the chain and the corresponding class (physics.h, physics.C):
+	*** ONLY WHEN A NEW DATA SET IS TO BE DEFINED AND USED. OTHERWISE, SKIP THIS POINT ***
+	root
+	.L MakeClassFromChain.C++
+	MakeClassFromChain fcnc
+	makeChain(true, "dataset.list", "/path/to/datasets/");
+	chain2list();
+
+recompile everything and run, with the new (physics) class
+	root
+	.L main.C
+	compileAll("XX-XX-XX"); // the argument is the tag of the GoodRunList xml
+	loop(0,0); // loop(startEvent, events2process) ==> if events2process=0 then do all
+
+svn co:
+	svn checkout https://z0analysis.googlecode.com/svn/trunk/ z0analysis --username noam.com
+
+svn ci:
+	cd scripts
+	source cleanGoodRunsLists.sh
+	cd -
+	svn ci -m "some description"
+	svn cp https://z0analysis.googlecode.com/svn/{trunk,tags/z0analysis-1.0.0} -m "some description"

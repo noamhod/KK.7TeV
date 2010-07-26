@@ -29,6 +29,9 @@ make the chain and the corresponding class (physics.h, physics.C):
 	makeChain(true, "dataset.list", "/path/to/datasets/");
 	chain2list();
 
+to fit your architecture, change some hard coded paths in
+	src/analysisControl.C
+
 recompile everything and run, with the new (physics) class
 	root
 	.L main.C
@@ -36,11 +39,14 @@ recompile everything and run, with the new (physics) class
 	loop(0,0); // loop(startEvent, events2process) ==> if events2process=0 then do all
 
 svn co:
+	to co the trunk:
 	svn checkout https://z0analysis.googlecode.com/svn/trunk/ z0analysis --username noam.com
+	to co a certain tag:
+	svn checkout https://z0analysis.googlecode.com/svn/tags/z0analysis-X.Y.Z --username noam.com
 
 svn ci:
 	cd scripts
 	source cleanGoodRunsLists.sh
 	cd -
 	svn ci -m "some description"
-	svn cp https://z0analysis.googlecode.com/svn/{trunk,tags/z0analysis-1.0.0} -m "some description"
+	svn cp https://z0analysis.googlecode.com/svn/{trunk,tags/z0analysis-X.Y.Z} -m "some description"

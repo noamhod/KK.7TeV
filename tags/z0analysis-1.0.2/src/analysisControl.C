@@ -12,27 +12,27 @@ analysisControl::analysisControl()
 {
 	initialize();
 
-	makeChain(true, "dataset.list", "/data/hod/D3PDs/group10.phys-sm.data10_7TeV_physics_MuonswBeam_WZphys_D3PD/");
+	makeChain(true, "conf/dataset.list", "/data/hod/D3PDs/group10.phys-sm.data10_7TeV_physics_MuonswBeam_WZphys_D3PD/");
 
 	m_phys = new physics( m_chain );
 
 
-	m_treefile = new TFile("analysisTrees.root", "RECREATE");
+	m_treefile = new TFile("data/analysisTrees.root", "RECREATE");
         m_treefile->cd();
 
-	m_histfile = new TFile("analysisControl.root", "RECREATE");
+	m_histfile = new TFile("data/analysisControl.root", "RECREATE");
         m_histfile->cd();
 
 	m_graphics = new graphicObjects();
 	m_graphics->setStyle();
 
 	m_GRL = new GRLinterface();
-        m_GRL->glrinitialize("/srv01/tau/hod/d3pdAnalysis/analysis_current/Z_GRL_152844-159224.xml");
+        m_GRL->glrinitialize("conf/Z_GRL_152844-159224.xml");
 
         m_analysis = new analysis( m_phys, m_graphics, m_GRL, m_treefile );
 
 	// read the cut flow (ownership: selection class which analysis inherits from)
-	m_analysis->readCutFlow("cutFlow.cuts");
+	m_analysis->readCutFlow("conf/cutFlow.cuts");
 
 	book();
 }

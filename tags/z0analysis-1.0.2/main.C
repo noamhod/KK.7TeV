@@ -19,7 +19,7 @@ void compileAll(TString sGRLtag)
 	gROOT->ProcessLine(".L GoodRunsLists-" + sGRLtag + "/StandAlone/libGoodRunsLists.so");
 
 	// compile the analysisControl code and create an instance
-	gROOT->ProcessLine(".L analysisControl.C++");
+	gROOT->ProcessLine(".L src/analysisControl.C++");
 	gROOT->ProcessLine("analysisControl ac");
 }
 

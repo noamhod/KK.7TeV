@@ -7,9 +7,18 @@
 
 void compileAll(TString sGRLtag)
 {
+	// add this software include paths
+	gROOT->ProcessLine(".include include/");
+	gROOT->ProcessLine(".include src/");
+
+	// add the GRL include paths
 	gROOT->ProcessLine(".include GoodRunsLists-" + sGRLtag + "/");
 	gROOT->ProcessLine(".include GoodRunsLists-" + sGRLtag + "/GoodRunsLists/");
+
+	// load the GRL lib
 	gROOT->ProcessLine(".L GoodRunsLists-" + sGRLtag + "/StandAlone/libGoodRunsLists.so");
+
+	// compile the analysisControl code and create an instance
 	gROOT->ProcessLine(".L analysisControl.C++");
 	gROOT->ProcessLine("analysisControl ac");
 }

@@ -29,14 +29,14 @@ void selection::sinitialize()
 	d_etaCut         = 2.4;
 	d_d0Cut          = 150.; // mm ?
 	d_z0Cut          = 150.; // mm ?
-	d_cosmicCosthCut = 0.95;
+	d_cosmicCosthCut = -0.9;
 	d_imassCut       = 20.*m_util->d_toGeV;
 */
 }
 
 void selection::sfinalize()
 {
-	delete m_util;
+	//delete m_util;
 }
 
 void selection::initSelectionCuts(TMapsd* cutFlowMap, TMapds* cutFlowOrdered)
@@ -76,7 +76,7 @@ bool selection::imassCut( double imassCutVal, TLorentzVector* pa, TLorentzVector
 bool selection::cosmicCut( double cosmicCutVal, TLorentzVector* pa, TLorentzVector* pb )
 {
 	if(b_print) cout << "in cosmicCut: dimuonCosth(pa,pb)=" << dimuonCosth(pa,pb) << endl;
-        return ( fabs(dimuonCosth(pa,pb)) <= cosmicCutVal ) ? true : false;
+        return ( dimuonCosth(pa,pb) > cosmicCutVal ) ? true : false;
 }
 
 bool selection::oppositeCharge( double ca, double cb )

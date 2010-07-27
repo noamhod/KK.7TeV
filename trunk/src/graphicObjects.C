@@ -115,7 +115,7 @@ void graphicObjects::gfinalize()
 
 void graphicObjects::setStyle()
 {
-        gROOT->ProcessLine(".x rootlogon_atlas.C");
+        gROOT->ProcessLine(".x ../src/rootlogon_atlas.C");
         gROOT->SetStyle("ATLAS");
         gROOT->ForceStyle();
 }

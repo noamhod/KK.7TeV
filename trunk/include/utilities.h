@@ -21,6 +21,10 @@ class utilities
 		void   uinitialize();
 		void   ufinalize();
 
+		string checkANDsetFilepath(string envPath, string fileName);
+		string removeDoubleDot(string spath);
+		bool   checkPath(string envPath);
+
 		void   parseKeyValLine(string sLine);
 		int    getNVals();
                 string getKey();

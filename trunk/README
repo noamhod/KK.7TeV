@@ -32,6 +32,11 @@ make the chain and the corresponding class (physics.h, physics.C):
 to fit your architecture, change some hard coded paths in
 	src/analysisControl.C
 
+in the "run/" dir, create a soft link to the dataset dir, e.g.,
+	*** ONLY IF THE SOFT LINK DOES NOT EXIST ALREADY. OTHERWISE, SKIP THIS POINT ***
+	cd run/
+	ln -s  /data/hod/D3PDs/group10.phys-sm.data10_7TeV_physics_MuonswBeam_WZphys_D3PD  datasetdir
+
 recompile everything and run, with the new (physics) class
 	root
 	.L main.C

@@ -11,28 +11,35 @@
 analysisControl::analysisControl()
 {
 	initialize();
+	
+	string str = "";
 
-	makeChain(true, "/srv01/tau/hod/z0analysis/conf/dataset.list", "/data/hod/D3PDs/group10.phys-sm.data10_7TeV_physics_MuonswBeam_WZphys_D3PD/");
+	str = checkANDsetFilepath("PWD", "/../conf/dataset.list");
+	string strb = checkANDsetFilepath("PWD", "/datasetdir/"); // ln -s /data/hod/D3PDs/group10.phys-sm.data10_7TeV_physics_MuonswBeam_WZphys_D3PD datasetdir
+	makeChain(true, str, strb);
 
 	m_phys = new physics( m_chain );
 
-
-	m_treefile = new TFile("/srv01/tau/hod/z0analysis/data/analysisTrees.root", "RECREATE");
+	str = checkANDsetFilepath("PWD", "/../data/analysisTrees.root");
+	m_treefile = new TFile( str.c_str(), "RECREATE");
         m_treefile->cd();
 
-	m_histfile = new TFile("/srv01/tau/hod/z0analysis/data/analysisControl.root", "RECREATE");
+	str = checkANDsetFilepath("PWD", "/../data/analysisControl.root");
+	m_histfile = new TFile( str.c_str(), "RECREATE");
         m_histfile->cd();
 
 	m_graphics = new graphicObjects();
 	m_graphics->setStyle();
 
+	str = checkANDsetFilepath("PWD", "/../conf/Z_GRL_152844-159224.xml");
 	m_GRL = new GRLinterface();
-        m_GRL->glrinitialize("/srv01/tau/hod/z0analysis/conf/Z_GRL_152844-159224.xml");
+	m_GRL->glrinitialize( (TString)str );
 
         m_analysis = new analysis( m_phys, m_graphics, m_GRL, m_treefile );
 
 	// read the cut flow (ownership: selection class which analysis inherits from)
-	m_analysis->readCutFlow("/srv01/tau/hod/z0analysis/conf/cutFlow.cuts");
+	str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
+	m_analysis->readCutFlow( str );
 
 	book();
 }

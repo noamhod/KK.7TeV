@@ -3,10 +3,10 @@ Compile & run  (partially manual, full description)
 go to the analysis folder (THIS FOLDER)
 	cd /path/to/here/
 
-compile the GRL lib:
+get and compile the GRL lib:
 	check the latest tag in:
 		https://svnweb.cern.ch/cern/wsvn/atlasoff/DataQuality/GoodRunsLists/tags/
-	cheout the latest tag:
+	checkout the latest tag:
 		svn co svn+ssh://svn.cern.ch/reps/atlasoff/DataQuality/GoodRunsLists/tags/GoodRunsLists-XX-XX-XX
 	cd GoodRunsLists-XX-XX-XX/cmt
 	make -f Makefile.Standalone
@@ -30,13 +30,14 @@ make the chain and the corresponding class (physics.h, physics.C):
 	chain2list();
 
 to fit your architecture, change some hard coded paths in
-	src/analysisControl.C
+	run/analysisControl.C
 
 recompile everything and run, with the new (physics) class
+	cd run
 	root
 	.L main.C
-	compileAll("XX-XX-XX"); // the argument is the tag of the GoodRunList xml
-	loop(0,0); // loop(startEvent, events2process) ==> if events2process=0 then do all
+	compile("XX-XX-XX"); // the argument is the tag of the GoodRunList xml
+	run(0,0); // loop(startEvent, events2process) ==> if events2process=0 then do all
 
 svn co:
 	to co the trunk:

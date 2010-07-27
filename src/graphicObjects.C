@@ -86,6 +86,7 @@ void graphicObjects::ginitialize()
 
 void graphicObjects::gfinalize()
 {
+	/*
 	delete cnv_imass;
         delete cnv_pT;
         delete cnv_eta;
@@ -109,6 +110,7 @@ void graphicObjects::gfinalize()
 	
 	delete hmap_cutFlow_imass;
 	delete hmap_cutFlow_pT;
+	*/
 }
 
 void graphicObjects::setStyle()

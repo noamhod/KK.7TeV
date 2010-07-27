@@ -70,11 +70,13 @@ void analysisControl::finalize()
 	m_histfile->Close();
 
 	// pointers
+	/*
 	delete m_phys;
 	delete m_analysis;
 	delete m_graphics;
 	delete m_histfile;
 	delete m_treefile;
+	*/
 
 	cfinalize();
 	kfinalize();

@@ -58,7 +58,7 @@ class analysisControl : public chains, public analysis
 		Long64_t l64t_mod;
 		Long64_t l64t_startEvent;
 		Long64_t l64t_stopEvent;
-
+	
 	public:
 		analysisControl();
 		~analysisControl();

@@ -12,42 +12,34 @@ analysisControl::analysisControl()
 {
 	initialize();
 
-	//---------------------------------------------------------------/
-	/*---*/ string  slocalpath  = "/srv01/tau/hod/z0analysis/" /*---*/
-	/*---*/ TString tslocalpath = (TString)slocalpath;         /*---*/
-	/*---*/ string  sdatapath   = "/data/hod/D3PDs/"           /*---*/
-	//---------------------------------------------------------------/
-
-
-
-	makeChain(true, slocalpath+"conf/dataset.list", sdatapath+"group10.phys-sm.data10_7TeV_physics_MuonswBeam_WZphys_D3PD/");
+	makeChain(true, "/srv01/tau/hod/z0analysis-1.3.0/conf/dataset.list", "/data/hod/D3PDs/group10.phys-sm.data10_7TeV_physics_MuonswBeam_WZphys_D3PD/");
 
 	m_phys = new physics( m_chain );
 
 
-	m_treefile = new TFile( (slocalpath+"data/analysisTrees.root").c_str(), "RECREATE");
+	m_treefile = new TFile("/srv01/tau/hod/z0analysis-1.3.0/data/analysisTrees.root", "RECREATE");
         m_treefile->cd();
 
-	m_histfile = new TFile( (slocalpath+"data/analysisControl.root").c_str(), "RECREATE");
+	m_histfile = new TFile("/srv01/tau/hod/z0analysis-1.3.0/data/analysisControl.root", "RECREATE");
         m_histfile->cd();
 
 	m_graphics = new graphicObjects();
 	m_graphics->setStyle();
 
 	m_GRL = new GRLinterface();
-        m_GRL->glrinitialize(tslocalpath+"conf/Z_GRL_152844-159224.xml");
+        m_GRL->glrinitialize("/srv01/tau/hod/z0analysis-1.3.0/conf/Z_GRL_152844-159224.xml");
 
         m_analysis = new analysis( m_phys, m_graphics, m_GRL, m_treefile );
 
 	// read the cut flow (ownership: selection class which analysis inherits from)
-	m_analysis->readCutFlow(slocalpath+"conf/cutFlow.cuts");
+	m_analysis->readCutFlow("/srv01/tau/hod/z0analysis-1.3.0/conf/cutFlow.cuts");
 
 	book();
 }
 
-void analysisControl::setLocalPath(string spath)
+analysisControl::~analysisControl()
 {
-	m_spath = spath;	
+	finalize();
 }
 
 void analysisControl::initialize()
@@ -78,11 +70,13 @@ void analysisControl::finalize()
 	m_histfile->Close();
 
 	// pointers
+	/*
 	delete m_phys;
 	delete m_analysis;
 	delete m_graphics;
 	delete m_histfile;
 	delete m_treefile;
+	*/
 
 	cfinalize();
 	kfinalize();

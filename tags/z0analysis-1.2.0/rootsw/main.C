@@ -21,17 +21,16 @@ void compile(TString sGRLtag) // to use for compilation
 {
 	loadGRL(sGRLtag);
 	gROOT->ProcessLine(".L analysisControl.C++");
-	gROOT->ProcessLine("analysisControl ac");
 }
 
 void load(TString sGRLtag) // to use in case of already compiled
 {
         loadGRL(sGRLtag);
-        gROOT->ProcessLine("analysisControl ac");
 }
 
 void run(Long64_t startEvent=0, Long64_t stopEvent=0) // to use for running
 {
+	analysisControl ac;
 	ac.loop(startEvent, stopEvent);
 }
 

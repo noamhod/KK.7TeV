@@ -25,7 +25,7 @@ void chains::cinitialize()
 
 void chains::cfinalize()
 {
-	delete m_chain;
+//	delete m_chain;
 }
 
 void chains::list2chain(string sListFilePath, string sListContentAbsolutePath)

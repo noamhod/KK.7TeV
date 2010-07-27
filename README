@@ -35,8 +35,10 @@ to fit your architecture, change some hard coded paths in
 recompile everything and run, with the new (physics) class
 	root
 	.L main.C
-	compileAll("XX-XX-XX"); // the argument is the tag of the GoodRunList xml
-	loop(0,0); // loop(startEvent, events2process) ==> if events2process=0 then do all
+	to compile:   compile("XX-XX-XX");
+	or, to load:  load("XX-XX-XX");
+	where the "XX-XX-XX" argument is the tag of the GoodRunList xml
+	ac.loop(0,0); // loop(startEvent, events2process) ==> if events2process=0 then do all
 
 svn co:
 	to co the trunk:

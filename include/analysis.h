@@ -58,13 +58,19 @@ class analysis : public physics, public selection, public graphicObjects
                 vector<double>* vd_imass;
                 vector<double>* vd_costh;
                 vector<double>* vd_sum_pTid;
-                Bool_t b_l1mu6;
+		int    i_runnumber;
+                int    i_lumiblock;
+		Bool_t b_isgrl;
+		Bool_t b_l1mu6;
 
 		// event level variables
 		double d_imass;
 		double d_costh;
 		double d_sum_pTid;
 		Bool_t b_isL1MU6;
+		int    i_run;
+                int    i_lum;
+		Bool_t b_isGRL;
 
 		// other
 		int nAllEvents;

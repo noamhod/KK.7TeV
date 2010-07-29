@@ -30,7 +30,7 @@ void load(TString sGRLtag) // only for loading, if already compiled
 {
 	prepare(sGRLtag);
 
-	gROOT->ProcessLine(".L src/analysisControl_C.so");
+	gROOT->ProcessLine(".L analysisControl_C.so");
 
 	gROOT->ProcessLine("analysisControl ac");
 }

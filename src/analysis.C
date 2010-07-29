@@ -70,11 +70,22 @@ void analysis::setEventLevelBranches()
 	vd_imass = new vector<double>;
 	vd_costh = new vector<double>;
 	vd_sum_pTid = new vector<double>;
+	
+	i_runnumber = -1;
+	i_lumiblock = -1;
+
+	b_isgrl = false;
 	b_l1mu6 = false;
+	
 
         m_eventLevelTree->Branch( "imass", &vd_imass );
         m_eventLevelTree->Branch( "costh", &vd_costh );
         m_eventLevelTree->Branch( "sum_pTid", &vd_sum_pTid );
+        
+	m_eventLevelTree->Branch( "runnumber", &i_runnumber );
+        m_eventLevelTree->Branch( "lumiblock", &i_lumiblock );
+	
+        m_eventLevelTree->Branch( "GRL", &b_isgrl );
         m_eventLevelTree->Branch( "L1_MU6", &b_l1mu6 );
 }
 
@@ -91,7 +102,12 @@ void analysis::fillEventLevelVectors()
         vd_imass->push_back( d_imass );
         vd_costh->push_back( d_costh );
         vd_sum_pTid->push_back( d_sum_pTid );
-        b_l1mu6 = b_isL1MU6;
+	
+	i_runnumber = i_run;
+	i_lumiblock = i_lum;
+
+	b_l1mu6 = b_isGRL;
+	b_l1mu6 = b_isL1MU6;
 }
 
 void analysis::fillEventLevelTree()
@@ -217,6 +233,8 @@ void analysis::fillCutFlow(string sCurrentCutName, TMapsd& values2fill)
 
 void analysis::executeBasic(bool isendofrun)
 {
+	cout << "m_analysis_grl->m_grl.HasRunLumiBlock(RunNumber=" << m_phys->RunNumber << ",lbn=" << m_phys->lbn << ") = " << m_analysis_grl->m_grl.HasRunLumiBlock(m_phys->RunNumber,m_phys->lbn) << endl;
+
 	// local variables
 	TMapii      mupairMap;
 	TVectorP2VL pmu;
@@ -259,7 +277,7 @@ void analysis::executeBasic(bool isendofrun)
 			if( removeOverlaps(mupairMap, n, m) ) continue;
 
 			// now can insert dimuon into the index map (all the final selection criteria)
-			if( (m_analysis_grl->m_grl.HasRunLumiBlock(RunNumber,lbn)) ) // this is a cut and not overlap removal
+			if( (m_analysis_grl->m_grl.HasRunLumiBlock(m_phys->RunNumber,m_phys->lbn)) ) // this is a cut and not overlap removal
 			{
 				if(m_phys->L1_MU6) // this is also a cut and not overlap removal
 				{
@@ -293,7 +311,11 @@ void analysis::executeBasic(bool isendofrun)
 				d_costh = cosThetaCollinsSoper( pmu[n], (double)m_phys->mu_staco_charge->at(n),
 								pmu[m], (double)m_phys->mu_staco_charge->at(m) );
 				d_sum_pTid = 0.; // ??????????????????????????????????????????????????????????????????????????????????
-				b_isL1MU6 = m_phys->L1_MU6;
+				i_run      = m_phys->RunNumber;
+				i_lum      = m_phys->lbn;
+				b_isGRL    = m_analysis_grl->m_grl.HasRunLumiBlock(m_phys->RunNumber,m_phys->lbn);
+				b_isL1MU6  = m_phys->L1_MU6;
+				
 				//-------------------------------------/
 				/*---*/ fillEventLevelVectors(); /*---*/
 				//-------------------------------------/
@@ -318,7 +340,7 @@ void analysis::executeBasic(bool isendofrun)
 			pTb = pT( pmu[bi] );
 			etaa = eta( pmu[ai] );	
 			etab = eta( pmu[bi] );
-			costh = cosThetaCollinsSoper( pmu[ai], (double)m_phys->mu_staco_charge->at(ai),
+			costh = cosThetaCollinsSoper( 	pmu[ai], (double)m_phys->mu_staco_charge->at(ai),
 							pmu[bi], (double)m_phys->mu_staco_charge->at(bi) );
 			d0exPVa = m_phys->mu_staco_d0_exPV->at(ai);
 			z0exPVa = m_phys->mu_staco_z0_exPV->at(ai);
@@ -455,6 +477,10 @@ void analysis::executeCutFlow()
 			double z0exPVa = m_phys->mu_staco_z0_exPV->at(ai);
 			double d0exPVb = m_phys->mu_staco_d0_exPV->at(bi);
 			double z0exPVb = m_phys->mu_staco_z0_exPV->at(bi);
+
+			int runnumber  = m_phys->RunNumber;
+			int lumiblock  = m_phys->lbn;			
+
 			bool passCut  = true;
 
 			// fill the cut flow, stop at the relevant cut each time.
@@ -472,7 +498,7 @@ void analysis::executeCutFlow()
 
 				if(sorderedcutname=="GRL")
 				{
-					passCut = (m_analysis_grl->m_grl.HasRunLumiBlock(RunNumber,lbn)==(int)(*m_cutFlowMap)["GRL"]  &&  passCut) ? true : false;
+					passCut = (m_analysis_grl->m_grl.HasRunLumiBlock(runnumber,lumiblock)==(int)(*m_cutFlowMap)["GRL"]  &&  passCut) ? true : false;
 					if(passCut) fillCutFlow("GRL", values2fill); // stop at null cut
 				}
 

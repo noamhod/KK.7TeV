@@ -32,14 +32,16 @@ class MakeClassFromChain
 	public:
 		MakeClassFromChain();
 		~MakeClassFromChain();
+
+		string checkANDsetFilepath(string envPath, string fileName);
 	
-		void makeChain(bool doList = false, string sListFilePath = "dataset.list", string sListContentAbsolutePath = "/data/hod/D3PDs/");
+		void makeChain(bool doList = false, string sListFilePath = "dataset.list");
 		void chain2class(string sClassName = "physics");
 	
 		void GetEntries();	
 		void drawFromChain();	
 
-		void list2chain(string sListFilePath, string sListContentAbsolutePath = "/data/hod/D3PDs/");
+		void list2chain(string sListFilePath = "dataset.list");
 
 };
 #endif

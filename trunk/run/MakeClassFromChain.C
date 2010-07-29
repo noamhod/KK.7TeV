@@ -17,8 +17,57 @@ MakeClassFromChain::~MakeClassFromChain()
 	delete m_chain;
 }
 
-void MakeClassFromChain::list2chain(string sListFilePath, string sListContentAbsolutePath)
+string MakeClassFromChain::checkANDsetFilepath(string envPath, string fileName)
 {
+        char * tmpPath = getenv(envPath.c_str());
+        if (!tmpPath) {
+                cerr << "environment variable " << envPath  <<  " not defined" << endl;
+                cerr << "\tdid you forget to 'source configure_bash or configure_tcsh' ?" << endl;
+                exit(-1);
+        }
+
+        string fullPath = tmpPath;
+        fullPath += fileName;
+
+        //----------------- check if there are ".."-like parts in the fullPath
+        int i=0;
+        int pos=0;
+        bool isDoubledot = false;
+        while (i<(int)fullPath.size()-1) { // check if there's a ".." string in fullPath
+                if (fullPath.substr(i,2) == "..") {
+                        pos = i;
+                        isDoubledot = true;
+                        //cout << "warning: this is a known problem with file paths, fixing it now..." << endl;
+                }
+                i++;
+        }
+
+        if (isDoubledot) {
+                string oldPath = fullPath;
+                string fin = fullPath.substr(pos+2,(int)fullPath.size()-(pos+2)); // remember everything from after ".."
+                string newpath = fullPath.substr(0,pos-1); // remember everything before "/.."
+                int newpos = pos-2;
+                string isBackslash = newpath.substr(newpos,1);
+                while (isBackslash != "/") { // remove the dir name before "/.."
+                        newpos--;
+                        isBackslash = newpath.substr(newpos,1);
+                }
+                fullPath = newpath.substr(0,newpos) + fin;
+                //cout << "\t file path was: " << oldPath << endl;
+                //cout << "\t corrected to: " << fullPath << endl;
+                cout << "file path: " << fullPath << endl;
+        }
+
+        if (!isDoubledot) {cout << "file path: " << fullPath << endl;}
+
+        return(fullPath);
+}
+
+
+void MakeClassFromChain::list2chain(string sListFilePath)
+{
+	sListFilePath = checkANDsetFilepath("PWD", "../conf/"+sListFilePath);
+
 	ifstream file;
         file.open(sListFilePath.c_str());
 	string sLine;
@@ -45,9 +94,9 @@ void MakeClassFromChain::list2chain(string sListFilePath, string sListContentAbs
 			if(fileSize < min) { nignored++; continue; } // if file is too small
 		}
 	
-		// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-		sLine = sListContentAbsolutePath + sLine; // add the absolute path
-		// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+		// * * * * * * * * * * * * * * * * * * * * * * * * * * 
+		sLine = "datasetdir" + sLine; // add the absolute path
+		// * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 		m_chain->Add( sLine.c_str() );
 		nfound++;
@@ -56,9 +105,9 @@ void MakeClassFromChain::list2chain(string sListFilePath, string sListContentAbs
 	cout << "ignored " << nignored << " entries in " << sListFilePath << endl; 
 }
 
-void MakeClassFromChain::makeChain(bool doList, string sListFilePath, string sListContentAbsolutePath)
+void MakeClassFromChain::makeChain(bool doList, string sListFilePath)
 {
-	list2chain(sListFilePath, sListContentAbsolutePath);
+	list2chain(sListFilePath);
 	if(doList) m_chain->ls();
 }
 

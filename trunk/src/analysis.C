@@ -268,7 +268,7 @@ void analysis::executeBasic(bool isendofrun)
 		pmu[n]->SetPz( m_phys->mu_staco_pz->at(n) );
 		pmu[n]->SetE( m_phys->mu_staco_E->at(n) );
 	}
-	if(pmu.size()>0) cout << "\nbuild vector of TLorentzVector* (size=" << pmu.size() << ")" << endl;
+	//if(pmu.size()>0) cout << "\nbuild vector of TLorentzVector* (size=" << pmu.size() << ")" << endl;
 
 	// build the map of the good muon pairs	
 	//--------------------------------------/
@@ -333,7 +333,7 @@ void analysis::executeBasic(bool isendofrun)
 	//----------------------------------/
 	/*---*/ fillEventLevelTree(); /*---*/
 	//----------------------------------/
-	if(mupairMap.size()>0)    cout << "build mupair map (size="     << mupairMap.size()    << ") - passed all cuts" << endl;
+	//if(mupairMap.size()>0)    cout << "build mupair map (size="     << mupairMap.size()    << ") - passed all cuts" << endl;
 
 	// get the pmuon pairs from the dimuon good pairs map
 	if(mupairMap.size()>0)
@@ -440,7 +440,7 @@ void analysis::executeCutFlow()
                 pmu[n]->SetPz( m_phys->mu_staco_pz->at(n) );
                 pmu[n]->SetE( m_phys->mu_staco_E->at(n) );
         }
-        if(pmu.size()>0) cout << "\nbuild vector of TLorentzVector* (size=" << pmu.size() << ")" << endl;
+        //if(pmu.size()>0) cout << "\nbuild vector of TLorentzVector* (size=" << pmu.size() << ")" << endl;
 
 	// build the map of the good muon pairs 
         if(pmu.size()>1)
@@ -461,7 +461,7 @@ void analysis::executeCutFlow()
                                 
                         }
                 }
-                if(allmupairMap.size()>0) cout << "build all mupair map (size=" << allmupairMap.size() << ") - only opposite charge" << endl;
+    		//if(allmupairMap.size()>0) cout << "build all mupair map (size=" << allmupairMap.size() << ") - only opposite charge" << endl;
 	}
 
 	// get the pmuon pairs from the all pairs map

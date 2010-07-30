@@ -268,6 +268,7 @@ void graphicObjects::drawHistosMap(TMapsd* cutFlowMap, TMapds* cutFlowOrdered, T
 		colorAccumulate += colorOffset;
 		cout << "drawn " << sname << endl;
 	}
+	leg_cutFlow_imass->Draw("SAMES");
 	cnv_cutFlow_imass->Update();
 	cnv_cutFlow_imass->Write();
 
@@ -294,6 +295,7 @@ void graphicObjects::drawHistosMap(TMapsd* cutFlowMap, TMapds* cutFlowOrdered, T
 		colorAccumulate += colorOffset;
 		cout << "drawn " << sname << endl;
         }
+	leg_cutFlow_pT->Draw("SAMES");
 	cnv_cutFlow_pT->Update();
 	cnv_cutFlow_pT->Write();
 }

@@ -48,6 +48,12 @@ class graphicObjects : public utilities
 		// for the canvases
 		Int_t    canv_x;
 		Int_t    canv_y;
+	
+		// for the legends
+		Double_t leg_x1;
+		Double_t leg_x2;
+		Double_t leg_y1;
+		Double_t leg_y2;
 			
 		// for the histos
 		Int_t    imass_nbins;

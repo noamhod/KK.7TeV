@@ -22,6 +22,7 @@
 #include <TCanvas.h>
 #include <TFile.h>
 #include <TDirectory.h>
+#include <TLegend.h>
 
 #include <iostream>
 #include <stdlib.h>

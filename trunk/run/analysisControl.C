@@ -153,7 +153,7 @@ void analysisControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		l64t_nbytes += l64t_nb;
 		// if (Cut(l64t_ientry) < 0) continue;
 		
-		cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << endl;
+		if(l64t_jentry%100==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_phys->RunNumber << "\tlumiblock=" << m_phys->lbn << endl;
 		if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries);
 	
 		analyze();

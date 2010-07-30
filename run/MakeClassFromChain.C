@@ -95,7 +95,7 @@ void MakeClassFromChain::list2chain(string sListFilePath)
 		}
 	
 		// * * * * * * * * * * * * * * * * * * * * * * * * * * 
-		sLine = "datasetdir" + sLine; // add the absolute path
+		sLine = "datasetdir/" + sLine; // add the absolute path
 		// * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 		m_chain->Add( sLine.c_str() );

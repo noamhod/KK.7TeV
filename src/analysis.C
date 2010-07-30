@@ -43,16 +43,26 @@ analysis::analysis(physics* phys, graphicObjects* graphicobjs, GRLinterface* grl
 
 void analysis::enableGeneralBranches()
 {
-	/*
+	cout << "WARNING:   in analysis::enableGeneralBranches()" << endl;
+	cout << "           did you remember to enable the all the" << endl;
+	cout << "           branches that you are using ?" << endl;
+	/*----------------------------------------------------------------*/
+	/*--- this method disables all the branches of the chain.      ---*/
+	/*--- then, the relevant branches are enabled in 2 places:     ---*/
+	/*--- 1. in this method the event level branchea are enabled.  ---*/
+	/*--- 2. in the muon_staco and muon_muid classes, the relevant ---*/
+	/*---    branches are enabled for the relevant analysis        ---*/
+	/*----------------------------------------------------------------*/
+
 	m_phys->fChain->SetBranchStatus("*", 0); // disable all
 
-	m_phys->fChain->SetBranchStatus("L1_*", 1); // enable L1	
-	
+	// enable the event-level branches 
+	m_phys->fChain->SetBranchStatus("L1_*", 1); // enable L1
 	m_phys->fChain->SetBranchStatus("RunNumber", 1); // enable run nuber
 	m_phys->fChain->SetBranchStatus("lbn", 1); // enable lumi block number
 	m_phys->fChain->SetBranchStatus("EventNumber", 1); // enable event number
-	*/
-	m_phys->fChain->SetBranchStatus("*", 1); // enable all
+	
+	//m_phys->fChain->SetBranchStatus("*", 1); // enable all
 }
 
 //------------------------------------------------------------------
@@ -233,8 +243,6 @@ void analysis::fillCutFlow(string sCurrentCutName, TMapsd& values2fill)
 
 void analysis::executeBasic(bool isendofrun)
 {
-	cout << "m_analysis_grl->m_grl.HasRunLumiBlock(RunNumber=" << m_phys->RunNumber << ",lbn=" << m_phys->lbn << ") = " << m_analysis_grl->m_grl.HasRunLumiBlock(m_phys->RunNumber,m_phys->lbn) << endl;
-
 	// local variables
 	TMapii      mupairMap;
 	TVectorP2VL pmu;

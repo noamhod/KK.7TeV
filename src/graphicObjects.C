@@ -43,6 +43,10 @@ void graphicObjects::ginitialize()
 	cnv_cutFlow_imass  = NULL;
 	cnv_cutFlow_pT     = NULL;
 	
+	// cut flow legends
+	leg_cutFlow_imass  = NULL;
+	leg_cutFlow_pT     = NULL;
+	
 	// cut flow histos maps
 	hmap_cutFlow_imass = NULL;
 	hmap_cutFlow_pT = NULL;
@@ -107,6 +111,9 @@ void graphicObjects::gfinalize()
 
 	delete cnv_cutFlow_imass;
 	delete cnv_cutFlow_pT;
+
+	delete leg_cutFlow_imass;
+	delete leg_cutFlow_pT;
 	
 	delete hmap_cutFlow_imass;
 	delete hmap_cutFlow_pT;
@@ -235,6 +242,8 @@ void graphicObjects::drawHistosMap(TMapsd* cutFlowMap, TMapds* cutFlowOrdered, T
 	TMapds::iterator ii;
         string sname = "";
 
+	leg_cutFlow_imass = new TLegend(0.18, 0.25, 0.56, 0.65);
+        leg_cutFlow_pT    = new TLegend(0.18, 0.25, 0.56, 0.65);
 
 	cnv_cutFlow_imass = new TCanvas("imass.cutFlow","imass.cutFlow",canv_x,canv_y);
 	cnv_cutFlow_imass->SetLogy();
@@ -249,6 +258,7 @@ void graphicObjects::drawHistosMap(TMapsd* cutFlowMap, TMapds* cutFlowOrdered, T
 		string sname = it->first;
 		(*hmap_cutFlow_imass)[sname]->SetFillColor(colorAccumulate);
 		(*hmap_cutFlow_imass)[sname]->SetLineColor(colorAccumulate);
+		leg_cutFlow_imass->AddEntry( (*hmap_cutFlow_imass)[sname], str.c_str(), "f");
 		if(sname=="imass.null")
 		{
 			(*hmap_cutFlow_imass)[sname]->SetMinimum(5.e-1);
@@ -274,6 +284,7 @@ void graphicObjects::drawHistosMap(TMapsd* cutFlowMap, TMapds* cutFlowOrdered, T
                 string sname = it->first;
                 (*hmap_cutFlow_pT)[sname]->SetFillColor(colorAccumulate);
 		(*hmap_cutFlow_pT)[sname]->SetLineColor(colorAccumulate);
+		leg_cutFlow_pT->AddEntry( (*hmap_cutFlow_pT)[sname], str.c_str(), "f");
 		if(sname=="pT.null")
 		{
 			(*hmap_cutFlow_pT)[sname]->SetMinimum(5.e-1);

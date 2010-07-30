@@ -37,6 +37,10 @@ class graphicObjects : public utilities
 		TCanvas* cnv_cutFlow_imass;
 		TCanvas* cnv_cutFlow_pT;
 
+		// legends for the cut flow histod
+		TLegend* leg_cutFlow_imass;
+		TLegend* leg_cutFlow_pT;
+
 		// map of histos
 		TMapSP2TH1D* hmap_cutFlow_imass;
 		TMapSP2TH1D* hmap_cutFlow_pT;

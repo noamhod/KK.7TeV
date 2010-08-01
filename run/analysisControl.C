@@ -115,17 +115,10 @@ void analysisControl::analyze()
 {
 	bool isendofrun = (l64t_jentry==l64t_stopEvent-1) ? true : false;
 
-	m_analysis->executeBasic( isendofrun );
-	m_analysis->executeAdvanced( isendofrun );
+	m_analysis->executeTree( isendofrun );
+	m_analysis->executeBasic();
+	m_analysis->executeAdvanced();
 	m_analysis->executeCutFlow();
-}
-
-void analysisControl::makeTreeFriends()
-{
-	m_analysis->m_eventLevelTree->AddFriend( m_analysis->m_mustacotree->m_tree );
-	//m_analysis->m_eventLevelTree->AddFriend( m_analysis->m_mumuidtree->m_tree );
-        //m_analysis->m_eventLevelTree->AddFriend( m_analysis->m_eelctrontree->m_tree );
-        //....
 }
 
 void analysisControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
@@ -159,8 +152,6 @@ void analysisControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		analyze();
 	}
 	
-	makeTreeFriends();
-
 	draw();
 }
 

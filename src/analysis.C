@@ -22,8 +22,7 @@ analysis::analysis(physics* phys, graphicObjects* graphicobjs, GRLinterface* grl
 
 	m_treeFile = treeFile;
 
-	m_dirEventLevel = m_treeFile->mkdir("event_level");
-	setEventLevelTree( "event_level", m_dirEventLevel );
+	m_offlineTree = new offlineTree(m_phys, m_treeFile);
 
 	// need to switch off all the branches with:
 	enableGeneralBranches();
@@ -31,8 +30,8 @@ analysis::analysis(physics* phys, graphicObjects* graphicobjs, GRLinterface* grl
 	m_muid    = new muon_muid(  m_phys ); // this will also "turn on" the desired branches (virtual in the base)
 	m_mustaco = new muon_staco( m_phys ); // this will also  "turn on" the desired branches (virtual in the base)
 
-	m_dir_muon_staco = m_treeFile->mkdir("muon_staco");
-	m_mustacotree = new muon_staco_tree( m_mustaco, m_dir_muon_staco );
+	//m_dir_muon_staco = m_treeFile->mkdir("muon_staco");
+	//m_mustacotree = new muon_staco_tree( m_mustaco, m_dir_muon_staco );
 
 	m_cutFlowMap     = new TMapsd();
 	m_cutFlowOrdered = new TMapds();
@@ -64,73 +63,6 @@ void analysis::enableGeneralBranches()
 	
 	//m_phys->fChain->SetBranchStatus("*", 1); // enable all
 }
-
-//------------------------------------------------------------------
-void analysis::setEventLevelTree(string sname, TDirectory* dir)
-{
-        dir->cd();
-	m_eventLevelTree = new TTree(sname.c_str(), sname.c_str());
-
-	setEventLevelBranches();
-}
-
-void analysis::setEventLevelBranches()
-{
-	// allocate/reset the brances
-	vd_imass = new vector<double>;
-	vd_costh = new vector<double>;
-	vd_sum_pTid = new vector<double>;
-	
-	i_runnumber = -1;
-	i_lumiblock = -1;
-
-	b_isgrl = false;
-	b_l1mu6 = false;
-	
-
-        m_eventLevelTree->Branch( "imass", &vd_imass );
-        m_eventLevelTree->Branch( "costh", &vd_costh );
-        m_eventLevelTree->Branch( "sum_pTid", &vd_sum_pTid );
-        
-	m_eventLevelTree->Branch( "runnumber", &i_runnumber );
-        m_eventLevelTree->Branch( "lumiblock", &i_lumiblock );
-	
-        m_eventLevelTree->Branch( "GRL", &b_isgrl );
-        m_eventLevelTree->Branch( "L1_MU6", &b_l1mu6 );
-}
-
-void analysis::clearEventLevelVectors()
-{
-	if(vd_imass->size()>0) vd_imass->clear();
-	if(vd_costh->size()>0) vd_costh->clear();
-	if(vd_sum_pTid->size()>0) vd_sum_pTid->clear();
-	b_l1mu6 = false;
-}
-
-void analysis::fillEventLevelVectors()
-{
-        vd_imass->push_back( d_imass );
-        vd_costh->push_back( d_costh );
-        vd_sum_pTid->push_back( d_sum_pTid );
-	
-	i_runnumber = i_run;
-	i_lumiblock = i_lum;
-
-	b_l1mu6 = b_isGRL;
-	b_l1mu6 = b_isL1MU6;
-}
-
-void analysis::fillEventLevelTree()
-{
-	m_eventLevelTree->Fill();
-}
-
-void analysis::writeEventLevelTree()
-{
-	m_dirEventLevel->cd();
-	m_eventLevelTree->Write();
-}
-//-----------------------------------------
 
 void analysis::readCutFlow(string sCutFlowFilePath)
 {
@@ -241,7 +173,14 @@ void analysis::fillCutFlow(string sCurrentCutName, TMapsd& values2fill)
 	}
 }
 
-void analysis::executeBasic(bool isendofrun)
+void analysis::executeTree(bool isendofrun)
+{
+        b_isGRL = m_analysis_grl->m_grl.HasRunLumiBlock( m_phys->RunNumber, m_phys->lbn );
+        m_offlineTree->fill( b_isGRL );
+        if(isendofrun) m_offlineTree->write();
+}
+
+void analysis::executeBasic()
 {
 	// local variables
 	TMapii      mupairMap;
@@ -271,9 +210,6 @@ void analysis::executeBasic(bool isendofrun)
 	//if(pmu.size()>0) cout << "\nbuild vector of TLorentzVector* (size=" << pmu.size() << ")" << endl;
 
 	// build the map of the good muon pairs	
-	//--------------------------------------/
-	/*---*/ clearEventLevelVectors(); /*---*/
-	//--------------------------------------/
 	for(int n=0 ; n<(int)pmu.size() ; n++)
 	{
 		for(int m=0 ; m<(int)pmu.size() ; m++)
@@ -285,13 +221,14 @@ void analysis::executeBasic(bool isendofrun)
 			if( removeOverlaps(mupairMap, n, m) ) continue;
 
 			// now can insert dimuon into the index map (all the final selection criteria)
-			if( (m_analysis_grl->m_grl.HasRunLumiBlock(m_phys->RunNumber,m_phys->lbn)) ) // this is a cut and not overlap removal
+			b_isGRL = m_analysis_grl->m_grl.HasRunLumiBlock( m_phys->RunNumber, m_phys->lbn );
+			if( b_isGRL ) // this is a cut and not overlap removal
 			{
-				if(m_phys->L1_MU6) // this is also a cut and not overlap removal
+				if( m_phys->L1_MU6 ) // this is also a cut and not overlap removal
 				{
 					buildMuonPairMap( mupairMap,
-								pmu[n], m_phys->mu_staco_charge->at(n), m_phys->mu_staco_d0_exPV->at(n), m_phys->mu_staco_z0_exPV->at(n), n,
-								pmu[m], m_phys->mu_staco_charge->at(m), m_phys->mu_staco_d0_exPV->at(m), m_phys->mu_staco_z0_exPV->at(m), m );
+							  pmu[n], m_phys->mu_staco_charge->at(n), m_phys->mu_staco_d0_exPV->at(n), m_phys->mu_staco_z0_exPV->at(n), n,
+							  pmu[m], m_phys->mu_staco_charge->at(m), m_phys->mu_staco_d0_exPV->at(m), m_phys->mu_staco_z0_exPV->at(m), m );
 				}
 			}
 
@@ -311,29 +248,8 @@ void analysis::executeBasic(bool isendofrun)
 				m_graphicobjs->h1_z0exPV->Fill(z0exPVa);
 				m_graphicobjs->h1_z0exPV->Fill(z0exPVb);
 			}
-
-			// fill the event level tree before the cuts, but only for opposite charge
-			if(m_phys->mu_staco_charge->at(n) * m_phys->mu_staco_charge->at(m)<0.)
-			{
-				d_imass = imass( pmu[n], pmu[m] );
-				d_costh = cosThetaCollinsSoper( pmu[n], (double)m_phys->mu_staco_charge->at(n),
-								pmu[m], (double)m_phys->mu_staco_charge->at(m) );
-				d_sum_pTid = 0.; // ??????????????????????????????????????????????????????????????????????????????????
-				i_run      = m_phys->RunNumber;
-				i_lum      = m_phys->lbn;
-				b_isGRL    = m_analysis_grl->m_grl.HasRunLumiBlock(m_phys->RunNumber,m_phys->lbn);
-				b_isL1MU6  = m_phys->L1_MU6;
-				
-				//-------------------------------------/
-				/*---*/ fillEventLevelVectors(); /*---*/
-				//-------------------------------------/
-			}
 		}
 	}
-	//----------------------------------/
-	/*---*/ fillEventLevelTree(); /*---*/
-	//----------------------------------/
-	//if(mupairMap.size()>0)    cout << "build mupair map (size="     << mupairMap.size()    << ") - passed all cuts" << endl;
 
 	// get the pmuon pairs from the dimuon good pairs map
 	if(mupairMap.size()>0)
@@ -382,45 +298,26 @@ void analysis::executeBasic(bool isendofrun)
 	// re-initialize
 	if(mupairMap.size()>0)    mupairMap.clear();
 	if(pmu.size()>0)          pmu.clear();
-	//-------------------------------------------------/
-	/*---*/ if(isendofrun) writeEventLevelTree(); /*---*/
-	//-------------------------------------------------/
 }
 
-void analysis::executeAdvanced(bool isendofrun)
+void analysis::executeAdvanced()
 {
-	/*
+
 	// stupid example
 	if(m_muid->getNParticles()>0)
 	{
 		m_muid->setParticle(0);
 	}
-	*/
 
 	// stupid example
 	if(m_phys->mu_staco_n>0)
 	{
-		//-------------------------------------------/
-		/*---*/ m_mustacotree->clearVectors(); /*---*/
-		//-------------------------------------------/
 		for(int n=0 ; n<(int)m_mustaco->getNParticles() ; n++)
 		{
 			m_mustaco->setParticle(n);
 			m_graphicobjs->h2_xyVertex->Fill( m_mustaco->pvVec->X(), m_mustaco->pvVec->Y() );
-		
-			//------------------------------------------/	
-			/*---*/ m_mustacotree->fillVectors(); /*---*/ 
-			//------------------------------------------/
-
 		}
-		//--------------------------------------------------------------------/
-		/*---*/ m_mustacotree->nParticles = m_mustaco->getNParticles(); /*---*/
-		/*---*/ m_mustacotree->fillTree();                              /*---*/
-		//--------------------------------------------------------------------/
 	}
-	//-------------------------------------------------------/
-	/*---*/ if(isendofrun) m_mustacotree->writeTree(); /*---*/
-	//-------------------------------------------------------/
 }
 
 void analysis::executeCutFlow()
@@ -438,9 +335,8 @@ void analysis::executeCutFlow()
                 pmu[n]->SetPx( m_phys->mu_staco_px->at(n) );
                 pmu[n]->SetPy( m_phys->mu_staco_py->at(n) );
                 pmu[n]->SetPz( m_phys->mu_staco_pz->at(n) );
-                pmu[n]->SetE( m_phys->mu_staco_E->at(n) );
+                pmu[n]->SetE(  m_phys->mu_staco_E->at(n)  );
         }
-        //if(pmu.size()>0) cout << "\nbuild vector of TLorentzVector* (size=" << pmu.size() << ")" << endl;
 
 	// build the map of the good muon pairs 
         if(pmu.size()>1)
@@ -458,10 +354,8 @@ void analysis::executeCutFlow()
                                 buildMuonPairMap( allmupairMap,
                                                 (double)m_phys->mu_staco_charge->at(n), n,
                                                 (double)m_phys->mu_staco_charge->at(m), m );
-                                
                         }
                 }
-    		//if(allmupairMap.size()>0) cout << "build all mupair map (size=" << allmupairMap.size() << ") - only opposite charge" << endl;
 	}
 
 	// get the pmuon pairs from the all pairs map
@@ -487,7 +381,8 @@ void analysis::executeCutFlow()
 			double z0exPVb = m_phys->mu_staco_z0_exPV->at(bi);
 
 			int runnumber  = m_phys->RunNumber;
-			int lumiblock  = m_phys->lbn;			
+			int lumiblock  = m_phys->lbn;
+			int GRL        = m_analysis_grl->m_grl.HasRunLumiBlock( runnumber, lumiblock );
 
 			bool passCut  = true;
 
@@ -506,7 +401,7 @@ void analysis::executeCutFlow()
 
 				if(sorderedcutname=="GRL")
 				{
-					passCut = (m_analysis_grl->m_grl.HasRunLumiBlock(runnumber,lumiblock)==(int)(*m_cutFlowMap)["GRL"]  &&  passCut) ? true : false;
+					passCut = (GRL==(int)(*m_cutFlowMap)["GRL"]  &&  passCut) ? true : false;
 					if(passCut) fillCutFlow("GRL", values2fill); // stop at null cut
 				}
 

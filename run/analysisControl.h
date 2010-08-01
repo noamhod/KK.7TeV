@@ -5,20 +5,6 @@
 /* on 23/07/2010 11:24 */
 /* * * * * * * * * * * */
 
-/* * * * * * * * * * * */
-/* created by Naom Hod */
-/* noam.hod@cern.ch    */
-/* noam.com@gmail.com  */
-/* on 23/07/2010 11:23 */
-/* * * * * * * * * * * */
-
-/* * * * * * * * * * * */
-/* created by Naom Hod */
-/* noam.hod@cern.ch    */
-/* noam.com@gmail.com  */
-/* on 23/07/2010 11:22 */
-/* * * * * * * * * * * */
-
 #include "basicIncludes.h"
 
 #define chains_cxx
@@ -67,7 +53,6 @@ class analysisControl : public chains, public analysis
 		void   book();
 		void   draw();
 		void   analyze();
-		void   makeTreeFriends();
 		void   loop(Long64_t startEvent = 0, Long64_t stopAfterNevents = kMaxLong64);
 
 	private:

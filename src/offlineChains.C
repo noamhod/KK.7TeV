@@ -5,30 +5,30 @@
 /* on 23/07/2010 14:34 */
 /* * * * * * * * * * * */
 
-#ifdef chains_cxx
-#include "chains.h"
+#ifdef offlineChains_cxx
+#include "offlineChains.h"
 
-chains::chains()
+offlineChains::offlineChains()
 {
 	cinitialize();
 }
 
-chains::~chains()
+offlineChains::~offlineChains()
 {
 	cfinalize();
 }
 
-void chains::cinitialize()
+void offlineChains::cinitialize()
 {
-	m_chain = new TChain("physics");
+	m_chain = new TChain("offline");
 }
 
-void chains::cfinalize()
+void offlineChains::cfinalize()
 {
 //	delete m_chain;
 }
 
-void chains::list2chain(string sListFilePath, string sListContentAbsolutePath)
+void offlineChains::list2chain(string sListFilePath, string sListContentAbsolutePath)
 {
 	ifstream file;
         file.open(sListFilePath.c_str());
@@ -44,9 +44,6 @@ void chains::list2chain(string sListFilePath, string sListContentAbsolutePath)
 		pos = sLine.find(".root");
 		if (pos == string::npos) { nignored++; continue; } // if pattern ".root" is not found
 	
-		pos = sLine.find("D3PD._");
-		if (pos == string::npos) { nignored++; continue; } // if pattern "D3PD._" is not found
-
 		size_t fileSize = 0;
 		ifstream infile(sLine.c_str());
 		if(infile.is_open())
@@ -67,14 +64,14 @@ void chains::list2chain(string sListFilePath, string sListContentAbsolutePath)
 	cout << "ignored " << nignored << " entries in " << sListFilePath << endl; 
 }
 
-void chains::makeChain(bool doList, string sListFilePath, string sListContentAbsolutePath)
+void offlineChains::makeChain(bool doList, string sListFilePath, string sListContentAbsolutePath)
 {
 	list2chain(sListFilePath, sListContentAbsolutePath);
 	if(doList) m_chain->ls();
 }
 
 
-void chains::drawFromChain()
+void offlineChains::drawFromChain()
 {
 	//TCut cut0  = "mu_muid_charge->size()==2";
         TCut cut1  = "mu_muid_charge[0]+mu_muid_charge[1]==0";

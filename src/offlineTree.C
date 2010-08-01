@@ -54,6 +54,7 @@ void offlineTree::setBranches()
 	mustaco_qop   = new vector<float>;
 	mustaco_allauthor = new vector<unsigned short>;
 	mustaco_author    = new vector<int>;
+	m_tree->Branch( "mustaco_n", &mustaco_n );
 	m_tree->Branch( "mustaco_E", &mustaco_E );
 	m_tree->Branch( "mustaco_px", &mustaco_px );
 	m_tree->Branch( "mustaco_py", &mustaco_py );
@@ -69,7 +70,6 @@ void offlineTree::setBranches()
 	m_tree->Branch( "mustaco_qop", &mustaco_qop );
 	m_tree->Branch( "mustaco_allauthor", &mustaco_allauthor );
 	m_tree->Branch( "mustaco_author", &mustaco_author );
-
 }
 
 void offlineTree::fill(Bool_t isgrl)

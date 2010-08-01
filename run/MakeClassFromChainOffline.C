@@ -5,19 +5,19 @@
 /* on 23/07/2010 14:34 */
 /* * * * * * * * * * * */
 
-#include "MakeClassFromChain.h"
+#include "MakeClassFromChainOffline.h"
 
-MakeClassFromChain::MakeClassFromChain()
+MakeClassFromChainOffline::MakeClassFromChainOffline()
 {
-	m_chain = new TChain( "physics" );
+	m_chain = new TChain("offline");
 }
 
-MakeClassFromChain::~MakeClassFromChain()
+MakeClassFromChainOffline::~MakeClassFromChainOffline()
 {
 	delete m_chain;
 }
 
-string MakeClassFromChain::checkANDsetFilepath(string envPath, string fileName)
+string MakeClassFromChainOffline::checkANDsetFilepath(string envPath, string fileName)
 {
         char * tmpPath = getenv(envPath.c_str());
         if (!tmpPath) {
@@ -64,7 +64,7 @@ string MakeClassFromChain::checkANDsetFilepath(string envPath, string fileName)
 }
 
 
-void MakeClassFromChain::list2chain(string sListFilePath)
+void MakeClassFromChainOffline::list2chain(string sListFilePath)
 {
 	sListFilePath = checkANDsetFilepath("PWD", "../conf/"+sListFilePath);
 
@@ -82,9 +82,6 @@ void MakeClassFromChain::list2chain(string sListFilePath)
 		pos = sLine.find(".root");
 		if (pos == string::npos) { nignored++; continue; } // if pattern ".root" is not found
 		
-		pos = sLine.find("D3PD._");
-		if (pos == string::npos) { nignored++; continue; } // if pattern "D3PD._" is not found
-
 		size_t fileSize = 0;
 		ifstream infile(sLine.c_str());
 		if(infile.is_open())
@@ -95,7 +92,7 @@ void MakeClassFromChain::list2chain(string sListFilePath)
 		}
 	
 		// * * * * * * * * * * * * * * * * * * * * * * * * * * 
-		sLine = "datasetdir/" + sLine; // add the absolute path
+		sLine = "offline_datasetdir/" + sLine; // add the absolute path
 		// * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 		m_chain->Add( sLine.c_str() );
@@ -105,25 +102,25 @@ void MakeClassFromChain::list2chain(string sListFilePath)
 	cout << "ignored " << nignored << " entries in " << sListFilePath << endl; 
 }
 
-void MakeClassFromChain::makeChain(bool doList, string sListFilePath)
+void MakeClassFromChainOffline::makeChain(bool doList, string sListFilePath)
 {
 	list2chain(sListFilePath);
 	if(doList) m_chain->ls();
 }
 
-void MakeClassFromChain::GetEntries()
+void MakeClassFromChainOffline::GetEntries()
 {
 	long int nentries = (long int)m_chain->GetEntries();
         cout << "Entries in chain: N=" << nentries << endl;
 }
 
 
-void MakeClassFromChain::chain2class(string sClassName)
+void MakeClassFromChainOffline::chain2class(string sClassName)
 {
 	m_chain->MakeClass(sClassName.c_str());
 }
 
-void MakeClassFromChain::drawFromChain()
+void MakeClassFromChainOffline::drawFromChain()
 {
 	//TCut cut0  = "mu_muid_charge->size()==2";
         TCut cut1  = "mu_muid_charge[0]+mu_muid_charge[1]==0";

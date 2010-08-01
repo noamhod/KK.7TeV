@@ -57,11 +57,14 @@ typedef map<double, string>     TMapds;
 #pragma link C++ class vector<vector<int> >+;
 #endif
 
+#define offlinePhysics_cxx
+#include "offlinePhysics.C"
+
 #define particleBase_cxx
 #include "particleBase.C"
 
-#define outputTreeBase_cxx
-#include "outputTreeBase.C"
+//#define outputTreeBase_cxx
+//#include "outputTreeBase.C"
 
 enum pdtEnum { // *** note that this is not a complete list of pdt's particles ***
 	PDTDWN=1, PDTUP=2, PDTSTR=3, PDTCHM=4, PDTBOT=5, PDTTOP=6,

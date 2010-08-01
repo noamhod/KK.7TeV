@@ -51,9 +51,15 @@ void graphicObjects::ginitialize()
 	hmap_cutFlow_imass = NULL;
 	hmap_cutFlow_pT = NULL;
 
-	// other
+	// canvas size
 	canv_x = 600;
 	canv_y = 400;
+
+	// legend size
+	leg_x1 = 0.765;
+	leg_x2 = 0.919;
+	leg_y1 = 0.376;
+	leg_y2 = 0.922;
 
 	imass_nbins = 40;
 	imass_min   = 0.*d_toGeV;
@@ -242,8 +248,8 @@ void graphicObjects::drawHistosMap(TMapsd* cutFlowMap, TMapds* cutFlowOrdered, T
 	TMapds::iterator ii;
         string sname = "";
 
-	leg_cutFlow_imass = new TLegend(0.18, 0.25, 0.56, 0.65);
-        leg_cutFlow_pT    = new TLegend(0.18, 0.25, 0.56, 0.65);
+	leg_cutFlow_imass = new TLegend(leg_x1, leg_y1, leg_x2, leg_y2);
+        leg_cutFlow_pT    = new TLegend(leg_x1, leg_y1, leg_x2, leg_y2);
 
 	cnv_cutFlow_imass = new TCanvas("imass.cutFlow","imass.cutFlow",canv_x,canv_y);
 	cnv_cutFlow_imass->SetLogy();

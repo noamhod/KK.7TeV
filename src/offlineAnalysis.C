@@ -20,7 +20,7 @@ offlineAnalysis::offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphi
 
 	/*
 	m_muid    = new muon_muid(  m_offPhys ); // this will also "turn on" the desired branches (virtual in the base)
-	m_mustaco = new muon_staco( m_offPhys ); // this will also  "turn on" the desired branches (virtual in the base)
+	m_mu_staco = new muon_staco( m_offPhys ); // this will also  "turn on" the desired branches (virtual in the base)
 	*/
 
 	m_cutFlowMap     = new TMapsd();
@@ -158,14 +158,14 @@ void offlineAnalysis::executeBasic()
 	double cosmicCosth;
 
 	// build vector of the muons TLorentzVector
-	//for(int n=0 ; n<(int)m_offPhys->mustaco_n ; n++)
-	for(int n=0 ; n<(int)m_offPhys->mustaco_m->size() ; n++)
+	//for(int n=0 ; n<(int)m_offPhys->mu_staco_n ; n++)
+	for(int n=0 ; n<(int)m_offPhys->mu_staco_m->size() ; n++)
 	{
 		pmu.push_back( new TLorentzVector() );
-		pmu[n]->SetPx( m_offPhys->mustaco_px->at(n) );
-		pmu[n]->SetPy( m_offPhys->mustaco_py->at(n) );
-		pmu[n]->SetPz( m_offPhys->mustaco_pz->at(n) );
-		pmu[n]->SetE( m_offPhys->mustaco_E->at(n) );
+		pmu[n]->SetPx( m_offPhys->mu_staco_px->at(n) );
+		pmu[n]->SetPy( m_offPhys->mu_staco_py->at(n) );
+		pmu[n]->SetPz( m_offPhys->mu_staco_pz->at(n) );
+		pmu[n]->SetE( m_offPhys->mu_staco_E->at(n) );
 	}
 	//if(pmu.size()>0) cout << "\nbuild vector of TLorentzVector* (size=" << pmu.size() << ")" << endl;
 
@@ -181,29 +181,29 @@ void offlineAnalysis::executeBasic()
 			if( removeOverlaps(mupairMap, n, m) ) continue;
 
 			// now can insert dimuon into the index map (all the final selection criteria)
-			if( m_offPhys->GRL ) // this is a cut and not overlap removal
+			if( m_offPhys->isGRL ) // this is a cut and not overlap removal
 			{
 				if( m_offPhys->L1_MU6 ) // this is also a cut and not overlap removal
 				{
 					buildMuonPairMap( mupairMap,
-							  pmu[n], m_offPhys->mustaco_c->at(n), m_offPhys->mustaco_d0exPV->at(n), m_offPhys->mustaco_z0exPV->at(n), n,
-							  pmu[m], m_offPhys->mustaco_c->at(m), m_offPhys->mustaco_d0exPV->at(m), m_offPhys->mustaco_z0exPV->at(m), m );
+							  pmu[n], m_offPhys->mu_staco_charge->at(n), m_offPhys->mu_staco_d0_exPV->at(n), m_offPhys->mu_staco_z0_exPV->at(n), n,
+							  pmu[m], m_offPhys->mu_staco_charge->at(m), m_offPhys->mu_staco_d0_exPV->at(m), m_offPhys->mu_staco_z0_exPV->at(m), m );
 				}
 			}
 
 			// check before cuts
-			if(m_offPhys->mustaco_c->at(n) * m_offPhys->mustaco_c->at(m)<0.)
+			if(m_offPhys->mu_staco_charge->at(n) * m_offPhys->mu_staco_charge->at(m)<0.)
 			{
 				cosmicCosth = dimuonCosth( pmu[n], pmu[m] );
 				m_graphicobjs->h1_cosmicCosth->Fill( cosmicCosth );
 				
-				d0exPVa = m_offPhys->mustaco_d0exPV->at(n);
-				d0exPVb = m_offPhys->mustaco_d0exPV->at(m);
+				d0exPVa = m_offPhys->mu_staco_d0_exPV->at(n);
+				d0exPVb = m_offPhys->mu_staco_d0_exPV->at(m);
 				m_graphicobjs->h1_d0exPV->Fill(d0exPVa);
 				m_graphicobjs->h1_d0exPV->Fill(d0exPVb);
 
-				z0exPVa = m_offPhys->mustaco_z0exPV->at(n);
-				z0exPVb = m_offPhys->mustaco_z0exPV->at(m);
+				z0exPVa = m_offPhys->mu_staco_z0_exPV->at(n);
+				z0exPVb = m_offPhys->mu_staco_z0_exPV->at(m);
 				m_graphicobjs->h1_z0exPV->Fill(z0exPVa);
 				m_graphicobjs->h1_z0exPV->Fill(z0exPVb);
 			}
@@ -223,12 +223,12 @@ void offlineAnalysis::executeBasic()
 			pTb = pT( pmu[bi] );
 			etaa = eta( pmu[ai] );	
 			etab = eta( pmu[bi] );
-			costh = cosThetaCollinsSoper( 	pmu[ai], (double)m_offPhys->mustaco_c->at(ai),
-							pmu[bi], (double)m_offPhys->mustaco_c->at(bi) );
-			d0exPVa = m_offPhys->mustaco_d0exPV->at(ai);
-			z0exPVa = m_offPhys->mustaco_z0exPV->at(ai);
-			d0exPVb = m_offPhys->mustaco_d0exPV->at(bi);
-			z0exPVb = m_offPhys->mustaco_z0exPV->at(bi);
+			costh = cosThetaCollinsSoper( 	pmu[ai], (double)m_offPhys->mu_staco_charge->at(ai),
+							pmu[bi], (double)m_offPhys->mu_staco_charge->at(bi) );
+			d0exPVa = m_offPhys->mu_staco_d0_exPV->at(ai);
+			z0exPVa = m_offPhys->mu_staco_z0_exPV->at(ai);
+			d0exPVb = m_offPhys->mu_staco_d0_exPV->at(bi);
+			z0exPVb = m_offPhys->mu_staco_z0_exPV->at(bi);
 			//cosmicCosth = dimuonCosth( pmu[ai], pmu[bi] );
 
 			cout << "$$$$$$$$$ dimuon $$$$$$$$$" << endl;
@@ -238,7 +238,7 @@ void offlineAnalysis::executeBasic()
 			cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << endl;
 
 			// fill the histos
-			if( m_offPhys->mustaco_c->at(ai)<0. )
+			if( m_offPhys->mu_staco_charge->at(ai)<0. )
 			{
 				m_graphicobjs->h1_pT->Fill( pTa );
 				m_graphicobjs->h1_eta->Fill( etaa );
@@ -270,12 +270,12 @@ void offlineAnalysis::executeAdvanced()
 	}
 
 	// stupid example
-	if(m_offPhys->mustaco_n>0)
+	if(m_offPhys->mu_staco_n>0)
 	{
-		for(int n=0 ; n<(int)m_mustaco->getNParticles() ; n++)
+		for(int n=0 ; n<(int)m_mu_staco->getNParticles() ; n++)
 		{
-			m_mustaco->setParticle(n);
-			m_graphicobjs->h2_xyVertex->Fill( m_mustaco->pvVec->X(), m_mustaco->pvVec->Y() );
+			m_mu_staco->setParticle(n);
+			m_graphicobjs->h2_xyVertex->Fill( m_mu_staco->pvVec->X(), m_mu_staco->pvVec->Y() );
 		}
 	}
 }
@@ -290,14 +290,14 @@ void offlineAnalysis::executeCutFlow()
         TVectorP2VL pmu;
 
         // build vector of the muons TLorentzVector
-	//for(int n=0 ; n<(int)m_offPhys->mustaco_n ; n++)
-	for(int n=0 ; n<(int)m_offPhys->mustaco_m->size() ; n++) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//for(int n=0 ; n<(int)m_offPhys->mu_staco_n ; n++)
+	for(int n=0 ; n<(int)m_offPhys->mu_staco_m->size() ; n++) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         {
                 pmu.push_back( new TLorentzVector() );
-                pmu[n]->SetPx( m_offPhys->mustaco_px->at(n) );
-                pmu[n]->SetPy( m_offPhys->mustaco_py->at(n) );
-                pmu[n]->SetPz( m_offPhys->mustaco_pz->at(n) );
-                pmu[n]->SetE(  m_offPhys->mustaco_E->at(n)  );
+                pmu[n]->SetPx( m_offPhys->mu_staco_px->at(n) );
+                pmu[n]->SetPy( m_offPhys->mu_staco_py->at(n) );
+                pmu[n]->SetPz( m_offPhys->mu_staco_pz->at(n) );
+                pmu[n]->SetE(  m_offPhys->mu_staco_E->at(n)  );
         }
 
 	// build the map of the good muon pairs 
@@ -314,8 +314,8 @@ void offlineAnalysis::executeCutFlow()
                                 if( removeOverlaps(allmupairMap, n, m) ) continue;
                                 // now can insert all dimuons into the index map (only opposite charge requirement)
                                 buildMuonPairMap( allmupairMap,
-                                                (double)m_offPhys->mustaco_c->at(n), n,
-                                                (double)m_offPhys->mustaco_c->at(m), m );
+                                                (double)m_offPhys->mu_staco_charge->at(n), n,
+                                                (double)m_offPhys->mu_staco_charge->at(m), m );
                         }
                 }
 	}
@@ -334,17 +334,17 @@ void offlineAnalysis::executeCutFlow()
 			// calculate the necessary variables to be filled
 			TMapsd values2fill;
 			values2fill.insert( make_pair( "imass",imass(pmu[ai],pmu[bi]) ) );
-			values2fill.insert( make_pair( "pT",(m_offPhys->mustaco_c->at(ai)<0.)?pT(pmu[ai]):pT(pmu[bi]) ) );
+			values2fill.insert( make_pair( "pT",(m_offPhys->mu_staco_charge->at(ai)<0.)?pT(pmu[ai]):pT(pmu[bi]) ) );
 
 			// help
-			double d0exPVa = m_offPhys->mustaco_d0exPV->at(ai);
-			double z0exPVa = m_offPhys->mustaco_z0exPV->at(ai);
-			double d0exPVb = m_offPhys->mustaco_d0exPV->at(bi);
-			double z0exPVb = m_offPhys->mustaco_z0exPV->at(bi);
+			double d0exPVa = m_offPhys->mu_staco_d0_exPV->at(ai);
+			double z0exPVa = m_offPhys->mu_staco_z0_exPV->at(ai);
+			double d0exPVb = m_offPhys->mu_staco_d0_exPV->at(bi);
+			double z0exPVb = m_offPhys->mu_staco_z0_exPV->at(bi);
 
 			//int runnumber  = m_offPhys->runnumber;
 			//int lumiblock  = m_offPhys->lumiblock;
-			int GRL        = m_offPhys->GRL;
+			int isGRL        = m_offPhys->isGRL;
 
 			bool passCut  = true;
 
@@ -361,10 +361,10 @@ void offlineAnalysis::executeCutFlow()
 					if(passCut) fillCutFlow("null", values2fill); // stop at null cut
 				}
 
-				if(sorderedcutname=="GRL")
+				if(sorderedcutname=="isGRL")
 				{
-					passCut = (GRL==(int)(*m_cutFlowMap)["GRL"]  &&  passCut) ? true : false;
-					if(passCut) fillCutFlow("GRL", values2fill); // stop at null cut
+					passCut = (isGRL==(int)(*m_cutFlowMap)["isGRL"]  &&  passCut) ? true : false;
+					if(passCut) fillCutFlow("isGRL", values2fill); // stop at null cut
 				}
 
 				if(sorderedcutname=="L1_MU6")

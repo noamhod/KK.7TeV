@@ -2,8 +2,8 @@
 null			0.			0
 pT			15000.			2
 eta			2.4			3
-cosmicCut		-0.9			4
-d0			150.			5
+#cosmicCut		-0.9			4
+#d0			150.			5
 imass			20000.			1
 z0			150.			6
 L1_MU6			1.			7

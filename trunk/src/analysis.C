@@ -207,7 +207,6 @@ void analysis::executeBasic()
 		pmu[n]->SetPz( m_phys->mu_staco_pz->at(n) );
 		pmu[n]->SetE( m_phys->mu_staco_E->at(n) );
 	}
-	//if(pmu.size()>0) cout << "\nbuild vector of TLorentzVector* (size=" << pmu.size() << ")" << endl;
 
 	// build the map of the good muon pairs	
 	for(int n=0 ; n<(int)pmu.size() ; n++)
@@ -222,9 +221,9 @@ void analysis::executeBasic()
 
 			// now can insert dimuon into the index map (all the final selection criteria)
 			b_isGRL = m_analysis_grl->m_grl.HasRunLumiBlock( m_phys->RunNumber, m_phys->lbn );
-			if( b_isGRL ) // this is a cut and not overlap removal
+			if( b_isGRL == 1 ) // this is a cut and not overlap removal
 			{
-				if( m_phys->L1_MU6 ) // this is also a cut and not overlap removal
+				if( m_phys->L1_MU6 == 1 ) // this is also a cut and not overlap removal
 				{
 					buildMuonPairMap( mupairMap,
 							  pmu[n], m_phys->mu_staco_charge->at(n), m_phys->mu_staco_d0_exPV->at(n), m_phys->mu_staco_z0_exPV->at(n), n,

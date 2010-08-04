@@ -5,6 +5,8 @@
 /* on 26/07/2010 12:36 */
 /* * * * * * * * * * * */
 
+#include <TROOT.h>
+
 void prepare() // do not use alone
 {
 	gROOT->ProcessLine(".include ../include/");

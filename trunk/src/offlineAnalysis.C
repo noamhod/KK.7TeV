@@ -361,10 +361,10 @@ void offlineAnalysis::executeCutFlow()
 					if(passCut) fillCutFlow("null", values2fill); // stop at null cut
 				}
 
-				if(sorderedcutname=="isGRL")
+				if(sorderedcutname=="GRL")
 				{
-					passCut = (isGRL==(int)(*m_cutFlowMap)["isGRL"]  &&  passCut) ? true : false;
-					if(passCut) fillCutFlow("isGRL", values2fill); // stop at null cut
+					passCut = (isGRL==(int)(*m_cutFlowMap)["GRL"]  &&  passCut) ? true : false;
+					if(passCut) fillCutFlow("GRL", values2fill); // stop at null cut
 				}
 
 				if(sorderedcutname=="L1_MU6")

@@ -133,7 +133,7 @@ void offlineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		l64t_nbytes += l64t_nb;
 		// if (Cut(l64t_ientry) < 0) continue;
 		
-		if(l64t_jentry%100==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_offPhys->RunNumber << "\tlumiblock=" << m_offPhys->lbn << endl;
+		if(l64t_jentry%1000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_offPhys->RunNumber << "\tlumiblock=" << m_offPhys->lbn << endl;
 		if(l64t_jentry%l64t_mod==0) m_offlineAnalysis->printCutFlowNumbers(l64t_nentries);
 	
 		analyze();

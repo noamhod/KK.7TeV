@@ -53,13 +53,13 @@ void analysis::enableGeneralBranches()
 	/*---    branches are enabled for the relevant analysis        ---*/
 	/*----------------------------------------------------------------*/
 
-	m_phys->fChain->SetBranchStatus("*", 0); // disable all
+	//m_phys->fChain->SetBranchStatus("*", 0); // disable all
 
 	// enable the event-level branches 
-	m_phys->fChain->SetBranchStatus("L1_*", 1); // enable L1
-	m_phys->fChain->SetBranchStatus("RunNumber", 1); // enable run nuber
-	m_phys->fChain->SetBranchStatus("lbn", 1); // enable lumi block number
-	m_phys->fChain->SetBranchStatus("EventNumber", 1); // enable event number
+	//m_phys->fChain->SetBranchStatus("L1_*", 1); // enable L1
+	//m_phys->fChain->SetBranchStatus("RunNumber", 1); // enable run nuber
+	//m_phys->fChain->SetBranchStatus("lbn", 1); // enable lumi block number
+	//m_phys->fChain->SetBranchStatus("EventNumber", 1); // enable event number
 	
 	//m_phys->fChain->SetBranchStatus("*", 1); // enable all
 }
@@ -177,7 +177,7 @@ void analysis::executeTree(bool isendofrun)
 {
         b_isGRL = m_analysis_grl->m_grl.HasRunLumiBlock( m_phys->RunNumber, m_phys->lbn );
         m_offlineTree->fill( b_isGRL );
-        if(isendofrun) m_offlineTree->write();
+        //if(isendofrun) m_offlineTree->write();
 }
 
 void analysis::executeBasic()

@@ -37,7 +37,6 @@ string MakeClassFromChainOffline::checkANDsetFilepath(string envPath, string fil
                 if (fullPath.substr(i,2) == "..") {
                         pos = i;
                         isDoubledot = true;
-                        //cout << "warning: this is a known problem with file paths, fixing it now..." << endl;
                 }
                 i++;
         }
@@ -53,8 +52,6 @@ string MakeClassFromChainOffline::checkANDsetFilepath(string envPath, string fil
                         isBackslash = newpath.substr(newpos,1);
                 }
                 fullPath = newpath.substr(0,newpos) + fin;
-                //cout << "\t file path was: " << oldPath << endl;
-                //cout << "\t corrected to: " << fullPath << endl;
                 cout << "file path: " << fullPath << endl;
         }
 
@@ -80,7 +77,12 @@ void MakeClassFromChainOffline::list2chain(string sListFilePath)
 		getline(file,sLine);
 		
 		pos = sLine.find(".root");
-		if (pos == string::npos) { nignored++; continue; } // if pattern ".root" is not found
+		if (pos == string::npos)
+		{
+			nignored++;
+			cout << "ignoring entry: " << sLine << endl;
+			continue;
+		} // if pattern ".root" is not found
 		
 		size_t fileSize = 0;
 		ifstream infile(sLine.c_str());
@@ -88,18 +90,23 @@ void MakeClassFromChainOffline::list2chain(string sListFilePath)
 		{
 			infile.seekg(0, ios::end ); // move to end of file
 			fileSize = infile.tellg();
-			if(fileSize < min) { nignored++; continue; } // if file is too small
+			if(fileSize < min)
+			{
+				nignored++;
+				cout << "ignoring entry: " << sLine << endl;
+				continue;
+			} // if file is too small
 		}
 	
-		// * * * * * * * * * * * * * * * * * * * * * * * * * * 
+		// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 		sLine = "offline_datasetdir/" + sLine; // add the absolute path
-		// * * * * * * * * * * * * * * * * * * * * * * * * * *
+		// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 		m_chain->Add( sLine.c_str() );
 		nfound++;
 	}
 	cout << "found "   << nfound   << " entries in " << sListFilePath << endl;
-	cout << "ignored " << nignored << " entries in " << sListFilePath << endl; 
+	cout << "ignored " << nignored << " entries in " << sListFilePath << endl;
 }
 
 void MakeClassFromChainOffline::makeChain(bool doList, string sListFilePath)

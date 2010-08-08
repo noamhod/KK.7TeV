@@ -15,10 +15,8 @@ double exponential(double *x, double *par)
 	double xlow = XMIN;
 	double xmax = XMAX;
 	double N = (TMath::Exp(par[0] + par[1]*xmax) - TMath::Exp(par[0] + par[1]*xlow))/par[1];
-	if(N == 0) 
-	return 0;
-	else
-	return (1/N)*TMath::Exp(par[0] + par[1]*x[0]);
+	if(N == 0) return 0;
+	else       return (1/N)*TMath::Exp(par[0] + par[1]*x[0]);
 }
 
 ///////////////////////
@@ -376,10 +374,10 @@ void fit::minimize(bool signal_only, TCanvas* canv, TH1D* h, double* yields)
 	
 	///// INITIALIZATION:  SIGNAL + BACKGROUND
 	// Exponential
-	parSignalBackground[0] = 100000.;   // Scale Background (Nb)
-	parSignalBackground[1] = 50000.;   // Scale Signal (Ns)
-	parSignalBackground[2] = 0.5;       // Exp: constant argument
-	parSignalBackground[3] = -0.00001; // Exp: the multiplier of the x argument
+	parSignalBackground[0] = 50000.;   // Scale Background (Nb)
+	parSignalBackground[1] = 30000.;   // Scale Signal (Ns)
+	parSignalBackground[2] = 0.8;       // Exp: constant argument
+	parSignalBackground[3] = -0.0001; // Exp: the multiplier of the x argument
 	// Breit-Wigner x Gaussian convolution
 	parSignalBackground[4] = 2500.;    // Breit Wigner Width (gamma)
 	parSignalBackground[5] = 90000.;   // Most probable location (peak mean) 
@@ -387,9 +385,9 @@ void fit::minimize(bool signal_only, TCanvas* canv, TH1D* h, double* yields)
 	parSignalBackground[7] = 3000.;    // Gaussian sigma 2 
 	parSignalBackground[8] = 3000.;    // Gaussian sigma 3
 	
-	minValSignalBackground[0] = 30000.;   // Scale Background (Nb)
-	minValSignalBackground[1] = 30000.;   // Scale Signal (Ns)
-	minValSignalBackground[2] = 0.;      // Exp: constant argument
+	minValSignalBackground[0] = 10000.;   // Scale Background (Nb)
+	minValSignalBackground[1] = 10000.;   // Scale Signal (Ns)
+	minValSignalBackground[2] = 0.1;      // Exp: constant argument
 	minValSignalBackground[3] = -1.;     // Exp: the multiplier of the x argument
 	minValSignalBackground[4] = 1000.;   // Breit Wigner Width (gamma)
 	minValSignalBackground[5] = XMIN;  // Most probable location (peak mean) 
@@ -397,10 +395,10 @@ void fit::minimize(bool signal_only, TCanvas* canv, TH1D* h, double* yields)
 	minValSignalBackground[7] = 1000.;    // Gaussian sigma 2
 	minValSignalBackground[8] = 1000.;    // Gaussian sigma 3
 	
-	maxValSignalBackground[0] = 130000;  // Scale Background (Nb)
-	maxValSignalBackground[1] = 130000;  // Scale Signal (Ns)
+	maxValSignalBackground[0] = 80000;  // Scale Background (Nb)
+	maxValSignalBackground[1] = 80000;  // Scale Signal (Ns)
 	maxValSignalBackground[2] = 1.;    // Exp: constant argument
-	maxValSignalBackground[3] = -0.0000001;  // Exp: the multiplier of the x argument
+	maxValSignalBackground[3] = -0.00001;  // Exp: the multiplier of the x argument
 	maxValSignalBackground[4] = 5000.;  // Breit Wigner Width (gamma)
 	maxValSignalBackground[5] = XMAX; // Most probable location (peak mean) 
 	maxValSignalBackground[6] = 4000.;    // Gaussian sigma 1
@@ -410,7 +408,7 @@ void fit::minimize(bool signal_only, TCanvas* canv, TH1D* h, double* yields)
 	stepSizeSignalBackground[0] = 1.;    // Scale Background (Nb)
 	stepSizeSignalBackground[1] = 1.;    // Scale Signal (Ns)
 	stepSizeSignalBackground[2] = 0.001; // Exp: constant argument
-	stepSizeSignalBackground[3] = 0.0000001; // Exp: the multiplier of the x argument
+	stepSizeSignalBackground[3] = 0.000001; // Exp: the multiplier of the x argument
 	stepSizeSignalBackground[4] = 0.1;  // Breit Wigner Width (gamma)
 	stepSizeSignalBackground[5] = 0.1;  // Most probable location (peak mean) 
 	stepSizeSignalBackground[6] = 0.1;  // Gaussian sigma 1
@@ -581,10 +579,10 @@ void fit::minimize(bool signal_only, TCanvas* canv, TH1D* h, double* yields)
 	double p[9];
 	///// INITIALIZATION:  SIGNAL + BACKGROUND
 	// Exponential
-	p[0] = 100000.;   // Scale Background (Nb)
-	p[1] = 50000.;   // Scale Signal (Ns)
-	p[2] = 0.5;       // Exp: constant argument
-	p[3] = -0.000000001; // Exp: the multiplier of the x argument
+	p[0] = 50000.;   // Scale Background (Nb)
+	p[1] = 30000.;   // Scale Signal (Ns)
+	p[2] = 0.8;       // Exp: constant argument
+	p[3] = -0.0001; // Exp: the multiplier of the x argument
 	// Breit-Wigner x Gaussian convolution
 	p[4] = 2500.;    // Breit Wigner Width (gamma)
 	p[5] = 90000.;   // Most probable location (peak mean) 

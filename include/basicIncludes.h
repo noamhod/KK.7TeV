@@ -23,6 +23,11 @@
 #include <TFile.h>
 #include <TDirectory.h>
 #include <TLegend.h>
+#include <TMinuit.h>
+#include <TApplication.h>
+#include <TF1.h>
+#include <TAxis.h>
+#include <TLine.h>
 
 #include <iostream>
 #include <stdlib.h>

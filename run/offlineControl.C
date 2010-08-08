@@ -22,12 +22,12 @@ offlineControl::offlineControl()
 
 	str = checkANDsetFilepath("PWD", "/../data/offlineControl.root");
 	m_histfile = new TFile( str.c_str(), "RECREATE");
-        m_histfile->cd();
+	m_histfile->cd();
 
 	m_graphics = new graphicObjects();
 	m_graphics->setStyle();
 
-        m_offlineAnalysis = new offlineAnalysis( m_offPhys, m_graphics );
+	m_offlineAnalysis = new offlineAnalysis( m_offPhys, m_graphics );
 
 	// read the cut flow (ownership: selection class which offlineAnalysis inherits from)
 	str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
@@ -45,12 +45,12 @@ void offlineControl::initialize()
 {
 	// run control
 	l64t_nentries = 0;
-        l64t_nbytes   = 0;
-        l64t_nb       = 0;
-        l64t_jentry   = 0;
-        l64t_ientry   = 0;
+	l64t_nbytes   = 0;
+	l64t_nb       = 0;
+	l64t_jentry   = 0;
+	l64t_ientry   = 0;
 
-        // pointers
+	// pointers
 	m_offPhys     = NULL;
 	m_offlineAnalysis = NULL;
 	m_graphics = NULL;
@@ -78,7 +78,7 @@ void offlineControl::finalize()
 
 	cfinalize();
 	kfinalize();
-        ufinalize();
+	ufinalize();
 }
 
 void offlineControl::book()
@@ -88,18 +88,22 @@ void offlineControl::book()
 
 	m_dirAllCuts = m_histfile->mkdir("allCuts");
 	m_graphics->bookHistos(m_dirAllCuts);
+	
+	m_dirFit = m_histfile->mkdir("fit");
+	m_graphics->bookFitHistos(m_dirFit);
 
 	m_dirCutFlow = m_histfile->mkdir("cutFlow");
-        m_graphics->bookHistosMap( m_offlineAnalysis->getCutFlowMapPtr(), m_offlineAnalysis->getCutFlowOrderedPtr(), m_dirCutFlow );	
+	m_graphics->bookHistosMap( m_offlineAnalysis->getCutFlowMapPtr(), m_offlineAnalysis->getCutFlowOrderedPtr(), m_dirCutFlow );	
 }
 
 void offlineControl::draw()
 {
 	m_graphics->drawBareHistos(m_dirNoCuts);
 	m_graphics->drawHistos(m_dirAllCuts);
-        m_graphics->drawHistosMap( m_offlineAnalysis->getCutFlowMapPtr(), m_offlineAnalysis->getCutFlowOrderedPtr(), m_dirCutFlow );
+	m_graphics->drawHistosMap( m_offlineAnalysis->getCutFlowMapPtr(), m_offlineAnalysis->getCutFlowOrderedPtr(), m_dirCutFlow );
+	m_graphics->drawFitHistos(m_dirFit, m_offlineAnalysis->m_fGuess, m_offlineAnalysis->m_fFitted);
 
-        m_offlineAnalysis->printCutFlowNumbers(l64t_nentries);
+	m_offlineAnalysis->printCutFlowNumbers(l64t_nentries);
 }
 
 void offlineControl::analyze()
@@ -135,9 +139,11 @@ void offlineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		
 		if(l64t_jentry%1000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_offPhys->RunNumber << "\tlumiblock=" << m_offPhys->lbn << endl;
 		if(l64t_jentry%l64t_mod==0) m_offlineAnalysis->printCutFlowNumbers(l64t_nentries);
-	
+		
 		analyze();
 	}
+	
+	m_offlineAnalysis->fitter();
 	
 	draw();
 }

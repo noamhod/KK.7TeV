@@ -22,6 +22,7 @@ class graphicObjects : public utilities
 		TCanvas* cnv_z0exPV;
 		TCanvas* cnv_cosmicCosth;
 		TCanvas* cnv_xyVertex;
+		TCanvas* cnv_imassAllCuts;
 
 		// histos
 		TH1D*    h1_imass;
@@ -32,6 +33,7 @@ class graphicObjects : public utilities
 		TH1D*    h1_z0exPV;
 		TH1D*    h1_cosmicCosth;
 		TH2D*    h2_xyVertex;
+		TH1D*    h1_imassFinal;
 
 		// canvases for cut flows
 		TCanvas* cnv_cutFlow_imass;
@@ -103,6 +105,8 @@ class graphicObjects : public utilities
 		void bookHistos(TDirectory* tdir);
 		void drawHistos(TDirectory* tdir);
 
+		void bookFitHistos(TDirectory* tdir);
+		void drawFitHistos(TDirectory* tdir, TF1* fGuess, TF1* fFitted);
 
 		void bookHistosMap(TMapsd* cutFlowMap, TMapds* cutFlowOrdered, TDirectory* tdir);
 		void drawHistosMap(TMapsd* cutFlowMap, TMapds* cutFlowOrdered, TDirectory* tdir);

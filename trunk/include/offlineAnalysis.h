@@ -13,6 +13,9 @@
 #define graphicObjects_cxx
 #include "graphicObjects.C"
 
+#define fit_cxx
+#include "fit.C"
+
 /*
 #define muon_staco_cxx
 #include "muon_staco.C"
@@ -30,6 +33,9 @@ class offlineAnalysis : public offlinePhysics, public selection, public graphicO
 		// pointers to classes
 		graphicObjects* m_graphicobjs;
 
+		fit*           m_fit;
+		TF1* m_fFitted;
+		TF1* m_fGuess;
 		/*
 		muon_muid*      m_muid;
 		muon_staco*     m_mustaco;
@@ -52,6 +58,8 @@ class offlineAnalysis : public offlinePhysics, public selection, public graphicO
 
 		void initialize();
 		void finalize();
+
+		void fitter();
 
 		void printCutFlowNumbers(Long64_t chainEntries);
 		void fillCutFlow(string sCurrentCutName, TMapsd& values2fill);

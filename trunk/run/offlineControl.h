@@ -42,6 +42,10 @@ class offlineControl : public offlineChains, public offlineAnalysis
 		TDirectory*     m_dirAllCuts;
 		TDirectory* 	m_dirNoCuts;
 		TDirectory* 	m_dirCutFlow;
+		TDirectory* 	m_dirFit;
+		
+		TF1* m_fGuess;
+		TF1* m_fFitted;
 		
 		offlineAnalysis* m_offlineAnalysis;
 		graphicObjects*  m_graphics;

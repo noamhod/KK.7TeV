@@ -9,7 +9,7 @@
 
 offlineAnalysis::offlineAnalysis()
 {
-        initialize();
+	initialize();
 }
 
 offlineAnalysis::offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphicobjs)
@@ -28,21 +28,23 @@ offlineAnalysis::offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphi
 	m_cutFlowNumbers = new TMapsi();
 
 	m_graphicobjs = graphicobjs;
+
+	m_fit = new fit();
 }
 
 void offlineAnalysis::readCutFlow(string sCutFlowFilePath)
 {
-        fstream file;
-        file.open( sCutFlowFilePath.c_str() );
+	fstream file;
+	file.open( sCutFlowFilePath.c_str() );
 
-        string sLine = "";
-        string skey  = "";
-        double dval  = 0.;
+	string sLine = "";
+	string skey  = "";
+	double dval  = 0.;
 	double dnum  = 0.;
 
 	vector<string> orderedVec;
 
-        int nLinesRead = 0;
+	int nLinesRead = 0;
 
 	if (!file)
 	{
@@ -50,37 +52,37 @@ void offlineAnalysis::readCutFlow(string sCutFlowFilePath)
 		exit(1);   // call system to stop
 	}
 
-        while(!file.eof())
-        {
-                getline(file,sLine);
+	while(!file.eof())
+	{
+		getline(file,sLine);
 
-                if(sLine == "") continue;
+		if(sLine == "") continue;
 		if(sLine.substr(0,1) == "#")    continue;
 
-                // parse the line (ownership utilitis):
-                parseKeyValLine(sLine);
+		// parse the line (ownership utilitis):
+		parseKeyValLine(sLine);
 
-                // get the key = cut name (ownership utilitis):
-                skey = getKey();
+		// get the key = cut name (ownership utilitis):
+		skey = getKey();
 
-                // get the 1st val = cut value:
-                dval = getVal(0);
+		// get the 1st val = cut value:
+		dval = getVal(0);
 
 		// get the 2nd val = cut number:
 		dnum = getVal(1);
- 
- 		//for(int i=0 ; i<(int)getNVals() ; i++) { dval = getVal(i); }
 
-                nLinesRead++;
+		//for(int i=0 ; i<(int)getNVals() ; i++) { dval = getVal(i); }
 
-                if(b_print) { cout << "key=" << skey << "\tval=" << dval << "\tdnum=" << dnum << endl; }
+		nLinesRead++;
 
-                // pair the map
-                m_cutFlowMap->insert( make_pair(skey,dval) );
+		if(b_print) { cout << "key=" << skey << "\tval=" << dval << "\tdnum=" << dnum << endl; }
+
+		// pair the map
+		m_cutFlowMap->insert( make_pair(skey,dval) );
 		m_cutFlowOrdered->insert( make_pair(dnum,skey) );
 		m_cutFlowNumbers->insert( make_pair(skey,0) );
-        }
-        cout << "\nread " << nLinesRead << " lines from " << sCutFlowFilePath << endl;
+	}
+	cout << "\nread " << nLinesRead << " lines from " << sCutFlowFilePath << endl;
 
 	// ownership: selection class:
 	initSelectionCuts(m_cutFlowMap, m_cutFlowOrdered);
@@ -113,18 +115,33 @@ void offlineAnalysis::finalize()
 
 }
 
+void offlineAnalysis::fitter()
+{
+	// clone the last wanted histogram to preform the fit on:
+	m_graphicobjs->h1_imassFinal = (TH1D*)m_graphicobjs->hmap_cutFlow_imass->operator[]("imass.cosmicCut")->Clone("imassFinal");
+	double yields[2];
+	
+	m_fit->minimize( false, 
+					m_graphicobjs->cnv_imassAllCuts,
+					m_graphicobjs->h1_imassFinal,
+					yields );
+	
+	m_fGuess  = (TF1*)m_fit->m_fGuess->Clone();
+	m_fFitted = (TF1*)m_fit->m_fFitted->Clone();
+}
+
 void offlineAnalysis::printCutFlowNumbers(Long64_t chainEntries)
 {
 	cout << "+------------------------------------------------" << endl;
 	cout << "|             print cut flow numbers             " << endl;
 	cout << "|................................................" << endl;
-        cout << "|    all events in chain, " << chainEntries << endl;
-        cout << "|    all processed events, " << nAllEvents << endl;
-        for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
-        {
-                string scutname = ii->second;
-                cout << "|    events remaining after " << scutname << " cut, " << m_cutFlowNumbers->operator[](scutname) << endl;
-        }
+	cout << "|    all events in chain, " << chainEntries << endl;
+	cout << "|    all processed events, " << nAllEvents << endl;
+	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
+	{
+		string scutname = ii->second;
+		cout << "|    events remaining after " << scutname << " cut, " << m_cutFlowNumbers->operator[](scutname) << endl;
+	}
 	cout << "+------------------------------------------------" << endl;
 }
 
@@ -186,8 +203,8 @@ void offlineAnalysis::executeBasic()
 				if( m_offPhys->L1_MU6 ) // this is also a cut and not overlap removal
 				{
 					buildMuonPairMap( mupairMap,
-							  pmu[n], m_offPhys->mu_staco_charge->at(n), m_offPhys->mu_staco_d0_exPV->at(n), m_offPhys->mu_staco_z0_exPV->at(n), n,
-							  pmu[m], m_offPhys->mu_staco_charge->at(m), m_offPhys->mu_staco_d0_exPV->at(m), m_offPhys->mu_staco_z0_exPV->at(m), m );
+					pmu[n], m_offPhys->mu_staco_charge->at(n), m_offPhys->mu_staco_d0_exPV->at(n), m_offPhys->mu_staco_z0_exPV->at(n), n,
+					pmu[m], m_offPhys->mu_staco_charge->at(m), m_offPhys->mu_staco_d0_exPV->at(m), m_offPhys->mu_staco_z0_exPV->at(m), m );
 				}
 			}
 
@@ -217,14 +234,14 @@ void offlineAnalysis::executeBasic()
 		{
 			int ai = it->first;
 			int bi = it->second;
-		
+			
 			im = imass( pmu[ai], pmu[bi] );
 			pTa = pT( pmu[ai] );
 			pTb = pT( pmu[bi] );
 			etaa = eta( pmu[ai] );	
 			etab = eta( pmu[bi] );
 			costh = cosThetaCollinsSoper( 	pmu[ai], (double)m_offPhys->mu_staco_charge->at(ai),
-							pmu[bi], (double)m_offPhys->mu_staco_charge->at(bi) );
+			pmu[bi], (double)m_offPhys->mu_staco_charge->at(bi) );
 			d0exPVa = m_offPhys->mu_staco_d0_exPV->at(ai);
 			z0exPVa = m_offPhys->mu_staco_z0_exPV->at(ai);
 			d0exPVb = m_offPhys->mu_staco_d0_exPV->at(bi);
@@ -286,38 +303,38 @@ void offlineAnalysis::executeCutFlow()
 	nAllEvents++;
 
 	// local variables
-        TMapii      allmupairMap;
-        TVectorP2VL pmu;
+	TMapii      allmupairMap;
+	TVectorP2VL pmu;
 
-        // build vector of the muons TLorentzVector
+	// build vector of the muons TLorentzVector
 	//for(int n=0 ; n<(int)m_offPhys->mu_staco_n ; n++)
 	for(int n=0 ; n<(int)m_offPhys->mu_staco_m->size() ; n++) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        {
-                pmu.push_back( new TLorentzVector() );
-                pmu[n]->SetPx( m_offPhys->mu_staco_px->at(n) );
-                pmu[n]->SetPy( m_offPhys->mu_staco_py->at(n) );
-                pmu[n]->SetPz( m_offPhys->mu_staco_pz->at(n) );
-                pmu[n]->SetE(  m_offPhys->mu_staco_E->at(n)  );
-        }
+	{
+		pmu.push_back( new TLorentzVector() );
+		pmu[n]->SetPx( m_offPhys->mu_staco_px->at(n) );
+		pmu[n]->SetPy( m_offPhys->mu_staco_py->at(n) );
+		pmu[n]->SetPz( m_offPhys->mu_staco_pz->at(n) );
+		pmu[n]->SetE(  m_offPhys->mu_staco_E->at(n)  );
+	}
 
 	// build the map of the good muon pairs 
-        if(pmu.size()>1)
-        {               
-                for(int n=0 ; n<(int)pmu.size() ; n++)
-                {               
-                        for(int m=0 ; m<(int)pmu.size() ; m++)
-                        {
-                                // dont pair with itself
-                                if( m==n ) continue;
+	if(pmu.size()>1)
+	{               
+		for(int n=0 ; n<(int)pmu.size() ; n++)
+		{               
+			for(int m=0 ; m<(int)pmu.size() ; m++)
+			{
+				// dont pair with itself
+				if( m==n ) continue;
 
-                                // remove overlaps
-                                if( removeOverlaps(allmupairMap, n, m) ) continue;
-                                // now can insert all dimuons into the index map (only opposite charge requirement)
-                                buildMuonPairMap( allmupairMap,
-                                                (double)m_offPhys->mu_staco_charge->at(n), n,
-                                                (double)m_offPhys->mu_staco_charge->at(m), m );
-                        }
-                }
+				// remove overlaps
+				if( removeOverlaps(allmupairMap, n, m) ) continue;
+				// now can insert all dimuons into the index map (only opposite charge requirement)
+				buildMuonPairMap( allmupairMap,
+				(double)m_offPhys->mu_staco_charge->at(n), n,
+				(double)m_offPhys->mu_staco_charge->at(m), m );
+			}
+		}
 	}
 
 	// get the pmuon pairs from the all pairs map
@@ -332,6 +349,7 @@ void offlineAnalysis::executeCutFlow()
 			// fill the cut flow histograms:
 
 			// calculate the necessary variables to be filled
+			double currentimass = imass(pmu[ai],pmu[bi]);
 			TMapsd values2fill;
 			values2fill.insert( make_pair( "imass",imass(pmu[ai],pmu[bi]) ) );
 			values2fill.insert( make_pair( "pT",(m_offPhys->mu_staco_charge->at(ai)<0.)?pT(pmu[ai]):pT(pmu[bi]) ) );
@@ -395,6 +413,9 @@ void offlineAnalysis::executeCutFlow()
 				{
 					passCut = ( cosmicCut((*m_cutFlowMap)["cosmicCut"], pmu[ai], pmu[bi])  &&  passCut ) ? true : false;
 					if(passCut) fillCutFlow("cosmicCut", values2fill); // stop at cosmic cut
+					/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+					/* * */ if(passCut) m_fit->fillXvec( currentimass ); /* * */
+					/* * * * * * * * * * * * * * * * * * * *  * * * * * * * * */
 				}
 
 				if(sorderedcutname=="d0")

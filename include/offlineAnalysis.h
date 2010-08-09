@@ -50,10 +50,11 @@ class offlineAnalysis : public offlinePhysics, public selection, public graphicO
 		
 		Bool_t b_isGRL;
 		int    nAllEvents;
+		string m_sLastCut2Hist;
 
 	public:
 		offlineAnalysis();
-		offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphicobjs);
+		offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphicobjs, string sLastCut2Hist);
 		~offlineAnalysis();
 
 		void initialize();

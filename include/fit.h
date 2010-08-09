@@ -71,7 +71,7 @@ class fit
 
 		void fcn(int& npar, double* deriv, double& f, double par[], int flag);
 		
-		void minimize(bool signal_only, TCanvas* canv, TH1D* h, double* yields);
+		void minimize(bool signal_only, TH1D* h, double* yields);
 		
 	private:
 		

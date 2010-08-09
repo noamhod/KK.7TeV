@@ -49,6 +49,9 @@ void graphicObjects::ginitialize()
 	leg_cutFlow_imass  = NULL;
 	leg_cutFlow_pT     = NULL;
 	
+	// fit legends
+	leg_imassFinal = NULL;
+	
 	// cut flow histos maps
 	hmap_cutFlow_imass = NULL;
 	hmap_cutFlow_pT = NULL;
@@ -98,34 +101,7 @@ void graphicObjects::ginitialize()
 
 void graphicObjects::gfinalize()
 {
-	/*
-	delete cnv_imass;
-		delete cnv_pT;
-		delete cnv_eta;
-		delete cnv_costh;
-		delete cnv_d0exPV;
-		delete cnv_z0exPV;
-		delete cnv_cosmicCosth;
-		delete cnv_xyVertex;
-		
-	delete h1_imass;
-		delete h1_pT;
-		delete h1_eta;
-		delete h1_costh;
-		delete h1_d0exPV;
-		delete h1_z0exPV;
-		delete h1_cosmicCosth;
-		delete h2_xyVertex;
 
-	delete cnv_cutFlow_imass;
-	delete cnv_cutFlow_pT;
-
-	delete leg_cutFlow_imass;
-	delete leg_cutFlow_pT;
-	
-	delete hmap_cutFlow_imass;
-	delete hmap_cutFlow_pT;
-	*/
 }
 
 void graphicObjects::setStyle()
@@ -319,8 +295,9 @@ void graphicObjects::drawFitHistos(TDirectory* tdir, TF1* fGuess, TF1* fFitted)
 {
 	if(tdir!=NULL) tdir->cd();
 	
+	leg_imassFinal = new TLegend(leg_x1, leg_y1*2., leg_x2, leg_y2);
+	
 	cnv_imassAllCuts = new TCanvas("imassFinal","imassFinal",canv_x,canv_y);
-	//cnv_imassAllCuts->SetLogy();
 	cnv_imassAllCuts->Draw();
 	cnv_imassAllCuts->cd();
 	
@@ -336,5 +313,10 @@ void graphicObjects::drawFitHistos(TDirectory* tdir, TF1* fGuess, TF1* fFitted)
 	fFitted->SetLineColor(kBlue);
 	fFitted->SetLineWidth(2);
 	fFitted->Draw("sames");
+	
+	leg_imassFinal->AddEntry( h1_imassFinal, "Data", "lep");
+	leg_imassFinal->AddEntry( fGuess, "Guess", "L");
+	leg_imassFinal->AddEntry( fFitted, "ML fit", "L");
+	leg_imassFinal->Draw("sames");
 }
 

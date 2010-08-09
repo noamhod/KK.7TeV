@@ -12,7 +12,7 @@ offlineAnalysis::offlineAnalysis()
 	initialize();
 }
 
-offlineAnalysis::offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphicobjs)
+offlineAnalysis::offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphicobjs, string sLastCut2Hist)
 {
 	initialize();
 
@@ -30,6 +30,8 @@ offlineAnalysis::offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphi
 	m_graphicobjs = graphicobjs;
 
 	m_fit = new fit();
+	
+	m_sLastCut2Hist = sLastCut2Hist;
 }
 
 void offlineAnalysis::readCutFlow(string sCutFlowFilePath)
@@ -117,14 +119,19 @@ void offlineAnalysis::finalize()
 
 void offlineAnalysis::fitter()
 {
+	string lastCutName = m_sLastCut2Hist;
+
 	// clone the last wanted histogram to preform the fit on:
-	m_graphicobjs->h1_imassFinal = (TH1D*)m_graphicobjs->hmap_cutFlow_imass->operator[]("imass.cosmicCut")->Clone("imassFinal");
+	m_graphicobjs->h1_imassFinal = (TH1D*)m_graphicobjs->hmap_cutFlow_imass->operator[]("imass."+lastCutName)->Clone("imassFinal");
 	double yields[2];
 	
-	m_fit->minimize( false, 
-					m_graphicobjs->cnv_imassAllCuts,
-					m_graphicobjs->h1_imassFinal,
-					yields );
+	///////////////////////////////////////////////////////////////
+	// Preform the fit ////////////////////////////////////////////
+	m_fit->minimize( false, m_graphicobjs->h1_imassFinal, yields );
+	///////////////////////////////////////////////////////////////
+					
+	cout << "\nyields[0] = " <<  yields[0] << endl;
+	cout << "yields[1] = " <<  yields[1] << "\n" << endl;
 	
 	m_fGuess  = (TF1*)m_fit->m_fGuess->Clone();
 	m_fFitted = (TF1*)m_fit->m_fFitted->Clone();
@@ -175,7 +182,6 @@ void offlineAnalysis::executeBasic()
 	double cosmicCosth;
 
 	// build vector of the muons TLorentzVector
-	//for(int n=0 ; n<(int)m_offPhys->mu_staco_n ; n++)
 	for(int n=0 ; n<(int)m_offPhys->mu_staco_m->size() ; n++)
 	{
 		pmu.push_back( new TLorentzVector() );
@@ -184,7 +190,6 @@ void offlineAnalysis::executeBasic()
 		pmu[n]->SetPz( m_offPhys->mu_staco_pz->at(n) );
 		pmu[n]->SetE( m_offPhys->mu_staco_E->at(n) );
 	}
-	//if(pmu.size()>0) cout << "\nbuild vector of TLorentzVector* (size=" << pmu.size() << ")" << endl;
 
 	// build the map of the good muon pairs	
 	for(int n=0 ; n<(int)pmu.size() ; n++)
@@ -307,8 +312,7 @@ void offlineAnalysis::executeCutFlow()
 	TVectorP2VL pmu;
 
 	// build vector of the muons TLorentzVector
-	//for(int n=0 ; n<(int)m_offPhys->mu_staco_n ; n++)
-	for(int n=0 ; n<(int)m_offPhys->mu_staco_m->size() ; n++) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	for(int n=0 ; n<(int)m_offPhys->mu_staco_m->size() ; n++)
 	{
 		pmu.push_back( new TLorentzVector() );
 		pmu[n]->SetPx( m_offPhys->mu_staco_px->at(n) );
@@ -377,57 +381,63 @@ void offlineAnalysis::executeCutFlow()
 				{
 					passCut = (passCut)                                                                  ? true : false;
 					if(passCut) fillCutFlow("null", values2fill); // stop at null cut
+					if(m_sLastCut2Hist=="null" && passCut) m_fit->fillXvec( currentimass );
 				}
 
 				if(sorderedcutname=="GRL")
 				{
 					passCut = (isGRL==(int)(*m_cutFlowMap)["GRL"]  &&  passCut) ? true : false;
 					if(passCut) fillCutFlow("GRL", values2fill); // stop at null cut
+					if(m_sLastCut2Hist=="GRL" && passCut) m_fit->fillXvec( currentimass );
 				}
 
 				if(sorderedcutname=="L1_MU6")
 				{
 					passCut = (m_offPhys->L1_MU6==(int)(*m_cutFlowMap)["L1_MU6"]  &&  passCut)             ? true : false;
 					if(passCut) fillCutFlow("L1_MU6", values2fill); // stop at null cut
+					if(m_sLastCut2Hist=="L1_MU6" && passCut) m_fit->fillXvec( currentimass );
 				}		
 
 				if(sorderedcutname=="imass")
 				{
 					passCut = ( imassCut((*m_cutFlowMap)["imass"], pmu[ai], pmu[bi])  &&  passCut )      ? true : false;
 					if(passCut) fillCutFlow("imass", values2fill); // stop at imass cut
+					if(m_sLastCut2Hist=="imass" && passCut) m_fit->fillXvec( currentimass );
 				}
 
 				if(sorderedcutname=="pT")
 				{
 					passCut = ( pTCut((*m_cutFlowMap)["pT"], pmu[ai], pmu[bi])  &&  passCut )            ? true : false;
 					if(passCut) fillCutFlow("pT", values2fill); // stop at pT cut
+					if(m_sLastCut2Hist=="pT" && passCut) m_fit->fillXvec( currentimass );
 				}
 
 				if(sorderedcutname=="eta")
 				{
 					passCut = ( etaCut((*m_cutFlowMap)["eta"], pmu[ai], pmu[bi])  &&  passCut )          ? true : false;
 					if(passCut) fillCutFlow("eta", values2fill); // stop at eta cut
+					if(m_sLastCut2Hist=="eta" && passCut) m_fit->fillXvec( currentimass );
 				}
 
 				if(sorderedcutname=="cosmicCut")
 				{
 					passCut = ( cosmicCut((*m_cutFlowMap)["cosmicCut"], pmu[ai], pmu[bi])  &&  passCut ) ? true : false;
 					if(passCut) fillCutFlow("cosmicCut", values2fill); // stop at cosmic cut
-					/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-					/* * */ if(passCut) m_fit->fillXvec( currentimass ); /* * */
-					/* * * * * * * * * * * * * * * * * * * *  * * * * * * * * */
+					if(m_sLastCut2Hist=="cosmicCut" && passCut) m_fit->fillXvec( currentimass );
 				}
 
 				if(sorderedcutname=="d0")
 				{
 					passCut = ( d0Cut((*m_cutFlowMap)["d0"], d0exPVa, d0exPVb)  &&  passCut )            ? true : false;
 					if(passCut) fillCutFlow("d0", values2fill); // stop at d0 cut
+					if(m_sLastCut2Hist=="d0" && passCut) m_fit->fillXvec( currentimass );
 				}
 
 				if(sorderedcutname=="z0")
 				{
 					passCut = ( z0Cut((*m_cutFlowMap)["z0"], z0exPVa, z0exPVb)  &&  passCut )            ? true : false;
 					if(passCut) fillCutFlow("z0", values2fill); // stop at d0 cut
+					if(m_sLastCut2Hist=="z0" && passCut) m_fit->fillXvec( currentimass );
 				}
 
 				// count the numbers

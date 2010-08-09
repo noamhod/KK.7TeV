@@ -42,6 +42,7 @@ class graphicObjects : public utilities
 		// legends for the cut flow histod
 		TLegend* leg_cutFlow_imass;
 		TLegend* leg_cutFlow_pT;
+		TLegend* leg_imassFinal;
 
 		// map of histos
 		TMapSP2TH1D* hmap_cutFlow_imass;

@@ -300,40 +300,8 @@ void fit::fillXvec(double x)
 	xVecPtr->push_back(x);
 }
 
-void fit::minimize(bool signal_only, TCanvas* canv, TH1D* h, double* yields)
-{
-	//TF1*     fitFCN;
-	/*
-	double*  par;
-	double*  stepSize;
-	double*  minVal;
-	double*  maxVal;
-	string*  parName;
-	double*  outpar;
-	double*  err;
-	
-	double   parSignal[6];
-	double   parSignalBackground[9];
-	
-	double   stepSizeSignal[6];           // step sizes
-	double   stepSizeSignalBackground[9]; // step sizes
-	
-	double   minValSignal[6];             // minimum bound on parameter
-	double   minValSignalBackground[9];   // minimum bound on parameter
-	
-	double   maxValSignal[6];             // maximum bound on parameter
-	double   maxValSignalBackground[9];   // maximum bound on parameter
-	
-	string   parNameSignal[6];            // parameter name
-	string   parNameSignalBackground[9];  // parameter name
-
-	double   outparSignal[6];             // out paramenters
-	double   outparSignalBackground[9];   // out errors
-	
-	double   errSignal[6];                // out paramenters
-	double   errSignalBackground[9];      // out errors
-	*/
-	
+void fit::minimize(bool signal_only, TH1D* h, double* yields)
+{	
 	///// INITIALIZATION:  SIGNAL ONLY
 	// Breit-Wigner x Gaussian convolution (can have 3 gaussians)
 	parSignal[0] = 100.;    // Scale Signal (Ns)
@@ -374,10 +342,10 @@ void fit::minimize(bool signal_only, TCanvas* canv, TH1D* h, double* yields)
 	
 	///// INITIALIZATION:  SIGNAL + BACKGROUND
 	// Exponential
-	parSignalBackground[0] = 50000.;   // Scale Background (Nb)
+	parSignalBackground[0] = 30000.;   // Scale Background (Nb)
 	parSignalBackground[1] = 30000.;   // Scale Signal (Ns)
-	parSignalBackground[2] = 1.;       // Exp: constant argument
-	parSignalBackground[3] = -0.0001; // Exp: the multiplier of the x argument
+	parSignalBackground[2] = 2;       // Exp: constant argument
+	parSignalBackground[3] = -0.00004; // Exp: the multiplier of the x argument
 	// Breit-Wigner x Gaussian convolution
 	parSignalBackground[4] = 2500.;    // Breit Wigner Width (gamma)
 	parSignalBackground[5] = 90000.;   // Most probable location (peak mean) 
@@ -388,8 +356,8 @@ void fit::minimize(bool signal_only, TCanvas* canv, TH1D* h, double* yields)
 	minValSignalBackground[0] = 10000.;   // Scale Background (Nb)
 	minValSignalBackground[1] = 10000.;   // Scale Signal (Ns)
 	minValSignalBackground[2] = 0.1;      // Exp: constant argument
-	minValSignalBackground[3] = -1.;     // Exp: the multiplier of the x argument
-	minValSignalBackground[4] = 1000.;   // Breit Wigner Width (gamma)
+	minValSignalBackground[3] = -0.00007;     // Exp: the multiplier of the x argument
+	minValSignalBackground[4] = 2000.;   // Breit Wigner Width (gamma)
 	minValSignalBackground[5] = XMIN;  // Most probable location (peak mean) 
 	minValSignalBackground[6] = 1000.;     // Gaussian sigma 1
 	minValSignalBackground[7] = 1000.;    // Gaussian sigma 2
@@ -397,9 +365,9 @@ void fit::minimize(bool signal_only, TCanvas* canv, TH1D* h, double* yields)
 	
 	maxValSignalBackground[0] = 80000;  // Scale Background (Nb)
 	maxValSignalBackground[1] = 80000;  // Scale Signal (Ns)
-	maxValSignalBackground[2] = 1.5;    // Exp: constant argument
-	maxValSignalBackground[3] = 0.;  // Exp: the multiplier of the x argument
-	maxValSignalBackground[4] = 5000.;  // Breit Wigner Width (gamma)
+	maxValSignalBackground[2] = 3.;    // Exp: constant argument
+	maxValSignalBackground[3] = -0.00001;  // Exp: the multiplier of the x argument
+	maxValSignalBackground[4] = 3000.;  // Breit Wigner Width (gamma)
 	maxValSignalBackground[5] = XMAX; // Most probable location (peak mean) 
 	maxValSignalBackground[6] = 4000.;    // Gaussian sigma 1
 	maxValSignalBackground[7] = 5000.;   // Gaussian sigma 2
@@ -424,9 +392,8 @@ void fit::minimize(bool signal_only, TCanvas* canv, TH1D* h, double* yields)
 	parNameSignalBackground[6] = "Gsigma1";
 	parNameSignalBackground[7] = "Gsigma2";
 	parNameSignalBackground[8] = "Gsigma3";
-
 	
-	double bin_width = h->GetBinWidth(1);
+	
 	int index_mean;
 	int index_gamma;
 	int index_sigma1;
@@ -485,6 +452,8 @@ void fit::minimize(bool signal_only, TCanvas* canv, TH1D* h, double* yields)
 	}
 	
 	/*
+	double bin_width = h->GetBinWidth(1);
+	
 	// set initial parameters
 	fitFCN->SetParameters(par);
 
@@ -523,9 +492,6 @@ void fit::minimize(bool signal_only, TCanvas* canv, TH1D* h, double* yields)
 	ParFit = fitFCN->GetParameters();
 	yields[0] = ParFit[index_signal]/bin_width;
 	yields[1] = ParFit[0]/bin_width;
-	
-	canv->cd();
-	fitFCN->Draw("sames");
 	*/
 	
 	////////////////////
@@ -566,39 +532,29 @@ void fit::minimize(bool signal_only, TCanvas* canv, TH1D* h, double* yields)
 
 	fitFCN->SetParameters(outpar);
 	m_fFitted = (TF1*)fitFCN->Clone();
-	/*
-	canv->cd();
-	fitFCN->SetLineStyle(1);
-	fitFCN->SetLineColor(kBlue);
-	fitFCN->SetLineWidth(2);
-	fitFCN->Draw("sames");
-	*/
 	
+	//yields[0] = outpar[index_signal]/bin_width;
+	//yields[1] = outpar[0]/bin_width;
+	
+	yields[0] = outpar[index_signal];
+	yields[1] = outpar[0];
 	
 	//--------------------------- test ---------------------------
-	//double p[9];
 	///// INITIALIZATION:  SIGNAL + BACKGROUND
 	// Exponential
-	p[0] = 50000.;   // Scale Background (Nb)
+	p[0] = 30000.;   // Scale Background (Nb)
 	p[1] = 30000.;   // Scale Signal (Ns)
-	p[2] = 1.;       // Exp: constant argument
-	p[3] = -0.0001; // Exp: the multiplier of the x argument
+	p[2] = 2.;       // Exp: constant argument
+	p[3] = -0.00004; // Exp: the multiplier of the x argument
 	// Breit-Wigner x Gaussian convolution
 	p[4] = 2500.;    // Breit Wigner Width (gamma)
 	p[5] = 90000.;   // Most probable location (peak mean) 
 	p[6] = 2000.;    // Gaussian sigma 1
 	p[7] = 3000.;    // Gaussian sigma 2 
 	p[8] = 3000.;    // Gaussian sigma 3
-	//TF1* guess = new TF1("guess",fitFunctionSB2, XMIN, XMAX ,8);
 	guess = new TF1("guess",fitFunctionSB2, XMIN, XMAX ,8);
 	guess->SetParameters(p);
 	m_fGuess = (TF1*)guess->Clone();
-	/*
-	guess->SetLineStyle(1);
-	guess->SetLineColor(kRed);
-	guess->SetLineWidth(2);
-	guess->Draw("sames");
-	*/
 	cout << "\nIntegral = " << guess->Integral(XMIN, XMAX) << "\n" << endl;
 	//---------------------------------------------------------------
 }

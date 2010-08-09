@@ -27,7 +27,7 @@ offlineControl::offlineControl()
 	m_graphics = new graphicObjects();
 	m_graphics->setStyle();
 
-	m_offlineAnalysis = new offlineAnalysis( m_offPhys, m_graphics );
+	m_offlineAnalysis = new offlineAnalysis( m_offPhys, m_graphics, /*"cosmicCut"*/ "GRL" );
 
 	// read the cut flow (ownership: selection class which offlineAnalysis inherits from)
 	str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");

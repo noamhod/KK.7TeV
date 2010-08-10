@@ -67,6 +67,9 @@ typedef map<string, bool>       TMapsb;
 #define offlinePhysics_cxx
 #include "offlinePhysics.C"
 
+#define digestPhysics_cxx
+#include "digestPhysics.C"
+
 #define particleBase_cxx
 #include "particleBase.C"
 

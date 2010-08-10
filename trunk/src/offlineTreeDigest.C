@@ -25,7 +25,7 @@ offlineTreeDigest::offlineTreeDigest(offlinePhysics* offPhys, TFile* treeFile)
 
 	m_treeFile->cd();
 
-	m_tree = new TTree("offlineDigest", "offlineDigest");
+	m_tree = new TTree("digest", "digest");
 
 	//m_tree->SetMaxTreeSize(50000000); // 50Mb per file
 }
@@ -44,6 +44,7 @@ void offlineTreeDigest::setBranches(TMapds* cutFlowOrdered)
 	m_tree->Branch( "kin_cosTheta_mu",  &m_mu_cosTheta );
 	
 	// set cut flow branches
+	/*
 	for(TMapds::iterator it=cutFlowOrdered->begin() ; it!=cutFlowOrdered->end() ; ++it)
 	{
 		//double snumber = it->first;
@@ -59,6 +60,16 @@ void offlineTreeDigest::setBranches(TMapds* cutFlowOrdered)
 		if(sname=="pT")        m_tree->Branch( ("is_" + sname).c_str(), &b_pT );
 		if(sname=="eta")       m_tree->Branch( ("is_" + sname).c_str(), &b_eta );
 	}
+	*/
+	m_tree->Branch( "is_null", &b_null );
+	m_tree->Branch( "is_GRL", &b_GRL );
+	m_tree->Branch( "is_L1_MU6", &b_L1_MU6 );
+	m_tree->Branch( "is_z0", &b_z0 );
+	m_tree->Branch( "is_d0", &b_d0 );
+	m_tree->Branch( "is_cosmicCut", &b_cosmicCut );
+	m_tree->Branch( "is_imass", &b_imass );
+	m_tree->Branch( "is_pT", &b_pT );
+	m_tree->Branch( "is_eta", &b_eta );
 }
 
 void offlineTreeDigest::fill(TMapsb& cutFlowDecision, TMapsd& kinematicVariables)

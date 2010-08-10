@@ -217,6 +217,11 @@ double fitFunctionS3(double *x, double *par)
 // Signal only, Breit Wigner x Double Gaussian
 void fcnSignal(int& npar, double* deriv, double& f, double par[], int flag)
 {
+	// irrelevant
+	if(!docout) cout << "npar="  << npar  << endl;
+	if(!docout) cout << "deriv=" << deriv << endl;
+	if(!docout) cout << "flag="  << flag  << endl;
+
 	vector<double> xVec = *xVecPtr;           // xVecPtr is public
 	int n = xVec.size();
 
@@ -242,6 +247,11 @@ void fcnSignal(int& npar, double* deriv, double& f, double par[], int flag)
 // Signal and Background, Breit Wigner x Double Gaussian + exponent
 void fcnSignalBackground(int& npar, double* deriv, double& f, double par[], int flag)
 {
+	// irrelevant
+	if(!docout) cout << "npar="  << npar  << endl;
+	if(!docout) cout << "deriv=" << deriv << endl;
+	if(!docout) cout << "flag="  << flag  << endl;
+
 	vector<double> xVec = *xVecPtr;           // xVecPtr is public
 	int n = xVec.size();
 
@@ -343,9 +353,9 @@ void fit::minimize(bool signal_only, TH1D* h, double* yields)
 	///// INITIALIZATION:  SIGNAL + BACKGROUND
 	// Exponential
 	parSignalBackground[0] = 30000.;   // Scale Background (Nb)
-	parSignalBackground[1] = 30000.;   // Scale Signal (Ns)
+	parSignalBackground[1] = 50000.;   // Scale Signal (Ns)
 	parSignalBackground[2] = 2.;       // Exp: constant argument
-	parSignalBackground[3] = -0.00004; // Exp: the multiplier of the x argument
+	parSignalBackground[3] = -0.00001; // Exp: the multiplier of the x argument
 	// Breit-Wigner x Gaussian convolution
 	parSignalBackground[4] = 2500.;    // Breit Wigner Width (gamma)
 	parSignalBackground[5] = 90000.;   // Most probable location (peak mean) 
@@ -354,9 +364,9 @@ void fit::minimize(bool signal_only, TH1D* h, double* yields)
 	parSignalBackground[8] = 3000.;    // Gaussian sigma 3
 	
 	minValSignalBackground[0] = 10000.;   // Scale Background (Nb)
-	minValSignalBackground[1] = 10000.;   // Scale Signal (Ns)
+	minValSignalBackground[1] = 30000.;   // Scale Signal (Ns)
 	minValSignalBackground[2] = 6.;      // Exp: constant argument
-	minValSignalBackground[3] = -0.0000401;     // Exp: the multiplier of the x argument
+	minValSignalBackground[3] = -0.0000101;     // Exp: the multiplier of the x argument
 	minValSignalBackground[4] = 2000.;   // Breit Wigner Width (gamma)
 	minValSignalBackground[5] = XMIN;  // Most probable location (peak mean) 
 	minValSignalBackground[6] = 1000.;     // Gaussian sigma 1
@@ -364,9 +374,9 @@ void fit::minimize(bool signal_only, TH1D* h, double* yields)
 	minValSignalBackground[8] = 1000.;    // Gaussian sigma 3
 	
 	maxValSignalBackground[0] = 80000;  // Scale Background (Nb)
-	maxValSignalBackground[1] = 80000;  // Scale Signal (Ns)
+	maxValSignalBackground[1] = 100000;  // Scale Signal (Ns)
 	maxValSignalBackground[2] = 10.;    // Exp: constant argument
-	maxValSignalBackground[3] = -0.0000399;  // Exp: the multiplier of the x argument
+	maxValSignalBackground[3] = -0.000009;  // Exp: the multiplier of the x argument
 	maxValSignalBackground[4] = 3000.;  // Breit Wigner Width (gamma)
 	maxValSignalBackground[5] = XMAX; // Most probable location (peak mean) 
 	maxValSignalBackground[6] = 4000.;    // Gaussian sigma 1
@@ -543,9 +553,9 @@ void fit::minimize(bool signal_only, TH1D* h, double* yields)
 	///// INITIALIZATION:  SIGNAL + BACKGROUND
 	// Exponential
 	p[0] = 30000.;   // Scale Background (Nb)
-	p[1] = 30000.;   // Scale Signal (Ns)
+	p[1] = 50000.;   // Scale Signal (Ns)
 	p[2] = 2.;       // Exp: constant argument
-	p[3] = -0.00004; // Exp: the multiplier of the x argument
+	p[3] = -0.00001; // Exp: the multiplier of the x argument
 	// Breit-Wigner x Gaussian convolution
 	p[4] = 2500.;    // Breit Wigner Width (gamma)
 	p[5] = 90000.;   // Most probable location (peak mean) 

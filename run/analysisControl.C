@@ -22,11 +22,11 @@ analysisControl::analysisControl()
 
 	str = checkANDsetFilepath("PWD", "/../data/analysisTrees.root");
 	m_treefile = new TFile( str.c_str(), "RECREATE");
-        m_treefile->cd();
+	m_treefile->cd();
 
 	str = checkANDsetFilepath("PWD", "/../data/analysisControl.root");
 	m_histfile = new TFile( str.c_str(), "RECREATE");
-        m_histfile->cd();
+	m_histfile->cd();
 
 	m_graphics = new graphicObjects();
 	m_graphics->setStyle();
@@ -35,7 +35,7 @@ analysisControl::analysisControl()
 	m_GRL = new GRLinterface();
 	m_GRL->glrinitialize( (TString)str );
 
-        m_analysis = new analysis( m_phys, m_graphics, m_GRL, m_treefile );
+	m_analysis = new analysis( m_phys, m_graphics, m_GRL, m_treefile );
 
 	// read the cut flow (ownership: selection class which analysis inherits from)
 	str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
@@ -53,12 +53,12 @@ void analysisControl::initialize()
 {
 	// run control
 	l64t_nentries = 0;
-        l64t_nbytes   = 0;
-        l64t_nb       = 0;
-        l64t_jentry   = 0;
-        l64t_ientry   = 0;
+	l64t_nbytes   = 0;
+	l64t_nb       = 0;
+	l64t_jentry   = 0;
+	l64t_ientry   = 0;
 
-        // pointers
+	// pointers
 	m_phys     = NULL;
 	m_analysis = NULL;
 	m_graphics = NULL;
@@ -76,18 +76,9 @@ void analysisControl::finalize()
 	m_histfile->Write();
 	m_histfile->Close();
 
-	// pointers
-	/*
-	delete m_phys;
-	delete m_analysis;
-	delete m_graphics;
-	delete m_histfile;
-	delete m_treefile;
-	*/
-
 	cfinalize();
 	kfinalize();
-        ufinalize();
+	ufinalize();
 }
 
 void analysisControl::book()
@@ -99,16 +90,16 @@ void analysisControl::book()
 	m_graphics->bookHistos(m_dirAllCuts);
 
 	m_dirCutFlow = m_histfile->mkdir("cutFlow");
-        m_graphics->bookHistosMap( m_analysis->getCutFlowMapPtr(), m_analysis->getCutFlowOrderedPtr(), m_dirCutFlow );	
+	m_graphics->bookHistosMap( m_analysis->getCutFlowMapPtr(), m_analysis->getCutFlowOrderedPtr(), m_dirCutFlow );	
 }
 
 void analysisControl::draw()
 {
 	m_graphics->drawBareHistos(m_dirNoCuts);
 	m_graphics->drawHistos(m_dirAllCuts);
-        m_graphics->drawHistosMap( m_analysis->getCutFlowMapPtr(), m_analysis->getCutFlowOrderedPtr(), m_dirCutFlow );
+	m_graphics->drawHistosMap( m_analysis->getCutFlowMapPtr(), m_analysis->getCutFlowOrderedPtr(), m_dirCutFlow );
 
-        m_analysis->printCutFlowNumbers(l64t_nentries);
+	m_analysis->printCutFlowNumbers(l64t_nentries);
 }
 
 void analysisControl::analyze()
@@ -129,7 +120,7 @@ void analysisControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	l64t_nbytes = 0;
 	l64t_nb = 0;
 
-	l64t_mod = 5000;
+	l64t_mod = 20000;
 
 	l64t_startEvent = startEvent;
 	l64t_stopEvent = l64t_nentries;
@@ -146,9 +137,9 @@ void analysisControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		l64t_nbytes += l64t_nb;
 		// if (Cut(l64t_ientry) < 0) continue;
 		
-		if(l64t_jentry%100==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_phys->RunNumber << "\tlumiblock=" << m_phys->lbn << endl;
+		if(l64t_jentry%10000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_phys->RunNumber << "\tlumiblock=" << m_phys->lbn << endl;
 		if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries);
-	
+		
 		analyze();
 	}
 	

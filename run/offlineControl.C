@@ -20,6 +20,9 @@ offlineControl::offlineControl()
 
 	m_offPhys = new offlinePhysics( m_chain );
 
+	str = checkANDsetFilepath("PWD", "/../data/offlineTreeDigest.root");
+	m_treefile = new TFile( str.c_str(), "RECREATE");
+	
 	str = checkANDsetFilepath("PWD", "/../data/offlineControl.root");
 	m_histfile = new TFile( str.c_str(), "RECREATE");
 	m_histfile->cd();
@@ -27,7 +30,7 @@ offlineControl::offlineControl()
 	m_graphics = new graphicObjects();
 	m_graphics->setStyle();
 
-	m_offlineAnalysis = new offlineAnalysis( m_offPhys, m_graphics, /*"cosmicCut"*/ "GRL" );
+	m_offlineAnalysis = new offlineAnalysis( m_offPhys, m_graphics, m_treefile, /*"cosmicCut"*/ "GRL" );
 
 	// read the cut flow (ownership: selection class which offlineAnalysis inherits from)
 	str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
@@ -55,6 +58,7 @@ void offlineControl::initialize()
 	m_offlineAnalysis = NULL;
 	m_graphics = NULL;
 	m_histfile = NULL;
+	m_treefile = NULL;
 
 	cinitialize();
 	kinitialize();
@@ -67,15 +71,9 @@ void offlineControl::finalize()
 	m_histfile->Write();
 	m_histfile->Close();
 
-	// pointers
-	/*
-	delete m_offPhys;
-	delete m_offlineAnalysis;
-	delete m_graphics;
-	delete m_histfile;
-	delete m_treefile;
-	*/
-
+	//m_treefile->Write();
+	//m_treefile->Close();
+	
 	cfinalize();
 	kfinalize();
 	ufinalize();
@@ -93,7 +91,7 @@ void offlineControl::book()
 	m_graphics->bookFitHistos(m_dirFit);
 
 	m_dirCutFlow = m_histfile->mkdir("cutFlow");
-	m_graphics->bookHistosMap( m_offlineAnalysis->getCutFlowMapPtr(), m_offlineAnalysis->getCutFlowOrderedPtr(), m_dirCutFlow );	
+	m_graphics->bookHistosMap( m_offlineAnalysis->getCutFlowMapPtr(), m_offlineAnalysis->getCutFlowOrderedPtr(), m_dirCutFlow );
 }
 
 void offlineControl::draw()
@@ -120,7 +118,7 @@ void offlineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	l64t_nbytes = 0;
 	l64t_nb = 0;
 
-	l64t_mod = 5000;
+	l64t_mod = 20000;
 
 	l64t_startEvent = startEvent;
 	l64t_stopEvent = l64t_nentries;
@@ -137,7 +135,7 @@ void offlineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		l64t_nbytes += l64t_nb;
 		// if (Cut(l64t_ientry) < 0) continue;
 		
-		if(l64t_jentry%1000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_offPhys->RunNumber << "\tlumiblock=" << m_offPhys->lbn << endl;
+		if(l64t_jentry%10000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_offPhys->RunNumber << "\tlumiblock=" << m_offPhys->lbn << endl;
 		if(l64t_jentry%l64t_mod==0) m_offlineAnalysis->printCutFlowNumbers(l64t_nentries);
 		
 		analyze();
@@ -146,5 +144,109 @@ void offlineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	m_offlineAnalysis->fitter();
 	
 	draw();
+	
+	m_offlineAnalysis->write();
 }
 
+
+void offlineControl::getCandidates(string sFilePath)
+{
+	fstream file;
+	file.open( sFilePath.c_str() );
+
+	string sLine = "";
+	vector<double> values;
+	double tmpVal = 0.;
+
+	int nLinesRead = 0;
+
+	while(!file.eof())
+	{
+		getline(file,sLine);
+
+		if(sLine == "") continue;
+		cout << sLine << endl;
+
+		// parse the line:
+		if(values.size()>0) values.clear();
+		stringstream strm(sLine);
+		while(!strm.eof())
+		{
+			strm >> tmpVal;
+			values.push_back(tmpVal);
+		}
+		
+		for(int i=0 ; i<(int)values.size() ; i++)
+		{
+			// encoding:
+			// 0=RN
+			// 1=LB
+			// 2=EN
+			// 3=Mass(CB)
+			// 4=Mass(ID)
+			// 5=Mass(ME)
+			// 6=pT1
+			// 7=pT2
+			switch(i)
+			{
+				case 0: runNumber.push_back( values[i] ); break;
+				case 1: lumiBlock.push_back( values[i] ); break;
+				case 2: eventNumber.push_back( values[i] ); break;
+				case 3: mass_cb.push_back( values[i] ); break;
+				case 4: mass_id.push_back( values[i] ); break;
+				case 5: mass_me.push_back( values[i] ); break;
+				case 6: pT1.push_back( values[i] ); break;
+				case 7: pT2.push_back( values[i] ); break;
+				default: break;
+			}
+		}
+		nLinesRead++;
+	}
+	cout << "read " << nLinesRead << " lines" << endl;
+}
+
+bool offlineControl::matchCandidates()
+{	
+	for(int rn=0 ; rn<(int)runNumber.size() ; rn++)
+	{
+		if( runNumber[rn] != (double)m_offPhys->RunNumber ) continue;
+		for(int lb=0 ; lb<(int)lumiBlock.size() ; lb++)
+		{
+			if( lumiBlock[lb] != (double)m_offPhys->lbn ) continue;
+			for(int en=0 ; en<(int)eventNumber.size() ; en++)
+			{
+				if( eventNumber[en] != (double)m_offPhys->EventNumber ) continue;			
+				cout << "match !" << endl;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+void offlineControl::loopCandidates()
+{
+	if (m_offPhys->fChain == 0)  return;
+
+	l64t_nentries = m_offPhys->fChain->GetEntriesFast();
+	l64t_nbytes = 0;
+	l64t_nb = 0;
+
+	// read the external list of Z candidates
+	int nMatched = 0;
+	string sFilePath = checkANDsetFilepath("PWD", "/../conf/STACO.cand");
+	getCandidates(sFilePath);
+	
+	for (l64t_jentry=0 ; l64t_jentry<l64t_nentries ; l64t_jentry++)
+	{
+		l64t_ientry = m_offPhys->LoadTree(l64t_jentry);
+		if (l64t_ientry < 0) break;
+		l64t_nb = m_offPhys->fChain->GetEntry(l64t_jentry);
+		l64t_nbytes += l64t_nb;
+		
+		if(l64t_jentry%1000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_offPhys->RunNumber << "\tlumiblock=" << m_offPhys->lbn << "\tnMatched=" << nMatched << endl;
+		
+		// try to match this event to an entry from the external list
+		if( matchCandidates() ) nMatched++;
+	}
+}

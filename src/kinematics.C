@@ -49,7 +49,7 @@ double kinematics::dR( TLorentzVector* pa, TLorentzVector* pb )
 
 double kinematics::pAbs( TLorentzVector* p )
 {       
-        return p->Mag();
+	return p->Mag();
 }       
 
 double kinematics::dimuonCosth( TLorentzVector* pa, TLorentzVector* pb )
@@ -65,7 +65,7 @@ double kinematics::QT( TLorentzVector* pa, TLorentzVector* pb )
 	m_pTmp = (*pa)+(*pb);
 	return m_pTmp.Perp();
 }       
-        
+
 double kinematics::y( TLorentzVector* p )
 {       
 	return p->Rapidity();
@@ -74,22 +74,23 @@ double kinematics::y( TLorentzVector* p )
 double kinematics::ySystem( TLorentzVector* pa, TLorentzVector* pb )
 {
 	m_pTmp = (*pa)+(*pb);
-        return m_pTmp.Rapidity();
+	return m_pTmp.Rapidity();
 }
 
 double kinematics::cosThetaCollinsSoper( TLorentzVector* pa, double ca,
-					 TLorentzVector* pb, double cb )
+										 TLorentzVector* pb, double cb )
 {
 	// this will work only for leptons e, mu and tau
 	// by default it is assumed that pa is the lepton
 	// if instead pb is the lepton, then the result is
 	// reclassified by a (-) sign - see line 4.
-        double mass2 = imass(pa,pb)*imass(pa,pb);
-        double QT2 = QT(pa,pb)*QT(pa,pb);
-        double cosThetaCS = 2.*( pa->Plus()*pb->Minus() - pa->Minus()*pb->Plus() ) / sqrt( mass2 * (mass2 + QT2) );
+	double mass2 = imass(pa,pb)*imass(pa,pb);
+	double QT2 = QT(pa,pb)*QT(pa,pb);
+	//double cosThetaCS = 2.*( pa->Plus()*pb->Minus() - pa->Minus()*pb->Plus() ) / sqrt( mass2 * (mass2 + QT2) );
+	double cosThetaCS = 2.*( pa->Pz()*pb->E() - pa->E()*pb->Pz() ) / sqrt( mass2 * (mass2 + QT2) );
 	if (ca>0. && cb<0.)     cosThetaCS *= -1.; // if pb is the lepton
-        if (ySystem(pa,pb) < 0) cosThetaCS *= -1.; // reclassify
-        return cosThetaCS;
+	if (ySystem(pa,pb) < 0) cosThetaCS *= -1.; // reclassify
+	return cosThetaCS;
 }
 
 

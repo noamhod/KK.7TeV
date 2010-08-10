@@ -12,24 +12,28 @@ offlineAnalysis::offlineAnalysis()
 	initialize();
 }
 
-offlineAnalysis::offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphicobjs, string sLastCut2Hist)
+offlineAnalysis::offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphicobjs, TFile* treeFile, string sLastCut2Hist)
 {
 	initialize();
 
 	m_offPhys = offPhys;
+	
+	m_treeFile = treeFile;
 
 	/*
 	m_muid    = new muon_muid(  m_offPhys ); // this will also "turn on" the desired branches (virtual in the base)
 	m_mu_staco = new muon_staco( m_offPhys ); // this will also  "turn on" the desired branches (virtual in the base)
 	*/
 
-	m_cutFlowMap     = new TMapsd();
-	m_cutFlowOrdered = new TMapds();
-	m_cutFlowNumbers = new TMapsi();
+	m_cutFlowMap         = new TMapsd();
+	m_cutFlowOrdered     = new TMapds();
+	m_cutFlowNumbers     = new TMapsi();
 
 	m_graphicobjs = graphicobjs;
 
 	m_fit = new fit();
+	
+	m_offTreeDigest = new offlineTreeDigest( m_offPhys, m_treeFile );
 	
 	m_sLastCut2Hist = sLastCut2Hist;
 }
@@ -89,6 +93,8 @@ void offlineAnalysis::readCutFlow(string sCutFlowFilePath)
 	// ownership: selection class:
 	initSelectionCuts(m_cutFlowMap, m_cutFlowOrdered);
 	
+	m_offTreeDigest->setBranches(m_cutFlowOrdered);
+	
 	file.close();
 }
 
@@ -114,7 +120,7 @@ void offlineAnalysis::initialize()
 
 void offlineAnalysis::finalize()
 {
-
+	
 }
 
 void offlineAnalysis::fitter()
@@ -310,6 +316,9 @@ void offlineAnalysis::executeCutFlow()
 	// local variables
 	TMapii      allmupairMap;
 	TVectorP2VL pmu;
+	
+	TMapsb cutFlowDecision;
+	TMapsd kinematicVariables;
 
 	// build vector of the muons TLorentzVector
 	for(int n=0 ; n<(int)m_offPhys->mu_staco_m->size() ; n++)
@@ -344,6 +353,9 @@ void offlineAnalysis::executeCutFlow()
 	// get the pmuon pairs from the all pairs map
 	if(allmupairMap.size()>0)
 	{
+		if(cutFlowDecision.size()>0)    cutFlowDecision.clear();
+		if(kinematicVariables.size()>0) kinematicVariables.clear();
+		
 		for(TMapii::iterator it=allmupairMap.begin() ; it!=allmupairMap.end() ; ++it)
 		{
 			int ai = it->first;
@@ -353,22 +365,32 @@ void offlineAnalysis::executeCutFlow()
 			// fill the cut flow histograms:
 
 			// calculate the necessary variables to be filled
-			double currentimass = imass(pmu[ai],pmu[bi]);
+			double current_imass       = imass(pmu[ai],pmu[bi]);
+			double current_mu_pT       = (m_offPhys->mu_staco_charge->at(ai)<0.)?pT(pmu[ai]):pT(pmu[bi]);
+			double current_mu_eta      = (m_offPhys->mu_staco_charge->at(ai)<0.)?eta(pmu[ai]):eta(pmu[bi]);
+			double current_mu_cosTheta = cosThetaCollinsSoper( 	pmu[ai], (double)m_offPhys->mu_staco_charge->at(ai),
+																pmu[bi], (double)m_offPhys->mu_staco_charge->at(bi) );
+			
+			// fill the kinematic variables of this pair for the digested tree
+			kinematicVariables.insert( make_pair("imass", current_imass) );
+			kinematicVariables.insert( make_pair("pT", current_mu_pT) );
+			kinematicVariables.insert( make_pair("eta", current_mu_eta) );
+			kinematicVariables.insert( make_pair("cosTheta", current_mu_cosTheta) );
+			
 			TMapsd values2fill;
-			values2fill.insert( make_pair( "imass",imass(pmu[ai],pmu[bi]) ) );
-			values2fill.insert( make_pair( "pT",(m_offPhys->mu_staco_charge->at(ai)<0.)?pT(pmu[ai]):pT(pmu[bi]) ) );
+			values2fill.insert( make_pair( "imass",current_imass ) );
+			values2fill.insert( make_pair( "pT",current_mu_pT ) );
 
 			// help
 			double d0exPVa = m_offPhys->mu_staco_d0_exPV->at(ai);
 			double z0exPVa = m_offPhys->mu_staco_z0_exPV->at(ai);
 			double d0exPVb = m_offPhys->mu_staco_d0_exPV->at(bi);
 			double z0exPVb = m_offPhys->mu_staco_z0_exPV->at(bi);
+			int isGRL      = m_offPhys->isGRL;
 
-			//int runnumber  = m_offPhys->runnumber;
-			//int lumiblock  = m_offPhys->lumiblock;
-			int isGRL        = m_offPhys->isGRL;
-
-			bool passCut  = true;
+			bool passCutFlow    = true;
+			bool passCurrentCut = true;
+			
 
 			// fill the cut flow, stop at the relevant cut each time.
 			// the cut objects don't have to be "correctly" ordered
@@ -379,74 +401,106 @@ void offlineAnalysis::executeCutFlow()
 
 				if(sorderedcutname=="null")
 				{
-					passCut = (passCut)                                                                  ? true : false;
-					if(passCut) fillCutFlow("null", values2fill); // stop at null cut
-					if(m_sLastCut2Hist=="null" && passCut) m_fit->fillXvec( currentimass );
+					passCurrentCut = (true) ? true : false;
+					//passCutFlow   = (passCurrentCut) ? true : false;
+					//if(passCutFlow) fillCutFlow(sorderedcutname, values2fill); // stop at null cut
+					//if(m_sLastCut2Hist==sorderedcutname && passCutFlow) m_fit->fillXvec( current_imass );
+					//cutFlowDecision.insert( make_pair(sorderedcutname, passCurrentCut) );
 				}
 
 				if(sorderedcutname=="GRL")
 				{
-					passCut = (isGRL==(int)(*m_cutFlowMap)["GRL"]  &&  passCut) ? true : false;
-					if(passCut) fillCutFlow("GRL", values2fill); // stop at null cut
-					if(m_sLastCut2Hist=="GRL" && passCut) m_fit->fillXvec( currentimass );
+					passCurrentCut = (isGRL==(int)(*m_cutFlowMap)[sorderedcutname]) ? true : false;
+					//passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
+					//if(passCutFlow) fillCutFlow(sorderedcutname, values2fill); // stop at null cut
+					//if(m_sLastCut2Hist==sorderedcutname && passCutFlow) m_fit->fillXvec( current_imass );
+					//cutFlowDecision.insert( make_pair(sorderedcutname, passCurrentCut) );
 				}
 
 				if(sorderedcutname=="L1_MU6")
 				{
-					passCut = (m_offPhys->L1_MU6==(int)(*m_cutFlowMap)["L1_MU6"]  &&  passCut)             ? true : false;
-					if(passCut) fillCutFlow("L1_MU6", values2fill); // stop at null cut
-					if(m_sLastCut2Hist=="L1_MU6" && passCut) m_fit->fillXvec( currentimass );
+					passCurrentCut = (m_offPhys->L1_MU6==(int)(*m_cutFlowMap)[sorderedcutname]) ? true : false;
+					//passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
+					//if(passCutFlow) fillCutFlow(sorderedcutname, values2fill); // stop at null cut
+					//if(m_sLastCut2Hist==sorderedcutname && passCutFlow) m_fit->fillXvec( current_imass );
+					//cutFlowDecision.insert( make_pair(sorderedcutname, passCurrentCut) );
 				}		
 
 				if(sorderedcutname=="imass")
 				{
-					passCut = ( imassCut((*m_cutFlowMap)["imass"], pmu[ai], pmu[bi])  &&  passCut )      ? true : false;
-					if(passCut) fillCutFlow("imass", values2fill); // stop at imass cut
-					if(m_sLastCut2Hist=="imass" && passCut) m_fit->fillXvec( currentimass );
+					passCurrentCut = ( imassCut((*m_cutFlowMap)[sorderedcutname], pmu[ai], pmu[bi]) ) ? true : false;
+					//passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
+					//if(passCutFlow) fillCutFlow(sorderedcutname, values2fill); // stop at imass cut
+					//if(m_sLastCut2Hist==sorderedcutname && passCutFlow) m_fit->fillXvec( current_imass );
+					//cutFlowDecision.insert( make_pair(sorderedcutname, passCurrentCut) );
 				}
 
 				if(sorderedcutname=="pT")
 				{
-					passCut = ( pTCut((*m_cutFlowMap)["pT"], pmu[ai], pmu[bi])  &&  passCut )            ? true : false;
-					if(passCut) fillCutFlow("pT", values2fill); // stop at pT cut
-					if(m_sLastCut2Hist=="pT" && passCut) m_fit->fillXvec( currentimass );
+					passCurrentCut = ( pTCut((*m_cutFlowMap)[sorderedcutname], pmu[ai], pmu[bi]) ) ? true : false;
+					//passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
+					//if(passCutFlow) fillCutFlow(sorderedcutname, values2fill); // stop at pT cut
+					//if(m_sLastCut2Hist==sorderedcutname && passCutFlow) m_fit->fillXvec( current_imass );
+					//cutFlowDecision.insert( make_pair(sorderedcutname, passCurrentCut) );
 				}
 
 				if(sorderedcutname=="eta")
 				{
-					passCut = ( etaCut((*m_cutFlowMap)["eta"], pmu[ai], pmu[bi])  &&  passCut )          ? true : false;
-					if(passCut) fillCutFlow("eta", values2fill); // stop at eta cut
-					if(m_sLastCut2Hist=="eta" && passCut) m_fit->fillXvec( currentimass );
+					passCurrentCut = ( etaCut((*m_cutFlowMap)[sorderedcutname], pmu[ai], pmu[bi]) ) ? true : false;
+					//passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
+					//if(passCutFlow) fillCutFlow(sorderedcutname, values2fill); // stop at eta cut
+					//if(m_sLastCut2Hist==sorderedcutname && passCutFlow) m_fit->fillXvec( current_imass );
+					//cutFlowDecision.insert( make_pair(sorderedcutname, passCurrentCut) );
 				}
 
 				if(sorderedcutname=="cosmicCut")
 				{
-					passCut = ( cosmicCut((*m_cutFlowMap)["cosmicCut"], pmu[ai], pmu[bi])  &&  passCut ) ? true : false;
-					if(passCut) fillCutFlow("cosmicCut", values2fill); // stop at cosmic cut
-					if(m_sLastCut2Hist=="cosmicCut" && passCut) m_fit->fillXvec( currentimass );
+					passCurrentCut = ( cosmicCut((*m_cutFlowMap)[sorderedcutname], pmu[ai], pmu[bi]) ) ? true : false;
+					//passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
+					//if(passCutFlow) fillCutFlow(sorderedcutname, values2fill); // stop at cosmic cut
+					//if(m_sLastCut2Hist==sorderedcutname && passCutFlow) m_fit->fillXvec( current_imass );
+					//cutFlowDecision.insert( make_pair(sorderedcutname, passCurrentCut) );
 				}
 
 				if(sorderedcutname=="d0")
 				{
-					passCut = ( d0Cut((*m_cutFlowMap)["d0"], d0exPVa, d0exPVb)  &&  passCut )            ? true : false;
-					if(passCut) fillCutFlow("d0", values2fill); // stop at d0 cut
-					if(m_sLastCut2Hist=="d0" && passCut) m_fit->fillXvec( currentimass );
+					passCurrentCut = ( d0Cut((*m_cutFlowMap)[sorderedcutname], d0exPVa, d0exPVb) ) ? true : false;
+					//passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
+					//if(passCutFlow) fillCutFlow(sorderedcutname, values2fill); // stop at d0 cut
+					//if(m_sLastCut2Hist==sorderedcutname && passCutFlow) m_fit->fillXvec( current_imass );
+					//cutFlowDecision.insert( make_pair(sorderedcutname, passCurrentCut) );
 				}
 
 				if(sorderedcutname=="z0")
 				{
-					passCut = ( z0Cut((*m_cutFlowMap)["z0"], z0exPVa, z0exPVb)  &&  passCut )            ? true : false;
-					if(passCut) fillCutFlow("z0", values2fill); // stop at d0 cut
-					if(m_sLastCut2Hist=="z0" && passCut) m_fit->fillXvec( currentimass );
+					passCurrentCut = ( z0Cut((*m_cutFlowMap)[sorderedcutname], z0exPVa, z0exPVb) ) ? true : false;
+					//passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
+					//if(passCutFlow) fillCutFlow(sorderedcutname, values2fill); // stop at d0 cut
+					//if(m_sLastCut2Hist==sorderedcutname && passCutFlow) m_fit->fillXvec( current_imass );
+					//cutFlowDecision.insert( make_pair(sorderedcutname, passCurrentCut) );
 				}
 
+				passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
+				if(passCutFlow) fillCutFlow(sorderedcutname, values2fill); // stop at this(sorderedcutname) cut
+				if(m_sLastCut2Hist==sorderedcutname && passCutFlow) m_fit->fillXvec( current_imass );
+				cutFlowDecision.insert( make_pair(sorderedcutname, passCurrentCut) );
+				
 				// count the numbers
-				if(passCut) m_cutFlowNumbers->operator[](sorderedcutname) ++;
+				if(passCutFlow) m_cutFlowNumbers->operator[](sorderedcutname) ++;
 			}
 		}
+		////////////////////////////////////////////////////////////////////////////
+		m_offTreeDigest->fill(cutFlowDecision, kinematicVariables);
+		////////////////////////////////////////////////////////////////////////////
 	}
 	// re-initialize
 	if(allmupairMap.size()>0) allmupairMap.clear();
 	if(pmu.size()>0)          pmu.clear();
 }
 
+void offlineAnalysis::write()
+{
+	m_offTreeDigest->write();
+	//m_offTreeDigest->m_tree->Print();
+	m_treeFile->Close();
+}

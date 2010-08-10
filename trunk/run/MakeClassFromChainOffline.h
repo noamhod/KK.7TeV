@@ -39,10 +39,9 @@ class MakeClassFromChainOffline
 		void chain2class(string sClassName = "offlinePhysics");
 	
 		void GetEntries();	
-		void drawFromChain();	
+		void drawFromChain();
 
 		void list2chain(string sListFilePath = "offline_dataset.list");
-
 };
 #endif
 

@@ -50,6 +50,8 @@ typedef map<string, TH1D*>      TMapSP2TH1D;
 typedef map<string, double>     TMapsd;
 typedef map<string, int>        TMapsi;
 typedef map<double, string>     TMapds;
+typedef map<double, double>     TMapdd;
+typedef map<string, bool>       TMapsb;
 
 #define utilities_cxx
 #include "utilities.C"

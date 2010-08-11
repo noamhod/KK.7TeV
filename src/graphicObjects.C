@@ -318,5 +318,8 @@ void graphicObjects::drawFitHistos(TDirectory* tdir, TF1* fGuess, TF1* fFitted)
 	leg_imassFinal->AddEntry( fGuess, "Guess", "L");
 	leg_imassFinal->AddEntry( fFitted, "ML fit", "L");
 	leg_imassFinal->Draw("sames");
+	
+	cnv_imassAllCuts->Update();
+	cnv_imassAllCuts->Write();
 }
 

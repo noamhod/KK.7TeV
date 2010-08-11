@@ -73,7 +73,7 @@ class offlineTree
 		Bool_t  EF_L1ItemStreamer_L1_EM10I;
 		Bool_t  EF_L1ItemStreamer_L1_EM14;
 		Bool_t  EF_L1ItemStreamer_L1_EM2;
-		Bool_t  EF_L1ItemStreamer_L1_EM2_UNPAIRED;
+		//Bool_t  EF_L1ItemStreamer_L1_EM2_UNPAIRED;
 		Bool_t  EF_L1ItemStreamer_L1_EM3;
 		Bool_t  EF_L1ItemStreamer_L1_EM3_EMPTY;
 		Bool_t  EF_L1ItemStreamer_L1_EM3_FIRSTEMPTY;
@@ -93,7 +93,7 @@ class offlineTree
 		Bool_t  EF_L1ItemStreamer_L1_MU0_J15;
 		Bool_t  EF_L1ItemStreamer_L1_MU0_J5;
 		Bool_t  EF_L1ItemStreamer_L1_MU0_MV;
-		Bool_t  EF_L1ItemStreamer_L1_MU0_UNPAIRED;
+		//Bool_t  EF_L1ItemStreamer_L1_MU0_UNPAIRED;
 		Bool_t  EF_L1ItemStreamer_L1_MU10;
 		Bool_t  EF_L1ItemStreamer_L1_MU10_EMPTY;
 		Bool_t  EF_L1ItemStreamer_L1_MU15;
@@ -105,8 +105,8 @@ class offlineTree
 		Bool_t  EF_L1ItemStreamer_L1_MU6_J5;
 		Bool_t  EF_L1ItemStreamer_L1_MU6_UNPAIRED;
    
- 		Bool_t  EF_mu0_missingRoi;
-		Bool_t  EF_mu0_rpcOnly;
+ 		//Bool_t  EF_mu0_missingRoi;
+		//Bool_t  EF_mu0_rpcOnly;
 		Bool_t  EF_mu10;
 		Bool_t  EF_mu10_MG;
 		Bool_t  EF_mu10_MSonly;
@@ -127,10 +127,10 @@ class offlineTree
 		Bool_t  EF_mu4_DiMu;
 		Bool_t  EF_mu4_DiMu_FS;
 		Bool_t  EF_mu4_DiMu_FS_noOS;
-		Bool_t  EF_mu4_Jpsie5e3;
-		Bool_t  EF_mu4_Jpsie5e3_FS;
-		Bool_t  EF_mu4_Jpsie5e3_SiTrk;
-		Bool_t  EF_mu4_Jpsie5e3_SiTrk_FS;
+		//Bool_t  EF_mu4_Jpsie5e3;
+		//Bool_t  EF_mu4_Jpsie5e3_FS;
+		//Bool_t  EF_mu4_Jpsie5e3_SiTrk;
+		//Bool_t  EF_mu4_Jpsie5e3_SiTrk_FS;
 		Bool_t  EF_mu4_L2MSonly_EFFS_passL2;
 		Bool_t  EF_mu4_MG;
 		Bool_t  EF_mu4_MSonly;
@@ -164,7 +164,7 @@ class offlineTree
 		Bool_t  EF_mu4_tile_SiTrk;
 		Bool_t  EF_mu4_trod;
 		Bool_t  EF_mu4_trod_SiTrk;
-		Bool_t  EF_mu4_unpaired;
+		//Bool_t  EF_mu4_unpaired;
 		Bool_t  EF_mu4mu6_DiMu;
 		Bool_t  EF_mu6;
 		Bool_t  EF_mu6_DiMu;
@@ -172,9 +172,9 @@ class offlineTree
 		Bool_t  EF_mu6_DiMu_FS_noOS;
 		Bool_t  EF_mu6_DsPhiPi;
 		Bool_t  EF_mu6_Jpsie5e3;
-		Bool_t  EF_mu6_Jpsie5e3_FS;
-		Bool_t  EF_mu6_Jpsie5e3_SiTrk;
-		Bool_t  EF_mu6_Jpsie5e3_SiTrk_FS;
+		//Bool_t  EF_mu6_Jpsie5e3_FS;
+		//Bool_t  EF_mu6_Jpsie5e3_SiTrk;
+		//Bool_t  EF_mu6_Jpsie5e3_SiTrk_FS;
 		Bool_t  EF_mu6_MG;
 		Bool_t  EF_mu6_MSonly;
 		Bool_t  EF_mu6_MSonly_cosmic;
@@ -203,7 +203,7 @@ class offlineTree
 		Bool_t  L1_EM10I;
 		Bool_t  L1_EM14;
 		Bool_t  L1_EM2;
-		Bool_t  L1_EM2_UNPAIRED;
+		//Bool_t  L1_EM2_UNPAIRED;
 		Bool_t  L1_EM3;
 		Bool_t  L1_EM3_EMPTY;
 		Bool_t  L1_EM3_FIRSTEMPTY;
@@ -259,7 +259,7 @@ class offlineTree
 		Bool_t  L2_L1ItemStreamer_L1_MU0_J15;
 		Bool_t  L2_L1ItemStreamer_L1_MU0_J5;
 		Bool_t  L2_L1ItemStreamer_L1_MU0_MV;
-		Bool_t  L2_L1ItemStreamer_L1_MU0_UNPAIRED;
+		//Bool_t  L2_L1ItemStreamer_L1_MU0_UNPAIRED;
 		Bool_t  L2_L1ItemStreamer_L1_MU10;
 		Bool_t  L2_L1ItemStreamer_L1_MU10_EMPTY;
 		Bool_t  L2_L1ItemStreamer_L1_MU15;
@@ -271,8 +271,8 @@ class offlineTree
 		Bool_t  L2_L1ItemStreamer_L1_MU6_J5;
 		Bool_t  L2_L1ItemStreamer_L1_MU6_UNPAIRED;
    
- 		Bool_t  L2_mu0_missingRoi;
-		Bool_t  L2_mu0_rpcOnly;
+ 		//Bool_t  L2_mu0_missingRoi;
+		//Bool_t  L2_mu0_rpcOnly;
 		Bool_t  L2_mu10;
 		Bool_t  L2_mu10_MG;
 		Bool_t  L2_mu10_MSonly;
@@ -293,10 +293,10 @@ class offlineTree
 		Bool_t  L2_mu4_DiMu;
 		Bool_t  L2_mu4_DiMu_FS;
 		Bool_t  L2_mu4_DiMu_FS_noOS;
-		Bool_t  L2_mu4_Jpsie5e3;
-		Bool_t  L2_mu4_Jpsie5e3_FS;
-		Bool_t  L2_mu4_Jpsie5e3_SiTrk;
-		Bool_t  L2_mu4_Jpsie5e3_SiTrk_FS;
+		//Bool_t  L2_mu4_Jpsie5e3;
+		//Bool_t  L2_mu4_Jpsie5e3_FS;
+		//Bool_t  L2_mu4_Jpsie5e3_SiTrk;
+		//Bool_t  L2_mu4_Jpsie5e3_SiTrk_FS;
 		Bool_t  L2_mu4_L2MSonly_EFFS_passL2;
 		Bool_t  L2_mu4_MG;
 		Bool_t  L2_mu4_MSonly;
@@ -330,7 +330,7 @@ class offlineTree
 		Bool_t  L2_mu4_tile_SiTrk;
 		Bool_t  L2_mu4_trod;
 		Bool_t  L2_mu4_trod_SiTrk;
-		Bool_t  L2_mu4_unpaired;
+		//Bool_t  L2_mu4_unpaired;
 		Bool_t  L2_mu4mu6_DiMu;
 		Bool_t  L2_mu6;
 		Bool_t  L2_mu6_DiMu;
@@ -338,9 +338,9 @@ class offlineTree
 		Bool_t  L2_mu6_DiMu_FS_noOS;
 		Bool_t  L2_mu6_DsPhiPi;
 		Bool_t  L2_mu6_Jpsie5e3;
-		Bool_t  L2_mu6_Jpsie5e3_FS;
-		Bool_t  L2_mu6_Jpsie5e3_SiTrk;
-		Bool_t  L2_mu6_Jpsie5e3_SiTrk_FS;
+		//Bool_t  L2_mu6_Jpsie5e3_FS;
+		//Bool_t  L2_mu6_Jpsie5e3_SiTrk;
+		//Bool_t  L2_mu6_Jpsie5e3_SiTrk_FS;
 		Bool_t  L2_mu6_MG;
 		Bool_t  L2_mu6_MSonly;
 		Bool_t  L2_mu6_MSonly_cosmic;

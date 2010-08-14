@@ -72,6 +72,13 @@ void offlineTreeDigest::setBranches(TMapds* cutFlowOrdered)
 	m_tree->Branch( "is_eta", &b_eta );
 }
 
+void offlineTreeDigest::fill()
+{
+	/*---------------------------*/
+	/*---*/ m_tree->Fill(); /*---*/
+	/*---------------------------*/
+}
+
 void offlineTreeDigest::fill(TMapsb& cutFlowDecision, TMapsd& kinematicVariables)
 {
 	// fill run branches
@@ -111,6 +118,31 @@ void offlineTreeDigest::fill(TMapsb& cutFlowDecision, TMapsd& kinematicVariables
 	/*---------------------------*/
 	/*---*/ m_tree->Fill(); /*---*/
 	/*---------------------------*/
+}
+
+void offlineTreeDigest::reset()
+{
+	// run
+	m_RunNumber   = -999;
+	m_lbn         = -999;
+	m_EventNumber = -999;
+
+	// kin
+	m_imass       = -999;
+	m_mu_pT       = -999;
+	m_mu_eta      = -999;
+	m_mu_cosTheta = -999;
+
+	// cutFlow
+	b_null      = false;
+	b_GRL       = false;
+	b_L1_MU6    = false;
+	b_z0        = false;
+	b_d0        = false;
+	b_cosmicCut = false;
+	b_imass     = false;
+	b_pT        = false;
+	b_eta       = false;
 }
 
 void offlineTreeDigest::write()

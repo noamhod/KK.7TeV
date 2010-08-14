@@ -44,7 +44,9 @@ class offlineTreeDigest : public utilities
 		~offlineTreeDigest();
 		
 		void setBranches(TMapds* cutFlowOrdered);
+		void fill();
 		void fill(TMapsb& cutFlowDecision, TMapsd& kinematicVariables);
+		void reset();
 		void write();
 
 	private:

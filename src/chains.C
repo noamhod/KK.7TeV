@@ -25,13 +25,13 @@ void chains::cinitialize()
 
 void chains::cfinalize()
 {
-//	delete m_chain;
+	//	delete m_chain;
 }
 
 void chains::list2chain(string sListFilePath, string sListContentAbsolutePath)
 {
 	ifstream file;
-        file.open(sListFilePath.c_str());
+	file.open(sListFilePath.c_str());
 	string sLine;
 	size_t pos;
 	size_t min = 32000;
@@ -43,7 +43,7 @@ void chains::list2chain(string sListFilePath, string sListContentAbsolutePath)
 		
 		pos = sLine.find(".root");
 		if (pos == string::npos) { nignored++; continue; } // if pattern ".root" is not found
-	
+		
 		pos = sLine.find("D3PD._");
 		if (pos == string::npos) { nignored++; continue; } // if pattern "D3PD._" is not found
 
@@ -55,7 +55,7 @@ void chains::list2chain(string sListFilePath, string sListContentAbsolutePath)
 			fileSize = infile.tellg();
 			if(fileSize < min) { nignored++; continue; } // if file is too small
 		}
-	
+		
 		// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 		sLine = sListContentAbsolutePath + sLine; // add the absolute path
 		// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -77,31 +77,31 @@ void chains::makeChain(bool doList, string sListFilePath, string sListContentAbs
 void chains::drawFromChain()
 {
 	//TCut cut0  = "mu_muid_charge->size()==2";
-        TCut cut1  = "mu_muid_charge[0]+mu_muid_charge[1]==0";
-        const char* formula1 = "sqrt(mu_muid_m[0]*mu_muid_m[0] + mu_muid_m[1]*mu_muid_m[1] + 2*mu_muid_E[0]*mu_muid_E[1] - 2*(mu_muid_px[0]*mu_muid_px[1] + mu_muid_py[0]*mu_muid_py[1] + mu_muid_pz[0]*mu_muid_pz[1]))";
+	TCut cut1  = "mu_muid_charge[0]+mu_muid_charge[1]==0";
+	const char* formula1 = "sqrt(mu_muid_m[0]*mu_muid_m[0] + mu_muid_m[1]*mu_muid_m[1] + 2*mu_muid_E[0]*mu_muid_E[1] - 2*(mu_muid_px[0]*mu_muid_px[1] + mu_muid_py[0]*mu_muid_py[1] + mu_muid_pz[0]*mu_muid_pz[1]))";
 
-        TCut cut2  = "mu_muid_charge[0]<0";
-        TCut cut3  = "mu_muid_charge[1]<0";
-        const char* formula2 = "sqrt( mu_muid_px[0]*mu_muid_px[0] + mu_muid_py[0]*mu_muid_py[0] )";
-        const char* formula3 = "sqrt( mu_muid_px[1]*mu_muid_px[1] + mu_muid_py[1]*mu_muid_py[1] )";
+	TCut cut2  = "mu_muid_charge[0]<0";
+	TCut cut3  = "mu_muid_charge[1]<0";
+	const char* formula2 = "sqrt( mu_muid_px[0]*mu_muid_px[0] + mu_muid_py[0]*mu_muid_py[0] )";
+	const char* formula3 = "sqrt( mu_muid_px[1]*mu_muid_px[1] + mu_muid_py[1]*mu_muid_py[1] )";
 
-        TCanvas* c1 = new TCanvas("imass from m_chain","imass from m_chain",600,400);
-        c1->SetLogy();
-        c1->Draw();
-        c1->cd();
-        m_chain->Draw(formula1, cut1);
+	TCanvas* c1 = new TCanvas("imass from m_chain","imass from m_chain",600,400);
+	c1->SetLogy();
+	c1->Draw();
+	c1->cd();
+	m_chain->Draw(formula1, cut1);
 
-        TCanvas* c2 = new TCanvas("pT mu^- from m_chain","pT mu^- from m_chain",600,400);
-        c2->SetLogy();
-        c2->Draw();
-        c2->cd();
-        m_chain->Draw(formula2, cut1+cut2);
-        m_chain->Draw(formula3, cut1+cut3, "sames");
+	TCanvas* c2 = new TCanvas("pT mu^- from m_chain","pT mu^- from m_chain",600,400);
+	c2->SetLogy();
+	c2->Draw();
+	c2->cd();
+	m_chain->Draw(formula2, cut1+cut2);
+	m_chain->Draw(formula3, cut1+cut3, "sames");
 
 	TCanvas* c3 = new TCanvas("L1_MU6 from m_chain","L1_MU6 from m_chain",600,400);
-        //c3->SetLogy();
-        c3->Draw();
-        c3->cd();
+	//c3->SetLogy();
+	c3->Draw();
+	c3->cd();
 	m_chain->Draw("L1_MU6");
 }
 #endif

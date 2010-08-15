@@ -9,7 +9,7 @@
 
 analysis::analysis()
 {
-        initialize();
+	initialize();
 }
 
 analysis::analysis(physics* phys, graphicObjects* graphicobjs, GRLinterface* grl, TFile* treeFile)
@@ -66,17 +66,17 @@ void analysis::enableGeneralBranches()
 
 void analysis::readCutFlow(string sCutFlowFilePath)
 {
-        fstream file;
-        file.open( sCutFlowFilePath.c_str() );
+	fstream file;
+	file.open( sCutFlowFilePath.c_str() );
 
-        string sLine = "";
-        string skey  = "";
-        double dval  = 0.;
+	string sLine = "";
+	string skey  = "";
+	double dval  = 0.;
 	double dnum  = 0.;
 
 	vector<string> orderedVec;
 
-        int nLinesRead = 0;
+	int nLinesRead = 0;
 
 	if (!file)
 	{
@@ -84,37 +84,37 @@ void analysis::readCutFlow(string sCutFlowFilePath)
 		exit(1);   // call system to stop
 	}
 
-        while(!file.eof())
-        {
-                getline(file,sLine);
+	while(!file.eof())
+	{
+		getline(file,sLine);
 
-                if(sLine == "") continue;
+		if(sLine == "") continue;
 		if(sLine.substr(0,1) == "#")    continue;
 
-                // parse the line (ownership utilitis):
-                parseKeyValLine(sLine);
+		// parse the line (ownership utilitis):
+		parseKeyValLine(sLine);
 
-                // get the key = cut name (ownership utilitis):
-                skey = getKey();
+		// get the key = cut name (ownership utilitis):
+		skey = getKey();
 
-                // get the 1st val = cut value:
-                dval = getVal(0);
+		// get the 1st val = cut value:
+		dval = getVal(0);
 
 		// get the 2nd val = cut number:
 		dnum = getVal(1);
- 
- 		//for(int i=0 ; i<(int)getNVals() ; i++) { dval = getVal(i); }
 
-                nLinesRead++;
+		//for(int i=0 ; i<(int)getNVals() ; i++) { dval = getVal(i); }
 
-                if(b_print) { cout << "key=" << skey << "\tval=" << dval << "\tdnum=" << dnum << endl; }
+		nLinesRead++;
 
-                // pair the map
-                m_cutFlowMap->insert( make_pair(skey,dval) );
+		if(b_print) { cout << "key=" << skey << "\tval=" << dval << "\tdnum=" << dnum << endl; }
+
+		// pair the map
+		m_cutFlowMap->insert( make_pair(skey,dval) );
 		m_cutFlowOrdered->insert( make_pair(dnum,skey) );
 		m_cutFlowNumbers->insert( make_pair(skey,0) );
-        }
-        cout << "\nread " << nLinesRead << " lines from " << sCutFlowFilePath << endl;
+	}
+	cout << "\nread " << nLinesRead << " lines from " << sCutFlowFilePath << endl;
 
 	// ownership: selection class:
 	initSelectionCuts(m_cutFlowMap, m_cutFlowOrdered);
@@ -152,13 +152,13 @@ void analysis::printCutFlowNumbers(Long64_t chainEntries)
 	cout << "+------------------------------------------------" << endl;
 	cout << "|             print cut flow numbers             " << endl;
 	cout << "|................................................" << endl;
-        cout << "|    all events in chain, " << chainEntries << endl;
-        cout << "|    all processed events, " << nAllEvents << endl;
-        for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
-        {
-                string scutname = ii->second;
-                cout << "|    events remaining after " << scutname << " cut, " << m_cutFlowNumbers->operator[](scutname) << endl;
-        }
+	cout << "|    all events in chain, " << chainEntries << endl;
+	cout << "|    all processed events, " << nAllEvents << endl;
+	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
+	{
+		string scutname = ii->second;
+		cout << "|    events remaining after " << scutname << " cut, " << m_cutFlowNumbers->operator[](scutname) << endl;
+	}
 	cout << "+------------------------------------------------" << endl;
 }
 
@@ -175,9 +175,11 @@ void analysis::fillCutFlow(string sCurrentCutName, TMapsd& values2fill)
 
 void analysis::executeTree(bool isendofrun)
 {
-        b_isGRL = m_analysis_grl->m_grl.HasRunLumiBlock( m_phys->RunNumber, m_phys->lbn );
-        m_offlineTree->fill( b_isGRL );
-        //if(isendofrun) m_offlineTree->write();
+	if(isendofrun) cout << "--- !!! END OF RUN !!! ---" << endl;
+	
+	b_isGRL = m_analysis_grl->m_grl.HasRunLumiBlock( m_phys->RunNumber, m_phys->lbn );
+	m_offlineTree->fill( b_isGRL );
+	//if(isendofrun) m_offlineTree->write();
 }
 
 void analysis::executeBasic()
@@ -226,15 +228,15 @@ void analysis::executeBasic()
 				if( m_phys->L1_MU6 == 1 ) // this is also a cut and not overlap removal
 				{
 					buildMuonPairMap( mupairMap,
-							  pmu[n], m_phys->mu_staco_charge->at(n), m_phys->mu_staco_d0_exPV->at(n), m_phys->mu_staco_z0_exPV->at(n), n,
-							  pmu[m], m_phys->mu_staco_charge->at(m), m_phys->mu_staco_d0_exPV->at(m), m_phys->mu_staco_z0_exPV->at(m), m );
+									  pmu[n], m_phys->mu_staco_charge->at(n), m_phys->mu_staco_d0_exPV->at(n), m_phys->mu_staco_z0_exPV->at(n), n,
+									  pmu[m], m_phys->mu_staco_charge->at(m), m_phys->mu_staco_d0_exPV->at(m), m_phys->mu_staco_z0_exPV->at(m), m );
 				}
 			}
 
 			// check before cuts
 			if(m_phys->mu_staco_charge->at(n) * m_phys->mu_staco_charge->at(m)<0.)
 			{
-				cosmicCosth = dimuonCosth( pmu[n], pmu[m] );
+				cosmicCosth = cosThetaDimu( pmu[n], pmu[m] );
 				m_graphicobjs->h1_cosmicCosth->Fill( cosmicCosth );
 				
 				d0exPVa = m_phys->mu_staco_d0_exPV->at(n);
@@ -257,19 +259,19 @@ void analysis::executeBasic()
 		{
 			int ai = it->first;
 			int bi = it->second;
-		
+			
 			im = imass( pmu[ai], pmu[bi] );
 			pTa = pT( pmu[ai] );
 			pTb = pT( pmu[bi] );
 			etaa = eta( pmu[ai] );	
 			etab = eta( pmu[bi] );
 			costh = cosThetaCollinsSoper( 	pmu[ai], (double)m_phys->mu_staco_charge->at(ai),
-							pmu[bi], (double)m_phys->mu_staco_charge->at(bi) );
+			pmu[bi], (double)m_phys->mu_staco_charge->at(bi) );
 			d0exPVa = m_phys->mu_staco_d0_exPV->at(ai);
 			z0exPVa = m_phys->mu_staco_z0_exPV->at(ai);
 			d0exPVb = m_phys->mu_staco_d0_exPV->at(bi);
 			z0exPVb = m_phys->mu_staco_z0_exPV->at(bi);
-			//cosmicCosth = dimuonCosth( pmu[ai], pmu[bi] );
+			//cosmicCosth = cosThetaDimu( pmu[ai], pmu[bi] );
 
 			cout << "$$$$$$$$$ dimuon $$$$$$$$$" << endl;
 			cout << "\t im=" << im << endl;
@@ -324,37 +326,37 @@ void analysis::executeCutFlow()
 	nAllEvents++;
 
 	// local variables
-        TMapii      allmupairMap;
-        TVectorP2VL pmu;
+	TMapii      allmupairMap;
+	TVectorP2VL pmu;
 
-        // build vector of the muons TLorentzVector
-        for(int n=0 ; n<(int)m_phys->mu_staco_n ; n++)
-        {
-                pmu.push_back( new TLorentzVector() );
-                pmu[n]->SetPx( m_phys->mu_staco_px->at(n) );
-                pmu[n]->SetPy( m_phys->mu_staco_py->at(n) );
-                pmu[n]->SetPz( m_phys->mu_staco_pz->at(n) );
-                pmu[n]->SetE(  m_phys->mu_staco_E->at(n)  );
-        }
+	// build vector of the muons TLorentzVector
+	for(int n=0 ; n<(int)m_phys->mu_staco_n ; n++)
+	{
+		pmu.push_back( new TLorentzVector() );
+		pmu[n]->SetPx( m_phys->mu_staco_px->at(n) );
+		pmu[n]->SetPy( m_phys->mu_staco_py->at(n) );
+		pmu[n]->SetPz( m_phys->mu_staco_pz->at(n) );
+		pmu[n]->SetE(  m_phys->mu_staco_E->at(n)  );
+	}
 
 	// build the map of the good muon pairs 
-        if(pmu.size()>1)
-        {               
-                for(int n=0 ; n<(int)pmu.size() ; n++)
-                {               
-                        for(int m=0 ; m<(int)pmu.size() ; m++)
-                        {
-                                // dont pair with itself
-                                if( m==n ) continue;
+	if(pmu.size()>1)
+	{               
+		for(int n=0 ; n<(int)pmu.size() ; n++)
+		{               
+			for(int m=0 ; m<(int)pmu.size() ; m++)
+			{
+				// dont pair with itself
+				if( m==n ) continue;
 
-                                // remove overlaps
-                                if( removeOverlaps(allmupairMap, n, m) ) continue;
-                                // now can insert all dimuons into the index map (only opposite charge requirement)
-                                buildMuonPairMap( allmupairMap,
-                                                (double)m_phys->mu_staco_charge->at(n), n,
-                                                (double)m_phys->mu_staco_charge->at(m), m );
-                        }
-                }
+				// remove overlaps
+				if( removeOverlaps(allmupairMap, n, m) ) continue;
+				// now can insert all dimuons into the index map (only opposite charge requirement)
+				buildMuonPairMap( allmupairMap,
+				(double)m_phys->mu_staco_charge->at(n), n,
+				(double)m_phys->mu_staco_charge->at(m), m );
+			}
+		}
 	}
 
 	// get the pmuon pairs from the all pairs map
@@ -392,10 +394,10 @@ void analysis::executeCutFlow()
 			{
 				string sorderedcutname = ii->second;
 
-				if(sorderedcutname=="null")
+				if(sorderedcutname=="c1*c2<0")
 				{
 					passCut = (passCut)                                                                  ? true : false;
-					if(passCut) fillCutFlow("null", values2fill); // stop at null cut
+					if(passCut) fillCutFlow("c1*c2<0", values2fill); // stop at null cut
 				}
 
 				if(sorderedcutname=="GRL")
@@ -428,10 +430,10 @@ void analysis::executeCutFlow()
 					if(passCut) fillCutFlow("eta", values2fill); // stop at eta cut
 				}
 
-				if(sorderedcutname=="cosmicCut")
+				if(sorderedcutname=="cosThetaDimu")
 				{
-					passCut = ( cosmicCut((*m_cutFlowMap)["cosmicCut"], pmu[ai], pmu[bi])  &&  passCut ) ? true : false;
-					if(passCut) fillCutFlow("cosmicCut", values2fill); // stop at cosmic cut
+					passCut = ( cosThetaDimuCut((*m_cutFlowMap)["cosThetaDimu"], pmu[ai], pmu[bi])  &&  passCut ) ? true : false;
+					if(passCut) fillCutFlow("cosThetaDimu", values2fill); // stop at cosmic cut
 				}
 
 				if(sorderedcutname=="d0")

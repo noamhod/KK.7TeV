@@ -59,6 +59,9 @@ class digestControl : public digestChains, public digestAnalysis
 		~digestControl();
 		void   initialize();
 		void   finalize();
+		
+		void resetLastCut2Hist(string sLastCut2Hist = "GRL") {m_digestAnalysis->m_sLastCut2Hist = sLastCut2Hist;}
+		
 		void   book();
 		void   draw();
 		void   analyze();

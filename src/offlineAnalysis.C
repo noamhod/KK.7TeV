@@ -222,7 +222,7 @@ void offlineAnalysis::executeBasic()
 			// check before cuts
 			if(m_offPhys->mu_staco_charge->at(n) * m_offPhys->mu_staco_charge->at(m)<0.)
 			{
-				cosmicCosth = dimuonCosth( pmu[n], pmu[m] );
+				cosmicCosth = cosThetaDimu( pmu[n], pmu[m] );
 				m_graphicobjs->h1_cosmicCosth->Fill( cosmicCosth );
 				
 				d0exPVa = m_offPhys->mu_staco_d0_exPV->at(n);
@@ -257,7 +257,7 @@ void offlineAnalysis::executeBasic()
 			z0exPVa = m_offPhys->mu_staco_z0_exPV->at(ai);
 			d0exPVb = m_offPhys->mu_staco_d0_exPV->at(bi);
 			z0exPVb = m_offPhys->mu_staco_z0_exPV->at(bi);
-			//cosmicCosth = dimuonCosth( pmu[ai], pmu[bi] );
+			//cosmicCosth = cosThetaDimu( pmu[ai], pmu[bi] );
 
 			cout << "$$$$$$$$$ dimuon $$$$$$$$$" << endl;
 			cout << "\t im=" << im << endl;
@@ -405,7 +405,7 @@ void offlineAnalysis::executeCutFlow()
 			{
 				string sorderedcutname = ii->second;
 
-				if(sorderedcutname=="null")
+				if(sorderedcutname=="c1*c2<0")
 				{
 					passCurrentCut = (true) ? true : false;
 				}
@@ -435,9 +435,9 @@ void offlineAnalysis::executeCutFlow()
 					passCurrentCut = ( etaCut((*m_cutFlowMap)[sorderedcutname], pmu[ai], pmu[bi]) ) ? true : false;
 				}
 
-				if(sorderedcutname=="cosmicCut")
+				if(sorderedcutname=="cosThetaDimu")
 				{
-					passCurrentCut = ( cosmicCut((*m_cutFlowMap)[sorderedcutname], pmu[ai], pmu[bi]) ) ? true : false;
+					passCurrentCut = ( cosThetaDimuCut((*m_cutFlowMap)[sorderedcutname], pmu[ai], pmu[bi]) ) ? true : false;
 				}
 
 				if(sorderedcutname=="d0")

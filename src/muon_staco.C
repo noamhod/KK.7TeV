@@ -13,7 +13,7 @@ muon_staco::muon_staco() {}
 muon_staco::muon_staco(physics* phys)
 {
 	physPtr = phys;
-	turnonBraches();
+	physPtr->fChain->SetBranchStatus("mu_staco_*", 1);
 }
 
 muon_staco::~muon_staco() {}
@@ -52,50 +52,6 @@ void muon_staco::setParticle(int index)
 	setQvec(); //--------------------------
 	setVertex(); //------------------------
 	//-------------------------------------
-}
-
-void muon_staco::turnonBraches()
-{
-	physPtr->fChain->SetBranchStatus("mu_staco_*", 1);
-	/*
-	physPtr->fChain->SetBranchStatus("mu_staco_n",                1); 
-	physPtr->fChain->SetBranchStatus("mu_staco_E",                1);
-	physPtr->fChain->SetBranchStatus("mu_staco_pt",               1);
-	physPtr->fChain->SetBranchStatus("mu_staco_m",                1);
-	physPtr->fChain->SetBranchStatus("mu_staco_eta",              1);
-	physPtr->fChain->SetBranchStatus("mu_staco_phi",              1);
-	physPtr->fChain->SetBranchStatus("mu_staco_px",               1);
-	physPtr->fChain->SetBranchStatus("mu_staco_py",               1);
-	physPtr->fChain->SetBranchStatus("mu_staco_pz",               1);
-	physPtr->fChain->SetBranchStatus("mu_staco_charge",           1);
-	physPtr->fChain->SetBranchStatus("mu_staco_allauthor",        1);
-	physPtr->fChain->SetBranchStatus("mu_staco_author",           1);
-	physPtr->fChain->SetBranchStatus("mu_staco_matchchi2",        1);
-	physPtr->fChain->SetBranchStatus("mu_staco_matchndof",        1);
-	physPtr->fChain->SetBranchStatus("mu_staco_etcone20",         1);
-	physPtr->fChain->SetBranchStatus("mu_staco_etcone30",         1);
-	physPtr->fChain->SetBranchStatus("mu_staco_etcone40",         1);
-	physPtr->fChain->SetBranchStatus("mu_staco_nucone20",         1);
-	physPtr->fChain->SetBranchStatus("mu_staco_nucone30",         1);
-	physPtr->fChain->SetBranchStatus("mu_staco_nucone40",         1);
-	physPtr->fChain->SetBranchStatus("mu_staco_ptcone20",         1);
-	physPtr->fChain->SetBranchStatus("mu_staco_ptcone30",         1);
-	physPtr->fChain->SetBranchStatus("mu_staco_ptcone40",         1);
-	physPtr->fChain->SetBranchStatus("mu_staco_energyLossPar",    1);
-	physPtr->fChain->SetBranchStatus("mu_staco_energyLossErr",    1);
-	physPtr->fChain->SetBranchStatus("mu_staco_bestMatch",        1);
-	physPtr->fChain->SetBranchStatus("mu_staco_isStandAloneMuon", 1);
-	physPtr->fChain->SetBranchStatus("mu_staco_isCombinedMuon",   1);
-	physPtr->fChain->SetBranchStatus("mu_staco_isLowPtReconstructedMuon", 1);
-	physPtr->fChain->SetBranchStatus("mu_staco_loose",       1);
-	physPtr->fChain->SetBranchStatus("mu_staco_medium",      1);
-	physPtr->fChain->SetBranchStatus("mu_staco_tight",       1);
-	physPtr->fChain->SetBranchStatus("mu_staco_d0_exPV",     1);
-	physPtr->fChain->SetBranchStatus("mu_staco_z0_exPV",     1);
-	physPtr->fChain->SetBranchStatus("mu_staco_phi_exPV",    1);
-	physPtr->fChain->SetBranchStatus("mu_staco_theta_exPV",  1);
-	physPtr->fChain->SetBranchStatus("mu_staco_qoverp_exPV", 1);
-	*/
 }
 
 void muon_staco::setMore(int index)

@@ -229,7 +229,8 @@ void fcnSignal(int& npar, double* deriv, double& f, double par[], int flag)
 	for (int i=0; i<n; i++)
 	{
 		double x = xVec[i];
-		double pdf = fitFunctionS2(&x, par);
+		//double pdf = fitFunctionS2(&x, par);
+		double pdf = fitFunctionS(&x, par);
 		if ( pdf > 0.0 )
 		{
 			lnL += log(pdf);    // need positive f
@@ -259,7 +260,8 @@ void fcnSignalBackground(int& npar, double* deriv, double& f, double par[], int 
 	for (int i=0; i<n; i++)
 	{
 		double x = xVec[i];
-		double pdf = fitFunctionSB2(&x, par);
+		//double pdf = fitFunctionSB2(&x, par);
+		double pdf = fitFunctionSB(&x, par);
 		if ( pdf > 0.0 )
 		{
 			lnL += log(pdf);    // need positive f
@@ -461,9 +463,12 @@ void fit::minimize(bool signal_only, TH1D* h, double* yields)
 		minuit = new TMinuit(9);
 	}
 	
-	/*
-	double bin_width = h->GetBinWidth(1);
 	
+	double bin_width = h->GetBinWidth(1);
+	// irrelevant
+	if(!docout) cout << "bin_width="  << bin_width  << endl;
+	
+	/*
 	// set initial parameters
 	fitFCN->SetParameters(par);
 

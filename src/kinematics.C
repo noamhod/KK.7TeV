@@ -52,7 +52,7 @@ double kinematics::pAbs( TLorentzVector* p )
 	return p->Mag();
 }       
 
-double kinematics::dimuonCosth( TLorentzVector* pa, TLorentzVector* pb )
+double kinematics::cosThetaDimu( TLorentzVector* pa, TLorentzVector* pb )
 {
 	double paMag = sqrt( pa->Px()*pa->Px() + pa->Py()*pa->Py() + pa->Pz()*pa->Pz() );
 	double pbMag = sqrt( pb->Px()*pb->Px() + pb->Py()*pb->Py() + pb->Pz()*pb->Pz() );	

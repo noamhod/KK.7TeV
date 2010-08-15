@@ -20,14 +20,14 @@ graphicObjects::~graphicObjects()
 void graphicObjects::ginitialize()
 {
 	// canvases
-	cnv_imass  = NULL;
-	cnv_pT     = NULL;
-	cnv_eta    = NULL;
-	cnv_costh  = NULL;
-	cnv_d0exPV = NULL;
-	cnv_z0exPV = NULL;
-	cnv_cosmicCosth = NULL;
-	cnv_xyVertex = NULL;
+	cnv_imass        = NULL;
+	cnv_pT           = NULL;
+	cnv_eta          = NULL;
+	cnv_costh        = NULL;
+	cnv_d0exPV       = NULL;
+	cnv_z0exPV       = NULL;
+	cnv_cosmicCosth  = NULL;
+	cnv_xyVertex     = NULL;
 	cnv_imassAllCuts = NULL;
 	
 	// histos
@@ -117,7 +117,7 @@ void graphicObjects::bookBareHistos(TDirectory* tdir)
 
 	h1_d0exPV = new TH1D("d0exPV","d0exPV", d0exPV_nbins, d0exPV_min, d0exPV_max);
 	h1_z0exPV = new TH1D("z0exPV","z0exPV", z0exPV_nbins, z0exPV_min, z0exPV_max);
-	h1_cosmicCosth = new TH1D("cosmicCosth","cosmicCosth", cosmicCosth_nbins, cosmicCosth_min, cosmicCosth_max);
+	h1_cosmicCosth = new TH1D("cosThetaDimu","cosThetaDimu", cosmicCosth_nbins, cosmicCosth_min, cosmicCosth_max);
 	h2_xyVertex = new TH2D("xyVertex","xyVertex",   xyVertex_nbins, xyVertex_min, xyVertex_max,
 	xyVertex_nbins, xyVertex_min, xyVertex_max);
 }
@@ -148,7 +148,7 @@ void graphicObjects::drawBareHistos(TDirectory* tdir)
 	cnv_z0exPV->cd();
 	h1_z0exPV->Draw();
 
-	cnv_cosmicCosth = new TCanvas("cosmicCosth","cosmicCosth",canv_x,canv_y);
+	cnv_cosmicCosth = new TCanvas("cosThetaDimu","cosThetaDimu",canv_x,canv_y);
 	cnv_cosmicCosth->Draw();
 	cnv_cosmicCosth->cd();
 	h1_cosmicCosth->Draw();

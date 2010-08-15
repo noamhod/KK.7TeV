@@ -48,6 +48,7 @@ public :
    Float_t         lar_timeA;
    Float_t         lar_timeC;
    Float_t         lar_timeDiff;
+   /*
    Int_t           el_n;
    vector<float>   *el_E;
    vector<float>   *el_Et;
@@ -355,6 +356,7 @@ public :
    vector<float>   *el_L1_pt;
    vector<float>   *el_L1_Et;
    vector<int>     *el_L1_matched;
+   */
    Bool_t          EF_2e3_NoCut;
    Bool_t          EF_2e3_loose_EM2;
    Bool_t          EF_2e3_medium_EM2;
@@ -807,6 +809,7 @@ public :
    Bool_t          L2_xe40_medium_noMu;
    Bool_t          L2_xe50_medium_noMu;
    Bool_t          L2_xe60_medium_noMu;
+   /*
    Int_t           ph_n;
    vector<float>   *ph_E;
    vector<float>   *ph_Et;
@@ -1015,6 +1018,7 @@ public :
    vector<float>   *ph_L1_pt;
    vector<float>   *ph_L1_Et;
    vector<int>     *ph_L1_matched;
+   */
    Int_t           mu_muid_n;
    vector<float>   *mu_muid_E;
    vector<float>   *mu_muid_pt;
@@ -1381,6 +1385,7 @@ public :
    vector<short>   *mu_staco_L1_source;
    vector<short>   *mu_staco_L1_hemisphere;
    vector<int>     *mu_staco_L1_matched;
+   /*
    Int_t           tau_n;
    vector<float>   *tau_Et;
    vector<float>   *tau_m;
@@ -1499,6 +1504,8 @@ public :
    vector<float>   *tau_L1_eta;
    vector<float>   *tau_L1_phi;
    vector<int>     *tau_L1_matched;
+   */
+   /*
    Int_t           jet_antikt4h1topo_n;
    vector<float>   *jet_antikt4h1topo_E;
    vector<float>   *jet_antikt4h1topo_pt;
@@ -2177,6 +2184,8 @@ public :
    vector<int>     *jet_antikt6h1topo_el_matched;
    vector<float>   *jet_antikt6h1topo_mu_dr;
    vector<int>     *jet_antikt6h1topo_mu_matched;
+   */
+   /*
    Float_t         MET_RefFinal_etx;
    Float_t         MET_RefFinal_ety;
    Float_t         MET_RefFinal_sumet;
@@ -2605,6 +2614,8 @@ public :
    Float_t         MET_JetsInfo_JetPtWeightedSize;
    Float_t         MET_JetsInfo_LeadingJetEt;
    Float_t         MET_JetsInfo_LeadingJetEta;
+   */
+   /*
    Int_t           cl_n;
    vector<float>   *cl_E;
    vector<float>   *cl_pt;
@@ -2623,6 +2634,8 @@ public :
    vector<float>   *cl_deltaTheta;
    vector<float>   *cl_deltaPhi;
    vector<float>   *cl_time;
+   */
+   /*
    Int_t           emcl_n;
    vector<float>   *emcl_E;
    vector<float>   *emcl_pt;
@@ -2665,6 +2678,8 @@ public :
    vector<float>   *emcl_E_FCAL0;
    vector<float>   *emcl_E_FCAL1;
    vector<float>   *emcl_E_FCAL2;
+   */
+   
    Int_t           trk_n;
    vector<float>   *trk_d0;
    vector<float>   *trk_z0;
@@ -2736,6 +2751,8 @@ public :
    vector<int>     *trk_patternReco1;
    vector<int>     *trk_patternReco2;
    vector<int>     *trk_seedFinder;
+   
+   
    Int_t           mb_n;
    vector<float>   *mb_E;
    vector<float>   *mb_eta;
@@ -2782,6 +2799,8 @@ public :
    Bool_t          collcand_passCaloTime;
    Bool_t          collcand_passTrigger;
    Bool_t          collcand_pass;
+   
+   
    Int_t           vxp_n;
    vector<float>   *vxp_x;
    vector<float>   *vxp_y;
@@ -2811,6 +2830,8 @@ public :
    vector<vector<float> > *vxp_trk_theta;
    vector<vector<float> > *vxp_trk_weight;
    vector<vector<int> > *vxp_trk_index;
+   
+   /*
    Int_t           trig_L1_emtau_n;
    vector<float>   *trig_L1_emtau_eta;
    vector<float>   *trig_L1_emtau_phi;
@@ -3191,6 +3212,8 @@ public :
    vector<short>   *trig_RoI_EF_e_lastStep;
    vector<int>     *trig_RoI_EF_e_EmTau_ROI;
    vector<int>     *trig_RoI_EF_e_EmTau_ROIStatus;
+   */
+   /*
    Bool_t          EF_tau12_loose;
    Bool_t          EF_tau12_loose_PT;
    Bool_t          EF_tau16_loose;
@@ -3305,6 +3328,7 @@ public :
    Bool_t          MET_Goodness_All;
    Bool_t          MET_Goodness_JetCleaning;
    Long64_t        MET_Goodness_BitMask;
+   */
 
    // List of branches
    TBranch        *b_RunNumber;   //!
@@ -3338,6 +3362,7 @@ public :
    TBranch        *b_lar_timeA;   //!
    TBranch        *b_lar_timeC;   //!
    TBranch        *b_lar_timeDiff;   //!
+   /*
    TBranch        *b_el_n;   //!
    TBranch        *b_el_E;   //!
    TBranch        *b_el_Et;   //!
@@ -3645,6 +3670,7 @@ public :
    TBranch        *b_el_L1_pt;   //!
    TBranch        *b_el_L1_Et;   //!
    TBranch        *b_el_L1_matched;   //!
+   */
    TBranch        *b_EF_2e3_NoCut;   //!
    TBranch        *b_EF_2e3_loose_EM2;   //!
    TBranch        *b_EF_2e3_medium_EM2;   //!
@@ -4097,6 +4123,7 @@ public :
    TBranch        *b_L2_xe40_medium_noMu;   //!
    TBranch        *b_L2_xe50_medium_noMu;   //!
    TBranch        *b_L2_xe60_medium_noMu;   //!
+   /*
    TBranch        *b_ph_n;   //!
    TBranch        *b_ph_E;   //!
    TBranch        *b_ph_Et;   //!
@@ -4305,6 +4332,7 @@ public :
    TBranch        *b_ph_L1_pt;   //!
    TBranch        *b_ph_L1_Et;   //!
    TBranch        *b_ph_L1_matched;   //!
+   */
    TBranch        *b_mu_muid_n;   //!
    TBranch        *b_mu_muid_E;   //!
    TBranch        *b_mu_muid_pt;   //!
@@ -4671,6 +4699,7 @@ public :
    TBranch        *b_mu_staco_L1_source;   //!
    TBranch        *b_mu_staco_L1_hemisphere;   //!
    TBranch        *b_mu_staco_L1_matched;   //!
+   /*
    TBranch        *b_tau_n;   //!
    TBranch        *b_tau_Et;   //!
    TBranch        *b_tau_m;   //!
@@ -4789,6 +4818,8 @@ public :
    TBranch        *b_tau_L1_eta;   //!
    TBranch        *b_tau_L1_phi;   //!
    TBranch        *b_tau_L1_matched;   //!
+   */
+   /*
    TBranch        *b_jet_antikt4h1topo_n;   //!
    TBranch        *b_jet_antikt4h1topo_E;   //!
    TBranch        *b_jet_antikt4h1topo_pt;   //!
@@ -5467,6 +5498,8 @@ public :
    TBranch        *b_jet_antikt6h1topo_el_matched;   //!
    TBranch        *b_jet_antikt6h1topo_mu_dr;   //!
    TBranch        *b_jet_antikt6h1topo_mu_matched;   //!
+   */
+   /*
    TBranch        *b_MET_RefFinal_etx;   //!
    TBranch        *b_MET_RefFinal_ety;   //!
    TBranch        *b_MET_RefFinal_sumet;   //!
@@ -5895,6 +5928,8 @@ public :
    TBranch        *b_MET_JetsInfo_JetPtWeightedSize;   //!
    TBranch        *b_MET_JetsInfo_LeadingJetEt;   //!
    TBranch        *b_MET_JetsInfo_LeadingJetEta;   //!
+   */
+   /*
    TBranch        *b_cl_n;   //!
    TBranch        *b_cl_E;   //!
    TBranch        *b_cl_pt;   //!
@@ -5955,6 +5990,7 @@ public :
    TBranch        *b_emcl_E_FCAL0;   //!
    TBranch        *b_emcl_E_FCAL1;   //!
    TBranch        *b_emcl_E_FCAL2;   //!
+   */
    TBranch        *b_trk_n;   //!
    TBranch        *b_trk_d0;   //!
    TBranch        *b_trk_z0;   //!
@@ -6026,6 +6062,7 @@ public :
    TBranch        *b_trk_patternReco1;   //!
    TBranch        *b_trk_patternReco2;   //!
    TBranch        *b_trk_seedFinder;   //!
+   
    TBranch        *b_mb_n;   //!
    TBranch        *b_mb_E;   //!
    TBranch        *b_mb_eta;   //!
@@ -6072,6 +6109,7 @@ public :
    TBranch        *b_collcand_passCaloTime;   //!
    TBranch        *b_collcand_passTrigger;   //!
    TBranch        *b_collcand_pass;   //!
+   
    TBranch        *b_vxp_n;   //!
    TBranch        *b_vxp_x;   //!
    TBranch        *b_vxp_y;   //!
@@ -6101,6 +6139,7 @@ public :
    TBranch        *b_vxp_trk_theta;   //!
    TBranch        *b_vxp_trk_weight;   //!
    TBranch        *b_vxp_trk_index;   //!
+   /*
    TBranch        *b_trig_L1_emtau_n;   //!
    TBranch        *b_trig_L1_emtau_eta;   //!
    TBranch        *b_trig_L1_emtau_phi;   //!
@@ -6481,6 +6520,8 @@ public :
    TBranch        *b_trig_RoI_EF_e_lastStep;   //!
    TBranch        *b_trig_RoI_EF_e_EmTau_ROI;   //!
    TBranch        *b_trig_RoI_EF_e_EmTau_ROIStatus;   //!
+   */
+   /*
    TBranch        *b_EF_tau12_loose;   //!
    TBranch        *b_EF_tau12_loose_PT;   //!
    TBranch        *b_EF_tau16_loose;   //!
@@ -6595,6 +6636,7 @@ public :
    TBranch        *b_MET_Goodness_All;   //!
    TBranch        *b_MET_Goodness_JetCleaning;   //!
    TBranch        *b_MET_Goodness_BitMask;   //!
+   */
 
    physics(TTree *tree=0);
    virtual ~physics();
@@ -14847,6 +14889,7 @@ void physics::Init(TTree *tree)
    // (once per file to be processed).
 
    // Set object pointer
+   /*
    el_E = 0;
    el_Et = 0;
    el_pt = 0;
@@ -15153,6 +15196,8 @@ void physics::Init(TTree *tree)
    el_L1_pt = 0;
    el_L1_Et = 0;
    el_L1_matched = 0;
+   */
+   /*
    ph_E = 0;
    ph_Et = 0;
    ph_pt = 0;
@@ -15360,6 +15405,7 @@ void physics::Init(TTree *tree)
    ph_L1_pt = 0;
    ph_L1_Et = 0;
    ph_L1_matched = 0;
+   */
    mu_muid_E = 0;
    mu_muid_pt = 0;
    mu_muid_m = 0;
@@ -15724,6 +15770,7 @@ void physics::Init(TTree *tree)
    mu_staco_L1_source = 0;
    mu_staco_L1_hemisphere = 0;
    mu_staco_L1_matched = 0;
+   /*
    tau_Et = 0;
    tau_m = 0;
    tau_eta = 0;
@@ -15841,6 +15888,8 @@ void physics::Init(TTree *tree)
    tau_L1_eta = 0;
    tau_L1_phi = 0;
    tau_L1_matched = 0;
+   */
+   /*
    jet_antikt4h1topo_E = 0;
    jet_antikt4h1topo_pt = 0;
    jet_antikt4h1topo_m = 0;
@@ -16513,6 +16562,8 @@ void physics::Init(TTree *tree)
    jet_antikt6h1topo_el_matched = 0;
    jet_antikt6h1topo_mu_dr = 0;
    jet_antikt6h1topo_mu_matched = 0;
+   */
+   /*
    cl_E = 0;
    cl_pt = 0;
    cl_m = 0;
@@ -16571,6 +16622,7 @@ void physics::Init(TTree *tree)
    emcl_E_FCAL0 = 0;
    emcl_E_FCAL1 = 0;
    emcl_E_FCAL2 = 0;
+   */
    trk_d0 = 0;
    trk_z0 = 0;
    trk_phi = 0;
@@ -16677,6 +16729,7 @@ void physics::Init(TTree *tree)
    vxp_trk_theta = 0;
    vxp_trk_weight = 0;
    vxp_trk_index = 0;
+   /*
    trig_L1_emtau_eta = 0;
    trig_L1_emtau_phi = 0;
    trig_L1_emtau_thrNames = 0;
@@ -17044,6 +17097,8 @@ void physics::Init(TTree *tree)
    trig_RoI_EF_e_lastStep = 0;
    trig_RoI_EF_e_EmTau_ROI = 0;
    trig_RoI_EF_e_EmTau_ROIStatus = 0;
+   */
+   /*
    MET_Goodness_BCH_CORR_CELL_Jet = 0;
    MET_Goodness_BCH_CORR_JET = 0;
    MET_Goodness_BCH_CORR_JET_FORCELL_Jet = 0;
@@ -17087,6 +17142,7 @@ void physics::Init(TTree *tree)
    MET_Goodness_N_BadCells_Jet = 0;
    MET_Goodness_NumTracks_Jet = 0;
    MET_Goodness_SamplingMaxID_Jet = 0;
+   */
    // Set branch addresses and branch pointers
    if (!tree) return;
    fChain = tree;
@@ -17124,6 +17180,7 @@ void physics::Init(TTree *tree)
    fChain->SetBranchAddress("lar_timeA", &lar_timeA, &b_lar_timeA);
    fChain->SetBranchAddress("lar_timeC", &lar_timeC, &b_lar_timeC);
    fChain->SetBranchAddress("lar_timeDiff", &lar_timeDiff, &b_lar_timeDiff);
+   /*
    fChain->SetBranchAddress("el_n", &el_n, &b_el_n);
    fChain->SetBranchAddress("el_E", &el_E, &b_el_E);
    fChain->SetBranchAddress("el_Et", &el_Et, &b_el_Et);
@@ -17431,6 +17488,7 @@ void physics::Init(TTree *tree)
    fChain->SetBranchAddress("el_L1_pt", &el_L1_pt, &b_el_L1_pt);
    fChain->SetBranchAddress("el_L1_Et", &el_L1_Et, &b_el_L1_Et);
    fChain->SetBranchAddress("el_L1_matched", &el_L1_matched, &b_el_L1_matched);
+   */
    fChain->SetBranchAddress("EF_2e3_NoCut", &EF_2e3_NoCut, &b_EF_2e3_NoCut);
    fChain->SetBranchAddress("EF_2e3_loose_EM2", &EF_2e3_loose_EM2, &b_EF_2e3_loose_EM2);
    fChain->SetBranchAddress("EF_2e3_medium_EM2", &EF_2e3_medium_EM2, &b_EF_2e3_medium_EM2);
@@ -17883,6 +17941,7 @@ void physics::Init(TTree *tree)
    fChain->SetBranchAddress("L2_xe40_medium_noMu", &L2_xe40_medium_noMu, &b_L2_xe40_medium_noMu);
    fChain->SetBranchAddress("L2_xe50_medium_noMu", &L2_xe50_medium_noMu, &b_L2_xe50_medium_noMu);
    fChain->SetBranchAddress("L2_xe60_medium_noMu", &L2_xe60_medium_noMu, &b_L2_xe60_medium_noMu);
+   /*
    fChain->SetBranchAddress("ph_n", &ph_n, &b_ph_n);
    fChain->SetBranchAddress("ph_E", &ph_E, &b_ph_E);
    fChain->SetBranchAddress("ph_Et", &ph_Et, &b_ph_Et);
@@ -18091,6 +18150,7 @@ void physics::Init(TTree *tree)
    fChain->SetBranchAddress("ph_L1_pt", &ph_L1_pt, &b_ph_L1_pt);
    fChain->SetBranchAddress("ph_L1_Et", &ph_L1_Et, &b_ph_L1_Et);
    fChain->SetBranchAddress("ph_L1_matched", &ph_L1_matched, &b_ph_L1_matched);
+   */
    fChain->SetBranchAddress("mu_muid_n", &mu_muid_n, &b_mu_muid_n);
    fChain->SetBranchAddress("mu_muid_E", &mu_muid_E, &b_mu_muid_E);
    fChain->SetBranchAddress("mu_muid_pt", &mu_muid_pt, &b_mu_muid_pt);
@@ -18457,6 +18517,7 @@ void physics::Init(TTree *tree)
    fChain->SetBranchAddress("mu_staco_L1_source", &mu_staco_L1_source, &b_mu_staco_L1_source);
    fChain->SetBranchAddress("mu_staco_L1_hemisphere", &mu_staco_L1_hemisphere, &b_mu_staco_L1_hemisphere);
    fChain->SetBranchAddress("mu_staco_L1_matched", &mu_staco_L1_matched, &b_mu_staco_L1_matched);
+   /*
    fChain->SetBranchAddress("tau_n", &tau_n, &b_tau_n);
    fChain->SetBranchAddress("tau_Et", &tau_Et, &b_tau_Et);
    fChain->SetBranchAddress("tau_m", &tau_m, &b_tau_m);
@@ -18575,6 +18636,8 @@ void physics::Init(TTree *tree)
    fChain->SetBranchAddress("tau_L1_eta", &tau_L1_eta, &b_tau_L1_eta);
    fChain->SetBranchAddress("tau_L1_phi", &tau_L1_phi, &b_tau_L1_phi);
    fChain->SetBranchAddress("tau_L1_matched", &tau_L1_matched, &b_tau_L1_matched);
+   */
+   /*
    fChain->SetBranchAddress("jet_antikt4h1topo_n", &jet_antikt4h1topo_n, &b_jet_antikt4h1topo_n);
    fChain->SetBranchAddress("jet_antikt4h1topo_E", &jet_antikt4h1topo_E, &b_jet_antikt4h1topo_E);
    fChain->SetBranchAddress("jet_antikt4h1topo_pt", &jet_antikt4h1topo_pt, &b_jet_antikt4h1topo_pt);
@@ -19253,6 +19316,8 @@ void physics::Init(TTree *tree)
    fChain->SetBranchAddress("jet_antikt6h1topo_el_matched", &jet_antikt6h1topo_el_matched, &b_jet_antikt6h1topo_el_matched);
    fChain->SetBranchAddress("jet_antikt6h1topo_mu_dr", &jet_antikt6h1topo_mu_dr, &b_jet_antikt6h1topo_mu_dr);
    fChain->SetBranchAddress("jet_antikt6h1topo_mu_matched", &jet_antikt6h1topo_mu_matched, &b_jet_antikt6h1topo_mu_matched);
+   */
+   /*
    fChain->SetBranchAddress("MET_RefFinal_etx", &MET_RefFinal_etx, &b_MET_RefFinal_etx);
    fChain->SetBranchAddress("MET_RefFinal_ety", &MET_RefFinal_ety, &b_MET_RefFinal_ety);
    fChain->SetBranchAddress("MET_RefFinal_sumet", &MET_RefFinal_sumet, &b_MET_RefFinal_sumet);
@@ -19681,6 +19746,8 @@ void physics::Init(TTree *tree)
    fChain->SetBranchAddress("MET_JetsInfo_JetPtWeightedSize", &MET_JetsInfo_JetPtWeightedSize, &b_MET_JetsInfo_JetPtWeightedSize);
    fChain->SetBranchAddress("MET_JetsInfo_LeadingJetEt", &MET_JetsInfo_LeadingJetEt, &b_MET_JetsInfo_LeadingJetEt);
    fChain->SetBranchAddress("MET_JetsInfo_LeadingJetEta", &MET_JetsInfo_LeadingJetEta, &b_MET_JetsInfo_LeadingJetEta);
+   */
+   /*
    fChain->SetBranchAddress("cl_n", &cl_n, &b_cl_n);
    fChain->SetBranchAddress("cl_E", &cl_E, &b_cl_E);
    fChain->SetBranchAddress("cl_pt", &cl_pt, &b_cl_pt);
@@ -19699,6 +19766,8 @@ void physics::Init(TTree *tree)
    fChain->SetBranchAddress("cl_deltaTheta", &cl_deltaTheta, &b_cl_deltaTheta);
    fChain->SetBranchAddress("cl_deltaPhi", &cl_deltaPhi, &b_cl_deltaPhi);
    fChain->SetBranchAddress("cl_time", &cl_time, &b_cl_time);
+   */
+   /*
    fChain->SetBranchAddress("emcl_n", &emcl_n, &b_emcl_n);
    fChain->SetBranchAddress("emcl_E", &emcl_E, &b_emcl_E);
    fChain->SetBranchAddress("emcl_pt", &emcl_pt, &b_emcl_pt);
@@ -19741,6 +19810,7 @@ void physics::Init(TTree *tree)
    fChain->SetBranchAddress("emcl_E_FCAL0", &emcl_E_FCAL0, &b_emcl_E_FCAL0);
    fChain->SetBranchAddress("emcl_E_FCAL1", &emcl_E_FCAL1, &b_emcl_E_FCAL1);
    fChain->SetBranchAddress("emcl_E_FCAL2", &emcl_E_FCAL2, &b_emcl_E_FCAL2);
+   */
    fChain->SetBranchAddress("trk_n", &trk_n, &b_trk_n);
    fChain->SetBranchAddress("trk_d0", &trk_d0, &b_trk_d0);
    fChain->SetBranchAddress("trk_z0", &trk_z0, &b_trk_z0);
@@ -19812,6 +19882,7 @@ void physics::Init(TTree *tree)
    fChain->SetBranchAddress("trk_patternReco1", &trk_patternReco1, &b_trk_patternReco1);
    fChain->SetBranchAddress("trk_patternReco2", &trk_patternReco2, &b_trk_patternReco2);
    fChain->SetBranchAddress("trk_seedFinder", &trk_seedFinder, &b_trk_seedFinder);
+
    fChain->SetBranchAddress("mb_n", &mb_n, &b_mb_n);
    fChain->SetBranchAddress("mb_E", &mb_E, &b_mb_E);
    fChain->SetBranchAddress("mb_eta", &mb_eta, &b_mb_eta);
@@ -19887,6 +19958,7 @@ void physics::Init(TTree *tree)
    fChain->SetBranchAddress("vxp_trk_theta", &vxp_trk_theta, &b_vxp_trk_theta);
    fChain->SetBranchAddress("vxp_trk_weight", &vxp_trk_weight, &b_vxp_trk_weight);
    fChain->SetBranchAddress("vxp_trk_index", &vxp_trk_index, &b_vxp_trk_index);
+   /*
    fChain->SetBranchAddress("trig_L1_emtau_n", &trig_L1_emtau_n, &b_trig_L1_emtau_n);
    fChain->SetBranchAddress("trig_L1_emtau_eta", &trig_L1_emtau_eta, &b_trig_L1_emtau_eta);
    fChain->SetBranchAddress("trig_L1_emtau_phi", &trig_L1_emtau_phi, &b_trig_L1_emtau_phi);
@@ -20267,6 +20339,8 @@ void physics::Init(TTree *tree)
    fChain->SetBranchAddress("trig_RoI_EF_e_lastStep", &trig_RoI_EF_e_lastStep, &b_trig_RoI_EF_e_lastStep);
    fChain->SetBranchAddress("trig_RoI_EF_e_EmTau_ROI", &trig_RoI_EF_e_EmTau_ROI, &b_trig_RoI_EF_e_EmTau_ROI);
    fChain->SetBranchAddress("trig_RoI_EF_e_EmTau_ROIStatus", &trig_RoI_EF_e_EmTau_ROIStatus, &b_trig_RoI_EF_e_EmTau_ROIStatus);
+   */
+   /*
    fChain->SetBranchAddress("EF_tau12_loose", &EF_tau12_loose, &b_EF_tau12_loose);
    fChain->SetBranchAddress("EF_tau12_loose_PT", &EF_tau12_loose_PT, &b_EF_tau12_loose_PT);
    fChain->SetBranchAddress("EF_tau16_loose", &EF_tau16_loose, &b_EF_tau16_loose);
@@ -20287,6 +20361,8 @@ void physics::Init(TTree *tree)
    fChain->SetBranchAddress("L2_tau29_loose", &L2_tau29_loose, &b_L2_tau29_loose);
    fChain->SetBranchAddress("L2_tau29i_loose", &L2_tau29i_loose, &b_L2_tau29i_loose);
    fChain->SetBranchAddress("L2_tau50_loose", &L2_tau50_loose, &b_L2_tau50_loose);
+   */
+   /*
    fChain->SetBranchAddress("MET_Goodness_CalClusForwBackw_pass", &MET_Goodness_CalClusForwBackw_pass, &b_MET_Goodness_CalClusForwBackw_pass);
    fChain->SetBranchAddress("MET_Goodness_CalClusUpDown_pass", &MET_Goodness_CalClusUpDown_pass, &b_MET_Goodness_CalClusUpDown_pass);
    fChain->SetBranchAddress("MET_Goodness_Calo_countA", &MET_Goodness_Calo_countA, &b_MET_Goodness_Calo_countA);
@@ -20381,6 +20457,7 @@ void physics::Init(TTree *tree)
    fChain->SetBranchAddress("MET_Goodness_All", &MET_Goodness_All, &b_MET_Goodness_All);
    fChain->SetBranchAddress("MET_Goodness_JetCleaning", &MET_Goodness_JetCleaning, &b_MET_Goodness_JetCleaning);
    fChain->SetBranchAddress("MET_Goodness_BitMask", &MET_Goodness_BitMask, &b_MET_Goodness_BitMask);
+   */
    Notify();
 }
 
@@ -20404,6 +20481,7 @@ void physics::Show(Long64_t entry)
 }
 Int_t physics::Cut(Long64_t entry)
 {
+   if(false) cout << "entry=" << entry << endl;
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
 // returns -1 otherwise.

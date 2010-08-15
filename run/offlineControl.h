@@ -60,6 +60,9 @@ class offlineControl : public offlineChains, public offlineAnalysis
 		~offlineControl();
 		void   initialize();
 		void   finalize();
+		
+		void resetLastCut2Hist(string sLastCut2Hist = "GRL") {m_offlineAnalysis->m_sLastCut2Hist = sLastCut2Hist;}
+		
 		void   book();
 		void   draw();
 		void   analyze();

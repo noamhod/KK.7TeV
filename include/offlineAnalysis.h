@@ -61,12 +61,14 @@ class offlineAnalysis : public offlinePhysics, public selection, public graphicO
 
 	public:
 		offlineAnalysis();
-		offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphicobjs, TFile* treeFile, string sLastCut2Hist);
+		offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphicobjs, TFile* treeFile, string sLastCut2Hist = "GRL");
 		~offlineAnalysis();
 
 		void initialize();
 		void finalize();
 
+		void resetLastCut2Hist(string sLastCut2Hist = "GRL") {m_sLastCut2Hist = sLastCut2Hist;}
+		
 		void fitter();
 
 		void printCutFlowNumbers(Long64_t chainEntries);

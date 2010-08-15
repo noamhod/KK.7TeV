@@ -21,8 +21,7 @@ class muon_staco : virtual public particleBase
 	
 		virtual int  getNParticles();
 		virtual void setParticle(int index); // mandatory to implement
-		virtual void turnonBraches();
-			void setMore(int index);     // user input, not mandatory
+		void setMore(int index);     // user input, not mandatory
 
 };
 #endif

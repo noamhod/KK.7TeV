@@ -29,7 +29,7 @@ public :
    Bool_t          is_L1_MU6;
    Bool_t          is_z0;
    Bool_t          is_d0;
-   Bool_t          is_cosmicCut;
+   Bool_t          is_cosThetaDimuCut;
    Bool_t          is_imass;
    Bool_t          is_pT;
    Bool_t          is_eta;
@@ -47,7 +47,7 @@ public :
    TBranch        *b_is_L1_MU6;   //!
    TBranch        *b_is_z0;   //!
    TBranch        *b_is_d0;   //!
-   TBranch        *b_is_cosmicCut;   //!
+   TBranch        *b_is_cosThetaDimuCut;   //!
    TBranch        *b_is_imass;   //!
    TBranch        *b_is_pT;   //!
    TBranch        *b_is_eta;   //!
@@ -150,7 +150,7 @@ void digestPhysics::Init(TTree *tree)
    fChain->SetBranchAddress("is_L1_MU6", &is_L1_MU6, &b_is_L1_MU6);
    fChain->SetBranchAddress("is_z0", &is_z0, &b_is_z0);
    fChain->SetBranchAddress("is_d0", &is_d0, &b_is_d0);
-   fChain->SetBranchAddress("is_cosmicCut", &is_cosmicCut, &b_is_cosmicCut);
+   fChain->SetBranchAddress("is_cosThetaDimuCut", &is_cosThetaDimuCut, &b_is_cosThetaDimuCut);
    fChain->SetBranchAddress("is_imass", &is_imass, &b_is_imass);
    fChain->SetBranchAddress("is_pT", &is_pT, &b_is_pT);
    fChain->SetBranchAddress("is_eta", &is_eta, &b_is_eta);
@@ -177,6 +177,7 @@ void digestPhysics::Show(Long64_t entry)
 }
 Int_t digestPhysics::Cut(Long64_t entry)
 {
+   if(false) cout << "entry=" << entry << endl;
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
 // returns -1 otherwise.

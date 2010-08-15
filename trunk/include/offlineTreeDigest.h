@@ -33,7 +33,7 @@ class offlineTreeDigest : public utilities
 		Bool_t b_L1_MU6;
 		Bool_t b_z0;
 		Bool_t b_d0;
-		Bool_t b_cosmicCut;
+		Bool_t b_cosThetaDimuCut;
 		Bool_t b_imass;
 		Bool_t b_pT;
 		Bool_t b_eta;

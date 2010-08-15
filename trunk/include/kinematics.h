@@ -12,31 +12,31 @@
 
 class kinematics
 {
-	public:
-		// utilities
-		TLorentzVector m_pTmp;
+public:
+	// utilities
+	TLorentzVector m_pTmp;
 
-	public:
-		kinematics();
-		~kinematics();
+public:
+	kinematics();
+	~kinematics();
 	
-		void kinitialize();
-                void kfinalize();
+	void kinitialize();
+	void kfinalize();
 	
-		double pT(   TLorentzVector* p );
-		double eta(  TLorentzVector* p );
-		double pAbs( TLorentzVector* p );
-		double y(    TLorentzVector* p );
+	double pT(   TLorentzVector* p );
+	double eta(  TLorentzVector* p );
+	double pAbs( TLorentzVector* p );
+	double y(    TLorentzVector* p );
 
-		double dimuonCosth(          TLorentzVector* pa, TLorentzVector* pb );
-		double dR(                   TLorentzVector* pa, TLorentzVector* pb );
-		double imass(                TLorentzVector* pa, TLorentzVector* pb );
-		double QT(                   TLorentzVector* pa, TLorentzVector* pb );
-		double ySystem(              TLorentzVector* pa, TLorentzVector* pb );
-		double cosThetaCollinsSoper( TLorentzVector* pa, double ca,
-					     TLorentzVector* pb, double cb );
+	double cosThetaDimu(         TLorentzVector* pa, TLorentzVector* pb );
+	double dR(                   TLorentzVector* pa, TLorentzVector* pb );
+	double imass(                TLorentzVector* pa, TLorentzVector* pb );
+	double QT(                   TLorentzVector* pa, TLorentzVector* pb );
+	double ySystem(              TLorentzVector* pa, TLorentzVector* pb );
+	double cosThetaCollinsSoper( TLorentzVector* pa, double ca,
+	TLorentzVector* pb, double cb );
 
-	private:
+private:
 
 };
 #endif

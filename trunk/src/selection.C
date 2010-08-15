@@ -24,12 +24,12 @@ void selection::sinitialize()
 	m_util = new utilities();	
 
 	b_print     = false;
-/*
+	/*
 	d_pTCut          = 15.*m_util->d_toGeV;
 	d_etaCut         = 2.4;
 	d_d0Cut          = 150.; // mm ?
 	d_z0Cut          = 150.; // mm ?
-	d_cosmicCosthCut = -0.9;
+	d_cosThetaDimuCut = -0.9;
 	d_imassCut       = 20.*m_util->d_toGeV;
 */
 }
@@ -41,18 +41,23 @@ void selection::sfinalize()
 
 void selection::initSelectionCuts(TMapsd* cutFlowMap, TMapds* cutFlowOrdered)
 {
-        for(TMapds::iterator ii=cutFlowOrdered->begin() ; ii!=cutFlowOrdered->end() ; ++ii)
-        {
-                string scutname = ii->second;
+	m_cutFlowMap     = cutFlowMap;
+	m_cutFlowOrdered = cutFlowOrdered;
+
+	/*
+	for(TMapds::iterator ii=cutFlowOrdered->begin() ; ii!=cutFlowOrdered->end() ; ++ii)
+	{
+		string scutname = ii->second;
 		double cutValue = cutFlowMap->operator[](scutname);
 		
 		if(scutname=="pT")        d_pTCut = cutValue * m_util->d_toGeV;
 		if(scutname=="eta")       d_etaCut = cutValue;
 		if(scutname=="d0")        d_d0Cut = cutValue;
 		if(scutname=="z0")        d_z0Cut = cutValue;
-		if(scutname=="cosmicCut") d_cosmicCosthCut = cutValue;
+		if(scutname=="cosThetaDimu") d_cosThetaDimuCut = cutValue;
 		if(scutname=="imass")     d_imassCut = cutValue * m_util->d_toGeV;
-        }
+	}
+	*/
 }
 
 bool selection::pTCut( double pTCutVal, TLorentzVector* pa, TLorentzVector* pb )
@@ -73,10 +78,10 @@ bool selection::imassCut( double imassCutVal, TLorentzVector* pa, TLorentzVector
 	return ( imass(pa,pb) >= imassCutVal ) ? true : false;
 }
 
-bool selection::cosmicCut( double cosmicCutVal, TLorentzVector* pa, TLorentzVector* pb )
+bool selection::cosThetaDimuCut( double cosThetaDimuCutVal, TLorentzVector* pa, TLorentzVector* pb )
 {
-	if(b_print) cout << "in cosmicCut: dimuonCosth(pa,pb)=" << dimuonCosth(pa,pb) << endl;
-        return ( dimuonCosth(pa,pb) > cosmicCutVal ) ? true : false;
+	if(b_print) cout << "in cosThetaDimuCut: cosThetaDimu(pa,pb)=" << cosThetaDimu(pa,pb) << endl;
+	return ( cosThetaDimu(pa,pb) > cosThetaDimuCutVal ) ? true : false;
 }
 
 bool selection::oppositeCharge( double ca, double cb )
@@ -88,7 +93,7 @@ bool selection::oppositeCharge( double ca, double cb )
 bool selection::d0Cut( double d0CutVal, double d0a, double d0b )
 {
 	if(b_print) cout << "in d0Cut: d0=" << d0a << ", d0b=" << d0b << endl;
-        return ( fabs(d0a)<=d0CutVal  &&  fabs(d0b)<=d0CutVal ) ? true : false;
+	return ( fabs(d0a)<=d0CutVal  &&  fabs(d0b)<=d0CutVal ) ? true : false;
 }
 
 bool selection::z0Cut( double z0CutVal, double z0a, double z0b )
@@ -97,28 +102,45 @@ bool selection::z0Cut( double z0CutVal, double z0a, double z0b )
 	return ( fabs(z0a)<=z0CutVal  &&  fabs(z0b)<=z0CutVal ) ? true : false;
 }
 
-void selection::buildMuonPairMap( TMapii& mupair,
-                                  double ca, int ia,
-                                  double cb, int ib)
+void selection::buildMuonPairMap( 	TMapii& mupair,
+									double ca, int ia,
+									double cb, int ib)
 {
 	if(!oppositeCharge(ca,cb)) { if(b_print) {cout << "failed 0 charge cut" << endl;} return; }
 	mupair.insert( make_pair(ia,ib) );
 }
 
 void selection::buildMuonPairMap( TMapii& mupair,
-				  TLorentzVector* pa, double ca, double d0a, double z0a, int ia,
-				  TLorentzVector* pb, double cb, double d0b, double z0b, int ib)
+								  TLorentzVector* pa, double ca, double d0a, double z0a, int ia,
+								  TLorentzVector* pb, double cb, double d0b, double z0b, int ib)
 {
+	// run over all the dimuon-level cuts (i.e., not the event-level cuts such as L1_MU6 or GRL etc.)
+	// if one of the dimuon-level cuts fails, return from this function and do not insert this pair
+	// into the muPair map.
+	// If passed all dimuon-level cuts, then insert this pair into the muPair map.
+	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
+	{
+		string scutname = ii->second;
+		double cutValue = m_cutFlowMap->operator[](scutname);
+		
+		if(scutname=="c1*c2<0")      if(!oppositeCharge(ca,cb))           { if(b_print) {cout << "failed 0 charge cut" << endl;} return; }
+		if(scutname=="pT")           if(!pTCut(cutValue,pa,pb))           { if(b_print) {cout << "failed pT cut"       << endl;} return; }
+		if(scutname=="eta")          if(!etaCut(cutValue,pa,pb))          { if(b_print) {cout << "failed eta cut"      << endl;} return; }
+		if(scutname=="d0")           if(!d0Cut(cutValue,d0a,d0b))         { if(b_print) {cout << "failed d0 cut"       << endl;} return; }
+		if(scutname=="z0")           if(!z0Cut(cutValue,z0a,z0b))         { if(b_print) {cout << "failed z0 cut"       << endl;} return; }
+		if(scutname=="cosThetaDimu") if(!cosThetaDimuCut(cutValue,pa,pb)) { if(b_print) {cout << "failed cosmic cut"   << endl;} return; }
+		if(scutname=="imass")        if(!imassCut(cutValue,pa,pb))        { if(b_print) {cout << "failed imass cut"    << endl;} return; }
+	}
+	/*
 	if(!oppositeCharge(ca,cb))             { if(b_print) {cout << "failed 0 charge cut" << endl;} return; }
 	if(!pTCut(d_pTCut,pa,pb))              { if(b_print) {cout << "failed pT cut"       << endl;} return; }
 	if(!etaCut(d_etaCut,pa,pb))            { if(b_print) {cout << "failed eta cut"      << endl;} return; }
 	if(!d0Cut(d_d0Cut,d0a,d0b))            { if(b_print) {cout << "failed d0 cut"       << endl;} return; }
 	if(!z0Cut(d_z0Cut,z0a,z0b))            { if(b_print) {cout << "failed z0 cut"       << endl;} return; }
 	if(!imassCut(d_imassCut,pa,pb))        { if(b_print) {cout << "failed imass cut"    << endl;} return; }
-	if(!cosmicCut(d_cosmicCosthCut,pa,pb)) { if(b_print) {cout << "failed cosmic cut"   << endl;} return; } //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ???
-
+	if(!cosThetaDimuCut(d_cosThetaDimuCut,pa,pb)) { if(b_print) {cout << "failed cosmic cut"   << endl;} return; } //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ???
+	*/
 	mupair.insert( make_pair(ia,ib) );
-	//mupair->insert( pair<int,int>(ia,ib) );
 }
 
 bool selection::removeOverlaps( TMapii& mupair, int ia, int ib)

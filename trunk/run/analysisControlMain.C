@@ -9,14 +9,16 @@
 
 void prepare(TString sGRLtag) // do not use alone
 {
+	gROOT->Reset();
+	
 	gROOT->ProcessLine(".include ../include/");
-        gROOT->ProcessLine(".include ../src/");
-        gROOT->ProcessLine(".include ./");
+	gROOT->ProcessLine(".include ../src/");
+	gROOT->ProcessLine(".include ./");
 
-        gROOT->ProcessLine(".include ../GoodRunsLists-" + sGRLtag + "/");
-        gROOT->ProcessLine(".include ../GoodRunsLists-" + sGRLtag + "/GoodRunsLists/");
+	gROOT->ProcessLine(".include ../GoodRunsLists-" + sGRLtag + "/");
+	gROOT->ProcessLine(".include ../GoodRunsLists-" + sGRLtag + "/GoodRunsLists/");
 
-        gROOT->ProcessLine(".L ../GoodRunsLists-" + sGRLtag + "/StandAlone/libGoodRunsLists.so");
+	gROOT->ProcessLine(".L ../GoodRunsLists-" + sGRLtag + "/StandAlone/libGoodRunsLists.so");
 }
 
 void compile(TString sGRLtag) // for re-compilation

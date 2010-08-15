@@ -27,7 +27,7 @@ digestControl::digestControl()
 	m_graphics = new graphicObjects();
 	m_graphics->setStyle();
 
-	m_digestAnalysis = new digestAnalysis( m_digestPhys, m_graphics, /*"cosmicCut"*/ "GRL" );
+	m_digestAnalysis = new digestAnalysis( m_digestPhys, m_graphics, /*"cosThetaDimu"*/ "GRL" );
 
 	// read the cut flow (ownership: selection class which digestAnalysis inherits from)
 	str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");

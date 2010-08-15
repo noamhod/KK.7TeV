@@ -55,12 +55,14 @@ class digestAnalysis : public digestPhysics, public selection, public graphicObj
 
 	public:
 		digestAnalysis();
-		digestAnalysis(digestPhysics* offPhys, graphicObjects* graphicobjs, string sLastCut2Hist);
+		digestAnalysis(digestPhysics* offPhys, graphicObjects* graphicobjs, string sLastCut2Hist = "GRL");
 		~digestAnalysis();
 
 		void initialize();
 		void finalize();
 
+		void resetLastCut2Hist(string sLastCut2Hist = "GRL") {m_sLastCut2Hist = sLastCut2Hist;}
+		
 		void fitter();
 
 		void printCutFlowNumbers(Long64_t chainEntries);

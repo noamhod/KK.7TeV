@@ -9,9 +9,11 @@
 
 void prepare() // do not use alone
 {
+	gROOT->Reset();
+	
 	gROOT->ProcessLine(".include ../include/");
-        gROOT->ProcessLine(".include ../src/");
-        gROOT->ProcessLine(".include ./");
+	gROOT->ProcessLine(".include ../src/");
+	gROOT->ProcessLine(".include ./");
 }
 
 void compile() // for re-compilation

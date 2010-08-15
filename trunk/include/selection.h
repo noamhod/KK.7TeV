@@ -15,47 +15,52 @@
 
 class selection : public kinematics
 {
-	public:
-		utilities* m_util;
-		
-		bool   b_print;
-		double d_pTCut;
-		double d_etaCut;
-		double d_imassCut;
-		double d_d0Cut;
-		double d_z0Cut;
-		double d_cosmicCosthCut;
-
-	public:
-		selection();
-		~selection();
+public:
+	utilities* m_util;
 	
-		void sinitialize();
-                void sfinalize();
-
-		void initSelectionCuts(TMapsd* cutFlowMap, TMapds* cutFlowOrdered); // called by analysis.C
+	bool   b_print;
+	/*
+	double d_pTCut;
+	double d_etaCut;
+	double d_imassCut;
+	double d_d0Cut;
+	double d_z0Cut;
+	double d_cosThetaDimuCut;
+	*/
 	
-		bool pTCut(     double pTCutVal,     TLorentzVector* pa, TLorentzVector* pb );
-		bool etaCut(    double etaCutVal,    TLorentzVector* pa, TLorentzVector* pb );
-		bool cosmicCut( double cosmicCutVal, TLorentzVector* pa, TLorentzVector* pb );
-		bool imassCut(  double imassCutVal,  TLorentzVector* pa, TLorentzVector* pb );
+	TMapsd* m_cutFlowMap;
+	TMapds* m_cutFlowOrdered;
 
-		bool d0Cut(          double d0CutVal, double d0a, double d0b );
-		bool z0Cut(          double z0CutVal, double z0a, double z0b );
-		bool oppositeCharge( double ca, double cb );
+public:
+	selection();
+	~selection();
+	
+	void sinitialize();
+	void sfinalize();
 
-		void buildMuonPairMap(	TMapii& mupair,
-					double ca, int ia,
-					double cb, int ib);
+	void initSelectionCuts(TMapsd* cutFlowMap, TMapds* cutFlowOrdered); // called by analysis.C
+	
+	bool pTCut(           double pTCutVal,           TLorentzVector* pa, TLorentzVector* pb );
+	bool etaCut(          double etaCutVal,          TLorentzVector* pa, TLorentzVector* pb );
+	bool cosThetaDimuCut( double cosThetaDimuCutVal, TLorentzVector* pa, TLorentzVector* pb );
+	bool imassCut(        double imassCutVal,        TLorentzVector* pa, TLorentzVector* pb );
 
-		void buildMuonPairMap(	TMapii& mupair,
-					TLorentzVector* pa, double ca, double d0a, double z0a, int ia,
-					TLorentzVector* pb, double cb, double d0b, double z0b, int ib );
+	bool d0Cut(          double d0CutVal, double d0a, double d0b );
+	bool z0Cut(          double z0CutVal, double z0a, double z0b );
+	bool oppositeCharge( double ca, double cb );
 
-		bool removeOverlaps(	TMapii& mupair, int ia, int ib );
-		void findBestMuonPair(	TMapii& mupair, int& ia, int& ib);
+	void buildMuonPairMap(	TMapii& mupair,
+							double ca, int ia,
+							double cb, int ib);
 
-	private:
+	void buildMuonPairMap(	TMapii& mupair,
+							TLorentzVector* pa, double ca, double d0a, double z0a, int ia,
+							TLorentzVector* pb, double cb, double d0b, double z0b, int ib );
+
+	bool removeOverlaps(	TMapii& mupair, int ia, int ib );
+	void findBestMuonPair(	TMapii& mupair, int& ia, int& ib);
+
+private:
 
 };
 #endif

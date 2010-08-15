@@ -69,7 +69,7 @@ public :
    Bool_t          EF_L1ItemStreamer_L1_EM10I;
    Bool_t          EF_L1ItemStreamer_L1_EM14;
    Bool_t          EF_L1ItemStreamer_L1_EM2;
-   Bool_t          EF_L1ItemStreamer_L1_EM2_UNPAIRED;
+   //Bool_t          EF_L1ItemStreamer_L1_EM2_UNPAIRED;
    Bool_t          EF_L1ItemStreamer_L1_EM3;
    Bool_t          EF_L1ItemStreamer_L1_EM3_EMPTY;
    Bool_t          EF_L1ItemStreamer_L1_EM3_FIRSTEMPTY;
@@ -100,8 +100,8 @@ public :
    Bool_t          EF_L1ItemStreamer_L1_MU6_FIRSTEMPTY;
    Bool_t          EF_L1ItemStreamer_L1_MU6_J5;
    Bool_t          EF_L1ItemStreamer_L1_MU6_UNPAIRED;
-   Bool_t          EF_mu0_missingRoi;
-   Bool_t          EF_mu0_rpcOnly;
+   //Bool_t          EF_mu0_missingRoi;
+   //Bool_t          EF_mu0_rpcOnly;
    Bool_t          EF_mu10;
    Bool_t          EF_mu10_MG;
    Bool_t          EF_mu10_MSonly;
@@ -122,10 +122,10 @@ public :
    Bool_t          EF_mu4_DiMu;
    Bool_t          EF_mu4_DiMu_FS;
    Bool_t          EF_mu4_DiMu_FS_noOS;
-   Bool_t          EF_mu4_Jpsie5e3;
-   Bool_t          EF_mu4_Jpsie5e3_FS;
-   Bool_t          EF_mu4_Jpsie5e3_SiTrk;
-   Bool_t          EF_mu4_Jpsie5e3_SiTrk_FS;
+   //Bool_t          EF_mu4_Jpsie5e3;
+   //Bool_t          EF_mu4_Jpsie5e3_FS;
+   //Bool_t          EF_mu4_Jpsie5e3_SiTrk;
+   //Bool_t          EF_mu4_Jpsie5e3_SiTrk_FS;
    Bool_t          EF_mu4_L2MSonly_EFFS_passL2;
    Bool_t          EF_mu4_MG;
    Bool_t          EF_mu4_MSonly;
@@ -159,7 +159,7 @@ public :
    Bool_t          EF_mu4_tile_SiTrk;
    Bool_t          EF_mu4_trod;
    Bool_t          EF_mu4_trod_SiTrk;
-   Bool_t          EF_mu4_unpaired;
+   //Bool_t          EF_mu4_unpaired;
    Bool_t          EF_mu4mu6_DiMu;
    Bool_t          EF_mu6;
    Bool_t          EF_mu6_DiMu;
@@ -167,9 +167,9 @@ public :
    Bool_t          EF_mu6_DiMu_FS_noOS;
    Bool_t          EF_mu6_DsPhiPi;
    Bool_t          EF_mu6_Jpsie5e3;
-   Bool_t          EF_mu6_Jpsie5e3_FS;
-   Bool_t          EF_mu6_Jpsie5e3_SiTrk;
-   Bool_t          EF_mu6_Jpsie5e3_SiTrk_FS;
+   //Bool_t          EF_mu6_Jpsie5e3_FS;
+   //Bool_t          EF_mu6_Jpsie5e3_SiTrk;
+   //Bool_t          EF_mu6_Jpsie5e3_SiTrk_FS;
    Bool_t          EF_mu6_MG;
    Bool_t          EF_mu6_MSonly;
    Bool_t          EF_mu6_MSonly_cosmic;
@@ -197,7 +197,7 @@ public :
    Bool_t          L1_EM10I;
    Bool_t          L1_EM14;
    Bool_t          L1_EM2;
-   Bool_t          L1_EM2_UNPAIRED;
+   //Bool_t          L1_EM2_UNPAIRED;
    Bool_t          L1_EM3;
    Bool_t          L1_EM3_EMPTY;
    Bool_t          L1_EM3_FIRSTEMPTY;
@@ -217,7 +217,7 @@ public :
    Bool_t          L1_MU0_J15;
    Bool_t          L1_MU0_J5;
    Bool_t          L1_MU0_MV;
-   Bool_t          L1_MU0_UNPAIRED;
+   //Bool_t          L1_MU0_UNPAIRED;
    Bool_t          L1_MU10;
    Bool_t          L1_MU10_EMPTY;
    Bool_t          L1_MU15;
@@ -251,7 +251,7 @@ public :
    Bool_t          L2_L1ItemStreamer_L1_MU0_J15;
    Bool_t          L2_L1ItemStreamer_L1_MU0_J5;
    Bool_t          L2_L1ItemStreamer_L1_MU0_MV;
-   Bool_t          L2_L1ItemStreamer_L1_MU0_UNPAIRED;
+   //Bool_t          L2_L1ItemStreamer_L1_MU0_UNPAIRED;
    Bool_t          L2_L1ItemStreamer_L1_MU10;
    Bool_t          L2_L1ItemStreamer_L1_MU10_EMPTY;
    Bool_t          L2_L1ItemStreamer_L1_MU15;
@@ -262,8 +262,8 @@ public :
    Bool_t          L2_L1ItemStreamer_L1_MU6_FIRSTEMPTY;
    Bool_t          L2_L1ItemStreamer_L1_MU6_J5;
    Bool_t          L2_L1ItemStreamer_L1_MU6_UNPAIRED;
-   Bool_t          L2_mu0_missingRoi;
-   Bool_t          L2_mu0_rpcOnly;
+   //Bool_t          L2_mu0_missingRoi;
+   //Bool_t          L2_mu0_rpcOnly;
    Bool_t          L2_mu10;
    Bool_t          L2_mu10_MG;
    Bool_t          L2_mu10_MSonly;
@@ -284,10 +284,10 @@ public :
    Bool_t          L2_mu4_DiMu;
    Bool_t          L2_mu4_DiMu_FS;
    Bool_t          L2_mu4_DiMu_FS_noOS;
-   Bool_t          L2_mu4_Jpsie5e3;
-   Bool_t          L2_mu4_Jpsie5e3_FS;
-   Bool_t          L2_mu4_Jpsie5e3_SiTrk;
-   Bool_t          L2_mu4_Jpsie5e3_SiTrk_FS;
+   //Bool_t          L2_mu4_Jpsie5e3;
+   //Bool_t          L2_mu4_Jpsie5e3_FS;
+   //Bool_t          L2_mu4_Jpsie5e3_SiTrk;
+   //Bool_t          L2_mu4_Jpsie5e3_SiTrk_FS;
    Bool_t          L2_mu4_L2MSonly_EFFS_passL2;
    Bool_t          L2_mu4_MG;
    Bool_t          L2_mu4_MSonly;
@@ -321,7 +321,7 @@ public :
    Bool_t          L2_mu4_tile_SiTrk;
    Bool_t          L2_mu4_trod;
    Bool_t          L2_mu4_trod_SiTrk;
-   Bool_t          L2_mu4_unpaired;
+   //Bool_t          L2_mu4_unpaired;
    Bool_t          L2_mu4mu6_DiMu;
    Bool_t          L2_mu6;
    Bool_t          L2_mu6_DiMu;
@@ -329,9 +329,9 @@ public :
    Bool_t          L2_mu6_DiMu_FS_noOS;
    Bool_t          L2_mu6_DsPhiPi;
    Bool_t          L2_mu6_Jpsie5e3;
-   Bool_t          L2_mu6_Jpsie5e3_FS;
-   Bool_t          L2_mu6_Jpsie5e3_SiTrk;
-   Bool_t          L2_mu6_Jpsie5e3_SiTrk_FS;
+   //Bool_t          L2_mu6_Jpsie5e3_FS;
+   //Bool_t          L2_mu6_Jpsie5e3_SiTrk;
+   //Bool_t          L2_mu6_Jpsie5e3_SiTrk_FS;
    Bool_t          L2_mu6_MG;
    Bool_t          L2_mu6_MSonly;
    Bool_t          L2_mu6_MSonly_cosmic;
@@ -761,7 +761,7 @@ public :
    TBranch        *b_EF_L1ItemStreamer_L1_EM10I;   //!
    TBranch        *b_EF_L1ItemStreamer_L1_EM14;   //!
    TBranch        *b_EF_L1ItemStreamer_L1_EM2;   //!
-   TBranch        *b_EF_L1ItemStreamer_L1_EM2_UNPAIRED;   //!
+   //TBranch        *b_EF_L1ItemStreamer_L1_EM2_UNPAIRED;   //!
    TBranch        *b_EF_L1ItemStreamer_L1_EM3;   //!
    TBranch        *b_EF_L1ItemStreamer_L1_EM3_EMPTY;   //!
    TBranch        *b_EF_L1ItemStreamer_L1_EM3_FIRSTEMPTY;   //!
@@ -792,8 +792,8 @@ public :
    TBranch        *b_EF_L1ItemStreamer_L1_MU6_FIRSTEMPTY;   //!
    TBranch        *b_EF_L1ItemStreamer_L1_MU6_J5;   //!
    TBranch        *b_EF_L1ItemStreamer_L1_MU6_UNPAIRED;   //!
-   TBranch        *b_EF_mu0_missingRoi;   //!
-   TBranch        *b_EF_mu0_rpcOnly;   //!
+   //TBranch        *b_EF_mu0_missingRoi;   //!
+   //TBranch        *b_EF_mu0_rpcOnly;   //!
    TBranch        *b_EF_mu10;   //!
    TBranch        *b_EF_mu10_MG;   //!
    TBranch        *b_EF_mu10_MSonly;   //!
@@ -814,10 +814,10 @@ public :
    TBranch        *b_EF_mu4_DiMu;   //!
    TBranch        *b_EF_mu4_DiMu_FS;   //!
    TBranch        *b_EF_mu4_DiMu_FS_noOS;   //!
-   TBranch        *b_EF_mu4_Jpsie5e3;   //!
-   TBranch        *b_EF_mu4_Jpsie5e3_FS;   //!
-   TBranch        *b_EF_mu4_Jpsie5e3_SiTrk;   //!
-   TBranch        *b_EF_mu4_Jpsie5e3_SiTrk_FS;   //!
+   //TBranch        *b_EF_mu4_Jpsie5e3;   //!
+   //TBranch        *b_EF_mu4_Jpsie5e3_FS;   //!
+   //TBranch        *b_EF_mu4_Jpsie5e3_SiTrk;   //!
+   //TBranch        *b_EF_mu4_Jpsie5e3_SiTrk_FS;   //!
    TBranch        *b_EF_mu4_L2MSonly_EFFS_passL2;   //!
    TBranch        *b_EF_mu4_MG;   //!
    TBranch        *b_EF_mu4_MSonly;   //!
@@ -851,7 +851,7 @@ public :
    TBranch        *b_EF_mu4_tile_SiTrk;   //!
    TBranch        *b_EF_mu4_trod;   //!
    TBranch        *b_EF_mu4_trod_SiTrk;   //!
-   TBranch        *b_EF_mu4_unpaired;   //!
+   //TBranch        *b_EF_mu4_unpaired;   //!
    TBranch        *b_EF_mu4mu6_DiMu;   //!
    TBranch        *b_EF_mu6;   //!
    TBranch        *b_EF_mu6_DiMu;   //!
@@ -859,9 +859,9 @@ public :
    TBranch        *b_EF_mu6_DiMu_FS_noOS;   //!
    TBranch        *b_EF_mu6_DsPhiPi;   //!
    TBranch        *b_EF_mu6_Jpsie5e3;   //!
-   TBranch        *b_EF_mu6_Jpsie5e3_FS;   //!
-   TBranch        *b_EF_mu6_Jpsie5e3_SiTrk;   //!
-   TBranch        *b_EF_mu6_Jpsie5e3_SiTrk_FS;   //!
+   //TBranch        *b_EF_mu6_Jpsie5e3_FS;   //!
+   //TBranch        *b_EF_mu6_Jpsie5e3_SiTrk;   //!
+   //TBranch        *b_EF_mu6_Jpsie5e3_SiTrk_FS;   //!
    TBranch        *b_EF_mu6_MG;   //!
    TBranch        *b_EF_mu6_MSonly;   //!
    TBranch        *b_EF_mu6_MSonly_cosmic;   //!
@@ -889,7 +889,7 @@ public :
    TBranch        *b_L1_EM10I;   //!
    TBranch        *b_L1_EM14;   //!
    TBranch        *b_L1_EM2;   //!
-   TBranch        *b_L1_EM2_UNPAIRED;   //!
+   //TBranch        *b_L1_EM2_UNPAIRED;   //!
    TBranch        *b_L1_EM3;   //!
    TBranch        *b_L1_EM3_EMPTY;   //!
    TBranch        *b_L1_EM3_FIRSTEMPTY;   //!
@@ -909,7 +909,7 @@ public :
    TBranch        *b_L1_MU0_J15;   //!
    TBranch        *b_L1_MU0_J5;   //!
    TBranch        *b_L1_MU0_MV;   //!
-   TBranch        *b_L1_MU0_UNPAIRED;   //!
+   //TBranch        *b_L1_MU0_UNPAIRED;   //!
    TBranch        *b_L1_MU10;   //!
    TBranch        *b_L1_MU10_EMPTY;   //!
    TBranch        *b_L1_MU15;   //!
@@ -943,7 +943,7 @@ public :
    TBranch        *b_L2_L1ItemStreamer_L1_MU0_J15;   //!
    TBranch        *b_L2_L1ItemStreamer_L1_MU0_J5;   //!
    TBranch        *b_L2_L1ItemStreamer_L1_MU0_MV;   //!
-   TBranch        *b_L2_L1ItemStreamer_L1_MU0_UNPAIRED;   //!
+   //TBranch        *b_L2_L1ItemStreamer_L1_MU0_UNPAIRED;   //!
    TBranch        *b_L2_L1ItemStreamer_L1_MU10;   //!
    TBranch        *b_L2_L1ItemStreamer_L1_MU10_EMPTY;   //!
    TBranch        *b_L2_L1ItemStreamer_L1_MU15;   //!
@@ -954,8 +954,8 @@ public :
    TBranch        *b_L2_L1ItemStreamer_L1_MU6_FIRSTEMPTY;   //!
    TBranch        *b_L2_L1ItemStreamer_L1_MU6_J5;   //!
    TBranch        *b_L2_L1ItemStreamer_L1_MU6_UNPAIRED;   //!
-   TBranch        *b_L2_mu0_missingRoi;   //!
-   TBranch        *b_L2_mu0_rpcOnly;   //!
+   //TBranch        *b_L2_mu0_missingRoi;   //!
+   //TBranch        *b_L2_mu0_rpcOnly;   //!
    TBranch        *b_L2_mu10;   //!
    TBranch        *b_L2_mu10_MG;   //!
    TBranch        *b_L2_mu10_MSonly;   //!
@@ -976,10 +976,10 @@ public :
    TBranch        *b_L2_mu4_DiMu;   //!
    TBranch        *b_L2_mu4_DiMu_FS;   //!
    TBranch        *b_L2_mu4_DiMu_FS_noOS;   //!
-   TBranch        *b_L2_mu4_Jpsie5e3;   //!
-   TBranch        *b_L2_mu4_Jpsie5e3_FS;   //!
-   TBranch        *b_L2_mu4_Jpsie5e3_SiTrk;   //!
-   TBranch        *b_L2_mu4_Jpsie5e3_SiTrk_FS;   //!
+   //TBranch        *b_L2_mu4_Jpsie5e3;   //!
+   //TBranch        *b_L2_mu4_Jpsie5e3_FS;   //!
+   //TBranch        *b_L2_mu4_Jpsie5e3_SiTrk;   //!
+   //TBranch        *b_L2_mu4_Jpsie5e3_SiTrk_FS;   //!
    TBranch        *b_L2_mu4_L2MSonly_EFFS_passL2;   //!
    TBranch        *b_L2_mu4_MG;   //!
    TBranch        *b_L2_mu4_MSonly;   //!
@@ -1013,7 +1013,7 @@ public :
    TBranch        *b_L2_mu4_tile_SiTrk;   //!
    TBranch        *b_L2_mu4_trod;   //!
    TBranch        *b_L2_mu4_trod_SiTrk;   //!
-   TBranch        *b_L2_mu4_unpaired;   //!
+   //TBranch        *b_L2_mu4_unpaired;   //!
    TBranch        *b_L2_mu4mu6_DiMu;   //!
    TBranch        *b_L2_mu6;   //!
    TBranch        *b_L2_mu6_DiMu;   //!
@@ -1021,9 +1021,9 @@ public :
    TBranch        *b_L2_mu6_DiMu_FS_noOS;   //!
    TBranch        *b_L2_mu6_DsPhiPi;   //!
    TBranch        *b_L2_mu6_Jpsie5e3;   //!
-   TBranch        *b_L2_mu6_Jpsie5e3_FS;   //!
-   TBranch        *b_L2_mu6_Jpsie5e3_SiTrk;   //!
-   TBranch        *b_L2_mu6_Jpsie5e3_SiTrk_FS;   //!
+   //TBranch        *b_L2_mu6_Jpsie5e3_FS;   //!
+   //TBranch        *b_L2_mu6_Jpsie5e3_SiTrk;   //!
+   //TBranch        *b_L2_mu6_Jpsie5e3_SiTrk_FS;   //!
    TBranch        *b_L2_mu6_MG;   //!
    TBranch        *b_L2_mu6_MSonly;   //!
    TBranch        *b_L2_mu6_MSonly_cosmic;   //!
@@ -2059,7 +2059,7 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_EM10I", &EF_L1ItemStreamer_L1_EM10I, &b_EF_L1ItemStreamer_L1_EM10I);
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_EM14", &EF_L1ItemStreamer_L1_EM14, &b_EF_L1ItemStreamer_L1_EM14);
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_EM2", &EF_L1ItemStreamer_L1_EM2, &b_EF_L1ItemStreamer_L1_EM2);
-   fChain->SetBranchAddress("EF_L1ItemStreamer_L1_EM2_UNPAIRED", &EF_L1ItemStreamer_L1_EM2_UNPAIRED, &b_EF_L1ItemStreamer_L1_EM2_UNPAIRED);
+   //fChain->SetBranchAddress("EF_L1ItemStreamer_L1_EM2_UNPAIRED", &EF_L1ItemStreamer_L1_EM2_UNPAIRED, &b_EF_L1ItemStreamer_L1_EM2_UNPAIRED);
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_EM3", &EF_L1ItemStreamer_L1_EM3, &b_EF_L1ItemStreamer_L1_EM3);
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_EM3_EMPTY", &EF_L1ItemStreamer_L1_EM3_EMPTY, &b_EF_L1ItemStreamer_L1_EM3_EMPTY);
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_EM3_FIRSTEMPTY", &EF_L1ItemStreamer_L1_EM3_FIRSTEMPTY, &b_EF_L1ItemStreamer_L1_EM3_FIRSTEMPTY);
@@ -2090,8 +2090,8 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_MU6_FIRSTEMPTY", &EF_L1ItemStreamer_L1_MU6_FIRSTEMPTY, &b_EF_L1ItemStreamer_L1_MU6_FIRSTEMPTY);
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_MU6_J5", &EF_L1ItemStreamer_L1_MU6_J5, &b_EF_L1ItemStreamer_L1_MU6_J5);
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_MU6_UNPAIRED", &EF_L1ItemStreamer_L1_MU6_UNPAIRED, &b_EF_L1ItemStreamer_L1_MU6_UNPAIRED);
-   fChain->SetBranchAddress("EF_mu0_missingRoi", &EF_mu0_missingRoi, &b_EF_mu0_missingRoi);
-   fChain->SetBranchAddress("EF_mu0_rpcOnly", &EF_mu0_rpcOnly, &b_EF_mu0_rpcOnly);
+   //fChain->SetBranchAddress("EF_mu0_missingRoi", &EF_mu0_missingRoi, &b_EF_mu0_missingRoi);
+   //fChain->SetBranchAddress("EF_mu0_rpcOnly", &EF_mu0_rpcOnly, &b_EF_mu0_rpcOnly);
    fChain->SetBranchAddress("EF_mu10", &EF_mu10, &b_EF_mu10);
    fChain->SetBranchAddress("EF_mu10_MG", &EF_mu10_MG, &b_EF_mu10_MG);
    fChain->SetBranchAddress("EF_mu10_MSonly", &EF_mu10_MSonly, &b_EF_mu10_MSonly);
@@ -2112,10 +2112,10 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("EF_mu4_DiMu", &EF_mu4_DiMu, &b_EF_mu4_DiMu);
    fChain->SetBranchAddress("EF_mu4_DiMu_FS", &EF_mu4_DiMu_FS, &b_EF_mu4_DiMu_FS);
    fChain->SetBranchAddress("EF_mu4_DiMu_FS_noOS", &EF_mu4_DiMu_FS_noOS, &b_EF_mu4_DiMu_FS_noOS);
-   fChain->SetBranchAddress("EF_mu4_Jpsie5e3", &EF_mu4_Jpsie5e3, &b_EF_mu4_Jpsie5e3);
-   fChain->SetBranchAddress("EF_mu4_Jpsie5e3_FS", &EF_mu4_Jpsie5e3_FS, &b_EF_mu4_Jpsie5e3_FS);
-   fChain->SetBranchAddress("EF_mu4_Jpsie5e3_SiTrk", &EF_mu4_Jpsie5e3_SiTrk, &b_EF_mu4_Jpsie5e3_SiTrk);
-   fChain->SetBranchAddress("EF_mu4_Jpsie5e3_SiTrk_FS", &EF_mu4_Jpsie5e3_SiTrk_FS, &b_EF_mu4_Jpsie5e3_SiTrk_FS);
+   //fChain->SetBranchAddress("EF_mu4_Jpsie5e3", &EF_mu4_Jpsie5e3, &b_EF_mu4_Jpsie5e3);
+   //fChain->SetBranchAddress("EF_mu4_Jpsie5e3_FS", &EF_mu4_Jpsie5e3_FS, &b_EF_mu4_Jpsie5e3_FS);
+   //fChain->SetBranchAddress("EF_mu4_Jpsie5e3_SiTrk", &EF_mu4_Jpsie5e3_SiTrk, &b_EF_mu4_Jpsie5e3_SiTrk);
+   //fChain->SetBranchAddress("EF_mu4_Jpsie5e3_SiTrk_FS", &EF_mu4_Jpsie5e3_SiTrk_FS, &b_EF_mu4_Jpsie5e3_SiTrk_FS);
    fChain->SetBranchAddress("EF_mu4_L2MSonly_EFFS_passL2", &EF_mu4_L2MSonly_EFFS_passL2, &b_EF_mu4_L2MSonly_EFFS_passL2);
    fChain->SetBranchAddress("EF_mu4_MG", &EF_mu4_MG, &b_EF_mu4_MG);
    fChain->SetBranchAddress("EF_mu4_MSonly", &EF_mu4_MSonly, &b_EF_mu4_MSonly);
@@ -2149,7 +2149,7 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("EF_mu4_tile_SiTrk", &EF_mu4_tile_SiTrk, &b_EF_mu4_tile_SiTrk);
    fChain->SetBranchAddress("EF_mu4_trod", &EF_mu4_trod, &b_EF_mu4_trod);
    fChain->SetBranchAddress("EF_mu4_trod_SiTrk", &EF_mu4_trod_SiTrk, &b_EF_mu4_trod_SiTrk);
-   fChain->SetBranchAddress("EF_mu4_unpaired", &EF_mu4_unpaired, &b_EF_mu4_unpaired);
+   //fChain->SetBranchAddress("EF_mu4_unpaired", &EF_mu4_unpaired, &b_EF_mu4_unpaired);
    fChain->SetBranchAddress("EF_mu4mu6_DiMu", &EF_mu4mu6_DiMu, &b_EF_mu4mu6_DiMu);
    fChain->SetBranchAddress("EF_mu6", &EF_mu6, &b_EF_mu6);
    fChain->SetBranchAddress("EF_mu6_DiMu", &EF_mu6_DiMu, &b_EF_mu6_DiMu);
@@ -2157,9 +2157,9 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("EF_mu6_DiMu_FS_noOS", &EF_mu6_DiMu_FS_noOS, &b_EF_mu6_DiMu_FS_noOS);
    fChain->SetBranchAddress("EF_mu6_DsPhiPi", &EF_mu6_DsPhiPi, &b_EF_mu6_DsPhiPi);
    fChain->SetBranchAddress("EF_mu6_Jpsie5e3", &EF_mu6_Jpsie5e3, &b_EF_mu6_Jpsie5e3);
-   fChain->SetBranchAddress("EF_mu6_Jpsie5e3_FS", &EF_mu6_Jpsie5e3_FS, &b_EF_mu6_Jpsie5e3_FS);
-   fChain->SetBranchAddress("EF_mu6_Jpsie5e3_SiTrk", &EF_mu6_Jpsie5e3_SiTrk, &b_EF_mu6_Jpsie5e3_SiTrk);
-   fChain->SetBranchAddress("EF_mu6_Jpsie5e3_SiTrk_FS", &EF_mu6_Jpsie5e3_SiTrk_FS, &b_EF_mu6_Jpsie5e3_SiTrk_FS);
+   //fChain->SetBranchAddress("EF_mu6_Jpsie5e3_FS", &EF_mu6_Jpsie5e3_FS, &b_EF_mu6_Jpsie5e3_FS);
+   //fChain->SetBranchAddress("EF_mu6_Jpsie5e3_SiTrk", &EF_mu6_Jpsie5e3_SiTrk, &b_EF_mu6_Jpsie5e3_SiTrk);
+   //fChain->SetBranchAddress("EF_mu6_Jpsie5e3_SiTrk_FS", &EF_mu6_Jpsie5e3_SiTrk_FS, &b_EF_mu6_Jpsie5e3_SiTrk_FS);
    fChain->SetBranchAddress("EF_mu6_MG", &EF_mu6_MG, &b_EF_mu6_MG);
    fChain->SetBranchAddress("EF_mu6_MSonly", &EF_mu6_MSonly, &b_EF_mu6_MSonly);
    fChain->SetBranchAddress("EF_mu6_MSonly_cosmic", &EF_mu6_MSonly_cosmic, &b_EF_mu6_MSonly_cosmic);
@@ -2187,7 +2187,7 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("L1_EM10I", &L1_EM10I, &b_L1_EM10I);
    fChain->SetBranchAddress("L1_EM14", &L1_EM14, &b_L1_EM14);
    fChain->SetBranchAddress("L1_EM2", &L1_EM2, &b_L1_EM2);
-   fChain->SetBranchAddress("L1_EM2_UNPAIRED", &L1_EM2_UNPAIRED, &b_L1_EM2_UNPAIRED);
+   //fChain->SetBranchAddress("L1_EM2_UNPAIRED", &L1_EM2_UNPAIRED, &b_L1_EM2_UNPAIRED);
    fChain->SetBranchAddress("L1_EM3", &L1_EM3, &b_L1_EM3);
    fChain->SetBranchAddress("L1_EM3_EMPTY", &L1_EM3_EMPTY, &b_L1_EM3_EMPTY);
    fChain->SetBranchAddress("L1_EM3_FIRSTEMPTY", &L1_EM3_FIRSTEMPTY, &b_L1_EM3_FIRSTEMPTY);
@@ -2207,7 +2207,7 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("L1_MU0_J15", &L1_MU0_J15, &b_L1_MU0_J15);
    fChain->SetBranchAddress("L1_MU0_J5", &L1_MU0_J5, &b_L1_MU0_J5);
    fChain->SetBranchAddress("L1_MU0_MV", &L1_MU0_MV, &b_L1_MU0_MV);
-   fChain->SetBranchAddress("L1_MU0_UNPAIRED", &L1_MU0_UNPAIRED, &b_L1_MU0_UNPAIRED);
+   //fChain->SetBranchAddress("L1_MU0_UNPAIRED", &L1_MU0_UNPAIRED, &b_L1_MU0_UNPAIRED);
    fChain->SetBranchAddress("L1_MU10", &L1_MU10, &b_L1_MU10);
    fChain->SetBranchAddress("L1_MU10_EMPTY", &L1_MU10_EMPTY, &b_L1_MU10_EMPTY);
    fChain->SetBranchAddress("L1_MU15", &L1_MU15, &b_L1_MU15);
@@ -2241,7 +2241,7 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU0_J15", &L2_L1ItemStreamer_L1_MU0_J15, &b_L2_L1ItemStreamer_L1_MU0_J15);
    fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU0_J5", &L2_L1ItemStreamer_L1_MU0_J5, &b_L2_L1ItemStreamer_L1_MU0_J5);
    fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU0_MV", &L2_L1ItemStreamer_L1_MU0_MV, &b_L2_L1ItemStreamer_L1_MU0_MV);
-   fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU0_UNPAIRED", &L2_L1ItemStreamer_L1_MU0_UNPAIRED, &b_L2_L1ItemStreamer_L1_MU0_UNPAIRED);
+   //fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU0_UNPAIRED", &L2_L1ItemStreamer_L1_MU0_UNPAIRED, &b_L2_L1ItemStreamer_L1_MU0_UNPAIRED);
    fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU10", &L2_L1ItemStreamer_L1_MU10, &b_L2_L1ItemStreamer_L1_MU10);
    fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU10_EMPTY", &L2_L1ItemStreamer_L1_MU10_EMPTY, &b_L2_L1ItemStreamer_L1_MU10_EMPTY);
    fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU15", &L2_L1ItemStreamer_L1_MU15, &b_L2_L1ItemStreamer_L1_MU15);
@@ -2252,8 +2252,8 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU6_FIRSTEMPTY", &L2_L1ItemStreamer_L1_MU6_FIRSTEMPTY, &b_L2_L1ItemStreamer_L1_MU6_FIRSTEMPTY);
    fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU6_J5", &L2_L1ItemStreamer_L1_MU6_J5, &b_L2_L1ItemStreamer_L1_MU6_J5);
    fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU6_UNPAIRED", &L2_L1ItemStreamer_L1_MU6_UNPAIRED, &b_L2_L1ItemStreamer_L1_MU6_UNPAIRED);
-   fChain->SetBranchAddress("L2_mu0_missingRoi", &L2_mu0_missingRoi, &b_L2_mu0_missingRoi);
-   fChain->SetBranchAddress("L2_mu0_rpcOnly", &L2_mu0_rpcOnly, &b_L2_mu0_rpcOnly);
+   //fChain->SetBranchAddress("L2_mu0_missingRoi", &L2_mu0_missingRoi, &b_L2_mu0_missingRoi);
+   //fChain->SetBranchAddress("L2_mu0_rpcOnly", &L2_mu0_rpcOnly, &b_L2_mu0_rpcOnly);
    fChain->SetBranchAddress("L2_mu10", &L2_mu10, &b_L2_mu10);
    fChain->SetBranchAddress("L2_mu10_MG", &L2_mu10_MG, &b_L2_mu10_MG);
    fChain->SetBranchAddress("L2_mu10_MSonly", &L2_mu10_MSonly, &b_L2_mu10_MSonly);
@@ -2274,10 +2274,10 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("L2_mu4_DiMu", &L2_mu4_DiMu, &b_L2_mu4_DiMu);
    fChain->SetBranchAddress("L2_mu4_DiMu_FS", &L2_mu4_DiMu_FS, &b_L2_mu4_DiMu_FS);
    fChain->SetBranchAddress("L2_mu4_DiMu_FS_noOS", &L2_mu4_DiMu_FS_noOS, &b_L2_mu4_DiMu_FS_noOS);
-   fChain->SetBranchAddress("L2_mu4_Jpsie5e3", &L2_mu4_Jpsie5e3, &b_L2_mu4_Jpsie5e3);
-   fChain->SetBranchAddress("L2_mu4_Jpsie5e3_FS", &L2_mu4_Jpsie5e3_FS, &b_L2_mu4_Jpsie5e3_FS);
-   fChain->SetBranchAddress("L2_mu4_Jpsie5e3_SiTrk", &L2_mu4_Jpsie5e3_SiTrk, &b_L2_mu4_Jpsie5e3_SiTrk);
-   fChain->SetBranchAddress("L2_mu4_Jpsie5e3_SiTrk_FS", &L2_mu4_Jpsie5e3_SiTrk_FS, &b_L2_mu4_Jpsie5e3_SiTrk_FS);
+   //fChain->SetBranchAddress("L2_mu4_Jpsie5e3", &L2_mu4_Jpsie5e3, &b_L2_mu4_Jpsie5e3);
+   //fChain->SetBranchAddress("L2_mu4_Jpsie5e3_FS", &L2_mu4_Jpsie5e3_FS, &b_L2_mu4_Jpsie5e3_FS);
+   //fChain->SetBranchAddress("L2_mu4_Jpsie5e3_SiTrk", &L2_mu4_Jpsie5e3_SiTrk, &b_L2_mu4_Jpsie5e3_SiTrk);
+   //fChain->SetBranchAddress("L2_mu4_Jpsie5e3_SiTrk_FS", &L2_mu4_Jpsie5e3_SiTrk_FS, &b_L2_mu4_Jpsie5e3_SiTrk_FS);
    fChain->SetBranchAddress("L2_mu4_L2MSonly_EFFS_passL2", &L2_mu4_L2MSonly_EFFS_passL2, &b_L2_mu4_L2MSonly_EFFS_passL2);
    fChain->SetBranchAddress("L2_mu4_MG", &L2_mu4_MG, &b_L2_mu4_MG);
    fChain->SetBranchAddress("L2_mu4_MSonly", &L2_mu4_MSonly, &b_L2_mu4_MSonly);
@@ -2311,7 +2311,7 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("L2_mu4_tile_SiTrk", &L2_mu4_tile_SiTrk, &b_L2_mu4_tile_SiTrk);
    fChain->SetBranchAddress("L2_mu4_trod", &L2_mu4_trod, &b_L2_mu4_trod);
    fChain->SetBranchAddress("L2_mu4_trod_SiTrk", &L2_mu4_trod_SiTrk, &b_L2_mu4_trod_SiTrk);
-   fChain->SetBranchAddress("L2_mu4_unpaired", &L2_mu4_unpaired, &b_L2_mu4_unpaired);
+   //fChain->SetBranchAddress("L2_mu4_unpaired", &L2_mu4_unpaired, &b_L2_mu4_unpaired);
    fChain->SetBranchAddress("L2_mu4mu6_DiMu", &L2_mu4mu6_DiMu, &b_L2_mu4mu6_DiMu);
    fChain->SetBranchAddress("L2_mu6", &L2_mu6, &b_L2_mu6);
    fChain->SetBranchAddress("L2_mu6_DiMu", &L2_mu6_DiMu, &b_L2_mu6_DiMu);
@@ -2319,9 +2319,9 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("L2_mu6_DiMu_FS_noOS", &L2_mu6_DiMu_FS_noOS, &b_L2_mu6_DiMu_FS_noOS);
    fChain->SetBranchAddress("L2_mu6_DsPhiPi", &L2_mu6_DsPhiPi, &b_L2_mu6_DsPhiPi);
    fChain->SetBranchAddress("L2_mu6_Jpsie5e3", &L2_mu6_Jpsie5e3, &b_L2_mu6_Jpsie5e3);
-   fChain->SetBranchAddress("L2_mu6_Jpsie5e3_FS", &L2_mu6_Jpsie5e3_FS, &b_L2_mu6_Jpsie5e3_FS);
-   fChain->SetBranchAddress("L2_mu6_Jpsie5e3_SiTrk", &L2_mu6_Jpsie5e3_SiTrk, &b_L2_mu6_Jpsie5e3_SiTrk);
-   fChain->SetBranchAddress("L2_mu6_Jpsie5e3_SiTrk_FS", &L2_mu6_Jpsie5e3_SiTrk_FS, &b_L2_mu6_Jpsie5e3_SiTrk_FS);
+   //fChain->SetBranchAddress("L2_mu6_Jpsie5e3_FS", &L2_mu6_Jpsie5e3_FS, &b_L2_mu6_Jpsie5e3_FS);
+   //fChain->SetBranchAddress("L2_mu6_Jpsie5e3_SiTrk", &L2_mu6_Jpsie5e3_SiTrk, &b_L2_mu6_Jpsie5e3_SiTrk);
+   //fChain->SetBranchAddress("L2_mu6_Jpsie5e3_SiTrk_FS", &L2_mu6_Jpsie5e3_SiTrk_FS, &b_L2_mu6_Jpsie5e3_SiTrk_FS);
    fChain->SetBranchAddress("L2_mu6_MG", &L2_mu6_MG, &b_L2_mu6_MG);
    fChain->SetBranchAddress("L2_mu6_MSonly", &L2_mu6_MSonly, &b_L2_mu6_MSonly);
    fChain->SetBranchAddress("L2_mu6_MSonly_cosmic", &L2_mu6_MSonly_cosmic, &b_L2_mu6_MSonly_cosmic);
@@ -2720,6 +2720,7 @@ void offlinePhysics::Show(Long64_t entry)
 }
 Int_t offlinePhysics::Cut(Long64_t entry)
 {
+   if(false) cout << "entry=" << entry << endl;
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
 // returns -1 otherwise.

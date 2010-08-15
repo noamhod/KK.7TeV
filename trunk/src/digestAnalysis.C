@@ -217,7 +217,7 @@ void digestAnalysis::executeBasic()
 			// check before cuts
 			if(m_digestPhys->mu_staco_charge->at(n) * m_digestPhys->mu_staco_charge->at(m)<0.)
 			{
-				cosmicCosth = dimuonCosth( pmu[n], pmu[m] );
+				cosmicCosth = cosThetaDimu( pmu[n], pmu[m] );
 				m_graphicobjs->h1_cosmicCosth->Fill( cosmicCosth );
 				
 				d0exPVa = m_digestPhys->mu_staco_d0_exPV->at(n);
@@ -252,7 +252,7 @@ void digestAnalysis::executeBasic()
 			z0exPVa = m_digestPhys->mu_staco_z0_exPV->at(ai);
 			d0exPVb = m_digestPhys->mu_staco_d0_exPV->at(bi);
 			z0exPVb = m_digestPhys->mu_staco_z0_exPV->at(bi);
-			//cosmicCosth = dimuonCosth( pmu[ai], pmu[bi] );
+			//cosmicCosth = cosThetaDimu( pmu[ai], pmu[bi] );
 
 			cout << "$$$$$$$$$ dimuon $$$$$$$$$" << endl;
 			cout << "\t im=" << im << endl;
@@ -330,7 +330,7 @@ void digestAnalysis::executeCutFlow()
 	{
 		string sorderedcutname = ii->second;
 
-		if(sorderedcutname=="null")
+		if(sorderedcutname=="c1*c2<0")
 		{
 			passCurrentCut = (m_digestPhys->is_null) ? true : false;
 		}
@@ -360,9 +360,9 @@ void digestAnalysis::executeCutFlow()
 			passCurrentCut = ( m_digestPhys->is_eta ) ? true : false;
 		}
 
-		if(sorderedcutname=="cosmicCut")
+		if(sorderedcutname=="cosThetaDimu")
 		{
-			passCurrentCut = ( m_digestPhys->is_cosmicCut ) ? true : false;
+			passCurrentCut = ( m_digestPhys->is_cosThetaDimuCut ) ? true : false;
 		}
 
 		if(sorderedcutname=="d0")

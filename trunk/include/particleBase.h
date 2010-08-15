@@ -43,7 +43,6 @@ class particleBase : public physics
 	
 		virtual int  getNParticles() = 0;
 		virtual void setParticle(int index) = 0;
-		virtual void turnonBraches() = 0;
 
 		void setPvec();
 		void setQvec();

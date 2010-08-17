@@ -7,24 +7,21 @@
 
 #include "basicIncludes.h"
 
-#define chains_cxx
-#include "chains.C"
-
 #define analysis_cxx
 #include "analysis.C"
 
-#ifndef ANALYSISCONTROL_H
-#define ANALYSISCONTROL_H
+#ifndef analysisGridControl_H
+#define analysisGridControl_H
 
-class analysisControl : public chains, public analysis
+class analysisGridControl : public analysis
 {
 	public:
 		// from MakeClass
 		physics* m_phys;		
 
 		// pointers
-		TFile*          m_histfile;
-		TFile*          m_treefile;
+		TFile*          m_rootfile;
+		TChain*			m_chain;
 		
 		TDirectory*     m_dirAllCuts;
 		TDirectory* 	m_dirNoCuts;
@@ -46,8 +43,9 @@ class analysisControl : public chains, public analysis
 		Long64_t l64t_stopEvent;
 	
 	public:
-		analysisControl();
-		~analysisControl();
+		analysisGridControl();
+		analysisGridControl( TChain* inchain, TFile* outfile );
+		~analysisGridControl();
 		void   initialize();
 		void   finalize();
 		void   book();

@@ -18,6 +18,23 @@ using namespace std;
 TFile *fout;
 TChain *fChain;
 
+bool fileexists(string filename)
+{
+	ifstream ifile( filename.c_str() );
+	return ifile;
+}
+
+void exitIfNotExist(string fullPath)
+{
+	if ( !fileexists(fullPath) )
+	{
+		cout << "Error: the mandatory file " << fullPath << " does not exist" << endl;
+		cout << "Did you forget to copy it ?" << endl;
+		cout << "Exit now" << endl;
+		exit(-1);
+	}
+}
+
 void analysisGridControlRun()
 {
 	// read a string via file since long string causes memory error in CINT when it is read via stdin
@@ -72,8 +89,11 @@ void analysisGridControlRun()
 	gROOT->ProcessLine(".include ./");
 	gROOT->ProcessLine(".include ../GoodRunsLists-00-00-84/");
 	gROOT->ProcessLine(".include ../GoodRunsLists-00-00-84/GoodRunsLists/");
+	
 	//gROOT->ProcessLine(".L ../GoodRunsLists-00-00-84/StandAlone/libGoodRunsLists.so");
+	exitIfNotExist("libGoodRunsLists.so");
 	gROOT->ProcessLine(".L libGoodRunsLists.so");
+	
 	gROOT->ProcessLine(".L analysisGridControl_C.so");
 	gROOT->ProcessLine("analysisGridControl agc(fChain, fout);");
 	gROOT->ProcessLine("agc.loop(0,0);");

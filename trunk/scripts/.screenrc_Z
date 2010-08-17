@@ -1,0 +1,31 @@
+#.screenrc
+#Changes screen escape character to be `
+#escape ``
+
+#change the hardstatus settings to give an window list at the bottom of the
+#screen, with the time and date and with the current window highlighted
+hardstatus alwayslastline
+
+hardstatus string '%{gk}[ %{G}%H %{g}][%{= kK}%-Lw%{= cb}%50>%n*%f %t%?(%u)%?%{=b kK}%+Lw%< %{= kK}%=%{g}][%{Y}%l%{g}]%{=b kC}[ %d/%m %0c:%s ]%{W}'
+
+termcapinfo xterm|xterms|xs|rxvt ti@:te@
+
+# make bells in other windows audible
+bell "Bell in window % "
+
+# detach on hangup
+autodetach on
+
+# don't display the copyright page
+startup_message off
+
+vbell off
+
+screen -t		0	bash
+stuff "source setupAthena.sh 15.6.9\015"
+screen -t 		1	bash
+stuff "source setupAthena.sh 15.6.9\015"
+screen -t 		2	bash
+stuff "source setupAthena.sh 15.6.9\015"
+screen -t 		3	bash
+stuff "source setupAthena.sh 15.6.9\015"

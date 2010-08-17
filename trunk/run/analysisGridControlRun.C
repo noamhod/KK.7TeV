@@ -72,7 +72,8 @@ void analysisGridControlRun()
 	gROOT->ProcessLine(".include ./");
 	gROOT->ProcessLine(".include ../GoodRunsLists-00-00-84/");
 	gROOT->ProcessLine(".include ../GoodRunsLists-00-00-84/GoodRunsLists/");
-	gROOT->ProcessLine(".L ../GoodRunsLists-00-00-84/StandAlone/libGoodRunsLists.so");
+	//gROOT->ProcessLine(".L ../GoodRunsLists-00-00-84/StandAlone/libGoodRunsLists.so");
+	gROOT->ProcessLine(".L libGoodRunsLists.so");
 	gROOT->ProcessLine(".L analysisGridControl_C.so");
 	gROOT->ProcessLine("analysisGridControl agc(fChain, fout);");
 	gROOT->ProcessLine("agc.loop(0,0);");

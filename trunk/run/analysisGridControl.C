@@ -5,52 +5,50 @@
 /* on 23/07/2010 11:24 */
 /* * * * * * * * * * * */
 
-#include "analysisControl.h"
+#include "analysisGridControl.h"
 
-analysisControl::analysisControl()
+analysisGridControl::analysisGridControl()
 {
+
+}
+
+analysisGridControl::analysisGridControl( TChain* inchain, TFile* outfile )
+{
+	string str = "";
+	
 	initialize();
 	
-	string str = "";
-
-	str = checkANDsetFilepath("PWD", "/../conf/dataset.list");
-	//string strb = checkANDsetFilepath("PWD", "/datasetdir/"); // ln -s /data/hod/D3PDs/group10.phys-sm.data10_7TeV_physics_MuonswBeam_WZphys_D3PD datasetdir
-	string strb = "";
-	makeChain(true, str, strb);
+	m_chain    = inchain;
+	m_rootfile = outfile;
 
 	m_phys = new physics( m_chain );
 
-	//str = checkANDsetFilepath("PWD", "/../data/analysisTrees.root");
-	str = "analysisTrees.root";
-	m_treefile = new TFile( str.c_str(), "RECREATE");
-	m_treefile->cd();
-
-	str = checkANDsetFilepath("PWD", "/../data/analysisControl.root");
-	m_histfile = new TFile( str.c_str(), "RECREATE");
-	m_histfile->cd();
+	m_rootfile->cd();
 
 	m_graphics = new graphicObjects();
 	m_graphics->setStyle();
 
-	str = checkANDsetFilepath("PWD", "/../conf/Z_GRL_152844-159224.xml");
+	//str = checkANDsetFilepath("PWD", "/../conf/Z_GRL_152844-159224.xml");
+	str = "Z_GRL_152844-159224.xml";
 	m_GRL = new GRLinterface();
 	m_GRL->glrinitialize( (TString)str );
 
-	m_analysis = new analysis( m_phys, m_graphics, m_GRL, m_treefile );
+	m_analysis = new analysis( m_phys, m_graphics, m_GRL, m_rootfile );
 
 	// read the cut flow (ownership: selection class which analysis inherits from)
-	str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
+	//str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
+	str = "cutFlow.cuts";
 	m_analysis->readCutFlow( str );
 
 	book();
 }
 
-analysisControl::~analysisControl()
+analysisGridControl::~analysisGridControl()
 {
 	finalize();
 }
 
-void analysisControl::initialize()
+void analysisGridControl::initialize()
 {
 	// run control
 	l64t_nentries = 0;
@@ -63,38 +61,36 @@ void analysisControl::initialize()
 	m_phys     = NULL;
 	m_analysis = NULL;
 	m_graphics = NULL;
-	m_histfile = NULL;
-	m_treefile = NULL;
+	m_rootfile = NULL;
+	m_rootfile = NULL;
 
-	cinitialize();
 	kinitialize();
 	uinitialize();
 }
 
-void analysisControl::finalize()
+void analysisGridControl::finalize()
 {
 	// file
-	m_histfile->Write();
-	m_histfile->Close();
+	//m_rootfile->Write();
+	m_rootfile->Close();
 
-	cfinalize();
 	kfinalize();
 	ufinalize();
 }
 
-void analysisControl::book()
+void analysisGridControl::book()
 {
-	m_dirNoCuts = m_histfile->mkdir("noCuts");
+	m_dirNoCuts = m_rootfile->mkdir("noCuts");
 	m_graphics->bookBareHistos(m_dirNoCuts);
 
-	m_dirAllCuts = m_histfile->mkdir("allCuts");
+	m_dirAllCuts = m_rootfile->mkdir("allCuts");
 	m_graphics->bookHistos(m_dirAllCuts);
 
-	m_dirCutFlow = m_histfile->mkdir("cutFlow");
+	m_dirCutFlow = m_rootfile->mkdir("cutFlow");
 	m_graphics->bookHistosMap( m_analysis->getCutFlowMapPtr(), m_analysis->getCutFlowOrderedPtr(), m_dirCutFlow );	
 }
 
-void analysisControl::draw()
+void analysisGridControl::draw()
 {
 	m_graphics->drawBareHistos(m_dirNoCuts);
 	m_graphics->drawHistos(m_dirAllCuts);
@@ -103,7 +99,7 @@ void analysisControl::draw()
 	m_analysis->printCutFlowNumbers(l64t_nentries);
 }
 
-void analysisControl::analyze()
+void analysisGridControl::analyze()
 {
 	bool isendofrun = (l64t_jentry==l64t_stopEvent-1) ? true : false;
 
@@ -113,7 +109,7 @@ void analysisControl::analyze()
 	m_analysis->executeCutFlow();
 }
 
-void analysisControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
+void analysisGridControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 {
 	if (m_phys->fChain == 0)  return;
 

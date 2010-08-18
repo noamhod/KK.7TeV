@@ -27,7 +27,7 @@ offlineTree::offlineTree(physics* phys, TFile* treeFile)
 
 	m_tree = new TTree("offline", "offline");
 
-	m_tree->SetMaxTreeSize(50000000); // 50Mb per file
+	//m_tree->SetMaxTreeSize(50000000); // 50Mb per file
 
 	setBranches();
 }
@@ -36,7 +36,7 @@ void offlineTree::setBranches()
 {
 	// event level
 	m_tree->Branch( "isGRL", &isGRL );
-		
+	
 	m_tree->Branch( "RunNumber", &RunNumber );
 	m_tree->Branch( "EventNumber", &EventNumber );
 	m_tree->Branch( "timestamp", &timestamp );
@@ -68,7 +68,7 @@ void offlineTree::setBranches()
 	m_tree->Branch( "lar_timeA", &lar_timeA );
 	m_tree->Branch( "lar_timeC", &lar_timeC );
 	m_tree->Branch( "lar_timeDiff", &lar_timeDiff );
-			
+	
 	m_tree->Branch( "EF_2mu10", &EF_2mu10 );
 	m_tree->Branch( "EF_2mu4", &EF_2mu4 );
 	m_tree->Branch( "EF_2mu4_DiMu", &EF_2mu4_DiMu );
@@ -120,7 +120,7 @@ void offlineTree::setBranches()
 	m_tree->Branch( "EF_L1ItemStreamer_L1_MU6_FIRSTEMPTY", &EF_L1ItemStreamer_L1_MU6_FIRSTEMPTY );
 	m_tree->Branch( "EF_L1ItemStreamer_L1_MU6_J5", &EF_L1ItemStreamer_L1_MU6_J5 );
 	m_tree->Branch( "EF_L1ItemStreamer_L1_MU6_UNPAIRED", &EF_L1ItemStreamer_L1_MU6_UNPAIRED );
-	   
+	
 	//m_tree->Branch( "EF_mu0_missingRoi", &EF_mu0_missingRoi );
 	//m_tree->Branch( "EF_mu0_rpcOnly", &EF_mu0_rpcOnly );
 	m_tree->Branch( "EF_mu10", &EF_mu10 );
@@ -206,7 +206,7 @@ void offlineTree::setBranches()
 	m_tree->Branch( "EF_mu6_muCombTag_SiTrk", &EF_mu6_muCombTag_SiTrk );
 	m_tree->Branch( "EF_mu6_passHLT", &EF_mu6_passHLT );
 	m_tree->Branch( "EF_mu6_unpaired", &EF_mu6_unpaired );
-	   
+	
 	m_tree->Branch( "L1_2EM2", &L1_2EM2 );
 	m_tree->Branch( "L1_2EM3", &L1_2EM3 );
 	m_tree->Branch( "L1_2EM4", &L1_2EM4 );
@@ -250,7 +250,7 @@ void offlineTree::setBranches()
 	m_tree->Branch( "L1_MU6_FIRSTEMPTY", &L1_MU6_FIRSTEMPTY );
 	m_tree->Branch( "L1_MU6_J5", &L1_MU6_J5 );
 	m_tree->Branch( "L1_MU6_UNPAIRED", &L1_MU6_UNPAIRED );
-	   
+	
 	m_tree->Branch( "L2_2mu10", &L2_2mu10 );
 	m_tree->Branch( "L2_2mu4", &L2_2mu4 );
 	m_tree->Branch( "L2_2mu4_DiMu", &L2_2mu4_DiMu );
@@ -263,7 +263,7 @@ void offlineTree::setBranches()
 	m_tree->Branch( "L2_2mu6", &L2_2mu6 );
 	m_tree->Branch( "L2_2mu6_DiMu", &L2_2mu6_DiMu );
 	m_tree->Branch( "L2_2mu6_DiMu_noVtx_noOS", &L2_2mu6_DiMu_noVtx_noOS );
-	   
+	
 	m_tree->Branch( "L2_L1ItemStreamer_L1_MU0", &L2_L1ItemStreamer_L1_MU0 );
 	m_tree->Branch( "L2_L1ItemStreamer_L1_MU0_COMM", &L2_L1ItemStreamer_L1_MU0_COMM );
 	m_tree->Branch( "L2_L1ItemStreamer_L1_MU0_COMM_EMPTY", &L2_L1ItemStreamer_L1_MU0_COMM_EMPTY );
@@ -286,7 +286,7 @@ void offlineTree::setBranches()
 	m_tree->Branch( "L2_L1ItemStreamer_L1_MU6_FIRSTEMPTY", &L2_L1ItemStreamer_L1_MU6_FIRSTEMPTY );
 	m_tree->Branch( "L2_L1ItemStreamer_L1_MU6_J5", &L2_L1ItemStreamer_L1_MU6_J5 );
 	m_tree->Branch( "L2_L1ItemStreamer_L1_MU6_UNPAIRED", &L2_L1ItemStreamer_L1_MU6_UNPAIRED );
-	   
+	
 	//m_tree->Branch( "L2_mu0_missingRoi", &L2_mu0_missingRoi );
 	//m_tree->Branch( "L2_mu0_rpcOnly", &L2_mu0_rpcOnly );
 	m_tree->Branch( "L2_mu10", &L2_mu10 );
@@ -1098,6 +1098,268 @@ void offlineTree::setBranches()
 	m_tree->Branch( "mu_muid_L1_source", &mu_muid_L1_source );
 	m_tree->Branch( "mu_muid_L1_hemisphere", &mu_muid_L1_hemisphere );
 	m_tree->Branch( "mu_muid_L1_matched", &mu_muid_L1_matched );
+	
+	
+	
+	
+	// other 
+	trk_d0 = new vector<float>;
+	trk_z0 = new vector<float>;
+	trk_phi = new vector<float>;
+	trk_theta = new vector<float>;
+	trk_qoverp = new vector<float>;
+	trk_pt = new vector<float>;
+	trk_eta = new vector<float>;
+	trk_err_d0 = new vector<float>;
+	trk_err_z0 = new vector<float>;
+	trk_err_phi = new vector<float>;
+	trk_err_theta = new vector<float>;
+	trk_err_qoverp = new vector<float>;
+	trk_cov_d0 = new vector<float>;
+	trk_cov_z0 = new vector<float>;
+	trk_cov_phi = new vector<float>;
+	trk_cov_theta = new vector<float>;
+	trk_cov_qoverp = new vector<float>;
+	trk_cov_d0_z0 = new vector<float>;
+	trk_cov_d0_phi = new vector<float>;
+	trk_cov_d0_theta = new vector<float>;
+	trk_cov_d0_qoverp = new vector<float>;
+	trk_cov_z0_phi = new vector<float>;
+	trk_cov_z0_theta = new vector<float>;
+	trk_cov_z0_qoverp = new vector<float>;
+	trk_cov_phi_theta = new vector<float>;
+	trk_cov_phi_qoverp = new vector<float>;
+	trk_cov_theta_qoverp = new vector<float>;
+	trk_blayerPrediction_expectHit = new vector<int>;
+	trk_blayerPrediction_x = new vector<vector<float> >;
+	trk_blayerPrediction_y = new vector<vector<float> >;
+	trk_blayerPrediction_z = new vector<vector<float> >;
+	trk_blayerPrediction_locX = new vector<vector<float> >;
+	trk_blayerPrediction_locY = new vector<vector<float> >;
+	trk_blayerPrediction_err_locX = new vector<vector<float> >;
+	trk_blayerPrediction_err_locY = new vector<vector<float> >;
+	trk_blayerPrediction_etaDistToEdge = new vector<vector<float> >;
+	trk_blayerPrediction_phiDistToEdge = new vector<vector<float> >;
+	trk_blayerPrediction_detElementId = new vector<vector<unsigned int> >;
+	trk_blayerPrediction_row = new vector<vector<int> >;
+	trk_blayerPrediction_col = new vector<vector<int> >;
+	trk_blayerPrediction_type = new vector<vector<int> >;
+	trk_d0_wrtPV = new vector<float>;
+	trk_z0_wrtPV = new vector<float>;
+	trk_phi_wrtPV = new vector<float>;
+	trk_theta_wrtPV = new vector<float>;
+	trk_qoverp_wrtPV = new vector<float>;
+	trk_chi2 = new vector<float>;
+	trk_ndof = new vector<int>;
+	trk_nBLHits = new vector<int>;
+	trk_nPixHits = new vector<int>;
+	trk_nSCTHits = new vector<int>;
+	trk_nTRTHits = new vector<int>;
+	trk_nPixHoles = new vector<int>;
+	trk_nSCTHoles = new vector<int>;
+	trk_nMDTHits = new vector<int>;
+	trk_nCSCEtaHits = new vector<int>;
+	trk_nCSCPhiHits = new vector<int>;
+	trk_nRPCEtaHits = new vector<int>;
+	trk_nRPCPhiHits = new vector<int>;
+	trk_nTGCEtaHits = new vector<int>;
+	trk_nTGCPhiHits = new vector<int>;
+	trk_nHits = new vector<int>;
+	trk_nHoles = new vector<int>;
+	trk_hitPattern = new vector<int>;
+	trk_TRTHighTHitsRatio = new vector<float>;
+	trk_pixeldEdx = new vector<float>;
+	trk_fitter = new vector<int>;
+	trk_patternReco1 = new vector<int>;
+	trk_patternReco2 = new vector<int>;
+	trk_seedFinder = new vector<int>;
+
+	mb_E = new vector<float>;
+	mb_eta = new vector<float>;
+	mb_phi = new vector<float>;
+	mb_time = new vector<float>;
+	mb_quality = new vector<int>;
+	mb_type = new vector<int>;
+	mb_module = new vector<int>;
+	mb_channel = new vector<int>;
+	
+	vxp_x = new vector<float>;
+	vxp_y = new vector<float>;
+	vxp_z = new vector<float>;
+	vxp_chi2 = new vector<float>;
+	vxp_ndof = new vector<int>;
+	vxp_err_x = new vector<float>;
+	vxp_err_y = new vector<float>;
+	vxp_err_z = new vector<float>;
+	vxp_px = new vector<float>;
+	vxp_py = new vector<float>;
+	vxp_pz = new vector<float>;
+	vxp_E = new vector<float>;
+	vxp_m = new vector<float>;
+	vxp_nTracks = new vector<int>;
+	vxp_sumPt = new vector<float>;
+	vxp_type = new vector<int>;
+	vxp_trk_n = new vector<int>;
+	vxp_trk_chi2 = new vector<vector<float> >;
+	vxp_trk_d0 = new vector<vector<float> >;
+	vxp_trk_z0 = new vector<vector<float> >;
+	vxp_trk_unbiased_d0 = new vector<vector<float> >;
+	vxp_trk_unbiased_z0 = new vector<vector<float> >;
+	vxp_trk_err_unbiased_d0 = new vector<vector<float> >;
+	vxp_trk_err_unbiased_z0 = new vector<vector<float> >;
+	vxp_trk_phi = new vector<vector<float> >;
+	vxp_trk_theta = new vector<vector<float> >;
+	vxp_trk_weight = new vector<vector<float> >;
+	vxp_trk_index = new vector<vector<int> >;
+	
+	m_tree->Branch( "trk_n", &trk_n );
+	m_tree->Branch( "trk_d0", &trk_d0 );
+	m_tree->Branch( "trk_z0", &trk_z0 );
+	m_tree->Branch( "trk_phi", &trk_phi );
+	m_tree->Branch( "trk_theta", &trk_theta );
+	m_tree->Branch( "trk_qoverp", &trk_qoverp );
+	m_tree->Branch( "trk_pt", &trk_pt );
+	m_tree->Branch( "trk_eta", &trk_eta );
+	m_tree->Branch( "trk_err_d0", &trk_err_d0 );
+	m_tree->Branch( "trk_err_z0", &trk_err_z0 );
+	m_tree->Branch( "trk_err_phi", &trk_err_phi );
+	m_tree->Branch( "trk_err_theta", &trk_err_theta );
+	m_tree->Branch( "trk_err_qoverp", &trk_err_qoverp );
+	m_tree->Branch( "trk_cov_d0", &trk_cov_d0 );
+	m_tree->Branch( "trk_cov_z0", &trk_cov_z0 );
+	m_tree->Branch( "trk_cov_phi", &trk_cov_phi );
+	m_tree->Branch( "trk_cov_theta", &trk_cov_theta );
+	m_tree->Branch( "trk_cov_qoverp", &trk_cov_qoverp );
+	m_tree->Branch( "trk_cov_d0_z0", &trk_cov_d0_z0 );
+	m_tree->Branch( "trk_cov_d0_phi", &trk_cov_d0_phi );
+	m_tree->Branch( "trk_cov_d0_theta", &trk_cov_d0_theta );
+	m_tree->Branch( "trk_cov_d0_qoverp", &trk_cov_d0_qoverp );
+	m_tree->Branch( "trk_cov_z0_phi", &trk_cov_z0_phi );
+	m_tree->Branch( "trk_cov_z0_theta", &trk_cov_z0_theta );
+	m_tree->Branch( "trk_cov_z0_qoverp", &trk_cov_z0_qoverp );
+	m_tree->Branch( "trk_cov_phi_theta", &trk_cov_phi_theta );
+	m_tree->Branch( "trk_cov_phi_qoverp", &trk_cov_phi_qoverp );
+	m_tree->Branch( "trk_cov_theta_qoverp", &trk_cov_theta_qoverp );
+	m_tree->Branch( "trk_blayerPrediction_expectHit", &trk_blayerPrediction_expectHit );
+	m_tree->Branch( "trk_blayerPrediction_x", &trk_blayerPrediction_x );
+	m_tree->Branch( "trk_blayerPrediction_y", &trk_blayerPrediction_y );
+	m_tree->Branch( "trk_blayerPrediction_z", &trk_blayerPrediction_z );
+	m_tree->Branch( "trk_blayerPrediction_locX", &trk_blayerPrediction_locX );
+	m_tree->Branch( "trk_blayerPrediction_locY", &trk_blayerPrediction_locY );
+	m_tree->Branch( "trk_blayerPrediction_err_locX", &trk_blayerPrediction_err_locX );
+	m_tree->Branch( "trk_blayerPrediction_err_locY", &trk_blayerPrediction_err_locY );
+	m_tree->Branch( "trk_blayerPrediction_etaDistToEdge", &trk_blayerPrediction_etaDistToEdge );
+	m_tree->Branch( "trk_blayerPrediction_phiDistToEdge", &trk_blayerPrediction_phiDistToEdge );
+	m_tree->Branch( "trk_blayerPrediction_detElementId", &trk_blayerPrediction_detElementId );
+	m_tree->Branch( "trk_blayerPrediction_row", &trk_blayerPrediction_row );
+	m_tree->Branch( "trk_blayerPrediction_col", &trk_blayerPrediction_col );
+	m_tree->Branch( "trk_blayerPrediction_type", &trk_blayerPrediction_type );
+	m_tree->Branch( "trk_d0_wrtPV", &trk_d0_wrtPV );
+	m_tree->Branch( "trk_z0_wrtPV", &trk_z0_wrtPV );
+	m_tree->Branch( "trk_phi_wrtPV", &trk_phi_wrtPV );
+	m_tree->Branch( "trk_theta_wrtPV", &trk_theta_wrtPV );
+	m_tree->Branch( "trk_qoverp_wrtPV", &trk_qoverp_wrtPV );
+	m_tree->Branch( "trk_chi2", &trk_chi2 );
+	m_tree->Branch( "trk_ndof", &trk_ndof );
+	m_tree->Branch( "trk_nBLHits", &trk_nBLHits );
+	m_tree->Branch( "trk_nPixHits", &trk_nPixHits );
+	m_tree->Branch( "trk_nSCTHits", &trk_nSCTHits );
+	m_tree->Branch( "trk_nTRTHits", &trk_nTRTHits );
+	m_tree->Branch( "trk_nPixHoles", &trk_nPixHoles );
+	m_tree->Branch( "trk_nSCTHoles", &trk_nSCTHoles );
+	m_tree->Branch( "trk_nMDTHits", &trk_nMDTHits );
+	m_tree->Branch( "trk_nCSCEtaHits", &trk_nCSCEtaHits );
+	m_tree->Branch( "trk_nCSCPhiHits", &trk_nCSCPhiHits );
+	m_tree->Branch( "trk_nRPCEtaHits", &trk_nRPCEtaHits );
+	m_tree->Branch( "trk_nRPCPhiHits", &trk_nRPCPhiHits );
+	m_tree->Branch( "trk_nTGCEtaHits", &trk_nTGCEtaHits );
+	m_tree->Branch( "trk_nTGCPhiHits", &trk_nTGCPhiHits );
+	m_tree->Branch( "trk_nHits", &trk_nHits );
+	m_tree->Branch( "trk_nHoles", &trk_nHoles );
+	m_tree->Branch( "trk_hitPattern", &trk_hitPattern );
+	m_tree->Branch( "trk_TRTHighTHitsRatio", &trk_TRTHighTHitsRatio );
+	m_tree->Branch( "trk_pixeldEdx", &trk_pixeldEdx );
+	m_tree->Branch( "trk_fitter", &trk_fitter );
+	m_tree->Branch( "trk_patternReco1", &trk_patternReco1 );
+	m_tree->Branch( "trk_patternReco2", &trk_patternReco2 );
+	m_tree->Branch( "trk_seedFinder", &trk_seedFinder );
+
+	m_tree->Branch( "mb_n", &mb_n );
+	m_tree->Branch( "mb_E", &mb_E );
+	m_tree->Branch( "mb_eta", &mb_eta );
+	m_tree->Branch( "mb_phi", &mb_phi );
+	m_tree->Branch( "mb_time", &mb_time );
+	m_tree->Branch( "mb_quality", &mb_quality );
+	m_tree->Branch( "mb_type", &mb_type );
+	m_tree->Branch( "mb_module", &mb_module );
+	m_tree->Branch( "mb_channel", &mb_channel );
+	m_tree->Branch( "mbtime_timeDiff", &mbtime_timeDiff );
+	m_tree->Branch( "mbtime_timeA", &mbtime_timeA );
+	m_tree->Branch( "mbtime_timeC", &mbtime_timeC );
+	m_tree->Branch( "mbtime_countA", &mbtime_countA );
+	m_tree->Branch( "mbtime_countC", &mbtime_countC );
+	m_tree->Branch( "L1_MBTS_1", &L1_MBTS_1 );
+	m_tree->Branch( "L1_MBTS_1_1", &L1_MBTS_1_1 );
+	m_tree->Branch( "L1_MBTS_1_1_Col", &L1_MBTS_1_1_Col );
+	m_tree->Branch( "L1_MBTS_1_1_EMPTY", &L1_MBTS_1_1_EMPTY );
+	m_tree->Branch( "L1_MBTS_1_1_FIRSTEMPTY", &L1_MBTS_1_1_FIRSTEMPTY );
+	m_tree->Branch( "L1_MBTS_1_1_UNPAIRED", &L1_MBTS_1_1_UNPAIRED );
+	m_tree->Branch( "L1_MBTS_1_1_UNPAIRED1", &L1_MBTS_1_1_UNPAIRED1 );
+	m_tree->Branch( "L1_MBTS_1_1_UNPAIRED2", &L1_MBTS_1_1_UNPAIRED2 );
+	m_tree->Branch( "L1_MBTS_1_Col", &L1_MBTS_1_Col );
+	m_tree->Branch( "L1_MBTS_1_EMPTY", &L1_MBTS_1_EMPTY );
+	m_tree->Branch( "L1_MBTS_1_FIRSTEMPTY", &L1_MBTS_1_FIRSTEMPTY );
+	m_tree->Branch( "L1_MBTS_1_UNPAIRED", &L1_MBTS_1_UNPAIRED );
+	m_tree->Branch( "L1_MBTS_1_UNPAIRED1", &L1_MBTS_1_UNPAIRED1 );
+	m_tree->Branch( "L1_MBTS_1_UNPAIRED2", &L1_MBTS_1_UNPAIRED2 );
+	m_tree->Branch( "L1_MBTS_2", &L1_MBTS_2 );
+	m_tree->Branch( "L1_MBTS_2_Col", &L1_MBTS_2_Col );
+	m_tree->Branch( "L1_MBTS_2_EMPTY", &L1_MBTS_2_EMPTY );
+	m_tree->Branch( "L1_MBTS_2_FIRSTEMPTY", &L1_MBTS_2_FIRSTEMPTY );
+	m_tree->Branch( "L1_MBTS_2_UNPAIRED", &L1_MBTS_2_UNPAIRED );
+	m_tree->Branch( "L1_MBTS_2_UNPAIRED1", &L1_MBTS_2_UNPAIRED1 );
+	m_tree->Branch( "L1_MBTS_2_UNPAIRED2", &L1_MBTS_2_UNPAIRED2 );
+	m_tree->Branch( "L1_MBTS_4_4", &L1_MBTS_4_4 );
+	m_tree->Branch( "L1_MBTS_4_4_FIRSTEMPTY", &L1_MBTS_4_4_FIRSTEMPTY );
+	m_tree->Branch( "L1_MBTS_4_4_UNPAIRED", &L1_MBTS_4_4_UNPAIRED );
+	m_tree->Branch( "L1_MBTS_4_4_UNPAIRED1", &L1_MBTS_4_4_UNPAIRED1 );
+	m_tree->Branch( "L1_MBTS_4_4_UNPAIRED2", &L1_MBTS_4_4_UNPAIRED2 );
+	m_tree->Branch( "L1_MBTS_A", &L1_MBTS_A );
+	m_tree->Branch( "L1_MBTS_C", &L1_MBTS_C );
+	m_tree->Branch( "collcand_passMBTSTime", &collcand_passMBTSTime );
+	m_tree->Branch( "collcand_passCaloTime", &collcand_passCaloTime );
+	m_tree->Branch( "collcand_passTrigger", &collcand_passTrigger );
+	m_tree->Branch( "collcand_pass", &collcand_pass );
+
+	m_tree->Branch( "vxp_n", &vxp_n );
+	m_tree->Branch( "vxp_x", &vxp_x );
+	m_tree->Branch( "vxp_y", &vxp_y );
+	m_tree->Branch( "vxp_z", &vxp_z );
+	m_tree->Branch( "vxp_chi2", &vxp_chi2 );
+	m_tree->Branch( "vxp_ndof", &vxp_ndof );
+	m_tree->Branch( "vxp_err_x", &vxp_err_x );
+	m_tree->Branch( "vxp_err_y", &vxp_err_y );
+	m_tree->Branch( "vxp_err_z", &vxp_err_z );
+	m_tree->Branch( "vxp_px", &vxp_px );
+	m_tree->Branch( "vxp_py", &vxp_py );
+	m_tree->Branch( "vxp_pz", &vxp_pz );
+	m_tree->Branch( "vxp_E", &vxp_E );
+	m_tree->Branch( "vxp_m", &vxp_m );
+	m_tree->Branch( "vxp_nTracks", &vxp_nTracks );
+	m_tree->Branch( "vxp_sumPt", &vxp_sumPt );
+	m_tree->Branch( "vxp_type", &vxp_type );
+	m_tree->Branch( "vxp_trk_n", &vxp_trk_n );
+	m_tree->Branch( "vxp_trk_chi2", &vxp_trk_chi2 );
+	m_tree->Branch( "vxp_trk_d0", &vxp_trk_d0 );
+	m_tree->Branch( "vxp_trk_z0", &vxp_trk_z0 );
+	m_tree->Branch( "vxp_trk_unbiased_d0", &vxp_trk_unbiased_d0 );
+	m_tree->Branch( "vxp_trk_unbiased_z0", &vxp_trk_unbiased_z0 );
+	m_tree->Branch( "vxp_trk_err_unbiased_d0", &vxp_trk_err_unbiased_d0 );
+	m_tree->Branch( "vxp_trk_err_unbiased_z0", &vxp_trk_err_unbiased_z0 );
+	m_tree->Branch( "vxp_trk_phi", &vxp_trk_phi );
+	m_tree->Branch( "vxp_trk_theta", &vxp_trk_theta );
+	m_tree->Branch( "vxp_trk_weight", &vxp_trk_weight );
+	m_tree->Branch( "vxp_trk_index", &vxp_trk_index );
 }
 
 void offlineTree::fill(Bool_t isgrl)
@@ -1137,7 +1399,7 @@ void offlineTree::fill(Bool_t isgrl)
 	lar_timeA = m_phys->lar_timeA;
 	lar_timeC = m_phys->lar_timeC;
 	lar_timeDiff = m_phys->lar_timeDiff;
-		
+	
 	EF_2mu10 = m_phys->EF_2mu10;
 	EF_2mu4 = m_phys->EF_2mu4;
 	EF_2mu4_DiMu = m_phys->EF_2mu4_DiMu;
@@ -1189,7 +1451,7 @@ void offlineTree::fill(Bool_t isgrl)
 	EF_L1ItemStreamer_L1_MU6_FIRSTEMPTY = m_phys->EF_L1ItemStreamer_L1_MU6_FIRSTEMPTY;
 	EF_L1ItemStreamer_L1_MU6_J5 = m_phys->EF_L1ItemStreamer_L1_MU6_J5;
 	EF_L1ItemStreamer_L1_MU6_UNPAIRED = m_phys->EF_L1ItemStreamer_L1_MU6_UNPAIRED;
-		   
+	
 	//EF_mu0_missingRoi = m_phys-> EF_mu0_missingRoi;
 	//EF_mu0_rpcOnly = m_phys->EF_mu0_rpcOnly;
 	EF_mu10 = m_phys->EF_mu10;
@@ -1275,7 +1537,7 @@ void offlineTree::fill(Bool_t isgrl)
 	EF_mu6_muCombTag_SiTrk = m_phys->EF_mu6_muCombTag_SiTrk;
 	EF_mu6_passHLT = m_phys->EF_mu6_passHLT;
 	EF_mu6_unpaired = m_phys->EF_mu6_unpaired;
-		   
+	
 	L1_2EM2 = m_phys->L1_2EM2;
 	L1_2EM3 = m_phys->L1_2EM3;
 	L1_2EM4 = m_phys->L1_2EM4;
@@ -1319,7 +1581,7 @@ void offlineTree::fill(Bool_t isgrl)
 	L1_MU6_FIRSTEMPTY = m_phys->L1_MU6_FIRSTEMPTY;
 	L1_MU6_J5 = m_phys->L1_MU6_J5;
 	L1_MU6_UNPAIRED = m_phys->L1_MU6_UNPAIRED;
-		   
+	
 	L2_2mu10 = m_phys->L2_2mu10;
 	L2_2mu4 = m_phys->L2_2mu4;
 	L2_2mu4_DiMu = m_phys->L2_2mu4_DiMu;
@@ -1332,7 +1594,7 @@ void offlineTree::fill(Bool_t isgrl)
 	L2_2mu6 = m_phys->L2_2mu6;
 	L2_2mu6_DiMu = m_phys->L2_2mu6_DiMu;
 	L2_2mu6_DiMu_noVtx_noOS = m_phys->L2_2mu6_DiMu_noVtx_noOS;
-		   
+	
 	L2_L1ItemStreamer_L1_MU0 = m_phys->L2_L1ItemStreamer_L1_MU0;
 	L2_L1ItemStreamer_L1_MU0_COMM = m_phys->L2_L1ItemStreamer_L1_MU0_COMM;
 	L2_L1ItemStreamer_L1_MU0_COMM_EMPTY = m_phys->L2_L1ItemStreamer_L1_MU0_COMM_EMPTY;
@@ -1355,7 +1617,7 @@ void offlineTree::fill(Bool_t isgrl)
 	L2_L1ItemStreamer_L1_MU6_FIRSTEMPTY = m_phys->L2_L1ItemStreamer_L1_MU6_FIRSTEMPTY;
 	L2_L1ItemStreamer_L1_MU6_J5 = m_phys->L2_L1ItemStreamer_L1_MU6_J5;
 	L2_L1ItemStreamer_L1_MU6_UNPAIRED = m_phys->L2_L1ItemStreamer_L1_MU6_UNPAIRED;
-		   
+	
 	//L2_mu0_missingRoi = m_phys-> L2_mu0_missingRoi;
 	//L2_mu0_rpcOnly = m_phys->L2_mu0_rpcOnly;
 	L2_mu10 = m_phys->L2_mu10;
@@ -1809,6 +2071,157 @@ void offlineTree::fill(Bool_t isgrl)
 	mu_muid_L1_source = m_phys->mu_muid_L1_source;
 	mu_muid_L1_hemisphere = m_phys->mu_muid_L1_hemisphere;
 	mu_muid_L1_matched = m_phys->mu_muid_L1_matched;
+	
+	
+	
+	trk_n = m_phys->trk_n;
+	trk_d0 = m_phys->trk_d0;
+	trk_z0 = m_phys->trk_z0;
+	trk_phi = m_phys->trk_phi;
+	trk_theta = m_phys->trk_theta;
+	trk_qoverp = m_phys->trk_qoverp;
+	trk_pt = m_phys->trk_pt;
+	trk_eta = m_phys->trk_eta;
+	trk_err_d0 = m_phys->trk_err_d0;
+	trk_err_z0 = m_phys->trk_err_z0;
+	trk_err_phi = m_phys->trk_err_phi;
+	trk_err_theta = m_phys->trk_err_theta;
+	trk_err_qoverp = m_phys->trk_err_qoverp;
+	trk_cov_d0 = m_phys->trk_cov_d0;
+	trk_cov_z0 = m_phys->trk_cov_z0;
+	trk_cov_phi = m_phys->trk_cov_phi;
+	trk_cov_theta = m_phys->trk_cov_theta;
+	trk_cov_qoverp = m_phys->trk_cov_qoverp;
+	trk_cov_d0_z0 = m_phys->trk_cov_d0_z0;
+	trk_cov_d0_phi = m_phys->trk_cov_d0_phi;
+	trk_cov_d0_theta = m_phys->trk_cov_d0_theta;
+	trk_cov_d0_qoverp = m_phys->trk_cov_d0_qoverp;
+	trk_cov_z0_phi = m_phys->trk_cov_z0_phi;
+	trk_cov_z0_theta = m_phys->trk_cov_z0_theta;
+	trk_cov_z0_qoverp = m_phys->trk_cov_z0_qoverp;
+	trk_cov_phi_theta = m_phys->trk_cov_phi_theta;
+	trk_cov_phi_qoverp = m_phys->trk_cov_phi_qoverp;
+	trk_cov_theta_qoverp = m_phys->trk_cov_theta_qoverp;
+	trk_blayerPrediction_expectHit = m_phys->trk_blayerPrediction_expectHit;
+	trk_blayerPrediction_x = m_phys->trk_blayerPrediction_x;
+	trk_blayerPrediction_y = m_phys->trk_blayerPrediction_y;
+	trk_blayerPrediction_z = m_phys->trk_blayerPrediction_z;
+	trk_blayerPrediction_locX = m_phys->trk_blayerPrediction_locX;
+	trk_blayerPrediction_locY = m_phys->trk_blayerPrediction_locY;
+	trk_blayerPrediction_err_locX = m_phys->trk_blayerPrediction_err_locX;
+	trk_blayerPrediction_err_locY = m_phys->trk_blayerPrediction_err_locY;
+	trk_blayerPrediction_etaDistToEdge = m_phys->trk_blayerPrediction_etaDistToEdge;
+	trk_blayerPrediction_phiDistToEdge = m_phys->trk_blayerPrediction_phiDistToEdge;
+	trk_blayerPrediction_detElementId = m_phys->trk_blayerPrediction_detElementId;
+	trk_blayerPrediction_row = m_phys->trk_blayerPrediction_row;
+	trk_blayerPrediction_col = m_phys->trk_blayerPrediction_col;
+	trk_blayerPrediction_type = m_phys->trk_blayerPrediction_type;
+	trk_d0_wrtPV = m_phys->trk_d0_wrtPV;
+	trk_z0_wrtPV = m_phys->trk_z0_wrtPV;
+	trk_phi_wrtPV = m_phys->trk_phi_wrtPV;
+	trk_theta_wrtPV = m_phys->trk_theta_wrtPV;
+	trk_qoverp_wrtPV = m_phys->trk_qoverp_wrtPV;
+	trk_chi2 = m_phys->trk_chi2;
+	trk_ndof = m_phys->trk_ndof;
+	trk_nBLHits = m_phys->trk_nBLHits;
+	trk_nPixHits = m_phys->trk_nPixHits;
+	trk_nSCTHits = m_phys->trk_nSCTHits;
+	trk_nTRTHits = m_phys->trk_nTRTHits;
+	trk_nPixHoles = m_phys->trk_nPixHoles;
+	trk_nSCTHoles = m_phys->trk_nSCTHoles;
+	trk_nMDTHits = m_phys->trk_nMDTHits;
+	trk_nCSCEtaHits = m_phys->trk_nCSCEtaHits;
+	trk_nCSCPhiHits = m_phys->trk_nCSCPhiHits;
+	trk_nRPCEtaHits = m_phys->trk_nRPCEtaHits;
+	trk_nRPCPhiHits = m_phys->trk_nRPCPhiHits;
+	trk_nTGCEtaHits = m_phys->trk_nTGCEtaHits;
+	trk_nTGCPhiHits = m_phys->trk_nTGCPhiHits;
+	trk_nHits = m_phys->trk_nHits;
+	trk_nHoles = m_phys->trk_nHoles;
+	trk_hitPattern = m_phys->trk_hitPattern;
+	trk_TRTHighTHitsRatio = m_phys->trk_TRTHighTHitsRatio;
+	trk_pixeldEdx = m_phys->trk_pixeldEdx;
+	trk_fitter = m_phys->trk_fitter;
+	trk_patternReco1 = m_phys->trk_patternReco1;
+	trk_patternReco2 = m_phys->trk_patternReco2;
+	trk_seedFinder = m_phys->trk_seedFinder;
+
+	mb_n = m_phys->mb_n;
+	mb_E = m_phys->mb_E;
+	mb_eta = m_phys->mb_eta;
+	mb_phi = m_phys->mb_phi;
+	mb_time = m_phys->mb_time;
+	mb_quality = m_phys->mb_quality;
+	mb_type = m_phys->mb_type;
+	mb_module = m_phys->mb_module;
+	mb_channel = m_phys->mb_channel;
+	mbtime_timeDiff = m_phys->mbtime_timeDiff;
+	mbtime_timeA = m_phys->mbtime_timeA;
+	mbtime_timeC = m_phys->mbtime_timeC;
+	mbtime_countA = m_phys->mbtime_countA;
+	mbtime_countC = m_phys->mbtime_countC;
+	L1_MBTS_1 = m_phys->L1_MBTS_1;
+	L1_MBTS_1_1 = m_phys->L1_MBTS_1_1;
+	L1_MBTS_1_1_Col = m_phys->L1_MBTS_1_1_Col;
+	L1_MBTS_1_1_EMPTY = m_phys->L1_MBTS_1_1_EMPTY;
+	L1_MBTS_1_1_FIRSTEMPTY = m_phys->L1_MBTS_1_1_FIRSTEMPTY;
+	L1_MBTS_1_1_UNPAIRED = m_phys->L1_MBTS_1_1_UNPAIRED;
+	L1_MBTS_1_1_UNPAIRED1 = m_phys->L1_MBTS_1_1_UNPAIRED1;
+	L1_MBTS_1_1_UNPAIRED2 = m_phys->L1_MBTS_1_1_UNPAIRED2;
+	L1_MBTS_1_Col = m_phys->L1_MBTS_1_Col;
+	L1_MBTS_1_EMPTY = m_phys->L1_MBTS_1_EMPTY;
+	L1_MBTS_1_FIRSTEMPTY = m_phys->L1_MBTS_1_FIRSTEMPTY;
+	L1_MBTS_1_UNPAIRED = m_phys->L1_MBTS_1_UNPAIRED;
+	L1_MBTS_1_UNPAIRED1 = m_phys->L1_MBTS_1_UNPAIRED1;
+	L1_MBTS_1_UNPAIRED2 = m_phys->L1_MBTS_1_UNPAIRED2;
+	L1_MBTS_2 = m_phys->L1_MBTS_2;
+	L1_MBTS_2_Col = m_phys->L1_MBTS_2_Col;
+	L1_MBTS_2_EMPTY = m_phys->L1_MBTS_2_EMPTY;
+	L1_MBTS_2_FIRSTEMPTY = m_phys->L1_MBTS_2_FIRSTEMPTY;
+	L1_MBTS_2_UNPAIRED = m_phys->L1_MBTS_2_UNPAIRED;
+	L1_MBTS_2_UNPAIRED1 = m_phys->L1_MBTS_2_UNPAIRED1;
+	L1_MBTS_2_UNPAIRED2 = m_phys->L1_MBTS_2_UNPAIRED2;
+	L1_MBTS_4_4 = m_phys->L1_MBTS_4_4;
+	L1_MBTS_4_4_FIRSTEMPTY = m_phys->L1_MBTS_4_4_FIRSTEMPTY;
+	L1_MBTS_4_4_UNPAIRED = m_phys->L1_MBTS_4_4_UNPAIRED;
+	L1_MBTS_4_4_UNPAIRED1 = m_phys->L1_MBTS_4_4_UNPAIRED1;
+	L1_MBTS_4_4_UNPAIRED2 = m_phys->L1_MBTS_4_4_UNPAIRED2;
+	L1_MBTS_A = m_phys->L1_MBTS_A;
+	L1_MBTS_C = m_phys->L1_MBTS_C;
+	collcand_passMBTSTime = m_phys->collcand_passMBTSTime;
+	collcand_passCaloTime = m_phys->collcand_passCaloTime;
+	collcand_passTrigger = m_phys->collcand_passTrigger;
+	collcand_pass = m_phys->collcand_pass;
+
+	vxp_n = m_phys->vxp_n;
+	vxp_x = m_phys->vxp_x;
+	vxp_y = m_phys->vxp_y;
+	vxp_z = m_phys->vxp_z;
+	vxp_chi2 = m_phys->vxp_chi2;
+	vxp_ndof = m_phys->vxp_ndof;
+	vxp_err_x = m_phys->vxp_err_x;
+	vxp_err_y = m_phys->vxp_err_y;
+	vxp_err_z = m_phys->vxp_err_z;
+	vxp_px = m_phys->vxp_px;
+	vxp_py = m_phys->vxp_py;
+	vxp_pz = m_phys->vxp_pz;
+	vxp_E = m_phys->vxp_E;
+	vxp_m = m_phys->vxp_m;
+	vxp_nTracks = m_phys->vxp_nTracks;
+	vxp_sumPt = m_phys->vxp_sumPt;
+	vxp_type = m_phys->vxp_type;
+	vxp_trk_n = m_phys->vxp_trk_n;
+	vxp_trk_chi2 = m_phys->vxp_trk_chi2;
+	vxp_trk_d0 = m_phys->vxp_trk_d0;
+	vxp_trk_z0 = m_phys->vxp_trk_z0;
+	vxp_trk_unbiased_d0 = m_phys->vxp_trk_unbiased_d0;
+	vxp_trk_unbiased_z0 = m_phys->vxp_trk_unbiased_z0;
+	vxp_trk_err_unbiased_d0 = m_phys->vxp_trk_err_unbiased_d0;
+	vxp_trk_err_unbiased_z0 = m_phys->vxp_trk_err_unbiased_z0;
+	vxp_trk_phi = m_phys->vxp_trk_phi;
+	vxp_trk_theta = m_phys->vxp_trk_theta;
+	vxp_trk_weight = m_phys->vxp_trk_weight;
+	vxp_trk_index = m_phys->vxp_trk_index;
 
 	/*---------------------------*/
 	/*---*/ m_tree->Fill(); /*---*/

@@ -477,6 +477,7 @@ void offlineAnalysis::executeCutFlow()
 
 void offlineAnalysis::write()
 {
+	m_treeFile->cd();
 	m_offTreeDigest->write();
-	m_treeFile->Close();
+	//m_treeFile->Close();
 }

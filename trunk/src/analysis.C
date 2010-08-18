@@ -458,3 +458,9 @@ void analysis::executeCutFlow()
 	if(pmu.size()>0)          pmu.clear();
 }
 
+void analysis::write()
+{
+	m_treeFile->cd();
+	m_offlineTree->write();
+	//m_treeFile->Close();
+}

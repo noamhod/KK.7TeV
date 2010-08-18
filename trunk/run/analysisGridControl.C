@@ -45,7 +45,7 @@ analysisGridControl::analysisGridControl( TChain* inchain, TFile* outfile )
 
 analysisGridControl::~analysisGridControl()
 {
-	finalize();
+	//finalize();
 }
 
 void analysisGridControl::initialize()
@@ -70,8 +70,11 @@ void analysisGridControl::initialize()
 
 void analysisGridControl::finalize()
 {
+	// write the tree
+	m_analysis->write();
+
 	// file
-	//m_rootfile->Write();
+	m_rootfile->Write();
 	m_rootfile->Close();
 
 	kfinalize();
@@ -141,5 +144,7 @@ void analysisGridControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	}
 	
 	draw();
+	
+	finalize();
 }
 

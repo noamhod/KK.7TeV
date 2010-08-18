@@ -70,6 +70,8 @@ class analysis : public physics, public selection, public graphicObjects
 		void executeBasic();
 		void executeAdvanced();
 		void executeCutFlow();
+		
+		void write();
 
 		void    readCutFlow(string sCutFlowFilePath);
 		TMapsd* getCutFlowMapPtr();

@@ -41,7 +41,7 @@ offlineControl::offlineControl()
 
 offlineControl::~offlineControl()
 {
-	finalize();
+	//finalize();
 }
 
 void offlineControl::initialize()
@@ -67,12 +67,15 @@ void offlineControl::initialize()
 
 void offlineControl::finalize()
 {
-	// file
+	// write the tree
+	m_offlineAnalysis->write();
+
+	// files
 	m_histfile->Write();
 	m_histfile->Close();
 
-	//m_treefile->Write();
-	//m_treefile->Close();
+	m_treefile->Write();
+	m_treefile->Close();
 	
 	cfinalize();
 	kfinalize();
@@ -145,8 +148,14 @@ void offlineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	
 	draw();
 	
-	m_offlineAnalysis->write();
+	finalize();
 }
+
+
+
+
+
+
 
 
 void offlineControl::getCandidates(string sFilePath)

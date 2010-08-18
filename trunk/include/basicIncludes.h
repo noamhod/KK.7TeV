@@ -59,25 +59,25 @@ typedef map<string, bool>       TMapsb;
 #define physics_cxx
 #include "physics.C"
 
-#ifdef __CINT__
+#ifdef __MAKECINT__
 #pragma link C++ class vector<vector<double> >+;
 #else
 template class vector<vector<double> >;
 #endif
 
-#ifdef __CINT__
+#ifdef __MAKECINT__
 #pragma link C++ class vector<vector<float> >+;
 #else
 template class vector<vector<float> >;
 #endif
 
-#ifdef __CINT__
+#ifdef __MAKECINT__
 #pragma link C++ class vector<vector<int> >+;
 #else
 template class vector<vector<int> >;
 #endif
 
-#ifdef __CINT__
+#ifdef __MAKECINT__
 #pragma link C++ class vector<vector<unsigned int> >+;
 #else
 template class vector<vector<unsigned int> >;

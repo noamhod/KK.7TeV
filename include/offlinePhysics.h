@@ -347,6 +347,7 @@ public :
    Bool_t          L2_mu6_muCombTag_SiTrk;
    Bool_t          L2_mu6_passHLT;
    Bool_t          L2_mu6_unpaired;
+   
    Int_t           mu_staco_n;
    vector<float>   *mu_staco_E;
    vector<float>   *mu_staco_px;
@@ -527,6 +528,7 @@ public :
    vector<short>   *mu_staco_L1_source;
    vector<short>   *mu_staco_L1_hemisphere;
    vector<int>     *mu_staco_L1_matched;
+   
    Int_t           mu_muid_n;
    vector<float>   *mu_muid_E;
    vector<float>   *mu_muid_px;
@@ -707,6 +709,158 @@ public :
    vector<short>   *mu_muid_L1_source;
    vector<short>   *mu_muid_L1_hemisphere;
    vector<int>     *mu_muid_L1_matched;
+   
+   Int_t           trk_n;
+   vector<float>   *trk_d0;
+   vector<float>   *trk_z0;
+   vector<float>   *trk_phi;
+   vector<float>   *trk_theta;
+   vector<float>   *trk_qoverp;
+   vector<float>   *trk_pt;
+   vector<float>   *trk_eta;
+   vector<float>   *trk_err_d0;
+   vector<float>   *trk_err_z0;
+   vector<float>   *trk_err_phi;
+   vector<float>   *trk_err_theta;
+   vector<float>   *trk_err_qoverp;
+   vector<float>   *trk_cov_d0;
+   vector<float>   *trk_cov_z0;
+   vector<float>   *trk_cov_phi;
+   vector<float>   *trk_cov_theta;
+   vector<float>   *trk_cov_qoverp;
+   vector<float>   *trk_cov_d0_z0;
+   vector<float>   *trk_cov_d0_phi;
+   vector<float>   *trk_cov_d0_theta;
+   vector<float>   *trk_cov_d0_qoverp;
+   vector<float>   *trk_cov_z0_phi;
+   vector<float>   *trk_cov_z0_theta;
+   vector<float>   *trk_cov_z0_qoverp;
+   vector<float>   *trk_cov_phi_theta;
+   vector<float>   *trk_cov_phi_qoverp;
+   vector<float>   *trk_cov_theta_qoverp;
+   vector<int>     *trk_blayerPrediction_expectHit;
+   
+   vector<vector<float> > *trk_blayerPrediction_x;
+   vector<vector<float> > *trk_blayerPrediction_y;
+   vector<vector<float> > *trk_blayerPrediction_z;
+   vector<vector<float> > *trk_blayerPrediction_locX;
+   vector<vector<float> > *trk_blayerPrediction_locY;
+   vector<vector<float> > *trk_blayerPrediction_err_locX;
+   vector<vector<float> > *trk_blayerPrediction_err_locY;
+   vector<vector<float> > *trk_blayerPrediction_etaDistToEdge;
+   vector<vector<float> > *trk_blayerPrediction_phiDistToEdge;
+   vector<vector<unsigned int> > *trk_blayerPrediction_detElementId;
+   vector<vector<int> > *trk_blayerPrediction_row;
+   vector<vector<int> > *trk_blayerPrediction_col;
+   vector<vector<int> > *trk_blayerPrediction_type;
+   
+   vector<float>   *trk_d0_wrtPV;
+   vector<float>   *trk_z0_wrtPV;
+   vector<float>   *trk_phi_wrtPV;
+   vector<float>   *trk_theta_wrtPV;
+   vector<float>   *trk_qoverp_wrtPV;
+   vector<float>   *trk_chi2;
+   vector<int>     *trk_ndof;
+   vector<int>     *trk_nBLHits;
+   vector<int>     *trk_nPixHits;
+   vector<int>     *trk_nSCTHits;
+   vector<int>     *trk_nTRTHits;
+   vector<int>     *trk_nPixHoles;
+   vector<int>     *trk_nSCTHoles;
+   vector<int>     *trk_nMDTHits;
+   vector<int>     *trk_nCSCEtaHits;
+   vector<int>     *trk_nCSCPhiHits;
+   vector<int>     *trk_nRPCEtaHits;
+   vector<int>     *trk_nRPCPhiHits;
+   vector<int>     *trk_nTGCEtaHits;
+   vector<int>     *trk_nTGCPhiHits;
+   vector<int>     *trk_nHits;
+   vector<int>     *trk_nHoles;
+   vector<int>     *trk_hitPattern;
+   vector<float>   *trk_TRTHighTHitsRatio;
+   vector<float>   *trk_pixeldEdx;
+   vector<int>     *trk_fitter;
+   vector<int>     *trk_patternReco1;
+   vector<int>     *trk_patternReco2;
+   vector<int>     *trk_seedFinder;
+   
+   Int_t           mb_n;
+   vector<float>   *mb_E;
+   vector<float>   *mb_eta;
+   vector<float>   *mb_phi;
+   vector<float>   *mb_time;
+   vector<int>     *mb_quality;
+   vector<int>     *mb_type;
+   vector<int>     *mb_module;
+   vector<int>     *mb_channel;
+   Float_t         mbtime_timeDiff;
+   Float_t         mbtime_timeA;
+   Float_t         mbtime_timeC;
+   Int_t           mbtime_countA;
+   Int_t           mbtime_countC;
+   Bool_t          L1_MBTS_1;
+   Bool_t          L1_MBTS_1_1;
+   Bool_t          L1_MBTS_1_1_Col;
+   Bool_t          L1_MBTS_1_1_EMPTY;
+   Bool_t          L1_MBTS_1_1_FIRSTEMPTY;
+   Bool_t          L1_MBTS_1_1_UNPAIRED;
+   Bool_t          L1_MBTS_1_1_UNPAIRED1;
+   Bool_t          L1_MBTS_1_1_UNPAIRED2;
+   Bool_t          L1_MBTS_1_Col;
+   Bool_t          L1_MBTS_1_EMPTY;
+   Bool_t          L1_MBTS_1_FIRSTEMPTY;
+   Bool_t          L1_MBTS_1_UNPAIRED;
+   Bool_t          L1_MBTS_1_UNPAIRED1;
+   Bool_t          L1_MBTS_1_UNPAIRED2;
+   Bool_t          L1_MBTS_2;
+   Bool_t          L1_MBTS_2_Col;
+   Bool_t          L1_MBTS_2_EMPTY;
+   Bool_t          L1_MBTS_2_FIRSTEMPTY;
+   Bool_t          L1_MBTS_2_UNPAIRED;
+   Bool_t          L1_MBTS_2_UNPAIRED1;
+   Bool_t          L1_MBTS_2_UNPAIRED2;
+   Bool_t          L1_MBTS_4_4;
+   Bool_t          L1_MBTS_4_4_FIRSTEMPTY;
+   Bool_t          L1_MBTS_4_4_UNPAIRED;
+   Bool_t          L1_MBTS_4_4_UNPAIRED1;
+   Bool_t          L1_MBTS_4_4_UNPAIRED2;
+   Bool_t          L1_MBTS_A;
+   Bool_t          L1_MBTS_C;
+   Bool_t          collcand_passMBTSTime;
+   Bool_t          collcand_passCaloTime;
+   Bool_t          collcand_passTrigger;
+   Bool_t          collcand_pass;
+   
+   Int_t           vxp_n;
+   vector<float>   *vxp_x;
+   vector<float>   *vxp_y;
+   vector<float>   *vxp_z;
+   vector<float>   *vxp_chi2;
+   vector<int>     *vxp_ndof;
+   vector<float>   *vxp_err_x;
+   vector<float>   *vxp_err_y;
+   vector<float>   *vxp_err_z;
+   vector<float>   *vxp_px;
+   vector<float>   *vxp_py;
+   vector<float>   *vxp_pz;
+   vector<float>   *vxp_E;
+   vector<float>   *vxp_m;
+   vector<int>     *vxp_nTracks;
+   vector<float>   *vxp_sumPt;
+   vector<int>     *vxp_type;
+   vector<int>     *vxp_trk_n;
+   
+   vector<vector<float> > *vxp_trk_chi2;
+   vector<vector<float> > *vxp_trk_d0;
+   vector<vector<float> > *vxp_trk_z0;
+   vector<vector<float> > *vxp_trk_unbiased_d0;
+   vector<vector<float> > *vxp_trk_unbiased_z0;
+   vector<vector<float> > *vxp_trk_err_unbiased_d0;
+   vector<vector<float> > *vxp_trk_err_unbiased_z0;
+   vector<vector<float> > *vxp_trk_phi;
+   vector<vector<float> > *vxp_trk_theta;
+   vector<vector<float> > *vxp_trk_weight;
+   vector<vector<int> > *vxp_trk_index;
 
    // List of branches
    TBranch        *b_isGRL;   //!
@@ -1400,6 +1554,156 @@ public :
    TBranch        *b_mu_muid_L1_hemisphere;   //!
    TBranch        *b_mu_muid_L1_matched;   //!
 
+   TBranch        *b_trk_n;   //!
+   TBranch        *b_trk_d0;   //!
+   TBranch        *b_trk_z0;   //!
+   TBranch        *b_trk_phi;   //!
+   TBranch        *b_trk_theta;   //!
+   TBranch        *b_trk_qoverp;   //!
+   TBranch        *b_trk_pt;   //!
+   TBranch        *b_trk_eta;   //!
+   TBranch        *b_trk_err_d0;   //!
+   TBranch        *b_trk_err_z0;   //!
+   TBranch        *b_trk_err_phi;   //!
+   TBranch        *b_trk_err_theta;   //!
+   TBranch        *b_trk_err_qoverp;   //!
+   TBranch        *b_trk_cov_d0;   //!
+   TBranch        *b_trk_cov_z0;   //!
+   TBranch        *b_trk_cov_phi;   //!
+   TBranch        *b_trk_cov_theta;   //!
+   TBranch        *b_trk_cov_qoverp;   //!
+   TBranch        *b_trk_cov_d0_z0;   //!
+   TBranch        *b_trk_cov_d0_phi;   //!
+   TBranch        *b_trk_cov_d0_theta;   //!
+   TBranch        *b_trk_cov_d0_qoverp;   //!
+   TBranch        *b_trk_cov_z0_phi;   //!
+   TBranch        *b_trk_cov_z0_theta;   //!
+   TBranch        *b_trk_cov_z0_qoverp;   //!
+   TBranch        *b_trk_cov_phi_theta;   //!
+   TBranch        *b_trk_cov_phi_qoverp;   //!
+   TBranch        *b_trk_cov_theta_qoverp;   //!
+   TBranch        *b_trk_blayerPrediction_expectHit;   //!
+   TBranch        *b_trk_blayerPrediction_x;   //!
+   TBranch        *b_trk_blayerPrediction_y;   //!
+   TBranch        *b_trk_blayerPrediction_z;   //!
+   TBranch        *b_trk_blayerPrediction_locX;   //!
+   TBranch        *b_trk_blayerPrediction_locY;   //!
+   TBranch        *b_trk_blayerPrediction_err_locX;   //!
+   TBranch        *b_trk_blayerPrediction_err_locY;   //!
+   TBranch        *b_trk_blayerPrediction_etaDistToEdge;   //!
+   TBranch        *b_trk_blayerPrediction_phiDistToEdge;   //!
+   TBranch        *b_trk_blayerPrediction_detElementId;   //!
+   TBranch        *b_trk_blayerPrediction_row;   //!
+   TBranch        *b_trk_blayerPrediction_col;   //!
+   TBranch        *b_trk_blayerPrediction_type;   //!
+   TBranch        *b_trk_d0_wrtPV;   //!
+   TBranch        *b_trk_z0_wrtPV;   //!
+   TBranch        *b_trk_phi_wrtPV;   //!
+   TBranch        *b_trk_theta_wrtPV;   //!
+   TBranch        *b_trk_qoverp_wrtPV;   //!
+   TBranch        *b_trk_chi2;   //!
+   TBranch        *b_trk_ndof;   //!
+   TBranch        *b_trk_nBLHits;   //!
+   TBranch        *b_trk_nPixHits;   //!
+   TBranch        *b_trk_nSCTHits;   //!
+   TBranch        *b_trk_nTRTHits;   //!
+   TBranch        *b_trk_nPixHoles;   //!
+   TBranch        *b_trk_nSCTHoles;   //!
+   TBranch        *b_trk_nMDTHits;   //!
+   TBranch        *b_trk_nCSCEtaHits;   //!
+   TBranch        *b_trk_nCSCPhiHits;   //!
+   TBranch        *b_trk_nRPCEtaHits;   //!
+   TBranch        *b_trk_nRPCPhiHits;   //!
+   TBranch        *b_trk_nTGCEtaHits;   //!
+   TBranch        *b_trk_nTGCPhiHits;   //!
+   TBranch        *b_trk_nHits;   //!
+   TBranch        *b_trk_nHoles;   //!
+   TBranch        *b_trk_hitPattern;   //!
+   TBranch        *b_trk_TRTHighTHitsRatio;   //!
+   TBranch        *b_trk_pixeldEdx;   //!
+   TBranch        *b_trk_fitter;   //!
+   TBranch        *b_trk_patternReco1;   //!
+   TBranch        *b_trk_patternReco2;   //!
+   TBranch        *b_trk_seedFinder;   //!
+   
+   TBranch        *b_mb_n;   //!
+   TBranch        *b_mb_E;   //!
+   TBranch        *b_mb_eta;   //!
+   TBranch        *b_mb_phi;   //!
+   TBranch        *b_mb_time;   //!
+   TBranch        *b_mb_quality;   //!
+   TBranch        *b_mb_type;   //!
+   TBranch        *b_mb_module;   //!
+   TBranch        *b_mb_channel;   //!
+   TBranch        *b_mbtime_timeDiff;   //!
+   TBranch        *b_mbtime_timeA;   //!
+   TBranch        *b_mbtime_timeC;   //!
+   TBranch        *b_mbtime_countA;   //!
+   TBranch        *b_mbtime_countC;   //!
+   TBranch        *b_L1_MBTS_1;   //!
+   TBranch        *b_L1_MBTS_1_1;   //!
+   TBranch        *b_L1_MBTS_1_1_Col;   //!
+   TBranch        *b_L1_MBTS_1_1_EMPTY;   //!
+   TBranch        *b_L1_MBTS_1_1_FIRSTEMPTY;   //!
+   TBranch        *b_L1_MBTS_1_1_UNPAIRED;   //!
+   TBranch        *b_L1_MBTS_1_1_UNPAIRED1;   //!
+   TBranch        *b_L1_MBTS_1_1_UNPAIRED2;   //!
+   TBranch        *b_L1_MBTS_1_Col;   //!
+   TBranch        *b_L1_MBTS_1_EMPTY;   //!
+   TBranch        *b_L1_MBTS_1_FIRSTEMPTY;   //!
+   TBranch        *b_L1_MBTS_1_UNPAIRED;   //!
+   TBranch        *b_L1_MBTS_1_UNPAIRED1;   //!
+   TBranch        *b_L1_MBTS_1_UNPAIRED2;   //!
+   TBranch        *b_L1_MBTS_2;   //!
+   TBranch        *b_L1_MBTS_2_Col;   //!
+   TBranch        *b_L1_MBTS_2_EMPTY;   //!
+   TBranch        *b_L1_MBTS_2_FIRSTEMPTY;   //!
+   TBranch        *b_L1_MBTS_2_UNPAIRED;   //!
+   TBranch        *b_L1_MBTS_2_UNPAIRED1;   //!
+   TBranch        *b_L1_MBTS_2_UNPAIRED2;   //!
+   TBranch        *b_L1_MBTS_4_4;   //!
+   TBranch        *b_L1_MBTS_4_4_FIRSTEMPTY;   //!
+   TBranch        *b_L1_MBTS_4_4_UNPAIRED;   //!
+   TBranch        *b_L1_MBTS_4_4_UNPAIRED1;   //!
+   TBranch        *b_L1_MBTS_4_4_UNPAIRED2;   //!
+   TBranch        *b_L1_MBTS_A;   //!
+   TBranch        *b_L1_MBTS_C;   //!
+   TBranch        *b_collcand_passMBTSTime;   //!
+   TBranch        *b_collcand_passCaloTime;   //!
+   TBranch        *b_collcand_passTrigger;   //!
+   TBranch        *b_collcand_pass;   //!
+   
+   TBranch        *b_vxp_n;   //!
+   TBranch        *b_vxp_x;   //!
+   TBranch        *b_vxp_y;   //!
+   TBranch        *b_vxp_z;   //!
+   TBranch        *b_vxp_chi2;   //!
+   TBranch        *b_vxp_ndof;   //!
+   TBranch        *b_vxp_err_x;   //!
+   TBranch        *b_vxp_err_y;   //!
+   TBranch        *b_vxp_err_z;   //!
+   TBranch        *b_vxp_px;   //!
+   TBranch        *b_vxp_py;   //!
+   TBranch        *b_vxp_pz;   //!
+   TBranch        *b_vxp_E;   //!
+   TBranch        *b_vxp_m;   //!
+   TBranch        *b_vxp_nTracks;   //!
+   TBranch        *b_vxp_sumPt;   //!
+   TBranch        *b_vxp_type;   //!
+   TBranch        *b_vxp_trk_n;   //!
+   TBranch        *b_vxp_trk_chi2;   //!
+   TBranch        *b_vxp_trk_d0;   //!
+   TBranch        *b_vxp_trk_z0;   //!
+   TBranch        *b_vxp_trk_unbiased_d0;   //!
+   TBranch        *b_vxp_trk_unbiased_z0;   //!
+   TBranch        *b_vxp_trk_err_unbiased_d0;   //!
+   TBranch        *b_vxp_trk_err_unbiased_z0;   //!
+   TBranch        *b_vxp_trk_phi;   //!
+   TBranch        *b_vxp_trk_theta;   //!
+   TBranch        *b_vxp_trk_weight;   //!
+   TBranch        *b_vxp_trk_index;   //!
+   
+   
    offlinePhysics(TTree *tree=0);
    virtual ~offlinePhysics();
    virtual Int_t    Cut(Long64_t entry);
@@ -2001,6 +2305,115 @@ void offlinePhysics::Init(TTree *tree)
    mu_muid_L1_source = 0;
    mu_muid_L1_hemisphere = 0;
    mu_muid_L1_matched = 0;
+   
+   trk_d0 = 0;
+   trk_z0 = 0;
+   trk_phi = 0;
+   trk_theta = 0;
+   trk_qoverp = 0;
+   trk_pt = 0;
+   trk_eta = 0;
+   trk_err_d0 = 0;
+   trk_err_z0 = 0;
+   trk_err_phi = 0;
+   trk_err_theta = 0;
+   trk_err_qoverp = 0;
+   trk_cov_d0 = 0;
+   trk_cov_z0 = 0;
+   trk_cov_phi = 0;
+   trk_cov_theta = 0;
+   trk_cov_qoverp = 0;
+   trk_cov_d0_z0 = 0;
+   trk_cov_d0_phi = 0;
+   trk_cov_d0_theta = 0;
+   trk_cov_d0_qoverp = 0;
+   trk_cov_z0_phi = 0;
+   trk_cov_z0_theta = 0;
+   trk_cov_z0_qoverp = 0;
+   trk_cov_phi_theta = 0;
+   trk_cov_phi_qoverp = 0;
+   trk_cov_theta_qoverp = 0;
+   trk_blayerPrediction_expectHit = 0;
+   trk_blayerPrediction_x = 0;
+   trk_blayerPrediction_y = 0;
+   trk_blayerPrediction_z = 0;
+   trk_blayerPrediction_locX = 0;
+   trk_blayerPrediction_locY = 0;
+   trk_blayerPrediction_err_locX = 0;
+   trk_blayerPrediction_err_locY = 0;
+   trk_blayerPrediction_etaDistToEdge = 0;
+   trk_blayerPrediction_phiDistToEdge = 0;
+   trk_blayerPrediction_detElementId = 0;
+   trk_blayerPrediction_row = 0;
+   trk_blayerPrediction_col = 0;
+   trk_blayerPrediction_type = 0;
+   trk_d0_wrtPV = 0;
+   trk_z0_wrtPV = 0;
+   trk_phi_wrtPV = 0;
+   trk_theta_wrtPV = 0;
+   trk_qoverp_wrtPV = 0;
+   trk_chi2 = 0;
+   trk_ndof = 0;
+   trk_nBLHits = 0;
+   trk_nPixHits = 0;
+   trk_nSCTHits = 0;
+   trk_nTRTHits = 0;
+   trk_nPixHoles = 0;
+   trk_nSCTHoles = 0;
+   trk_nMDTHits = 0;
+   trk_nCSCEtaHits = 0;
+   trk_nCSCPhiHits = 0;
+   trk_nRPCEtaHits = 0;
+   trk_nRPCPhiHits = 0;
+   trk_nTGCEtaHits = 0;
+   trk_nTGCPhiHits = 0;
+   trk_nHits = 0;
+   trk_nHoles = 0;
+   trk_hitPattern = 0;
+   trk_TRTHighTHitsRatio = 0;
+   trk_pixeldEdx = 0;
+   trk_fitter = 0;
+   trk_patternReco1 = 0;
+   trk_patternReco2 = 0;
+   trk_seedFinder = 0;
+   mb_E = 0;
+   mb_eta = 0;
+   mb_phi = 0;
+   mb_time = 0;
+   mb_quality = 0;
+   mb_type = 0;
+   mb_module = 0;
+   mb_channel = 0;
+   vxp_x = 0;
+   vxp_y = 0;
+   vxp_z = 0;
+   vxp_chi2 = 0;
+   vxp_ndof = 0;
+   vxp_err_x = 0;
+   vxp_err_y = 0;
+   vxp_err_z = 0;
+   vxp_px = 0;
+   vxp_py = 0;
+   vxp_pz = 0;
+   vxp_E = 0;
+   vxp_m = 0;
+   vxp_nTracks = 0;
+   vxp_sumPt = 0;
+   vxp_type = 0;
+   vxp_trk_n = 0;
+   vxp_trk_chi2 = 0;
+   vxp_trk_d0 = 0;
+   vxp_trk_z0 = 0;
+   vxp_trk_unbiased_d0 = 0;
+   vxp_trk_unbiased_z0 = 0;
+   vxp_trk_err_unbiased_d0 = 0;
+   vxp_trk_err_unbiased_z0 = 0;
+   vxp_trk_phi = 0;
+   vxp_trk_theta = 0;
+   vxp_trk_weight = 0;
+   vxp_trk_index = 0;
+   
+   
    // Set branch addresses and branch pointers
    if (!tree) return;
    fChain = tree;
@@ -2697,6 +3110,156 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("mu_muid_L1_source", &mu_muid_L1_source, &b_mu_muid_L1_source);
    fChain->SetBranchAddress("mu_muid_L1_hemisphere", &mu_muid_L1_hemisphere, &b_mu_muid_L1_hemisphere);
    fChain->SetBranchAddress("mu_muid_L1_matched", &mu_muid_L1_matched, &b_mu_muid_L1_matched);
+   
+   fChain->SetBranchAddress("trk_n", &trk_n, &b_trk_n);
+   fChain->SetBranchAddress("trk_d0", &trk_d0, &b_trk_d0);
+   fChain->SetBranchAddress("trk_z0", &trk_z0, &b_trk_z0);
+   fChain->SetBranchAddress("trk_phi", &trk_phi, &b_trk_phi);
+   fChain->SetBranchAddress("trk_theta", &trk_theta, &b_trk_theta);
+   fChain->SetBranchAddress("trk_qoverp", &trk_qoverp, &b_trk_qoverp);
+   fChain->SetBranchAddress("trk_pt", &trk_pt, &b_trk_pt);
+   fChain->SetBranchAddress("trk_eta", &trk_eta, &b_trk_eta);
+   fChain->SetBranchAddress("trk_err_d0", &trk_err_d0, &b_trk_err_d0);
+   fChain->SetBranchAddress("trk_err_z0", &trk_err_z0, &b_trk_err_z0);
+   fChain->SetBranchAddress("trk_err_phi", &trk_err_phi, &b_trk_err_phi);
+   fChain->SetBranchAddress("trk_err_theta", &trk_err_theta, &b_trk_err_theta);
+   fChain->SetBranchAddress("trk_err_qoverp", &trk_err_qoverp, &b_trk_err_qoverp);
+   fChain->SetBranchAddress("trk_cov_d0", &trk_cov_d0, &b_trk_cov_d0);
+   fChain->SetBranchAddress("trk_cov_z0", &trk_cov_z0, &b_trk_cov_z0);
+   fChain->SetBranchAddress("trk_cov_phi", &trk_cov_phi, &b_trk_cov_phi);
+   fChain->SetBranchAddress("trk_cov_theta", &trk_cov_theta, &b_trk_cov_theta);
+   fChain->SetBranchAddress("trk_cov_qoverp", &trk_cov_qoverp, &b_trk_cov_qoverp);
+   fChain->SetBranchAddress("trk_cov_d0_z0", &trk_cov_d0_z0, &b_trk_cov_d0_z0);
+   fChain->SetBranchAddress("trk_cov_d0_phi", &trk_cov_d0_phi, &b_trk_cov_d0_phi);
+   fChain->SetBranchAddress("trk_cov_d0_theta", &trk_cov_d0_theta, &b_trk_cov_d0_theta);
+   fChain->SetBranchAddress("trk_cov_d0_qoverp", &trk_cov_d0_qoverp, &b_trk_cov_d0_qoverp);
+   fChain->SetBranchAddress("trk_cov_z0_phi", &trk_cov_z0_phi, &b_trk_cov_z0_phi);
+   fChain->SetBranchAddress("trk_cov_z0_theta", &trk_cov_z0_theta, &b_trk_cov_z0_theta);
+   fChain->SetBranchAddress("trk_cov_z0_qoverp", &trk_cov_z0_qoverp, &b_trk_cov_z0_qoverp);
+   fChain->SetBranchAddress("trk_cov_phi_theta", &trk_cov_phi_theta, &b_trk_cov_phi_theta);
+   fChain->SetBranchAddress("trk_cov_phi_qoverp", &trk_cov_phi_qoverp, &b_trk_cov_phi_qoverp);
+   fChain->SetBranchAddress("trk_cov_theta_qoverp", &trk_cov_theta_qoverp, &b_trk_cov_theta_qoverp);
+   fChain->SetBranchAddress("trk_blayerPrediction_expectHit", &trk_blayerPrediction_expectHit, &b_trk_blayerPrediction_expectHit);
+   fChain->SetBranchAddress("trk_blayerPrediction_x", &trk_blayerPrediction_x, &b_trk_blayerPrediction_x);
+   fChain->SetBranchAddress("trk_blayerPrediction_y", &trk_blayerPrediction_y, &b_trk_blayerPrediction_y);
+   fChain->SetBranchAddress("trk_blayerPrediction_z", &trk_blayerPrediction_z, &b_trk_blayerPrediction_z);
+   fChain->SetBranchAddress("trk_blayerPrediction_locX", &trk_blayerPrediction_locX, &b_trk_blayerPrediction_locX);
+   fChain->SetBranchAddress("trk_blayerPrediction_locY", &trk_blayerPrediction_locY, &b_trk_blayerPrediction_locY);
+   fChain->SetBranchAddress("trk_blayerPrediction_err_locX", &trk_blayerPrediction_err_locX, &b_trk_blayerPrediction_err_locX);
+   fChain->SetBranchAddress("trk_blayerPrediction_err_locY", &trk_blayerPrediction_err_locY, &b_trk_blayerPrediction_err_locY);
+   fChain->SetBranchAddress("trk_blayerPrediction_etaDistToEdge", &trk_blayerPrediction_etaDistToEdge, &b_trk_blayerPrediction_etaDistToEdge);
+   fChain->SetBranchAddress("trk_blayerPrediction_phiDistToEdge", &trk_blayerPrediction_phiDistToEdge, &b_trk_blayerPrediction_phiDistToEdge);
+   fChain->SetBranchAddress("trk_blayerPrediction_detElementId", &trk_blayerPrediction_detElementId, &b_trk_blayerPrediction_detElementId);
+   fChain->SetBranchAddress("trk_blayerPrediction_row", &trk_blayerPrediction_row, &b_trk_blayerPrediction_row);
+   fChain->SetBranchAddress("trk_blayerPrediction_col", &trk_blayerPrediction_col, &b_trk_blayerPrediction_col);
+   fChain->SetBranchAddress("trk_blayerPrediction_type", &trk_blayerPrediction_type, &b_trk_blayerPrediction_type);
+   fChain->SetBranchAddress("trk_d0_wrtPV", &trk_d0_wrtPV, &b_trk_d0_wrtPV);
+   fChain->SetBranchAddress("trk_z0_wrtPV", &trk_z0_wrtPV, &b_trk_z0_wrtPV);
+   fChain->SetBranchAddress("trk_phi_wrtPV", &trk_phi_wrtPV, &b_trk_phi_wrtPV);
+   fChain->SetBranchAddress("trk_theta_wrtPV", &trk_theta_wrtPV, &b_trk_theta_wrtPV);
+   fChain->SetBranchAddress("trk_qoverp_wrtPV", &trk_qoverp_wrtPV, &b_trk_qoverp_wrtPV);
+   fChain->SetBranchAddress("trk_chi2", &trk_chi2, &b_trk_chi2);
+   fChain->SetBranchAddress("trk_ndof", &trk_ndof, &b_trk_ndof);
+   fChain->SetBranchAddress("trk_nBLHits", &trk_nBLHits, &b_trk_nBLHits);
+   fChain->SetBranchAddress("trk_nPixHits", &trk_nPixHits, &b_trk_nPixHits);
+   fChain->SetBranchAddress("trk_nSCTHits", &trk_nSCTHits, &b_trk_nSCTHits);
+   fChain->SetBranchAddress("trk_nTRTHits", &trk_nTRTHits, &b_trk_nTRTHits);
+   fChain->SetBranchAddress("trk_nPixHoles", &trk_nPixHoles, &b_trk_nPixHoles);
+   fChain->SetBranchAddress("trk_nSCTHoles", &trk_nSCTHoles, &b_trk_nSCTHoles);
+   fChain->SetBranchAddress("trk_nMDTHits", &trk_nMDTHits, &b_trk_nMDTHits);
+   fChain->SetBranchAddress("trk_nCSCEtaHits", &trk_nCSCEtaHits, &b_trk_nCSCEtaHits);
+   fChain->SetBranchAddress("trk_nCSCPhiHits", &trk_nCSCPhiHits, &b_trk_nCSCPhiHits);
+   fChain->SetBranchAddress("trk_nRPCEtaHits", &trk_nRPCEtaHits, &b_trk_nRPCEtaHits);
+   fChain->SetBranchAddress("trk_nRPCPhiHits", &trk_nRPCPhiHits, &b_trk_nRPCPhiHits);
+   fChain->SetBranchAddress("trk_nTGCEtaHits", &trk_nTGCEtaHits, &b_trk_nTGCEtaHits);
+   fChain->SetBranchAddress("trk_nTGCPhiHits", &trk_nTGCPhiHits, &b_trk_nTGCPhiHits);
+   fChain->SetBranchAddress("trk_nHits", &trk_nHits, &b_trk_nHits);
+   fChain->SetBranchAddress("trk_nHoles", &trk_nHoles, &b_trk_nHoles);
+   fChain->SetBranchAddress("trk_hitPattern", &trk_hitPattern, &b_trk_hitPattern);
+   fChain->SetBranchAddress("trk_TRTHighTHitsRatio", &trk_TRTHighTHitsRatio, &b_trk_TRTHighTHitsRatio);
+   fChain->SetBranchAddress("trk_pixeldEdx", &trk_pixeldEdx, &b_trk_pixeldEdx);
+   fChain->SetBranchAddress("trk_fitter", &trk_fitter, &b_trk_fitter);
+   fChain->SetBranchAddress("trk_patternReco1", &trk_patternReco1, &b_trk_patternReco1);
+   fChain->SetBranchAddress("trk_patternReco2", &trk_patternReco2, &b_trk_patternReco2);
+   fChain->SetBranchAddress("trk_seedFinder", &trk_seedFinder, &b_trk_seedFinder);
+
+   fChain->SetBranchAddress("mb_n", &mb_n, &b_mb_n);
+   fChain->SetBranchAddress("mb_E", &mb_E, &b_mb_E);
+   fChain->SetBranchAddress("mb_eta", &mb_eta, &b_mb_eta);
+   fChain->SetBranchAddress("mb_phi", &mb_phi, &b_mb_phi);
+   fChain->SetBranchAddress("mb_time", &mb_time, &b_mb_time);
+   fChain->SetBranchAddress("mb_quality", &mb_quality, &b_mb_quality);
+   fChain->SetBranchAddress("mb_type", &mb_type, &b_mb_type);
+   fChain->SetBranchAddress("mb_module", &mb_module, &b_mb_module);
+   fChain->SetBranchAddress("mb_channel", &mb_channel, &b_mb_channel);
+   fChain->SetBranchAddress("mbtime_timeDiff", &mbtime_timeDiff, &b_mbtime_timeDiff);
+   fChain->SetBranchAddress("mbtime_timeA", &mbtime_timeA, &b_mbtime_timeA);
+   fChain->SetBranchAddress("mbtime_timeC", &mbtime_timeC, &b_mbtime_timeC);
+   fChain->SetBranchAddress("mbtime_countA", &mbtime_countA, &b_mbtime_countA);
+   fChain->SetBranchAddress("mbtime_countC", &mbtime_countC, &b_mbtime_countC);
+   fChain->SetBranchAddress("L1_MBTS_1", &L1_MBTS_1, &b_L1_MBTS_1);
+   fChain->SetBranchAddress("L1_MBTS_1_1", &L1_MBTS_1_1, &b_L1_MBTS_1_1);
+   fChain->SetBranchAddress("L1_MBTS_1_1_Col", &L1_MBTS_1_1_Col, &b_L1_MBTS_1_1_Col);
+   fChain->SetBranchAddress("L1_MBTS_1_1_EMPTY", &L1_MBTS_1_1_EMPTY, &b_L1_MBTS_1_1_EMPTY);
+   fChain->SetBranchAddress("L1_MBTS_1_1_FIRSTEMPTY", &L1_MBTS_1_1_FIRSTEMPTY, &b_L1_MBTS_1_1_FIRSTEMPTY);
+   fChain->SetBranchAddress("L1_MBTS_1_1_UNPAIRED", &L1_MBTS_1_1_UNPAIRED, &b_L1_MBTS_1_1_UNPAIRED);
+   fChain->SetBranchAddress("L1_MBTS_1_1_UNPAIRED1", &L1_MBTS_1_1_UNPAIRED1, &b_L1_MBTS_1_1_UNPAIRED1);
+   fChain->SetBranchAddress("L1_MBTS_1_1_UNPAIRED2", &L1_MBTS_1_1_UNPAIRED2, &b_L1_MBTS_1_1_UNPAIRED2);
+   fChain->SetBranchAddress("L1_MBTS_1_Col", &L1_MBTS_1_Col, &b_L1_MBTS_1_Col);
+   fChain->SetBranchAddress("L1_MBTS_1_EMPTY", &L1_MBTS_1_EMPTY, &b_L1_MBTS_1_EMPTY);
+   fChain->SetBranchAddress("L1_MBTS_1_FIRSTEMPTY", &L1_MBTS_1_FIRSTEMPTY, &b_L1_MBTS_1_FIRSTEMPTY);
+   fChain->SetBranchAddress("L1_MBTS_1_UNPAIRED", &L1_MBTS_1_UNPAIRED, &b_L1_MBTS_1_UNPAIRED);
+   fChain->SetBranchAddress("L1_MBTS_1_UNPAIRED1", &L1_MBTS_1_UNPAIRED1, &b_L1_MBTS_1_UNPAIRED1);
+   fChain->SetBranchAddress("L1_MBTS_1_UNPAIRED2", &L1_MBTS_1_UNPAIRED2, &b_L1_MBTS_1_UNPAIRED2);
+   fChain->SetBranchAddress("L1_MBTS_2", &L1_MBTS_2, &b_L1_MBTS_2);
+   fChain->SetBranchAddress("L1_MBTS_2_Col", &L1_MBTS_2_Col, &b_L1_MBTS_2_Col);
+   fChain->SetBranchAddress("L1_MBTS_2_EMPTY", &L1_MBTS_2_EMPTY, &b_L1_MBTS_2_EMPTY);
+   fChain->SetBranchAddress("L1_MBTS_2_FIRSTEMPTY", &L1_MBTS_2_FIRSTEMPTY, &b_L1_MBTS_2_FIRSTEMPTY);
+   fChain->SetBranchAddress("L1_MBTS_2_UNPAIRED", &L1_MBTS_2_UNPAIRED, &b_L1_MBTS_2_UNPAIRED);
+   fChain->SetBranchAddress("L1_MBTS_2_UNPAIRED1", &L1_MBTS_2_UNPAIRED1, &b_L1_MBTS_2_UNPAIRED1);
+   fChain->SetBranchAddress("L1_MBTS_2_UNPAIRED2", &L1_MBTS_2_UNPAIRED2, &b_L1_MBTS_2_UNPAIRED2);
+   fChain->SetBranchAddress("L1_MBTS_4_4", &L1_MBTS_4_4, &b_L1_MBTS_4_4);
+   fChain->SetBranchAddress("L1_MBTS_4_4_FIRSTEMPTY", &L1_MBTS_4_4_FIRSTEMPTY, &b_L1_MBTS_4_4_FIRSTEMPTY);
+   fChain->SetBranchAddress("L1_MBTS_4_4_UNPAIRED", &L1_MBTS_4_4_UNPAIRED, &b_L1_MBTS_4_4_UNPAIRED);
+   fChain->SetBranchAddress("L1_MBTS_4_4_UNPAIRED1", &L1_MBTS_4_4_UNPAIRED1, &b_L1_MBTS_4_4_UNPAIRED1);
+   fChain->SetBranchAddress("L1_MBTS_4_4_UNPAIRED2", &L1_MBTS_4_4_UNPAIRED2, &b_L1_MBTS_4_4_UNPAIRED2);
+   fChain->SetBranchAddress("L1_MBTS_A", &L1_MBTS_A, &b_L1_MBTS_A);
+   fChain->SetBranchAddress("L1_MBTS_C", &L1_MBTS_C, &b_L1_MBTS_C);
+   fChain->SetBranchAddress("collcand_passMBTSTime", &collcand_passMBTSTime, &b_collcand_passMBTSTime);
+   fChain->SetBranchAddress("collcand_passCaloTime", &collcand_passCaloTime, &b_collcand_passCaloTime);
+   fChain->SetBranchAddress("collcand_passTrigger", &collcand_passTrigger, &b_collcand_passTrigger);
+   fChain->SetBranchAddress("collcand_pass", &collcand_pass, &b_collcand_pass);
+   fChain->SetBranchAddress("vxp_n", &vxp_n, &b_vxp_n);
+   fChain->SetBranchAddress("vxp_x", &vxp_x, &b_vxp_x);
+   fChain->SetBranchAddress("vxp_y", &vxp_y, &b_vxp_y);
+   fChain->SetBranchAddress("vxp_z", &vxp_z, &b_vxp_z);
+   fChain->SetBranchAddress("vxp_chi2", &vxp_chi2, &b_vxp_chi2);
+   fChain->SetBranchAddress("vxp_ndof", &vxp_ndof, &b_vxp_ndof);
+   fChain->SetBranchAddress("vxp_err_x", &vxp_err_x, &b_vxp_err_x);
+   fChain->SetBranchAddress("vxp_err_y", &vxp_err_y, &b_vxp_err_y);
+   fChain->SetBranchAddress("vxp_err_z", &vxp_err_z, &b_vxp_err_z);
+   fChain->SetBranchAddress("vxp_px", &vxp_px, &b_vxp_px);
+   fChain->SetBranchAddress("vxp_py", &vxp_py, &b_vxp_py);
+   fChain->SetBranchAddress("vxp_pz", &vxp_pz, &b_vxp_pz);
+   fChain->SetBranchAddress("vxp_E", &vxp_E, &b_vxp_E);
+   fChain->SetBranchAddress("vxp_m", &vxp_m, &b_vxp_m);
+   fChain->SetBranchAddress("vxp_nTracks", &vxp_nTracks, &b_vxp_nTracks);
+   fChain->SetBranchAddress("vxp_sumPt", &vxp_sumPt, &b_vxp_sumPt);
+   fChain->SetBranchAddress("vxp_type", &vxp_type, &b_vxp_type);
+   fChain->SetBranchAddress("vxp_trk_n", &vxp_trk_n, &b_vxp_trk_n);
+   fChain->SetBranchAddress("vxp_trk_chi2", &vxp_trk_chi2, &b_vxp_trk_chi2);
+   fChain->SetBranchAddress("vxp_trk_d0", &vxp_trk_d0, &b_vxp_trk_d0);
+   fChain->SetBranchAddress("vxp_trk_z0", &vxp_trk_z0, &b_vxp_trk_z0);
+   fChain->SetBranchAddress("vxp_trk_unbiased_d0", &vxp_trk_unbiased_d0, &b_vxp_trk_unbiased_d0);
+   fChain->SetBranchAddress("vxp_trk_unbiased_z0", &vxp_trk_unbiased_z0, &b_vxp_trk_unbiased_z0);
+   fChain->SetBranchAddress("vxp_trk_err_unbiased_d0", &vxp_trk_err_unbiased_d0, &b_vxp_trk_err_unbiased_d0);
+   fChain->SetBranchAddress("vxp_trk_err_unbiased_z0", &vxp_trk_err_unbiased_z0, &b_vxp_trk_err_unbiased_z0);
+   fChain->SetBranchAddress("vxp_trk_phi", &vxp_trk_phi, &b_vxp_trk_phi);
+   fChain->SetBranchAddress("vxp_trk_theta", &vxp_trk_theta, &b_vxp_trk_theta);
+   fChain->SetBranchAddress("vxp_trk_weight", &vxp_trk_weight, &b_vxp_trk_weight);
+   fChain->SetBranchAddress("vxp_trk_index", &vxp_trk_index, &b_vxp_trk_index);
+   
+   
    Notify();
 }
 

@@ -47,7 +47,7 @@ analysisControl::analysisControl()
 
 analysisControl::~analysisControl()
 {
-	finalize();
+	//finalize();
 }
 
 void analysisControl::initialize()
@@ -73,10 +73,16 @@ void analysisControl::initialize()
 
 void analysisControl::finalize()
 {
-	// file
+	// write the tree
+	m_analysis->write();
+
+	// files
 	m_histfile->Write();
 	m_histfile->Close();
 
+	m_treefile->Write();
+	m_treefile->Close();
+	
 	cfinalize();
 	kfinalize();
 	ufinalize();
@@ -145,5 +151,7 @@ void analysisControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	}
 	
 	draw();
+	
+	finalize();
 }
 

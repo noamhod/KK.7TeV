@@ -21,11 +21,11 @@ startup_message off
 
 vbell off
 
-screen -t		0	bash
+screen		0	bash
 stuff "source setupAthena.sh 15.6.9\015"
-screen -t 		1	bash
+screen 		1	bash
 stuff "source setupAthena.sh 15.6.9\015"
-screen -t 		2	bash
+screen 		2	bash
 stuff "source setupAthena.sh 15.6.9\015"
-screen -t 		3	bash
+screen 		3	bash
 stuff "source setupAthena.sh 15.6.9\015"

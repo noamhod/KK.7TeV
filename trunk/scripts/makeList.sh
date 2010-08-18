@@ -1,9 +1,9 @@
 #!/bin/bash/
 
 ################################################
-commonstring='group10.phys-sm.data10_7TeV'
-file='dataset.list'
-tabchar='V'
+commonstring='.z0analysis.root'
+file='offline_dataset.list'
+tabchar='_'
 ################################################
 
 tmpfile='temp.list'
@@ -29,5 +29,5 @@ sed -i '/^[ ]*$/d' $tmpfile
 #sed -i '$d' $tmpfile
 #sed -i '$d' $tmpfile
 
-sort -t $tabchar +1 -n $tmpfile > file
+sort -t $tabchar -n $tmpfile > $file
 rm -f $tmpfile

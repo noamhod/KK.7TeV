@@ -405,7 +405,7 @@ void offlineAnalysis::executeCutFlow()
 			{
 				string sorderedcutname = ii->second;
 
-				if(sorderedcutname=="c1*c2<0")
+				if(sorderedcutname=="oppositeCharcge")
 				{
 					passCurrentCut = (true) ? true : false;
 				}

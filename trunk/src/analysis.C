@@ -394,10 +394,10 @@ void analysis::executeCutFlow()
 			{
 				string sorderedcutname = ii->second;
 
-				if(sorderedcutname=="c1*c2<0")
+				if(sorderedcutname=="oppositeCharcge")
 				{
 					passCut = (passCut)                                                                  ? true : false;
-					if(passCut) fillCutFlow("c1*c2<0", values2fill); // stop at null cut
+					if(passCut) fillCutFlow("oppositeCharcge", values2fill); // stop at null cut
 				}
 
 				if(sorderedcutname=="GRL")

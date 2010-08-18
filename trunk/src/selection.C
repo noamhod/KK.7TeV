@@ -123,7 +123,7 @@ void selection::buildMuonPairMap( TMapii& mupair,
 		string scutname = ii->second;
 		double cutValue = m_cutFlowMap->operator[](scutname);
 		
-		if(scutname=="c1*c2<0")      if(!oppositeCharge(ca,cb))           { if(b_print) {cout << "failed 0 charge cut" << endl;} return; }
+		if(scutname=="oppositeCharcge")      if(!oppositeCharge(ca,cb))           { if(b_print) {cout << "failed 0 charge cut" << endl;} return; }
 		if(scutname=="pT")           if(!pTCut(cutValue,pa,pb))           { if(b_print) {cout << "failed pT cut"       << endl;} return; }
 		if(scutname=="eta")          if(!etaCut(cutValue,pa,pb))          { if(b_print) {cout << "failed eta cut"      << endl;} return; }
 		if(scutname=="d0")           if(!d0Cut(cutValue,d0a,d0b))         { if(b_print) {cout << "failed d0 cut"       << endl;} return; }

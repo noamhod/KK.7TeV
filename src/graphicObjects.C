@@ -243,7 +243,7 @@ void graphicObjects::drawHistosMap(TMapsd* cutFlowMap, TMapds* cutFlowOrdered, T
 		(*hmap_cutFlow_imass)[sname]->SetFillColor(colorAccumulate);
 		(*hmap_cutFlow_imass)[sname]->SetLineColor(colorAccumulate);
 		leg_cutFlow_imass->AddEntry( (*hmap_cutFlow_imass)[sname], str.c_str(), "f");
-		if(sname=="imass.null")
+		if(sname=="imass.oppositeCharcge")
 		{
 			(*hmap_cutFlow_imass)[sname]->SetMinimum(5.e-1);
 			(*hmap_cutFlow_imass)[sname]->Draw();
@@ -270,7 +270,7 @@ void graphicObjects::drawHistosMap(TMapsd* cutFlowMap, TMapds* cutFlowOrdered, T
 		(*hmap_cutFlow_pT)[sname]->SetFillColor(colorAccumulate);
 		(*hmap_cutFlow_pT)[sname]->SetLineColor(colorAccumulate);
 		leg_cutFlow_pT->AddEntry( (*hmap_cutFlow_pT)[sname], str.c_str(), "f");
-		if(sname=="pT.null")
+		if(sname=="pT.oppositeCharcge")
 		{
 			(*hmap_cutFlow_pT)[sname]->SetMinimum(5.e-1);
 			(*hmap_cutFlow_pT)[sname]->Draw();

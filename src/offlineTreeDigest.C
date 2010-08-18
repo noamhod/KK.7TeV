@@ -50,7 +50,7 @@ void offlineTreeDigest::setBranches(TMapds* cutFlowOrdered)
 		//double snumber = it->first;
 		string sname = it->second;
 		
-		if(sname=="c1*c2<0")      m_tree->Branch( ("is_" + sname).c_str(), &b_null );
+		if(sname=="oppositeCharcge")      m_tree->Branch( ("is_" + sname).c_str(), &b_null );
 		if(sname=="GRL")       m_tree->Branch( ("is_" + sname).c_str(), &b_GRL );
 		if(sname=="L1_MU6")    m_tree->Branch( ("is_" + sname).c_str(), &b_L1_MU6 );
 		if(sname=="z0")        m_tree->Branch( ("is_" + sname).c_str(), &b_z0 );
@@ -104,7 +104,7 @@ void offlineTreeDigest::fill(TMapsb& cutFlowDecision, TMapsd& kinematicVariables
 		string sname = it->first;
 		Bool_t bval  = (Bool_t)it->second;
 		
-		if(sname=="c1*c2<0")      b_null      = bval;
+		if(sname=="oppositeCharcge")      b_null      = bval;
 		if(sname=="GRL")       b_GRL       = bval;
 		if(sname=="L1_MU6")    b_L1_MU6    = bval;
 		if(sname=="z0")        b_z0        = bval;

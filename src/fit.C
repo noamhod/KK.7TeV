@@ -365,28 +365,28 @@ void fit::minimize(bool signal_only, TH1D* h, double* yields)
 	parSignalBackground[7] = 3000.;    // Gaussian sigma 2 
 	parSignalBackground[8] = 3000.;    // Gaussian sigma 3
 	
-	minValSignalBackground[0] = 10000.;   // Scale Background (Nb)
-	minValSignalBackground[1] = 30000.;   // Scale Signal (Ns)
-	minValSignalBackground[2] = 6.;      // Exp: constant argument
-	minValSignalBackground[3] = -0.0000101;     // Exp: the multiplier of the x argument
-	minValSignalBackground[4] = 2000.;   // Breit Wigner Width (gamma)
+	minValSignalBackground[0] = 0;//10000.;   // Scale Background (Nb)
+	minValSignalBackground[1] = 0;//30000.;   // Scale Signal (Ns)
+	minValSignalBackground[2] = 0;//6.;      // Exp: constant argument
+	minValSignalBackground[3] = -10;//-0.0000101;     // Exp: the multiplier of the x argument
+	minValSignalBackground[4] = 0;//2000.;   // Breit Wigner Width (gamma)
 	minValSignalBackground[5] = XMIN;  // Most probable location (peak mean) 
-	minValSignalBackground[6] = 1000.;     // Gaussian sigma 1
-	minValSignalBackground[7] = 1000.;    // Gaussian sigma 2
-	minValSignalBackground[8] = 1000.;    // Gaussian sigma 3
+	minValSignalBackground[6] = 0;//1000.;     // Gaussian sigma 1
+	minValSignalBackground[7] = 0;//1000.;    // Gaussian sigma 2
+	minValSignalBackground[8] = 0;//1000.;    // Gaussian sigma 3
 	
-	maxValSignalBackground[0] = 80000;  // Scale Background (Nb)
-	maxValSignalBackground[1] = 100000;  // Scale Signal (Ns)
-	maxValSignalBackground[2] = 10.;    // Exp: constant argument
-	maxValSignalBackground[3] = -0.000009;  // Exp: the multiplier of the x argument
-	maxValSignalBackground[4] = 3000.;  // Breit Wigner Width (gamma)
+	maxValSignalBackground[0] = 0;//80000;  // Scale Background (Nb)
+	maxValSignalBackground[1] = 0;//100000;  // Scale Signal (Ns)
+	maxValSignalBackground[2] = 0;//10.;    // Exp: constant argument
+	maxValSignalBackground[3] = 0;//-0.000009;  // Exp: the multiplier of the x argument
+	maxValSignalBackground[4] = 0;//3000.;  // Breit Wigner Width (gamma)
 	maxValSignalBackground[5] = XMAX; // Most probable location (peak mean) 
-	maxValSignalBackground[6] = 4000.;    // Gaussian sigma 1
-	maxValSignalBackground[7] = 5000.;   // Gaussian sigma 2
-	maxValSignalBackground[8] = 5000.;   // Gaussian sigma 3
+	maxValSignalBackground[6] = 0;//4000.;    // Gaussian sigma 1
+	maxValSignalBackground[7] = 0;//5000.;   // Gaussian sigma 2
+	maxValSignalBackground[8] = 0;//5000.;   // Gaussian sigma 3
 	
-	stepSizeSignalBackground[0] = 0.01;    // Scale Background (Nb)
-	stepSizeSignalBackground[1] = 0.01;    // Scale Signal (Ns)
+	stepSizeSignalBackground[0] = 1;    // Scale Background (Nb)
+	stepSizeSignalBackground[1] = 1;    // Scale Signal (Ns)
 	stepSizeSignalBackground[2] = 0.01; // Exp: constant argument
 	stepSizeSignalBackground[3] = 0.01; // Exp: the multiplier of the x argument
 	stepSizeSignalBackground[4] = 0.01;  // Breit Wigner Width (gamma)
@@ -412,7 +412,7 @@ void fit::minimize(bool signal_only, TH1D* h, double* yields)
 	int index_sigma2;
 	int index_sigma3;
 	int index_signal;
-	
+
 	if(signal_only)
 	{
 		index_mean = 2;
@@ -445,7 +445,7 @@ void fit::minimize(bool signal_only, TH1D* h, double* yields)
 		index_sigma2 = 7;
 		index_sigma3 = 8;
 		index_signal = 1;
-		fitFCN = new TF1("fitFCN",fitFunctionSB2, XMIN, XMAX ,8);
+		fitFCN = new TF1("fitFCN",fitFunctionSB, XMIN, XMAX ,8);
 		par = parSignalBackground;
 		stepSize = stepSizeSignalBackground;
 		minVal   = minValSignalBackground;
@@ -468,13 +468,13 @@ void fit::minimize(bool signal_only, TH1D* h, double* yields)
 	// irrelevant
 	if(!docout) cout << "bin_width="  << bin_width  << endl;
 	
-	/*
+	//--------------------------------------------------------------------------------
 	// set initial parameters
 	fitFCN->SetParameters(par);
 
 	// set histogrma range and fit first time
 	h->SetAxisRange(20000,200000,"X");
-	h->Fit(fitFCN,"VN","",20000.,200000.);        
+	h->Fit(fitFCN,"VN","",XMIN,XMAX);        
 
 	// get fit parameters
 	double *ParFit;
@@ -507,8 +507,10 @@ void fit::minimize(bool signal_only, TH1D* h, double* yields)
 	ParFit = fitFCN->GetParameters();
 	yields[0] = ParFit[index_signal]/bin_width;
 	yields[1] = ParFit[0]/bin_width;
-	*/
+	//----------------------------------------------------------------------------------
 	
+
+	/*
 	////////////////////
 	// For TMinuit: ////
 	setfcn(signal_only);
@@ -544,15 +546,14 @@ void fit::minimize(bool signal_only, TH1D* h, double* yields)
 	{
 		cout << parName[i] << " = " << outpar[i] << " +- " << err[i] << endl;;
 	}
+	//yields[0] = outpar[index_signal];
+        //yields[1] = outpar[0];
 
 	fitFCN->SetParameters(outpar);
+
+	*/
+
 	m_fFitted = (TF1*)fitFCN->Clone();
-	
-	//yields[0] = outpar[index_signal]/bin_width;
-	//yields[1] = outpar[0]/bin_width;
-	
-	yields[0] = outpar[index_signal];
-	yields[1] = outpar[0];
 	
 	//--------------------------- test ---------------------------
 	///// INITIALIZATION:  SIGNAL + BACKGROUND
@@ -567,7 +568,7 @@ void fit::minimize(bool signal_only, TH1D* h, double* yields)
 	p[6] = 2000.;    // Gaussian sigma 1
 	p[7] = 3000.;    // Gaussian sigma 2 
 	p[8] = 3000.;    // Gaussian sigma 3
-	guess = new TF1("guess",fitFunctionSB2, XMIN, XMAX ,8);
+	guess = new TF1("guess",fitFunctionSB, XMIN, XMAX ,8);
 	guess->SetParameters(p);
 	m_fGuess = (TF1*)guess->Clone();
 	cout << "\nIntegral = " << guess->Integral(XMIN, XMAX) << "\n" << endl;

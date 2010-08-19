@@ -751,6 +751,7 @@ class offlineTree
 		vector<float>* trk_cov_phi_qoverp;
 		vector<float>* trk_cov_theta_qoverp;
 		vector<int>* trk_blayerPrediction_expectHit;
+		/*
 		vector<vector<float> >* trk_blayerPrediction_x;
 		vector<vector<float> >* trk_blayerPrediction_y;
 		vector<vector<float> >* trk_blayerPrediction_z;
@@ -764,6 +765,7 @@ class offlineTree
 		vector<vector<int> >* trk_blayerPrediction_row;
 		vector<vector<int> >* trk_blayerPrediction_col;
 		vector<vector<int> >* trk_blayerPrediction_type;
+		*/
 		vector<float>* trk_d0_wrtPV;
 		vector<float>* trk_z0_wrtPV;
 		vector<float>* trk_phi_wrtPV;
@@ -861,6 +863,7 @@ class offlineTree
 		vector<float>* vxp_sumPt;
 		vector<int>* vxp_type;
 		vector<int>* vxp_trk_n;
+		/*
 		vector<vector<float> >* vxp_trk_chi2;
 		vector<vector<float> >* vxp_trk_d0;
 		vector<vector<float> >* vxp_trk_z0;
@@ -872,6 +875,7 @@ class offlineTree
 		vector<vector<float> >* vxp_trk_theta;
 		vector<vector<float> >* vxp_trk_weight;
 		vector<vector<int> >* vxp_trk_index;
+		*/
 
 	public:
 		offlineTree();

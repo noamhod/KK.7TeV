@@ -59,29 +59,46 @@ typedef map<string, bool>       TMapsb;
 #define physics_cxx
 #include "physics.C"
 
-#ifdef __MAKECINT__
+/*
+#ifdef __CINT__
 #pragma link C++ class vector<vector<double> >+;
-#else
-template class vector<vector<double> >;
-#endif
-
-#ifdef __MAKECINT__
 #pragma link C++ class vector<vector<float> >+;
-#else
-template class vector<vector<float> >;
-#endif
-
-#ifdef __MAKECINT__
 #pragma link C++ class vector<vector<int> >+;
-#else
-template class vector<vector<int> >;
-#endif
-
-#ifdef __MAKECINT__
 #pragma link C++ class vector<vector<unsigned int> >+;
 #else
-template class vector<vector<unsigned int> >;
+template class std::vector<std::vector<double> >;
+template class std::vector<std::vector<float> >;
+template class std::vector<std::vector<int> >;
+template class std::vector<std::vector<unsigned int> >;
 #endif
+*/
+
+
+/*
+#ifdef __CINT__
+#pragma link C++ class std::vector<std::vector<double> >+;
+#else
+	template class std::vector<std::vector<double> >;
+#endif
+
+#ifdef __CINT__
+#pragma link C++ class std::vector<std::vector<float> >+;
+#else
+	template class std::vector<std::vector<float> >;
+#endif
+
+#ifdef __CINT__
+#pragma link C++ class std::vector<std::vector<int> >+;
+#else
+	template class std::vector<std::vector<int> >;
+#endif
+
+#ifdef __CINT__
+#pragma link C++ class std::vector<std::vector<unsigned int> >+;
+#else
+	template class std::vector<std::vector<unsigned int> >;
+#endif
+*/
 
 #define offlinePhysics_cxx
 #include "offlinePhysics.C"
@@ -91,9 +108,6 @@ template class vector<vector<unsigned int> >;
 
 #define particleBase_cxx
 #include "particleBase.C"
-
-//#define outputTreeBase_cxx
-//#include "outputTreeBase.C"
 
 enum pdtEnum { // *** note that this is not a complete list of pdt's particles ***
 	PDTDWN=1, PDTUP=2, PDTSTR=3, PDTCHM=4, PDTBOT=5, PDTTOP=6,

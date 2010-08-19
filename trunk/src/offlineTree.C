@@ -1131,6 +1131,7 @@ void offlineTree::setBranches()
 	trk_cov_phi_qoverp = new vector<float>;
 	trk_cov_theta_qoverp = new vector<float>;
 	trk_blayerPrediction_expectHit = new vector<int>;
+	/*
 	trk_blayerPrediction_x = new vector<vector<float> >;
 	trk_blayerPrediction_y = new vector<vector<float> >;
 	trk_blayerPrediction_z = new vector<vector<float> >;
@@ -1144,6 +1145,7 @@ void offlineTree::setBranches()
 	trk_blayerPrediction_row = new vector<vector<int> >;
 	trk_blayerPrediction_col = new vector<vector<int> >;
 	trk_blayerPrediction_type = new vector<vector<int> >;
+	*/
 	trk_d0_wrtPV = new vector<float>;
 	trk_z0_wrtPV = new vector<float>;
 	trk_phi_wrtPV = new vector<float>;
@@ -1200,6 +1202,7 @@ void offlineTree::setBranches()
 	vxp_sumPt = new vector<float>;
 	vxp_type = new vector<int>;
 	vxp_trk_n = new vector<int>;
+	/*
 	vxp_trk_chi2 = new vector<vector<float> >;
 	vxp_trk_d0 = new vector<vector<float> >;
 	vxp_trk_z0 = new vector<vector<float> >;
@@ -1211,7 +1214,8 @@ void offlineTree::setBranches()
 	vxp_trk_theta = new vector<vector<float> >;
 	vxp_trk_weight = new vector<vector<float> >;
 	vxp_trk_index = new vector<vector<int> >;
-	
+	*/
+
 	m_tree->Branch( "trk_n", &trk_n );
 	m_tree->Branch( "trk_d0", &trk_d0 );
 	m_tree->Branch( "trk_z0", &trk_z0 );
@@ -1241,6 +1245,7 @@ void offlineTree::setBranches()
 	m_tree->Branch( "trk_cov_phi_qoverp", &trk_cov_phi_qoverp );
 	m_tree->Branch( "trk_cov_theta_qoverp", &trk_cov_theta_qoverp );
 	m_tree->Branch( "trk_blayerPrediction_expectHit", &trk_blayerPrediction_expectHit );
+	/*
 	m_tree->Branch( "trk_blayerPrediction_x", &trk_blayerPrediction_x );
 	m_tree->Branch( "trk_blayerPrediction_y", &trk_blayerPrediction_y );
 	m_tree->Branch( "trk_blayerPrediction_z", &trk_blayerPrediction_z );
@@ -1254,6 +1259,7 @@ void offlineTree::setBranches()
 	m_tree->Branch( "trk_blayerPrediction_row", &trk_blayerPrediction_row );
 	m_tree->Branch( "trk_blayerPrediction_col", &trk_blayerPrediction_col );
 	m_tree->Branch( "trk_blayerPrediction_type", &trk_blayerPrediction_type );
+	*/
 	m_tree->Branch( "trk_d0_wrtPV", &trk_d0_wrtPV );
 	m_tree->Branch( "trk_z0_wrtPV", &trk_z0_wrtPV );
 	m_tree->Branch( "trk_phi_wrtPV", &trk_phi_wrtPV );
@@ -1349,6 +1355,7 @@ void offlineTree::setBranches()
 	m_tree->Branch( "vxp_sumPt", &vxp_sumPt );
 	m_tree->Branch( "vxp_type", &vxp_type );
 	m_tree->Branch( "vxp_trk_n", &vxp_trk_n );
+	/*
 	m_tree->Branch( "vxp_trk_chi2", &vxp_trk_chi2 );
 	m_tree->Branch( "vxp_trk_d0", &vxp_trk_d0 );
 	m_tree->Branch( "vxp_trk_z0", &vxp_trk_z0 );
@@ -1360,6 +1367,7 @@ void offlineTree::setBranches()
 	m_tree->Branch( "vxp_trk_theta", &vxp_trk_theta );
 	m_tree->Branch( "vxp_trk_weight", &vxp_trk_weight );
 	m_tree->Branch( "vxp_trk_index", &vxp_trk_index );
+	*/
 }
 
 void offlineTree::fill(Bool_t isgrl)
@@ -2103,6 +2111,7 @@ void offlineTree::fill(Bool_t isgrl)
 	trk_cov_phi_qoverp = m_phys->trk_cov_phi_qoverp;
 	trk_cov_theta_qoverp = m_phys->trk_cov_theta_qoverp;
 	trk_blayerPrediction_expectHit = m_phys->trk_blayerPrediction_expectHit;
+	/*
 	trk_blayerPrediction_x = m_phys->trk_blayerPrediction_x;
 	trk_blayerPrediction_y = m_phys->trk_blayerPrediction_y;
 	trk_blayerPrediction_z = m_phys->trk_blayerPrediction_z;
@@ -2116,6 +2125,7 @@ void offlineTree::fill(Bool_t isgrl)
 	trk_blayerPrediction_row = m_phys->trk_blayerPrediction_row;
 	trk_blayerPrediction_col = m_phys->trk_blayerPrediction_col;
 	trk_blayerPrediction_type = m_phys->trk_blayerPrediction_type;
+	*/
 	trk_d0_wrtPV = m_phys->trk_d0_wrtPV;
 	trk_z0_wrtPV = m_phys->trk_z0_wrtPV;
 	trk_phi_wrtPV = m_phys->trk_phi_wrtPV;
@@ -2211,6 +2221,7 @@ void offlineTree::fill(Bool_t isgrl)
 	vxp_sumPt = m_phys->vxp_sumPt;
 	vxp_type = m_phys->vxp_type;
 	vxp_trk_n = m_phys->vxp_trk_n;
+	/*
 	vxp_trk_chi2 = m_phys->vxp_trk_chi2;
 	vxp_trk_d0 = m_phys->vxp_trk_d0;
 	vxp_trk_z0 = m_phys->vxp_trk_z0;
@@ -2222,6 +2233,7 @@ void offlineTree::fill(Bool_t isgrl)
 	vxp_trk_theta = m_phys->vxp_trk_theta;
 	vxp_trk_weight = m_phys->vxp_trk_weight;
 	vxp_trk_index = m_phys->vxp_trk_index;
+	*/
 
 	/*---------------------------*/
 	/*---*/ m_tree->Fill(); /*---*/

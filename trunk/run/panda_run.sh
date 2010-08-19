@@ -40,7 +40,7 @@ dateandhour=`date +d%d%m%Y.h%H%M`
 # remove the arlier outputs
 rm -f input.txt
 rm -f z0analysis.root
-
+rm -f Loader_C.so
 
 # get the latest grl and cut flow
 cp -u ../conf/cutFlow.cuts .
@@ -53,7 +53,7 @@ chmod 777 Z_GRL_152844-159224.xml
 
 
 # submit the panda run with a single dataset using --writeInputToTxt
-prun --exec "root.exe -b -q analysisGridControlRun.C;" --writeInputToTxt IN:input.txt  --athenaTag=15.6.9 --outDS user.hod.WZphys.$runnumber.$subsetnumber.$dateandhour  --outputs WZphys.root --inDS $datasetname  --extFile analysisGridControl_C.so, ../GoodRunsLists-00-00-84/StandAlone/libGoodRunsLists.so --workDir ../
+prun --exec "root.exe -b -q analysisGridControlRun.C;" --writeInputToTxt IN:input.txt  --athenaTag=15.6.9 --outDS user.hod.WZphys.$runnumber.$subsetnumber.$dateandhour  --outputs WZphys.root --inDS $datasetname  --extFile analysisGridControl_C.so, Loader_C.so, ../GoodRunsLists-00-00-84/StandAlone/libGoodRunsLists.so --workDir ../
 
 # or, submit the panda run with a single dataset using shell echo command (can handle up to 200 files)
 #prun --exec "echo %IN > input.txt;  root.exe analysisGridControlRun.C;" --athenaTag=15.6.9 --outDS user.hod.z0analysis.$dateandhour --outputs z0analysis.root --inDS group10.phys-sm.data10_7TeV.00159224.physics_MuonswBeam.recon.ESD.x30.WZphys.100612.02.D3PD  --extFile analysisGridControl_C.so, ../GoodRunsLists-00-00-84/StandAlone/libGoodRunsLists.so --workDir ../

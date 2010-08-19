@@ -323,7 +323,7 @@ void graphicObjects::drawFitHistos(TDirectory* tdir, TF1* fGuess, TF1* fFitted)
 	fGuess->SetLineStyle(1);
 	fGuess->SetLineColor(kRed);
 	fGuess->SetLineWidth(2);
-	fGuess->Draw("sames");
+	//fGuess->Draw("sames");
 	
 	fFitted->SetLineStyle(1);
 	fFitted->SetLineColor(kBlue);
@@ -331,7 +331,7 @@ void graphicObjects::drawFitHistos(TDirectory* tdir, TF1* fGuess, TF1* fFitted)
 	fFitted->Draw("sames");
 	
 	leg_imassFinal->AddEntry( h1_imassFinal, "Data", "lep");
-	leg_imassFinal->AddEntry( fGuess, "Guess", "L");
+	//leg_imassFinal->AddEntry( fGuess, "Guess", "L");
 	leg_imassFinal->AddEntry( fFitted, "ML fit", "L");
 	leg_imassFinal->Draw("sames");
 	

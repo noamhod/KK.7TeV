@@ -42,6 +42,7 @@ void analysisGridControlRun()
 	char buf[256+1];
 	unsigned int delpos;
 	ifstream ifs("input.txt");
+	cout << "#################################################################################################" << endl;
 	while (true)
 	{
 		ifs.read(buf,256);
@@ -56,7 +57,10 @@ void analysisGridControlRun()
 		}
 		buf[delpos] = 0x00;
 		argStr += buf;
+		
+		cout << "buf=" << buf << endl;
 	}
+	cout << "#################################################################################################" << endl;
 
 
 	// split by ','
@@ -70,27 +74,43 @@ void analysisGridControlRun()
 		fileList.push_back(tmp);
 	}
 
-	//TChain *fChain= new TChain("physics");
 	TString chainName ="physics";
 	fChain = new TChain(chainName);
 	for (unsigned int iFile=0; iFile<fileList.size(); ++iFile)
 	{
+		//--------------- fix the last entry (a missing "t" at the end of the file name suffix) -------------
+		if(iFile==fileList.size()-1)
+		{
+			int len = (int)fileList[iFile].length();
+			string slast = fileList[iFile].substr(len-1,1);
+			if( slast != "t" )
+			{
+				cout << "slast=" << slast << endl;
+				fileList[iFile]+="t";
+				cout << "#################################################################" << endl;
+				cout << "### fixed missing character at the end of the last input file ###" << endl;
+				cout << "#################################################################" << endl;
+			}
+		}
+		//---------------------------------------------------------------------------------------------------
+	
 		cout << "open " << fileList[iFile].c_str() << endl;
+	
 		fChain->Add(fileList[iFile].c_str());
 	}
+
 	
-	//TFile *fout= new TFile(fileName, "RECREATE");
-	TString fileName ="z0analysis.root";
+	TString fileName ="WZphys.root";
 	fout = new TFile(fileName, "RECREATE");
 	
 	// some includings and loadings
+	
 	gROOT->ProcessLine(".include ../include/");
 	gROOT->ProcessLine(".include ../src/");
 	gROOT->ProcessLine(".include ./");
 	gROOT->ProcessLine(".include ../GoodRunsLists-00-00-84/");
 	gROOT->ProcessLine(".include ../GoodRunsLists-00-00-84/GoodRunsLists/");
 	
-	//gROOT->ProcessLine(".L ../GoodRunsLists-00-00-84/StandAlone/libGoodRunsLists.so");
 	exitIfNotExist("../GoodRunsLists-00-00-84/StandAlone/libGoodRunsLists.so");
 	gROOT->ProcessLine(".L ../GoodRunsLists-00-00-84/StandAlone/libGoodRunsLists.so");
 	

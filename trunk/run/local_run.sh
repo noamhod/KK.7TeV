@@ -1,7 +1,8 @@
 #!/bin/bash/
 
 # the data set
-datasetfiles=/tmp/hod/group10.phys-sm.data10_7TeV.00159224.physics_MuonswBeam.recon.ESD.x30.WZphys.100612.02.D3PD.D3PD._01067.root
+#datasetfiles=/tmp/hod/group10.phys-sm.data10_7TeV.00159224.physics_MuonswBeam.recon.ESD.x30.WZphys.100612.02.D3PD.D3PD._01067.root
+datasetfiles=$1
 
 
 # the GRL version
@@ -29,8 +30,8 @@ rm -f z0analysis.root
 
 
 # get the latest grl and cut flow
-cp -f ../conf/cutFlow.cuts .
-cp -f ../conf/Z_GRL_152844-159224.xml .
+cp -u ../conf/cutFlow.cuts .
+cp -u ../conf/Z_GRL_152844-159224.xml .
 
 
 # make usable

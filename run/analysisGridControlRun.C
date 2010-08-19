@@ -104,7 +104,8 @@ void analysisGridControlRun()
 	fout = new TFile(fileName, "RECREATE");
 	
 	// some includings and loadings
-	
+	gROOT->ProcessLine(".L Loader.C+");
+
 	gROOT->ProcessLine(".include ../include/");
 	gROOT->ProcessLine(".include ../src/");
 	gROOT->ProcessLine(".include ./");

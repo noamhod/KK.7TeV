@@ -141,22 +141,30 @@ void graphicObjects::drawBareHistos(TDirectory* tdir)
 	cnv_d0exPV->Draw();
 	cnv_d0exPV->cd();
 	h1_d0exPV->Draw();
+	cnv_d0exPV->Update();
+        cnv_d0exPV->Write();
 
 	cnv_z0exPV = new TCanvas("z0exPV","z0exPV",canv_x,canv_y);
 	cnv_z0exPV->SetLogy();
 	cnv_z0exPV->Draw();
 	cnv_z0exPV->cd();
 	h1_z0exPV->Draw();
+	cnv_z0exPV->Update();
+        cnv_z0exPV->Write();
 
 	cnv_cosmicCosth = new TCanvas("cosThetaDimu","cosThetaDimu",canv_x,canv_y);
 	cnv_cosmicCosth->Draw();
 	cnv_cosmicCosth->cd();
 	h1_cosmicCosth->Draw();
+	cnv_cosmicCosth->Update();
+        cnv_cosmicCosth->Write();
 
 	cnv_xyVertex = new TCanvas("xyVertex","xyVertex",canv_x,canv_y);
 	cnv_xyVertex->Draw();
 	cnv_xyVertex->cd();
 	h2_xyVertex->Draw("BOX");
+	cnv_xyVertex->Update();
+        cnv_xyVertex->Write();
 }
 
 void graphicObjects::drawHistos(TDirectory* tdir)
@@ -168,22 +176,30 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	cnv_imass->Draw();
 	cnv_imass->cd();
 	h1_imass->Draw();
+	cnv_imass->Update();
+        cnv_imass->Write();
 
 	cnv_pT = new TCanvas("pT","pT",canv_x,canv_y);
 	cnv_pT->SetLogy();
 	cnv_pT->Draw();
 	cnv_pT->cd();
 	h1_pT->Draw();
+	cnv_pT->Update();
+        cnv_pT->Write();
 
 	cnv_eta = new TCanvas("eta","eta",canv_x,canv_y);
 	cnv_eta->Draw();
 	cnv_eta->cd();
 	h1_eta->Draw();
+	cnv_eta->Update();
+        cnv_eta->Write();
 
 	cnv_costh = new TCanvas("costh","costh",canv_x,canv_y);
 	cnv_costh->Draw();
 	cnv_costh->cd();
 	h1_costh->Draw();
+	cnv_costh->Update();
+        cnv_costh->Write();
 }
 
 void graphicObjects::bookHistosMap(TMapsd* cutFlowMap, TMapds* cutFlowOrdered, TDirectory* tdir)

@@ -370,12 +370,55 @@ void offlineAnalysis::executeCutFlow()
 			//-----------------------------
 			// fill the cut flow histograms:
 
-			// calculate the necessary variables to be filled
+			// calculate the necessary variables
 			double current_imass       = imass(pmu[ai],pmu[bi]);
 			double current_mu_pT       = (m_offPhys->mu_staco_charge->at(ai)<0.)?pT(pmu[ai]):pT(pmu[bi]);
 			double current_mu_eta      = (m_offPhys->mu_staco_charge->at(ai)<0.)?eta(pmu[ai]):eta(pmu[bi]);
 			double current_mu_cosTheta = cosThetaCollinsSoper( 	pmu[ai], (double)m_offPhys->mu_staco_charge->at(ai),
 																pmu[bi], (double)m_offPhys->mu_staco_charge->at(bi) );
+			
+			// event level
+			int isGRL      = m_offPhys->isGRL;
+			int isL1MU6    = m_offPhys->L1_MU6;
+			
+			// deprecated !!!
+			double d0exPVa = m_offPhys->mu_staco_d0_exPV->at(ai);
+			double z0exPVa = m_offPhys->mu_staco_z0_exPV->at(ai);
+			double d0exPVb = m_offPhys->mu_staco_d0_exPV->at(bi);
+			double z0exPVb = m_offPhys->mu_staco_z0_exPV->at(bi);
+			
+			// primary vertex
+			/*
+			int nPVtracks = m_offPhys->vxp_nTracks; // number of tracks > 2
+			int nPVtype   = m_offPhys->vxp_type;    // ==1
+			double PVz0   = m_offPhys->vxp_z;       // = absolute z position of primary vertex < 150mm
+			double PVz0   = m_offPhys->vxp_err_z;   // = error
+			*/
+			
+			// combined muon ?
+			int isMuComb  = m_offPhys->mu_staco_isCombinedMuon->at(ai);
+			
+			// inner detector hits
+			int nSCThits  = m_offPhys->mu_staco_nSCTHits->at(ai); //  SCT hits >=4
+			int nPIXhits  = m_offPhys->mu_staco_nPixHitss->at(ai); // pixel hits >=1
+			int nIDhits   = nSCThits+nPIXhits; // pixel+SCT hits >=5
+			
+			// ID - MS pT matching
+			double qOp_me = m_offPhys->mu_staco_me_qover_p->at(ai);
+			double qOp_id = m_offPhys->mu_staco_id_qover_p->at(ai);
+			double theta_me = m_offPhys->mu_staco_me_theta->at(ai);
+			double theta_id = m_offPhys->mu_staco_id_theta->at(ai);
+			
+			// impact parameter
+			double impPrmZ0 = offPhys->mu_staco_z0_exPV->at(ai);
+			double impPrmZ0 = offPhys->mu_staco_d0_exPV->at(ai);
+			
+			// isolation
+			double mu_pT    = offPhys->mu_staco_pt->at(ai);
+			double pTcone20 = offPhys->mu_staco_ptcone20->at(ai);
+			double pTcone30 = offPhys->mu_staco_ptcone30->at(ai);
+			double pTcone40 = offPhys->mu_staco_ptcone40->at(ai);
+			
 			
 			// fill the kinematic variables of this pair for the digested tree
 			kinematicVariables.insert( make_pair("imass", current_imass) );
@@ -386,14 +429,8 @@ void offlineAnalysis::executeCutFlow()
 			TMapsd values2fill;
 			values2fill.insert( make_pair( "imass",current_imass ) );
 			values2fill.insert( make_pair( "pT",current_mu_pT ) );
-
-			// help
-			double d0exPVa = m_offPhys->mu_staco_d0_exPV->at(ai);
-			double z0exPVa = m_offPhys->mu_staco_z0_exPV->at(ai);
-			double d0exPVb = m_offPhys->mu_staco_d0_exPV->at(bi);
-			double z0exPVb = m_offPhys->mu_staco_z0_exPV->at(bi);
-			int isGRL      = m_offPhys->isGRL;
-			int isL1MU6    = m_offPhys->L1_MU6;
+			
+			
 
 			bool passCutFlow    = true;
 			bool passCurrentCut = true;

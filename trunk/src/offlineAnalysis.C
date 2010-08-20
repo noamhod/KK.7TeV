@@ -393,11 +393,10 @@ void offlineAnalysis::executeCutFlow()
 			double d0exPVb = m_offPhys->mu_staco_d0_exPV->at(bi);
 			double z0exPVb = m_offPhys->mu_staco_z0_exPV->at(bi);
 			int isGRL      = m_offPhys->isGRL;
+			int isL1MU6    = m_offPhys->L1_MU6;
 
 			bool passCutFlow    = true;
 			bool passCurrentCut = true;
-			
-
 			// fill the cut flow, stop at the relevant cut each time.
 			// the cut objects don't have to be "correctly" ordered
 			// since it is done by the loop on the ordered cut flow map
@@ -412,12 +411,14 @@ void offlineAnalysis::executeCutFlow()
 
 				if(sorderedcutname=="GRL")
 				{
-					passCurrentCut = (isGRL==(int)(*m_cutFlowMap)[sorderedcutname]) ? true : false;
+					//passCurrentCut = (isGRL==(int)(*m_cutFlowMap)[sorderedcutname]) ? true : false;
+					passCurrentCut = ( isGRLCut((*m_cutFlowMap)[sorderedcutname], isGRL) ) ? true : false;
 				}
 
 				if(sorderedcutname=="L1_MU6")
 				{
-					passCurrentCut = (m_offPhys->L1_MU6==(int)(*m_cutFlowMap)[sorderedcutname]) ? true : false;
+					//passCurrentCut = (m_offPhys->L1_MU6==(int)(*m_cutFlowMap)[sorderedcutname]) ? true : false;
+					passCurrentCut = ( isL1_MU6Cut((*m_cutFlowMap)[sorderedcutname], isL1MU6) ) ? true : false;
 				}		
 
 				if(sorderedcutname=="imass")

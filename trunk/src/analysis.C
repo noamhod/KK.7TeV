@@ -384,7 +384,70 @@ void analysis::executeCutFlow()
 			int runnumber  = m_phys->RunNumber;
 			int lumiblock  = m_phys->lbn;
 			int GRL        = m_analysis_grl->m_grl.HasRunLumiBlock( runnumber, lumiblock );
+			int L1MU6      = m_phys->L1_MU6;
 
+			
+			bool passCutFlow    = true;
+			bool passCurrentCut = true;
+			// fill the cut flow, stop at the relevant cut each time.
+			// the cut objects don't have to be "correctly" ordered
+			// since it is done by the loop on the ordered cut flow map
+			for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
+			{
+				string sorderedcutname = ii->second;
+
+				if(sorderedcutname=="oppositeCharcge")
+				{
+					passCurrentCut = (true) ? true : false;
+				}
+
+				if(sorderedcutname=="GRL")
+				{
+					//passCurrentCut = (isGRL==(int)(*m_cutFlowMap)[sorderedcutname]) ? true : false;
+					passCurrentCut = ( isGRLCut((*m_cutFlowMap)[sorderedcutname], isGRL) ) ? true : false;
+				}
+
+				if(sorderedcutname=="L1_MU6")
+				{
+					//passCurrentCut = (m_offPhys->L1_MU6==(int)(*m_cutFlowMap)[sorderedcutname]) ? true : false;
+					passCurrentCut = ( isL1_MU6Cut((*m_cutFlowMap)[sorderedcutname], L1MU6) ) ? true : false;
+				}		
+
+				if(sorderedcutname=="imass")
+				{
+					passCurrentCut = ( imassCut((*m_cutFlowMap)[sorderedcutname], pmu[ai], pmu[bi]) ) ? true : false;
+				}
+
+				if(sorderedcutname=="pT")
+				{
+					passCurrentCut = ( pTCut((*m_cutFlowMap)[sorderedcutname], pmu[ai], pmu[bi]) ) ? true : false;
+				}
+
+				if(sorderedcutname=="eta")
+				{
+					passCurrentCut = ( etaCut((*m_cutFlowMap)[sorderedcutname], pmu[ai], pmu[bi]) ) ? true : false;
+				}
+
+				if(sorderedcutname=="cosThetaDimu")
+				{
+					passCurrentCut = ( cosThetaDimuCut((*m_cutFlowMap)[sorderedcutname], pmu[ai], pmu[bi]) ) ? true : false;
+				}
+
+				if(sorderedcutname=="d0")
+				{
+					passCurrentCut = ( d0Cut((*m_cutFlowMap)[sorderedcutname], d0exPVa, d0exPVb) ) ? true : false;
+				}
+
+				if(sorderedcutname=="z0")
+				{
+					passCurrentCut = ( z0Cut((*m_cutFlowMap)[sorderedcutname], z0exPVa, z0exPVb) ) ? true : false;
+				}
+
+				passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
+				if(passCutFlow) fillCutFlow(sorderedcutname, values2fill); // stop at this(sorderedcutname) cut
+			}
+			
+			/*
 			bool passCut  = true;
 
 			// fill the cut flow, stop at the relevant cut each time.
@@ -402,13 +465,15 @@ void analysis::executeCutFlow()
 
 				if(sorderedcutname=="GRL")
 				{
-					passCut = (GRL==(int)(*m_cutFlowMap)["GRL"]  &&  passCut) ? true : false;
+					//passCut = (GRL==(int)(*m_cutFlowMap)["GRL"]  &&  passCut) ? true : false;
+					passCut = ( isGRLCut((*m_cutFlowMap)["GRL"], GRL)  &&  passCut ) ? true : false;
 					if(passCut) fillCutFlow("GRL", values2fill); // stop at null cut
 				}
 
 				if(sorderedcutname=="L1_MU6")
 				{
-					passCut = (m_phys->L1_MU6==(int)(*m_cutFlowMap)["L1_MU6"]  &&  passCut)             ? true : false;
+					//passCut = (m_phys->L1_MU6==(int)(*m_cutFlowMap)["L1_MU6"]  &&  passCut)             ? true : false;
+					passCut = ( isL1M_U6Cut((*m_cutFlowMap)["L1_MU6"], m_phys->L1_MU6) ) ? true : false;
 					if(passCut) fillCutFlow("L1_MU6", values2fill); // stop at null cut
 				}		
 
@@ -451,6 +516,7 @@ void analysis::executeCutFlow()
 				// count the numbers
 				if(passCut) m_cutFlowNumbers->operator[](sorderedcutname) ++;
 			}
+			*/
 		}
 	}
 	// re-initialize

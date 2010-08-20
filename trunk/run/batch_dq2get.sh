@@ -140,7 +140,7 @@ source dq2get.sh   156682   01   20082010   0033
 
 source dq2get.sh   158045   01   20082010   0034
 
-#source dq2get.sh   158116   01   20082010   0036  ### still in Pre-Run !!!
+source dq2get.sh   158116   01   20082010   0036
 source dq2get.sh   158116   02   20082010   0038
 
 source dq2get.sh   158269   01   20082010   0039
@@ -155,11 +155,11 @@ source dq2get.sh   158466   01   20082010   0043
 
 source dq2get.sh   158545   01   20082010   0044
 
-#source dq2get.sh   158548   01   20082010   0044  ### still in Pre-Run !!!
-#source dq2get.sh   158548   02   20082010   1139  ### 11/35 still in Running !!!
+source dq2get.sh   158548   01   20082010   0044
+#source dq2get.sh   158548   02   20082010  #### resubmitted (3 times)
 
-#source dq2get.sh   158582   01   20082010   0047  ### still in Pre-Run !!!
-#source dq2get.sh   158582   02   20082010   0049  ### 1/54 still in Running !!!
+source dq2get.sh   158582   01   20082010   0047
+#source dq2get.sh   158582   02   20082010   0049  ### 1/54 FAILED - not resubmitted yet
 
 source dq2get.sh   158632   01   20082010   0052
 
@@ -170,7 +170,7 @@ source dq2get.sh   158975   01   20082010   0055
 source dq2get.sh   159041   01   20082010   0057
 
 source dq2get.sh   159086   01   20082010   0058
-#source dq2get.sh   159086   02   #######   #### resubmitted !!!
+#source dq2get.sh   159086   02   #######   #### resubmitted (3 times !)
 source dq2get.sh   159086   03   20082010   0102
 
 source dq2get.sh   159113   01   20082010   0104

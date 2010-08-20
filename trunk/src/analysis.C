@@ -404,7 +404,7 @@ void analysis::executeCutFlow()
 				if(sorderedcutname=="GRL")
 				{
 					//passCurrentCut = (isGRL==(int)(*m_cutFlowMap)[sorderedcutname]) ? true : false;
-					passCurrentCut = ( isGRLCut((*m_cutFlowMap)[sorderedcutname], isGRL) ) ? true : false;
+					passCurrentCut = ( isGRLCut((*m_cutFlowMap)[sorderedcutname], GRL) ) ? true : false;
 				}
 
 				if(sorderedcutname=="L1_MU6")
@@ -443,8 +443,18 @@ void analysis::executeCutFlow()
 					passCurrentCut = ( z0Cut((*m_cutFlowMap)[sorderedcutname], z0exPVa, z0exPVb) ) ? true : false;
 				}
 
+				// decide
 				passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
-				if(passCutFlow) fillCutFlow(sorderedcutname, values2fill); // stop at this(sorderedcutname) cut
+				
+				// do some stuff
+				if(passCutFlow)
+				{
+					// fill the cut flow histos
+					fillCutFlow(sorderedcutname, values2fill); // stop at this(sorderedcutname) cut
+				
+					// count the numbers after the cuts
+					if(passCutFlow) m_cutFlowNumbers->operator[](sorderedcutname) ++;
+				}
 			}
 			
 			/*

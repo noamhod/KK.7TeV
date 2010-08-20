@@ -37,6 +37,20 @@ void selection::initSelectionCuts(TMapsd* cutFlowMap, TMapds* cutFlowOrdered)
 	m_cutFlowOrdered = cutFlowOrdered;
 }
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+
+bool selection::isGRLCut( double isGRLCutVal, int isGRL )
+{
+	if(b_print) cout << "in isGRLCut: isGRL=" << isGRL << endl;
+	return ( (double)isGRL == isGRLCutVal ) ? true : false;
+}
+
+bool selection::isL1_MU6Cut( double isL1_MU6CutVal, int isL1_MU6 )
+{
+	if(b_print) cout << "in isL1_MU6Cut: isL1_MU6=" << isL1_MU6 << endl;
+	return ( (double)isL1_MU6 == isL1_MU6CutVal ) ? true : false;
+}
+
 bool selection::pTCut( double pTCutVal, TLorentzVector* pa, TLorentzVector* pb )
 {
 	if(b_print) cout << "in pTCut: pT(pa)=" << pT(pa) << ", pT(pb)=" << pT(pb) << endl;
@@ -61,7 +75,7 @@ bool selection::cosThetaDimuCut( double cosThetaDimuCutVal, TLorentzVector* pa, 
 	return ( cosThetaDimu(pa,pb) > cosThetaDimuCutVal ) ? true : false;
 }
 
-bool selection::oppositeCharge( double ca, double cb )
+bool selection::oppositeChargeCut( double ca, double cb )
 {
 	if(b_print) cout << "in oppositeCharge: ca=" << ca << ", cb=" << cb << endl;
 	return ( ca*cb<0 ) ? true : false;
@@ -79,11 +93,127 @@ bool selection::z0Cut( double z0CutVal, double z0a, double z0b )
 	return ( fabs(z0a)<=z0CutVal  &&  fabs(z0b)<=z0CutVal ) ? true : false;
 }
 
+bool selection::prmVtxNtracksCut( double prmVtxNtracksCutVal, int nPVtracks )
+{
+	/*vxp_nTracks=number of tracks > 2*/
+	if(b_print) cout << "in prmVtxNtracksCut: nPVtracks=" << nPVtracks << endl;
+	return ( (double)nPVtracks > prmVtxNtracksCutVal ) ? true : false;
+}
+
+bool selection::prmVtxTypeCut( double prmVtxTypeCutVal, int nPVtype )
+{
+	/*vxp_type==1*/
+	if(b_print) cout << "in prmVtxTypeCut: nPVtype=" << nPVtype << endl;
+	return ( (double)nPVtype == prmVtxTypeCutVal ) ? true : false;
+}
+
+bool selection::prmVtxZ0Cut( double prmVtxZ0CutVal, double dPVz0 )
+{
+	/*vxp_z=absolute z position of primary vertex < 150mms*/
+	if(b_print) cout << "in prmVtxZ0Cut: dPVz0=" << dPVz0 << endl;
+	return ( dPVz0 < prmVtxZ0CutVal ) ? true : false;
+}
+
+bool selection::isCombMuCut( double isCombMuCutVal, int isCombMu )
+{
+	/*mu_staco_isCombinedMuon*/
+	if(b_print) cout << "in isCombMuCut: isCombMu=" << isCombMu << endl;
+	return ( (double)isCombMu == isCombMuCutVal ) ? true : false;
+}
+
+bool selection::nSCThitsCut( double nSCThitsCutVal, int nSCThits )
+{
+	/*mu_staco_nSCTHits :  SCT hits >=4*/
+	if(b_print) cout << "in nSCThitsCut: nSCThits=" << nSCThits << endl;
+	return ( (double)nSCThits >= nSCThitsCutVal ) ? true : false;
+}
+
+bool selection::nPIXhitsCut( double nPIXhitsCutVal, int nPIXhits )
+{
+	/*mu_staco_nPixHitss  :  pixel hits >=1*/
+	if(b_print) cout << "in nPIXhitsCut: nPIXhits=" << nPIXhits << endl;
+	return ( (double)nPIXhits >= nPIXhitsCutVal ) ? true : false;
+}
+
+bool selection::nIDhitsCut( double nIDhitsCutVal, int nIDhits )
+{
+	/*mu_staco_nSCTHits, mu_staco_nPixHitss  :  pixel+SCT hits >=5*/
+	if(b_print) cout << "in nIDhitsCut: nIDhits=" << nIDhits << endl;
+	return ( (double)nIDhits >= nIDhitsCutVal ) ? true : false;
+}
+
+bool selection::pTmatchLowRatioCut()
+{
+	/* mu_staco_me_qover_p, mu_staco_me_theta, mu_staco_id_qover_p, mu_staco_id_theta */
+	// pT ratio of Muon Extrapolated track to ID track greater than 0.5
+	return true; // ???????????????????????????????????????????????????????????????????????????????????????????
+}
+
+bool selection::pTmatchHighRatioCut()
+{
+	/* mu_staco_me_qover_p, mu_staco_me_theta, mu_staco_id_qover_p, mu_staco_id_theta */
+	// pT ratio of Muon Extrapolated track to ID track less than 2
+	return true; // ???????????????????????????????????????????????????????????????????????????????????????????
+}
+
+bool selection::impcatParamZ0Cut( double impcatParamZ0CutVal, double impPrmZ0)
+{
+	/*mu_staco_z0_exPV*/
+	// Impact Parameter wrt primary vertex in z0 less than 5mm 
+	if(b_print) cout << "in impcatParamZ0Cut: impPrmZ0=" << impPrmZ0 << endl;
+	return ( impPrmZ0 < impcatParamZ0CutVal ) ? true : false;
+}
+
+bool selection::impcatParamD0Cut( double impcatParamD0CutVal, double impPrmD0 )
+{
+	/*mu_staco_d0_exPV*/
+	// Impact Parameter wrt primary vertex in d0 less than 1mm 
+	if(b_print) cout << "in impcatParamD0Cut: impPrmD0=" << impPrmD0 << endl;
+	return ( impPrmD0 < impcatParamD0CutVal ) ? true : false;
+}
+
+bool selection::isolation20Cut( double isolationCutVal, double pTmu, double pTcone )
+{
+	/*mu_staco_ptcone20, mu_staco_pt*/
+	// track sum pT in 0.2 cone relative to muon pT less than 0.05
+	
+	double isolation = (pTmu==0) ? 999 : pTcone/pTmu;
+	
+	if(b_print) cout << "in isolation20Cut: isolation 20=" << isolation << endl;
+	return ( isolation < isolationCutVal ) ? true : false;
+}
+
+bool selection::isolation30Cut( double isolationCutVal, double pTmu, double pTcone )
+{
+	/*mu_staco_ptcone30, mu_staco_pt*/
+	// track sum pT in 0.3 cone relative to muon pT less than 0.05
+	
+	double isolation = (pTmu==0) ? 999 : pTcone/pTmu;
+	
+	if(b_print) cout << "in isolation30Cut: isolation 30=" << isolation << endl;
+	return ( isolation < isolationCutVal ) ? true : false;
+}
+
+bool selection::isolation40Cut( double isolationCutVal, double pTmu, double pTcone )
+{
+	/*mu_staco_ptcone40, mu_staco_pt*/
+	// track sum pT in 0.4 cone relative to muon pT less than 0.05
+	
+	double isolation = (pTmu==0) ? 999 : pTcone/pTmu;
+	
+	if(b_print) cout << "in isolation40Cut: isolation 40=" << isolation << endl;
+	return ( isolation < isolationCutVal ) ? true : false;
+}
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+
+
 void selection::buildMuonPairMap( 	TMapii& mupair,
 									double ca, int ia,
 									double cb, int ib)
 {
-	if(!oppositeCharge(ca,cb)) { if(b_print) {cout << "failed 0 charge cut" << endl;} return; }
+	if(!oppositeChargeCut(ca,cb)) { if(b_print) {cout << "failed 0 charge cut" << endl;} return; }
 	mupair.insert( make_pair(ia,ib) );
 }
 
@@ -100,7 +230,7 @@ void selection::buildMuonPairMap( TMapii& mupair,
 		string scutname = ii->second;
 		double cutValue = m_cutFlowMap->operator[](scutname);
 		
-		if(scutname=="oppositeCharcge")      if(!oppositeCharge(ca,cb))           { if(b_print) {cout << "failed 0 charge cut" << endl;} return; }
+		if(scutname=="oppositeCharcge")      if(!oppositeChargeCut(ca,cb))           { if(b_print) {cout << "failed 0 charge cut" << endl;} return; }
 		if(scutname=="pT")           if(!pTCut(cutValue,pa,pb))           { if(b_print) {cout << "failed pT cut"       << endl;} return; }
 		if(scutname=="eta")          if(!etaCut(cutValue,pa,pb))          { if(b_print) {cout << "failed eta cut"      << endl;} return; }
 		if(scutname=="d0")           if(!d0Cut(cutValue,d0a,d0b))         { if(b_print) {cout << "failed d0 cut"       << endl;} return; }

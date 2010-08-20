@@ -308,9 +308,8 @@ void digestAnalysis::executeAdvanced()
 void digestAnalysis::executeCutFlow()
 {
 	nAllEvents++;
-	// fill the cut flow histograms:
 
-	// calculate the necessary variables to be filled
+	// calculate the necessary variables
 	double current_imass       = m_digestPhys->kin_imass;
 	double current_mu_pT       = m_digestPhys->kin_pT_mu;
 	double current_mu_eta      = m_digestPhys->kin_eta_mu;

@@ -90,7 +90,7 @@ void graphicObjects::ginitialize()
 	z0exPV_min   = -300.;
 	z0exPV_max   = 300.;
 
-	cosmicCosth_nbins = 25;
+	cosmicCosth_nbins = 200;
 	cosmicCosth_min   = -1.;
 	cosmicCosth_max   = 1.;
 

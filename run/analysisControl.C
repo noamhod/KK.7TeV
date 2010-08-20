@@ -127,7 +127,7 @@ void analysisControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	l64t_nbytes = 0;
 	l64t_nb = 0;
 
-	l64t_mod = 20000;
+	l64t_mod = 100000;
 
 	l64t_startEvent = startEvent;
 	l64t_stopEvent = l64t_nentries;
@@ -152,6 +152,12 @@ void analysisControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	
 	draw();
 	
-	finalize();
+	//////////////////////////////////////////////////////////////////////////
+	finalize(); //////////////////////////////////////////////////////////////
+	// ususally I call this messege manually, after //////////////////////////
+	// the loop() method has exitted since otherwise the histos //////////////
+	// will disappear. Here we usually run root with "-b -q" options /////////
+	// in the grid, so this is needed to be executed automatically. //////////
+	//////////////////////////////////////////////////////////////////////////
 }
 

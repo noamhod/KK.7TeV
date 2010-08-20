@@ -38,7 +38,7 @@ digestControl::digestControl()
 
 digestControl::~digestControl()
 {
-	finalize();
+	//finalize();
 }
 
 void digestControl::initialize()

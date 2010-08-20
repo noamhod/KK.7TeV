@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon Aug  2 10:47:53 2010 by ROOT version 5.22/00
+// Fri Aug 20 15:52:14 2010 by ROOT version 5.22/00i
 // from TChain offline/
 //////////////////////////////////////////////////////////
 
@@ -69,7 +69,6 @@ public :
    Bool_t          EF_L1ItemStreamer_L1_EM10I;
    Bool_t          EF_L1ItemStreamer_L1_EM14;
    Bool_t          EF_L1ItemStreamer_L1_EM2;
-   //Bool_t          EF_L1ItemStreamer_L1_EM2_UNPAIRED;
    Bool_t          EF_L1ItemStreamer_L1_EM3;
    Bool_t          EF_L1ItemStreamer_L1_EM3_EMPTY;
    Bool_t          EF_L1ItemStreamer_L1_EM3_FIRSTEMPTY;
@@ -89,7 +88,6 @@ public :
    Bool_t          EF_L1ItemStreamer_L1_MU0_J15;
    Bool_t          EF_L1ItemStreamer_L1_MU0_J5;
    Bool_t          EF_L1ItemStreamer_L1_MU0_MV;
-   //Bool_t          EF_L1ItemStreamer_L1_MU0_UNPAIRED;
    Bool_t          EF_L1ItemStreamer_L1_MU10;
    Bool_t          EF_L1ItemStreamer_L1_MU10_EMPTY;
    Bool_t          EF_L1ItemStreamer_L1_MU15;
@@ -100,8 +98,6 @@ public :
    Bool_t          EF_L1ItemStreamer_L1_MU6_FIRSTEMPTY;
    Bool_t          EF_L1ItemStreamer_L1_MU6_J5;
    Bool_t          EF_L1ItemStreamer_L1_MU6_UNPAIRED;
-   //Bool_t          EF_mu0_missingRoi;
-   //Bool_t          EF_mu0_rpcOnly;
    Bool_t          EF_mu10;
    Bool_t          EF_mu10_MG;
    Bool_t          EF_mu10_MSonly;
@@ -122,10 +118,6 @@ public :
    Bool_t          EF_mu4_DiMu;
    Bool_t          EF_mu4_DiMu_FS;
    Bool_t          EF_mu4_DiMu_FS_noOS;
-   //Bool_t          EF_mu4_Jpsie5e3;
-   //Bool_t          EF_mu4_Jpsie5e3_FS;
-   //Bool_t          EF_mu4_Jpsie5e3_SiTrk;
-   //Bool_t          EF_mu4_Jpsie5e3_SiTrk_FS;
    Bool_t          EF_mu4_L2MSonly_EFFS_passL2;
    Bool_t          EF_mu4_MG;
    Bool_t          EF_mu4_MSonly;
@@ -159,7 +151,6 @@ public :
    Bool_t          EF_mu4_tile_SiTrk;
    Bool_t          EF_mu4_trod;
    Bool_t          EF_mu4_trod_SiTrk;
-   //Bool_t          EF_mu4_unpaired;
    Bool_t          EF_mu4mu6_DiMu;
    Bool_t          EF_mu6;
    Bool_t          EF_mu6_DiMu;
@@ -167,9 +158,6 @@ public :
    Bool_t          EF_mu6_DiMu_FS_noOS;
    Bool_t          EF_mu6_DsPhiPi;
    Bool_t          EF_mu6_Jpsie5e3;
-   //Bool_t          EF_mu6_Jpsie5e3_FS;
-   //Bool_t          EF_mu6_Jpsie5e3_SiTrk;
-   //Bool_t          EF_mu6_Jpsie5e3_SiTrk_FS;
    Bool_t          EF_mu6_MG;
    Bool_t          EF_mu6_MSonly;
    Bool_t          EF_mu6_MSonly_cosmic;
@@ -197,7 +185,6 @@ public :
    Bool_t          L1_EM10I;
    Bool_t          L1_EM14;
    Bool_t          L1_EM2;
-   //Bool_t          L1_EM2_UNPAIRED;
    Bool_t          L1_EM3;
    Bool_t          L1_EM3_EMPTY;
    Bool_t          L1_EM3_FIRSTEMPTY;
@@ -217,7 +204,6 @@ public :
    Bool_t          L1_MU0_J15;
    Bool_t          L1_MU0_J5;
    Bool_t          L1_MU0_MV;
-   //Bool_t          L1_MU0_UNPAIRED;
    Bool_t          L1_MU10;
    Bool_t          L1_MU10_EMPTY;
    Bool_t          L1_MU15;
@@ -251,7 +237,6 @@ public :
    Bool_t          L2_L1ItemStreamer_L1_MU0_J15;
    Bool_t          L2_L1ItemStreamer_L1_MU0_J5;
    Bool_t          L2_L1ItemStreamer_L1_MU0_MV;
-   //Bool_t          L2_L1ItemStreamer_L1_MU0_UNPAIRED;
    Bool_t          L2_L1ItemStreamer_L1_MU10;
    Bool_t          L2_L1ItemStreamer_L1_MU10_EMPTY;
    Bool_t          L2_L1ItemStreamer_L1_MU15;
@@ -262,8 +247,6 @@ public :
    Bool_t          L2_L1ItemStreamer_L1_MU6_FIRSTEMPTY;
    Bool_t          L2_L1ItemStreamer_L1_MU6_J5;
    Bool_t          L2_L1ItemStreamer_L1_MU6_UNPAIRED;
-   //Bool_t          L2_mu0_missingRoi;
-   //Bool_t          L2_mu0_rpcOnly;
    Bool_t          L2_mu10;
    Bool_t          L2_mu10_MG;
    Bool_t          L2_mu10_MSonly;
@@ -284,10 +267,6 @@ public :
    Bool_t          L2_mu4_DiMu;
    Bool_t          L2_mu4_DiMu_FS;
    Bool_t          L2_mu4_DiMu_FS_noOS;
-   //Bool_t          L2_mu4_Jpsie5e3;
-   //Bool_t          L2_mu4_Jpsie5e3_FS;
-   //Bool_t          L2_mu4_Jpsie5e3_SiTrk;
-   //Bool_t          L2_mu4_Jpsie5e3_SiTrk_FS;
    Bool_t          L2_mu4_L2MSonly_EFFS_passL2;
    Bool_t          L2_mu4_MG;
    Bool_t          L2_mu4_MSonly;
@@ -321,7 +300,6 @@ public :
    Bool_t          L2_mu4_tile_SiTrk;
    Bool_t          L2_mu4_trod;
    Bool_t          L2_mu4_trod_SiTrk;
-   //Bool_t          L2_mu4_unpaired;
    Bool_t          L2_mu4mu6_DiMu;
    Bool_t          L2_mu6;
    Bool_t          L2_mu6_DiMu;
@@ -329,9 +307,6 @@ public :
    Bool_t          L2_mu6_DiMu_FS_noOS;
    Bool_t          L2_mu6_DsPhiPi;
    Bool_t          L2_mu6_Jpsie5e3;
-   //Bool_t          L2_mu6_Jpsie5e3_FS;
-   //Bool_t          L2_mu6_Jpsie5e3_SiTrk;
-   //Bool_t          L2_mu6_Jpsie5e3_SiTrk_FS;
    Bool_t          L2_mu6_MG;
    Bool_t          L2_mu6_MSonly;
    Bool_t          L2_mu6_MSonly_cosmic;
@@ -347,7 +322,6 @@ public :
    Bool_t          L2_mu6_muCombTag_SiTrk;
    Bool_t          L2_mu6_passHLT;
    Bool_t          L2_mu6_unpaired;
-   
    Int_t           mu_staco_n;
    vector<float>   *mu_staco_E;
    vector<float>   *mu_staco_px;
@@ -528,7 +502,6 @@ public :
    vector<short>   *mu_staco_L1_source;
    vector<short>   *mu_staco_L1_hemisphere;
    vector<int>     *mu_staco_L1_matched;
-   
    Int_t           mu_muid_n;
    vector<float>   *mu_muid_E;
    vector<float>   *mu_muid_px;
@@ -709,7 +682,6 @@ public :
    vector<short>   *mu_muid_L1_source;
    vector<short>   *mu_muid_L1_hemisphere;
    vector<int>     *mu_muid_L1_matched;
-   
    Int_t           trk_n;
    vector<float>   *trk_d0;
    vector<float>   *trk_z0;
@@ -739,21 +711,6 @@ public :
    vector<float>   *trk_cov_phi_qoverp;
    vector<float>   *trk_cov_theta_qoverp;
    vector<int>     *trk_blayerPrediction_expectHit;
-   
-   vector<vector<float> > *trk_blayerPrediction_x;
-   vector<vector<float> > *trk_blayerPrediction_y;
-   vector<vector<float> > *trk_blayerPrediction_z;
-   vector<vector<float> > *trk_blayerPrediction_locX;
-   vector<vector<float> > *trk_blayerPrediction_locY;
-   vector<vector<float> > *trk_blayerPrediction_err_locX;
-   vector<vector<float> > *trk_blayerPrediction_err_locY;
-   vector<vector<float> > *trk_blayerPrediction_etaDistToEdge;
-   vector<vector<float> > *trk_blayerPrediction_phiDistToEdge;
-   vector<vector<unsigned int> > *trk_blayerPrediction_detElementId;
-   vector<vector<int> > *trk_blayerPrediction_row;
-   vector<vector<int> > *trk_blayerPrediction_col;
-   vector<vector<int> > *trk_blayerPrediction_type;
-   
    vector<float>   *trk_d0_wrtPV;
    vector<float>   *trk_z0_wrtPV;
    vector<float>   *trk_phi_wrtPV;
@@ -783,7 +740,6 @@ public :
    vector<int>     *trk_patternReco1;
    vector<int>     *trk_patternReco2;
    vector<int>     *trk_seedFinder;
-   
    Int_t           mb_n;
    vector<float>   *mb_E;
    vector<float>   *mb_eta;
@@ -830,7 +786,6 @@ public :
    Bool_t          collcand_passCaloTime;
    Bool_t          collcand_passTrigger;
    Bool_t          collcand_pass;
-   
    Int_t           vxp_n;
    vector<float>   *vxp_x;
    vector<float>   *vxp_y;
@@ -849,18 +804,6 @@ public :
    vector<float>   *vxp_sumPt;
    vector<int>     *vxp_type;
    vector<int>     *vxp_trk_n;
-   
-   vector<vector<float> > *vxp_trk_chi2;
-   vector<vector<float> > *vxp_trk_d0;
-   vector<vector<float> > *vxp_trk_z0;
-   vector<vector<float> > *vxp_trk_unbiased_d0;
-   vector<vector<float> > *vxp_trk_unbiased_z0;
-   vector<vector<float> > *vxp_trk_err_unbiased_d0;
-   vector<vector<float> > *vxp_trk_err_unbiased_z0;
-   vector<vector<float> > *vxp_trk_phi;
-   vector<vector<float> > *vxp_trk_theta;
-   vector<vector<float> > *vxp_trk_weight;
-   vector<vector<int> > *vxp_trk_index;
 
    // List of branches
    TBranch        *b_isGRL;   //!
@@ -915,7 +858,6 @@ public :
    TBranch        *b_EF_L1ItemStreamer_L1_EM10I;   //!
    TBranch        *b_EF_L1ItemStreamer_L1_EM14;   //!
    TBranch        *b_EF_L1ItemStreamer_L1_EM2;   //!
-   //TBranch        *b_EF_L1ItemStreamer_L1_EM2_UNPAIRED;   //!
    TBranch        *b_EF_L1ItemStreamer_L1_EM3;   //!
    TBranch        *b_EF_L1ItemStreamer_L1_EM3_EMPTY;   //!
    TBranch        *b_EF_L1ItemStreamer_L1_EM3_FIRSTEMPTY;   //!
@@ -935,7 +877,6 @@ public :
    TBranch        *b_EF_L1ItemStreamer_L1_MU0_J15;   //!
    TBranch        *b_EF_L1ItemStreamer_L1_MU0_J5;   //!
    TBranch        *b_EF_L1ItemStreamer_L1_MU0_MV;   //!
-   //TBranch        *b_EF_L1ItemStreamer_L1_MU0_UNPAIRED;   //!
    TBranch        *b_EF_L1ItemStreamer_L1_MU10;   //!
    TBranch        *b_EF_L1ItemStreamer_L1_MU10_EMPTY;   //!
    TBranch        *b_EF_L1ItemStreamer_L1_MU15;   //!
@@ -946,8 +887,6 @@ public :
    TBranch        *b_EF_L1ItemStreamer_L1_MU6_FIRSTEMPTY;   //!
    TBranch        *b_EF_L1ItemStreamer_L1_MU6_J5;   //!
    TBranch        *b_EF_L1ItemStreamer_L1_MU6_UNPAIRED;   //!
-   //TBranch        *b_EF_mu0_missingRoi;   //!
-   //TBranch        *b_EF_mu0_rpcOnly;   //!
    TBranch        *b_EF_mu10;   //!
    TBranch        *b_EF_mu10_MG;   //!
    TBranch        *b_EF_mu10_MSonly;   //!
@@ -968,10 +907,6 @@ public :
    TBranch        *b_EF_mu4_DiMu;   //!
    TBranch        *b_EF_mu4_DiMu_FS;   //!
    TBranch        *b_EF_mu4_DiMu_FS_noOS;   //!
-   //TBranch        *b_EF_mu4_Jpsie5e3;   //!
-   //TBranch        *b_EF_mu4_Jpsie5e3_FS;   //!
-   //TBranch        *b_EF_mu4_Jpsie5e3_SiTrk;   //!
-   //TBranch        *b_EF_mu4_Jpsie5e3_SiTrk_FS;   //!
    TBranch        *b_EF_mu4_L2MSonly_EFFS_passL2;   //!
    TBranch        *b_EF_mu4_MG;   //!
    TBranch        *b_EF_mu4_MSonly;   //!
@@ -1005,7 +940,6 @@ public :
    TBranch        *b_EF_mu4_tile_SiTrk;   //!
    TBranch        *b_EF_mu4_trod;   //!
    TBranch        *b_EF_mu4_trod_SiTrk;   //!
-   //TBranch        *b_EF_mu4_unpaired;   //!
    TBranch        *b_EF_mu4mu6_DiMu;   //!
    TBranch        *b_EF_mu6;   //!
    TBranch        *b_EF_mu6_DiMu;   //!
@@ -1013,9 +947,6 @@ public :
    TBranch        *b_EF_mu6_DiMu_FS_noOS;   //!
    TBranch        *b_EF_mu6_DsPhiPi;   //!
    TBranch        *b_EF_mu6_Jpsie5e3;   //!
-   //TBranch        *b_EF_mu6_Jpsie5e3_FS;   //!
-   //TBranch        *b_EF_mu6_Jpsie5e3_SiTrk;   //!
-   //TBranch        *b_EF_mu6_Jpsie5e3_SiTrk_FS;   //!
    TBranch        *b_EF_mu6_MG;   //!
    TBranch        *b_EF_mu6_MSonly;   //!
    TBranch        *b_EF_mu6_MSonly_cosmic;   //!
@@ -1043,7 +974,6 @@ public :
    TBranch        *b_L1_EM10I;   //!
    TBranch        *b_L1_EM14;   //!
    TBranch        *b_L1_EM2;   //!
-   //TBranch        *b_L1_EM2_UNPAIRED;   //!
    TBranch        *b_L1_EM3;   //!
    TBranch        *b_L1_EM3_EMPTY;   //!
    TBranch        *b_L1_EM3_FIRSTEMPTY;   //!
@@ -1063,7 +993,6 @@ public :
    TBranch        *b_L1_MU0_J15;   //!
    TBranch        *b_L1_MU0_J5;   //!
    TBranch        *b_L1_MU0_MV;   //!
-   //TBranch        *b_L1_MU0_UNPAIRED;   //!
    TBranch        *b_L1_MU10;   //!
    TBranch        *b_L1_MU10_EMPTY;   //!
    TBranch        *b_L1_MU15;   //!
@@ -1097,7 +1026,6 @@ public :
    TBranch        *b_L2_L1ItemStreamer_L1_MU0_J15;   //!
    TBranch        *b_L2_L1ItemStreamer_L1_MU0_J5;   //!
    TBranch        *b_L2_L1ItemStreamer_L1_MU0_MV;   //!
-   //TBranch        *b_L2_L1ItemStreamer_L1_MU0_UNPAIRED;   //!
    TBranch        *b_L2_L1ItemStreamer_L1_MU10;   //!
    TBranch        *b_L2_L1ItemStreamer_L1_MU10_EMPTY;   //!
    TBranch        *b_L2_L1ItemStreamer_L1_MU15;   //!
@@ -1108,8 +1036,6 @@ public :
    TBranch        *b_L2_L1ItemStreamer_L1_MU6_FIRSTEMPTY;   //!
    TBranch        *b_L2_L1ItemStreamer_L1_MU6_J5;   //!
    TBranch        *b_L2_L1ItemStreamer_L1_MU6_UNPAIRED;   //!
-   //TBranch        *b_L2_mu0_missingRoi;   //!
-   //TBranch        *b_L2_mu0_rpcOnly;   //!
    TBranch        *b_L2_mu10;   //!
    TBranch        *b_L2_mu10_MG;   //!
    TBranch        *b_L2_mu10_MSonly;   //!
@@ -1130,10 +1056,6 @@ public :
    TBranch        *b_L2_mu4_DiMu;   //!
    TBranch        *b_L2_mu4_DiMu_FS;   //!
    TBranch        *b_L2_mu4_DiMu_FS_noOS;   //!
-   //TBranch        *b_L2_mu4_Jpsie5e3;   //!
-   //TBranch        *b_L2_mu4_Jpsie5e3_FS;   //!
-   //TBranch        *b_L2_mu4_Jpsie5e3_SiTrk;   //!
-   //TBranch        *b_L2_mu4_Jpsie5e3_SiTrk_FS;   //!
    TBranch        *b_L2_mu4_L2MSonly_EFFS_passL2;   //!
    TBranch        *b_L2_mu4_MG;   //!
    TBranch        *b_L2_mu4_MSonly;   //!
@@ -1167,7 +1089,6 @@ public :
    TBranch        *b_L2_mu4_tile_SiTrk;   //!
    TBranch        *b_L2_mu4_trod;   //!
    TBranch        *b_L2_mu4_trod_SiTrk;   //!
-   //TBranch        *b_L2_mu4_unpaired;   //!
    TBranch        *b_L2_mu4mu6_DiMu;   //!
    TBranch        *b_L2_mu6;   //!
    TBranch        *b_L2_mu6_DiMu;   //!
@@ -1175,9 +1096,6 @@ public :
    TBranch        *b_L2_mu6_DiMu_FS_noOS;   //!
    TBranch        *b_L2_mu6_DsPhiPi;   //!
    TBranch        *b_L2_mu6_Jpsie5e3;   //!
-   //TBranch        *b_L2_mu6_Jpsie5e3_FS;   //!
-   //TBranch        *b_L2_mu6_Jpsie5e3_SiTrk;   //!
-   //TBranch        *b_L2_mu6_Jpsie5e3_SiTrk_FS;   //!
    TBranch        *b_L2_mu6_MG;   //!
    TBranch        *b_L2_mu6_MSonly;   //!
    TBranch        *b_L2_mu6_MSonly_cosmic;   //!
@@ -1553,7 +1471,6 @@ public :
    TBranch        *b_mu_muid_L1_source;   //!
    TBranch        *b_mu_muid_L1_hemisphere;   //!
    TBranch        *b_mu_muid_L1_matched;   //!
-
    TBranch        *b_trk_n;   //!
    TBranch        *b_trk_d0;   //!
    TBranch        *b_trk_z0;   //!
@@ -1583,19 +1500,6 @@ public :
    TBranch        *b_trk_cov_phi_qoverp;   //!
    TBranch        *b_trk_cov_theta_qoverp;   //!
    TBranch        *b_trk_blayerPrediction_expectHit;   //!
-   TBranch        *b_trk_blayerPrediction_x;   //!
-   TBranch        *b_trk_blayerPrediction_y;   //!
-   TBranch        *b_trk_blayerPrediction_z;   //!
-   TBranch        *b_trk_blayerPrediction_locX;   //!
-   TBranch        *b_trk_blayerPrediction_locY;   //!
-   TBranch        *b_trk_blayerPrediction_err_locX;   //!
-   TBranch        *b_trk_blayerPrediction_err_locY;   //!
-   TBranch        *b_trk_blayerPrediction_etaDistToEdge;   //!
-   TBranch        *b_trk_blayerPrediction_phiDistToEdge;   //!
-   TBranch        *b_trk_blayerPrediction_detElementId;   //!
-   TBranch        *b_trk_blayerPrediction_row;   //!
-   TBranch        *b_trk_blayerPrediction_col;   //!
-   TBranch        *b_trk_blayerPrediction_type;   //!
    TBranch        *b_trk_d0_wrtPV;   //!
    TBranch        *b_trk_z0_wrtPV;   //!
    TBranch        *b_trk_phi_wrtPV;   //!
@@ -1625,7 +1529,6 @@ public :
    TBranch        *b_trk_patternReco1;   //!
    TBranch        *b_trk_patternReco2;   //!
    TBranch        *b_trk_seedFinder;   //!
-   
    TBranch        *b_mb_n;   //!
    TBranch        *b_mb_E;   //!
    TBranch        *b_mb_eta;   //!
@@ -1672,7 +1575,6 @@ public :
    TBranch        *b_collcand_passCaloTime;   //!
    TBranch        *b_collcand_passTrigger;   //!
    TBranch        *b_collcand_pass;   //!
-   
    TBranch        *b_vxp_n;   //!
    TBranch        *b_vxp_x;   //!
    TBranch        *b_vxp_y;   //!
@@ -1691,19 +1593,7 @@ public :
    TBranch        *b_vxp_sumPt;   //!
    TBranch        *b_vxp_type;   //!
    TBranch        *b_vxp_trk_n;   //!
-   TBranch        *b_vxp_trk_chi2;   //!
-   TBranch        *b_vxp_trk_d0;   //!
-   TBranch        *b_vxp_trk_z0;   //!
-   TBranch        *b_vxp_trk_unbiased_d0;   //!
-   TBranch        *b_vxp_trk_unbiased_z0;   //!
-   TBranch        *b_vxp_trk_err_unbiased_d0;   //!
-   TBranch        *b_vxp_trk_err_unbiased_z0;   //!
-   TBranch        *b_vxp_trk_phi;   //!
-   TBranch        *b_vxp_trk_theta;   //!
-   TBranch        *b_vxp_trk_weight;   //!
-   TBranch        *b_vxp_trk_index;   //!
-   
-   
+
    offlinePhysics(TTree *tree=0);
    virtual ~offlinePhysics();
    virtual Int_t    Cut(Long64_t entry);
@@ -1739,169 +1629,7 @@ offlinePhysics::offlinePhysics(TTree *tree)
       // The following code should be used if you want this class to access a chain
       // of trees.
       TChain * chain = new TChain("offline","");
-      chain->Add("offline_datasetdir/analysisTrees_100.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_104.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_105.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_106.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_107.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_109.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_10.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_110.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_112.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_114.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_116.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_117.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_118.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_119.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_11.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_125.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_126.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_127.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_129.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_12.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_134.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_138.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_141.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_142.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_145.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_146.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_147.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_153.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_154.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_155.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_156.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_159.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_15.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_19.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_1.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_21.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_23.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_25.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_27.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_28.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_29.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_31.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_32.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_33.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_34.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_36.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_38.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_39.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_3.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_41.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_44.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_45.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_46.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_47.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_50.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_51.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_56.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_57.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_5.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_60.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_63.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_66.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_67.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_68.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_69.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_70.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_71.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_76.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_78.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_79.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_7.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_80.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_81.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_82.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_84.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_86.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_87.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_88.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_89.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_90.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_91.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_92.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_94.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_95.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_98.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_9.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_151.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_149.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_157.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_131.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_53.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_26.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_20.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_49.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_42.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_37.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_62.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_55.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_135.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_148.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_61.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_35.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_2.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_58.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_111.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_52.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_150.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_120.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_137.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_128.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_48.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_108.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_133.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_43.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_101.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_130.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_14.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_16.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_40.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_113.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_123.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_54.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_139.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_144.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_24.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_124.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_122.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_30.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_160.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_13.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_115.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_102.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_59.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_140.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_22.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_161.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_65.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_103.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_158.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_4.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_136.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_64.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_143.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_17.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_152.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_121.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_132.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_162.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_18.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_6.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_72.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_73.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_74.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_75.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_77.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_83.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_85.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_8.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_93.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_96.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_97.root/offline");
-      chain->Add("offline_datasetdir/analysisTrees_99.root/offline");
+      chain->Add("offline_datasetdir/user.hod.WZphys.159224.02.d20082010.h0112.100820011253/user.hod.000347._00006.WZphys.root/offline");
       tree = chain;
 #endif // SINGLE_TREE
 
@@ -2305,7 +2033,6 @@ void offlinePhysics::Init(TTree *tree)
    mu_muid_L1_source = 0;
    mu_muid_L1_hemisphere = 0;
    mu_muid_L1_matched = 0;
-   
    trk_d0 = 0;
    trk_z0 = 0;
    trk_phi = 0;
@@ -2334,19 +2061,6 @@ void offlinePhysics::Init(TTree *tree)
    trk_cov_phi_qoverp = 0;
    trk_cov_theta_qoverp = 0;
    trk_blayerPrediction_expectHit = 0;
-   trk_blayerPrediction_x = 0;
-   trk_blayerPrediction_y = 0;
-   trk_blayerPrediction_z = 0;
-   trk_blayerPrediction_locX = 0;
-   trk_blayerPrediction_locY = 0;
-   trk_blayerPrediction_err_locX = 0;
-   trk_blayerPrediction_err_locY = 0;
-   trk_blayerPrediction_etaDistToEdge = 0;
-   trk_blayerPrediction_phiDistToEdge = 0;
-   trk_blayerPrediction_detElementId = 0;
-   trk_blayerPrediction_row = 0;
-   trk_blayerPrediction_col = 0;
-   trk_blayerPrediction_type = 0;
    trk_d0_wrtPV = 0;
    trk_z0_wrtPV = 0;
    trk_phi_wrtPV = 0;
@@ -2401,19 +2115,6 @@ void offlinePhysics::Init(TTree *tree)
    vxp_sumPt = 0;
    vxp_type = 0;
    vxp_trk_n = 0;
-   vxp_trk_chi2 = 0;
-   vxp_trk_d0 = 0;
-   vxp_trk_z0 = 0;
-   vxp_trk_unbiased_d0 = 0;
-   vxp_trk_unbiased_z0 = 0;
-   vxp_trk_err_unbiased_d0 = 0;
-   vxp_trk_err_unbiased_z0 = 0;
-   vxp_trk_phi = 0;
-   vxp_trk_theta = 0;
-   vxp_trk_weight = 0;
-   vxp_trk_index = 0;
-   
-   
    // Set branch addresses and branch pointers
    if (!tree) return;
    fChain = tree;
@@ -2472,7 +2173,6 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_EM10I", &EF_L1ItemStreamer_L1_EM10I, &b_EF_L1ItemStreamer_L1_EM10I);
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_EM14", &EF_L1ItemStreamer_L1_EM14, &b_EF_L1ItemStreamer_L1_EM14);
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_EM2", &EF_L1ItemStreamer_L1_EM2, &b_EF_L1ItemStreamer_L1_EM2);
-   //fChain->SetBranchAddress("EF_L1ItemStreamer_L1_EM2_UNPAIRED", &EF_L1ItemStreamer_L1_EM2_UNPAIRED, &b_EF_L1ItemStreamer_L1_EM2_UNPAIRED);
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_EM3", &EF_L1ItemStreamer_L1_EM3, &b_EF_L1ItemStreamer_L1_EM3);
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_EM3_EMPTY", &EF_L1ItemStreamer_L1_EM3_EMPTY, &b_EF_L1ItemStreamer_L1_EM3_EMPTY);
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_EM3_FIRSTEMPTY", &EF_L1ItemStreamer_L1_EM3_FIRSTEMPTY, &b_EF_L1ItemStreamer_L1_EM3_FIRSTEMPTY);
@@ -2492,7 +2192,6 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_MU0_J15", &EF_L1ItemStreamer_L1_MU0_J15, &b_EF_L1ItemStreamer_L1_MU0_J15);
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_MU0_J5", &EF_L1ItemStreamer_L1_MU0_J5, &b_EF_L1ItemStreamer_L1_MU0_J5);
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_MU0_MV", &EF_L1ItemStreamer_L1_MU0_MV, &b_EF_L1ItemStreamer_L1_MU0_MV);
-   //fChain->SetBranchAddress("EF_L1ItemStreamer_L1_MU0_UNPAIRED", &EF_L1ItemStreamer_L1_MU0_UNPAIRED, &b_EF_L1ItemStreamer_L1_MU0_UNPAIRED);
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_MU10", &EF_L1ItemStreamer_L1_MU10, &b_EF_L1ItemStreamer_L1_MU10);
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_MU10_EMPTY", &EF_L1ItemStreamer_L1_MU10_EMPTY, &b_EF_L1ItemStreamer_L1_MU10_EMPTY);
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_MU15", &EF_L1ItemStreamer_L1_MU15, &b_EF_L1ItemStreamer_L1_MU15);
@@ -2503,8 +2202,6 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_MU6_FIRSTEMPTY", &EF_L1ItemStreamer_L1_MU6_FIRSTEMPTY, &b_EF_L1ItemStreamer_L1_MU6_FIRSTEMPTY);
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_MU6_J5", &EF_L1ItemStreamer_L1_MU6_J5, &b_EF_L1ItemStreamer_L1_MU6_J5);
    fChain->SetBranchAddress("EF_L1ItemStreamer_L1_MU6_UNPAIRED", &EF_L1ItemStreamer_L1_MU6_UNPAIRED, &b_EF_L1ItemStreamer_L1_MU6_UNPAIRED);
-   //fChain->SetBranchAddress("EF_mu0_missingRoi", &EF_mu0_missingRoi, &b_EF_mu0_missingRoi);
-   //fChain->SetBranchAddress("EF_mu0_rpcOnly", &EF_mu0_rpcOnly, &b_EF_mu0_rpcOnly);
    fChain->SetBranchAddress("EF_mu10", &EF_mu10, &b_EF_mu10);
    fChain->SetBranchAddress("EF_mu10_MG", &EF_mu10_MG, &b_EF_mu10_MG);
    fChain->SetBranchAddress("EF_mu10_MSonly", &EF_mu10_MSonly, &b_EF_mu10_MSonly);
@@ -2525,10 +2222,6 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("EF_mu4_DiMu", &EF_mu4_DiMu, &b_EF_mu4_DiMu);
    fChain->SetBranchAddress("EF_mu4_DiMu_FS", &EF_mu4_DiMu_FS, &b_EF_mu4_DiMu_FS);
    fChain->SetBranchAddress("EF_mu4_DiMu_FS_noOS", &EF_mu4_DiMu_FS_noOS, &b_EF_mu4_DiMu_FS_noOS);
-   //fChain->SetBranchAddress("EF_mu4_Jpsie5e3", &EF_mu4_Jpsie5e3, &b_EF_mu4_Jpsie5e3);
-   //fChain->SetBranchAddress("EF_mu4_Jpsie5e3_FS", &EF_mu4_Jpsie5e3_FS, &b_EF_mu4_Jpsie5e3_FS);
-   //fChain->SetBranchAddress("EF_mu4_Jpsie5e3_SiTrk", &EF_mu4_Jpsie5e3_SiTrk, &b_EF_mu4_Jpsie5e3_SiTrk);
-   //fChain->SetBranchAddress("EF_mu4_Jpsie5e3_SiTrk_FS", &EF_mu4_Jpsie5e3_SiTrk_FS, &b_EF_mu4_Jpsie5e3_SiTrk_FS);
    fChain->SetBranchAddress("EF_mu4_L2MSonly_EFFS_passL2", &EF_mu4_L2MSonly_EFFS_passL2, &b_EF_mu4_L2MSonly_EFFS_passL2);
    fChain->SetBranchAddress("EF_mu4_MG", &EF_mu4_MG, &b_EF_mu4_MG);
    fChain->SetBranchAddress("EF_mu4_MSonly", &EF_mu4_MSonly, &b_EF_mu4_MSonly);
@@ -2562,7 +2255,6 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("EF_mu4_tile_SiTrk", &EF_mu4_tile_SiTrk, &b_EF_mu4_tile_SiTrk);
    fChain->SetBranchAddress("EF_mu4_trod", &EF_mu4_trod, &b_EF_mu4_trod);
    fChain->SetBranchAddress("EF_mu4_trod_SiTrk", &EF_mu4_trod_SiTrk, &b_EF_mu4_trod_SiTrk);
-   //fChain->SetBranchAddress("EF_mu4_unpaired", &EF_mu4_unpaired, &b_EF_mu4_unpaired);
    fChain->SetBranchAddress("EF_mu4mu6_DiMu", &EF_mu4mu6_DiMu, &b_EF_mu4mu6_DiMu);
    fChain->SetBranchAddress("EF_mu6", &EF_mu6, &b_EF_mu6);
    fChain->SetBranchAddress("EF_mu6_DiMu", &EF_mu6_DiMu, &b_EF_mu6_DiMu);
@@ -2570,9 +2262,6 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("EF_mu6_DiMu_FS_noOS", &EF_mu6_DiMu_FS_noOS, &b_EF_mu6_DiMu_FS_noOS);
    fChain->SetBranchAddress("EF_mu6_DsPhiPi", &EF_mu6_DsPhiPi, &b_EF_mu6_DsPhiPi);
    fChain->SetBranchAddress("EF_mu6_Jpsie5e3", &EF_mu6_Jpsie5e3, &b_EF_mu6_Jpsie5e3);
-   //fChain->SetBranchAddress("EF_mu6_Jpsie5e3_FS", &EF_mu6_Jpsie5e3_FS, &b_EF_mu6_Jpsie5e3_FS);
-   //fChain->SetBranchAddress("EF_mu6_Jpsie5e3_SiTrk", &EF_mu6_Jpsie5e3_SiTrk, &b_EF_mu6_Jpsie5e3_SiTrk);
-   //fChain->SetBranchAddress("EF_mu6_Jpsie5e3_SiTrk_FS", &EF_mu6_Jpsie5e3_SiTrk_FS, &b_EF_mu6_Jpsie5e3_SiTrk_FS);
    fChain->SetBranchAddress("EF_mu6_MG", &EF_mu6_MG, &b_EF_mu6_MG);
    fChain->SetBranchAddress("EF_mu6_MSonly", &EF_mu6_MSonly, &b_EF_mu6_MSonly);
    fChain->SetBranchAddress("EF_mu6_MSonly_cosmic", &EF_mu6_MSonly_cosmic, &b_EF_mu6_MSonly_cosmic);
@@ -2600,7 +2289,6 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("L1_EM10I", &L1_EM10I, &b_L1_EM10I);
    fChain->SetBranchAddress("L1_EM14", &L1_EM14, &b_L1_EM14);
    fChain->SetBranchAddress("L1_EM2", &L1_EM2, &b_L1_EM2);
-   //fChain->SetBranchAddress("L1_EM2_UNPAIRED", &L1_EM2_UNPAIRED, &b_L1_EM2_UNPAIRED);
    fChain->SetBranchAddress("L1_EM3", &L1_EM3, &b_L1_EM3);
    fChain->SetBranchAddress("L1_EM3_EMPTY", &L1_EM3_EMPTY, &b_L1_EM3_EMPTY);
    fChain->SetBranchAddress("L1_EM3_FIRSTEMPTY", &L1_EM3_FIRSTEMPTY, &b_L1_EM3_FIRSTEMPTY);
@@ -2620,7 +2308,6 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("L1_MU0_J15", &L1_MU0_J15, &b_L1_MU0_J15);
    fChain->SetBranchAddress("L1_MU0_J5", &L1_MU0_J5, &b_L1_MU0_J5);
    fChain->SetBranchAddress("L1_MU0_MV", &L1_MU0_MV, &b_L1_MU0_MV);
-   //fChain->SetBranchAddress("L1_MU0_UNPAIRED", &L1_MU0_UNPAIRED, &b_L1_MU0_UNPAIRED);
    fChain->SetBranchAddress("L1_MU10", &L1_MU10, &b_L1_MU10);
    fChain->SetBranchAddress("L1_MU10_EMPTY", &L1_MU10_EMPTY, &b_L1_MU10_EMPTY);
    fChain->SetBranchAddress("L1_MU15", &L1_MU15, &b_L1_MU15);
@@ -2654,7 +2341,6 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU0_J15", &L2_L1ItemStreamer_L1_MU0_J15, &b_L2_L1ItemStreamer_L1_MU0_J15);
    fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU0_J5", &L2_L1ItemStreamer_L1_MU0_J5, &b_L2_L1ItemStreamer_L1_MU0_J5);
    fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU0_MV", &L2_L1ItemStreamer_L1_MU0_MV, &b_L2_L1ItemStreamer_L1_MU0_MV);
-   //fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU0_UNPAIRED", &L2_L1ItemStreamer_L1_MU0_UNPAIRED, &b_L2_L1ItemStreamer_L1_MU0_UNPAIRED);
    fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU10", &L2_L1ItemStreamer_L1_MU10, &b_L2_L1ItemStreamer_L1_MU10);
    fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU10_EMPTY", &L2_L1ItemStreamer_L1_MU10_EMPTY, &b_L2_L1ItemStreamer_L1_MU10_EMPTY);
    fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU15", &L2_L1ItemStreamer_L1_MU15, &b_L2_L1ItemStreamer_L1_MU15);
@@ -2665,8 +2351,6 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU6_FIRSTEMPTY", &L2_L1ItemStreamer_L1_MU6_FIRSTEMPTY, &b_L2_L1ItemStreamer_L1_MU6_FIRSTEMPTY);
    fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU6_J5", &L2_L1ItemStreamer_L1_MU6_J5, &b_L2_L1ItemStreamer_L1_MU6_J5);
    fChain->SetBranchAddress("L2_L1ItemStreamer_L1_MU6_UNPAIRED", &L2_L1ItemStreamer_L1_MU6_UNPAIRED, &b_L2_L1ItemStreamer_L1_MU6_UNPAIRED);
-   //fChain->SetBranchAddress("L2_mu0_missingRoi", &L2_mu0_missingRoi, &b_L2_mu0_missingRoi);
-   //fChain->SetBranchAddress("L2_mu0_rpcOnly", &L2_mu0_rpcOnly, &b_L2_mu0_rpcOnly);
    fChain->SetBranchAddress("L2_mu10", &L2_mu10, &b_L2_mu10);
    fChain->SetBranchAddress("L2_mu10_MG", &L2_mu10_MG, &b_L2_mu10_MG);
    fChain->SetBranchAddress("L2_mu10_MSonly", &L2_mu10_MSonly, &b_L2_mu10_MSonly);
@@ -2687,10 +2371,6 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("L2_mu4_DiMu", &L2_mu4_DiMu, &b_L2_mu4_DiMu);
    fChain->SetBranchAddress("L2_mu4_DiMu_FS", &L2_mu4_DiMu_FS, &b_L2_mu4_DiMu_FS);
    fChain->SetBranchAddress("L2_mu4_DiMu_FS_noOS", &L2_mu4_DiMu_FS_noOS, &b_L2_mu4_DiMu_FS_noOS);
-   //fChain->SetBranchAddress("L2_mu4_Jpsie5e3", &L2_mu4_Jpsie5e3, &b_L2_mu4_Jpsie5e3);
-   //fChain->SetBranchAddress("L2_mu4_Jpsie5e3_FS", &L2_mu4_Jpsie5e3_FS, &b_L2_mu4_Jpsie5e3_FS);
-   //fChain->SetBranchAddress("L2_mu4_Jpsie5e3_SiTrk", &L2_mu4_Jpsie5e3_SiTrk, &b_L2_mu4_Jpsie5e3_SiTrk);
-   //fChain->SetBranchAddress("L2_mu4_Jpsie5e3_SiTrk_FS", &L2_mu4_Jpsie5e3_SiTrk_FS, &b_L2_mu4_Jpsie5e3_SiTrk_FS);
    fChain->SetBranchAddress("L2_mu4_L2MSonly_EFFS_passL2", &L2_mu4_L2MSonly_EFFS_passL2, &b_L2_mu4_L2MSonly_EFFS_passL2);
    fChain->SetBranchAddress("L2_mu4_MG", &L2_mu4_MG, &b_L2_mu4_MG);
    fChain->SetBranchAddress("L2_mu4_MSonly", &L2_mu4_MSonly, &b_L2_mu4_MSonly);
@@ -2724,7 +2404,6 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("L2_mu4_tile_SiTrk", &L2_mu4_tile_SiTrk, &b_L2_mu4_tile_SiTrk);
    fChain->SetBranchAddress("L2_mu4_trod", &L2_mu4_trod, &b_L2_mu4_trod);
    fChain->SetBranchAddress("L2_mu4_trod_SiTrk", &L2_mu4_trod_SiTrk, &b_L2_mu4_trod_SiTrk);
-   //fChain->SetBranchAddress("L2_mu4_unpaired", &L2_mu4_unpaired, &b_L2_mu4_unpaired);
    fChain->SetBranchAddress("L2_mu4mu6_DiMu", &L2_mu4mu6_DiMu, &b_L2_mu4mu6_DiMu);
    fChain->SetBranchAddress("L2_mu6", &L2_mu6, &b_L2_mu6);
    fChain->SetBranchAddress("L2_mu6_DiMu", &L2_mu6_DiMu, &b_L2_mu6_DiMu);
@@ -2732,9 +2411,6 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("L2_mu6_DiMu_FS_noOS", &L2_mu6_DiMu_FS_noOS, &b_L2_mu6_DiMu_FS_noOS);
    fChain->SetBranchAddress("L2_mu6_DsPhiPi", &L2_mu6_DsPhiPi, &b_L2_mu6_DsPhiPi);
    fChain->SetBranchAddress("L2_mu6_Jpsie5e3", &L2_mu6_Jpsie5e3, &b_L2_mu6_Jpsie5e3);
-   //fChain->SetBranchAddress("L2_mu6_Jpsie5e3_FS", &L2_mu6_Jpsie5e3_FS, &b_L2_mu6_Jpsie5e3_FS);
-   //fChain->SetBranchAddress("L2_mu6_Jpsie5e3_SiTrk", &L2_mu6_Jpsie5e3_SiTrk, &b_L2_mu6_Jpsie5e3_SiTrk);
-   //fChain->SetBranchAddress("L2_mu6_Jpsie5e3_SiTrk_FS", &L2_mu6_Jpsie5e3_SiTrk_FS, &b_L2_mu6_Jpsie5e3_SiTrk_FS);
    fChain->SetBranchAddress("L2_mu6_MG", &L2_mu6_MG, &b_L2_mu6_MG);
    fChain->SetBranchAddress("L2_mu6_MSonly", &L2_mu6_MSonly, &b_L2_mu6_MSonly);
    fChain->SetBranchAddress("L2_mu6_MSonly_cosmic", &L2_mu6_MSonly_cosmic, &b_L2_mu6_MSonly_cosmic);
@@ -3110,7 +2786,6 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("mu_muid_L1_source", &mu_muid_L1_source, &b_mu_muid_L1_source);
    fChain->SetBranchAddress("mu_muid_L1_hemisphere", &mu_muid_L1_hemisphere, &b_mu_muid_L1_hemisphere);
    fChain->SetBranchAddress("mu_muid_L1_matched", &mu_muid_L1_matched, &b_mu_muid_L1_matched);
-   
    fChain->SetBranchAddress("trk_n", &trk_n, &b_trk_n);
    fChain->SetBranchAddress("trk_d0", &trk_d0, &b_trk_d0);
    fChain->SetBranchAddress("trk_z0", &trk_z0, &b_trk_z0);
@@ -3140,19 +2815,6 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("trk_cov_phi_qoverp", &trk_cov_phi_qoverp, &b_trk_cov_phi_qoverp);
    fChain->SetBranchAddress("trk_cov_theta_qoverp", &trk_cov_theta_qoverp, &b_trk_cov_theta_qoverp);
    fChain->SetBranchAddress("trk_blayerPrediction_expectHit", &trk_blayerPrediction_expectHit, &b_trk_blayerPrediction_expectHit);
-   fChain->SetBranchAddress("trk_blayerPrediction_x", &trk_blayerPrediction_x, &b_trk_blayerPrediction_x);
-   fChain->SetBranchAddress("trk_blayerPrediction_y", &trk_blayerPrediction_y, &b_trk_blayerPrediction_y);
-   fChain->SetBranchAddress("trk_blayerPrediction_z", &trk_blayerPrediction_z, &b_trk_blayerPrediction_z);
-   fChain->SetBranchAddress("trk_blayerPrediction_locX", &trk_blayerPrediction_locX, &b_trk_blayerPrediction_locX);
-   fChain->SetBranchAddress("trk_blayerPrediction_locY", &trk_blayerPrediction_locY, &b_trk_blayerPrediction_locY);
-   fChain->SetBranchAddress("trk_blayerPrediction_err_locX", &trk_blayerPrediction_err_locX, &b_trk_blayerPrediction_err_locX);
-   fChain->SetBranchAddress("trk_blayerPrediction_err_locY", &trk_blayerPrediction_err_locY, &b_trk_blayerPrediction_err_locY);
-   fChain->SetBranchAddress("trk_blayerPrediction_etaDistToEdge", &trk_blayerPrediction_etaDistToEdge, &b_trk_blayerPrediction_etaDistToEdge);
-   fChain->SetBranchAddress("trk_blayerPrediction_phiDistToEdge", &trk_blayerPrediction_phiDistToEdge, &b_trk_blayerPrediction_phiDistToEdge);
-   fChain->SetBranchAddress("trk_blayerPrediction_detElementId", &trk_blayerPrediction_detElementId, &b_trk_blayerPrediction_detElementId);
-   fChain->SetBranchAddress("trk_blayerPrediction_row", &trk_blayerPrediction_row, &b_trk_blayerPrediction_row);
-   fChain->SetBranchAddress("trk_blayerPrediction_col", &trk_blayerPrediction_col, &b_trk_blayerPrediction_col);
-   fChain->SetBranchAddress("trk_blayerPrediction_type", &trk_blayerPrediction_type, &b_trk_blayerPrediction_type);
    fChain->SetBranchAddress("trk_d0_wrtPV", &trk_d0_wrtPV, &b_trk_d0_wrtPV);
    fChain->SetBranchAddress("trk_z0_wrtPV", &trk_z0_wrtPV, &b_trk_z0_wrtPV);
    fChain->SetBranchAddress("trk_phi_wrtPV", &trk_phi_wrtPV, &b_trk_phi_wrtPV);
@@ -3182,7 +2844,6 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("trk_patternReco1", &trk_patternReco1, &b_trk_patternReco1);
    fChain->SetBranchAddress("trk_patternReco2", &trk_patternReco2, &b_trk_patternReco2);
    fChain->SetBranchAddress("trk_seedFinder", &trk_seedFinder, &b_trk_seedFinder);
-
    fChain->SetBranchAddress("mb_n", &mb_n, &b_mb_n);
    fChain->SetBranchAddress("mb_E", &mb_E, &b_mb_E);
    fChain->SetBranchAddress("mb_eta", &mb_eta, &b_mb_eta);
@@ -3247,19 +2908,6 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("vxp_sumPt", &vxp_sumPt, &b_vxp_sumPt);
    fChain->SetBranchAddress("vxp_type", &vxp_type, &b_vxp_type);
    fChain->SetBranchAddress("vxp_trk_n", &vxp_trk_n, &b_vxp_trk_n);
-   fChain->SetBranchAddress("vxp_trk_chi2", &vxp_trk_chi2, &b_vxp_trk_chi2);
-   fChain->SetBranchAddress("vxp_trk_d0", &vxp_trk_d0, &b_vxp_trk_d0);
-   fChain->SetBranchAddress("vxp_trk_z0", &vxp_trk_z0, &b_vxp_trk_z0);
-   fChain->SetBranchAddress("vxp_trk_unbiased_d0", &vxp_trk_unbiased_d0, &b_vxp_trk_unbiased_d0);
-   fChain->SetBranchAddress("vxp_trk_unbiased_z0", &vxp_trk_unbiased_z0, &b_vxp_trk_unbiased_z0);
-   fChain->SetBranchAddress("vxp_trk_err_unbiased_d0", &vxp_trk_err_unbiased_d0, &b_vxp_trk_err_unbiased_d0);
-   fChain->SetBranchAddress("vxp_trk_err_unbiased_z0", &vxp_trk_err_unbiased_z0, &b_vxp_trk_err_unbiased_z0);
-   fChain->SetBranchAddress("vxp_trk_phi", &vxp_trk_phi, &b_vxp_trk_phi);
-   fChain->SetBranchAddress("vxp_trk_theta", &vxp_trk_theta, &b_vxp_trk_theta);
-   fChain->SetBranchAddress("vxp_trk_weight", &vxp_trk_weight, &b_vxp_trk_weight);
-   fChain->SetBranchAddress("vxp_trk_index", &vxp_trk_index, &b_vxp_trk_index);
-   
-   
    Notify();
 }
 
@@ -3283,7 +2931,6 @@ void offlinePhysics::Show(Long64_t entry)
 }
 Int_t offlinePhysics::Cut(Long64_t entry)
 {
-   if(false) cout << "entry=" << entry << endl;
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
 // returns -1 otherwise.

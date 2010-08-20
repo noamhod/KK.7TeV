@@ -19,14 +19,6 @@ public:
 	utilities* m_util;
 	
 	bool   b_print;
-	/*
-	double d_pTCut;
-	double d_etaCut;
-	double d_imassCut;
-	double d_d0Cut;
-	double d_z0Cut;
-	double d_cosThetaDimuCut;
-	*/
 	
 	TMapsd* m_cutFlowMap;
 	TMapds* m_cutFlowOrdered;

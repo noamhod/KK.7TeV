@@ -24,14 +24,6 @@ void selection::sinitialize()
 	m_util = new utilities();	
 
 	b_print     = false;
-	/*
-	d_pTCut          = 15.*m_util->d_toGeV;
-	d_etaCut         = 2.4;
-	d_d0Cut          = 150.; // mm ?
-	d_z0Cut          = 150.; // mm ?
-	d_cosThetaDimuCut = -0.9;
-	d_imassCut       = 20.*m_util->d_toGeV;
-*/
 }
 
 void selection::sfinalize()
@@ -43,21 +35,6 @@ void selection::initSelectionCuts(TMapsd* cutFlowMap, TMapds* cutFlowOrdered)
 {
 	m_cutFlowMap     = cutFlowMap;
 	m_cutFlowOrdered = cutFlowOrdered;
-
-	/*
-	for(TMapds::iterator ii=cutFlowOrdered->begin() ; ii!=cutFlowOrdered->end() ; ++ii)
-	{
-		string scutname = ii->second;
-		double cutValue = cutFlowMap->operator[](scutname);
-		
-		if(scutname=="pT")        d_pTCut = cutValue * m_util->d_toGeV;
-		if(scutname=="eta")       d_etaCut = cutValue;
-		if(scutname=="d0")        d_d0Cut = cutValue;
-		if(scutname=="z0")        d_z0Cut = cutValue;
-		if(scutname=="cosThetaDimu") d_cosThetaDimuCut = cutValue;
-		if(scutname=="imass")     d_imassCut = cutValue * m_util->d_toGeV;
-	}
-	*/
 }
 
 bool selection::pTCut( double pTCutVal, TLorentzVector* pa, TLorentzVector* pb )
@@ -131,15 +108,6 @@ void selection::buildMuonPairMap( TMapii& mupair,
 		if(scutname=="cosThetaDimu") if(!cosThetaDimuCut(cutValue,pa,pb)) { if(b_print) {cout << "failed cosmic cut"   << endl;} return; }
 		if(scutname=="imass")        if(!imassCut(cutValue,pa,pb))        { if(b_print) {cout << "failed imass cut"    << endl;} return; }
 	}
-	/*
-	if(!oppositeCharge(ca,cb))             { if(b_print) {cout << "failed 0 charge cut" << endl;} return; }
-	if(!pTCut(d_pTCut,pa,pb))              { if(b_print) {cout << "failed pT cut"       << endl;} return; }
-	if(!etaCut(d_etaCut,pa,pb))            { if(b_print) {cout << "failed eta cut"      << endl;} return; }
-	if(!d0Cut(d_d0Cut,d0a,d0b))            { if(b_print) {cout << "failed d0 cut"       << endl;} return; }
-	if(!z0Cut(d_z0Cut,z0a,z0b))            { if(b_print) {cout << "failed z0 cut"       << endl;} return; }
-	if(!imassCut(d_imassCut,pa,pb))        { if(b_print) {cout << "failed imass cut"    << endl;} return; }
-	if(!cosThetaDimuCut(d_cosThetaDimuCut,pa,pb)) { if(b_print) {cout << "failed cosmic cut"   << endl;} return; } //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ???
-	*/
 	mupair.insert( make_pair(ia,ib) );
 }
 

@@ -335,7 +335,8 @@ void offlineAnalysis::executeCutFlow()
 		pmu[n]->SetPz( m_offPhys->mu_staco_pz->at(n) );
 		pmu[n]->SetE(  m_offPhys->mu_staco_E->at(n)  );
 	}
-
+		
+		
 	// build the map of the good muon pairs 
 	if(pmu.size()>1)
 	{               
@@ -387,13 +388,12 @@ void offlineAnalysis::executeCutFlow()
 			double d0exPVb = m_offPhys->mu_staco_d0_exPV->at(bi);
 			double z0exPVb = m_offPhys->mu_staco_z0_exPV->at(bi);
 			
-			// primary vertex
-			/*
-			int nPVtracks = m_offPhys->vxp_nTracks; // number of tracks > 2
-			int nPVtype   = m_offPhys->vxp_type;    // ==1
-			double PVz0   = m_offPhys->vxp_z;       // = absolute z position of primary vertex < 150mm
-			double PVz0   = m_offPhys->vxp_err_z;   // = error
-			*/
+			// primary vertex:
+			// at least one primary vtx passes the z selection
+			vector<int>* nPVtracksPtr = m_offPhys->vxp_nTracks; // number of tracks > 2
+			vector<int>* nPVtypePtr   = m_offPhys->vxp_type;    // ==1
+			vector<double>* PVz0Ptr   = m_offPhys->vxp_z;       // = absolute z position of primary vertex < 150mm
+			vector<double>* PVz0errPtr   = m_offPhys->vxp_err_z;   // = error
 			
 			// combined muon ?
 			int isMuComb  = m_offPhys->mu_staco_isCombinedMuon->at(ai);

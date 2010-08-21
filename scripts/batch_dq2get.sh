@@ -1,5 +1,7 @@
 #!/bin/bash/
 
+source $HOME/setupGrid.sh
+
 #---------------------------------------------------
 # job submit    |  run    | sub |   day   |  hour  |
 # script        |  number | set |         |        |
@@ -53,6 +55,8 @@ source dq2get_dataset.sh   153200   02   19082010   2328
 source dq2get_dataset.sh   153200   04   19082010   2328
 source dq2get_dataset.sh   153200   05   19082010   2329
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 source dq2get_dataset.sh   153565   01   19082010   2330
 source dq2get_dataset.sh   153565   02   19082010   2331
 source dq2get_dataset.sh   153565   03   19082010   2332
@@ -95,6 +99,8 @@ source dq2get_dataset.sh   155073   01   19082010   2358
 source dq2get_dataset.sh   155073   02   19082010   2359
 source dq2get_dataset.sh   155073   03   20082010   0000
 source dq2get_dataset.sh   155073   04   20082010   0001
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 source dq2get_dataset.sh   155112   01   20082010   0002 
 source dq2get_dataset.sh   155112   02   20082010   0004
@@ -140,6 +146,8 @@ source dq2get_dataset.sh   156682   01   20082010   0033
 
 source dq2get_dataset.sh   158045   01   20082010   0034
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 source dq2get_dataset.sh   158116   01   20082010   0036
 source dq2get_dataset.sh   158116   02   20082010   0038
 
@@ -156,7 +164,7 @@ source dq2get_dataset.sh   158466   01   20082010   0043
 source dq2get_dataset.sh   158545   01   20082010   0044
 
 source dq2get_dataset.sh   158548   01   20082010   0044
-#source dq2get_dataset.sh   158548   02   20082010  #### resubmitted (3 times)
+#source dq2get_dataset.sh   158548   02   21082010  0203   ### 1/35 FAILED - not resubmitted yet
 
 source dq2get_dataset.sh   158582   01   20082010   0047
 #source dq2get_dataset.sh   158582   02   20082010   0049  ### 1/54 FAILED - not resubmitted yet
@@ -170,7 +178,7 @@ source dq2get_dataset.sh   158975   01   20082010   0055
 source dq2get_dataset.sh   159041   01   20082010   0057
 
 source dq2get_dataset.sh   159086   01   20082010   0058
-source dq2get_dataset.sh   159086   02   20082010   2355
+source dq2get_dataset.sh   159086   02   21082010   0204
 source dq2get_dataset.sh   159086   03   20082010   0102
 
 source dq2get_dataset.sh   159113   01   20082010   0104

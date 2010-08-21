@@ -50,7 +50,7 @@ public:
 	bool prmVtxNtracksCut( double prmVtxNtracksCutVal, int nPVtracks );
 	bool prmVtxTypeCut( double prmVtxTypeCutVal, int nPVtype );
 	bool prmVtxZ0Cut( double prmVtxZ0CutVal, double dPVz0, double dPVz0err );
-	bool isCombMuCut( double isCombMuCutVal, int isCombMu );
+	bool isCombMuCut( double isCombMuCutVal, int isCombMua, int isCombMub );
 	bool nSCThitsCut( double nSCThitsCutVal, int nSCThits );
 	bool nPIXhitsCut( double nPIXhitsCutVal, int nPIXhits );
 	bool pTmatchLowRatioCut( double pTmatchLowRatioCutVal, double me_qOp, double me_theta,
@@ -73,6 +73,8 @@ public:
 						double id_qOp, double id_theta );
 	bool impactParameterCut( double impcatParamZ0CutVal, double impcatParamD0CutVal,
 							 double impPrmZ0, double impPrmD0 );
+	bool pairXXisolation( double isolationCutVal, string sIsoValName,
+						  double pTmua, double pTmub, double pTconea, double pTconeb );
 	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 	

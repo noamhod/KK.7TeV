@@ -20,8 +20,8 @@ public:
 	
 	bool   b_print;
 	
-	TMapsd* m_cutFlowMap;
-	TMapds* m_cutFlowOrdered;
+	TMapsvd* m_cutFlowMapSVD;
+	TMapds*  m_cutFlowOrdered;
 
 public:
 	selection();
@@ -30,10 +30,10 @@ public:
 	void sinitialize();
 	void sfinalize();
 
-	void initSelectionCuts(TMapsd* cutFlowMap, TMapds* cutFlowOrdered); // called by analysis.C
+	void initSelectionCuts(TMapsvd* cutFlowMapSVD, TMapds* cutFlowOrdered); // called by analysis, offlineAnalysis and digestAnalysis
 	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-	// all cuts methods:
+	// * * * simple cuts methods * * *
 	
 	bool isGRLCut( double isGRLCutVal, int isGRL );
 	bool isL1_MU6Cut( double isL1_MU6CutVal, int isL1_MU6 );
@@ -43,26 +43,39 @@ public:
 	bool cosThetaDimuCut( double cosThetaDimuCutVal, TLorentzVector* pa, TLorentzVector* pb );
 	bool imassCut(        double imassCutVal,        TLorentzVector* pa, TLorentzVector* pb );
 
-	bool d0Cut(          double d0CutVal, double d0a, double d0b );
-	bool z0Cut(          double z0CutVal, double z0a, double z0b );
+	bool d0Cut(          double d0CutVal, double d0a, double d0b ); // deprecated !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	bool z0Cut(          double z0CutVal, double z0a, double z0b ); // deprecated !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	bool oppositeChargeCut( double ca, double cb );
 	
-	bool prmVtxNtracksCut( double prmVtxNtracksCutVal, vector<int>* nPVtracksPtr, int& pvtxIndex );
-	bool prmVtxTypeCut( double prmVtxTypeCutVal, vector<int>* nPVtypePtr, int& pvtxIndex );
-	bool prmVtxZ0Cut( double prmVtxZ0CutVal, vector<double>* PVz0Ptr, vector<double>* PVz0errPtr, int& pvtxIndex );
+	bool prmVtxNtracksCut( double prmVtxNtracksCutVal, int nPVtracks );
+	bool prmVtxTypeCut( double prmVtxTypeCutVal, int nPVtype );
+	bool prmVtxZ0Cut( double prmVtxZ0CutVal, double dPVz0, double dPVz0err );
 	bool isCombMuCut( double isCombMuCutVal, int isCombMu );
 	bool nSCThitsCut( double nSCThitsCutVal, int nSCThits );
 	bool nPIXhitsCut( double nPIXhitsCutVal, int nPIXhits );
-	bool nIDhitsCut( double nIDhitsCutVal, int nIDhits );
-	bool pTmatchLowRatioCut();
-	bool pTmatchHighRatioCut();
+	bool pTmatchLowRatioCut( double pTmatchLowRatioCutVal, double me_qOp, double me_theta,
+														   double id_qOp, double id_theta );
+	bool pTmatchHighRatioCut( double pTmatchHighRatioCutVal, double me_qOp, double me_theta,
+															 double id_qOp, double id_theta );
 	bool impcatParamZ0Cut( double impcatParamZ0CutVal, double impPrmZ0);
 	bool impcatParamD0Cut( double impcatParamD0CutVal, double impPrmD0 );
-	bool isolation20Cut( double isolationCutVal, double pTmu, double pTcone );
-	bool isolation30Cut( double isolationCutVal, double pTmu, double pTcone );
-	bool isolation40Cut( double isolationCutVal, double pTmu, double pTcone );
+	bool isolationXXCut( double isolationCutVal, string sIsoValName, double pTmu, double pTcone );
+	
 	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+	// * * * combined cuts methods * * *
+	
+	bool primaryVertexCut( double prmVtxNtracksCutVal, double prmVtxTypeCutVal, double prmVtxZ0CutVal,
+						   vector<int>* pviPVtracks, vector<int>* pviPVtype, vector<float>* pvfPVz0, vector<float>* pvfPVz0err );
+	bool nIDhitsCut( double nSCThitsCutVal, double nPIXhitsCutVal, double nIDhitsCutVal, int nSCThits, int nPIXhits );
+	bool pTmatchingCut( double pTmatchLowRatioCutVal, double pTmatchHighRatioCutVal,
+						double me_qOp, double me_theta,
+						double id_qOp, double id_theta );
+	bool impactParameterCut( double impcatParamZ0CutVal, double impcatParamD0CutVal,
+							 double impPrmZ0, double impPrmD0 );
+	
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+	
 	
 	void buildMuonPairMap(	TMapii& mupair,
 							double ca, int ia,

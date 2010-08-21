@@ -12,7 +12,7 @@ offlineAnalysis::offlineAnalysis()
 	initialize();
 }
 
-offlineAnalysis::offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphicobjs, TFile* treeFile, string sLastCut2Hist)
+offlineAnalysis::offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphicobjs, TFile* treeFile, cutFlowHandler* cutFlowHandler, string sLastCut2Hist)
 {
 	initialize();
 
@@ -25,10 +25,16 @@ offlineAnalysis::offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphi
 	m_mu_staco = new muon_staco( m_offPhys ); // this will also  "turn on" the desired branches (virtual in the base)
 	*/
 
-	m_cutFlowMap         = new TMapsd();
-	m_cutFlowOrdered     = new TMapds();
-	m_cutFlowNumbers     = new TMapsi();
-
+	//m_cutFlowMap         = new TMapsd();
+	//m_cutFlowMapSVD	 = new TMapsvd();
+	//m_cutFlowOrdered = new TMapds();
+	//m_cutFlowNumbers = new TMapsi();
+	
+	m_cutFlowHandler = cutFlowHandler;
+	m_cutFlowMapSVD  = m_cutFlowHandler->getCutFlowMapSVDPtr();
+	m_cutFlowOrdered = m_cutFlowHandler-> getCutFlowOrderedMapPtr();
+	m_cutFlowNumbers = m_cutFlowHandler->getCutFlowNumbersMapPtr();
+	
 	m_graphicobjs = graphicobjs;
 
 	m_fit = new fit();
@@ -36,8 +42,14 @@ offlineAnalysis::offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphi
 	m_offTreeDigest = new offlineTreeDigest( m_offPhys, m_treeFile );
 	
 	m_sLastCut2Hist = sLastCut2Hist;
+	
+	// cut flow has been read out already
+	initSelectionCuts(m_cutFlowMapSVD, m_cutFlowOrdered);
+	//m_offTreeDigest->setBranches();
+	
 }
 
+/*
 void offlineAnalysis::readCutFlow(string sCutFlowFilePath)
 {
 	fstream file;
@@ -97,7 +109,10 @@ void offlineAnalysis::readCutFlow(string sCutFlowFilePath)
 	
 	file.close();
 }
+*/
 
+
+/*
 TMapsd* offlineAnalysis::getCutFlowMapPtr()
 {
 	return m_cutFlowMap;
@@ -107,7 +122,7 @@ TMapds* offlineAnalysis::getCutFlowOrderedPtr()
 {
 	return m_cutFlowOrdered;
 }
-
+*/
 offlineAnalysis::~offlineAnalysis()
 {
 	finalize();
@@ -115,7 +130,7 @@ offlineAnalysis::~offlineAnalysis()
 
 void offlineAnalysis::initialize()
 {
-	nAllEvents = 0;
+	//nAllEvents = 0;
 }
 
 void offlineAnalysis::finalize()
@@ -143,6 +158,7 @@ void offlineAnalysis::fitter()
 	m_fFitted = (TF1*)m_fit->m_fFitted->Clone();
 }
 
+/*
 void offlineAnalysis::printCutFlowNumbers(Long64_t chainEntries)
 {
 	cout << "+------------------------------------------------" << endl;
@@ -157,6 +173,7 @@ void offlineAnalysis::printCutFlowNumbers(Long64_t chainEntries)
 	}
 	cout << "+------------------------------------------------" << endl;
 }
+*/
 
 void offlineAnalysis::fillCutFlow(string sCurrentCutName, TMapsd& values2fill)
 {
@@ -264,7 +281,7 @@ void offlineAnalysis::executeBasic()
 			cout << "\t pTa=" << pTa  << endl;
 			cout << "\t pTb=" << pTb  << endl;
 			cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << endl;
-
+			
 			// fill the histos
 			if( m_offPhys->mu_staco_charge->at(ai)<0. )
 			{
@@ -311,9 +328,9 @@ void offlineAnalysis::executeAdvanced()
 
 void offlineAnalysis::executeCutFlow()
 {
-	///////////////////////
-	nAllEvents++; /////////
-	///////////////////////
+	/////////////////////////////////////////
+	m_cutFlowHandler->nAllEvents++; /////////
+	/////////////////////////////////////////
 
 	// local variables
 	TMapii      allmupairMap;
@@ -388,37 +405,39 @@ void offlineAnalysis::executeCutFlow()
 			double d0exPVb = m_offPhys->mu_staco_d0_exPV->at(bi);
 			double z0exPVb = m_offPhys->mu_staco_z0_exPV->at(bi);
 			
+			
 			// primary vertex:
 			// at least one primary vtx passes the z selection
 			vector<int>* nPVtracksPtr = m_offPhys->vxp_nTracks; // number of tracks > 2
 			vector<int>* nPVtypePtr   = m_offPhys->vxp_type;    // ==1
-			vector<double>* PVz0Ptr   = m_offPhys->vxp_z;       // = absolute z position of primary vertex < 150mm
-			vector<double>* PVz0errPtr   = m_offPhys->vxp_err_z;   // = error
+			vector<float>* PVz0Ptr   = m_offPhys->vxp_z;       // = absolute z position of primary vertex < 150mm
+			vector<float>* PVz0errPtr   = m_offPhys->vxp_err_z;   // = error
 			
+			/*
 			// combined muon ?
 			int isMuComb  = m_offPhys->mu_staco_isCombinedMuon->at(ai);
 			
 			// inner detector hits
 			int nSCThits  = m_offPhys->mu_staco_nSCTHits->at(ai); //  SCT hits >=4
-			int nPIXhits  = m_offPhys->mu_staco_nPixHitss->at(ai); // pixel hits >=1
+			int nPIXhits  = m_offPhys->mu_staco_nPixHits->at(ai); // pixel hits >=1
 			int nIDhits   = nSCThits+nPIXhits; // pixel+SCT hits >=5
 			
 			// ID - MS pT matching
-			double qOp_me = m_offPhys->mu_staco_me_qover_p->at(ai);
-			double qOp_id = m_offPhys->mu_staco_id_qover_p->at(ai);
+			double qOp_me = m_offPhys->mu_staco_me_qoverp->at(ai);
+			double qOp_id = m_offPhys->mu_staco_id_qoverp->at(ai);
 			double theta_me = m_offPhys->mu_staco_me_theta->at(ai);
 			double theta_id = m_offPhys->mu_staco_id_theta->at(ai);
 			
 			// impact parameter
-			double impPrmZ0 = offPhys->mu_staco_z0_exPV->at(ai);
-			double impPrmZ0 = offPhys->mu_staco_d0_exPV->at(ai);
+			double impPrmZ0 = m_offPhys->mu_staco_z0_exPV->at(ai);
+			double impPrmD0 = m_offPhys->mu_staco_d0_exPV->at(ai);
 			
 			// isolation
-			double mu_pT    = offPhys->mu_staco_pt->at(ai);
-			double pTcone20 = offPhys->mu_staco_ptcone20->at(ai);
-			double pTcone30 = offPhys->mu_staco_ptcone30->at(ai);
-			double pTcone40 = offPhys->mu_staco_ptcone40->at(ai);
-			
+			double mu_pT    = m_offPhys->mu_staco_pt->at(ai);
+			double pTcone20 = m_offPhys->mu_staco_ptcone20->at(ai);
+			double pTcone30 = m_offPhys->mu_staco_ptcone30->at(ai);
+			double pTcone40 = m_offPhys->mu_staco_ptcone40->at(ai);
+			*/
 			
 			// fill the kinematic variables of this pair for the digested tree
 			kinematicVariables.insert( make_pair("imass", current_imass) );
@@ -429,7 +448,6 @@ void offlineAnalysis::executeCutFlow()
 			TMapsd values2fill;
 			values2fill.insert( make_pair( "imass",current_imass ) );
 			values2fill.insert( make_pair( "pT",current_mu_pT ) );
-			
 			
 
 			bool passCutFlow    = true;
@@ -448,44 +466,58 @@ void offlineAnalysis::executeCutFlow()
 
 				if(sorderedcutname=="GRL")
 				{
-					//passCurrentCut = (isGRL==(int)(*m_cutFlowMap)[sorderedcutname]) ? true : false;
-					passCurrentCut = ( isGRLCut((*m_cutFlowMap)[sorderedcutname], isGRL) ) ? true : false;
+					passCurrentCut = ( isGRLCut((*m_cutFlowMapSVD)[sorderedcutname][0], isGRL) ) ? true : false;
 				}
 
 				if(sorderedcutname=="L1_MU6")
 				{
-					//passCurrentCut = (m_offPhys->L1_MU6==(int)(*m_cutFlowMap)[sorderedcutname]) ? true : false;
-					passCurrentCut = ( isL1_MU6Cut((*m_cutFlowMap)[sorderedcutname], isL1MU6) ) ? true : false;
+					passCurrentCut = ( isL1_MU6Cut((*m_cutFlowMapSVD)[sorderedcutname][0], isL1MU6) ) ? true : false;
 				}		
 
 				if(sorderedcutname=="imass")
 				{
-					passCurrentCut = ( imassCut((*m_cutFlowMap)[sorderedcutname], pmu[ai], pmu[bi]) ) ? true : false;
+					passCurrentCut = ( imassCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
 				}
 
 				if(sorderedcutname=="pT")
 				{
-					passCurrentCut = ( pTCut((*m_cutFlowMap)[sorderedcutname], pmu[ai], pmu[bi]) ) ? true : false;
+					passCurrentCut = ( pTCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
 				}
 
 				if(sorderedcutname=="eta")
 				{
-					passCurrentCut = ( etaCut((*m_cutFlowMap)[sorderedcutname], pmu[ai], pmu[bi]) ) ? true : false;
+					passCurrentCut = ( etaCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
 				}
 
 				if(sorderedcutname=="cosThetaDimu")
 				{
-					passCurrentCut = ( cosThetaDimuCut((*m_cutFlowMap)[sorderedcutname], pmu[ai], pmu[bi]) ) ? true : false;
+					passCurrentCut = ( cosThetaDimuCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
 				}
 
 				if(sorderedcutname=="d0")
 				{
-					passCurrentCut = ( d0Cut((*m_cutFlowMap)[sorderedcutname], d0exPVa, d0exPVb) ) ? true : false;
+					passCurrentCut = ( d0Cut((*m_cutFlowMapSVD)[sorderedcutname][0], d0exPVa, d0exPVb) ) ? true : false;
 				}
 
 				if(sorderedcutname=="z0")
 				{
-					passCurrentCut = ( z0Cut((*m_cutFlowMap)[sorderedcutname], z0exPVa, z0exPVb) ) ? true : false;
+					passCurrentCut = ( z0Cut((*m_cutFlowMapSVD)[sorderedcutname][0], z0exPVa, z0exPVb) ) ? true : false;
+				}
+				
+				if(sorderedcutname=="PV")
+				{
+					///////////////////////////////////////////////////////////////////////////////////////
+					if( current_imass > 60000. ) b_print = true;
+					///////////////////////////////////////////////////////////////////////////////////////
+				
+					double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
+					double cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
+					double cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
+					passCurrentCut = ( primaryVertexCut(cutval1,cutval2,cutval3, nPVtracksPtr, nPVtypePtr, PVz0Ptr, PVz0errPtr) ) ? true : false;
+					
+					/////////////////////////////////////////
+					if(b_print) b_print = false;
+					/////////////////////////////////////////
 				}
 
 				passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;

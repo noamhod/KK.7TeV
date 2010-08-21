@@ -202,9 +202,9 @@ void graphicObjects::drawHistos(TDirectory* tdir)
         cnv_costh->Write();
 }
 
-void graphicObjects::bookHistosMap(TMapsd* cutFlowMap, TMapds* cutFlowOrdered, TDirectory* tdir)
+void graphicObjects::bookHistosMap(TMapds* cutFlowOrdered, TDirectory* tdir)
 {
-	if(cutFlowMap==NULL || tdir==NULL) return;
+	if(tdir==NULL) return;
 
 	tdir->cd();
 
@@ -229,9 +229,9 @@ void graphicObjects::bookHistosMap(TMapsd* cutFlowMap, TMapds* cutFlowOrdered, T
 	}
 }
 
-void graphicObjects::drawHistosMap(TMapsd* cutFlowMap, TMapds* cutFlowOrdered, TDirectory* tdir)
+void graphicObjects::drawHistosMap(TMapds* cutFlowOrdered, TDirectory* tdir)
 {
-	if(cutFlowMap==NULL || tdir==NULL) return;
+	if(tdir==NULL) return;
 	
 	tdir->cd();
 

@@ -109,8 +109,8 @@ class graphicObjects : public utilities
 		void bookFitHistos(TDirectory* tdir);
 		void drawFitHistos(TDirectory* tdir, TF1* fGuess, TF1* fFitted);
 
-		void bookHistosMap(TMapsd* cutFlowMap, TMapds* cutFlowOrdered, TDirectory* tdir);
-		void drawHistosMap(TMapsd* cutFlowMap, TMapds* cutFlowOrdered, TDirectory* tdir);
+		void bookHistosMap(TMapds* cutFlowOrdered, TDirectory* tdir);
+		void drawHistosMap(TMapds* cutFlowOrdered, TDirectory* tdir);
 
 	private:
 

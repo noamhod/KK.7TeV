@@ -55,8 +55,8 @@ typedef map<string, int>        TMapsi;
 typedef map<string, bool>       TMapsb;
 typedef map<double, string>     TMapds;
 
-typedef map<string, vector<double>>  TMapsvd;
-typedef map<string, vector<double>*> TMapsP2vd;
+typedef map<string, vector<double> >  TMapsvd;
+typedef map<string, vector<double>* > TMapsP2vd;
 
 #define utilities_cxx
 #include "utilities.C"

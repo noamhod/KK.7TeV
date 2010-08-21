@@ -116,11 +116,11 @@ bool selection::prmVtxZ0Cut( double prmVtxZ0CutVal, double dPVz0, double dPVz0er
 	return ( fabs(dPVz0) < prmVtxZ0CutVal ) ? true : false;
 }
 
-bool selection::isCombMuCut( double isCombMuCutVal, int isCombMu )
+bool selection::isCombMuCut( double isCombMuCutVal, int isCombMua, int isCombMub )
 {
 	/*mu_staco_isCombinedMuon*/
-	if(b_print) cout << "in isCombMuCut: isCombMu=" << isCombMu << endl;
-	return ( (double)isCombMu == isCombMuCutVal ) ? true : false;
+	if(b_print) cout << "in isCombMuCut: isCombMua=" << isCombMua << ", isCombMub=" << isCombMub << endl;
+	return ( (double)isCombMua == isCombMuCutVal || (double)isCombMub == isCombMuCutVal ) ? true : false;
 }
 
 bool selection::nSCThitsCut( double nSCThitsCutVal, int nSCThits )
@@ -206,15 +206,15 @@ bool selection::primaryVertexCut( double prmVtxNtracksCutVal, double prmVtxTypeC
 	
 	int nPassed = 0;
 
-	bool bPassed = false;
+	bool bPassed = true;
 	for(int i=0 ; i<(int)pviPVtracks->size() ; i++)
 	{
 		bPassed = true;
 	
 		nPVtracks = pviPVtracks->at(i);
 		nPVtype   = pviPVtype->at(i);
-		dPVz0 = pvfPVz0->at(i);
-		dPVz0err = pvfPVz0err->at(i);
+		dPVz0     = pvfPVz0->at(i);
+		dPVz0err  = pvfPVz0err->at(i);
 	
 		if( !prmVtxNtracksCut(prmVtxNtracksCutVal, nPVtracks) )
 		{
@@ -235,7 +235,7 @@ bool selection::primaryVertexCut( double prmVtxNtracksCutVal, double prmVtxTypeC
 		nPassed += (bPassed) ? 1 : 0;
 	}
 	
-	if(b_print) { cout << "\t\tnPassed=" << nPassed << endl; b_print = false; }
+	if(b_print) { cout << "\t\tnPassed=" << nPassed << endl; }
 	
 	return (nPassed>0) ? true : false; // MOVE THIS HARD-CODED VALUE TO THE CUTFLOW FILE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
@@ -304,6 +304,24 @@ bool selection::impactParameterCut( double impcatParamZ0CutVal, double impcatPar
 	return (bPassed) ? true : false;
 }
 
+bool selection::pairXXisolation( double isolationCutVal, string sIsoValName,
+								 double pTmua, double pTmub, double pTconea, double pTconeb )
+{
+	bool bPassed = true;
+	
+	if( !isolationXXCut(isolationCutVal,sIsoValName,pTmua,pTconea) )
+	{
+		bPassed = false;
+		if(b_print) cout << "in pairXXisolation:isolationXXCut: mu(A)" << endl;
+	}
+	if( !isolationXXCut(isolationCutVal,sIsoValName,pTmub,pTconeb) )
+	{
+		bPassed = false;
+		if(b_print) cout << "in pairXXisolation:isolationXXCut: mu(B)" << endl;
+	}
+	
+	return (bPassed) ? true : false;
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 

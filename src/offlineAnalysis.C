@@ -408,20 +408,25 @@ void offlineAnalysis::executeCutFlow()
 			
 			// primary vertex:
 			// at least one primary vtx passes the z selection
-			vector<int>* nPVtracksPtr = m_offPhys->vxp_nTracks; // number of tracks > 2
-			vector<int>* nPVtypePtr   = m_offPhys->vxp_type;    // ==1
-			vector<float>* PVz0Ptr   = m_offPhys->vxp_z;       // = absolute z position of primary vertex < 150mm
+			vector<int>*   nPVtracksPtr = m_offPhys->vxp_nTracks; // number of tracks > 2
+			vector<int>*   nPVtypePtr   = m_offPhys->vxp_type;    // ==1
+			vector<float>* PVz0Ptr      = m_offPhys->vxp_z;       // = absolute z position of primary vertex < 150mm
 			vector<float>* PVz0errPtr   = m_offPhys->vxp_err_z;   // = error
 			
-			/*
 			// combined muon ?
-			int isMuComb  = m_offPhys->mu_staco_isCombinedMuon->at(ai);
+			int isMuaComb  = m_offPhys->mu_staco_isCombinedMuon->at(ai);
+			int isMubComb  = m_offPhys->mu_staco_isCombinedMuon->at(bi);
+			
 			
 			// inner detector hits
-			int nSCThits  = m_offPhys->mu_staco_nSCTHits->at(ai); //  SCT hits >=4
-			int nPIXhits  = m_offPhys->mu_staco_nPixHits->at(ai); // pixel hits >=1
-			int nIDhits   = nSCThits+nPIXhits; // pixel+SCT hits >=5
+			int nSCThitsMua  = m_offPhys->mu_staco_nSCTHits->at(ai); //  SCT hits >=4
+			int nSCThitsMub  = m_offPhys->mu_staco_nSCTHits->at(bi); //  SCT hits >=4
+			int nPIXhitsMua  = m_offPhys->mu_staco_nPixHits->at(ai); // pixel hits >=1
+			int nPIXhitsMub  = m_offPhys->mu_staco_nPixHits->at(bi); // pixel hits >=1
+			int nIDhitsMua   = nSCThitsMua+nPIXhitsMua; // pixel+SCT hits >=5
+			int nIDhitsMub   = nSCThitsMub+nPIXhitsMub; // pixel+SCT hits >=5
 			
+			/*
 			// ID - MS pT matching
 			double qOp_me = m_offPhys->mu_staco_me_qoverp->at(ai);
 			double qOp_id = m_offPhys->mu_staco_id_qoverp->at(ai);
@@ -431,13 +436,16 @@ void offlineAnalysis::executeCutFlow()
 			// impact parameter
 			double impPrmZ0 = m_offPhys->mu_staco_z0_exPV->at(ai);
 			double impPrmD0 = m_offPhys->mu_staco_d0_exPV->at(ai);
-			
-			// isolation
-			double mu_pT    = m_offPhys->mu_staco_pt->at(ai);
-			double pTcone20 = m_offPhys->mu_staco_ptcone20->at(ai);
-			double pTcone30 = m_offPhys->mu_staco_ptcone30->at(ai);
-			double pTcone40 = m_offPhys->mu_staco_ptcone40->at(ai);
 			*/
+			// isolation
+			double mu_pTa   = m_offPhys->mu_staco_pt->at(ai);
+			double mu_pTb   = m_offPhys->mu_staco_pt->at(bi);
+			double pTcone20a = m_offPhys->mu_staco_ptcone20->at(ai);
+			double pTcone20b = m_offPhys->mu_staco_ptcone20->at(bi);
+			double pTcone30a = m_offPhys->mu_staco_ptcone30->at(ai);
+			double pTcone30b = m_offPhys->mu_staco_ptcone30->at(bi);
+			double pTcone40a = m_offPhys->mu_staco_ptcone40->at(ai);
+			double pTcone40b = m_offPhys->mu_staco_ptcone40->at(bi);
 			
 			// fill the kinematic variables of this pair for the digested tree
 			kinematicVariables.insert( make_pair("imass", current_imass) );
@@ -506,18 +514,36 @@ void offlineAnalysis::executeCutFlow()
 				
 				if(sorderedcutname=="PV")
 				{
-					///////////////////////////////////////////////////////////////////////////////////////
-					if( current_imass > 60000. ) b_print = true;
-					///////////////////////////////////////////////////////////////////////////////////////
-				
 					double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 					double cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
 					double cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
 					passCurrentCut = ( primaryVertexCut(cutval1,cutval2,cutval3, nPVtracksPtr, nPVtypePtr, PVz0Ptr, PVz0errPtr) ) ? true : false;
-					
-					/////////////////////////////////////////
-					if(b_print) b_print = false;
-					/////////////////////////////////////////
+				}
+				
+				if(sorderedcutname=="isCombMu")
+				{
+					passCurrentCut = ( isCombMuCut((*m_cutFlowMapSVD)[sorderedcutname][0],isMuaComb,isMubComb) ) ? true : false;
+				}
+				/*
+				if(sorderedcutname=="idHits")
+				{
+					double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
+					double cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
+					double cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
+					if(passCutFlow)
+					{
+						cout << "nSCThits=" << nSCThits << ", nPIXhits=" << nPIXhits << ", nIDhits=" << nSCThits+nPIXhits << endl;
+					}
+					passCurrentCut = ( nIDhitsCut( cutval1,cutval2,cutval3,nSCThits,nPIXhits ) ) ? true : false;
+				}
+				*/
+				
+				if(sorderedcutname=="isolation30")
+				{
+					passCurrentCut =
+					(
+						pairXXisolation((*m_cutFlowMapSVD)[sorderedcutname][0],"isolation30",mu_pTa,mu_pTb,pTcone20a,pTcone20b)
+					) ? true : false;
 				}
 
 				passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;

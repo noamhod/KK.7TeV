@@ -47,9 +47,9 @@ public:
 	bool z0Cut(          double z0CutVal, double z0a, double z0b );
 	bool oppositeChargeCut( double ca, double cb );
 	
-	bool prmVtxNtracksCut( double prmVtxNtracksCutVal, int nPVtracks );
-	bool prmVtxTypeCut( double prmVtxTypeCutVal, int nPVtype );
-	bool prmVtxZ0Cut( double prmVtxZ0CutVal, double dPVz0 );
+	bool prmVtxNtracksCut( double prmVtxNtracksCutVal, vector<int>* nPVtracksPtr, int& pvtxIndex );
+	bool prmVtxTypeCut( double prmVtxTypeCutVal, vector<int>* nPVtypePtr, int& pvtxIndex );
+	bool prmVtxZ0Cut( double prmVtxZ0CutVal, vector<double>* PVz0Ptr, vector<double>* PVz0errPtr, int& pvtxIndex );
 	bool isCombMuCut( double isCombMuCutVal, int isCombMu );
 	bool nSCThitsCut( double nSCThitsCutVal, int nSCThits );
 	bool nPIXhitsCut( double nPIXhitsCutVal, int nPIXhits );

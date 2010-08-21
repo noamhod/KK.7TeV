@@ -93,25 +93,25 @@ bool selection::z0Cut( double z0CutVal, double z0a, double z0b )
 	return ( fabs(z0a)<=z0CutVal  &&  fabs(z0b)<=z0CutVal ) ? true : false;
 }
 
-bool selection::prmVtxNtracksCut( double prmVtxNtracksCutVal, int nPVtracks )
+bool selection::prmVtxNtracksCut( double prmVtxNtracksCutVal, vector<int>* nPVtracksPtr, int& pvtxIndex )
 {
 	/*vxp_nTracks=number of tracks > 2*/
-	if(b_print) cout << "in prmVtxNtracksCut: nPVtracks=" << nPVtracks << endl;
-	return ( (double)nPVtracks > prmVtxNtracksCutVal ) ? true : false;
+//	if(b_print) cout << "in prmVtxNtracksCut: nPVtracks=" << nPVtracks << endl;
+//	return ( (double)nPVtracks > prmVtxNtracksCutVal ) ? true : false;
 }
 
-bool selection::prmVtxTypeCut( double prmVtxTypeCutVal, int nPVtype )
+bool selection::prmVtxTypeCut( double prmVtxTypeCutVal, vector<int>* nPVtypePtr, int& pvtxIndex )
 {
 	/*vxp_type==1*/
-	if(b_print) cout << "in prmVtxTypeCut: nPVtype=" << nPVtype << endl;
-	return ( (double)nPVtype == prmVtxTypeCutVal ) ? true : false;
+//	if(b_print) cout << "in prmVtxTypeCut: nPVtype=" << nPVtype << endl;
+//	return ( (double)nPVtype == prmVtxTypeCutVal ) ? true : false;
 }
 
-bool selection::prmVtxZ0Cut( double prmVtxZ0CutVal, double dPVz0 )
+bool selection::prmVtxZ0Cut( double prmVtxZ0CutVal, vector<double>* PVz0Ptr, vector<double>* PVz0errPtr, int& pvtxIndex )
 {
 	/*vxp_z=absolute z position of primary vertex < 150mms*/
-	if(b_print) cout << "in prmVtxZ0Cut: dPVz0=" << dPVz0 << endl;
-	return ( dPVz0 < prmVtxZ0CutVal ) ? true : false;
+//	if(b_print) cout << "in prmVtxZ0Cut: dPVz0=" << dPVz0 << endl;
+//	return ( dPVz0 < prmVtxZ0CutVal ) ? true : false;
 }
 
 bool selection::isCombMuCut( double isCombMuCutVal, int isCombMu )

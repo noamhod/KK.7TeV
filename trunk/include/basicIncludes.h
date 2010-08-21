@@ -45,13 +45,18 @@
 using namespace std;
 
 typedef map<int, int>           TMapii;
+typedef map<double, double>     TMapdd;
+
 typedef vector<TLorentzVector*> TVectorP2VL;
 typedef map<string, TH1D*>      TMapSP2TH1D;
+
 typedef map<string, double>     TMapsd;
 typedef map<string, int>        TMapsi;
-typedef map<double, string>     TMapds;
-typedef map<double, double>     TMapdd;
 typedef map<string, bool>       TMapsb;
+typedef map<double, string>     TMapds;
+
+typedef map<string, vector<double>>  TMapsvd;
+typedef map<string, vector<double>*> TMapsP2vd;
 
 #define utilities_cxx
 #include "utilities.C"

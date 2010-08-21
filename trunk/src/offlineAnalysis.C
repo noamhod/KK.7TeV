@@ -581,18 +581,48 @@ void offlineAnalysis::executeCutFlow()
 
 				
 				passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
-				if(passCutFlow) fillCutFlow(sorderedcutname, values2fill); // stop at this(sorderedcutname) cut
-				if(m_sLastCut2Hist==sorderedcutname && passCutFlow) m_fit->fillXvec( current_imass );
-				cutFlowDecision.insert( make_pair(sorderedcutname, passCurrentCut) );
+				if(passCutFlow)
+				{
+					//////////////////////////////////////////////////////
+					// for the cut flow: /////////////////////////////////
+					// stop at this(sorderedcutname) cut /////////////////
+					fillCutFlow(sorderedcutname, values2fill); ///////////
+					//////////////////////////////////////////////////////
+
+					//////////////////////////////////////////////////////////////////////
+					// count the numbers: ////////////////////////////////////////////////
+					if(passCutFlow) m_cutFlowNumbers->operator[](sorderedcutname) ++; ////
+					//////////////////////////////////////////////////////////////////////
+
+					////////////////////////////////////////////////////////////////////
+					if(m_sLastCut2Hist==sorderedcutname) ///////////////////////////////
+					{
+						// for the final histograms:
+						// i.e., not the curFlow histos
+						m_graphicobjs->h1_eta->Fill( current_mu_eta );
+						m_graphicobjs->h1_costh->Fill( current_mu_cosTheta );
+						m_graphicobjs->h1_pT->Fill( current_mu_pT );
+						m_graphicobjs->h1_imass->Fill( current_imass );
+					
+						cout << "$$$$$$$$$ dimuon $$$$$$$$$" << endl;
+						cout << "\t im=" << current_imass << endl;
+						cout << "\t pTmu=" << current_mu_pT  << endl;
+						cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << endl;
+						
+						// fill the xVector for the ML fit:
+						m_fit->fillXvec( current_imass );
+					}
+					///////////////////////////////////////////////////////////////////
+				} // end if(passCutFlow)
 				
-				// count the numbers
-				if(passCutFlow) m_cutFlowNumbers->operator[](sorderedcutname) ++;
-			}
-		}
+				// fill the decision
+				cutFlowDecision.insert( make_pair(sorderedcutname, passCurrentCut) );
+			} // end for(m_cutFlowOrdered)
+		} // for(allmupairMap)
 		////////////////////////////////////////////////////////////////////////////
 		m_offTreeDigest->fill(cutFlowDecision, kinematicVariables); ////////////////
 		////////////////////////////////////////////////////////////////////////////
-	}
+	} // end if(allmupairMap.size()>0)
 	else // no mu pair(s) at all
 	{
 		//////////////////////////////////////////////////

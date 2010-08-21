@@ -21,7 +21,8 @@ class offlineControl : public offlineChains, public offlineAnalysis
 	public:
 		// from MakeClass
 		offlinePhysics* m_offPhys;
-
+		cutFlowHandler* m_cutFlowHandler;
+		
 		// pointers
 		TFile*          m_histfile;
 		TFile*          m_treefile;

@@ -19,6 +19,9 @@
 #define offlineTreeDigest_cxx
 #include "offlineTreeDigest.C"
 
+#define cutFlowHandler_cxx
+#include "cutFlowHandler.C"
+
 /*
 #define muon_staco_cxx
 #include "muon_staco.C"
@@ -35,6 +38,7 @@ class offlineAnalysis : public offlinePhysics, public selection, public graphicO
 	public:
 		// pointers to classes
 		graphicObjects* m_graphicobjs;
+		cutFlowHandler* m_cutFlowHandler;
 
 		fit* m_fit;
 		TF1* m_fFitted;
@@ -51,17 +55,18 @@ class offlineAnalysis : public offlinePhysics, public selection, public graphicO
 		offlineTreeDigest* m_offTreeDigest;
 
 		// variables
-		TMapsd*         m_cutFlowMap;
-		TMapds*         m_cutFlowOrdered;
-		TMapsi*         m_cutFlowNumbers;
+		//TMapsd*  m_cutFlowMap;
+		TMapsvd* m_cutFlowMapSVD;
+		TMapds*  m_cutFlowOrdered;
+		TMapsi*  m_cutFlowNumbers;
 		
 		Bool_t b_isGRL;
-		int    nAllEvents;
+		//int    nAllEvents;
 		string m_sLastCut2Hist;
 
 	public:
 		offlineAnalysis();
-		offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphicobjs, TFile* treeFile, string sLastCut2Hist = "GRL");
+		offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphicobjs, TFile* treeFile, cutFlowHandler* m_cutFlowHandler, string sLastCut2Hist = "GRL");
 		~offlineAnalysis();
 
 		void initialize();
@@ -71,16 +76,16 @@ class offlineAnalysis : public offlinePhysics, public selection, public graphicO
 		
 		void fitter();
 
-		void printCutFlowNumbers(Long64_t chainEntries);
+		//void printCutFlowNumbers(Long64_t chainEntries);
 		void fillCutFlow(string sCurrentCutName, TMapsd& values2fill);
 
 		void executeBasic();
 		void executeCutFlow();
 		void write();
 
-		void    readCutFlow(string sCutFlowFilePath);
-		TMapsd* getCutFlowMapPtr();
-		TMapds* getCutFlowOrderedPtr();
+		//void    readCutFlow(string sCutFlowFilePath);
+		//TMapsd* getCutFlowMapPtr();
+		//TMapds* getCutFlowOrderedPtr();
 
 	private:
 

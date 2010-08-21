@@ -28,9 +28,11 @@ offlineTreeDigest::offlineTreeDigest(offlinePhysics* offPhys, TFile* treeFile)
 	m_tree = new TTree("digest", "digest");
 
 	//m_tree->SetMaxTreeSize(50000000); // 50Mb per file
+	
+	setBranches();
 }
 
-void offlineTreeDigest::setBranches(TMapds* cutFlowOrdered)
+void offlineTreeDigest::setBranches()
 {	
 	// run variables branches
 	m_tree->Branch( "run_RunNumber", &m_RunNumber );
@@ -44,23 +46,6 @@ void offlineTreeDigest::setBranches(TMapds* cutFlowOrdered)
 	m_tree->Branch( "kin_cosTheta_mu",  &m_mu_cosTheta );
 	
 	// set cut flow branches
-	/*
-	for(TMapds::iterator it=cutFlowOrdered->begin() ; it!=cutFlowOrdered->end() ; ++it)
-	{
-		//double snumber = it->first;
-		string sname = it->second;
-		
-		if(sname=="oppositeCharcge")      m_tree->Branch( ("is_" + sname).c_str(), &b_null );
-		if(sname=="GRL")       m_tree->Branch( ("is_" + sname).c_str(), &b_GRL );
-		if(sname=="L1_MU6")    m_tree->Branch( ("is_" + sname).c_str(), &b_L1_MU6 );
-		if(sname=="z0")        m_tree->Branch( ("is_" + sname).c_str(), &b_z0 );
-		if(sname=="d0")        m_tree->Branch( ("is_" + sname).c_str(), &b_d0 );
-		if(sname=="cosThetaDimu") m_tree->Branch( ("is_" + sname).c_str(), &b_cosThetaDimuCut );
-		if(sname=="imass")     m_tree->Branch( ("is_" + sname).c_str(), &b_imass );
-		if(sname=="pT")        m_tree->Branch( ("is_" + sname).c_str(), &b_pT );
-		if(sname=="eta")       m_tree->Branch( ("is_" + sname).c_str(), &b_eta );
-	}
-	*/
 	m_tree->Branch( "is_null", &b_null );
 	m_tree->Branch( "is_GRL", &b_GRL );
 	m_tree->Branch( "is_L1_MU6", &b_L1_MU6 );

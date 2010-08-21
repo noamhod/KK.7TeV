@@ -30,11 +30,12 @@ offlineControl::offlineControl()
 	m_graphics = new graphicObjects();
 	m_graphics->setStyle();
 
-	m_offlineAnalysis = new offlineAnalysis( m_offPhys, m_graphics, m_treefile, /*"cosThetaDimu"*/ "GRL" );
-
 	// read the cut flow (ownership: selection class which offlineAnalysis inherits from)
 	str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
-	m_offlineAnalysis->readCutFlow( str );
+	m_cutFlowHandler = new cutFlowHandler(str);
+	
+	string sLastCut2Hist = "PV"; // "cosThetaDimu"
+	m_offlineAnalysis = new offlineAnalysis( m_offPhys, m_graphics, m_treefile, m_cutFlowHandler, sLastCut2Hist );
 
 	book();
 }
@@ -94,17 +95,17 @@ void offlineControl::book()
 	m_graphics->bookFitHistos(m_dirFit);
 
 	m_dirCutFlow = m_histfile->mkdir("cutFlow");
-	m_graphics->bookHistosMap( m_offlineAnalysis->getCutFlowMapPtr(), m_offlineAnalysis->getCutFlowOrderedPtr(), m_dirCutFlow );
+	m_graphics->bookHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_dirCutFlow );
 }
 
 void offlineControl::draw()
 {
 	m_graphics->drawBareHistos(m_dirNoCuts);
 	m_graphics->drawHistos(m_dirAllCuts);
-	m_graphics->drawHistosMap( m_offlineAnalysis->getCutFlowMapPtr(), m_offlineAnalysis->getCutFlowOrderedPtr(), m_dirCutFlow );
+	m_graphics->drawHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_dirCutFlow );
 	m_graphics->drawFitHistos(m_dirFit, m_offlineAnalysis->m_fGuess, m_offlineAnalysis->m_fFitted);
 
-	m_offlineAnalysis->printCutFlowNumbers(l64t_nentries);
+	m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
 }
 
 void offlineControl::analyze()
@@ -139,7 +140,7 @@ void offlineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		// if (Cut(l64t_ientry) < 0) continue;
 		
 		if(l64t_jentry%10000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_offPhys->RunNumber << "\tlumiblock=" << m_offPhys->lbn << endl;
-		if(l64t_jentry%l64t_mod==0) m_offlineAnalysis->printCutFlowNumbers(l64t_nentries);
+		if(l64t_jentry%l64t_mod==0) m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
 		
 		analyze();
 	}

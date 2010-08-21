@@ -426,17 +426,23 @@ void offlineAnalysis::executeCutFlow()
 			int nIDhitsMua   = nSCThitsMua+nPIXhitsMua; // pixel+SCT hits >=5
 			int nIDhitsMub   = nSCThitsMub+nPIXhitsMub; // pixel+SCT hits >=5
 			
-			/*
-			// ID - MS pT matching
-			double qOp_me = m_offPhys->mu_staco_me_qoverp->at(ai);
-			double qOp_id = m_offPhys->mu_staco_id_qoverp->at(ai);
-			double theta_me = m_offPhys->mu_staco_me_theta->at(ai);
-			double theta_id = m_offPhys->mu_staco_id_theta->at(ai);
 			
+			// ID - MS pT matching: pT=|p|*sin(theta), qOp=charge/|p|
+			double me_qOp_a   = m_offPhys->mu_staco_me_qoverp->at(ai);
+			double id_qOp_a   = m_offPhys->mu_staco_id_qoverp->at(ai);
+			double me_theta_a = m_offPhys->mu_staco_me_theta->at(ai);
+			double id_theta_a = m_offPhys->mu_staco_id_theta->at(ai);
+			double me_qOp_b   = m_offPhys->mu_staco_me_qoverp->at(bi);
+			double id_qOp_b   = m_offPhys->mu_staco_id_qoverp->at(bi);
+			double me_theta_b = m_offPhys->mu_staco_me_theta->at(bi);
+			double id_theta_b = m_offPhys->mu_staco_id_theta->at(bi);
+			
+			/*
 			// impact parameter
 			double impPrmZ0 = m_offPhys->mu_staco_z0_exPV->at(ai);
 			double impPrmD0 = m_offPhys->mu_staco_d0_exPV->at(ai);
 			*/
+			
 			// isolation
 			double mu_pTa   = m_offPhys->mu_staco_pt->at(ai);
 			double mu_pTb   = m_offPhys->mu_staco_pt->at(bi);
@@ -542,10 +548,38 @@ void offlineAnalysis::executeCutFlow()
 				{
 					passCurrentCut =
 					(
-						pairXXisolation((*m_cutFlowMapSVD)[sorderedcutname][0],"isolation30",mu_pTa,mu_pTb,pTcone20a,pTcone20b)
+						pairXXisolation((*m_cutFlowMapSVD)[sorderedcutname][0],"isolation30",mu_pTa,mu_pTb,pTcone30a,pTcone30b)
 					) ? true : false;
 				}
+				
+				if(sorderedcutname=="pTmatchingRatio")
+				{
+					double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
+					double cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
+					passCurrentCut =
+					(
+						pTmatchingRatioCut( cutval1,cutval2,
+											me_qOp_a,me_theta_a,id_qOp_a,id_theta_a,
+											me_qOp_b,me_theta_b,id_qOp_b,id_theta_b)
+					) ? true : false;
+					
+					/*
+					if(passCutFlow)
+					{
+						double pT_id = (id_qOp_a!=0) ? fabs(1./id_qOp_a)*sin(id_theta_a) : 0.;
+						double pT_ms = (me_qOp_a!=0) ? fabs(1./me_qOp_a)*sin(me_theta_a) : 0.;
+						double ratio = (pT_id!=0.) ? fabs(pT_ms/pT_id) : 0.;					
+						cout << "A: pT_id=" << pT_id << ", pT_ms=" << pT_ms << ", ratio=" << ratio << endl;
+					
+						pT_id = (id_qOp_b!=0) ? fabs(1./id_qOp_b)*sin(id_theta_b) : 0.;
+						pT_ms = (me_qOp_b!=0) ? fabs(1./me_qOp_b)*sin(me_theta_b) : 0.;
+						ratio = (pT_id!=0.) ? fabs(pT_ms/pT_id) : 0.;					
+						cout << "B: pT_id=" << pT_id << ", pT_ms=" << pT_ms << ", ratio=" << ratio << endl;
+					}
+					*/
+				}
 
+				
 				passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
 				if(passCutFlow) fillCutFlow(sorderedcutname, values2fill); // stop at this(sorderedcutname) cut
 				if(m_sLastCut2Hist==sorderedcutname && passCutFlow) m_fit->fillXvec( current_imass );

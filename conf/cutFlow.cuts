@@ -10,9 +10,10 @@
 #8				d0						1				150.
 #9				z0						1				150.
 #10				idHits					3				4.				1.			5.
-#11				pTmatching				2				0.5				2.
-#12				impactParameter			2				5.				1.
-#13				isolation20				1				999
-14				isolation30				1				0.05
-#15				isolation40				1				999
-16				isCombMu				1				1.
+11				pTmatchingRatio			2				2.				0.5
+#12				pTmatchingAbsDiff		1				15000.
+#13				impactParameter			2				5.				1.
+#14				isolation20				1				999
+15				isolation30				1				0.05
+#16				isolation40				1				999
+17				isCombMu				1				1.

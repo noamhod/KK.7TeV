@@ -53,10 +53,13 @@ public:
 	bool isCombMuCut( double isCombMuCutVal, int isCombMua, int isCombMub );
 	bool nSCThitsCut( double nSCThitsCutVal, int nSCThits );
 	bool nPIXhitsCut( double nPIXhitsCutVal, int nPIXhits );
-	bool pTmatchLowRatioCut( double pTmatchLowRatioCutVal, double me_qOp, double me_theta,
-														   double id_qOp, double id_theta );
-	bool pTmatchHighRatioCut( double pTmatchHighRatioCutVal, double me_qOp, double me_theta,
-															 double id_qOp, double id_theta );
+	bool pTmatchRatioCut( double pTmatchHighRatioCutVal,
+						  double pTmatchLowRatioCutVal,
+						  double me_qOp, double me_theta,
+						  double id_qOp, double id_theta );
+	bool pTmatchAbsDiffCut(double pTmatchDiffCutVal,
+						   double me_qOp, double me_theta,
+						   double id_qOp, double id_theta );
 	bool impcatParamZ0Cut( double impcatParamZ0CutVal, double impPrmZ0);
 	bool impcatParamD0Cut( double impcatParamD0CutVal, double impPrmD0 );
 	bool isolationXXCut( double isolationCutVal, string sIsoValName, double pTmu, double pTcone );
@@ -68,9 +71,19 @@ public:
 	bool primaryVertexCut( double prmVtxNtracksCutVal, double prmVtxTypeCutVal, double prmVtxZ0CutVal,
 						   vector<int>* pviPVtracks, vector<int>* pviPVtype, vector<float>* pvfPVz0, vector<float>* pvfPVz0err );
 	bool nIDhitsCut( double nSCThitsCutVal, double nPIXhitsCutVal, double nIDhitsCutVal, int nSCThits, int nPIXhits );
-	bool pTmatchingCut( double pTmatchLowRatioCutVal, double pTmatchHighRatioCutVal,
-						double me_qOp, double me_theta,
-						double id_qOp, double id_theta );
+	bool pTmatchingRatioCut( double pTmatchHighRatioCutVal,
+							 double pTmatchLowRatioCutVal,
+							 double me_qOp_a, double me_theta_a,
+							 double id_qOp_a, double id_theta_a,
+							 double me_qOp_b, double me_theta_b,
+							 double id_qOp_b, double id_theta_b
+							);
+	bool pTmatchingAbsDiffCut( double pTmatchDiffCutVal,
+							   double me_qOp_a, double me_theta_a,
+							   double id_qOp_a, double id_theta_a,
+							   double me_qOp_b, double me_theta_b,
+							   double id_qOp_b, double id_theta_b
+							 );
 	bool impactParameterCut( double impcatParamZ0CutVal, double impcatParamD0CutVal,
 							 double impPrmZ0, double impPrmD0 );
 	bool pairXXisolation( double isolationCutVal, string sIsoValName,

@@ -55,7 +55,6 @@ class offlineAnalysis : public offlinePhysics, public selection, public graphicO
 		offlineTreeDigest* m_offTreeDigest;
 
 		// variables
-		//TMapsd*  m_cutFlowMap;
 		TMapsvd* m_cutFlowMapSVD;
 		TMapds*  m_cutFlowOrdered;
 		TMapsi*  m_cutFlowNumbers;
@@ -68,7 +67,7 @@ class offlineAnalysis : public offlinePhysics, public selection, public graphicO
 
 	public:
 		offlineAnalysis();
-		offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphicobjs, TFile* treeFile, cutFlowHandler* m_cutFlowHandler, string sLastCut2Hist = "GRL");
+		offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphicobjs, TFile* treeFile, cutFlowHandler* cutFlowHandler, string sLastCut2Hist = "GRL");
 		~offlineAnalysis();
 
 		void initialize();
@@ -78,7 +77,6 @@ class offlineAnalysis : public offlinePhysics, public selection, public graphicO
 		
 		void fitter();
 
-		//void printCutFlowNumbers(Long64_t chainEntries);
 		void fillCutFlow(string sCurrentCutName, TMapsd& values2fill);
 
 		bool isD3PDreconOld();
@@ -86,10 +84,6 @@ class offlineAnalysis : public offlinePhysics, public selection, public graphicO
 		void executeBasic();
 		void executeCutFlow();
 		void write();
-
-		//void    readCutFlow(string sCutFlowFilePath);
-		//TMapsd* getCutFlowMapPtr();
-		//TMapds* getCutFlowOrderedPtr();
 
 	private:
 

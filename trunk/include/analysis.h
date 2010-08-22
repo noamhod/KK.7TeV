@@ -16,6 +16,9 @@
 #define graphicObjects_cxx
 #include "graphicObjects.C"
 
+#define cutFlowHandler_cxx
+#include "cutFlowHandler.C"
+
 #define muon_staco_cxx
 #include "muon_staco.C"
 
@@ -36,6 +39,8 @@ class analysis : public physics, public selection, public graphicObjects
 
 		graphicObjects* m_graphicobjs;
 
+		cutFlowHandler* m_cutFlowHandler;
+		
 		muon_muid*      m_muid;
 		muon_staco*     m_mustaco;
 		
@@ -44,18 +49,17 @@ class analysis : public physics, public selection, public graphicObjects
 		offlineTree*    m_offlineTree;
 
 		// variables
-		TMapsd*         m_cutFlowMap;
-		TMapds*         m_cutFlowOrdered;
-		TMapsi*         m_cutFlowNumbers;
+		TMapsvd* m_cutFlowMapSVD;
+		TMapds*  m_cutFlowOrdered;
+		TMapsi*  m_cutFlowNumbers;
 		
 		TFile*		m_treeFile;
 
 		Bool_t b_isGRL;
-		int    nAllEvents;
 
 	public:
 		analysis();
-		analysis(physics* phys, graphicObjects* m_graphicobjs, GRLinterface* grl, TFile* treeFile);
+		analysis(physics* phys, graphicObjects* m_graphicobjs, cutFlowHandler* cutFlowHandler, GRLinterface* grl, TFile* treeFile);
 		~analysis();
 
 		void initialize();
@@ -63,7 +67,6 @@ class analysis : public physics, public selection, public graphicObjects
 
 		void enableGeneralBranches();
 
-		void printCutFlowNumbers(Long64_t chainEntries);
 		void fillCutFlow(string sCurrentCutName, TMapsd& values2fill);
 
 		void executeTree(bool isendofrun);
@@ -72,10 +75,6 @@ class analysis : public physics, public selection, public graphicObjects
 		void executeCutFlow();
 		
 		void write();
-
-		void    readCutFlow(string sCutFlowFilePath);
-		TMapsd* getCutFlowMapPtr();
-		TMapds* getCutFlowOrderedPtr();
 
 	private:
 

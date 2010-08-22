@@ -25,14 +25,9 @@ offlineAnalysis::offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphi
 	m_mu_staco = new muon_staco( m_offPhys ); // this will also  "turn on" the desired branches (virtual in the base)
 	*/
 
-	//m_cutFlowMap         = new TMapsd();
-	//m_cutFlowMapSVD	 = new TMapsvd();
-	//m_cutFlowOrdered = new TMapds();
-	//m_cutFlowNumbers = new TMapsi();
-	
 	m_cutFlowHandler = cutFlowHandler;
 	m_cutFlowMapSVD  = m_cutFlowHandler->getCutFlowMapSVDPtr();
-	m_cutFlowOrdered = m_cutFlowHandler-> getCutFlowOrderedMapPtr();
+	m_cutFlowOrdered = m_cutFlowHandler->getCutFlowOrderedMapPtr();
 	m_cutFlowNumbers = m_cutFlowHandler->getCutFlowNumbersMapPtr();
 	
 	m_graphicobjs = graphicobjs;
@@ -45,86 +40,11 @@ offlineAnalysis::offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphi
 	
 	// cut flow has been read out already
 	initSelectionCuts(m_cutFlowMapSVD, m_cutFlowOrdered);
-	//m_offTreeDigest->setBranches();
 
 	m_bOldD3PDwarning = false;
 	m_nPrevRunWithWarning = 0;
 }
 
-/*
-void offlineAnalysis::readCutFlow(string sCutFlowFilePath)
-{
-	fstream file;
-	file.open( sCutFlowFilePath.c_str() );
-
-	string sLine = "";
-	string skey  = "";
-	double dval  = 0.;
-	double dnum  = 0.;
-
-	vector<string> orderedVec;
-
-	int nLinesRead = 0;
-
-	if (!file)
-	{
-		cerr << "Unable to open file: " << sCutFlowFilePath << endl;
-		exit(1);   // call system to stop
-	}
-
-	while(!file.eof())
-	{
-		getline(file,sLine);
-
-		if(sLine == "") continue;
-		if(sLine.substr(0,1) == "#")    continue;
-
-		// parse the line (ownership utilitis):
-		parseKeyValLine(sLine);
-
-		// get the key = cut name (ownership utilitis):
-		skey = getKey();
-
-		// get the 1st val = cut value:
-		dval = getVal(0);
-
-		// get the 2nd val = cut number:
-		dnum = getVal(1);
-
-		//for(int i=0 ; i<(int)getNVals() ; i++) { dval = getVal(i); }
-
-		nLinesRead++;
-
-		if(b_print) { cout << "key=" << skey << "\tval=" << dval << "\tdnum=" << dnum << endl; }
-
-		// pair the map
-		m_cutFlowMap->insert( make_pair(skey,dval) );
-		m_cutFlowOrdered->insert( make_pair(dnum,skey) );
-		m_cutFlowNumbers->insert( make_pair(skey,0) );
-	}
-	cout << "\nread " << nLinesRead << " lines from " << sCutFlowFilePath << endl;
-
-	// ownership: selection class:
-	initSelectionCuts(m_cutFlowMap, m_cutFlowOrdered);
-	
-	m_offTreeDigest->setBranches(m_cutFlowOrdered);
-	
-	file.close();
-}
-*/
-
-
-/*
-TMapsd* offlineAnalysis::getCutFlowMapPtr()
-{
-	return m_cutFlowMap;
-}
-
-TMapds* offlineAnalysis::getCutFlowOrderedPtr()
-{
-	return m_cutFlowOrdered;
-}
-*/
 offlineAnalysis::~offlineAnalysis()
 {
 	finalize();
@@ -132,7 +52,7 @@ offlineAnalysis::~offlineAnalysis()
 
 void offlineAnalysis::initialize()
 {
-	//nAllEvents = 0;
+
 }
 
 void offlineAnalysis::finalize()
@@ -159,23 +79,6 @@ void offlineAnalysis::fitter()
 	m_fGuess  = (TF1*)m_fit->m_fGuess->Clone();
 	m_fFitted = (TF1*)m_fit->m_fFitted->Clone();
 }
-
-/*
-void offlineAnalysis::printCutFlowNumbers(Long64_t chainEntries)
-{
-	cout << "+------------------------------------------------" << endl;
-	cout << "|             print cut flow numbers             " << endl;
-	cout << "|................................................" << endl;
-	cout << "|    all events in chain, " << chainEntries << endl;
-	cout << "|    all processed events, " << nAllEvents << endl;
-	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
-	{
-		string scutname = ii->second;
-		cout << "|    events remaining after " << scutname << " cut, " << m_cutFlowNumbers->operator[](scutname) << endl;
-	}
-	cout << "+------------------------------------------------" << endl;
-}
-*/
 
 void offlineAnalysis::fillCutFlow(string sCurrentCutName, TMapsd& values2fill)
 {
@@ -359,9 +262,7 @@ bool offlineAnalysis::isD3PDreconOld()
 			return true;
 		}
 	}
-	
 	return false;
-	
 }
 
 void offlineAnalysis::executeCutFlow()
@@ -420,7 +321,9 @@ void offlineAnalysis::executeCutFlow()
 		
 		for(TMapii::iterator it=allmupairMap.begin() ; it!=allmupairMap.end() ; ++it)
 		{
-			if( isD3PDreconOld() ) break;
+			//////////////////////////////////////
+			if( isD3PDreconOld() ) break; ////////
+			//////////////////////////////////////
 			
 			int ai = it->first;
 			int bi = it->second;
@@ -436,6 +339,8 @@ void offlineAnalysis::executeCutFlow()
 																pmu[bi], (double)m_offPhys->mu_staco_charge->at(bi) );
 			
 			// event level
+			int runnumber  = m_offPhys->RunNumber;
+			int lumiblock  = m_offPhys->lbn;
 			int isGRL      = m_offPhys->isGRL;
 			int isL1MU6    = m_offPhys->L1_MU6;
 			
@@ -444,7 +349,6 @@ void offlineAnalysis::executeCutFlow()
 			double z0exPVa = m_offPhys->mu_staco_z0_exPV->at(ai);
 			double d0exPVb = m_offPhys->mu_staco_d0_exPV->at(bi);
 			double z0exPVb = m_offPhys->mu_staco_z0_exPV->at(bi);
-			
 			
 			// primary vertex:
 			// at least one primary vtx passes the z selection
@@ -455,8 +359,7 @@ void offlineAnalysis::executeCutFlow()
 			
 			// combined muon ?
 			int isMuaComb  = m_offPhys->mu_staco_isCombinedMuon->at(ai);
-			int isMubComb  = m_offPhys->mu_staco_isCombinedMuon->at(bi);
-			
+			int isMubComb  = m_offPhys->mu_staco_isCombinedMuon->at(bi);	
 			
 			// inner detector hits
 			int nSCThitsMua  = m_offPhys->mu_staco_nSCTHits->at(ai); //  SCT hits >=4
@@ -465,7 +368,6 @@ void offlineAnalysis::executeCutFlow()
 			int nPIXhitsMub  = m_offPhys->mu_staco_nPixHits->at(bi); // pixel hits >=1
 			int nIDhitsMua   = nSCThitsMua+nPIXhitsMua; // pixel+SCT hits >=5
 			int nIDhitsMub   = nSCThitsMub+nPIXhitsMub; // pixel+SCT hits >=5
-			
 			
 			// ID - MS pT matching: pT=|p|*sin(theta), qOp=charge/|p|
 			double me_qOp_a   = m_offPhys->mu_staco_me_qoverp->at(ai);
@@ -619,7 +521,6 @@ void offlineAnalysis::executeCutFlow()
 					*/
 				}
 
-				
 				passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
 				if(passCutFlow)
 				{

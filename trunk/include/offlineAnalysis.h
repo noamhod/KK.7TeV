@@ -63,6 +63,8 @@ class offlineAnalysis : public offlinePhysics, public selection, public graphicO
 		Bool_t b_isGRL;
 		//int    nAllEvents;
 		string m_sLastCut2Hist;
+		bool   m_bOldD3PDwarning;
+		int    m_nPrevRunWithWarning;
 
 	public:
 		offlineAnalysis();

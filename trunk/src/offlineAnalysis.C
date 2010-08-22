@@ -46,7 +46,9 @@ offlineAnalysis::offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphi
 	// cut flow has been read out already
 	initSelectionCuts(m_cutFlowMapSVD, m_cutFlowOrdered);
 	//m_offTreeDigest->setBranches();
-	
+
+	m_bOldD3PDwarning = false;
+	m_nPrevRunWithWarning = 0;
 }
 
 /*
@@ -328,6 +330,8 @@ void offlineAnalysis::executeAdvanced()
 
 void offlineAnalysis::executeCutFlow()
 {
+	int currentrun = m_offPhys->RunNumber;
+
 	/////////////////////////////////////////
 	m_cutFlowHandler->nAllEvents++; /////////
 	/////////////////////////////////////////
@@ -382,6 +386,33 @@ void offlineAnalysis::executeCutFlow()
 		
 		for(TMapii::iterator it=allmupairMap.begin() ; it!=allmupairMap.end() ; ++it)
 		{
+			/////////////////////////////////////////////////////////////////////////////
+			// the old "recon" D3PDs haven't got the mu_staco_me_qoverp branch //////////
+			// it is called mu_staco_msextrap_qoverp whereas, the new ones, have it. ////
+			if((TBranch*)m_offPhys->fChain->GetBranch("mu_staco_me_qoverp")==NULL)
+			{
+				cout << "mu_staco_me_qoverp = NULL" << endl;
+				break;
+			}
+			else
+			{
+				if(m_offPhys->mu_staco_me_qoverp->size()==0)
+				{
+					if(!m_bOldD3PDwarning  &&  currentrun!=m_nPrevRunWithWarning)
+					{
+						cout << "WARNING:  in run" << m_offPhys->RunNumber  << ":" << endl;
+						cout << "          mu_staco_me_qoverp->size()==0." << endl;
+						cout << "          probably and old recon D3PD where this" << endl;
+						cout << "          branch is called mu_staco_msextrap_qoverp" << endl;
+						m_bOldD3PDwarning = true;
+						m_nPrevRunWithWarning = currentrun;
+					}
+					break;
+				}
+			}
+			/////////////////////////////////////////////////////////////////////////////
+			/////////////////////////////////////////////////////////////////////////////
+		
 			int ai = it->first;
 			int bi = it->second;
 

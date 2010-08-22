@@ -81,6 +81,8 @@ class offlineAnalysis : public offlinePhysics, public selection, public graphicO
 		//void printCutFlowNumbers(Long64_t chainEntries);
 		void fillCutFlow(string sCurrentCutName, TMapsd& values2fill);
 
+		bool isD3PDreconOld();
+		
 		void executeBasic();
 		void executeCutFlow();
 		void write();

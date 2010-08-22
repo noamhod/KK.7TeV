@@ -104,33 +104,6 @@ void analysisGridControlRun()
 	fout = new TFile(fileName, "RECREATE");
 	
 	// some includings and loadings
-	
-	gSystem->Load( "libCintex.so" );
-	Cintex::Cintex::Enable();
-	gROOT->ProcessLine(".L Loader.C+");
-
-	//--------------------------------------------------------
-	/*
-	TFile* f = new TFile("test.root","RECREATE");
-	TTree* t = new TTree("test","test");
-
-	TVvf* v = new TVvf();
-	//vector<vector<float> >* v;	
-	t->Branch("v", &v);
-
-	vector<float> vf;
-	vf.push_back(111);
-	vf.push_back(222);
-	vf.push_back(333);
-
-	v->push_back( vf );
-
-	t->Fill();
-	t->Write();
-	f->Write();
-	f->Close();
-	*/
-	//---------------------------------------------------------
 
 	gROOT->ProcessLine(".include ../include/");
 	gROOT->ProcessLine(".include ../src/");
@@ -140,6 +113,10 @@ void analysisGridControlRun()
 	
 	exitIfNotExist("../GoodRunsLists-00-00-84/StandAlone/libGoodRunsLists.so");
 	gROOT->ProcessLine(".L ../GoodRunsLists-00-00-84/StandAlone/libGoodRunsLists.so");
+	
+	gSystem->Load( "libCintex.so" );
+	Cintex::Cintex::Enable();
+	gROOT->ProcessLine(".L Loader.C+");
 	
 	gROOT->ProcessLine(".L analysisGridControl.C++");
 	gROOT->ProcessLine("analysisGridControl agc(fChain, fout);");

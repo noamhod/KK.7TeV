@@ -33,6 +33,7 @@ class analysisControl : public chains, public analysis
 		analysis*       m_analysis;
 		graphicObjects* m_graphics;
 		GRLinterface*   m_GRL; 
+		cutFlowHandler* m_cutFlowHandler;
 
 		// run control
 		Long64_t l64t_nentries;

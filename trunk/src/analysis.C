@@ -44,30 +44,6 @@ analysis::analysis(physics* phys, graphicObjects* graphicobjs, cutFlowHandler* c
 	m_graphicobjs = graphicobjs;
 }
 
-void analysis::enableGeneralBranches()
-{
-	cout << "WARNING:   in analysis::enableGeneralBranches()" << endl;
-	cout << "           did you remember to enable the all the" << endl;
-	cout << "           branches that you are using ?" << endl;
-	/*----------------------------------------------------------------*/
-	/*--- this method disables all the branches of the chain.      ---*/
-	/*--- then, the relevant branches are enabled in 2 places:     ---*/
-	/*--- 1. in this method the event level branchea are enabled.  ---*/
-	/*--- 2. in the muon_staco and muon_muid classes, the relevant ---*/
-	/*---    branches are enabled for the relevant analysis        ---*/
-	/*----------------------------------------------------------------*/
-
-	//m_phys->fChain->SetBranchStatus("*", 0); // disable all
-
-	// enable the event-level branches 
-	//m_phys->fChain->SetBranchStatus("L1_*", 1); // enable L1
-	//m_phys->fChain->SetBranchStatus("RunNumber", 1); // enable run nuber
-	//m_phys->fChain->SetBranchStatus("lbn", 1); // enable lumi block number
-	//m_phys->fChain->SetBranchStatus("EventNumber", 1); // enable event number
-	
-	//m_phys->fChain->SetBranchStatus("*", 1); // enable all
-}
-
 analysis::~analysis()
 {
 	finalize();

@@ -65,8 +65,6 @@ class analysis : public physics, public selection, public graphicObjects
 		void initialize();
 		void finalize();
 
-		void enableGeneralBranches();
-
 		void fillCutFlow(string sCurrentCutName, TMapsd& values2fill);
 
 		void executeTree(bool isendofrun);

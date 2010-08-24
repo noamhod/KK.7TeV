@@ -13480,9 +13480,9 @@ void physics::InitSkimmed(TTree *tree)
    //////////////////////////////////////////////////
    //////////////////////////////////////////////////
    // disable all branches first ////////////////////
-   fChain->SetBranchStatus("L1*",0);////////////////
-   fChain->SetBranchStatus("L2*",0);////////////////
-   fChain->SetBranchStatus("EF*",0);////////////////
+   fChain->SetBranchStatus("L1*",0);/////////////////
+   fChain->SetBranchStatus("L2*",0);/////////////////
+   fChain->SetBranchStatus("EF*",0);/////////////////
    fChain->SetBranchStatus("ph_*",0);////////////////
    fChain->SetBranchStatus("tau_*",0);///////////////
    fChain->SetBranchStatus("jet_*",0);///////////////
@@ -13492,6 +13492,19 @@ void physics::InitSkimmed(TTree *tree)
    fChain->SetBranchStatus("mb*",0);/////////////////
    fChain->SetBranchStatus("L1_MBTS*",0);////////////
    fChain->SetBranchStatus("collcand_*",0);//////////
+   //////////////////////////////////////////////////
+   // disable vector<vector<>> for the vertex branches
+   fChain->SetBranchStatus("vxp_trk_chi2", 0); //////
+   fChain->SetBranchStatus("vxp_trk_d0", 0); ////////
+   fChain->SetBranchStatus("vxp_trk_z0", 0); ////////
+   fChain->SetBranchStatus("vxp_trk_unbiased_d0", 0);
+   fChain->SetBranchStatus("vxp_trk_unbiased_z0", 0);
+   fChain->SetBranchStatus("vxp_trk_err_unbiased_d0", 0);
+   fChain->SetBranchStatus("vxp_trk_err_unbiased_z0", 0);
+   fChain->SetBranchStatus("vxp_trk_phi", 0); ///////
+   fChain->SetBranchStatus("vxp_trk_theta", 0); /////
+   fChain->SetBranchStatus("vxp_trk_weight", 0); ////
+   fChain->SetBranchStatus("vxp_trk_index", 0); /////
    //////////////////////////////////////////////////
    //////////////////////////////////////////////////
    

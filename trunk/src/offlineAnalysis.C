@@ -246,7 +246,7 @@ bool offlineAnalysis::isD3PDreconOld()
 	{
 		if(m_offPhys->mu_staco_me_qoverp->size()==0)
 		{
-			if(m_nPrevRunWithWarning != m_offPhys->RunNumber)
+			if(m_nPrevRunWithWarning != (int)m_offPhys->RunNumber)
 			{
 				m_nPrevRunWithWarning = m_offPhys->RunNumber;
 				m_bOldD3PDwarning     = false;

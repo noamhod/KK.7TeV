@@ -24,9 +24,6 @@ analysis::analysis(physics* phys, graphicObjects* graphicobjs, cutFlowHandler* c
 
 	m_offlineTree = new offlineTree(m_phys, m_treeFile);
 
-	// need to switch off all the branches with:
-	enableGeneralBranches();
-
 	m_muid    = new muon_muid(  m_phys ); // this will also "turn on" the desired branches (virtual in the base)
 	m_mustaco = new muon_staco( m_phys ); // this will also  "turn on" the desired branches (virtual in the base)
 

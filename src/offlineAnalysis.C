@@ -267,20 +267,26 @@ bool offlineAnalysis::isD3PDreconOld()
 
 void offlineAnalysis::executeCutFlow()
 {
-	/////////////////////////////////////////
-	m_cutFlowHandler->nAllEvents++; /////////
-	/////////////////////////////////////////
+	///////////////////////////////////////////
+	// do not skip this for correct counting //
+	m_cutFlowHandler->nAllEvents++; ///////////
+	///////////////////////////////////////////
 
-	// local variables
-	TMapii      allmupairMap;
-	TVectorP2VL pmu;
-	
-	TMapsb cutFlowDecision;
-	TMapsd kinematicVariables;
+	//////////////////////////////////////////
+	// preselection, can skip these events ///
+	if(!m_offPhys->isGRL)  return; ///////////
+	//if(!m_offPhys->L1_MU6) return; /////////
+	//////////////////////////////////////////
 
 	///////////////////////////////////////////////////
 	m_offTreeDigest->reset(); /////////////////////////
 	///////////////////////////////////////////////////
+
+	// local variables
+	TVectorP2VL	pmu;
+	TMapii		allmupairMap;
+	TMapsb		cutFlowDecision;
+	TMapsd		kinematicVariables;
 
 	// build vector of the muons TLorentzVector
 	for(int n=0 ; n<(int)m_offPhys->mu_staco_m->size() ; n++)
@@ -291,7 +297,6 @@ void offlineAnalysis::executeCutFlow()
 		pmu[n]->SetPz( m_offPhys->mu_staco_pz->at(n) );
 		pmu[n]->SetE(  m_offPhys->mu_staco_E->at(n)  );
 	}
-		
 		
 	// build the map of the good muon pairs 
 	if(pmu.size()>1)
@@ -307,8 +312,8 @@ void offlineAnalysis::executeCutFlow()
 				if( removeOverlaps(allmupairMap, n, m) ) continue;
 				// now can insert all dimuons into the index map (only opposite charge requirement)
 				buildMuonPairMap( allmupairMap,
-				(double)m_offPhys->mu_staco_charge->at(n), n,
-				(double)m_offPhys->mu_staco_charge->at(m), m );
+						  (double)m_offPhys->mu_staco_charge->at(n), n,
+						  (double)m_offPhys->mu_staco_charge->at(m), m );
 			}
 		}
 	}
@@ -486,11 +491,11 @@ void offlineAnalysis::executeCutFlow()
 				}
 				*/
 				
-				if(sorderedcutname=="isolation30")
+				if(sorderedcutname=="isolation40")
 				{
 					passCurrentCut =
 					(
-						pairXXisolation((*m_cutFlowMapSVD)[sorderedcutname][0],"isolation30",mu_pTa,mu_pTb,pTcone30a,pTcone30b)
+						pairXXisolation((*m_cutFlowMapSVD)[sorderedcutname][0],"isolation40",mu_pTa,mu_pTb,pTcone40a,pTcone40b)
 					) ? true : false;
 				}
 				
@@ -519,6 +524,18 @@ void offlineAnalysis::executeCutFlow()
 						cout << "B: pT_id=" << pT_id << ", pT_ms=" << pT_ms << ", ratio=" << ratio << endl;
 					}
 					*/
+				}
+
+				if(sorderedcutname=="pTmatchingAbsDiff")
+				{
+					double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
+					passCurrentCut =
+					(
+						pTmatchingAbsDiffCut( cutval1,
+								      me_qOp_a,me_theta_a,id_qOp_a,id_theta_a,
+								      me_qOp_b,me_theta_b,id_qOp_b,id_theta_b)
+					) ? true : false;
+	
 				}
 
 				passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;

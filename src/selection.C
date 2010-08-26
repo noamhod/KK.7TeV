@@ -31,10 +31,172 @@ void selection::sfinalize()
 	//delete m_util;
 }
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+
 void selection::initSelectionCuts(TMapsvd* cutFlowMapSVD, TMapds* cutFlowOrdered)
 {
 	m_cutFlowMapSVD  = cutFlowMapSVD;
 	m_cutFlowOrdered = cutFlowOrdered;
+}
+
+bool selection::findBestMuonPair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum)
+{
+	bool found = false;
+
+	double imassMax = -999.;
+	if(pmu.size()>1)
+	{               
+		for(int n=0 ; n<(int)pmu.size() ; n++)
+		{               
+			for(int m=0 ; m<(int)pmu.size() ; m++)
+			{
+				// dont pair with itself
+				if( m==n ) continue;
+
+				// remove overlaps
+				if( removeOverlaps(allmupairMap, n, m) ) continue;
+				
+				// take the pair with the largest invariant mass
+				// and set the incices of the two muons (by charge)
+				double current_imass = imass(pmu[n],pmu[m]);
+				if(current_imass > imassMax)
+				{
+					imassMax = current_imass;
+					iMum = (offPhys->mu_staco_charge->at(n)<0.) ? n : m;
+					iMup = (offPhys->mu_staco_charge->at(n)>0.) ? n : m;
+					
+					found = true;
+				}
+				else continue; // only one pair can survive this
+				
+				// now can insert all dimuons into the index map (only opposite charge requirement)
+				buildMuonPairMap( allmupairMap,
+								  (double)offPhys->mu_staco_charge->at(n), n,
+								  (double)offPhys->mu_staco_charge->at(m), m );
+			}
+		}
+	}
+	
+	if(!found)
+	{
+		if(b_print) cout << "WARNING:  in selection::findBestMuonPair:  didn't find any good muon pair" << endl;
+	}
+	
+	return found;
+}
+
+bool selection::findBestMuonPair(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum)
+{
+	bool found = false;
+
+	double imassMax = -999.;
+	if(pmu.size()>1)
+	{               
+		for(int n=0 ; n<(int)pmu.size() ; n++)
+		{               
+			for(int m=0 ; m<(int)pmu.size() ; m++)
+			{
+				// dont pair with itself
+				if( m==n ) continue;
+
+				// remove overlaps
+				if( removeOverlaps(allmupairMap, n, m) ) continue;
+				
+				// take the pair with the largest invariant mass
+				// and set the incices of the two muons (by charge)
+				double current_imass = imass(pmu[n],pmu[m]);
+				if(current_imass > imassMax)
+				{
+					imassMax = current_imass;
+					iMum = (phys->mu_staco_charge->at(n)<0.) ? n : m;
+					iMup = (phys->mu_staco_charge->at(n)>0.) ? n : m;
+					
+					found = true;
+				}
+				else continue;
+				
+				// now can insert all dimuons into the index map (only opposite charge requirement)
+				buildMuonPairMap( allmupairMap,
+								  (double)phys->mu_staco_charge->at(n), n,
+								  (double)phys->mu_staco_charge->at(m), m );
+			}
+		}
+	}
+	
+	if(!found)
+	{
+		if(b_print) cout << "WARNING:  in selection::findBestMuonPair:  didn't find any good muon pair" << endl;
+	}
+	
+	return found;
+}
+
+bool selection::findBestVertex(offlinePhysics* offPhys, int& iVtx)
+{
+	bool found = false;
+
+	int   nPVtracks;
+	int   nPVtype;
+	float dPVz0;
+	float z0max = +999.;
+	for(int i=0 ; i<(int)offPhys->vxp_n ; i++)
+	{
+		nPVtracks = offPhys->vxp_nTracks->at(i);
+		nPVtype   = offPhys->vxp_type->at(i);
+		dPVz0     = offPhys->vxp_z->at(i);
+		
+		if(nPVtracks>1  &&  nPVtype==1)
+		{
+			// find the vertex with the smallest z0
+			if(dPVz0 < z0max)
+			{
+				z0max = dPVz0;
+				iVtx  = i;
+				found = true;
+			}
+		}
+	}
+	
+	if(!found)
+	{
+		if(b_print) cout << "WARNING:  in selection::findBestVertex:  didn't find any good vertex" << endl;
+	}
+	
+	return found;
+}
+
+bool selection::findBestVertex(physics* phys, int& iVtx)
+{
+	bool found = false;
+
+	int   nPVtracks;
+	int   nPVtype;
+	float dPVz0;
+	float z0max = +999.;
+	for(int i=0 ; i<(int)phys->vxp_n ; i++)
+	{
+		nPVtracks = phys->vxp_nTracks->at(i);
+		nPVtype   = phys->vxp_type->at(i);
+		dPVz0     = phys->vxp_z->at(i);
+		
+		if(nPVtracks>1  &&  nPVtype==1)
+		{
+			// find the vertex with the smallest z0
+			if(dPVz0 < z0max)
+			{
+				z0max = dPVz0;
+				iVtx  = i;
+				found = true;
+			}
+		}
+	}
+	
+	if(!found)
+	{
+		if(b_print) cout << "WARNING:  in selection::findBestVertex:  didn't find any good vertex" << endl;
+	}
+	
+	return found;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -138,9 +300,9 @@ bool selection::nPIXhitsCut( double nPIXhitsCutVal, int nPIXhits )
 }
 
 bool selection::pTmatchRatioCut(double pTmatchHighRatioCutVal,
-								double pTmatchLowRatioCutVal,
-								double me_qOp, double me_theta,
-								double id_qOp, double id_theta )
+double pTmatchLowRatioCutVal,
+double me_qOp, double me_theta,
+double id_qOp, double id_theta )
 {
 	// pT=|p|*sin(theta)
 	// qOp=charge/|p|
@@ -148,7 +310,7 @@ bool selection::pTmatchRatioCut(double pTmatchHighRatioCutVal,
 	double pT_ms = (me_qOp!=0) ? fabs(1./me_qOp)*sin(me_theta) : 0.;
 	
 	double ratio = (pT_id!=0.) ? fabs(pT_ms/pT_id) : 0.;
-		
+	
 	/* mu_staco_me_qover_p, mu_staco_me_theta, mu_staco_id_qover_p, mu_staco_id_theta */
 	// pT ratio of Muon Extrapolated track to ID track greater than 0.5
 	if(b_print) cout << "in pTmatchLowRatioCut: pT_id=" << pT_id << ", pT_ms=" << pT_ms << endl;
@@ -156,8 +318,8 @@ bool selection::pTmatchRatioCut(double pTmatchHighRatioCutVal,
 }
 
 bool selection::pTmatchAbsDiffCut(double pTmatchDiffCutVal,
-								  double me_qOp, double me_theta,
-								  double id_qOp, double id_theta )
+double me_qOp, double me_theta,
+double id_qOp, double id_theta )
 {
 	// pT=|p|*sin(theta)
 	// qOp=charge/|p|
@@ -203,7 +365,7 @@ bool selection::isolationXXCut( double isolationCutVal, string sIsoValName, doub
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
 bool selection::primaryVertexCut( double prmVtxNtracksCutVal, double prmVtxTypeCutVal, double prmVtxZ0CutVal,
-								  vector<int>* pviPVtracks, vector<int>* pviPVtype, vector<float>* pvfPVz0, vector<float>* pvfPVz0err )
+vector<int>* pviPVtracks, vector<int>* pviPVtype, vector<float>* pvfPVz0, vector<float>* pvfPVz0err )
 {
 
 	int nPVtracks;
@@ -217,12 +379,12 @@ bool selection::primaryVertexCut( double prmVtxNtracksCutVal, double prmVtxTypeC
 	for(int i=0 ; i<(int)pviPVtracks->size() ; i++)
 	{
 		bPassed = true;
-	
+		
 		nPVtracks = pviPVtracks->at(i);
 		nPVtype   = pviPVtype->at(i);
 		dPVz0     = pvfPVz0->at(i);
 		dPVz0err  = pvfPVz0err->at(i);
-	
+		
 		if( !prmVtxNtracksCut(prmVtxNtracksCutVal, nPVtracks) )
 		{
 			bPassed = false;
@@ -273,12 +435,12 @@ bool selection::nIDhitsCut( double nSCThitsCutVal, double nPIXhitsCutVal, double
 }
 
 bool selection::pTmatchingRatioCut( double pTmatchHighRatioCutVal,
-									double pTmatchLowRatioCutVal,
-									double me_qOp_a, double me_theta_a,
-									double id_qOp_a, double id_theta_a,
-									double me_qOp_b, double me_theta_b,
-									double id_qOp_b, double id_theta_b
-								  )
+double pTmatchLowRatioCutVal,
+double me_qOp_a, double me_theta_a,
+double id_qOp_a, double id_theta_a,
+double me_qOp_b, double me_theta_b,
+double id_qOp_b, double id_theta_b
+)
 {
 	// at least one has to pass
 	bool bPassed = true;
@@ -300,11 +462,11 @@ bool selection::pTmatchingRatioCut( double pTmatchHighRatioCutVal,
 }
 
 bool selection::pTmatchingAbsDiffCut( double pTmatchDiffCutVal,
-									  double me_qOp_a, double me_theta_a,
-									  double id_qOp_a, double id_theta_a,
-									  double me_qOp_b, double me_theta_b,
-									  double id_qOp_b, double id_theta_b
-								   )
+double me_qOp_a, double me_theta_a,
+double id_qOp_a, double id_theta_a,
+double me_qOp_b, double me_theta_b,
+double id_qOp_b, double id_theta_b
+)
 {
 	// at least one has to pass
 	bool bPassed = true;
@@ -327,7 +489,7 @@ bool selection::pTmatchingAbsDiffCut( double pTmatchDiffCutVal,
 }
 
 bool selection::impactParameterCut( double impcatParamZ0CutVal, double impcatParamD0CutVal,
-									double impPrmZ0, double impPrmD0 )
+double impPrmZ0, double impPrmD0 )
 {
 	bool bPassed = true;
 
@@ -346,7 +508,7 @@ bool selection::impactParameterCut( double impcatParamZ0CutVal, double impcatPar
 }
 
 bool selection::pairXXisolation( double isolationCutVal, string sIsoValName,
-								 double pTmua, double pTmub, double pTconea, double pTconeb )
+double pTmua, double pTmub, double pTconea, double pTconeb )
 {
 	bool bPassed = true;
 	
@@ -368,16 +530,16 @@ bool selection::pairXXisolation( double isolationCutVal, string sIsoValName,
 
 
 void selection::buildMuonPairMap( 	TMapii& mupair,
-									double ca, int ia,
-									double cb, int ib)
+double ca, int ia,
+double cb, int ib)
 {
 	if(!oppositeChargeCut(ca,cb)) { if(b_print) {cout << "failed 0 charge cut" << endl;} return; }
 	mupair.insert( make_pair(ia,ib) );
 }
 
 void selection::buildMuonPairMap( TMapii& mupair,
-								  TLorentzVector* pa, double ca, double d0a, double z0a, int ia,
-								  TLorentzVector* pb, double cb, double d0b, double z0b, int ib)
+TLorentzVector* pa, double ca, double d0a, double z0a, int ia,
+TLorentzVector* pb, double cb, double d0b, double z0b, int ib)
 {
 	// run over all the dimuon-level cuts (i.e., not the event-level cuts such as L1_MU6 or GRL etc.)
 	// if one of the dimuon-level cuts fails, return from this function and do not insert this pair

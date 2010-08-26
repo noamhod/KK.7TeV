@@ -103,10 +103,10 @@ void offlineAnalysis::executeBasic()
 	double etaa;
 	double etab;
 	double costh;
-	double d0exPVa;
-	double z0exPVa;
-	double d0exPVb;
-	double z0exPVb;
+	//double d0exPVa;
+	//double z0exPVa;
+	//double d0exPVb;
+	//double z0exPVb;
 	double cosmicCosth;
 
 	// build vector of the muons TLorentzVector
@@ -173,8 +173,8 @@ void offlineAnalysis::executeBasic()
 			pTb = pT( pmu[bi] );
 			etaa = eta( pmu[ai] );	
 			etab = eta( pmu[bi] );
-			costh = cosThetaCollinsSoper( 	pmu[ai], (double)m_offPhys->mu_staco_charge->at(ai),
-			pmu[bi], (double)m_offPhys->mu_staco_charge->at(bi) );
+			costh = cosThetaCollinsSoper( pmu[ai], (double)m_offPhys->mu_staco_charge->at(ai),
+										  pmu[bi], (double)m_offPhys->mu_staco_charge->at(bi) );
 			d0exPVa = m_offPhys->mu_staco_d0_exPV->at(ai);
 			z0exPVa = m_offPhys->mu_staco_z0_exPV->at(ai);
 			d0exPVb = m_offPhys->mu_staco_d0_exPV->at(bi);
@@ -286,7 +286,13 @@ void offlineAnalysis::executeCutFlow()
 	TVectorP2VL	pmu;
 	TMapii		allmupairMap;
 	TMapsb		cutFlowDecision;
-	TMapsd		kinematicVariables;
+	TMapsd		kinVars;
+	int         iMup = 0;
+	int         iMum = 0;
+	int         iVtx = 0;
+	
+	// find the best vertex (nTracks>1, type==1, smallest z0) and set the index of best one
+	bool isVxpFound = findBestVertex(m_offPhys, iVtx);
 
 	// build vector of the muons TLorentzVector
 	for(int n=0 ; n<(int)m_offPhys->mu_staco_m->size() ; n++)
@@ -298,7 +304,10 @@ void offlineAnalysis::executeCutFlow()
 		pmu[n]->SetE(  m_offPhys->mu_staco_E->at(n)  );
 	}
 		
-	// build the map of the good muon pairs 
+	// build the map of the good muon pairs, set the indices of the muPlus and muMinus
+	bool isDiMuonFound = findBestMuonPair(m_offPhys, pmu, allmupairMap, iMup, iMum);
+	/*
+	double imassMax = -999.;
 	if(pmu.size()>1)
 	{               
 		for(int n=0 ; n<(int)pmu.size() ; n++)
@@ -307,22 +316,39 @@ void offlineAnalysis::executeCutFlow()
 			{
 				// dont pair with itself
 				if( m==n ) continue;
-
 				// remove overlaps
 				if( removeOverlaps(allmupairMap, n, m) ) continue;
+				
+				// take the pair with the largest invariant mass
+				// and set the incices of the two muons (by charge)
+				double current_imass = imass(pmu[n],pmu[m]);
+				if(current_imass > imassMax)
+				{
+					imassMax = current_imass;
+					iMum = (m_offPhys->mu_staco_charge->at(n)<0.) ? n : m;
+					iMup = (m_offPhys->mu_staco_charge->at(n)>0.) ? n : m;
+				}
+				else continue;
+				
+				///////////////
+				// return here the indices:
+				// (m_offPhys->mu_staco_charge->at(ai)<0.)?pT(pmu[ai]):pT(pmu[bi])
+				///////////////
+				
 				// now can insert all dimuons into the index map (only opposite charge requirement)
 				buildMuonPairMap( allmupairMap,
-						  (double)m_offPhys->mu_staco_charge->at(n), n,
-						  (double)m_offPhys->mu_staco_charge->at(m), m );
+								  (double)m_offPhys->mu_staco_charge->at(n), n,
+								  (double)m_offPhys->mu_staco_charge->at(m), m );
 			}
 		}
 	}
+	*/
 
 	// get the pmuon pairs from the all pairs map
 	if(allmupairMap.size()>0)
 	{
 		if(cutFlowDecision.size()>0)    cutFlowDecision.clear();
-		if(kinematicVariables.size()>0) kinematicVariables.clear();
+		if(kinVars.size()>0) kinVars.clear();
 		
 		for(TMapii::iterator it=allmupairMap.begin() ; it!=allmupairMap.end() ; ++it)
 		{
@@ -337,78 +363,74 @@ void offlineAnalysis::executeCutFlow()
 			// fill the cut flow histograms:
 
 			// calculate the necessary variables
-			double current_imass       = imass(pmu[ai],pmu[bi]);
-			double current_mu_pT       = (m_offPhys->mu_staco_charge->at(ai)<0.)?pT(pmu[ai]):pT(pmu[bi]);
-			double current_mu_eta      = (m_offPhys->mu_staco_charge->at(ai)<0.)?eta(pmu[ai]):eta(pmu[bi]);
-			double current_mu_cosTheta = cosThetaCollinsSoper( 	pmu[ai], (double)m_offPhys->mu_staco_charge->at(ai),
-																pmu[bi], (double)m_offPhys->mu_staco_charge->at(bi) );
+			current_imass    = imass(pmu[ai],pmu[bi]);
+			current_cosTheta = cosThetaCollinsSoper( pmu[ai], (double)m_offPhys->mu_staco_charge->at(ai),
+													 pmu[bi], (double)m_offPhys->mu_staco_charge->at(bi) );
+			current_mu_pT    = m_offPhys->mu_staco_pt->at(iMum);
+			current_mu_eta   = m_offPhys->mu_staco_eta->at(iMum);
 			
 			// event level
-			int runnumber  = m_offPhys->RunNumber;
-			int lumiblock  = m_offPhys->lbn;
-			int isGRL      = m_offPhys->isGRL;
-			int isL1MU6    = m_offPhys->L1_MU6;
+			runnumber  = m_offPhys->RunNumber;
+			lumiblock  = m_offPhys->lbn;
+			isGRL      = m_offPhys->isGRL;
+			isL1MU6    = m_offPhys->L1_MU6;
 			
 			// deprecated !!!
-			double d0exPVa = m_offPhys->mu_staco_d0_exPV->at(ai);
-			double z0exPVa = m_offPhys->mu_staco_z0_exPV->at(ai);
-			double d0exPVb = m_offPhys->mu_staco_d0_exPV->at(bi);
-			double z0exPVb = m_offPhys->mu_staco_z0_exPV->at(bi);
+			d0exPVa = m_offPhys->mu_staco_d0_exPV->at(ai);
+			z0exPVa = m_offPhys->mu_staco_z0_exPV->at(ai);
+			d0exPVb = m_offPhys->mu_staco_d0_exPV->at(bi);
+			z0exPVb = m_offPhys->mu_staco_z0_exPV->at(bi);
 			
 			// primary vertex:
 			// at least one primary vtx passes the z selection
-			vector<int>*   nPVtracksPtr = m_offPhys->vxp_nTracks; // number of tracks > 2
-			vector<int>*   nPVtypePtr   = m_offPhys->vxp_type;    // ==1
-			vector<float>* PVz0Ptr      = m_offPhys->vxp_z;       // = absolute z position of primary vertex < 150mm
-			vector<float>* PVz0errPtr   = m_offPhys->vxp_err_z;   // = error
+			nPVtracksPtr = m_offPhys->vxp_nTracks; // number of tracks > 2
+			nPVtypePtr   = m_offPhys->vxp_type;    // ==1
+			PVz0Ptr      = m_offPhys->vxp_z;       // = absolute z position of primary vertex < 150mm
+			PVz0errPtr   = m_offPhys->vxp_err_z;   // = error
 			
 			// combined muon ?
-			int isMuaComb  = m_offPhys->mu_staco_isCombinedMuon->at(ai);
-			int isMubComb  = m_offPhys->mu_staco_isCombinedMuon->at(bi);	
+			isMuaComb  = m_offPhys->mu_staco_isCombinedMuon->at(ai);
+			isMubComb  = m_offPhys->mu_staco_isCombinedMuon->at(bi);	
 			
 			// inner detector hits
-			int nSCThitsMua  = m_offPhys->mu_staco_nSCTHits->at(ai); //  SCT hits >=4
-			int nSCThitsMub  = m_offPhys->mu_staco_nSCTHits->at(bi); //  SCT hits >=4
-			int nPIXhitsMua  = m_offPhys->mu_staco_nPixHits->at(ai); // pixel hits >=1
-			int nPIXhitsMub  = m_offPhys->mu_staco_nPixHits->at(bi); // pixel hits >=1
-			int nIDhitsMua   = nSCThitsMua+nPIXhitsMua; // pixel+SCT hits >=5
-			int nIDhitsMub   = nSCThitsMub+nPIXhitsMub; // pixel+SCT hits >=5
+			nSCThitsMua  = m_offPhys->mu_staco_nSCTHits->at(ai); //  SCT hits >=4
+			nSCThitsMub  = m_offPhys->mu_staco_nSCTHits->at(bi); //  SCT hits >=4
+			nPIXhitsMua  = m_offPhys->mu_staco_nPixHits->at(ai); // pixel hits >=1
+			nPIXhitsMub  = m_offPhys->mu_staco_nPixHits->at(bi); // pixel hits >=1
+			nIDhitsMua   = nSCThitsMua+nPIXhitsMua; // pixel+SCT hits >=5
+			nIDhitsMub   = nSCThitsMub+nPIXhitsMub; // pixel+SCT hits >=5
 			
 			// ID - MS pT matching: pT=|p|*sin(theta), qOp=charge/|p|
-			double me_qOp_a   = m_offPhys->mu_staco_me_qoverp->at(ai);
-			double id_qOp_a   = m_offPhys->mu_staco_id_qoverp->at(ai);
-			double me_theta_a = m_offPhys->mu_staco_me_theta->at(ai);
-			double id_theta_a = m_offPhys->mu_staco_id_theta->at(ai);
-			double me_qOp_b   = m_offPhys->mu_staco_me_qoverp->at(bi);
-			double id_qOp_b   = m_offPhys->mu_staco_id_qoverp->at(bi);
-			double me_theta_b = m_offPhys->mu_staco_me_theta->at(bi);
-			double id_theta_b = m_offPhys->mu_staco_id_theta->at(bi);
+			me_qOp_a   = m_offPhys->mu_staco_me_qoverp->at(ai);
+			id_qOp_a   = m_offPhys->mu_staco_id_qoverp->at(ai);
+			me_theta_a = m_offPhys->mu_staco_me_theta->at(ai);
+			id_theta_a = m_offPhys->mu_staco_id_theta->at(ai);
+			me_qOp_b   = m_offPhys->mu_staco_me_qoverp->at(bi);
+			id_qOp_b   = m_offPhys->mu_staco_id_qoverp->at(bi);
+			me_theta_b = m_offPhys->mu_staco_me_theta->at(bi);
+			id_theta_b = m_offPhys->mu_staco_id_theta->at(bi);
 			
-			/*
 			// impact parameter
-			double impPrmZ0 = m_offPhys->mu_staco_z0_exPV->at(ai);
-			double impPrmD0 = m_offPhys->mu_staco_d0_exPV->at(ai);
-			*/
+			impPrmZ0 = m_offPhys->mu_staco_z0_exPV->at(ai);
+			impPrmD0 = m_offPhys->mu_staco_d0_exPV->at(ai);
 			
 			// isolation
-			double mu_pTa   = m_offPhys->mu_staco_pt->at(ai);
-			double mu_pTb   = m_offPhys->mu_staco_pt->at(bi);
-			double pTcone20a = m_offPhys->mu_staco_ptcone20->at(ai);
-			double pTcone20b = m_offPhys->mu_staco_ptcone20->at(bi);
-			double pTcone30a = m_offPhys->mu_staco_ptcone30->at(ai);
-			double pTcone30b = m_offPhys->mu_staco_ptcone30->at(bi);
-			double pTcone40a = m_offPhys->mu_staco_ptcone40->at(ai);
-			double pTcone40b = m_offPhys->mu_staco_ptcone40->at(bi);
+			mu_pTa   = m_offPhys->mu_staco_pt->at(ai);
+			mu_pTb   = m_offPhys->mu_staco_pt->at(bi);
+			pTcone20a = m_offPhys->mu_staco_ptcone20->at(ai);
+			pTcone20b = m_offPhys->mu_staco_ptcone20->at(bi);
+			pTcone30a = m_offPhys->mu_staco_ptcone30->at(ai);
+			pTcone30b = m_offPhys->mu_staco_ptcone30->at(bi);
+			pTcone40a = m_offPhys->mu_staco_ptcone40->at(ai);
+			pTcone40b = m_offPhys->mu_staco_ptcone40->at(bi);
 			
 			// fill the kinematic variables of this pair for the digested tree
-			kinematicVariables.insert( make_pair("imass", current_imass) );
-			kinematicVariables.insert( make_pair("pT", current_mu_pT) );
-			kinematicVariables.insert( make_pair("eta", current_mu_eta) );
-			kinematicVariables.insert( make_pair("cosTheta", current_mu_cosTheta) );
+			kinVars.insert( make_pair("imass", current_imass) );
+			kinVars.insert( make_pair("cosTheta", current_cosTheta) );
 			
 			TMapsd values2fill;
 			values2fill.insert( make_pair( "imass",current_imass ) );
-			values2fill.insert( make_pair( "pT",current_mu_pT ) );
+			values2fill.insert( make_pair( "pT",   current_mu_pT ) );
 			
 
 			bool passCutFlow    = true;
@@ -477,16 +499,13 @@ void offlineAnalysis::executeCutFlow()
 				{
 					passCurrentCut = ( isCombMuCut((*m_cutFlowMapSVD)[sorderedcutname][0],isMuaComb,isMubComb) ) ? true : false;
 				}
+				
 				/*
 				if(sorderedcutname=="idHits")
 				{
 					double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 					double cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
 					double cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
-					if(passCutFlow)
-					{
-						cout << "nSCThits=" << nSCThits << ", nPIXhits=" << nPIXhits << ", nIDhits=" << nSCThits+nPIXhits << endl;
-					}
 					passCurrentCut = ( nIDhitsCut( cutval1,cutval2,cutval3,nSCThits,nPIXhits ) ) ? true : false;
 				}
 				*/
@@ -509,21 +528,6 @@ void offlineAnalysis::executeCutFlow()
 											me_qOp_a,me_theta_a,id_qOp_a,id_theta_a,
 											me_qOp_b,me_theta_b,id_qOp_b,id_theta_b)
 					) ? true : false;
-					
-					/*
-					if(passCutFlow)
-					{
-						double pT_id = (id_qOp_a!=0) ? fabs(1./id_qOp_a)*sin(id_theta_a) : 0.;
-						double pT_ms = (me_qOp_a!=0) ? fabs(1./me_qOp_a)*sin(me_theta_a) : 0.;
-						double ratio = (pT_id!=0.) ? fabs(pT_ms/pT_id) : 0.;					
-						cout << "A: pT_id=" << pT_id << ", pT_ms=" << pT_ms << ", ratio=" << ratio << endl;
-					
-						pT_id = (id_qOp_b!=0) ? fabs(1./id_qOp_b)*sin(id_theta_b) : 0.;
-						pT_ms = (me_qOp_b!=0) ? fabs(1./me_qOp_b)*sin(me_theta_b) : 0.;
-						ratio = (pT_id!=0.) ? fabs(pT_ms/pT_id) : 0.;					
-						cout << "B: pT_id=" << pT_id << ", pT_ms=" << pT_ms << ", ratio=" << ratio << endl;
-					}
-					*/
 				}
 
 				if(sorderedcutname=="pTmatchingAbsDiff")
@@ -535,7 +539,6 @@ void offlineAnalysis::executeCutFlow()
 								      me_qOp_a,me_theta_a,id_qOp_a,id_theta_a,
 								      me_qOp_b,me_theta_b,id_qOp_b,id_theta_b)
 					) ? true : false;
-	
 				}
 
 				passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
@@ -558,7 +561,7 @@ void offlineAnalysis::executeCutFlow()
 						// for the final histograms:
 						// i.e., not the curFlow histos
 						m_graphicobjs->h1_eta->Fill( current_mu_eta );
-						m_graphicobjs->h1_costh->Fill( current_mu_cosTheta );
+						m_graphicobjs->h1_costh->Fill( current_cosTheta );
 						m_graphicobjs->h1_pT->Fill( current_mu_pT );
 						m_graphicobjs->h1_imass->Fill( current_imass );
 					
@@ -571,15 +574,19 @@ void offlineAnalysis::executeCutFlow()
 						m_fit->fillXvec( current_imass );
 					}
 					///////////////////////////////////////////////////////////////////
+					
 				} // end if(passCutFlow)
 				
 				// fill the decision
 				cutFlowDecision.insert( make_pair(sorderedcutname, passCurrentCut) );
 			} // end for(m_cutFlowOrdered)
+			
 		} // for(allmupairMap)
-		////////////////////////////////////////////////////////////////////////////
-		m_offTreeDigest->fill(cutFlowDecision, kinematicVariables); ////////////////
-		////////////////////////////////////////////////////////////////////////////
+		
+		//////////////////////////////////////////////////////////////////
+		m_offTreeDigest->fill(kinVars, iMup, iMum, iVtx); ////////////////
+		//////////////////////////////////////////////////////////////////
+		
 	} // end if(allmupairMap.size()>0)
 	else // no mu pair(s) at all
 	{

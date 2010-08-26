@@ -32,6 +32,12 @@ public:
 
 	void initSelectionCuts(TMapsvd* cutFlowMapSVD, TMapds* cutFlowOrdered); // called by analysis, offlineAnalysis and digestAnalysis
 	
+	bool findBestMuonPair(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum);
+	bool findBestMuonPair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum);
+	
+	bool findBestVertex(physics* phys, int& iVtx);
+	bool findBestVertex(offlinePhysics* offPhys, int& iVtx);
+	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 	// * * * simple cuts methods * * *
 	

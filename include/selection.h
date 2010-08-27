@@ -32,11 +32,35 @@ public:
 
 	void initSelectionCuts(TMapsvd* cutFlowMapSVD, TMapds* cutFlowOrdered); // called by analysis, offlineAnalysis and digestAnalysis
 	
+	void buildMuonPairMap(	TMapii& mupair,
+							double ca, int ia,
+							double cb, int ib);
+
+	void buildMuonPairMap(	TMapii& mupair,
+							TLorentzVector* pa, double ca, double d0a, double z0a, int ia,
+							TLorentzVector* pb, double cb, double d0b, double z0b, int ib );
+	
+	void buildMuonPairMap( TMapii& mupair, TVectorP2VL& pmu );
+
+	bool removeOverlaps(	TMapii& mupair, int ia, int ib );
+	
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+	// * * * preselection simple methods * * *
+	
 	bool findBestMuonPair(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum);
 	bool findBestMuonPair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum);
 	
 	bool findBestVertex(physics* phys, int& iVtx);
 	bool findBestVertex(offlinePhysics* offPhys, int& iVtx);
+	
+	bool findHipTmuon(physics* phys);
+	bool findHipTmuon(offlinePhysics* offPhys);
+	
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+	// * * * combined preselection * * *
+	
+	bool preselection(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum, int& iVtx, int isGRL);
+	bool preselection(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum, int& iVtx);
 	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 	// * * * simple cuts methods * * *
@@ -52,6 +76,7 @@ public:
 	bool d0Cut(          double d0CutVal, double d0a, double d0b ); // deprecated !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	bool z0Cut(          double z0CutVal, double z0a, double z0b ); // deprecated !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	bool oppositeChargeCut( double ca, double cb );
+	bool oppositeChargeCut( double oppositeChargeCutVal, double ca, double cb );
 	
 	bool prmVtxNtracksCut( double prmVtxNtracksCutVal, int nPVtracks );
 	bool prmVtxTypeCut( double prmVtxTypeCutVal, int nPVtype );
@@ -96,18 +121,6 @@ public:
 						  double pTmua, double pTmub, double pTconea, double pTconeb );
 	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-	
-	
-	void buildMuonPairMap(	TMapii& mupair,
-							double ca, int ia,
-							double cb, int ib);
-
-	void buildMuonPairMap(	TMapii& mupair,
-							TLorentzVector* pa, double ca, double d0a, double z0a, int ia,
-							TLorentzVector* pb, double cb, double d0b, double z0b, int ib );
-
-	bool removeOverlaps(	TMapii& mupair, int ia, int ib );
-	void findBestMuonPair(	TMapii& mupair, int& ia, int& ib);
 
 private:
 

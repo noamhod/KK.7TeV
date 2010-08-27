@@ -39,11 +39,73 @@ void selection::initSelectionCuts(TMapsvd* cutFlowMapSVD, TMapds* cutFlowOrdered
 	m_cutFlowOrdered = cutFlowOrdered;
 }
 
-bool selection::findBestMuonPair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum)
+void selection::buildMuonPairMap( TMapii& mupair,
+								  double ca, int ia,
+								  double cb, int ib)
 {
-	bool found = false;
+	if(!oppositeChargeCut(ca,cb)) { if(b_print) {cout << "failed 0 charge cut" << endl;} return; }
+	mupair.insert( make_pair(ia,ib) );
+}
 
-	double imassMax = -999.;
+void selection::buildMuonPairMap( TMapii& mupair,
+								  TLorentzVector* pa, double ca, double d0a, double z0a, int ia,
+								  TLorentzVector* pb, double cb, double d0b, double z0b, int ib)
+{
+	// run over all the dimuon-level cuts (i.e., not the event-level cuts such as L1_MU6 or GRL etc.)
+	// if one of the dimuon-level cuts fails, return from this function and do not insert this pair
+	// into the muPair map.
+	// If passed all dimuon-level cuts, then insert this pair into the muPair map.
+	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
+	{
+		string scutname = ii->second;
+		//vector<double> cutValue = m_cutFlowMapSVD->operator[](scutname);
+		
+		if(scutname=="oppositeCharcge")
+		{
+			if(!oppositeChargeCut(ca,cb)) { if(b_print) {cout << "failed 0 charge cut" << endl;} return; }
+		}
+		if(scutname=="pT")
+		{
+			if(!pTCut(m_cutFlowMapSVD->operator[](scutname)[0],pa,pb)) { if(b_print) {cout << "failed pT cut" << endl;} return; }
+		}
+		if(scutname=="eta")
+		{
+			if(!etaCut(m_cutFlowMapSVD->operator[](scutname)[0],pa,pb)) { if(b_print) {cout << "failed eta cut" << endl;} return; }
+		}
+		if(scutname=="d0")
+		{
+			if(!d0Cut(m_cutFlowMapSVD->operator[](scutname)[0],d0a,d0b)) { if(b_print) {cout << "failed d0 cut" << endl;} return; }
+		}
+		if(scutname=="z0")
+		{
+			if(!z0Cut(m_cutFlowMapSVD->operator[](scutname)[0],z0a,z0b)) { if(b_print) {cout << "failed z0 cut" << endl;} return; }
+		}
+		if(scutname=="cosThetaDimu")
+		{
+			if(!cosThetaDimuCut(m_cutFlowMapSVD->operator[](scutname)[0],pa,pb)) { if(b_print) {cout << "failed cosmic cut" << endl;} return; }
+		}
+		if(scutname=="imass")
+		{
+			if(!imassCut(m_cutFlowMapSVD->operator[](scutname)[0],pa,pb)) { if(b_print) {cout << "failed imass cut" << endl;} return; }
+		}
+	}
+	mupair.insert( make_pair(ia,ib) );
+}
+
+bool selection::removeOverlaps( TMapii& mupair, int ia, int ib)
+{
+	bool docontinue = false;
+	for(TMapii::iterator it=mupair.begin() ; it!=mupair.end() ; ++it)
+	{
+		if(it->first==ia  &&  it->second==ib) {docontinue=true; break;}
+		if(it->first==ib  &&  it->second==ia) {docontinue=true; break;}
+	}
+	if(docontinue) { if(b_print) cout << "overlap removed !" << endl; }
+	return docontinue;
+}
+
+void selection::buildMuonPairMap( TMapii& mupair, TVectorP2VL& pmu )
+{
 	if(pmu.size()>1)
 	{               
 		for(int n=0 ; n<(int)pmu.size() ; n++)
@@ -54,25 +116,41 @@ bool selection::findBestMuonPair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMap
 				if( m==n ) continue;
 
 				// remove overlaps
-				if( removeOverlaps(allmupairMap, n, m) ) continue;
-				
-				// take the pair with the largest invariant mass
-				// and set the incices of the two muons (by charge)
-				double current_imass = imass(pmu[n],pmu[m]);
-				if(current_imass > imassMax)
-				{
-					imassMax = current_imass;
-					iMum = (offPhys->mu_staco_charge->at(n)<0.) ? n : m;
-					iMup = (offPhys->mu_staco_charge->at(n)>0.) ? n : m;
-					
-					found = true;
-				}
-				else continue; // only one pair can survive this
-				
-				// now can insert all dimuons into the index map (only opposite charge requirement)
-				buildMuonPairMap( allmupairMap,
-								  (double)offPhys->mu_staco_charge->at(n), n,
-								  (double)offPhys->mu_staco_charge->at(m), m );
+				if( removeOverlaps(mupair, n, m) ) continue;
+
+				mupair.insert( make_pair(n,m) );
+			}
+		}
+	}
+}
+
+
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+
+bool selection::findBestMuonPair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum)
+{
+	bool found = false;
+	double current_imass;
+	double imassMax = -999.;
+	int ai, bi;
+	for(TMapii::iterator it=allmupairMap.begin() ; it!=allmupairMap.end() ; ++it)
+	{
+		ai = it->first;
+		bi = it->second;
+		
+		// find the pair with the largest invariant mass
+		// and set the incices of the two muons (by charge)
+		current_imass = imass(pmu[ai],pmu[bi]);
+		if(current_imass > imassMax)
+		{
+			if(offPhys->mu_staco_charge->at(ai)*offPhys->mu_staco_charge->at(bi)<0.)
+			{
+				imassMax = current_imass;
+				iMum = (offPhys->mu_staco_charge->at(ai)<0.) ? ai : bi;
+				iMup = (offPhys->mu_staco_charge->at(ai)>0.) ? ai : bi;
+				found = true;
 			}
 		}
 	}
@@ -88,37 +166,25 @@ bool selection::findBestMuonPair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMap
 bool selection::findBestMuonPair(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum)
 {
 	bool found = false;
-
+	double current_imass;
 	double imassMax = -999.;
-	if(pmu.size()>1)
-	{               
-		for(int n=0 ; n<(int)pmu.size() ; n++)
-		{               
-			for(int m=0 ; m<(int)pmu.size() ; m++)
+	int ai, bi;
+	for(TMapii::iterator it=allmupairMap.begin() ; it!=allmupairMap.end() ; ++it)
+	{
+		ai = it->first;
+		bi = it->second;
+		
+		// find the pair with the largest invariant mass
+		// and set the incices of the two muons (by charge)
+		current_imass = imass(pmu[ai],pmu[bi]);
+		if(current_imass > imassMax)
+		{
+			if(phys->mu_staco_charge->at(ai)*phys->mu_staco_charge->at(bi)<0.)
 			{
-				// dont pair with itself
-				if( m==n ) continue;
-
-				// remove overlaps
-				if( removeOverlaps(allmupairMap, n, m) ) continue;
-				
-				// take the pair with the largest invariant mass
-				// and set the incices of the two muons (by charge)
-				double current_imass = imass(pmu[n],pmu[m]);
-				if(current_imass > imassMax)
-				{
-					imassMax = current_imass;
-					iMum = (phys->mu_staco_charge->at(n)<0.) ? n : m;
-					iMup = (phys->mu_staco_charge->at(n)>0.) ? n : m;
-					
-					found = true;
-				}
-				else continue;
-				
-				// now can insert all dimuons into the index map (only opposite charge requirement)
-				buildMuonPairMap( allmupairMap,
-								  (double)phys->mu_staco_charge->at(n), n,
-								  (double)phys->mu_staco_charge->at(m), m );
+				imassMax = current_imass;
+				iMum = (phys->mu_staco_charge->at(ai)<0.) ? ai : bi;
+				iMup = (phys->mu_staco_charge->at(ai)>0.) ? ai : bi;
+				found = true;
 			}
 		}
 	}
@@ -199,7 +265,103 @@ bool selection::findBestVertex(physics* phys, int& iVtx)
 	return found;
 }
 
+
+bool selection::findHipTmuon(offlinePhysics* offPhys)
+{
+	bool found = false;
+	
+	double pT;
+	double pTms;
+	double qOp;
+	double theta;
+
+	for(int i=0 ; i<(int)offPhys->mu_staco_n ; i++)
+	{
+		pT    = offPhys->mu_staco_pt->at(i);
+		qOp   = offPhys->mu_staco_ms_qoverp->at(i);
+		theta = offPhys->mu_staco_ms_theta->at(i);
+		pTms  = (qOp!=0) ? fabs(1./qOp)*sin(theta) : 0.;
+		
+		if(pT > 15000.)   found = true;
+		if(pTms > 10000.) found = true;
+	}
+	
+	if(!found)
+	{
+		if(b_print) cout << "WARNING:  in selection::findHipTmuon:  didn't find any hipT muon" << endl;
+	}
+	
+	return found;
+}
+
+bool selection::findHipTmuon(physics* phys)
+{
+	bool found = false;
+	
+	double pT;
+	double pTms;
+	double qOp;
+	double theta;
+
+	for(int i=0 ; i<(int)phys->mu_staco_n ; i++)
+	{
+		pT    = phys->mu_staco_pt->at(i);
+		qOp   = phys->mu_staco_ms_qoverp->at(i);
+		theta = phys->mu_staco_ms_theta->at(i);
+		pTms  = (qOp!=0) ? fabs(1./qOp)*sin(theta) : 0.;
+		
+		if(pT > 15000.)   found = true;
+		if(pTms > 10000.) found = true;
+	}
+	
+	if(!found)
+	{
+		if(b_print) cout << "WARNING:  in selection::findHipTmuon:  didn't find any hipT muon" << endl;
+	}
+	
+	return found;
+}
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+
+
+bool selection::preselection(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum, int& iVtx)
+{
+	bool passed = false;
+	
+	passed = (offPhys->isGRL) ? true : false;
+	
+	passed = (offPhys->L1_MU6) ? true : false;
+	
+	passed = findHipTmuon(offPhys);
+	
+	passed = findBestMuonPair(offPhys, pmu, allmupairMap, iMup, iMum);
+	
+	passed = findBestVertex(offPhys, iVtx);
+	
+	return passed;
+}
+
+bool selection::preselection(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum, int& iVtx, int isGRL)
+{
+	bool passed = false;
+	
+	passed = (isGRL) ? true : false;
+	
+	passed = (phys->L1_MU6) ? true : false;
+	
+	passed = findHipTmuon(phys);
+	
+	passed = findBestMuonPair(phys, pmu, allmupairMap, iMup, iMum);
+	
+	passed = findBestVertex(phys, iVtx);
+	
+	return passed;
+}
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+
 
 bool selection::isGRLCut( double isGRLCutVal, int isGRL )
 {
@@ -241,6 +403,12 @@ bool selection::oppositeChargeCut( double ca, double cb )
 {
 	if(b_print) cout << "in oppositeCharge: ca=" << ca << ", cb=" << cb << endl;
 	return ( ca*cb<0 ) ? true : false;
+}
+
+bool selection::oppositeChargeCut( double oppositeChargeCutVal, double ca, double cb )
+{
+	if(b_print) cout << "in oppositeCharge: ca=" << ca << ", cb=" << cb << endl;
+	return ( ca*cb<oppositeChargeCutVal ) ? true : false;
 }
 
 bool selection::d0Cut( double d0CutVal, double d0a, double d0b )
@@ -527,81 +695,6 @@ double pTmua, double pTmub, double pTconea, double pTconeb )
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-
-
-void selection::buildMuonPairMap( 	TMapii& mupair,
-double ca, int ia,
-double cb, int ib)
-{
-	if(!oppositeChargeCut(ca,cb)) { if(b_print) {cout << "failed 0 charge cut" << endl;} return; }
-	mupair.insert( make_pair(ia,ib) );
-}
-
-void selection::buildMuonPairMap( TMapii& mupair,
-TLorentzVector* pa, double ca, double d0a, double z0a, int ia,
-TLorentzVector* pb, double cb, double d0b, double z0b, int ib)
-{
-	// run over all the dimuon-level cuts (i.e., not the event-level cuts such as L1_MU6 or GRL etc.)
-	// if one of the dimuon-level cuts fails, return from this function and do not insert this pair
-	// into the muPair map.
-	// If passed all dimuon-level cuts, then insert this pair into the muPair map.
-	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
-	{
-		string scutname = ii->second;
-		//vector<double> cutValue = m_cutFlowMapSVD->operator[](scutname);
-		
-		if(scutname=="oppositeCharcge")
-		{
-			if(!oppositeChargeCut(ca,cb)) { if(b_print) {cout << "failed 0 charge cut" << endl;} return; }
-		}
-		if(scutname=="pT")
-		{
-			if(!pTCut(m_cutFlowMapSVD->operator[](scutname)[0],pa,pb)) { if(b_print) {cout << "failed pT cut" << endl;} return; }
-		}
-		if(scutname=="eta")
-		{
-			if(!etaCut(m_cutFlowMapSVD->operator[](scutname)[0],pa,pb)) { if(b_print) {cout << "failed eta cut" << endl;} return; }
-		}
-		if(scutname=="d0")
-		{
-			if(!d0Cut(m_cutFlowMapSVD->operator[](scutname)[0],d0a,d0b)) { if(b_print) {cout << "failed d0 cut" << endl;} return; }
-		}
-		if(scutname=="z0")
-		{
-			if(!z0Cut(m_cutFlowMapSVD->operator[](scutname)[0],z0a,z0b)) { if(b_print) {cout << "failed z0 cut" << endl;} return; }
-		}
-		if(scutname=="cosThetaDimu")
-		{
-			if(!cosThetaDimuCut(m_cutFlowMapSVD->operator[](scutname)[0],pa,pb)) { if(b_print) {cout << "failed cosmic cut" << endl;} return; }
-		}
-		if(scutname=="imass")
-		{
-			if(!imassCut(m_cutFlowMapSVD->operator[](scutname)[0],pa,pb)) { if(b_print) {cout << "failed imass cut" << endl;} return; }
-		}
-	}
-	mupair.insert( make_pair(ia,ib) );
-}
-
-bool selection::removeOverlaps( TMapii& mupair, int ia, int ib)
-{
-	bool docontinue = false;
-	for(TMapii::iterator it=mupair.begin() ; it!=mupair.end() ; ++it)
-	{
-		if(it->first==ia  &&  it->second==ib) {docontinue=true; break;}
-		if(it->first==ib  &&  it->second==ia) {docontinue=true; break;}
-	}
-	if(docontinue) { if(b_print) cout << "overlap removed !" << endl; }
-	return docontinue;
-}
-
-
-void selection::findBestMuonPair( TMapii& mupair, int& ia, int& ib)
-{
-	int n = mupair.size();
-	if(b_print) cout << "n=" << n << endl;
-	ia = 0;
-	ib = 0;
-}
 
 #endif
 

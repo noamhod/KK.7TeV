@@ -285,16 +285,13 @@ void offlineAnalysis::executeCutFlow()
 	// local variables
 	TVectorP2VL	pmu;
 	TMapii		allmupairMap;
-	TMapsb		cutFlowDecision;
 	TMapsd		kinVars;
 	int         iMup = 0;
 	int         iMum = 0;
 	int         iVtx = 0;
-	
-	// find the best vertex (nTracks>1, type==1, smallest z0) and set the index of best one
-	bool isVxpFound = findBestVertex(m_offPhys, iVtx);
 
-	// build vector of the muons TLorentzVector
+	//////////////////////////////////////////////////////////////////
+	// build vector of the muons TLorentzVector //////////////////////
 	for(int n=0 ; n<(int)m_offPhys->mu_staco_m->size() ; n++)
 	{
 		pmu.push_back( new TLorentzVector() );
@@ -303,51 +300,21 @@ void offlineAnalysis::executeCutFlow()
 		pmu[n]->SetPz( m_offPhys->mu_staco_pz->at(n) );
 		pmu[n]->SetE(  m_offPhys->mu_staco_E->at(n)  );
 	}
-		
-	// build the map of the good muon pairs, set the indices of the muPlus and muMinus
-	bool isDiMuonFound = findBestMuonPair(m_offPhys, pmu, allmupairMap, iMup, iMum);
-	/*
-	double imassMax = -999.;
-	if(pmu.size()>1)
-	{               
-		for(int n=0 ; n<(int)pmu.size() ; n++)
-		{               
-			for(int m=0 ; m<(int)pmu.size() ; m++)
-			{
-				// dont pair with itself
-				if( m==n ) continue;
-				// remove overlaps
-				if( removeOverlaps(allmupairMap, n, m) ) continue;
-				
-				// take the pair with the largest invariant mass
-				// and set the incices of the two muons (by charge)
-				double current_imass = imass(pmu[n],pmu[m]);
-				if(current_imass > imassMax)
-				{
-					imassMax = current_imass;
-					iMum = (m_offPhys->mu_staco_charge->at(n)<0.) ? n : m;
-					iMup = (m_offPhys->mu_staco_charge->at(n)>0.) ? n : m;
-				}
-				else continue;
-				
-				///////////////
-				// return here the indices:
-				// (m_offPhys->mu_staco_charge->at(ai)<0.)?pT(pmu[ai]):pT(pmu[bi])
-				///////////////
-				
-				// now can insert all dimuons into the index map (only opposite charge requirement)
-				buildMuonPairMap( allmupairMap,
-								  (double)m_offPhys->mu_staco_charge->at(n), n,
-								  (double)m_offPhys->mu_staco_charge->at(m), m );
-			}
-		}
-	}
-	*/
-
+	///////////////////////////////////////////////////////////////////
+	
+	/////////////////////////////////////////////////////////////
+	// build the map of all the muon pair combinations //////////
+	buildMuonPairMap( allmupairMap, pmu ); //////////////////////
+	/////////////////////////////////////////////////////////////
+	
+	//////////////////////////////////////////////////////////////////////////////////////
+	// basic preselection ////////////////////////////////////////////////////////////////
+	if( !preselection(m_offPhys, pmu, allmupairMap, iMup, iMum, iVtx) ) return; //////////
+	//////////////////////////////////////////////////////////////////////////////////////
+	
 	// get the pmuon pairs from the all pairs map
 	if(allmupairMap.size()>0)
 	{
-		if(cutFlowDecision.size()>0)    cutFlowDecision.clear();
 		if(kinVars.size()>0) kinVars.clear();
 		
 		for(TMapii::iterator it=allmupairMap.begin() ; it!=allmupairMap.end() ; ++it)
@@ -424,6 +391,10 @@ void offlineAnalysis::executeCutFlow()
 			pTcone40a = m_offPhys->mu_staco_ptcone40->at(ai);
 			pTcone40b = m_offPhys->mu_staco_ptcone40->at(bi);
 			
+			// charge
+			mu_charge_a = m_offPhys->mu_staco_charge->at(ai);
+			mu_charge_b = m_offPhys->mu_staco_charge->at(bi);
+			
 			// fill the kinematic variables of this pair for the digested tree
 			kinVars.insert( make_pair("imass", current_imass) );
 			kinVars.insert( make_pair("cosTheta", current_cosTheta) );
@@ -444,7 +415,7 @@ void offlineAnalysis::executeCutFlow()
 
 				if(sorderedcutname=="oppositeCharcge")
 				{
-					passCurrentCut = (true) ? true : false;
+					passCurrentCut = ( oppositeChargeCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_charge_a, mu_charge_b) ) ? true : false;
 				}
 
 				if(sorderedcutname=="GRL")
@@ -577,8 +548,6 @@ void offlineAnalysis::executeCutFlow()
 					
 				} // end if(passCutFlow)
 				
-				// fill the decision
-				cutFlowDecision.insert( make_pair(sorderedcutname, passCurrentCut) );
 			} // end for(m_cutFlowOrdered)
 			
 		} // for(allmupairMap)
@@ -588,6 +557,7 @@ void offlineAnalysis::executeCutFlow()
 		//////////////////////////////////////////////////////////////////
 		
 	} // end if(allmupairMap.size()>0)
+	
 	else // no mu pair(s) at all
 	{
 		//////////////////////////////////////////////////

@@ -127,6 +127,10 @@ public:
 	double pTcone30b;
 	double pTcone40a;
 	double pTcone40b;
+	
+	// charge
+	double mu_charge_a;
+	double mu_charge_b;
 	////////////////////////
 
 public:

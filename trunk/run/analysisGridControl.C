@@ -104,9 +104,9 @@ void analysisGridControl::draw()
 
 void analysisGridControl::analyze()
 {
-	bool isendofrun = (l64t_jentry==l64t_stopEvent-1) ? true : false;
+	//bool isendofrun = (l64t_jentry==l64t_stopEvent-1) ? true : false;
 
-	m_analysis->executeTree( isendofrun );
+	//m_analysis->executeTree( isendofrun );
 	//m_analysis->executeBasic();
 	//m_analysis->executeAdvanced();
 	m_analysis->executeCutFlow();

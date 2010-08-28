@@ -44,7 +44,7 @@
 
 using namespace std;
 
-typedef map<int, int>           TMapii;
+typedef multimap<int, int>           TMapii;
 typedef map<double, double>     TMapdd;
 
 typedef vector<TLorentzVector*> TVectorP2VL;

@@ -47,11 +47,11 @@ public:
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 	// * * * preselection simple methods * * *
 	
-	bool findBestMuonPair(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum);
-	bool findBestMuonPair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum);
+	bool findBestMuonPair(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap);
+	bool findBestMuonPair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap);
 	
-	bool findBestVertex(physics* phys, int& iVtx);
-	bool findBestVertex(offlinePhysics* offPhys, int& iVtx);
+	bool findBestVertex(physics* phys);
+	bool findBestVertex(offlinePhysics* offPhys);
 	
 	bool findHipTmuon(physics* phys);
 	bool findHipTmuon(offlinePhysics* offPhys);
@@ -59,8 +59,8 @@ public:
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 	// * * * combined preselection * * *
 	
-	bool preselection(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum, int& iVtx, int isGRL);
-	bool preselection(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum, int& iVtx);
+	bool preselection(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int isGRL);
+	bool preselection(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap);
 	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 	// * * * simple cuts methods * * *
@@ -100,7 +100,11 @@ public:
 	// * * * combined cuts methods * * *
 	
 	bool primaryVertexCut( double prmVtxNtracksCutVal, double prmVtxTypeCutVal, double prmVtxZ0CutVal,
-						   vector<int>* pviPVtracks, vector<int>* pviPVtype, vector<float>* pvfPVz0, vector<float>* pvfPVz0err );
+						   vector<int>* pviPVtracks,
+						   vector<int>* pviPVtype,
+						   vector<float>* pvfPVz0,
+						   vector<float>* pvfPVz0err,
+						   int& bestVtxIndex );
 	bool nIDhitsCut( double nSCThitsCutVal, double nPIXhitsCutVal, double nIDhitsCutVal, int nSCThits, int nPIXhits );
 	bool pTmatchingRatioCut( double pTmatchHighRatioCutVal,
 							 double pTmatchLowRatioCutVal,

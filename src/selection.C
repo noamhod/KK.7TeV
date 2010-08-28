@@ -115,7 +115,7 @@ void selection::buildMuonPairMap( TMapii& mupair, TVectorP2VL& pmu )
 				// dont pair with itself
 				if( m==n ) continue;
 
-				// remove overlaps
+				// remove overlaps (mupair is a multimap !!!)
 				if( removeOverlaps(mupair, n, m) ) continue;
 
 				mupair.insert( make_pair(n,m) );
@@ -129,11 +129,11 @@ void selection::buildMuonPairMap( TMapii& mupair, TVectorP2VL& pmu )
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
-bool selection::findBestMuonPair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum)
+bool selection::findBestMuonPair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap)
 {
 	bool found = false;
 	double current_imass;
-	double imassMax = -999.;
+	double imassMax = 0.;
 	int ai, bi;
 	for(TMapii::iterator it=allmupairMap.begin() ; it!=allmupairMap.end() ; ++it)
 	{
@@ -145,13 +145,8 @@ bool selection::findBestMuonPair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMap
 		current_imass = imass(pmu[ai],pmu[bi]);
 		if(current_imass > imassMax)
 		{
-			if(offPhys->mu_staco_charge->at(ai)*offPhys->mu_staco_charge->at(bi)<0.)
-			{
-				imassMax = current_imass;
-				iMum = (offPhys->mu_staco_charge->at(ai)<0.) ? ai : bi;
-				iMup = (offPhys->mu_staco_charge->at(ai)>0.) ? ai : bi;
-				found = true;
-			}
+			imassMax = current_imass;
+			found = true;
 		}
 	}
 	
@@ -163,11 +158,11 @@ bool selection::findBestMuonPair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMap
 	return found;
 }
 
-bool selection::findBestMuonPair(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum)
+bool selection::findBestMuonPair(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap)
 {
 	bool found = false;
 	double current_imass;
-	double imassMax = -999.;
+	double imassMax = 0.;
 	int ai, bi;
 	for(TMapii::iterator it=allmupairMap.begin() ; it!=allmupairMap.end() ; ++it)
 	{
@@ -179,13 +174,8 @@ bool selection::findBestMuonPair(physics* phys, TVectorP2VL& pmu, TMapii& allmup
 		current_imass = imass(pmu[ai],pmu[bi]);
 		if(current_imass > imassMax)
 		{
-			if(phys->mu_staco_charge->at(ai)*phys->mu_staco_charge->at(bi)<0.)
-			{
-				imassMax = current_imass;
-				iMum = (phys->mu_staco_charge->at(ai)<0.) ? ai : bi;
-				iMup = (phys->mu_staco_charge->at(ai)>0.) ? ai : bi;
-				found = true;
-			}
+			imassMax = current_imass;
+			found = true;
 		}
 	}
 	
@@ -197,14 +187,14 @@ bool selection::findBestMuonPair(physics* phys, TVectorP2VL& pmu, TMapii& allmup
 	return found;
 }
 
-bool selection::findBestVertex(offlinePhysics* offPhys, int& iVtx)
+bool selection::findBestVertex(offlinePhysics* offPhys)
 {
 	bool found = false;
 
 	int   nPVtracks;
 	int   nPVtype;
 	float dPVz0;
-	float z0max = +999.;
+	float z0min = +9999.;
 	for(int i=0 ; i<(int)offPhys->vxp_n ; i++)
 	{
 		nPVtracks = offPhys->vxp_nTracks->at(i);
@@ -214,10 +204,9 @@ bool selection::findBestVertex(offlinePhysics* offPhys, int& iVtx)
 		if(nPVtracks>1  &&  nPVtype==1)
 		{
 			// find the vertex with the smallest z0
-			if(dPVz0 < z0max)
+			if(dPVz0 < z0min)
 			{
-				z0max = dPVz0;
-				iVtx  = i;
+				z0min = dPVz0;
 				found = true;
 			}
 		}
@@ -231,14 +220,14 @@ bool selection::findBestVertex(offlinePhysics* offPhys, int& iVtx)
 	return found;
 }
 
-bool selection::findBestVertex(physics* phys, int& iVtx)
+bool selection::findBestVertex(physics* phys)
 {
 	bool found = false;
 
 	int   nPVtracks;
 	int   nPVtype;
 	float dPVz0;
-	float z0max = +999.;
+	float z0min = +9999.;
 	for(int i=0 ; i<(int)phys->vxp_n ; i++)
 	{
 		nPVtracks = phys->vxp_nTracks->at(i);
@@ -248,10 +237,9 @@ bool selection::findBestVertex(physics* phys, int& iVtx)
 		if(nPVtracks>1  &&  nPVtype==1)
 		{
 			// find the vertex with the smallest z0
-			if(dPVz0 < z0max)
+			if(dPVz0 < z0min)
 			{
-				z0max = dPVz0;
-				iVtx  = i;
+				z0min = dPVz0;
 				found = true;
 			}
 		}
@@ -325,36 +313,36 @@ bool selection::findHipTmuon(physics* phys)
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
 
-bool selection::preselection(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum, int& iVtx)
+bool selection::preselection(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap)
 {
-	bool passed = false;
+	bool passed = true;
 	
-	passed = (offPhys->isGRL) ? true : false;
+	passed = (passed  &&  offPhys->isGRL) ? true : false;
 	
-	passed = (offPhys->L1_MU6) ? true : false;
+	passed = (passed  &&  offPhys->L1_MU6) ? true : false;
 	
-	passed = findHipTmuon(offPhys);
+	passed = (passed  &&  findHipTmuon(offPhys)) ? true : false;
 	
-	passed = findBestMuonPair(offPhys, pmu, allmupairMap, iMup, iMum);
+	passed = (passed  &&  findBestMuonPair(offPhys, pmu, allmupairMap)) ? true : false;
 	
-	passed = findBestVertex(offPhys, iVtx);
+	passed = (passed  &&  findBestVertex(offPhys)) ? true : false;
 	
 	return passed;
 }
 
-bool selection::preselection(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iMup, int& iMum, int& iVtx, int isGRL)
+bool selection::preselection(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int isGRL)
 {
-	bool passed = false;
+	bool passed = true;
 	
-	passed = (isGRL) ? true : false;
+	passed = (passed  &&  isGRL) ? true : false;
 	
-	passed = (phys->L1_MU6) ? true : false;
+	passed = (passed  &&  phys->L1_MU6) ? true : false;
 	
-	passed = findHipTmuon(phys);
+	passed = (passed  &&  findHipTmuon(phys)) ? true : false;
 	
-	passed = findBestMuonPair(phys, pmu, allmupairMap, iMup, iMum);
+	passed = (passed  &&  findBestMuonPair(phys, pmu, allmupairMap)) ? true : false;
 	
-	passed = findBestVertex(phys, iVtx);
+	passed = (passed  &&  findBestVertex(phys)) ? true : false;
 	
 	return passed;
 }
@@ -533,15 +521,24 @@ bool selection::isolationXXCut( double isolationCutVal, string sIsoValName, doub
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
 bool selection::primaryVertexCut( double prmVtxNtracksCutVal, double prmVtxTypeCutVal, double prmVtxZ0CutVal,
-vector<int>* pviPVtracks, vector<int>* pviPVtype, vector<float>* pvfPVz0, vector<float>* pvfPVz0err )
+								  vector<int>* pviPVtracks,
+								  vector<int>* pviPVtype,
+								  vector<float>* pvfPVz0,
+								  vector<float>* pvfPVz0err,
+								  int& bestVtxIndex)
 {
 
 	int nPVtracks;
 	int nPVtype;
 	float dPVz0;
 	float dPVz0err;
+	double minPVz0 = prmVtxZ0CutVal;
 	
 	int nPassed = 0;
+	
+	/////////////////////
+	bestVtxIndex = 0; ///
+	/////////////////////
 
 	bool bPassed = true;
 	for(int i=0 ; i<(int)pviPVtracks->size() ; i++)
@@ -570,6 +567,11 @@ vector<int>* pviPVtracks, vector<int>* pviPVtype, vector<float>* pvfPVz0, vector
 		}
 		
 		nPassed += (bPassed) ? 1 : 0;
+		if(dPVz0 < minPVz0)
+		{
+			minPVz0      = dPVz0;
+			bestVtxIndex = i; // return the best vertex
+		}
 	}
 	
 	if(b_print) { cout << "\t\tnPassed=" << nPassed << endl; }

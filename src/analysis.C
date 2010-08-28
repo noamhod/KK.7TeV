@@ -22,7 +22,8 @@ analysis::analysis(physics* phys, graphicObjects* graphicobjs, cutFlowHandler* c
 
 	m_treeFile = treeFile;
 
-	m_offlineTree = new offlineTree(m_phys, m_treeFile);
+	//m_offlineTree = new offlineTree(m_phys, m_treeFile);
+	m_offTree = new offTree( m_phys, m_treeFile );
 
 	m_muid    = new muon_muid(  m_phys ); // this will also "turn on" the desired branches (virtual in the base)
 	m_mustaco = new muon_staco( m_phys ); // this will also  "turn on" the desired branches (virtual in the base)
@@ -67,6 +68,7 @@ void analysis::fillCutFlow(string sCurrentCutName, TMapsd& values2fill)
 	}
 }
 
+/*
 void analysis::executeTree(bool isendofrun)
 {
 	if(isendofrun) cout << "--- !!! END OF RUN !!! ---" << endl;
@@ -74,6 +76,7 @@ void analysis::executeTree(bool isendofrun)
 	b_isGRL = m_analysis_grl->m_grl.HasRunLumiBlock( m_phys->RunNumber, m_phys->lbn );
 	m_offlineTree->fill( b_isGRL );
 }
+*/
 
 void analysis::executeBasic()
 {
@@ -87,10 +90,10 @@ void analysis::executeBasic()
 	double etaa;
 	double etab;
 	double costh;
-	double d0exPVa;
-	double z0exPVa;
-	double d0exPVb;
-	double z0exPVb;
+	//double d0exPVa;
+	//double z0exPVa;
+	//double d0exPVb;
+	//double z0exPVb;
 	double cosmicCosth;
 
 	// build vector of the muons TLorentzVector
@@ -216,16 +219,24 @@ void analysis::executeAdvanced()
 
 void analysis::executeCutFlow()
 {
-	/////////////////////////////////////////
-	m_cutFlowHandler->nAllEvents++; /////////
-	/////////////////////////////////////////
+	///////////////////////////////////////////
+	// do not skip this for correct counting //
+	m_cutFlowHandler->nAllEvents++; ///////////
+	///////////////////////////////////////////
+
+	///////////////////////////////////////////
+	m_offTree->reset(); ///////////////////////
+	///////////////////////////////////////////
 
 	// local variables
-	TMapii      allmupairMap;
-	TVectorP2VL pmu;
+	TVectorP2VL	pmu;
+	TMapii		muPairMap;
+	TMapsd		kinVars;
+	int         iVtx = 0;
 
-	// build vector of the muons TLorentzVector
-	for(int n=0 ; n<(int)m_phys->mu_staco_n ; n++)
+	//////////////////////////////////////////////////////////////////
+	// build vector of the muons TLorentzVector //////////////////////
+	for(int n=0 ; n<(int)m_phys->mu_staco_m->size() ; n++)
 	{
 		pmu.push_back( new TLorentzVector() );
 		pmu[n]->SetPx( m_phys->mu_staco_px->at(n) );
@@ -233,123 +244,125 @@ void analysis::executeCutFlow()
 		pmu[n]->SetPz( m_phys->mu_staco_pz->at(n) );
 		pmu[n]->SetE(  m_phys->mu_staco_E->at(n)  );
 	}
+	///////////////////////////////////////////////////////////////////
 
-	// build the map of the good muon pairs 
-	if(pmu.size()>1)
-	{               
-		for(int n=0 ; n<(int)pmu.size() ; n++)
-		{               
-			for(int m=0 ; m<(int)pmu.size() ; m++)
-			{
-				// dont pair with itself
-				if( m==n ) continue;
-
-				// remove overlaps
-				if( removeOverlaps(allmupairMap, n, m) ) continue;
-				// now can insert all dimuons into the index map (only opposite charge requirement)
-				buildMuonPairMap( allmupairMap,
-				(double)m_phys->mu_staco_charge->at(n), n,
-				(double)m_phys->mu_staco_charge->at(m), m );
-			}
-		}
-	}
-
-	// get the pmuon pairs from the all pairs map
-	if(allmupairMap.size()>0)
+	/////////////////////////////////////////////////////////////
+	// build the map of all the muon pair combinations //////////
+	buildMuonPairMap( muPairMap, pmu ); /////////////////////////
+	/////////////////////////////////////////////////////////////
+	
+	///////////////////////////////////////////////////////////////////////////////////////
+	// basic preselection /////////////////////////////////////////////////////////////////
+	isGRL = m_analysis_grl->m_grl.HasRunLumiBlock( m_phys->RunNumber, m_phys->lbn ); //////
+	if( !preselection(m_phys, pmu, muPairMap, isGRL) ) return; //////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////
+	
+	//if(muPairMap.size()>1) return;
+	
+	// get the pmuon pairs from the pairs map
+	if(muPairMap.size()>0)
 	{
-		for(TMapii::iterator it=allmupairMap.begin() ; it!=allmupairMap.end() ; ++it)
+		if(kinVars.size()>0) kinVars.clear();
+		
+		vector<int> score;
+		for(TMapii::iterator it=muPairMap.begin() ; it!=muPairMap.end() ; ++it)
 		{
 			int ai = it->first;
 			int bi = it->second;
-
-			//-----------------------------
-			// event level
-			int runnumber  = m_phys->RunNumber;
-			int lumiblock  = m_phys->lbn;
-			int isGRL      = m_analysis_grl->m_grl.HasRunLumiBlock( runnumber, lumiblock );
-			int isL1MU6    = m_phys->L1_MU6;
 			
+			////////////////////////
+			int nCutsPassed = 0; ///
+			////////////////////////
+
 			// calculate the necessary variables
-			double current_imass       = imass(pmu[ai],pmu[bi]);
-			double current_mu_pT       = (m_phys->mu_staco_charge->at(ai)<0.)?pT(pmu[ai]):pT(pmu[bi]);
-			double current_mu_eta      = (m_phys->mu_staco_charge->at(ai)<0.)?eta(pmu[ai]):eta(pmu[bi]);
-			double current_mu_cosTheta = cosThetaCollinsSoper( 	pmu[ai], (double)m_phys->mu_staco_charge->at(ai),
-																pmu[bi], (double)m_phys->mu_staco_charge->at(bi) );
+			current_imass    = imass(pmu[ai],pmu[bi]);
+			current_cosTheta = cosThetaCollinsSoper( pmu[ai], (double)m_phys->mu_staco_charge->at(ai),
+													 pmu[bi], (double)m_phys->mu_staco_charge->at(bi) );
+			current_mu_pT    = (m_phys->mu_staco_charge->at(ai)<0) ? m_phys->mu_staco_pt->at(ai) : m_phys->mu_staco_pt->at(bi);
+			current_mu_eta   = (m_phys->mu_staco_charge->at(ai)<0) ? m_phys->mu_staco_eta->at(ai) : m_phys->mu_staco_eta->at(bi);
+			
+			// event level
+			runnumber  = m_phys->RunNumber;
+			lumiblock  = m_phys->lbn;
+			isL1MU6    = m_phys->L1_MU6;
 			
 			// deprecated !!!
-			double d0exPVa = m_phys->mu_staco_d0_exPV->at(ai);
-			double z0exPVa = m_phys->mu_staco_z0_exPV->at(ai);
-			double d0exPVb = m_phys->mu_staco_d0_exPV->at(bi);
-			double z0exPVb = m_phys->mu_staco_z0_exPV->at(bi);
+			d0exPVa = m_phys->mu_staco_d0_exPV->at(ai);
+			z0exPVa = m_phys->mu_staco_z0_exPV->at(ai);
+			d0exPVb = m_phys->mu_staco_d0_exPV->at(bi);
+			z0exPVb = m_phys->mu_staco_z0_exPV->at(bi);
 			
 			// primary vertex:
 			// at least one primary vtx passes the z selection
-			vector<int>*   nPVtracksPtr = m_phys->vxp_nTracks; // number of tracks > 2
-			vector<int>*   nPVtypePtr   = m_phys->vxp_type;    // ==1
-			vector<float>* PVz0Ptr      = m_phys->vxp_z;       // = absolute z position of primary vertex < 150mm
-			vector<float>* PVz0errPtr   = m_phys->vxp_err_z;   // = error
+			nPVtracksPtr = m_phys->vxp_nTracks; // number of tracks > 2
+			nPVtypePtr   = m_phys->vxp_type;    // ==1
+			PVz0Ptr      = m_phys->vxp_z;       // = absolute z position of primary vertex < 150mm
+			PVz0errPtr   = m_phys->vxp_err_z;   // = error
 			
 			// combined muon ?
-			int isMuaComb  = m_phys->mu_staco_isCombinedMuon->at(ai);
-			int isMubComb  = m_phys->mu_staco_isCombinedMuon->at(bi);
+			isMuaComb  = m_phys->mu_staco_isCombinedMuon->at(ai);
+			isMubComb  = m_phys->mu_staco_isCombinedMuon->at(bi);	
 			
 			// inner detector hits
-			int nSCThitsMua  = m_phys->mu_staco_nSCTHits->at(ai); //  SCT hits >=4
-			int nSCThitsMub  = m_phys->mu_staco_nSCTHits->at(bi); //  SCT hits >=4
-			int nPIXhitsMua  = m_phys->mu_staco_nPixHits->at(ai); // pixel hits >=1
-			int nPIXhitsMub  = m_phys->mu_staco_nPixHits->at(bi); // pixel hits >=1
-			int nIDhitsMua   = nSCThitsMua+nPIXhitsMua; // pixel+SCT hits >=5
-			int nIDhitsMub   = nSCThitsMub+nPIXhitsMub; // pixel+SCT hits >=5
-					
-			// ID - MS pT matching: pT=|p|*sin(theta), qOp=charge/|p|
-			double me_qOp_a   = m_phys->mu_staco_me_qoverp->at(ai);
-			double id_qOp_a   = m_phys->mu_staco_id_qoverp->at(ai);
-			double me_theta_a = m_phys->mu_staco_me_theta->at(ai);
-			double id_theta_a = m_phys->mu_staco_id_theta->at(ai);
-			double me_qOp_b   = m_phys->mu_staco_me_qoverp->at(bi);
-			double id_qOp_b   = m_phys->mu_staco_id_qoverp->at(bi);
-			double me_theta_b = m_phys->mu_staco_me_theta->at(bi);
-			double id_theta_b = m_phys->mu_staco_id_theta->at(bi);
+			nSCThitsMua  = m_phys->mu_staco_nSCTHits->at(ai); //  SCT hits >=4
+			nSCThitsMub  = m_phys->mu_staco_nSCTHits->at(bi); //  SCT hits >=4
+			nPIXhitsMua  = m_phys->mu_staco_nPixHits->at(ai); // pixel hits >=1
+			nPIXhitsMub  = m_phys->mu_staco_nPixHits->at(bi); // pixel hits >=1
+			nIDhitsMua   = nSCThitsMua+nPIXhitsMua; // pixel+SCT hits >=5
+			nIDhitsMub   = nSCThitsMub+nPIXhitsMub; // pixel+SCT hits >=5
 			
-			/*
+			// ID - MS pT matching: pT=|p|*sin(theta), qOp=charge/|p|
+			me_qOp_a   = m_phys->mu_staco_me_qoverp->at(ai);
+			id_qOp_a   = m_phys->mu_staco_id_qoverp->at(ai);
+			me_theta_a = m_phys->mu_staco_me_theta->at(ai);
+			id_theta_a = m_phys->mu_staco_id_theta->at(ai);
+			me_qOp_b   = m_phys->mu_staco_me_qoverp->at(bi);
+			id_qOp_b   = m_phys->mu_staco_id_qoverp->at(bi);
+			me_theta_b = m_phys->mu_staco_me_theta->at(bi);
+			id_theta_b = m_phys->mu_staco_id_theta->at(bi);
+			
 			// impact parameter
-			double impPrmZ0 = m_phys->mu_staco_z0_exPV->at(ai);
-			double impPrmD0 = m_phys->mu_staco_d0_exPV->at(ai);
-			*/
+			impPrmZ0 = m_phys->mu_staco_z0_exPV->at(ai);
+			impPrmD0 = m_phys->mu_staco_d0_exPV->at(ai);
 			
 			// isolation
-			double mu_pTa   = m_phys->mu_staco_pt->at(ai);
-			double mu_pTb   = m_phys->mu_staco_pt->at(bi);
-			double pTcone20a = m_phys->mu_staco_ptcone20->at(ai);
-			double pTcone20b = m_phys->mu_staco_ptcone20->at(bi);
-			double pTcone30a = m_phys->mu_staco_ptcone30->at(ai);
-			double pTcone30b = m_phys->mu_staco_ptcone30->at(bi);
-			double pTcone40a = m_phys->mu_staco_ptcone40->at(ai);
-			double pTcone40b = m_phys->mu_staco_ptcone40->at(bi);
-
-			// calculate the necessary variables to be filled
-			TMapsd values2fill;
-			values2fill.insert( make_pair("imass",current_imass) );
-			values2fill.insert( make_pair("pT",current_mu_pT) );
-
+			mu_pTa   = m_phys->mu_staco_pt->at(ai);
+			mu_pTb   = m_phys->mu_staco_pt->at(bi);
+			pTcone20a = m_phys->mu_staco_ptcone20->at(ai);
+			pTcone20b = m_phys->mu_staco_ptcone20->at(bi);
+			pTcone30a = m_phys->mu_staco_ptcone30->at(ai);
+			pTcone30b = m_phys->mu_staco_ptcone30->at(bi);
+			pTcone40a = m_phys->mu_staco_ptcone40->at(ai);
+			pTcone40b = m_phys->mu_staco_ptcone40->at(bi);
 			
+			// charge
+			mu_charge_a = m_phys->mu_staco_charge->at(ai);
+			mu_charge_b = m_phys->mu_staco_charge->at(bi);
+			
+			// fill the kinematic variables of this pair for the digested tree
+			kinVars.insert( make_pair("imass", current_imass) );
+			kinVars.insert( make_pair("cosTheta", current_cosTheta) );
+			
+			TMapsd values2fill;
+			values2fill.insert( make_pair( "imass",current_imass ) );
+			values2fill.insert( make_pair( "pT",   current_mu_pT ) );
+			
+
 			bool passCutFlow    = true;
 			bool passCurrentCut = true;
 			// fill the cut flow, stop at the relevant cut each time.
 			// the cut objects don't have to be "correctly" ordered
 			// since it is done by the loop on the ordered cut flow map
-			
-			int cutFlowSize  = (int)m_cutFlowOrdered->size();
-			int cutFlowCount = 0;
+			int cutFlowMapSize = (int)m_cutFlowOrdered->size();
+			int counter = 0;
 			for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
 			{
-				cutFlowCount++;
-				
+				counter++;
 				string sorderedcutname = ii->second;
 
 				if(sorderedcutname=="oppositeCharcge")
 				{
-					passCurrentCut = (true) ? true : false;
+					passCurrentCut = ( oppositeChargeCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_charge_a, mu_charge_b) ) ? true : false;
 				}
 
 				if(sorderedcutname=="GRL")
@@ -397,32 +410,29 @@ void analysis::executeCutFlow()
 					double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 					double cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
 					double cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
-					passCurrentCut = ( primaryVertexCut(cutval1,cutval2,cutval3, nPVtracksPtr, nPVtypePtr, PVz0Ptr, PVz0errPtr) ) ? true : false;
+					passCurrentCut = ( primaryVertexCut(cutval1,cutval2,cutval3, nPVtracksPtr, nPVtypePtr, PVz0Ptr, PVz0errPtr, iVtx) ) ? true : false;
 				}
 				
 				if(sorderedcutname=="isCombMu")
 				{
 					passCurrentCut = ( isCombMuCut((*m_cutFlowMapSVD)[sorderedcutname][0],isMuaComb,isMubComb) ) ? true : false;
 				}
+				
 				/*
 				if(sorderedcutname=="idHits")
 				{
 					double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 					double cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
 					double cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
-					if(passCutFlow)
-					{
-						cout << "nSCThits=" << nSCThits << ", nPIXhits=" << nPIXhits << ", nIDhits=" << nSCThits+nPIXhits << endl;
-					}
 					passCurrentCut = ( nIDhitsCut( cutval1,cutval2,cutval3,nSCThits,nPIXhits ) ) ? true : false;
 				}
 				*/
 				
-				if(sorderedcutname=="isolation30")
+				if(sorderedcutname=="isolation40")
 				{
 					passCurrentCut =
 					(
-						pairXXisolation((*m_cutFlowMapSVD)[sorderedcutname][0],"isolation30",mu_pTa,mu_pTb,pTcone30a,pTcone30b)
+						pairXXisolation((*m_cutFlowMapSVD)[sorderedcutname][0],"isolation40",mu_pTa,mu_pTb,pTcone40a,pTcone40b)
 					) ? true : false;
 				}
 				
@@ -438,30 +448,42 @@ void analysis::executeCutFlow()
 					) ? true : false;
 				}
 
-				// decide
+				if(sorderedcutname=="pTmatchingAbsDiff")
+				{
+					double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
+					passCurrentCut =
+					(
+						pTmatchingAbsDiffCut( cutval1,
+								      me_qOp_a,me_theta_a,id_qOp_a,id_theta_a,
+								      me_qOp_b,me_theta_b,id_qOp_b,id_theta_b)
+					) ? true : false;
+				}
+
 				passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
-				
-				// do some stuff
 				if(passCutFlow)
 				{
+					//////////////////
+					nCutsPassed++; ///
+					//////////////////
+				
 					//////////////////////////////////////////////////////
 					// for the cut flow: /////////////////////////////////
 					// stop at this(sorderedcutname) cut /////////////////
 					fillCutFlow(sorderedcutname, values2fill); ///////////
 					//////////////////////////////////////////////////////
 
-					//////////////////////////////////////////////////////////////////////
-					// count the numbers: ////////////////////////////////////////////////
-					if(passCutFlow) m_cutFlowNumbers->operator[](sorderedcutname) ++; ////
-					//////////////////////////////////////////////////////////////////////
-					
-					////////////////////////////////////////////////////////////////////
-					if(cutFlowCount==cutFlowSize) ///////////////////////////////
+					//////////////////////////////////////////////////////
+					// count the numbers: ////////////////////////////////
+					m_cutFlowNumbers->operator[](sorderedcutname) ++; ////
+					//////////////////////////////////////////////////////
+
+					///////////////////////////////////////////////////////////
+					if(counter==cutFlowMapSize) ///////////////////////////////
 					{
 						// for the final histograms:
 						// i.e., not the curFlow histos
 						m_graphicobjs->h1_eta->Fill( current_mu_eta );
-						m_graphicobjs->h1_costh->Fill( current_mu_cosTheta );
+						m_graphicobjs->h1_costh->Fill( current_cosTheta );
 						m_graphicobjs->h1_pT->Fill( current_mu_pT );
 						m_graphicobjs->h1_imass->Fill( current_imass );
 					
@@ -470,19 +492,46 @@ void analysis::executeCutFlow()
 						cout << "\t pTmu=" << current_mu_pT  << endl;
 						cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << endl;
 					}
-					/////////////////////////////////////////////////////////////////////
+					///////////////////////////////////////////////////////////
+					
 				} // end if(passCutFlow)
+				
 			} // end for(m_cutFlowOrdered)
-		} // for(allmupairMap)
-	} // end if(allmupairMap.size()>0)
+			
+			/////////////////////////////////////
+			score.push_back(nCutsPassed); ///////
+			/////////////////////////////////////
+			
+		} // for(muPairMap)
+		
+		/////////////////////////////////////////////////////////////////////////////
+		// if mupairMap > 1 then take the pair with the highest cut-passing score ///
+		// and fill the tree with it ////////////////////////////////////////////////
+		int pairIndex = 0;
+		int maxScore = -1;
+		int ai,bi;
+		for(TMapii::iterator it=muPairMap.begin() ; it!=muPairMap.end() ; ++it)
+		{
+			if(score[pairIndex]>maxScore)
+			{
+				maxScore = score[pairIndex];
+				ai = it->first;
+				bi = it->second;
+			}
+			pairIndex++;
+		}
+		m_offTree->fill(isGRL, kinVars, ai, bi, iVtx); ///////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////
+		
+	} // end if(muPairMap.size()>0)
+
 	// re-initialize
-	if(allmupairMap.size()>0) allmupairMap.clear();
-	if(pmu.size()>0)          pmu.clear();
+	if(muPairMap.size()>0) muPairMap.clear();
+	if(pmu.size()>0)       pmu.clear();
 }
 
 void analysis::write()
 {
 	m_treeFile->cd();
-	m_offlineTree->write();
-	//m_treeFile->Close();
+	m_offTree->write();
 }

@@ -129,7 +129,7 @@ void selection::buildMuonPairMap( TMapii& mupair, TVectorP2VL& pmu )
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
-bool selection::findBestMuonPair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap)
+bool selection::findMostMassivePair(TVectorP2VL& pmu, TMapii& allmupairMap)
 {
 	bool found = false;
 	double current_imass;
@@ -152,39 +152,74 @@ bool selection::findBestMuonPair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMap
 	
 	if(!found)
 	{
-		if(b_print) cout << "WARNING:  in selection::findBestMuonPair:  didn't find any good muon pair" << endl;
+		if(b_print) cout << "WARNING:  in selection::findMostMassivePair:  didn't find any good muon pair" << endl;
 	}
 	
 	return found;
 }
 
-bool selection::findBestMuonPair(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap)
+bool selection::oppositeChargePair(physics* phys, int a, int b)
 {
-	bool found = false;
+	return ( phys->mu_staco_charge->at(a) * phys->mu_staco_charge->at(b) < 0) ? true : false;
+}
+
+bool selection::oppositeChargePair(offlinePhysics* offPhys, int a, int b)
+{
+	return ( offPhys->mu_staco_charge->at(a) * offPhys->mu_staco_charge->at(b) < 0) ? true : false;
+}
+
+void selection::findMostMassivePair(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iBest_a, int&iBest_b)
+{
 	double current_imass;
 	double imassMax = 0.;
 	int ai, bi;
+	iBest_a = 0;
+	iBest_b = 0;
 	for(TMapii::iterator it=allmupairMap.begin() ; it!=allmupairMap.end() ; ++it)
 	{
 		ai = it->first;
 		bi = it->second;
 		
-		// find the pair with the largest invariant mass
+		// find the mu+mu- pair with the largest invariant mass
 		// and set the incices of the two muons (by charge)
-		current_imass = imass(pmu[ai],pmu[bi]);
-		if(current_imass > imassMax)
+		if( oppositeChargePair(phys,ai,bi) )
 		{
-			imassMax = current_imass;
-			found = true;
+			current_imass = imass(pmu[ai],pmu[bi]);
+			if(current_imass > imassMax)
+			{
+				imassMax = current_imass;
+				iBest_a = ai;
+				iBest_b = bi;
+			}
 		}
 	}
-	
-	if(!found)
+}
+
+void selection::findMostMassivePair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iBest_a, int&iBest_b)
+{
+	double current_imass;
+	double imassMax = 0.;
+	int ai, bi;
+	iBest_a = 0;
+	iBest_b = 0;
+	for(TMapii::iterator it=allmupairMap.begin() ; it!=allmupairMap.end() ; ++it)
 	{
-		if(b_print) cout << "WARNING:  in selection::findBestMuonPair:  didn't find any good muon pair" << endl;
+		ai = it->first;
+		bi = it->second;
+		
+		// find the mu+mu- pair with the largest invariant mass
+		// and set the incices of the two muons (by charge)
+		if( oppositeChargePair(offPhys,ai,bi) )
+		{
+			current_imass = imass(pmu[ai],pmu[bi]);
+			if(current_imass > imassMax)
+			{
+				imassMax = current_imass;
+				iBest_a = ai;
+				iBest_b = bi;
+			}
+		}
 	}
-	
-	return found;
 }
 
 bool selection::findBestVertex(offlinePhysics* offPhys)
@@ -323,7 +358,7 @@ bool selection::preselection(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& 
 	
 	passed = (passed  &&  findHipTmuon(offPhys)) ? true : false;
 	
-	passed = (passed  &&  findBestMuonPair(offPhys, pmu, allmupairMap)) ? true : false;
+	passed = (passed  &&  findMostMassivePair(pmu, allmupairMap)) ? true : false;
 	
 	passed = (passed  &&  findBestVertex(offPhys)) ? true : false;
 	
@@ -340,7 +375,7 @@ bool selection::preselection(physics* phys, TVectorP2VL& pmu, TMapii& allmupairM
 	
 	passed = (passed  &&  findHipTmuon(phys)) ? true : false;
 	
-	passed = (passed  &&  findBestMuonPair(phys, pmu, allmupairMap)) ? true : false;
+	passed = (passed  &&  findMostMassivePair(pmu, allmupairMap)) ? true : false;
 	
 	passed = (passed  &&  findBestVertex(phys)) ? true : false;
 	

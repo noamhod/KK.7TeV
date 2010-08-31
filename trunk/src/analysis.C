@@ -57,17 +57,6 @@ void analysis::finalize()
 
 }
 
-void analysis::fillCutFlow(string sCurrentCutName, TMapsd& values2fill)
-{
-	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
-	{
-		string scutname = ii->second;
-		m_graphicobjs->hmap_cutFlow_imass->operator[]("imass."+scutname)->Fill( values2fill["imass"] );
-		m_graphicobjs->hmap_cutFlow_pT->operator[]("pT."+scutname)->Fill(       values2fill["pT"]    );
-		if(scutname==sCurrentCutName) break;
-	}
-}
-
 /*
 void analysis::executeTree(bool isendofrun)
 {
@@ -124,8 +113,8 @@ void analysis::executeBasic()
 				if( m_phys->L1_MU6 == 1 ) // this is also a cut and not overlap removal
 				{
 					buildMuonPairMap( mupairMap,
-									  pmu[n], m_phys->mu_staco_charge->at(n), m_phys->mu_staco_d0_exPV->at(n), m_phys->mu_staco_z0_exPV->at(n), n,
-									  pmu[m], m_phys->mu_staco_charge->at(m), m_phys->mu_staco_d0_exPV->at(m), m_phys->mu_staco_z0_exPV->at(m), m );
+					pmu[n], m_phys->mu_staco_charge->at(n), m_phys->mu_staco_d0_exPV->at(n), m_phys->mu_staco_z0_exPV->at(n), n,
+					pmu[m], m_phys->mu_staco_charge->at(m), m_phys->mu_staco_d0_exPV->at(m), m_phys->mu_staco_z0_exPV->at(m), m );
 				}
 			}
 
@@ -254,280 +243,255 @@ void analysis::executeCutFlow()
 	///////////////////////////////////////////////////////////////////////////////////////
 	// basic preselection /////////////////////////////////////////////////////////////////
 	isGRL = m_analysis_grl->m_grl.HasRunLumiBlock( m_phys->RunNumber, m_phys->lbn ); //////
-	if( !preselection(m_phys, pmu, muPairMap, isGRL) ) return; //////////////////////
+	if( !preselection(m_phys, pmu, muPairMap, isGRL) ) return; ////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////
 	
-	//if(muPairMap.size()>1) return;
-	
-	// get the pmuon pairs from the pairs map
-	if(muPairMap.size()>0)
+	///////////////////////////////////////////////////////////////
+	// extract the indices of the best pair if there are >1 pairs
+	// the selection is done for the most *massive* pair
+	int ai, bi;
+	if(muPairMap.size()>1)
 	{
-		if(kinVars.size()>0) kinVars.clear();
-		
-		vector<int> score;
-		for(TMapii::iterator it=muPairMap.begin() ; it!=muPairMap.end() ; ++it)
+		findMostMassivePair(m_phys, pmu, muPairMap, ai, bi);
+	}
+	else
+	{
+		TMapii::iterator it=muPairMap.begin();
+		ai = it->first;
+		bi = it->second;
+	}
+	////////////////////////////////////////////////////////////////
+	
+	
+
+	// calculate the necessary variables
+	current_imass    = imass(pmu[ai],pmu[bi]);
+	current_cosTheta = cosThetaCollinsSoper( pmu[ai], (double)m_phys->mu_staco_charge->at(ai),
+	pmu[bi], (double)m_phys->mu_staco_charge->at(bi) );
+	current_mu_pT    = (m_phys->mu_staco_charge->at(ai)<0) ? m_phys->mu_staco_pt->at(ai) : m_phys->mu_staco_pt->at(bi);
+	current_mu_eta   = (m_phys->mu_staco_charge->at(ai)<0) ? m_phys->mu_staco_eta->at(ai) : m_phys->mu_staco_eta->at(bi);
+	
+	// event level
+	runnumber  = m_phys->RunNumber;
+	lumiblock  = m_phys->lbn;
+	isL1MU6    = m_phys->L1_MU6;
+	
+	// deprecated !!!
+	d0exPVa = m_phys->mu_staco_d0_exPV->at(ai);
+	z0exPVa = m_phys->mu_staco_z0_exPV->at(ai);
+	d0exPVb = m_phys->mu_staco_d0_exPV->at(bi);
+	z0exPVb = m_phys->mu_staco_z0_exPV->at(bi);
+	
+	// primary vertex:
+	// at least one primary vtx passes the z selection
+	nPVtracksPtr = m_phys->vxp_nTracks; // number of tracks > 2
+	nPVtypePtr   = m_phys->vxp_type;    // ==1
+	PVz0Ptr      = m_phys->vxp_z;       // = absolute z position of primary vertex < 150mm
+	PVz0errPtr   = m_phys->vxp_err_z;   // = error
+	
+	// combined muon ?
+	isMuaComb  = m_phys->mu_staco_isCombinedMuon->at(ai);
+	isMubComb  = m_phys->mu_staco_isCombinedMuon->at(bi);	
+	
+	// inner detector hits
+	nSCThitsMua  = m_phys->mu_staco_nSCTHits->at(ai); //  SCT hits >=4
+	nSCThitsMub  = m_phys->mu_staco_nSCTHits->at(bi); //  SCT hits >=4
+	nPIXhitsMua  = m_phys->mu_staco_nPixHits->at(ai); // pixel hits >=1
+	nPIXhitsMub  = m_phys->mu_staco_nPixHits->at(bi); // pixel hits >=1
+	nIDhitsMua   = nSCThitsMua+nPIXhitsMua; // pixel+SCT hits >=5
+	nIDhitsMub   = nSCThitsMub+nPIXhitsMub; // pixel+SCT hits >=5
+	
+	// ID - MS pT matching: pT=|p|*sin(theta), qOp=charge/|p|
+	me_qOp_a   = m_phys->mu_staco_me_qoverp->at(ai);
+	id_qOp_a   = m_phys->mu_staco_id_qoverp->at(ai);
+	me_theta_a = m_phys->mu_staco_me_theta->at(ai);
+	id_theta_a = m_phys->mu_staco_id_theta->at(ai);
+	me_qOp_b   = m_phys->mu_staco_me_qoverp->at(bi);
+	id_qOp_b   = m_phys->mu_staco_id_qoverp->at(bi);
+	me_theta_b = m_phys->mu_staco_me_theta->at(bi);
+	id_theta_b = m_phys->mu_staco_id_theta->at(bi);
+	
+	// impact parameter
+	impPrmZ0 = m_phys->mu_staco_z0_exPV->at(ai);
+	impPrmD0 = m_phys->mu_staco_d0_exPV->at(ai);
+	
+	// isolation
+	mu_pTa   = m_phys->mu_staco_pt->at(ai);
+	mu_pTb   = m_phys->mu_staco_pt->at(bi);
+	pTcone20a = m_phys->mu_staco_ptcone20->at(ai);
+	pTcone20b = m_phys->mu_staco_ptcone20->at(bi);
+	pTcone30a = m_phys->mu_staco_ptcone30->at(ai);
+	pTcone30b = m_phys->mu_staco_ptcone30->at(bi);
+	pTcone40a = m_phys->mu_staco_ptcone40->at(ai);
+	pTcone40b = m_phys->mu_staco_ptcone40->at(bi);
+	
+	// charge
+	mu_charge_a = m_phys->mu_staco_charge->at(ai);
+	mu_charge_b = m_phys->mu_staco_charge->at(bi);
+	
+	
+	
+	// fill the kinematic variables of this pair for the digested tree
+	kinVars.insert( make_pair("imass", current_imass) );
+	kinVars.insert( make_pair("cosTheta", current_cosTheta) );
+	
+	TMapsd values2fill;
+	values2fill.insert( make_pair( "imass",current_imass ) );
+	values2fill.insert( make_pair( "pT",   current_mu_pT ) );
+	
+	bool passCutFlow    = true;
+	bool passCurrentCut = true;
+	// fill the cut flow, stop at the relevant cut each time.
+	// the cut objects don't have to be "correctly" ordered
+	// since it is done by the loop on the ordered cut flow map
+	int cutFlowMapSize = (int)m_cutFlowOrdered->size();
+	int counter = 0;
+	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
+	{
+		counter++;
+		string sorderedcutname = ii->second;
+
+		if(sorderedcutname=="oppositeCharcge")
 		{
-			int ai = it->first;
-			int bi = it->second;
-			
-			////////////////////////
-			int nCutsPassed = 0; ///
-			////////////////////////
-
-			// calculate the necessary variables
-			current_imass    = imass(pmu[ai],pmu[bi]);
-			current_cosTheta = cosThetaCollinsSoper( pmu[ai], (double)m_phys->mu_staco_charge->at(ai),
-													 pmu[bi], (double)m_phys->mu_staco_charge->at(bi) );
-			current_mu_pT    = (m_phys->mu_staco_charge->at(ai)<0) ? m_phys->mu_staco_pt->at(ai) : m_phys->mu_staco_pt->at(bi);
-			current_mu_eta   = (m_phys->mu_staco_charge->at(ai)<0) ? m_phys->mu_staco_eta->at(ai) : m_phys->mu_staco_eta->at(bi);
-			
-			// event level
-			runnumber  = m_phys->RunNumber;
-			lumiblock  = m_phys->lbn;
-			isL1MU6    = m_phys->L1_MU6;
-			
-			// deprecated !!!
-			d0exPVa = m_phys->mu_staco_d0_exPV->at(ai);
-			z0exPVa = m_phys->mu_staco_z0_exPV->at(ai);
-			d0exPVb = m_phys->mu_staco_d0_exPV->at(bi);
-			z0exPVb = m_phys->mu_staco_z0_exPV->at(bi);
-			
-			// primary vertex:
-			// at least one primary vtx passes the z selection
-			nPVtracksPtr = m_phys->vxp_nTracks; // number of tracks > 2
-			nPVtypePtr   = m_phys->vxp_type;    // ==1
-			PVz0Ptr      = m_phys->vxp_z;       // = absolute z position of primary vertex < 150mm
-			PVz0errPtr   = m_phys->vxp_err_z;   // = error
-			
-			// combined muon ?
-			isMuaComb  = m_phys->mu_staco_isCombinedMuon->at(ai);
-			isMubComb  = m_phys->mu_staco_isCombinedMuon->at(bi);	
-			
-			// inner detector hits
-			nSCThitsMua  = m_phys->mu_staco_nSCTHits->at(ai); //  SCT hits >=4
-			nSCThitsMub  = m_phys->mu_staco_nSCTHits->at(bi); //  SCT hits >=4
-			nPIXhitsMua  = m_phys->mu_staco_nPixHits->at(ai); // pixel hits >=1
-			nPIXhitsMub  = m_phys->mu_staco_nPixHits->at(bi); // pixel hits >=1
-			nIDhitsMua   = nSCThitsMua+nPIXhitsMua; // pixel+SCT hits >=5
-			nIDhitsMub   = nSCThitsMub+nPIXhitsMub; // pixel+SCT hits >=5
-			
-			// ID - MS pT matching: pT=|p|*sin(theta), qOp=charge/|p|
-			me_qOp_a   = m_phys->mu_staco_me_qoverp->at(ai);
-			id_qOp_a   = m_phys->mu_staco_id_qoverp->at(ai);
-			me_theta_a = m_phys->mu_staco_me_theta->at(ai);
-			id_theta_a = m_phys->mu_staco_id_theta->at(ai);
-			me_qOp_b   = m_phys->mu_staco_me_qoverp->at(bi);
-			id_qOp_b   = m_phys->mu_staco_id_qoverp->at(bi);
-			me_theta_b = m_phys->mu_staco_me_theta->at(bi);
-			id_theta_b = m_phys->mu_staco_id_theta->at(bi);
-			
-			// impact parameter
-			impPrmZ0 = m_phys->mu_staco_z0_exPV->at(ai);
-			impPrmD0 = m_phys->mu_staco_d0_exPV->at(ai);
-			
-			// isolation
-			mu_pTa   = m_phys->mu_staco_pt->at(ai);
-			mu_pTb   = m_phys->mu_staco_pt->at(bi);
-			pTcone20a = m_phys->mu_staco_ptcone20->at(ai);
-			pTcone20b = m_phys->mu_staco_ptcone20->at(bi);
-			pTcone30a = m_phys->mu_staco_ptcone30->at(ai);
-			pTcone30b = m_phys->mu_staco_ptcone30->at(bi);
-			pTcone40a = m_phys->mu_staco_ptcone40->at(ai);
-			pTcone40b = m_phys->mu_staco_ptcone40->at(bi);
-			
-			// charge
-			mu_charge_a = m_phys->mu_staco_charge->at(ai);
-			mu_charge_b = m_phys->mu_staco_charge->at(bi);
-			
-			// fill the kinematic variables of this pair for the digested tree
-			kinVars.insert( make_pair("imass", current_imass) );
-			kinVars.insert( make_pair("cosTheta", current_cosTheta) );
-			
-			TMapsd values2fill;
-			values2fill.insert( make_pair( "imass",current_imass ) );
-			values2fill.insert( make_pair( "pT",   current_mu_pT ) );
-			
-
-			bool passCutFlow    = true;
-			bool passCurrentCut = true;
-			// fill the cut flow, stop at the relevant cut each time.
-			// the cut objects don't have to be "correctly" ordered
-			// since it is done by the loop on the ordered cut flow map
-			int cutFlowMapSize = (int)m_cutFlowOrdered->size();
-			int counter = 0;
-			for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
-			{
-				counter++;
-				string sorderedcutname = ii->second;
-
-				if(sorderedcutname=="oppositeCharcge")
-				{
-					passCurrentCut = ( oppositeChargeCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_charge_a, mu_charge_b) ) ? true : false;
-				}
-
-				if(sorderedcutname=="GRL")
-				{
-					passCurrentCut = ( isGRLCut((*m_cutFlowMapSVD)[sorderedcutname][0], isGRL) ) ? true : false;
-				}
-
-				if(sorderedcutname=="L1_MU6")
-				{
-					passCurrentCut = ( isL1_MU6Cut((*m_cutFlowMapSVD)[sorderedcutname][0], isL1MU6) ) ? true : false;
-				}		
-
-				if(sorderedcutname=="imass")
-				{
-					passCurrentCut = ( imassCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
-				}
-
-				if(sorderedcutname=="pT")
-				{
-					passCurrentCut = ( pTCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
-				}
-
-				if(sorderedcutname=="eta")
-				{
-					passCurrentCut = ( etaCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
-				}
-
-				if(sorderedcutname=="cosThetaDimu")
-				{
-					passCurrentCut = ( cosThetaDimuCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
-				}
-
-				if(sorderedcutname=="d0")
-				{
-					passCurrentCut = ( d0Cut((*m_cutFlowMapSVD)[sorderedcutname][0], d0exPVa, d0exPVb) ) ? true : false;
-				}
-
-				if(sorderedcutname=="z0")
-				{
-					passCurrentCut = ( z0Cut((*m_cutFlowMapSVD)[sorderedcutname][0], z0exPVa, z0exPVb) ) ? true : false;
-				}
-				
-				if(sorderedcutname=="PV")
-				{
-					double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
-					double cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
-					double cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
-					passCurrentCut = ( primaryVertexCut(cutval1,cutval2,cutval3, nPVtracksPtr, nPVtypePtr, PVz0Ptr, PVz0errPtr, iVtx) ) ? true : false;
-				}
-				
-				if(sorderedcutname=="isCombMu")
-				{
-					passCurrentCut = ( isCombMuCut((*m_cutFlowMapSVD)[sorderedcutname][0],isMuaComb,isMubComb) ) ? true : false;
-				}
-				
-				/*
-				if(sorderedcutname=="idHits")
-				{
-					double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
-					double cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
-					double cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
-					passCurrentCut = ( nIDhitsCut( cutval1,cutval2,cutval3,nSCThits,nPIXhits ) ) ? true : false;
-				}
-				*/
-				
-				if(sorderedcutname=="isolation40")
-				{
-					passCurrentCut =
-					(
-						pairXXisolation((*m_cutFlowMapSVD)[sorderedcutname][0],"isolation40",mu_pTa,mu_pTb,pTcone40a,pTcone40b)
-					) ? true : false;
-				}
-				
-				if(sorderedcutname=="pTmatchingRatio")
-				{
-					double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
-					double cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
-					passCurrentCut =
-					(
-						pTmatchingRatioCut( cutval1,cutval2,
-											me_qOp_a,me_theta_a,id_qOp_a,id_theta_a,
-											me_qOp_b,me_theta_b,id_qOp_b,id_theta_b)
-					) ? true : false;
-				}
-
-				if(sorderedcutname=="pTmatchingAbsDiff")
-				{
-					double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
-					passCurrentCut =
-					(
-						pTmatchingAbsDiffCut( cutval1,
-								      me_qOp_a,me_theta_a,id_qOp_a,id_theta_a,
-								      me_qOp_b,me_theta_b,id_qOp_b,id_theta_b)
-					) ? true : false;
-				}
-
-				passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
-				if(passCutFlow)
-				{
-					//////////////////
-					nCutsPassed++; ///
-					//////////////////
-				
-					//////////////////////////////////////////////////////
-					// for the cut flow: /////////////////////////////////
-					// stop at this(sorderedcutname) cut /////////////////
-					fillCutFlow(sorderedcutname, values2fill); ///////////
-					//////////////////////////////////////////////////////
-
-					//////////////////////////////////////////////////////
-					// count the numbers: ////////////////////////////////
-					m_cutFlowNumbers->operator[](sorderedcutname) ++; ////
-					//////////////////////////////////////////////////////
-
-					///////////////////////////////////////////////////////////
-					if(counter==cutFlowMapSize) ///////////////////////////////
-					{
-						// for the final histograms:
-						// i.e., not the curFlow histos
-						m_graphicobjs->h1_eta->Fill( current_mu_eta );
-						m_graphicobjs->h1_costh->Fill( current_cosTheta );
-						m_graphicobjs->h1_pT->Fill( current_mu_pT );
-						m_graphicobjs->h1_imass->Fill( current_imass );
-					
-						cout << "$$$$$$$$$ dimuon $$$$$$$$$" << endl;
-						cout << "\t im=" << current_imass << endl;
-						cout << "\t pTmu=" << current_mu_pT  << endl;
-						cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << endl;
-					}
-					///////////////////////////////////////////////////////////
-					
-				} // end if(passCutFlow)
-				
-			} // end for(m_cutFlowOrdered)
-			
-			/////////////////////////////////////
-			score.push_back(nCutsPassed); ///////
-			/////////////////////////////////////
-			
-		} // for(muPairMap)
-		
-		/////////////////////////////////////////////////////////////////////////////
-		// if mupairMap > 1 then take the pair with the highest cut-passing score ///
-		// and fill the tree with it ////////////////////////////////////////////////
-		int pairIndex = 0;
-		int maxScore = -1;
-		int ai,bi;
-		for(TMapii::iterator it=muPairMap.begin() ; it!=muPairMap.end() ; ++it)
-		{
-			if(score[pairIndex]>maxScore)
-			{
-				maxScore = score[pairIndex];
-				ai = it->first;
-				bi = it->second;
-			}
-			pairIndex++;
+			passCurrentCut = ( oppositeChargeCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_charge_a, mu_charge_b) ) ? true : false;
 		}
-		m_offTree->fill(isGRL, kinVars, ai, bi, iVtx); ///////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////
+
+		if(sorderedcutname=="GRL")
+		{
+			passCurrentCut = ( isGRLCut((*m_cutFlowMapSVD)[sorderedcutname][0], isGRL) ) ? true : false;
+		}
+
+		if(sorderedcutname=="L1_MU6")
+		{
+			passCurrentCut = ( isL1_MU6Cut((*m_cutFlowMapSVD)[sorderedcutname][0], isL1MU6) ) ? true : false;
+		}		
+
+		if(sorderedcutname=="imass")
+		{
+			passCurrentCut = ( imassCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
+		}
+
+		if(sorderedcutname=="pT")
+		{
+			passCurrentCut = ( pTCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
+		}
+
+		if(sorderedcutname=="eta")
+		{
+			passCurrentCut = ( etaCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
+		}
+
+		if(sorderedcutname=="cosThetaDimu")
+		{
+			passCurrentCut = ( cosThetaDimuCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
+		}
+
+		if(sorderedcutname=="d0")
+		{
+			passCurrentCut = ( d0Cut((*m_cutFlowMapSVD)[sorderedcutname][0], d0exPVa, d0exPVb) ) ? true : false;
+		}
+
+		if(sorderedcutname=="z0")
+		{
+			passCurrentCut = ( z0Cut((*m_cutFlowMapSVD)[sorderedcutname][0], z0exPVa, z0exPVb) ) ? true : false;
+		}
 		
-	} // end if(muPairMap.size()>0)
+		if(sorderedcutname=="PV")
+		{
+			double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
+			double cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
+			double cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
+			passCurrentCut = ( primaryVertexCut(cutval1,cutval2,cutval3, nPVtracksPtr, nPVtypePtr, PVz0Ptr, PVz0errPtr, iVtx) ) ? true : false;
+		}
+		
+		if(sorderedcutname=="isCombMu")
+		{
+			passCurrentCut = ( isCombMuCut((*m_cutFlowMapSVD)[sorderedcutname][0],isMuaComb,isMubComb) ) ? true : false;
+		}
+		
+		/*
+		if(sorderedcutname=="idHits")
+		{
+			double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
+			double cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
+			double cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
+			passCurrentCut = ( nIDhitsCut( cutval1,cutval2,cutval3,nSCThits,nPIXhits ) ) ? true : false;
+		}
+		*/
+		
+		if(sorderedcutname=="isolation40")
+		{
+			passCurrentCut =
+			(
+			pairXXisolation((*m_cutFlowMapSVD)[sorderedcutname][0],"isolation40",mu_pTa,mu_pTb,pTcone40a,pTcone40b)
+			) ? true : false;
+		}
+		
+		if(sorderedcutname=="pTmatchingRatio")
+		{
+			double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
+			double cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
+			passCurrentCut =
+			(
+			pTmatchingRatioCut( cutval1,cutval2,
+			me_qOp_a,me_theta_a,id_qOp_a,id_theta_a,
+			me_qOp_b,me_theta_b,id_qOp_b,id_theta_b)
+			) ? true : false;
+		}
+
+		if(sorderedcutname=="pTmatchingAbsDiff")
+		{
+			double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
+			passCurrentCut =
+			(
+			pTmatchingAbsDiffCut( cutval1,
+			me_qOp_a,me_theta_a,id_qOp_a,id_theta_a,
+			me_qOp_b,me_theta_b,id_qOp_b,id_theta_b)
+			) ? true : false;
+		}
+
+		passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
+		if(passCutFlow)
+		{
+			//////////////////////////////////////////////////////
+			// for the cut flow: /////////////////////////////////
+			m_graphicobjs->hmap_cutFlow_imass->operator[]("imass."+sorderedcutname)->Fill( values2fill["imass"] );
+			m_graphicobjs->hmap_cutFlow_pT->operator[]("pT."+sorderedcutname)->Fill( values2fill["pT"] );
+			//////////////////////////////////////////////////////
+
+			//////////////////////////////////////////////////////
+			// count the numbers: ////////////////////////////////
+			m_cutFlowNumbers->operator[](sorderedcutname) ++; ////
+			//////////////////////////////////////////////////////
+
+			///////////////////////////////////////////////////////////
+			// fill the "allCuts" histograms only after the last cut 
+			if(counter==cutFlowMapSize)
+			{
+				// for the final histograms:
+				// i.e., not the curFlow histos
+				m_graphicobjs->h1_eta->Fill( current_mu_eta );
+				m_graphicobjs->h1_costh->Fill( current_cosTheta );
+				m_graphicobjs->h1_pT->Fill( current_mu_pT );
+				m_graphicobjs->h1_imass->Fill( current_imass );
+				
+				cout << "$$$$$$$$$ dimuon $$$$$$$$$" << endl;
+				cout << "\t im=" << current_imass << endl;
+				cout << "\t pTmu=" << current_mu_pT  << endl;
+				cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << endl;
+			}
+			///////////////////////////////////////////////////////////
+		} // end if(passCutFlow)
+	} // end for(m_cutFlowOrdered)
+	
+	//////////////////////////////////////////////////////////////////////////////
+	m_offTree->fill(isGRL, kinVars, ai, bi, iVtx); ///////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////
 
 	// re-initialize
 	if(muPairMap.size()>0) muPairMap.clear();
 	if(pmu.size()>0)       pmu.clear();
+	if(kinVars.size()>0)   kinVars.clear();
 }
 
 void analysis::write()

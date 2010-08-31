@@ -136,8 +136,6 @@ public:
 	void initialize();
 	void finalize();
 
-	void fillCutFlow(string sCurrentCutName, TMapsd& values2fill);
-
 	//void executeTree(bool isendofrun);
 	void executeBasic();
 	void executeAdvanced();

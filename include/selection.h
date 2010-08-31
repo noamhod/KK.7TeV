@@ -47,8 +47,12 @@ public:
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 	// * * * preselection simple methods * * *
 	
-	bool findBestMuonPair(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap);
-	bool findBestMuonPair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap);
+	bool oppositeChargePair(offlinePhysics* offPhys, int a, int b);
+	bool oppositeChargePair(physics* phys, int a, int b);
+	
+	bool findMostMassivePair(TVectorP2VL& pmu, TMapii& allmupairMap);
+	void findMostMassivePair(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iBest_a, int&iBest_b);
+	void findMostMassivePair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iBest_a, int&iBest_b);
 	
 	bool findBestVertex(physics* phys);
 	bool findBestVertex(offlinePhysics* offPhys);

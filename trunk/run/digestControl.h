@@ -21,9 +21,11 @@ class digestControl : public digestChains, public digestAnalysis
 	public:
 		// from MakeClass
 		digestPhysics* m_digestPhys;
-
+		cutFlowHandler* m_cutFlowHandler;
+		
 		// pointers
 		TFile*          m_histfile;
+		TFile*          m_treefile;
 		
 		TDirectory*     m_dirAllCuts;
 		TDirectory* 	m_dirNoCuts;

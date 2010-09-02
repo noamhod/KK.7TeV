@@ -19,6 +19,9 @@ digestControl::digestControl()
 	makeChain(true, str, strb);
 
 	m_digestPhys = new digestPhysics( m_chain );
+
+	str = checkANDsetFilepath("PWD", "/../data/digestTreeDigest.root");
+	m_treefile = new TFile( str.c_str(), "RECREATE");
 	
 	str = checkANDsetFilepath("PWD", "/../data/digestControl.root");
 	m_histfile = new TFile( str.c_str(), "RECREATE");
@@ -27,11 +30,12 @@ digestControl::digestControl()
 	m_graphics = new graphicObjects();
 	m_graphics->setStyle();
 
-	m_digestAnalysis = new digestAnalysis( m_digestPhys, m_graphics, /*"cosThetaDimu"*/ "GRL" );
-
 	// read the cut flow (ownership: selection class which digestAnalysis inherits from)
 	str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
-	m_digestAnalysis->readCutFlow( str );
+	m_cutFlowHandler = new cutFlowHandler(str);
+	
+	string sLastCut2Hist = "isCombMu"; // "cosThetaDimu"
+	m_digestAnalysis = new digestAnalysis( m_digestPhys, m_graphics, m_cutFlowHandler, m_treefile, sLastCut2Hist );
 
 	book();
 }
@@ -55,6 +59,7 @@ void digestControl::initialize()
 	m_digestAnalysis = NULL;
 	m_graphics = NULL;
 	m_histfile = NULL;
+	m_treefile = NULL;
 
 	cinitialize();
 	kinitialize();
@@ -63,9 +68,15 @@ void digestControl::initialize()
 
 void digestControl::finalize()
 {
-	// file
+	// write the tree
+	m_digestAnalysis->write();
+
+	// files
 	m_histfile->Write();
 	m_histfile->Close();
+
+	m_treefile->Write();
+	m_treefile->Close();
 	
 	cfinalize();
 	kfinalize();
@@ -84,17 +95,17 @@ void digestControl::book()
 	m_graphics->bookFitHistos(m_dirFit);
 
 	m_dirCutFlow = m_histfile->mkdir("cutFlow");
-	m_graphics->bookHistosMap( m_digestAnalysis->getCutFlowMapPtr(), m_digestAnalysis->getCutFlowOrderedPtr(), m_dirCutFlow );
+	m_graphics->bookHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_dirCutFlow );
 }
 
 void digestControl::draw()
 {
 	m_graphics->drawBareHistos(m_dirNoCuts);
 	m_graphics->drawHistos(m_dirAllCuts);
-	m_graphics->drawHistosMap( m_digestAnalysis->getCutFlowMapPtr(), m_digestAnalysis->getCutFlowOrderedPtr(), m_dirCutFlow );
+	m_graphics->drawHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_dirCutFlow );
 	m_graphics->drawFitHistos(m_dirFit, m_digestAnalysis->m_fGuess, m_digestAnalysis->m_fFitted);
 
-	m_digestAnalysis->printCutFlowNumbers(l64t_nentries);
+	m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
 }
 
 void digestControl::analyze()
@@ -111,7 +122,7 @@ void digestControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	l64t_nbytes = 0;
 	l64t_nb = 0;
 
-	l64t_mod = 100000;
+	l64t_mod = 20000;
 
 	l64t_startEvent = startEvent;
 	l64t_stopEvent = l64t_nentries;
@@ -128,8 +139,8 @@ void digestControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		l64t_nbytes += l64t_nb;
 		// if (Cut(l64t_ientry) < 0) continue;
 		
-		if(l64t_jentry%10000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_digestPhys->run_RunNumber << "\tlumiblock=" << m_digestPhys->run_lbn << endl;
-		if(l64t_jentry%l64t_mod==0) m_digestAnalysis->printCutFlowNumbers(l64t_nentries);
+		if(l64t_jentry%10000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_digestPhys->RunNumber << "\tlumiblock=" << m_digestPhys->lbn << endl;
+		if(l64t_jentry%l64t_mod==0) m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
 		
 		analyze();
 	}
@@ -137,7 +148,11 @@ void digestControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	m_digestAnalysis->fitter();
 	
 	draw();
+	
+	//finalize();
 }
+
+
 
 
 
@@ -203,13 +218,13 @@ bool digestControl::matchCandidates()
 {	
 	for(int rn=0 ; rn<(int)runNumber.size() ; rn++)
 	{
-		if( runNumber[rn] != (double)m_digestPhys->run_RunNumber ) continue;
+		if( runNumber[rn] != (double)m_digestPhys->RunNumber ) continue;
 		for(int lb=0 ; lb<(int)lumiBlock.size() ; lb++)
 		{
-			if( lumiBlock[lb] != (double)m_digestPhys->run_lbn ) continue;
+			if( lumiBlock[lb] != (double)m_digestPhys->lbn ) continue;
 			for(int en=0 ; en<(int)eventNumber.size() ; en++)
 			{
-				if( eventNumber[en] != (double)m_digestPhys->run_EventNumber ) continue;			
+				if( eventNumber[en] != (double)m_digestPhys->EventNumber ) continue;			
 				cout << "match !" << endl;
 				return true;
 			}
@@ -238,7 +253,7 @@ void digestControl::loopCandidates()
 		l64t_nb = m_digestPhys->fChain->GetEntry(l64t_jentry);
 		l64t_nbytes += l64t_nb;
 		
-		if(l64t_jentry%1000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_digestPhys->run_RunNumber << "\tlumiblock=" << m_digestPhys->run_lbn << "\tnMatched=" << nMatched << endl;
+		if(l64t_jentry%1000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_digestPhys->RunNumber << "\tlumiblock=" << m_digestPhys->lbn << "\tnMatched=" << nMatched << endl;
 		
 		// try to match this event to an entry from the external list
 		if( matchCandidates() ) nMatched++;

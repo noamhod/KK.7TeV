@@ -19,65 +19,69 @@ class offTree : public utilities
 		TTree*   m_tree;
 		
 		// check
-		Bool_t m_emptyEvent;
+		Bool_t emptyEvent;
 		
 		// event info branches
-		int m_RunNumber;
-		int m_lbn;
-		int m_EventNumber;
+		int RunNumber;
+		int lbn;
+		int EventNumber;
 		
 		// event preselection
-		int m_isGRL;
-		int m_L1_MU6;
+		int isGRL;
+		int L1_MU6;
 		
-		// dimuon kinematics variables
-		double m_imass;
-		double m_cosTheta;
+		// mu_staco
+		Int_t          mu_staco_n;
+		vector<float>* mu_staco_px;
+		vector<float>* mu_staco_py;
+		vector<float>* mu_staco_pz;
+		vector<float>* mu_staco_E;
+		vector<float>* mu_staco_m;
+		vector<float>* mu_staco_charge;
+		vector<float>* mu_staco_pt;
+		vector<float>* mu_staco_ptcone20;
+		vector<float>* mu_staco_ptcone30;
+		vector<float>* mu_staco_ptcone40;
+		vector<float>* mu_staco_eta;
+		vector<float>* mu_staco_d0_exPV;
+		vector<float>* mu_staco_z0_exPV;
+		vector<float>* mu_staco_me_qoverp;
+		vector<float>* mu_staco_id_qoverp;
+		vector<float>* mu_staco_me_theta;
+		vector<float>* mu_staco_id_theta;
+		vector<int>*   mu_staco_isCombinedMuon;
+		vector<int>*   mu_staco_nSCTHits;
+		vector<int>*   mu_staco_nPixHits;
 		
-		// mua and mub
-		double m_mua_m;
-		double m_mub_m;
-		double m_mua_charge;
-		double m_mub_charge;
-		double m_mua_pT;
-		double m_mub_pT;
-		double m_mua_pTcone20;
-		double m_mub_pTcone20;
-		double m_mua_pTcone30;
-		double m_mub_pTcone30;
-		double m_mua_pTcone40;
-		double m_mub_pTcone40;
-		double m_mua_eta;
-		double m_mub_eta;
-		double m_mua_d0_exPV;
-		double m_mub_d0_exPV;
-		double m_mua_z0_exPV;
-		double m_mub_z0_exPV;
-		double m_mua_me_qOp;
-		double m_mub_me_qOp;
-		double m_mua_id_qOp;
-		double m_mub_id_qOp;
-		double m_mua_me_theta;
-		double m_mub_me_theta;
-		double m_mua_id_theta;
-		double m_mub_id_theta;
-		double m_mua_isCombMu;
-		double m_mub_isCombMu;
-		double m_mua_nSCThits;
-		double m_mub_nSCThits;
-		double m_mua_nPIXhits;
-		double m_mub_nPIXhits;
-		double m_mua_nIDhits;
-		double m_mub_nIDhits;
-		
-		TLorentzVector m_mua_p4Vec;
-		TLorentzVector m_mub_p4Vec;
+		// muid
+		Int_t          mu_muid_n;
+		vector<float>* mu_muid_px;
+		vector<float>* mu_muid_py;
+		vector<float>* mu_muid_pz;
+		vector<float>* mu_muid_E;
+		vector<float>* mu_muid_m;
+		vector<float>* mu_muid_charge;
+		vector<float>* mu_muid_pt;
+		vector<float>* mu_muid_ptcone20;
+		vector<float>* mu_muid_ptcone30;
+		vector<float>* mu_muid_ptcone40;
+		vector<float>* mu_muid_eta;
+		vector<float>* mu_muid_d0_exPV;
+		vector<float>* mu_muid_z0_exPV;
+		vector<float>* mu_muid_me_qoverp;
+		vector<float>* mu_muid_id_qoverp;
+		vector<float>* mu_muid_me_theta;
+		vector<float>* mu_muid_id_theta;
+		vector<int>*   mu_muid_isCombinedMuon;
+		vector<int>*   mu_muid_nSCTHits;
+		vector<int>*   mu_muid_nPixHits;
 		
 		// vertex variables
-		double m_vxp_z;
-		double m_vxp_z_err;
-		double m_vxp_nTracks;
-		double m_vxp_type;
+		Int_t          vxp_n;
+		vector<float>* vxp_z;
+		vector<float>* vxp_z_err;
+		vector<int>*   vxp_nTracks;
+		vector<int>*   vxp_type;
 	
 	public:
 		offTree();
@@ -86,7 +90,7 @@ class offTree : public utilities
 		
 		void setBranches();
 		void fill();
-		void fill(int isGRL, TMapsd& kinVars, int ia, int ib, int iVtx);
+		void fill(int isGrl);
 		void reset();
 		void write();
 

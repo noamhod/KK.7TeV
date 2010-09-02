@@ -33,147 +33,228 @@ offlineTreeDigest::offlineTreeDigest(offlinePhysics* offPhys, TFile* treeFile)
 }
 
 void offlineTreeDigest::setBranches()
-{	
+{
+	mu_staco_px        = new vector<float>;
+	mu_staco_py        = new vector<float>;
+	mu_staco_pz        = new vector<float>;
+	mu_staco_E         = new vector<float>;
+	mu_staco_m         = new vector<float>;
+	mu_staco_charge    = new vector<float>;
+	mu_staco_pt        = new vector<float>;
+	mu_staco_ptcone20  = new vector<float>;
+	mu_staco_ptcone30  = new vector<float>;
+	mu_staco_ptcone40  = new vector<float>;
+	mu_staco_eta       = new vector<float>;
+	mu_staco_d0_exPV   = new vector<float>;
+	mu_staco_z0_exPV   = new vector<float>;
+	mu_staco_me_qoverp = new vector<float>;
+	mu_staco_id_qoverp = new vector<float>;
+	mu_staco_me_theta  = new vector<float>;
+	mu_staco_id_theta  = new vector<float>;
+	mu_staco_isCombinedMuon = new vector<int>;
+	mu_staco_nSCTHits  = new vector<int>;
+	mu_staco_nPixHits  = new vector<int>;
+	
+	// muid
+	//mu_muid_m         = new vector<float>;
+	//mu_muid_px        = new vector<float>;
+	//mu_muid_py        = new vector<float>;
+	//mu_muid_pz        = new vector<float>;
+	//mu_muid_E         = new vector<float>;
+	//mu_muid_charge    = new vector<float>;
+	//mu_muid_pt        = new vector<float>;
+	//mu_muid_ptcone20  = new vector<float>;
+	//mu_muid_ptcone30  = new vector<float>;
+	//mu_muid_ptcone40  = new vector<float>;
+	//mu_muid_eta       = new vector<float>;
+	//mu_muid_d0_exPV   = new vector<float>;
+	//mu_muid_z0_exPV   = new vector<float>;
+	//mu_muid_me_qoverp = new vector<float>;
+	//mu_muid_id_qoverp = new vector<float>;
+	//mu_muid_me_theta  = new vector<float>;
+	//mu_muid_id_theta  = new vector<float>;
+	//mu_muid_isCombinedMuon = new vector<int>;
+	//mu_muid_nSCTHits  = new vector<int>;
+	//mu_muid_nPixHits  = new vector<int>;
+	
+	vxp_z       = new vector<float>;
+	vxp_z_err   = new vector<float>;
+	vxp_nTracks = new vector<int>;
+	vxp_type    = new vector<int>;
+	
+
 	// run variables branches
-	m_tree->Branch( "RunNumber",   &m_RunNumber );
-	m_tree->Branch( "lbn",         &m_lbn );
-	m_tree->Branch( "EventNumber", &m_EventNumber );
+	m_tree->Branch( "RunNumber",   &RunNumber );
+	m_tree->Branch( "lbn",         &lbn );
+	m_tree->Branch( "EventNumber", &EventNumber );
 	
 	// preselection
-	m_tree->Branch( "isGRL",  &m_isGRL );
-	m_tree->Branch( "L1_MU6", &m_L1_MU6 );
+	m_tree->Branch( "isGRL",  &isGRL );
+	m_tree->Branch( "L1_MU6", &L1_MU6 );
 	
-	// kinematic variables branches
-	m_tree->Branch( "imass",    &m_imass );
-	m_tree->Branch( "cosTheta", &m_cosTheta );
+	// mu_staco
+	m_tree->Branch( "mu_staco_n",         &mu_staco_n );
+	m_tree->Branch( "mu_staco_px",        &mu_staco_px );
+	m_tree->Branch( "mu_staco_py",        &mu_staco_py );
+	m_tree->Branch( "mu_staco_pz",        &mu_staco_pz );
+	m_tree->Branch( "mu_staco_E",         &mu_staco_E );
+	m_tree->Branch( "mu_staco_m",         &mu_staco_m );
+	m_tree->Branch( "mu_staco_charge",    &mu_staco_charge );
+	m_tree->Branch( "mu_staco_pt",        &mu_staco_pt );
+	m_tree->Branch( "mu_staco_ptcone20",  &mu_staco_ptcone20 );
+	m_tree->Branch( "mu_staco_ptcone30",  &mu_staco_ptcone30 );
+	m_tree->Branch( "mu_staco_ptcone40",  &mu_staco_ptcone40 );
+	m_tree->Branch( "mu_staco_eta",       &mu_staco_eta );
+	m_tree->Branch( "mu_staco_d0_exPV",   &mu_staco_d0_exPV );
+	m_tree->Branch( "mu_staco_z0_exPV",   &mu_staco_z0_exPV );
+	m_tree->Branch( "mu_staco_me_qoverp",       &mu_staco_me_qoverp );
+	m_tree->Branch( "mu_staco_id_qoverp",       &mu_staco_id_qoverp );
+	m_tree->Branch( "mu_staco_me_theta",        &mu_staco_me_theta );
+	m_tree->Branch( "mu_staco_id_theta",        &mu_staco_id_theta );
+	m_tree->Branch( "mu_staco_isCombinedMuon",  &mu_staco_isCombinedMuon );
+	m_tree->Branch( "mu_staco_nSCTHits",        &mu_staco_nSCTHits );
+	m_tree->Branch( "mu_staco_nPixHits",        &mu_staco_nPixHits );
 	
-	// muPlus and muMinus other branches
-	m_tree->Branch( "muPlus_m",         &m_muPlus_m );
-	m_tree->Branch( "muMinus_m",        &m_muMinus_m );
-	m_tree->Branch( "muPlus_charge",    &m_muPlus_charge );
-	m_tree->Branch( "muMinus_charge",   &m_muMinus_charge );
-	m_tree->Branch( "muPlus_pT",        &m_muPlus_pT );
-	m_tree->Branch( "muMinus_pT",       &m_muMinus_pT );
-	m_tree->Branch( "muPlus_pTcone20",  &m_muPlus_pTcone20 );
-	m_tree->Branch( "muMinus_pTcone20", &m_muMinus_pTcone20 );
-	m_tree->Branch( "muPlus_pTcone30",  &m_muPlus_pTcone30 );
-	m_tree->Branch( "muMinus_pTcone30", &m_muMinus_pTcone30 );
-	m_tree->Branch( "muPlus_pTcone40",  &m_muPlus_pTcone40 );
-	m_tree->Branch( "muMinus_pTcone40", &m_muMinus_pTcone40 );
-	m_tree->Branch( "muPlus_eta",       &m_muPlus_eta );
-	m_tree->Branch( "muMinus_eta",      &m_muMinus_eta );
-	m_tree->Branch( "muPlus_d0_exPV",   &m_muPlus_d0_exPV );
-	m_tree->Branch( "muMinus_d0_exPV",  &m_muMinus_d0_exPV );
-	m_tree->Branch( "muPlus_z0_exPV",   &m_muPlus_z0_exPV );
-	m_tree->Branch( "muMinus_z0_exPV",  &m_muMinus_z0_exPV );
-	m_tree->Branch( "muPlus_me_qOp",    &m_muPlus_me_qOp );
-	m_tree->Branch( "muMinus_me_qOp",   &m_muMinus_me_qOp );
-	m_tree->Branch( "muPlus_id_qOp",    &m_muPlus_id_qOp );
-	m_tree->Branch( "muMinus_id_qOp",   &m_muMinus_id_qOp );
-	m_tree->Branch( "muPlus_me_theta",  &m_muPlus_me_theta );
-	m_tree->Branch( "muMinus_me_theta", &m_muMinus_me_theta );
-	m_tree->Branch( "muPlus_id_theta",  &m_muPlus_id_theta );
-	m_tree->Branch( "muMinus_id_theta", &m_muMinus_id_theta );
-	m_tree->Branch( "muPlus_isCombMu",  &m_muPlus_isCombMu );
-	m_tree->Branch( "muMinus_isCombMu", &m_muMinus_isCombMu );
-	m_tree->Branch( "muPlus_nSCThits",  &m_muPlus_nSCThits );
-	m_tree->Branch( "muMinus_nSCThits", &m_muMinus_nSCThits );
-	m_tree->Branch( "muPlus_nPIXhits",  &m_muPlus_nPIXhits );
-	m_tree->Branch( "muMinus_nPIXhits", &m_muMinus_nPIXhits );
-	m_tree->Branch( "muPlus_nIDhits",   &m_muPlus_nIDhits );
-	m_tree->Branch( "muMinus_nIDhits",  &m_muMinus_nIDhits );
-
-	// muPlus and muMinus TLorentzVector
-	m_tree->Branch( "muPlus_p4Vec",  &m_muPlus_p4Vec );
-	m_tree->Branch( "muMinus_p4Vec", &m_muMinus_p4Vec );
+	// //mu_muid
+	//m_tree->Branch( "mu_muid_n",         &//mu_muid_n );
+	//m_tree->Branch( "mu_muid_px",        &//mu_muid_px );
+	//m_tree->Branch( "mu_muid_py",        &//mu_muid_py );
+	//m_tree->Branch( "mu_muid_pz",        &//mu_muid_pz );
+	//m_tree->Branch( "mu_muid_E",         &//mu_muid_E );
+	//m_tree->Branch( "mu_muid_m",         &//mu_muid_m );
+	//m_tree->Branch( "mu_muid_charge",    &//mu_muid_charge );
+	//m_tree->Branch( "mu_muid_pt",        &//mu_muid_pt );
+	//m_tree->Branch( "mu_muid_ptcone20",  &//mu_muid_ptcone20 );
+	//m_tree->Branch( "mu_muid_ptcone30",  &//mu_muid_ptcone30 );
+	//m_tree->Branch( "mu_muid_ptcone40",  &//mu_muid_ptcone40 );
+	//m_tree->Branch( "mu_muid_eta",       &//mu_muid_eta );
+	//m_tree->Branch( "mu_muid_d0_exPV",   &//mu_muid_d0_exPV );
+	//m_tree->Branch( "mu_muid_z0_exPV",   &//mu_muid_z0_exPV );
+	//m_tree->Branch( "mu_muid_me_qoverp",       &//mu_muid_me_qoverp );
+	//m_tree->Branch( "mu_muid_id_qoverp",       &//mu_muid_id_qoverp );
+	//m_tree->Branch( "mu_muid_me_theta",        &//mu_muid_me_theta );
+	//m_tree->Branch( "mu_muid_id_theta",        &//mu_muid_id_theta );
+	//m_tree->Branch( "mu_muid_isCombinedMuon",  &//mu_muid_isCombinedMuon );
+	//m_tree->Branch( "mu_muid_nSCTHits",        &//mu_muid_nSCTHits );
+	//m_tree->Branch( "mu_muid_nPixHits",        &//mu_muid_nPixHits );
 	
 	// vertex branches
-	m_tree->Branch( "vxp_z",       &m_vxp_z );
-	m_tree->Branch( "vxp_z_err",   &m_vxp_z_err );
-	m_tree->Branch( "vxp_nTracks", &m_vxp_nTracks );
-	m_tree->Branch( "vxp_type",    &m_vxp_type );
-	
+	m_tree->Branch( "vxp_n",       &vxp_n );
+	m_tree->Branch( "vxp_nTracks", &vxp_nTracks );
+	m_tree->Branch( "vxp_type",    &vxp_type );
+	m_tree->Branch( "vxp_z",       &vxp_z );
+	m_tree->Branch( "vxp_z_err",   &vxp_z_err );	
 }
 
-void offlineTreeDigest::fill()
+void offlineTreeDigest::fill(int a, int b, int v)
 {
-	///////////////////////////////
-	m_tree->Fill(); ///////////////
-	///////////////////////////////
-}
 
-void offlineTreeDigest::fill(TMapsd& kinVars, int iMup, int iMum, int iVtx)
-{
+	//////////////////
+	reset(); /////////
+	//////////////////
+
+
 	// fill run branches
-	m_RunNumber   = m_offPhys->RunNumber;
-	m_lbn         = m_offPhys->lbn;
-	m_EventNumber = m_offPhys->EventNumber;
+	RunNumber   = m_offPhys->RunNumber;
+	lbn         = m_offPhys->lbn;
+	EventNumber = m_offPhys->EventNumber;
 	
 	// preselection
-	m_isGRL  = m_offPhys->isGRL;
-	m_L1_MU6 = m_offPhys->L1_MU6;
-
-	// fill kin branches
-	for(TMapsd::iterator it=kinVars.begin() ; it!=kinVars.end() ; ++it)
-	{
-		string sname = it->first;
-		double dval  = it->second;
-		
-		if(sname=="imass")    m_imass       = dval;
-		if(sname=="cosTheta") m_cosTheta = dval;
-	}
+	isGRL  = m_offPhys->isGRL;
+	L1_MU6 = m_offPhys->L1_MU6;
 	
-	// muons
-	m_muPlus_m = m_offPhys->mu_staco_m->at(iMup);
-	m_muMinus_m = m_offPhys->mu_staco_m->at(iMum);
-	m_muPlus_charge = m_offPhys->mu_staco_charge->at(iMup);
-	m_muMinus_charge = m_offPhys->mu_staco_charge->at(iMum);
-	m_muPlus_pT = m_offPhys->mu_staco_pt->at(iMup);
-	m_muMinus_pT = m_offPhys->mu_staco_pt->at(iMum);
-	m_muPlus_pTcone20 = m_offPhys->mu_staco_ptcone20->at(iMup);
-	m_muMinus_pTcone20 = m_offPhys->mu_staco_ptcone20->at(iMum);
-	m_muPlus_pTcone30 = m_offPhys->mu_staco_ptcone30->at(iMup);
-	m_muMinus_pTcone30 = m_offPhys->mu_staco_ptcone30->at(iMum);
-	m_muPlus_pTcone40 = m_offPhys->mu_staco_ptcone40->at(iMup);
-	m_muMinus_pTcone40 = m_offPhys->mu_staco_ptcone40->at(iMum);
-	m_muPlus_eta = m_offPhys->mu_staco_eta->at(iMup);
-	m_muMinus_eta = m_offPhys->mu_staco_eta->at(iMum);
-	m_muPlus_d0_exPV = m_offPhys->mu_staco_d0_exPV->at(iMup);
-	m_muMinus_d0_exPV = m_offPhys->mu_staco_d0_exPV->at(iMum);
-	m_muPlus_z0_exPV = m_offPhys->mu_staco_z0_exPV->at(iMup);
-	m_muMinus_z0_exPV = m_offPhys->mu_staco_z0_exPV->at(iMum);
-	m_muPlus_me_qOp = m_offPhys->mu_staco_me_qoverp->at(iMup);
-	m_muMinus_me_qOp = m_offPhys->mu_staco_me_qoverp->at(iMum);
-	m_muPlus_id_qOp = m_offPhys->mu_staco_id_qoverp->at(iMup);
-	m_muMinus_id_qOp = m_offPhys->mu_staco_id_qoverp->at(iMum);
-	m_muPlus_me_theta = m_offPhys->mu_staco_me_theta->at(iMup);
-	m_muMinus_me_theta = m_offPhys->mu_staco_me_theta->at(iMum);
-	m_muPlus_id_theta = m_offPhys->mu_staco_id_theta->at(iMup);
-	m_muMinus_id_theta = m_offPhys->mu_staco_id_theta->at(iMum);
-	m_muPlus_isCombMu = m_offPhys->mu_staco_isCombinedMuon->at(iMup);
-	m_muMinus_isCombMu = m_offPhys->mu_staco_isCombinedMuon->at(iMum);
-	m_muPlus_nSCThits = m_offPhys->mu_staco_nSCTHits->at(iMup);
-	m_muMinus_nSCThits = m_offPhys->mu_staco_nSCTHits->at(iMum);
-	m_muPlus_nPIXhits = m_offPhys->mu_staco_nPixHits->at(iMup);
-	m_muMinus_nPIXhits = m_offPhys->mu_staco_nPixHits->at(iMum);
-	m_muPlus_nIDhits = m_muPlus_nSCThits+m_muPlus_nPIXhits;
-	m_muMinus_nIDhits = m_muMinus_nSCThits+m_muMinus_nPIXhits;
+	// staco
+	mu_staco_n = m_offPhys->mu_staco_n;
+	mu_staco_px->push_back( m_offPhys->mu_staco_px->at(a) );
+	mu_staco_px->push_back( m_offPhys->mu_staco_px->at(b) );
+	mu_staco_py->push_back( m_offPhys->mu_staco_py->at(a) );
+	mu_staco_py->push_back( m_offPhys->mu_staco_py->at(b) );
+	mu_staco_pz->push_back( m_offPhys->mu_staco_pz->at(a) );
+	mu_staco_pz->push_back( m_offPhys->mu_staco_pz->at(b) );
+	mu_staco_E->push_back( m_offPhys->mu_staco_E->at(a) );
+	mu_staco_E->push_back( m_offPhys->mu_staco_E->at(b) );
+	mu_staco_m->push_back( m_offPhys->mu_staco_m->at(a) );
+	mu_staco_m->push_back( m_offPhys->mu_staco_m->at(b) );
+	mu_staco_charge->push_back( m_offPhys->mu_staco_charge->at(a) );
+	mu_staco_charge->push_back( m_offPhys->mu_staco_charge->at(b) );
+	mu_staco_pt->push_back( m_offPhys->mu_staco_pt->at(a) );
+	mu_staco_pt->push_back( m_offPhys->mu_staco_pt->at(b) );
+	mu_staco_ptcone20->push_back( m_offPhys->mu_staco_ptcone20->at(a) );
+	mu_staco_ptcone20->push_back( m_offPhys->mu_staco_ptcone20->at(b) );
+	mu_staco_ptcone30->push_back( m_offPhys->mu_staco_ptcone30->at(a) );
+	mu_staco_ptcone30->push_back( m_offPhys->mu_staco_ptcone30->at(b) );
+	mu_staco_ptcone40->push_back( m_offPhys->mu_staco_ptcone40->at(a) );
+	mu_staco_ptcone40->push_back( m_offPhys->mu_staco_ptcone40->at(b) );
+	mu_staco_eta->push_back( m_offPhys->mu_staco_eta->at(a) );
+	mu_staco_eta->push_back( m_offPhys->mu_staco_eta->at(b) );
+	mu_staco_d0_exPV->push_back( m_offPhys->mu_staco_d0_exPV->at(a) );
+	mu_staco_d0_exPV->push_back( m_offPhys->mu_staco_d0_exPV->at(b) );
+	mu_staco_z0_exPV->push_back( m_offPhys->mu_staco_z0_exPV->at(a) );
+	mu_staco_z0_exPV->push_back( m_offPhys->mu_staco_z0_exPV->at(b) );
+	mu_staco_me_qoverp->push_back( m_offPhys->mu_staco_me_qoverp->at(a) );
+	mu_staco_me_qoverp->push_back( m_offPhys->mu_staco_me_qoverp->at(b) );
+	mu_staco_id_qoverp->push_back( m_offPhys->mu_staco_id_qoverp->at(a) );
+	mu_staco_id_qoverp->push_back( m_offPhys->mu_staco_id_qoverp->at(b) );
+	mu_staco_me_theta->push_back( m_offPhys->mu_staco_me_theta->at(a) );
+	mu_staco_me_theta->push_back( m_offPhys->mu_staco_me_theta->at(b) );
+	mu_staco_id_theta->push_back( m_offPhys->mu_staco_id_theta->at(a) );
+	mu_staco_id_theta->push_back( m_offPhys->mu_staco_id_theta->at(b) );
+	mu_staco_isCombinedMuon->push_back( m_offPhys->mu_staco_isCombinedMuon->at(a) );
+	mu_staco_isCombinedMuon->push_back( m_offPhys->mu_staco_isCombinedMuon->at(b) );
+	mu_staco_nSCTHits->push_back( m_offPhys->mu_staco_nSCTHits->at(a) );
+	mu_staco_nSCTHits->push_back( m_offPhys->mu_staco_nSCTHits->at(b) );
+	mu_staco_nPixHits->push_back( m_offPhys->mu_staco_nPixHits->at(a) );
+	mu_staco_nPixHits->push_back( m_offPhys->mu_staco_nPixHits->at(b) );
 	
-	// muPlus and muMinus TLorentzVector
-	m_muPlus_p4Vec.SetPxPyPzE(m_offPhys->mu_staco_px->at(iMup),
-	m_offPhys->mu_staco_py->at(iMup),
-	m_offPhys->mu_staco_pz->at(iMup),
-	m_offPhys->mu_staco_E->at(iMup));
-	m_muMinus_p4Vec.SetPxPyPzE(m_offPhys->mu_staco_px->at(iMum),
-	m_offPhys->mu_staco_py->at(iMum),
-	m_offPhys->mu_staco_pz->at(iMum),
-	m_offPhys->mu_staco_E->at(iMum));
+	// muid
+	//mu_muid_n = m_offPhys->//mu_muid_n;
+	//mu_muid_px->push_back( m_offPhys->//mu_muid_px->at(a) );
+	//mu_muid_px->push_back( m_offPhys->//mu_muid_px->at(b) );
+	//mu_muid_py->push_back( m_offPhys->//mu_muid_py->at(a) );
+	//mu_muid_py->push_back( m_offPhys->//mu_muid_py->at(b) );
+	//mu_muid_pz->push_back( m_offPhys->//mu_muid_pz->at(a) );
+	//mu_muid_pz->push_back( m_offPhys->//mu_muid_pz->at(b) );
+	//mu_muid_E->push_back( m_offPhys->//mu_muid_E->at(a) );
+	//mu_muid_E->push_back( m_offPhys->//mu_muid_E->at(b) );
+	//mu_muid_m->push_back( m_offPhys->//mu_muid_m->at(a) );
+	//mu_muid_m->push_back( m_offPhys->//mu_muid_m->at(b) );
+	//mu_muid_charge->push_back( m_offPhys->//mu_muid_charge->at(a) );
+	//mu_muid_charge->push_back( m_offPhys->//mu_muid_charge->at(b) );
+	//mu_muid_pt->push_back( m_offPhys->//mu_muid_pt->at(a) );
+	//mu_muid_pt->push_back( m_offPhys->//mu_muid_pt->at(b) );
+	//mu_muid_ptcone20->push_back( m_offPhys->//mu_muid_ptcone20->at(a) );
+	//mu_muid_ptcone20->push_back( m_offPhys->//mu_muid_ptcone20->at(b) );
+	//mu_muid_ptcone30->push_back( m_offPhys->//mu_muid_ptcone30->at(a) );
+	//mu_muid_ptcone30->push_back( m_offPhys->//mu_muid_ptcone30->at(b) );
+	//mu_muid_ptcone40->push_back( m_offPhys->//mu_muid_ptcone40->at(a) );
+	//mu_muid_ptcone40->push_back( m_offPhys->//mu_muid_ptcone40->at(b) );
+	//mu_muid_eta->push_back( m_offPhys->//mu_muid_eta->at(a) );
+	//mu_muid_eta->push_back( m_offPhys->//mu_muid_eta->at(b) );
+	//mu_muid_d0_exPV->push_back( m_offPhys->//mu_muid_d0_exPV->at(a) );
+	//mu_muid_d0_exPV->push_back( m_offPhys->//mu_muid_d0_exPV->at(b) );
+	//mu_muid_z0_exPV->push_back( m_offPhys->//mu_muid_z0_exPV->at(a) );
+	//mu_muid_z0_exPV->push_back( m_offPhys->//mu_muid_z0_exPV->at(b) );
+	//mu_muid_me_qoverp->push_back( m_offPhys->//mu_muid_me_qoverp->at(a) );
+	//mu_muid_me_qoverp->push_back( m_offPhys->//mu_muid_me_qoverp->at(b) );
+	//mu_muid_id_qoverp->push_back( m_offPhys->//mu_muid_id_qoverp->at(a) );
+	//mu_muid_id_qoverp->push_back( m_offPhys->//mu_muid_id_qoverp->at(b) );
+	//mu_muid_me_theta->push_back( m_offPhys->//mu_muid_me_theta->at(a) );
+	//mu_muid_me_theta->push_back( m_offPhys->//mu_muid_me_theta->at(b) );
+	//mu_muid_id_theta->push_back( m_offPhys->//mu_muid_id_theta->at(a) );
+	//mu_muid_id_theta->push_back( m_offPhys->//mu_muid_id_theta->at(b) );
+	//mu_muid_isCombinedMuon->push_back( m_offPhys->//mu_muid_isCombinedMuon->at(a) );
+	//mu_muid_isCombinedMuon->push_back( m_offPhys->//mu_muid_isCombinedMuon->at(b) );
+	//mu_muid_nSCTHits->push_back( m_offPhys->//mu_muid_nSCTHits->at(a) );
+	//mu_muid_nSCTHits->push_back( m_offPhys->//mu_muid_nSCTHits->at(b) );
+	//mu_muid_nPixHits->push_back( m_offPhys->//mu_muid_nPixHits->at(a) );
+	//mu_muid_nPixHits->push_back( m_offPhys->//mu_muid_nPixHits->at(b) );
 	
 	// vertex
-	m_vxp_z = m_offPhys->vxp_nTracks->at(iVtx);
-	m_vxp_z_err = m_offPhys->vxp_type->at(iVtx);
-	m_vxp_nTracks = m_offPhys->vxp_z->at(iVtx);
-	m_vxp_type = m_offPhys->vxp_err_z->at(iVtx);
+	vxp_n = m_offPhys->vxp_n;
+	vxp_nTracks->push_back( m_offPhys->vxp_nTracks->at(v) );
+	vxp_type->push_back( m_offPhys->vxp_type->at(v) );
+	vxp_z->push_back( m_offPhys->vxp_z->at(v) );
+	vxp_z_err->push_back( m_offPhys->vxp_z_err->at(v) );
 	
 	///////////////////////////////
 	m_tree->Fill(); ///////////////
@@ -182,59 +263,54 @@ void offlineTreeDigest::fill(TMapsd& kinVars, int iMup, int iMum, int iVtx)
 
 void offlineTreeDigest::reset()
 {
-	// run
-	m_RunNumber   = -999;
-	m_lbn         = -999;
-	m_EventNumber = -999;
-
-	// kin
-	m_imass       = -999;
-	m_cosTheta = -999;
+	// staco
+	mu_staco_px->clear();
+	mu_staco_py->clear();
+	mu_staco_pz->clear();
+	mu_staco_E->clear();
+	mu_staco_m->clear();
+	mu_staco_charge->clear();
+	mu_staco_pt->clear();
+	mu_staco_ptcone20->clear();
+	mu_staco_ptcone30->clear();
+	mu_staco_ptcone40->clear();
+	mu_staco_eta->clear();
+	mu_staco_d0_exPV->clear();
+	mu_staco_z0_exPV->clear();
+	mu_staco_me_qoverp->clear();
+	mu_staco_id_qoverp->clear();
+	mu_staco_me_theta->clear();
+	mu_staco_id_theta->clear();
+	mu_staco_isCombinedMuon->clear();
+	mu_staco_nSCTHits->clear();
+	mu_staco_nPixHits->clear();
 	
-	// muons
-	m_muPlus_m         = -999;
-	m_muMinus_m        = -999;
-	m_muPlus_charge    = -999;
-	m_muMinus_charge   = -999;
-	m_muPlus_pT        = -999;
-	m_muMinus_pT       = -999;
-	m_muPlus_pTcone20  = -999;
-	m_muMinus_pTcone20 = -999;
-	m_muPlus_pTcone30  = -999;
-	m_muMinus_pTcone30 = -999;
-	m_muPlus_pTcone40  = -999;
-	m_muMinus_pTcone40 = -999;
-	m_muPlus_eta       = -999;
-	m_muMinus_eta      = -999;
-	m_muPlus_d0_exPV   = -999;
-	m_muMinus_d0_exPV  = -999;
-	m_muPlus_z0_exPV   = -999;
-	m_muMinus_z0_exPV  = -999;
-	m_muPlus_me_qOp    = -999;
-	m_muMinus_me_qOp   = -999;
-	m_muPlus_id_qOp    = -999;
-	m_muMinus_id_qOp   = -999;
-	m_muPlus_me_theta  = -999;
-	m_muMinus_me_theta = -999;
-	m_muPlus_id_theta  = -999;
-	m_muMinus_id_theta = -999;
-	m_muPlus_isCombMu  = -999;
-	m_muMinus_isCombMu = -999;
-	m_muPlus_nSCThits  = -999;
-	m_muMinus_nSCThits = -999;
-	m_muPlus_nPIXhits  = -999;
-	m_muMinus_nPIXhits = -999;
-	m_muPlus_nIDhits   = -999;
-	m_muMinus_nIDhits  = -999;
+	// muid
+	//mu_muid_px->clear();
+	//mu_muid_py->clear();
+	//mu_muid_pz->clear();
+	//mu_muid_E->clear();
+	//mu_muid_m->clear();
+	//mu_muid_charge->clear();
+	//mu_muid_pt->clear();
+	//mu_muid_ptcone20->clear();
+	//mu_muid_ptcone30->clear();
+	//mu_muid_ptcone40->clear();
+	//mu_muid_eta->clear();
+	//mu_muid_d0_exPV->clear();
+	//mu_muid_z0_exPV->clear();
+	//mu_muid_me_qoverp->clear();
+	//mu_muid_id_qoverp->clear();
+	//mu_muid_me_theta->clear();
+	//mu_muid_id_theta->clear();
+	//mu_muid_isCombinedMuon->clear();
+	//mu_muid_nSCTHits->clear();
+	//mu_muid_nPixHits->clear();
 	
-	m_muPlus_p4Vec.SetPxPyPzE(-999, -999, -999, -sqrt(3)*999);
-	m_muMinus_p4Vec.SetPxPyPzE(-999, -999, -999, -sqrt(3)*999);
-	
-	// vertex variables
-	m_vxp_z       = -999;
-	m_vxp_z_err   = -999;
-	m_vxp_nTracks = -999;
-	m_vxp_type    = -999;
+	vxp_nTracks->clear();
+	vxp_type->clear();
+	vxp_z->clear();
+	vxp_z_err->clear();
 }
 
 void offlineTreeDigest::write()

@@ -25,8 +25,8 @@
 #define muon_muid_cxx
 #include "muon_muid.C"
 
-#define offlineTree_cxx
-#include "offlineTree.C"
+//#define offlineTree_cxx
+//#include "offlineTree.C"
 
 #define offTree_cxx
 #include "offTree.C"
@@ -49,7 +49,6 @@ public:
 	
 	GRLinterface*   m_analysis_grl;
 
-	//offlineTree*    m_offlineTree;
 	offTree*        m_offTree;
 
 	// variables

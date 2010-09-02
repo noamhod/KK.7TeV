@@ -1,7 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Aug 10 23:44:14 2010 by ROOT version 5.22/00
-// from TChain digest/
+// Thu Sep  2 00:03:14 2010 by ROOT version 5.22/00
+// from TTree digest/digest
+// found on file: offlineTreeDigest.root
 //////////////////////////////////////////////////////////
 
 #ifndef digestPhysics_h
@@ -17,40 +18,70 @@ public :
    Int_t           fCurrent; //!current Tree number in a TChain
 
    // Declaration of leaf types
-   Int_t           run_RunNumber;
-   Int_t           run_lbn;
-   Int_t           run_EventNumber;
-   Double_t        kin_imass;
-   Double_t        kin_pT_mu;
-   Double_t        kin_eta_mu;
-   Double_t        kin_cosTheta_mu;
-   Bool_t          is_null;
-   Bool_t          is_GRL;
-   Bool_t          is_L1_MU6;
-   Bool_t          is_z0;
-   Bool_t          is_d0;
-   Bool_t          is_cosThetaDimuCut;
-   Bool_t          is_imass;
-   Bool_t          is_pT;
-   Bool_t          is_eta;
+   Int_t           RunNumber;
+   Int_t           lbn;
+   Int_t           EventNumber;
+   Int_t           isGRL;
+   Int_t           L1_MU6;
+   Int_t           mu_staco_n;
+   vector<float>   *mu_staco_px;
+   vector<float>   *mu_staco_py;
+   vector<float>   *mu_staco_pz;
+   vector<float>   *mu_staco_E;
+   vector<float>   *mu_staco_m;
+   vector<float>   *mu_staco_charge;
+   vector<float>   *mu_staco_pt;
+   vector<float>   *mu_staco_ptcone20;
+   vector<float>   *mu_staco_ptcone30;
+   vector<float>   *mu_staco_ptcone40;
+   vector<float>   *mu_staco_eta;
+   vector<float>   *mu_staco_d0_exPV;
+   vector<float>   *mu_staco_z0_exPV;
+   vector<float>   *mu_staco_me_qoverp;
+   vector<float>   *mu_staco_id_qoverp;
+   vector<float>   *mu_staco_me_theta;
+   vector<float>   *mu_staco_id_theta;
+   vector<int>     *mu_staco_isCombinedMuon;
+   vector<int>     *mu_staco_nSCTHits;
+   vector<int>     *mu_staco_nPixHits;
+   Int_t           vxp_n;
+   vector<int>     *vxp_nTracks;
+   vector<int>     *vxp_type;
+   vector<float>   *vxp_z;
+   vector<float>   *vxp_z_err;
 
    // List of branches
-   TBranch        *b_run_RunNumber;   //!
-   TBranch        *b_run_lbn;   //!
-   TBranch        *b_run_EventNumber;   //!
-   TBranch        *b_kin_imass;   //!
-   TBranch        *b_kin_pT_mu;   //!
-   TBranch        *b_kin_eta_mu;   //!
-   TBranch        *b_kin_cosTheta_mu;   //!
-   TBranch        *b_is_null;   //!
-   TBranch        *b_is_GRL;   //!
-   TBranch        *b_is_L1_MU6;   //!
-   TBranch        *b_is_z0;   //!
-   TBranch        *b_is_d0;   //!
-   TBranch        *b_is_cosThetaDimuCut;   //!
-   TBranch        *b_is_imass;   //!
-   TBranch        *b_is_pT;   //!
-   TBranch        *b_is_eta;   //!
+   TBranch        *b_RunNumber;   //!
+   TBranch        *b_lbn;   //!
+   TBranch        *b_EventNumber;   //!
+   TBranch        *b_isGRL;   //!
+   TBranch        *b_L1_MU6;   //!
+   TBranch        *b_mu_staco_n;   //!
+   TBranch        *b_mu_staco_px;   //!
+   TBranch        *b_mu_staco_py;   //!
+   TBranch        *b_mu_staco_pz;   //!
+   TBranch        *b_mu_staco_E;   //!
+   TBranch        *b_mu_staco_m;   //!
+   TBranch        *b_mu_staco_charge;   //!
+   TBranch        *b_mu_staco_pt;   //!
+   TBranch        *b_mu_staco_ptcone20;   //!
+   TBranch        *b_mu_staco_ptcone30;   //!
+   TBranch        *b_mu_staco_ptcone40;   //!
+   TBranch        *b_mu_staco_eta;   //!
+   TBranch        *b_mu_staco_d0_exPV;   //!
+   TBranch        *b_mu_staco_z0_exPV;   //!
+   TBranch        *b_mu_staco_me_qoverp;   //!
+   TBranch        *b_mu_staco_id_qoverp;   //!
+   TBranch        *b_mu_staco_me_theta;   //!
+   TBranch        *b_mu_staco_id_theta;   //!
+   TBranch        *b_mu_staco_isCombinedMuon;   //!
+   TBranch        *b_mu_staco_nSCTHits;   //!
+   TBranch        *b_mu_staco_nPixHits;   //!
+   TBranch        *b_vxp_n;   //!
+   TBranch        *b_vxp_nTracks;   //!
+   TBranch        *b_vxp_type;   //!
+   TBranch        *b_vxp_z;   //!
+   TBranch        *b_vxp_z_err;   //!
 
    digestPhysics(TTree *tree=0);
    virtual ~digestPhysics();
@@ -71,25 +102,11 @@ digestPhysics::digestPhysics(TTree *tree)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-
-#ifdef SINGLE_TREE
-      // The following code should be used if you want this class to access
-      // a single tree instead of a chain
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("Memory Directory");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("offlineTreeDigest.root");
       if (!f) {
-         f = new TFile("Memory Directory");
-         f->cd("Rint:/");
+         f = new TFile("offlineTreeDigest.root");
       }
       tree = (TTree*)gDirectory->Get("digest");
-
-#else // SINGLE_TREE
-
-      // The following code should be used if you want this class to access a chain
-      // of trees.
-      TChain * chain = new TChain("digest","");
-      chain->Add("digest_datasetdir/offlineTreeDigest.root/digest");
-      tree = chain;
-#endif // SINGLE_TREE
 
    }
    Init(tree);
@@ -132,28 +149,68 @@ void digestPhysics::Init(TTree *tree)
    // Init() will be called many times when running on PROOF
    // (once per file to be processed).
 
+   // Set object pointer
+   mu_staco_px = 0;
+   mu_staco_py = 0;
+   mu_staco_pz = 0;
+   mu_staco_E = 0;
+   mu_staco_m = 0;
+   mu_staco_charge = 0;
+   mu_staco_pt = 0;
+   mu_staco_ptcone20 = 0;
+   mu_staco_ptcone30 = 0;
+   mu_staco_ptcone40 = 0;
+   mu_staco_eta = 0;
+   mu_staco_d0_exPV = 0;
+   mu_staco_z0_exPV = 0;
+   mu_staco_me_qoverp = 0;
+   mu_staco_id_qoverp = 0;
+   mu_staco_me_theta = 0;
+   mu_staco_id_theta = 0;
+   mu_staco_isCombinedMuon = 0;
+   mu_staco_nSCTHits = 0;
+   mu_staco_nPixHits = 0;
+   vxp_nTracks = 0;
+   vxp_type = 0;
+   vxp_z = 0;
+   vxp_z_err = 0;
    // Set branch addresses and branch pointers
    if (!tree) return;
    fChain = tree;
    fCurrent = -1;
    fChain->SetMakeClass(1);
 
-   fChain->SetBranchAddress("run_RunNumber", &run_RunNumber, &b_run_RunNumber);
-   fChain->SetBranchAddress("run_lbn", &run_lbn, &b_run_lbn);
-   fChain->SetBranchAddress("run_EventNumber", &run_EventNumber, &b_run_EventNumber);
-   fChain->SetBranchAddress("kin_imass", &kin_imass, &b_kin_imass);
-   fChain->SetBranchAddress("kin_pT_mu", &kin_pT_mu, &b_kin_pT_mu);
-   fChain->SetBranchAddress("kin_eta_mu", &kin_eta_mu, &b_kin_eta_mu);
-   fChain->SetBranchAddress("kin_cosTheta_mu", &kin_cosTheta_mu, &b_kin_cosTheta_mu);
-   fChain->SetBranchAddress("is_null", &is_null, &b_is_null);
-   fChain->SetBranchAddress("is_GRL", &is_GRL, &b_is_GRL);
-   fChain->SetBranchAddress("is_L1_MU6", &is_L1_MU6, &b_is_L1_MU6);
-   fChain->SetBranchAddress("is_z0", &is_z0, &b_is_z0);
-   fChain->SetBranchAddress("is_d0", &is_d0, &b_is_d0);
-   fChain->SetBranchAddress("is_cosThetaDimuCut", &is_cosThetaDimuCut, &b_is_cosThetaDimuCut);
-   fChain->SetBranchAddress("is_imass", &is_imass, &b_is_imass);
-   fChain->SetBranchAddress("is_pT", &is_pT, &b_is_pT);
-   fChain->SetBranchAddress("is_eta", &is_eta, &b_is_eta);
+   fChain->SetBranchAddress("RunNumber", &RunNumber, &b_RunNumber);
+   fChain->SetBranchAddress("lbn", &lbn, &b_lbn);
+   fChain->SetBranchAddress("EventNumber", &EventNumber, &b_EventNumber);
+   fChain->SetBranchAddress("isGRL", &isGRL, &b_isGRL);
+   fChain->SetBranchAddress("L1_MU6", &L1_MU6, &b_L1_MU6);
+   fChain->SetBranchAddress("mu_staco_n", &mu_staco_n, &b_mu_staco_n);
+   fChain->SetBranchAddress("mu_staco_px", &mu_staco_px, &b_mu_staco_px);
+   fChain->SetBranchAddress("mu_staco_py", &mu_staco_py, &b_mu_staco_py);
+   fChain->SetBranchAddress("mu_staco_pz", &mu_staco_pz, &b_mu_staco_pz);
+   fChain->SetBranchAddress("mu_staco_E", &mu_staco_E, &b_mu_staco_E);
+   fChain->SetBranchAddress("mu_staco_m", &mu_staco_m, &b_mu_staco_m);
+   fChain->SetBranchAddress("mu_staco_charge", &mu_staco_charge, &b_mu_staco_charge);
+   fChain->SetBranchAddress("mu_staco_pt", &mu_staco_pt, &b_mu_staco_pt);
+   fChain->SetBranchAddress("mu_staco_ptcone20", &mu_staco_ptcone20, &b_mu_staco_ptcone20);
+   fChain->SetBranchAddress("mu_staco_ptcone30", &mu_staco_ptcone30, &b_mu_staco_ptcone30);
+   fChain->SetBranchAddress("mu_staco_ptcone40", &mu_staco_ptcone40, &b_mu_staco_ptcone40);
+   fChain->SetBranchAddress("mu_staco_eta", &mu_staco_eta, &b_mu_staco_eta);
+   fChain->SetBranchAddress("mu_staco_d0_exPV", &mu_staco_d0_exPV, &b_mu_staco_d0_exPV);
+   fChain->SetBranchAddress("mu_staco_z0_exPV", &mu_staco_z0_exPV, &b_mu_staco_z0_exPV);
+   fChain->SetBranchAddress("mu_staco_me_qoverp", &mu_staco_me_qoverp, &b_mu_staco_me_qoverp);
+   fChain->SetBranchAddress("mu_staco_id_qoverp", &mu_staco_id_qoverp, &b_mu_staco_id_qoverp);
+   fChain->SetBranchAddress("mu_staco_me_theta", &mu_staco_me_theta, &b_mu_staco_me_theta);
+   fChain->SetBranchAddress("mu_staco_id_theta", &mu_staco_id_theta, &b_mu_staco_id_theta);
+   fChain->SetBranchAddress("mu_staco_isCombinedMuon", &mu_staco_isCombinedMuon, &b_mu_staco_isCombinedMuon);
+   fChain->SetBranchAddress("mu_staco_nSCTHits", &mu_staco_nSCTHits, &b_mu_staco_nSCTHits);
+   fChain->SetBranchAddress("mu_staco_nPixHits", &mu_staco_nPixHits, &b_mu_staco_nPixHits);
+   fChain->SetBranchAddress("vxp_n", &vxp_n, &b_vxp_n);
+   fChain->SetBranchAddress("vxp_nTracks", &vxp_nTracks, &b_vxp_nTracks);
+   fChain->SetBranchAddress("vxp_type", &vxp_type, &b_vxp_type);
+   fChain->SetBranchAddress("vxp_z", &vxp_z, &b_vxp_z);
+   fChain->SetBranchAddress("vxp_z_err", &vxp_z_err, &b_vxp_z_err);
    Notify();
 }
 
@@ -177,7 +234,6 @@ void digestPhysics::Show(Long64_t entry)
 }
 Int_t digestPhysics::Cut(Long64_t entry)
 {
-   if(false) cout << "entry=" << entry << endl;
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
 // returns -1 otherwise.

@@ -35,7 +35,7 @@ offlineControl::offlineControl()
 	m_cutFlowHandler = new cutFlowHandler(str);
 	
 	string sLastCut2Hist = "isCombMu"; // "cosThetaDimu"
-	m_offlineAnalysis = new offlineAnalysis( m_offPhys, m_graphics, m_treefile, m_cutFlowHandler, sLastCut2Hist );
+	m_offlineAnalysis = new offlineAnalysis( m_offPhys, m_graphics, m_cutFlowHandler, m_treefile, sLastCut2Hist );
 
 	book();
 }

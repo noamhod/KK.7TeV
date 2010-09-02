@@ -141,7 +141,6 @@ bool selection::findMostMassivePair(TVectorP2VL& pmu, TMapii& allmupairMap)
 		bi = it->second;
 		
 		// find the pair with the largest invariant mass
-		// and set the incices of the two muons (by charge)
 		current_imass = imass(pmu[ai],pmu[bi]);
 		if(current_imass > imassMax)
 		{
@@ -229,21 +228,15 @@ bool selection::findBestVertex(offlinePhysics* offPhys)
 	int   nPVtracks;
 	int   nPVtype;
 	float dPVz0;
-	float z0min = +9999.;
 	for(int i=0 ; i<(int)offPhys->vxp_n ; i++)
 	{
 		nPVtracks = offPhys->vxp_nTracks->at(i);
 		nPVtype   = offPhys->vxp_type->at(i);
 		dPVz0     = offPhys->vxp_z->at(i);
 		
-		if(nPVtracks>1  &&  nPVtype==1)
+		if(nPVtracks>1  &&  nPVtype==1  &&  dPVz0<150.)
 		{
-			// find the vertex with the smallest z0
-			if(dPVz0 < z0min)
-			{
-				z0min = dPVz0;
-				found = true;
-			}
+			found = true;
 		}
 	}
 	
@@ -262,22 +255,12 @@ bool selection::findBestVertex(physics* phys)
 	int   nPVtracks;
 	int   nPVtype;
 	float dPVz0;
-	float z0min = +9999.;
 	for(int i=0 ; i<(int)phys->vxp_n ; i++)
 	{
 		nPVtracks = phys->vxp_nTracks->at(i);
 		nPVtype   = phys->vxp_type->at(i);
 		dPVz0     = phys->vxp_z->at(i);
-		
-		if(nPVtracks>1  &&  nPVtype==1)
-		{
-			// find the vertex with the smallest z0
-			if(dPVz0 < z0min)
-			{
-				z0min = dPVz0;
-				found = true;
-			}
-		}
+		if(nPVtracks>1  &&  nPVtype==1  &&  dPVz0<150.) found = true;
 	}
 	
 	if(!found)
@@ -288,6 +271,53 @@ bool selection::findBestVertex(physics* phys)
 	return found;
 }
 
+int selection::getPVindex(physics* phys)
+{
+	int   nPVtracks;
+	int   nPVtype;
+	float dPVz0;
+	float z0min = 9999;
+	int   index = 0;
+	for(int i=0 ; i<(int)phys->vxp_n ; i++)
+	{
+		nPVtracks = phys->vxp_nTracks->at(i);
+		nPVtype   = phys->vxp_type->at(i);
+		dPVz0     = phys->vxp_z->at(i);
+		if(nPVtracks>1  &&  nPVtype==1  &&  dPVz0<150.)
+		{
+			if(dPVz0<z0min)
+			{
+				z0min = dPVz0;
+				index = i;
+			}
+		}
+	}
+	return index;
+}
+
+int selection::getPVindex(offlinePhysics* offPhys)
+{
+	int   nPVtracks;
+	int   nPVtype;
+	float dPVz0;
+	float z0min = 9999;
+	int   index = 0;
+	for(int i=0 ; i<(int)offPhys->vxp_n ; i++)
+	{
+		nPVtracks = offPhys->vxp_nTracks->at(i);
+		nPVtype   = offPhys->vxp_type->at(i);
+		dPVz0     = offPhys->vxp_z->at(i);
+		if(nPVtracks>1  &&  nPVtype==1  &&  dPVz0<150.)
+		{
+			if(dPVz0<z0min)
+			{
+				z0min = dPVz0;
+				index = i;
+			}
+		}
+	}
+	return index;
+}
 
 bool selection::findHipTmuon(offlinePhysics* offPhys)
 {
@@ -301,8 +331,8 @@ bool selection::findHipTmuon(offlinePhysics* offPhys)
 	for(int i=0 ; i<(int)offPhys->mu_staco_n ; i++)
 	{
 		pT    = offPhys->mu_staco_pt->at(i);
-		qOp   = offPhys->mu_staco_ms_qoverp->at(i);
-		theta = offPhys->mu_staco_ms_theta->at(i);
+		qOp   = offPhys->mu_staco_me_qoverp->at(i);
+		theta = offPhys->mu_staco_me_theta->at(i);
 		pTms  = (qOp!=0) ? fabs(1./qOp)*sin(theta) : 0.;
 		
 		if(pT > 15000.)   found = true;
@@ -354,11 +384,11 @@ bool selection::preselection(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& 
 	
 	passed = (passed  &&  offPhys->isGRL) ? true : false;
 	
-	passed = (passed  &&  offPhys->L1_MU6) ? true : false;
+	//passed = (passed  &&  offPhys->L1_MU6) ? true : false;
 	
 	passed = (passed  &&  findHipTmuon(offPhys)) ? true : false;
 	
-	passed = (passed  &&  findMostMassivePair(pmu, allmupairMap)) ? true : false;
+	//passed = (passed  &&  findMostMassivePair(pmu, allmupairMap)) ? true : false;
 	
 	passed = (passed  &&  findBestVertex(offPhys)) ? true : false;
 	
@@ -371,11 +401,11 @@ bool selection::preselection(physics* phys, TVectorP2VL& pmu, TMapii& allmupairM
 	
 	passed = (passed  &&  isGRL) ? true : false;
 	
-	passed = (passed  &&  phys->L1_MU6) ? true : false;
+	//passed = (passed  &&  phys->L1_MU6) ? true : false;
 	
 	passed = (passed  &&  findHipTmuon(phys)) ? true : false;
 	
-	passed = (passed  &&  findMostMassivePair(pmu, allmupairMap)) ? true : false;
+	//passed = (passed  &&  findMostMassivePair(pmu, allmupairMap)) ? true : false;
 	
 	passed = (passed  &&  findBestVertex(phys)) ? true : false;
 	

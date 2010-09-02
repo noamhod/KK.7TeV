@@ -7,75 +7,130 @@
 
 #include "basicIncludes.h"
 
+#define fit_cxx
+#include "fit.C"
+
 #define selection_cxx
 #include "selection.C"
 
 #define graphicObjects_cxx
 #include "graphicObjects.C"
 
-#define fit_cxx
-#include "fit.C"
-
-/*
-#define muon_staco_cxx
-#include "muon_staco.C"
-
-#define muon_muid_cxx
-#include "muon_muid.C"
-*/
+#define cutFlowHandler_cxx
+#include "cutFlowHandler.C"
 
 #ifndef DIGESTANALYSIS_H
 #define DIGESTANALYSIS_H
 
 class digestAnalysis : public digestPhysics, public selection, public graphicObjects
 {
-	public:
-		// pointers to classes
-		graphicObjects* m_graphicobjs;
+public:
+	// pointers to classes
+	digestPhysics*        m_digestPhys;
 
-		fit* m_fit;
-		TF1* m_fFitted;
-		TF1* m_fGuess;
-		
-		/*
-		muon_muid*      m_muid;
-		muon_staco*     m_mustaco;
-		*/		
+	graphicObjects* m_graphicobjs;
 
-		digestPhysics* m_digestPhys;
+	cutFlowHandler* m_cutFlowHandler;
+	
+	fit* m_fit;
+	TF1* m_fFitted;
+	TF1* m_fGuess;
+	
+	TFile*		       m_treeFile;
 
-		// variables
-		TMapsd*         m_cutFlowMap;
-		TMapds*         m_cutFlowOrdered;
-		TMapsi*         m_cutFlowNumbers;
-		
-		Bool_t b_isGRL;
-		int    nAllEvents;
-		string m_sLastCut2Hist;
+	// variables
+	TMapsvd* m_cutFlowMapSVD;
+	TMapds*  m_cutFlowOrdered;
+	TMapsi*  m_cutFlowNumbers;
+	
+	Bool_t b_isGRL;
 
-	public:
-		digestAnalysis();
-		digestAnalysis(digestPhysics* offPhys, graphicObjects* graphicobjs, string sLastCut2Hist = "GRL");
-		~digestAnalysis();
+	string m_sLastCut2Hist;
+	
+	////////////////////////
+	// calculate the necessary variables
+	double current_imass;
+	double current_cosTheta;
+	double current_mu_pT;
+	double current_mu_eta;
+	
+	// event level
+	int runnumber;
+	int lumiblock;
+	int isGRL;
+	int isL1MU6;
+	
+	// deprecated !!!
+	double d0exPVa;
+	double z0exPVa;
+	double d0exPVb;
+	double z0exPVb;
+	
+	// primary vertex:
+	// at least one primary vtx passes the z selection
+	vector<int>*   nPVtracksPtr;
+	vector<int>*   nPVtypePtr;
+	vector<float>* PVz0Ptr;
+	vector<float>* PVz0errPtr;
+	
+	// combined muon ?
+	int isMuaComb;
+	int isMubComb;
+	
+	// inner detector hits
+	int nSCThitsMua;
+	int nSCThitsMub;
+	int nPIXhitsMua;
+	int nPIXhitsMub;
+	int nIDhitsMua;
+	int nIDhitsMub;
+	
+	// ID - MS pT matching: pT=|p|*sin(theta), qOp=charge/|p|
+	double me_qOp_a;
+	double id_qOp_a;
+	double me_theta_a;
+	double id_theta_a;
+	double me_qOp_b;
+	double id_qOp_b;
+	double me_theta_b;
+	double id_theta_b;
+	
+	// impact parameter
+	double impPrmZ0;
+	double impPrmD0;
+	
+	// isolation
+	double mu_pTa;
+	double mu_pTb;
+	double pTcone20a;
+	double pTcone20b;
+	double pTcone30a;
+	double pTcone30b;
+	double pTcone40a;
+	double pTcone40b;
+	
+	// charge
+	double mu_charge_a;
+	double mu_charge_b;
+	////////////////////////
 
-		void initialize();
-		void finalize();
+public:
+	digestAnalysis();
+	digestAnalysis(digestPhysics* offPhys, graphicObjects* m_graphicobjs, cutFlowHandler* cutFlowHandler, TFile* treeFile, string sLastCut2Hist = "GRL");
+	~digestAnalysis();
 
-		void resetLastCut2Hist(string sLastCut2Hist = "GRL") {m_sLastCut2Hist = sLastCut2Hist;}
-		
-		void fitter();
+	void initialize();
+	void finalize();
 
-		void printCutFlowNumbers(Long64_t chainEntries);
-		void fillCutFlow(string sCurrentCutName, TMapsd& values2fill);
+	void fitter();
+	
+	void executeBasic();
+	void executeAdvanced();
+	void executeCutFlow();
+	
+	void write();
 
-		//void executeBasic();
-		void executeCutFlow();
-
-		void    readCutFlow(string sCutFlowFilePath);
-		TMapsd* getCutFlowMapPtr();
-		TMapds* getCutFlowOrderedPtr();
-
-	private:
+private:
 
 };
 #endif

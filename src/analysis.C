@@ -22,7 +22,6 @@ analysis::analysis(physics* phys, graphicObjects* graphicobjs, cutFlowHandler* c
 
 	m_treeFile = treeFile;
 
-	//m_offlineTree = new offlineTree(m_phys, m_treeFile);
 	m_offTree = new offTree( m_phys, m_treeFile );
 
 	m_muid    = new muon_muid(  m_phys ); // this will also "turn on" the desired branches (virtual in the base)

@@ -54,6 +54,9 @@ public:
 	void findMostMassivePair(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iBest_a, int&iBest_b);
 	void findMostMassivePair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iBest_a, int&iBest_b);
 	
+	int getPVindex(physics* phys);
+	int getPVindex(offlinePhysics* offPhys);
+	
 	bool findBestVertex(physics* phys);
 	bool findBestVertex(offlinePhysics* offPhys);
 	

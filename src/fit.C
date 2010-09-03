@@ -445,7 +445,7 @@ void fit::minimize(bool signal_only, TH1D* h, double* yields)
 		index_sigma2 = 7;
 		index_sigma3 = 8;
 		index_signal = 1;
-		fitFCN = new TF1("fitFCN",fitFunctionSB, XMIN, XMAX ,8);
+		fitFCN = new TF1("fitFCN",fitFunctionSB, XMIN, XMAX ,7); // used to be 8 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		par = parSignalBackground;
 		stepSize = stepSizeSignalBackground;
 		minVal   = minValSignalBackground;
@@ -566,8 +566,8 @@ void fit::minimize(bool signal_only, TH1D* h, double* yields)
 	p[4] = 2500.;    // Breit Wigner Width (gamma)
 	p[5] = 90000.;   // Most probable location (peak mean) 
 	p[6] = 2000.;    // Gaussian sigma 1
-	p[7] = 3000.;    // Gaussian sigma 2 
-	p[8] = 3000.;    // Gaussian sigma 3
+	//p[7] = 3000.;    // Gaussian sigma 2 
+	//p[8] = 3000.;    // Gaussian sigma 3
 	guess = new TF1("guess",fitFunctionSB, XMIN, XMAX ,8);
 	guess->SetParameters(p);
 	m_fGuess = (TF1*)guess->Clone();

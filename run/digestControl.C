@@ -103,7 +103,8 @@ void digestControl::draw()
 	m_graphics->drawBareHistos(m_dirNoCuts);
 	m_graphics->drawHistos(m_dirAllCuts);
 	m_graphics->drawHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_dirCutFlow );
-	m_graphics->drawFitHistos(m_dirFit, m_digestAnalysis->m_fGuess, m_digestAnalysis->m_fFitted);
+	//m_graphics->drawFitHistos(m_dirFit, m_digestAnalysis->m_fit->m_fitROOT->guess, m_digestAnalysis->m_fit->m_fitROOT->fitFCN);
+	m_graphics->drawFitHistos(m_dirFit, m_digestAnalysis->m_fit->m_fitMinuit->guess, m_digestAnalysis->m_fit->m_fitMinuit->fitFCN);
 
 	m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
 }

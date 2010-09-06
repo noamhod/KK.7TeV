@@ -15,6 +15,8 @@ void prepare() // do not use alone
 	gROOT->ProcessLine(".include ../src/");
 	gROOT->ProcessLine(".include ./");
 
+	gSystem->Load("libRooFit") ;
+
 	gSystem->Load( "libCintex.so" );
 	Cintex::Cintex::Enable();
 	gROOT->ProcessLine(".L Loader.C+");

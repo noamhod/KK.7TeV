@@ -29,6 +29,27 @@
 #include <TAxis.h>
 #include <TLine.h>
 
+#include <RooFit.h>
+#include <RooRealVar.h>
+#include <RooGenericPdf.h>
+#include <RooArgList.h>
+#include <RooDataSet.h>
+#include <RooPlot.h>
+#include <RooMCStudy.h>
+#include <RooAbsMCStudyModule.h>
+#include <RooGenContext.h>
+#include <RooAbsPdf.h>
+#include <RooDataHist.h>
+#include <RooFitResult.h>
+#include <RooErrorVar.h>
+#include <RooFormulaVar.h>
+#include <RooArgList.h>
+#include <RooRandom.h>
+#include <RooCmdConfig.h>
+#include <RooGlobalFunc.h>
+#include <RooPullVar.h>
+#include <RooClassFactory.h>
+
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>      // for the sprintf call
@@ -43,6 +64,7 @@
 #include <map>
 
 using namespace std;
+using namespace RooFit;
 
 typedef multimap<int, int>           TMapii;
 typedef map<double, double>     TMapdd;
@@ -113,6 +135,12 @@ template class std::vector<std::vector<unsigned int> >;
 
 #define particleBase_cxx
 #include "particleBase.C"
+
+#define fitParameters_cxx
+#include "fitParameters.C"
+
+#define fitFunctions_cxx
+#include "fitFunctions.C"
 
 enum pdtEnum { // *** note that this is not a complete list of pdt's particles ***
 	PDTDWN=1, PDTUP=2, PDTSTR=3, PDTCHM=4, PDTBOT=5, PDTTOP=6,

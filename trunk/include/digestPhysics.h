@@ -115,7 +115,7 @@ digestPhysics::digestPhysics(TTree *tree)
 digestPhysics::~digestPhysics()
 {
    if (!fChain) return;
-   delete fChain->GetCurrentFile();
+   //delete fChain->GetCurrentFile();
 }
 
 Int_t digestPhysics::GetEntry(Long64_t entry)

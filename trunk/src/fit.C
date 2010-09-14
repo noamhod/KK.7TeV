@@ -22,6 +22,7 @@ void fit::finitialize()
 {
 	m_fitROOT = new fitROOT();
 	m_fitMinuit = new fitMinuit( xVecPtr );
+	m_fitRooFit = new fitRooFit( xVecPtr );
 	
 	xVecPtr->clear();
 }
@@ -43,6 +44,7 @@ void fit::minimize(bool signal_only, TH1D* h, double* yields)
 {
 	m_fitROOT->minimize(signal_only, h, yields);
 	m_fitMinuit->minimize(signal_only, h, yields);
+	m_fitRooFit->minimize(signal_only, h, yields);
 }
 
 #endif

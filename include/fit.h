@@ -13,6 +13,9 @@
 #define fitMinuit_cxx
 #include "fitMinuit.C"
 
+#define fitRooFit_cxx
+#include "fitRooFit.C"
+
 #ifndef FIT_H
 #define FIT_H
 
@@ -25,8 +28,9 @@ class fit
 		TF1* m_fGuess;
 		TF1* m_fFitted;
 		
-		fitROOT* m_fitROOT;
+		fitROOT*   m_fitROOT;
 		fitMinuit* m_fitMinuit;
+		fitRooFit* m_fitRooFit;
 	
 	public:
 		fit();

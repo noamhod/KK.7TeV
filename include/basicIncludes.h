@@ -43,12 +43,16 @@
 #include <RooFitResult.h>
 #include <RooErrorVar.h>
 #include <RooFormulaVar.h>
-#include <RooArgList.h>
 #include <RooRandom.h>
 #include <RooCmdConfig.h>
 #include <RooGlobalFunc.h>
 #include <RooPullVar.h>
 #include <RooClassFactory.h>
+#include <RooVoigtian.h>
+#include <RooExponential.h>
+#include <RooAddPdf.h>
+#include <RooBinning.h>
+
 
 #include <iostream>
 #include <stdlib.h>
@@ -66,7 +70,7 @@
 using namespace std;
 using namespace RooFit;
 
-typedef multimap<int, int>           TMapii;
+typedef multimap<int, int>      TMapii;
 typedef map<double, double>     TMapdd;
 
 typedef vector<TLorentzVector*> TVectorP2VL;

@@ -142,7 +142,7 @@ void graphicObjects::drawBareHistos(TDirectory* tdir)
 	cnv_d0exPV->cd();
 	h1_d0exPV->Draw();
 	cnv_d0exPV->Update();
-        cnv_d0exPV->Write();
+    cnv_d0exPV->Write();
 
 	cnv_z0exPV = new TCanvas("z0exPV","z0exPV",canv_x,canv_y);
 	cnv_z0exPV->SetLogy();
@@ -150,21 +150,21 @@ void graphicObjects::drawBareHistos(TDirectory* tdir)
 	cnv_z0exPV->cd();
 	h1_z0exPV->Draw();
 	cnv_z0exPV->Update();
-        cnv_z0exPV->Write();
+    cnv_z0exPV->Write();
 
 	cnv_cosmicCosth = new TCanvas("cosThetaDimu","cosThetaDimu",canv_x,canv_y);
 	cnv_cosmicCosth->Draw();
 	cnv_cosmicCosth->cd();
 	h1_cosmicCosth->Draw();
 	cnv_cosmicCosth->Update();
-        cnv_cosmicCosth->Write();
+    cnv_cosmicCosth->Write();
 
 	cnv_xyVertex = new TCanvas("xyVertex","xyVertex",canv_x,canv_y);
 	cnv_xyVertex->Draw();
 	cnv_xyVertex->cd();
 	h2_xyVertex->Draw("BOX");
 	cnv_xyVertex->Update();
-        cnv_xyVertex->Write();
+    cnv_xyVertex->Write();
 }
 
 void graphicObjects::drawHistos(TDirectory* tdir)
@@ -177,7 +177,7 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	cnv_imass->cd();
 	h1_imass->Draw();
 	cnv_imass->Update();
-        cnv_imass->Write();
+    cnv_imass->Write();
 
 	cnv_pT = new TCanvas("pT","pT",canv_x,canv_y);
 	cnv_pT->SetLogy();
@@ -185,21 +185,21 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	cnv_pT->cd();
 	h1_pT->Draw();
 	cnv_pT->Update();
-        cnv_pT->Write();
+    cnv_pT->Write();
 
 	cnv_eta = new TCanvas("eta","eta",canv_x,canv_y);
 	cnv_eta->Draw();
 	cnv_eta->cd();
 	h1_eta->Draw();
 	cnv_eta->Update();
-        cnv_eta->Write();
+    cnv_eta->Write();
 
 	cnv_costh = new TCanvas("costh","costh",canv_x,canv_y);
 	cnv_costh->Draw();
 	cnv_costh->cd();
 	h1_costh->Draw();
 	cnv_costh->Update();
-        cnv_costh->Write();
+    cnv_costh->Write();
 }
 
 void graphicObjects::bookHistosMap(TMapds* cutFlowOrdered, TDirectory* tdir)
@@ -330,15 +330,19 @@ void graphicObjects::drawFitHistos(TDirectory* tdir, TF1* fGuess, TF1* fFitted)
 	h1_imassFinal->SetMarkerStyle(20);
 	h1_imassFinal->Draw("e1x0");
 	
+	
 	fGuess->SetLineStyle(1);
 	fGuess->SetLineColor(kRed);
 	fGuess->SetLineWidth(2);
 	//fGuess->Draw("sames");
 	
+	cout << "after fGuess" << endl;
+	
 	fFitted->SetLineStyle(1);
 	fFitted->SetLineColor(kBlue);
 	fFitted->SetLineWidth(2);
 	fFitted->Draw("sames");
+	
 	
 	leg_imassFinal->AddEntry( h1_imassFinal, "Data", "lep");
 	//leg_imassFinal->AddEntry( fGuess, "Guess", "L");

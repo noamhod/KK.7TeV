@@ -28,6 +28,21 @@ double scale2data(TH1D* h)
 	return scale;
 }
 
+double scale2bg(TH1D* h)
+{
+	double scale;
+	double nentries = 0.;
+	for(int i=1 ; i<(int)h->GetNbinsX() ; i++)
+	{
+		double binCenter = h->GetBinCenter(i);
+		if( binCenter>XMIN  &&  binCenter<XMAXBG) nentries += h->GetBinContent(i);
+	}
+	scale = nentries*h->GetBinWidth(1);
+
+	return scale;
+}
+
+
 ///////////////////////////
 // exponential background
 double exponential(double *x, double *par) 

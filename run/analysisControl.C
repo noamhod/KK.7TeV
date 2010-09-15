@@ -32,7 +32,7 @@ analysisControl::analysisControl()
 	m_graphics = new graphicObjects();
 	m_graphics->setStyle();
 
-	str = checkANDsetFilepath("PWD", "/../conf/Z_GRL_152844-159224.xml");
+	str = checkANDsetFilepath("PWD", "/../conf/Z_GRL_152844-162882.xml");
 	m_GRL = new GRLinterface();
 	m_GRL->glrinitialize( (TString)str );
 

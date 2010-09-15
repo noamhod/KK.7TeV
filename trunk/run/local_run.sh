@@ -26,12 +26,12 @@ dateandhour=`date +d%d%m%Y.h%H%M`
 
 # remove the arlier outputs
 rm -f input.txt
-rm -f z0analysis.root
+rm -f WZphys.root
 rm -f Loader_C.so
 
 # get the latest grl and cut flow
 cp -u ../conf/cutFlow.cuts .
-cp -u ../conf/Z_GRL_152844-159224.xml .
+cp -u ../conf/Z_GRL_152844-162882.xml .
 
 
 # make usable

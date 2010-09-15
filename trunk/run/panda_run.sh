@@ -40,7 +40,7 @@ rm -f Loader_C.so
 
 # get the latest grl and cut flow
 cp -u ../conf/cutFlow.cuts .
-cp -u ../conf/Z_GRL_152844-159224.xml .
+cp -u ../conf/Z_GRL_152844-162882.xml .
 
 
 # make usable

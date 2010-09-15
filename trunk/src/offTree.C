@@ -42,6 +42,20 @@ void offTree::setBranches()
 	// preselection
 	m_tree->Branch( "isGRL",  &isGRL );
 	m_tree->Branch( "L1_MU6", &L1_MU6 );
+	m_tree->Branch( "EF_mu10", &EF_mu10 );
+	m_tree->Branch( "EF_mu10_MSonly", &EF_mu10_MSonly );
+	m_tree->Branch( "EF_mu10_passHLT", &EF_mu10_passHLT );
+	m_tree->Branch( "EF_mu13", &EF_mu13 );
+	m_tree->Branch( "EF_mu15", &EF_mu15 );
+	m_tree->Branch( "EF_mu20", &EF_mu20 );
+	m_tree->Branch( "EF_mu20_MSonly", &EF_mu20_MSonly );
+	m_tree->Branch( "EF_mu20_passHLT", &EF_mu20_passHLT );
+	m_tree->Branch( "EF_mu4", &EF_mu4 );
+	m_tree->Branch( "EF_mu4_MSonly", &EF_mu4_MSonly );
+	m_tree->Branch( "EF_mu4_passHLT", &EF_mu4_passHLT );
+	m_tree->Branch( "EF_mu6", &EF_mu6 );
+	m_tree->Branch( "EF_mu6_MSonly", &EF_mu6_MSonly );
+	m_tree->Branch( "EF_mu6_passHLT", &EF_mu6_passHLT );
 	
 	// mu_staco
 	m_tree->Branch( "mu_staco_n",         &mu_staco_n );
@@ -58,6 +72,8 @@ void offTree::setBranches()
 	m_tree->Branch( "mu_staco_eta",       &mu_staco_eta );
 	m_tree->Branch( "mu_staco_d0_exPV",   &mu_staco_d0_exPV );
 	m_tree->Branch( "mu_staco_z0_exPV",   &mu_staco_z0_exPV );
+	m_tree->Branch( "mu_staco_allauthor", &mu_staco_allauthor );
+	m_tree->Branch( "mu_staco_author",    &mu_staco_author);
 	m_tree->Branch( "mu_staco_me_qoverp",       &mu_staco_me_qoverp );
 	m_tree->Branch( "mu_staco_id_qoverp",       &mu_staco_id_qoverp );
 	m_tree->Branch( "mu_staco_me_theta",        &mu_staco_me_theta );
@@ -81,6 +97,8 @@ void offTree::setBranches()
 	m_tree->Branch( "mu_muid_eta",       &mu_muid_eta );
 	m_tree->Branch( "mu_muid_d0_exPV",   &mu_muid_d0_exPV );
 	m_tree->Branch( "mu_muid_z0_exPV",   &mu_muid_z0_exPV );
+	m_tree->Branch( "mu_muid_allauthor", &mu_muid_allauthor );
+	m_tree->Branch( "mu_muid_author",    &mu_muid_author);
 	m_tree->Branch( "mu_muid_me_qoverp",       &mu_muid_me_qoverp );
 	m_tree->Branch( "mu_muid_id_qoverp",       &mu_muid_id_qoverp );
 	m_tree->Branch( "mu_muid_me_theta",        &mu_muid_me_theta );
@@ -114,6 +132,20 @@ void offTree::fill(int isGrl)
 	// preselection
 	isGRL  = isGrl;
 	L1_MU6 = m_phys->L1_MU6;
+	EF_mu10         = m_phys->EF_mu10;
+	EF_mu10_MSonly  = m_phys->EF_mu10_MSonly;
+	EF_mu10_passHLT = m_phys->EF_mu10_passHLT;
+	EF_mu13         = m_phys->EF_mu13;
+	EF_mu15         = m_phys->EF_mu15;
+	EF_mu20         = m_phys->EF_mu20;
+	EF_mu20_MSonly  = m_phys->EF_mu20_MSonly;
+	EF_mu20_passHLT = m_phys->EF_mu20_passHLT;
+	EF_mu4          = m_phys->EF_mu4;
+	EF_mu4_MSonly   = m_phys->EF_mu4_MSonly;
+	EF_mu4_passHLT  = m_phys->EF_mu4_passHLT;
+	EF_mu6          = m_phys->EF_mu6;
+	EF_mu6_MSonly   = m_phys->EF_mu6_MSonly;
+	EF_mu6_passHLT  = m_phys->EF_mu6_passHLT;
 	
 	// staco
 	mu_staco_n        = m_phys->mu_staco_n;
@@ -130,8 +162,10 @@ void offTree::fill(int isGrl)
 	mu_staco_eta      = m_phys->mu_staco_eta;
 	mu_staco_d0_exPV  = m_phys->mu_staco_d0_exPV;
 	mu_staco_z0_exPV  = m_phys->mu_staco_z0_exPV;
-	mu_staco_me_qoverp   = m_phys->mu_staco_me_qoverp;
-	mu_staco_id_qoverp   = m_phys->mu_staco_id_qoverp;
+	mu_staco_allauthor= m_phys->mu_staco_allauthor;
+	mu_staco_author   = m_phys->mu_staco_author;
+	mu_staco_me_qoverp= m_phys->mu_staco_me_qoverp;
+	mu_staco_id_qoverp= m_phys->mu_staco_id_qoverp;
 	mu_staco_me_theta = m_phys->mu_staco_me_theta;
 	mu_staco_id_theta = m_phys->mu_staco_id_theta;
 	mu_staco_isCombinedMuon = m_phys->mu_staco_isCombinedMuon;
@@ -153,6 +187,8 @@ void offTree::fill(int isGrl)
 	mu_muid_eta      = m_phys->mu_muid_eta;
 	mu_muid_d0_exPV  = m_phys->mu_muid_d0_exPV;
 	mu_muid_z0_exPV  = m_phys->mu_muid_z0_exPV;
+	mu_muid_allauthor= m_phys->mu_muid_allauthor;
+	mu_muid_author   = m_phys->mu_muid_author;
 	mu_muid_me_qoverp = m_phys->mu_muid_me_qoverp;
 	mu_muid_id_qoverp = m_phys->mu_muid_id_qoverp;
 	mu_muid_me_theta = m_phys->mu_muid_me_theta;
@@ -165,7 +201,7 @@ void offTree::fill(int isGrl)
 	vxp_n       = m_phys->vxp_n;
 	vxp_nTracks = m_phys->vxp_nTracks;
 	vxp_type    = m_phys->vxp_type;
-	vxp_z       =  m_phys->vxp_z;
+	vxp_z       = m_phys->vxp_z;
 	vxp_z_err   = m_phys->vxp_err_z;
 	
 	
@@ -195,6 +231,8 @@ void offTree::reset()
 	mu_staco_eta       = NULL;
 	mu_staco_d0_exPV   = NULL;
 	mu_staco_z0_exPV   = NULL;
+	mu_staco_allauthor = NULL;
+	mu_staco_author    = NULL;
 	mu_staco_me_qoverp = NULL;
 	mu_staco_id_qoverp = NULL;
 	mu_staco_me_theta  = NULL;
@@ -217,6 +255,8 @@ void offTree::reset()
 	mu_muid_eta       = NULL;
 	mu_muid_d0_exPV   = NULL;
 	mu_muid_z0_exPV   = NULL;
+	mu_muid_allauthor = NULL;
+	mu_muid_author    = NULL;
 	mu_muid_me_qoverp = NULL;
 	mu_muid_id_qoverp = NULL;
 	mu_muid_me_theta  = NULL;

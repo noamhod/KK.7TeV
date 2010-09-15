@@ -29,7 +29,7 @@ analysisGridControl::analysisGridControl( TChain* inchain, TFile* outfile )
 	m_graphics->setStyle();
 
 	//str = checkANDsetFilepath("PWD", "/../conf/Z_GRL_152844-159224.xml");
-	str = "Z_GRL_152844-159224.xml";
+	str = "Z_GRL_152844-162882.xml";
 	m_GRL = new GRLinterface();
 	m_GRL->glrinitialize( (TString)str );
 

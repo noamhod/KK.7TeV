@@ -30,19 +30,11 @@ class offTree : public utilities
 		int isGRL;
 		int L1_MU6;
 		int EF_mu10;
-		int EF_mu10_MSonly;
-		int EF_mu10_passHLT;
 		int EF_mu13;
 		int EF_mu15;
 		int EF_mu20;
-		int EF_mu20_MSonly;
-		int EF_mu20_passHLT;
 		int EF_mu4;
-		int EF_mu4_MSonly;
-		int EF_mu4_passHLT;
 		int EF_mu6;
-		int EF_mu6_MSonly;
-		int EF_mu6_passHLT;
 		
 		// mu_staco
 		Int_t          mu_staco_n;

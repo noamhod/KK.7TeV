@@ -93,7 +93,7 @@ void fitRooFit::minimize(bool signal_only, TH1D* h, double* yields)
 	RooDataSet* data = new RooDataSet("data", "data", m_imassTree, imass /*RooArgSet(imass, boundaries)*/);
 	
 	// --- Perform extended ML fit of composite PDF to data ---
-	model.fitTo(*data, Range("fitRange"),Extended(kTRUE));
+	model.fitTo(*data, Range("fitRange"),Extended(kTRUE), "etlrh");
 		
 	// --- Plot toy data and composite PDF overlaid ---
 	TCanvas* canv_imass_roofit = new TCanvas("imass_roofit","imass_roofit",600,400);
@@ -123,6 +123,9 @@ void fitRooFit::minimize(bool signal_only, TH1D* h, double* yields)
 	leg_roofit->AddEntry( tline_bg, "BG", "L");
 	leg_roofit->AddEntry( tline_fit, "ML fit", "L");
 	frame->addObject(leg_roofit);
+	
+	frame->SetMinimum(1.e-5);
+	
 	frame->Draw();
 	canv_imass_roofit->Update();
 	canv_imass_roofit->Write();

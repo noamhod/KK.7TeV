@@ -43,19 +43,11 @@ void offTree::setBranches()
 	m_tree->Branch( "isGRL",  &isGRL );
 	m_tree->Branch( "L1_MU6", &L1_MU6 );
 	m_tree->Branch( "EF_mu10", &EF_mu10 );
-	m_tree->Branch( "EF_mu10_MSonly", &EF_mu10_MSonly );
-	m_tree->Branch( "EF_mu10_passHLT", &EF_mu10_passHLT );
 	m_tree->Branch( "EF_mu13", &EF_mu13 );
 	m_tree->Branch( "EF_mu15", &EF_mu15 );
 	m_tree->Branch( "EF_mu20", &EF_mu20 );
-	m_tree->Branch( "EF_mu20_MSonly", &EF_mu20_MSonly );
-	m_tree->Branch( "EF_mu20_passHLT", &EF_mu20_passHLT );
 	m_tree->Branch( "EF_mu4", &EF_mu4 );
-	m_tree->Branch( "EF_mu4_MSonly", &EF_mu4_MSonly );
-	m_tree->Branch( "EF_mu4_passHLT", &EF_mu4_passHLT );
 	m_tree->Branch( "EF_mu6", &EF_mu6 );
-	m_tree->Branch( "EF_mu6_MSonly", &EF_mu6_MSonly );
-	m_tree->Branch( "EF_mu6_passHLT", &EF_mu6_passHLT );
 	
 	// mu_staco
 	m_tree->Branch( "mu_staco_n",         &mu_staco_n );
@@ -133,19 +125,11 @@ void offTree::fill(int isGrl)
 	isGRL  = isGrl;
 	L1_MU6 = m_phys->L1_MU6;
 	EF_mu10         = m_phys->EF_mu10;
-	EF_mu10_MSonly  = m_phys->EF_mu10_MSonly;
-	EF_mu10_passHLT = m_phys->EF_mu10_passHLT;
 	EF_mu13         = m_phys->EF_mu13;
 	EF_mu15         = m_phys->EF_mu15;
 	EF_mu20         = m_phys->EF_mu20;
-	EF_mu20_MSonly  = m_phys->EF_mu20_MSonly;
-	EF_mu20_passHLT = m_phys->EF_mu20_passHLT;
 	EF_mu4          = m_phys->EF_mu4;
-	EF_mu4_MSonly   = m_phys->EF_mu4_MSonly;
-	EF_mu4_passHLT  = m_phys->EF_mu4_passHLT;
 	EF_mu6          = m_phys->EF_mu6;
-	EF_mu6_MSonly   = m_phys->EF_mu6_MSonly;
-	EF_mu6_passHLT  = m_phys->EF_mu6_passHLT;
 	
 	// staco
 	mu_staco_n        = m_phys->mu_staco_n;

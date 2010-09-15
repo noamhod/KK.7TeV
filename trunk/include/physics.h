@@ -13518,19 +13518,11 @@ void physics::InitSkimmed(TTree *tree)
    fChain->SetBranchStatus("L1_MU15",1);/////////////
    fChain->SetBranchStatus("L1_MU20",1);/////////////
    fChain->SetBranchStatus("EF_mu10",1);/////////////
-   fChain->SetBranchStatus("EF_mu10_MSonly",1);//////
-   fChain->SetBranchStatus("EF_mu10_passHLT",1);/////
    fChain->SetBranchStatus("EF_mu13",1);/////////////
    fChain->SetBranchStatus("EF_mu15",1);/////////////
    fChain->SetBranchStatus("EF_mu20",1);/////////////
-   fChain->SetBranchStatus("EF_mu20_MSonly",1);//////
-   fChain->SetBranchStatus("EF_mu20_passHLT",1);/////
    fChain->SetBranchStatus("EF_mu4",1);//////////////
-   fChain->SetBranchStatus("EF_mu4_MSonly",1);///////
-   fChain->SetBranchStatus("EF_mu4_passHLT",1);//////
    fChain->SetBranchStatus("EF_mu6",1);//////////////
-   fChain->SetBranchStatus("EF_mu6_MSonly",1);///////
-   fChain->SetBranchStatus("EF_mu6_passHLT",1);//////
    //////////////////////////////////////////////////
    //////////////////////////////////////////////////
    

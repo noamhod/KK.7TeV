@@ -75,9 +75,6 @@ void offlineAnalysis::fitter()
 					
 	cout << "\nyields[0] = " <<  yields[0] << endl;
 	cout << "yields[1] = " <<  yields[1] << "\n" << endl;
-	
-	m_fGuess  = (TF1*)m_fit->m_fGuess->Clone();
-	m_fFitted = (TF1*)m_fit->m_fFitted->Clone();
 }
 
 
@@ -495,7 +492,7 @@ void offlineAnalysis::executeCutFlow()
 				m_graphicobjs->h1_pT->Fill( current_mu_pT );
 				m_graphicobjs->h1_imass->Fill( current_imass );
 				
-				cout << "$$$$$$$$$ dimuon $$$$$$$$$" << endl;
+				cout << "\n$$$$$$$$$ dimuon $$$$$$$$$" << endl;
 				cout << "\t im=" << current_imass << endl;
 				cout << "\t pTmu=" << current_mu_pT  << endl;
 				cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << endl;

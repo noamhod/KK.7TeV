@@ -550,7 +550,7 @@ void analysis::executeCutFlow()
 				m_graphicobjs->h1_pT->Fill( current_mu_pT );
 				m_graphicobjs->h1_imass->Fill( current_imass );
 				
-				cout << "$$$$$$$$$ dimuon $$$$$$$$$" << endl;
+				cout << "\n$$$$$$$$$ dimuon $$$$$$$$$" << endl;
 				cout << "\t im=" << current_imass << endl;
 				cout << "\t pTmu=" << current_mu_pT  << endl;
 				cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << endl;

@@ -42,8 +42,11 @@ void fit::fillXvec(double x)
 
 void fit::minimize(bool signal_only, TH1D* h, double* yields)
 {
+	cout << "\n$$$$$$$$$$$$$$ start ROOT binned fit $$$$$$$$$$$$$$" << endl;
 	m_fitROOT->minimize(signal_only, h, yields);
+	cout << "\n$$$$$$$$$$$$$$ start TMinuit unbinned fit $$$$$$$$$$$$$$" << endl;
 	m_fitMinuit->minimize(signal_only, h, yields);
+	cout << "\n$$$$$$$$$$$$$$ start RooFit unbinned fit $$$$$$$$$$$$$$" << endl;
 	m_fitRooFit->minimize(signal_only, h, yields);
 }
 

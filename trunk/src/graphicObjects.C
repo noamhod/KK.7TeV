@@ -66,13 +66,13 @@ void graphicObjects::ginitialize()
 	leg_y1 = 0.376;
 	leg_y2 = 0.922;
 
-	imass_nbins = 40;
+	imass_nbins = 100;
 	imass_min   = 0.*d_toGeV;
-	imass_max   = 200.*d_toGeV;
+	imass_max   = 2000.*d_toGeV;
 	
-	pT_nbins    = 20;
+	pT_nbins    = 50;
 	pT_min      = 0.*d_toGeV;
-	pT_max      = 100.*d_toGeV;
+	pT_max      = 1000.*d_toGeV;
 
 	eta_nbins   = 25;
 	eta_min     = -4.;

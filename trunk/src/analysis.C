@@ -207,7 +207,7 @@ void analysis::executeAdvanced()
 
 void analysis::executeCutFlow()
 {
-	bool debugmode = true;
+	bool debugmode = false;
 
 	if(debugmode) cout << "### 0 ###" << endl;
 

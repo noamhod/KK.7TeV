@@ -382,7 +382,7 @@ bool selection::preselection(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& 
 {
 	bool passed = true;
 	
-	passed = (passed  &&  pmu.size()>1  &&  allmupairMap.size()>1) ? true : false;
+	passed = (passed  &&  pmu.size()>1) ? true : false;
 	
 	passed = (passed  &&  offPhys->isGRL) ? true : false;
 	
@@ -401,7 +401,7 @@ bool selection::preselection(physics* phys, TVectorP2VL& pmu, TMapii& allmupairM
 {
 	bool passed = true;
 	
-	passed = (passed  &&  pmu.size()>1  &&  allmupairMap.size()>1) ? true : false;
+	passed = (passed  &&  pmu.size()>1) ? true : false;
 	
 	passed = (passed  &&  isGRL) ? true : false;
 	

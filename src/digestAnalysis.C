@@ -235,7 +235,7 @@ void digestAnalysis::executeCutFlow()
 
 	//////////////////////////////////////////////////////////////////
 	// build vector of the muons TLorentzVector //////////////////////
-	for(int n=0 ; n<(int)m_digestPhys->mu_staco_m->size() ; n++)
+	for(int n=0 ; n<(int)m_digestPhys->mu_staco_n ; n++)
 	{
 		pmu.push_back( new TLorentzVector() );
 		pmu[n]->SetPx( m_digestPhys->mu_staco_px->at(n) );

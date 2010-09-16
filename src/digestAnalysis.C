@@ -66,8 +66,10 @@ void digestAnalysis::fitter()
 	cout << "\nyields[0] = " <<  yields[0] << endl;
 	cout << "yields[1] = " <<  yields[1] << "\n" << endl;
 	
-	m_fGuess  = (TF1*)m_fit->m_fGuess->Clone();
-	m_fFitted = (TF1*)m_fit->m_fFitted->Clone();
+	//m_fGuess  = (TF1*)m_fit->m_fGuess->Clone();
+	//m_fGuess  = m_fit->m_fGuess;
+	//m_fFitted = (TF1*)m_fit->m_fFitted->Clone();
+	//m_fFitted = m_fit->m_fFitted;
 }
 
 

@@ -380,13 +380,9 @@ bool selection::findHipTmuon(physics* phys)
 
 bool selection::preselection(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap)
 {
-	////////////////////////////////////////////////////////////////////////////
-	// irrelevant: /////////////////////////////////////////////////////////////
-	if(false) cout << "pmu.size()=" << pmu.size() << endl; /////////////////////
-	if(false) cout << "allmupairMap.size()=" << allmupairMap.size() << endl; ///
-	////////////////////////////////////////////////////////////////////////////
-
 	bool passed = true;
+	
+	passed = (passed  &&  pmu.size()>1  &&  allmupairMap.size()>1) ? true : false;
 	
 	passed = (passed  &&  offPhys->isGRL) ? true : false;
 	
@@ -403,13 +399,9 @@ bool selection::preselection(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& 
 
 bool selection::preselection(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int isGRL)
 {
-	////////////////////////////////////////////////////////////////////////////
-	// irrelevant: /////////////////////////////////////////////////////////////
-	if(false) cout << "pmu.size()=" << pmu.size() << endl; /////////////////////
-	if(false) cout << "allmupairMap.size()=" << allmupairMap.size() << endl; ///
-	////////////////////////////////////////////////////////////////////////////
-
 	bool passed = true;
+	
+	passed = (passed  &&  pmu.size()>1  &&  allmupairMap.size()>1) ? true : false;
 	
 	passed = (passed  &&  isGRL) ? true : false;
 	

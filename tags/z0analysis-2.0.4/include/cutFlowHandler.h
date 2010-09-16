@@ -1,0 +1,55 @@
+/* * * * * * * * * * * */
+/* created by Naom Hod */
+/* noam.hod@cern.ch    */
+/* noam.com@gmail.com  */
+/* on 23/07/2010 11:24 */
+/* * * * * * * * * * * */
+
+#include "basicIncludes.h"
+
+#ifndef CUTFLOWHANDLER_H
+#define CUTFLOWHANDLER_H
+
+class cutFlowHandler
+{
+	public:
+		bool b_print;
+		
+		// variables
+		string          m_skey;
+		int             m_inum;
+		int             m_nvals;
+		vector<double>  m_dval;
+		
+		TMapds*         m_cutFlowOrdered; // the map between the order of the cut and its name
+		TMapsi*         m_cutFlowNumbers; // the map between the name of the cut and the events surviving it
+		TMapsvd*		m_cutFlowMapSVD;  // the actual cut flow map between the cut's name and the vector of its values
+		
+		int    nAllEvents;
+
+	public:
+		cutFlowHandler();
+		cutFlowHandler(string sCutFlowFilePath);
+		~cutFlowHandler();
+
+		void initialize();
+		void finalize();
+		
+		void   parseKeyValLine(string sLine);
+		int    getNVals();
+        string getKey();
+		int    getNum();
+        double getVal(int valNum);
+		void getVal(vector<double>& dvalVec);
+		void readCutFlow(string sCutFlowFilePath);
+		void printCutFlowNumbers(Long64_t chainEntries);
+
+		TMapds*  getCutFlowOrderedMapPtr();
+		TMapsi*  getCutFlowNumbersMapPtr();
+		TMapsvd* getCutFlowMapSVDPtr();
+
+	private:
+
+};
+#endif
+

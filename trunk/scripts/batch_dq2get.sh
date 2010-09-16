@@ -93,7 +93,7 @@ source dq2get_dataset.sh   00160530   16092010   2058
 source dq2get_dataset.sh   00160613   16092010   2216
 source dq2get_dataset.sh   00160736   16092010   2218
 source dq2get_dataset.sh   00160800   16092010   1335
-#source dq2get_dataset.sh   00160801   16092010   1337 failed
+source dq2get_dataset.sh   00160801   16092010   2220
 source dq2get_dataset.sh   00160879   16092010   1339
 source dq2get_dataset.sh   00160899   16092010   1341
 source dq2get_dataset.sh   00160953   16092010   1342
@@ -110,7 +110,7 @@ source dq2get_dataset.sh   00160980   16092010   1348
 source dq2get_dataset.sh   00161114   16092010   1349
 source dq2get_dataset.sh   00161116   16092010   1350
 source dq2get_dataset.sh   00161118   16092010   1351
-#source dq2get_dataset.sh   00161379   16092010   1352 failed
+source dq2get_dataset.sh   00161379   16092010   2225
 source dq2get_dataset.sh   00161407   16092010   1354
 source dq2get_dataset.sh   00161520   16092010   1355
 #source dq2get_dataset.sh   00161562   16092010   1357 unfinished

@@ -35,7 +35,7 @@ void fcnSignal(int& npar, double* deriv, double& f, double par[], int flag)
 		}
 		else
 		{
-			cout << "WARNING -- pdf = " << pdf << endl;
+			//cout << "WARNING -- pdf = " << pdf << endl;
 		}
 	}
 	f = -2.0 * lnL;         // factor of -2 so minuit gets the errors right 
@@ -66,7 +66,7 @@ void fcnSignalBackground(int& npar, double* deriv, double& f, double par[], int 
 		}
 		else
 		{
-			cout << "WARNING -- pdf = " << pdf << endl;
+			//cout << "WARNING -- pdf = " << pdf << endl;
 		}
 	}
 	f = -2.0 * lnL;         // factor of -2 so minuit gets the errors right 
@@ -141,7 +141,7 @@ void fitMinuit::minimize(bool signal_only, TH1D* h, double* yields)
 	
 	///// INITIALIZATION:  SIGNAL + BACKGROUND
 	// Exponential
-	parSignalBackground[0] = 6.2e4;   // Scale Background (Nb)
+	parSignalBackground[0] = scale2bg(h);   // Scale Background (Nb)
 	parSignalBackground[1] = scale2data(h);   // Scale Signal (Ns)
 	parSignalBackground[2] = 2.2e0;       // Exp: constant argument
 	parSignalBackground[3] = -1.7e-5; // Exp: the multiplier of the x argument
@@ -300,8 +300,8 @@ void fitMinuit::minimize(bool signal_only, TH1D* h, double* yields)
 	//--------------------------- test ---------------------------
 	///// INITIALIZATION:  SIGNAL + BACKGROUND
 	// Exponential
-	p[0] = 30000.;   // Scale Background (Nb)
-	p[1] = 50000.;   // Scale Signal (Ns)
+	p[0] = scale2bg(h);   // Scale Background (Nb)
+	p[1] = scale2data(h);   // Scale Signal (Ns)
 	p[2] = 2.;       // Exp: constant argument
 	p[3] = -0.00001; // Exp: the multiplier of the x argument
 	// Breit-Wigner x Gaussian convolution

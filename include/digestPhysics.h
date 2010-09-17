@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Thu Sep  2 00:03:14 2010 by ROOT version 5.22/00
+// Fri Sep 17 20:37:05 2010 by ROOT version 5.22/00
 // from TTree digest/digest
 // found on file: offlineTreeDigest.root
 //////////////////////////////////////////////////////////
@@ -23,6 +23,12 @@ public :
    Int_t           EventNumber;
    Int_t           isGRL;
    Int_t           L1_MU6;
+   Int_t           EF_mu10;
+   Int_t           EF_mu13;
+   Int_t           EF_mu15;
+   Int_t           EF_mu20;
+   Int_t           EF_mu4;
+   Int_t           EF_mu6;
    Int_t           mu_staco_n;
    vector<float>   *mu_staco_px;
    vector<float>   *mu_staco_py;
@@ -44,6 +50,8 @@ public :
    vector<int>     *mu_staco_isCombinedMuon;
    vector<int>     *mu_staco_nSCTHits;
    vector<int>     *mu_staco_nPixHits;
+   vector<unsigned short> *mu_staco_allauthor;
+   vector<int>     *mu_staco_author;
    Int_t           vxp_n;
    vector<int>     *vxp_nTracks;
    vector<int>     *vxp_type;
@@ -56,6 +64,12 @@ public :
    TBranch        *b_EventNumber;   //!
    TBranch        *b_isGRL;   //!
    TBranch        *b_L1_MU6;   //!
+   TBranch        *b_EF_mu10;   //!
+   TBranch        *b_EF_mu13;   //!
+   TBranch        *b_EF_mu15;   //!
+   TBranch        *b_EF_mu20;   //!
+   TBranch        *b_EF_mu4;   //!
+   TBranch        *b_EF_mu6;   //!
    TBranch        *b_mu_staco_n;   //!
    TBranch        *b_mu_staco_px;   //!
    TBranch        *b_mu_staco_py;   //!
@@ -77,6 +91,8 @@ public :
    TBranch        *b_mu_staco_isCombinedMuon;   //!
    TBranch        *b_mu_staco_nSCTHits;   //!
    TBranch        *b_mu_staco_nPixHits;   //!
+   TBranch        *b_mu_staco_allauthor;   //!
+   TBranch        *b_mu_staco_author;   //!
    TBranch        *b_vxp_n;   //!
    TBranch        *b_vxp_nTracks;   //!
    TBranch        *b_vxp_type;   //!
@@ -170,6 +186,8 @@ void digestPhysics::Init(TTree *tree)
    mu_staco_isCombinedMuon = 0;
    mu_staco_nSCTHits = 0;
    mu_staco_nPixHits = 0;
+   mu_staco_allauthor = 0;
+   mu_staco_author = 0;
    vxp_nTracks = 0;
    vxp_type = 0;
    vxp_z = 0;
@@ -185,6 +203,12 @@ void digestPhysics::Init(TTree *tree)
    fChain->SetBranchAddress("EventNumber", &EventNumber, &b_EventNumber);
    fChain->SetBranchAddress("isGRL", &isGRL, &b_isGRL);
    fChain->SetBranchAddress("L1_MU6", &L1_MU6, &b_L1_MU6);
+   fChain->SetBranchAddress("EF_mu10", &EF_mu10, &b_EF_mu10);
+   fChain->SetBranchAddress("EF_mu13", &EF_mu13, &b_EF_mu13);
+   fChain->SetBranchAddress("EF_mu15", &EF_mu15, &b_EF_mu15);
+   fChain->SetBranchAddress("EF_mu20", &EF_mu20, &b_EF_mu20);
+   fChain->SetBranchAddress("EF_mu4", &EF_mu4, &b_EF_mu4);
+   fChain->SetBranchAddress("EF_mu6", &EF_mu6, &b_EF_mu6);
    fChain->SetBranchAddress("mu_staco_n", &mu_staco_n, &b_mu_staco_n);
    fChain->SetBranchAddress("mu_staco_px", &mu_staco_px, &b_mu_staco_px);
    fChain->SetBranchAddress("mu_staco_py", &mu_staco_py, &b_mu_staco_py);
@@ -206,6 +230,8 @@ void digestPhysics::Init(TTree *tree)
    fChain->SetBranchAddress("mu_staco_isCombinedMuon", &mu_staco_isCombinedMuon, &b_mu_staco_isCombinedMuon);
    fChain->SetBranchAddress("mu_staco_nSCTHits", &mu_staco_nSCTHits, &b_mu_staco_nSCTHits);
    fChain->SetBranchAddress("mu_staco_nPixHits", &mu_staco_nPixHits, &b_mu_staco_nPixHits);
+   fChain->SetBranchAddress("mu_staco_allauthor", &mu_staco_allauthor, &b_mu_staco_allauthor);
+   fChain->SetBranchAddress("mu_staco_author", &mu_staco_author, &b_mu_staco_author);
    fChain->SetBranchAddress("vxp_n", &vxp_n, &b_vxp_n);
    fChain->SetBranchAddress("vxp_nTracks", &vxp_nTracks, &b_vxp_nTracks);
    fChain->SetBranchAddress("vxp_type", &vxp_type, &b_vxp_type);

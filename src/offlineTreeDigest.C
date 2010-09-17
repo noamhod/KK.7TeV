@@ -54,6 +54,8 @@ void offlineTreeDigest::setBranches()
 	mu_staco_isCombinedMuon = new vector<int>;
 	mu_staco_nSCTHits  = new vector<int>;
 	mu_staco_nPixHits  = new vector<int>;
+	mu_staco_allauthor = new vector<unsigned short>;
+	mu_staco_author    = new vector<int>;
 	
 	// muid
 	//mu_muid_m         = new vector<float>;
@@ -76,6 +78,8 @@ void offlineTreeDigest::setBranches()
 	//mu_muid_isCombinedMuon = new vector<int>;
 	//mu_muid_nSCTHits  = new vector<int>;
 	//mu_muid_nPixHits  = new vector<int>;
+	//mu_muid_allauthor = new vector<unsigned short>;
+	//mu_muid_author    = new vector<int>;
 	
 	vxp_z       = new vector<float>;
 	vxp_z_err   = new vector<float>;
@@ -91,6 +95,13 @@ void offlineTreeDigest::setBranches()
 	// preselection
 	m_tree->Branch( "isGRL",  &isGRL );
 	m_tree->Branch( "L1_MU6", &L1_MU6 );
+	
+	m_tree->Branch( "EF_mu10", &EF_mu10 );
+	m_tree->Branch( "EF_mu13", &EF_mu13 );
+	m_tree->Branch( "EF_mu15", &EF_mu15 );
+	m_tree->Branch( "EF_mu20", &EF_mu20 );
+	m_tree->Branch( "EF_mu4", &EF_mu4 );
+	m_tree->Branch( "EF_mu6", &EF_mu6 );
 	
 	// mu_staco
 	m_tree->Branch( "mu_staco_n",         &mu_staco_n );
@@ -114,6 +125,8 @@ void offlineTreeDigest::setBranches()
 	m_tree->Branch( "mu_staco_isCombinedMuon",  &mu_staco_isCombinedMuon );
 	m_tree->Branch( "mu_staco_nSCTHits",        &mu_staco_nSCTHits );
 	m_tree->Branch( "mu_staco_nPixHits",        &mu_staco_nPixHits );
+	m_tree->Branch( "mu_staco_allauthor",       &mu_staco_allauthor );
+	m_tree->Branch( "mu_staco_author",          &mu_staco_author );
 	
 	// //mu_muid
 	//m_tree->Branch( "mu_muid_n",         &//mu_muid_n );
@@ -137,6 +150,8 @@ void offlineTreeDigest::setBranches()
 	//m_tree->Branch( "mu_muid_isCombinedMuon",  &//mu_muid_isCombinedMuon );
 	//m_tree->Branch( "mu_muid_nSCTHits",        &//mu_muid_nSCTHits );
 	//m_tree->Branch( "mu_muid_nPixHits",        &//mu_muid_nPixHits );
+	//m_tree->Branch( "mu_muid_allauthor",        &mu_muid_allauthor );
+	//m_tree->Branch( "mu_muid_author",           &mu_muid_author );
 	
 	// vertex branches
 	m_tree->Branch( "vxp_n",       &vxp_n );
@@ -162,6 +177,13 @@ void offlineTreeDigest::fill(int a, int b, int v)
 	// preselection
 	isGRL  = m_offPhys->isGRL;
 	L1_MU6 = m_offPhys->L1_MU6;
+	EF_mu10 = m_offPhys->EF_mu10;
+	EF_mu13 = m_offPhys->EF_mu13;
+	EF_mu15 = m_offPhys->EF_mu15;
+	EF_mu20 = m_offPhys->EF_mu20;
+	EF_mu4 = m_offPhys->EF_mu4;
+	EF_mu6 = m_offPhys->EF_mu6;
+
 	
 	// staco
 	mu_staco_n = m_offPhys->mu_staco_n;
@@ -205,6 +227,10 @@ void offlineTreeDigest::fill(int a, int b, int v)
 	mu_staco_nSCTHits->push_back( m_offPhys->mu_staco_nSCTHits->at(b) );
 	mu_staco_nPixHits->push_back( m_offPhys->mu_staco_nPixHits->at(a) );
 	mu_staco_nPixHits->push_back( m_offPhys->mu_staco_nPixHits->at(b) );
+	mu_staco_allauthor->push_back( m_offPhys->mu_staco_allauthor->at(a) );
+	mu_staco_allauthor->push_back( m_offPhys->mu_staco_allauthor->at(b) );
+	mu_staco_author->push_back( m_offPhys->mu_staco_author->at(a) );
+	mu_staco_author->push_back( m_offPhys->mu_staco_author->at(b) );
 	
 	// muid
 	//mu_muid_n = m_offPhys->//mu_muid_n;
@@ -248,6 +274,10 @@ void offlineTreeDigest::fill(int a, int b, int v)
 	//mu_muid_nSCTHits->push_back( m_offPhys->//mu_muid_nSCTHits->at(b) );
 	//mu_muid_nPixHits->push_back( m_offPhys->//mu_muid_nPixHits->at(a) );
 	//mu_muid_nPixHits->push_back( m_offPhys->//mu_muid_nPixHits->at(b) );
+	//mu_muid_allauthor->push_back( m_offPhys->mu_muid_allauthor->at(a) );
+	//mu_muid_allauthor->push_back( m_offPhys->mu_muid_allauthor->at(b) );
+	//mu_muid_author->push_back( m_offPhys->mu_muid_author->at(a) );
+	//mu_muid_author->push_back( m_offPhys->mu_muid_author->at(b) );
 	
 	// vertex
 	vxp_n = m_offPhys->vxp_n;
@@ -284,6 +314,8 @@ void offlineTreeDigest::reset()
 	mu_staco_isCombinedMuon->clear();
 	mu_staco_nSCTHits->clear();
 	mu_staco_nPixHits->clear();
+	mu_staco_allauthor->clear();
+	mu_staco_author->clear();
 	
 	// muid
 	//mu_muid_px->clear();
@@ -306,6 +338,8 @@ void offlineTreeDigest::reset()
 	//mu_muid_isCombinedMuon->clear();
 	//mu_muid_nSCTHits->clear();
 	//mu_muid_nPixHits->clear();
+	//mu_muid_allauthor->clear();
+	//mu_muid_author->clear();
 	
 	vxp_nTracks->clear();
 	vxp_type->clear();

@@ -29,6 +29,13 @@ class offlineTreeDigest : public utilities
 		// event preselection
 		int isGRL;
 		int L1_MU6;
+		int EF_mu10;
+		int EF_mu13;
+		int EF_mu15;
+		int EF_mu20;
+		int EF_mu4;
+		int EF_mu6;
+		
 		
 		// mu_staco
 		Int_t          mu_staco_n;
@@ -52,6 +59,8 @@ class offlineTreeDigest : public utilities
 		vector<int>*   mu_staco_isCombinedMuon;
 		vector<int>*   mu_staco_nSCTHits;
 		vector<int>*   mu_staco_nPixHits;
+		vector<unsigned short>* mu_staco_allauthor;
+		vector<int>*   mu_staco_author;
 		
 		// muid
 		//Int_t          mu_muid_n;
@@ -75,6 +84,8 @@ class offlineTreeDigest : public utilities
 		//vector<int>*   mu_muid_isCombinedMuon;
 		//vector<int>*   mu_muid_nSCTHits;
 		//vector<int>*   mu_muid_nPixHits;
+		vector<unsigned short>* mu_muid_allauthor;
+		vector<int>*   mu_muid_author;
 		
 		// vertex variables
 		Int_t vxp_n;

@@ -224,18 +224,28 @@ void digestAnalysis::executeAdvanced()
 
 void digestAnalysis::executeCutFlow()
 {
+	bool debugmode = false;
+
 	///////////////////////////////////////////
 	// do not skip this for correct counting //
 	m_cutFlowHandler->nAllEvents++; ///////////
 	///////////////////////////////////////////
 
+	if(debugmode) cout << "### 0 ###" << endl;
+	
 	// local variables
 	TVectorP2VL	pmu;
 	int         iVtx = 0;
+	
+	if(debugmode) cout << "### 1 ###" << endl;
 
 	//////////////////////////////////////////////////////////////////
 	// build vector of the muons TLorentzVector //////////////////////
-	for(int n=0 ; n<(int)m_digestPhys->mu_staco_n ; n++)
+	if(mu_staco_n<=1) return; ////////////////////////////////////////
+    // this needs to be looped acording to the size of the vector rather
+	// than according to the value of mu_staco_n since in the digest tree
+	// only the successive COUPLE is written.
+	for(int n=0 ; n<(int)m_digestPhys->mu_staco_m->size() ; n++)
 	{
 		pmu.push_back( new TLorentzVector() );
 		pmu[n]->SetPx( m_digestPhys->mu_staco_px->at(n) );
@@ -245,11 +255,13 @@ void digestAnalysis::executeCutFlow()
 	}
 	///////////////////////////////////////////////////////////////////
 	
+	if(debugmode) cout << "### 2 ###" << endl;
 	
 	///////////////////////////////////////
 	int ai=0, bi=1; ///////////////////////
 	///////////////////////////////////////
 	
+	if(debugmode) cout << "### 3 ###" << endl;
 	
 
 	// calculate the necessary variables
@@ -259,17 +271,23 @@ void digestAnalysis::executeCutFlow()
 	current_mu_pT    = (m_digestPhys->mu_staco_charge->at(ai)<0) ? m_digestPhys->mu_staco_pt->at(ai) : m_digestPhys->mu_staco_pt->at(bi);
 	current_mu_eta   = (m_digestPhys->mu_staco_charge->at(ai)<0) ? m_digestPhys->mu_staco_eta->at(ai) : m_digestPhys->mu_staco_eta->at(bi);
 	
+	if(debugmode) cout << "### 4 ###" << endl;
+	
 	// event level
 	runnumber  = m_digestPhys->RunNumber;
 	lumiblock  = m_digestPhys->lbn;
 	isL1MU6    = m_digestPhys->L1_MU6;
 	isGRL      = m_digestPhys->isGRL;
 	
+	if(debugmode) cout << "### 5 ###" << endl;
+	
 	// deprecated !!!
 	d0exPVa = m_digestPhys->mu_staco_d0_exPV->at(ai);
 	z0exPVa = m_digestPhys->mu_staco_z0_exPV->at(ai);
 	d0exPVb = m_digestPhys->mu_staco_d0_exPV->at(bi);
 	z0exPVb = m_digestPhys->mu_staco_z0_exPV->at(bi);
+	
+	if(debugmode) cout << "### 6 ###" << endl;
 	
 	// primary vertex:
 	// at least one primary vtx passes the z selection
@@ -278,9 +296,13 @@ void digestAnalysis::executeCutFlow()
 	PVz0Ptr      = m_digestPhys->vxp_z;       // = absolute z position of primary vertex < 150mm
 	PVz0errPtr   = m_digestPhys->vxp_z_err;   // = error
 	
+	if(debugmode) cout << "### 7 ###" << endl;
+	
 	// combined muon ?
 	isMuaComb  = m_digestPhys->mu_staco_isCombinedMuon->at(ai);
 	isMubComb  = m_digestPhys->mu_staco_isCombinedMuon->at(bi);	
+	
+	if(debugmode) cout << "### 8 ###" << endl;
 	
 	// inner detector hits
 	nSCThitsMua  = m_digestPhys->mu_staco_nSCTHits->at(ai); //  SCT hits >=4
@@ -289,6 +311,8 @@ void digestAnalysis::executeCutFlow()
 	nPIXhitsMub  = m_digestPhys->mu_staco_nPixHits->at(bi); // pixel hits >=1
 	nIDhitsMua   = nSCThitsMua+nPIXhitsMua; // pixel+SCT hits >=5
 	nIDhitsMub   = nSCThitsMub+nPIXhitsMub; // pixel+SCT hits >=5
+	
+	if(debugmode) cout << "### 9 ###" << endl;
 	
 	// ID - MS pT matching: pT=|p|*sin(theta), qOp=charge/|p|
 	me_qOp_a   = m_digestPhys->mu_staco_me_qoverp->at(ai);
@@ -300,9 +324,13 @@ void digestAnalysis::executeCutFlow()
 	me_theta_b = m_digestPhys->mu_staco_me_theta->at(bi);
 	id_theta_b = m_digestPhys->mu_staco_id_theta->at(bi);
 	
+	if(debugmode) cout << "### 10 ###" << endl;
+	
 	// impact parameter
 	impPrmZ0 = m_digestPhys->mu_staco_z0_exPV->at(ai);
 	impPrmD0 = m_digestPhys->mu_staco_d0_exPV->at(ai);
+	
+	if(debugmode) cout << "### 11 ###" << endl;
 	
 	// isolation
 	mu_pTa   = m_digestPhys->mu_staco_pt->at(ai);
@@ -314,14 +342,19 @@ void digestAnalysis::executeCutFlow()
 	pTcone40a = m_digestPhys->mu_staco_ptcone40->at(ai);
 	pTcone40b = m_digestPhys->mu_staco_ptcone40->at(bi);
 	
+	if(debugmode) cout << "### 12 ###" << endl;
+	
 	// charge
 	mu_charge_a = m_digestPhys->mu_staco_charge->at(ai);
 	mu_charge_b = m_digestPhys->mu_staco_charge->at(bi);
 	
+	if(debugmode) cout << "### 13 ###" << endl;
 	
 	TMapsd values2fill;
 	values2fill.insert( make_pair( "imass",current_imass ) );
 	values2fill.insert( make_pair( "pT",   current_mu_pT ) );
+	
+	if(debugmode) cout << "### 14 ###" << endl;
 	
 	bool passCutFlow    = true;
 	bool passCurrentCut = true;
@@ -335,50 +368,70 @@ void digestAnalysis::executeCutFlow()
 		counter++;
 		string sorderedcutname = ii->second;
 
+		if(debugmode) cout << "### 15 ###" << endl;
+		
 		if(sorderedcutname=="oppositeCharcge")
 		{
 			passCurrentCut = ( oppositeChargeCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_charge_a, mu_charge_b) ) ? true : false;
 		}
+		
+		if(debugmode) cout << "### 15.1 ###" << endl;
 
 		if(sorderedcutname=="GRL")
 		{
 			passCurrentCut = ( isGRLCut((*m_cutFlowMapSVD)[sorderedcutname][0], isGRL) ) ? true : false;
 		}
 
+		if(debugmode) cout << "### 15.2 ###" << endl;
+		
 		if(sorderedcutname=="L1_MU6")
 		{
 			passCurrentCut = ( isL1_MU6Cut((*m_cutFlowMapSVD)[sorderedcutname][0], isL1MU6) ) ? true : false;
-		}		
+		}
+		
+		if(debugmode) cout << "### 15.3 ###" << endl;
 
 		if(sorderedcutname=="imass")
 		{
 			passCurrentCut = ( imassCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
 		}
+		
+		if(debugmode) cout << "### 15.4 ###" << endl;
 
 		if(sorderedcutname=="pT")
 		{
 			passCurrentCut = ( pTCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
 		}
+		
+		if(debugmode) cout << "### 15.5 ###" << endl;
 
 		if(sorderedcutname=="eta")
 		{
 			passCurrentCut = ( etaCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
 		}
+		
+		if(debugmode) cout << "### 15.6 ###" << endl;
 
 		if(sorderedcutname=="cosThetaDimu")
 		{
 			passCurrentCut = ( cosThetaDimuCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
 		}
+		
+		if(debugmode) cout << "### 15.7 ###" << endl;
 
 		if(sorderedcutname=="d0")
 		{
 			passCurrentCut = ( d0Cut((*m_cutFlowMapSVD)[sorderedcutname][0], d0exPVa, d0exPVb) ) ? true : false;
 		}
+		
+		if(debugmode) cout << "### 15.8 ###" << endl;
 
 		if(sorderedcutname=="z0")
 		{
 			passCurrentCut = ( z0Cut((*m_cutFlowMapSVD)[sorderedcutname][0], z0exPVa, z0exPVb) ) ? true : false;
 		}
+		
+		if(debugmode) cout << "### 15.9 ###" << endl;
 		
 		if(sorderedcutname=="PV")
 		{
@@ -387,6 +440,8 @@ void digestAnalysis::executeCutFlow()
 			double cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
 			passCurrentCut = ( primaryVertexCut(cutval1,cutval2,cutval3, nPVtracksPtr, nPVtypePtr, PVz0Ptr, PVz0errPtr, iVtx) ) ? true : false;
 		}
+		
+		if(debugmode) cout << "### 15.10 ###" << endl;
 		
 		if(sorderedcutname=="isCombMu")
 		{
@@ -403,6 +458,8 @@ void digestAnalysis::executeCutFlow()
 		}
 		*/
 		
+		if(debugmode) cout << "### 15.11 ###" << endl;
+		
 		if(sorderedcutname=="isolation40")
 		{
 			passCurrentCut =
@@ -410,6 +467,8 @@ void digestAnalysis::executeCutFlow()
 			pairXXisolation((*m_cutFlowMapSVD)[sorderedcutname][0],"isolation40",mu_pTa,mu_pTb,pTcone40a,pTcone40b)
 			) ? true : false;
 		}
+		
+		if(debugmode) cout << "### 15.12 ###" << endl;
 		
 		if(sorderedcutname=="pTmatchingRatio")
 		{
@@ -422,6 +481,8 @@ void digestAnalysis::executeCutFlow()
 			me_qOp_b,me_theta_b,id_qOp_b,id_theta_b)
 			) ? true : false;
 		}
+		
+		if(debugmode) cout << "### 15.13 ###" << endl;
 
 		if(sorderedcutname=="pTmatchingAbsDiff")
 		{
@@ -433,6 +494,8 @@ void digestAnalysis::executeCutFlow()
 			me_qOp_b,me_theta_b,id_qOp_b,id_theta_b)
 			) ? true : false;
 		}
+		
+		if(debugmode) cout << "### 15.14 ###" << endl;
 
 		passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
 		if(passCutFlow)
@@ -443,11 +506,15 @@ void digestAnalysis::executeCutFlow()
 			m_graphicobjs->hmap_cutFlow_pT->operator[]("pT."+sorderedcutname)->Fill( values2fill["pT"] );
 			//////////////////////////////////////////////////////
 
+			if(debugmode) cout << "### 15.15 ###" << endl;
+			
 			//////////////////////////////////////////////////////
 			// count the numbers: ////////////////////////////////
 			m_cutFlowNumbers->operator[](sorderedcutname) ++; ////
 			//////////////////////////////////////////////////////
 
+			if(debugmode) cout << "### 15.16 ###" << endl;
+			
 			///////////////////////////////////////////////////////////
 			// fill the "allCuts" histograms only after the last cut 
 			if(counter==cutFlowMapSize)
@@ -459,6 +526,8 @@ void digestAnalysis::executeCutFlow()
 				m_graphicobjs->h1_pT->Fill( current_mu_pT );
 				m_graphicobjs->h1_imass->Fill( current_imass );
 				
+				if(debugmode) cout << "### 15.17 ###" << endl;
+				
 				cout << "\n$$$$$$$$$ dimuon $$$$$$$$$" << endl;
 				cout << "\t im=" << current_imass << endl;
 				cout << "\t pTmu=" << current_mu_pT  << endl;
@@ -466,13 +535,25 @@ void digestAnalysis::executeCutFlow()
 				
 				// fill the xVector for the ML fit:
 				m_fit->fillXvec( current_imass );
+				
+				if(debugmode) cout << "### 15.18 ###" << endl;
 			}
 			///////////////////////////////////////////////////////////
+			
+			if(debugmode) cout << "### 15.19 ###" << endl;
+			
 		} // end if(passCutFlow)
+		
+		if(debugmode) cout << "### 15.20 ###" << endl;
+		
 	} // end for(m_cutFlowOrdered)
+	
+	if(debugmode) cout << "### 16 ###" << endl;
 
 	// re-initialize
 	if(pmu.size()>0)       pmu.clear();
+	
+	if(debugmode) cout << "### 17 ###" << endl;
 }
 
 void digestAnalysis::write()

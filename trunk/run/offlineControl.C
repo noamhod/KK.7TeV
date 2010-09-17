@@ -103,7 +103,8 @@ void offlineControl::draw()
 	m_graphics->drawBareHistos(m_dirNoCuts);
 	m_graphics->drawHistos(m_dirAllCuts);
 	m_graphics->drawHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_dirCutFlow );
-	m_graphics->drawFitHistos(m_dirFit, m_offlineAnalysis->m_fGuess, m_offlineAnalysis->m_fFitted);
+	//m_graphics->drawFitHistos(m_dirFit, m_offlineAnalysis->m_fGuess, m_offlineAnalysis->m_fFitted);
+	m_graphics->drawFitHistos(m_dirFit, m_offlineAnalysis->m_fit->m_fitMinuit->guess, m_offlineAnalysis->m_fit->m_fitMinuit->fitFCN);
 
 	m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
 }
@@ -122,7 +123,7 @@ void offlineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	l64t_nbytes = 0;
 	l64t_nb = 0;
 
-	l64t_mod = 20000;
+	l64t_mod = 100000;
 
 	l64t_startEvent = startEvent;
 	l64t_stopEvent = l64t_nentries;
@@ -139,7 +140,7 @@ void offlineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		l64t_nbytes += l64t_nb;
 		// if (Cut(l64t_ientry) < 0) continue;
 		
-		if(l64t_jentry%10000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_offPhys->RunNumber << "\tlumiblock=" << m_offPhys->lbn << endl;
+		if(l64t_jentry%100000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_offPhys->RunNumber << "\tlumiblock=" << m_offPhys->lbn << endl;
 		if(l64t_jentry%l64t_mod==0) m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
 		
 		analyze();

@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Sep  1 15:21:31 2010 by ROOT version 5.22/00
+// Thu Sep 16 22:12:57 2010 by ROOT version 5.22/00
 // from TTree offline/offline
-// found on file: user.hod.000683._00001.WZphys.root
+// found on file: user.hod.000927._00024.WZphys.root
 //////////////////////////////////////////////////////////
 
 #ifndef offlinePhysics_h
@@ -23,6 +23,12 @@ public :
    Int_t           EventNumber;
    Int_t           isGRL;
    Int_t           L1_MU6;
+   Int_t           EF_mu10;
+   Int_t           EF_mu13;
+   Int_t           EF_mu15;
+   Int_t           EF_mu20;
+   Int_t           EF_mu4;
+   Int_t           EF_mu6;
    Int_t           mu_staco_n;
    vector<float>   *mu_staco_px;
    vector<float>   *mu_staco_py;
@@ -37,6 +43,8 @@ public :
    vector<float>   *mu_staco_eta;
    vector<float>   *mu_staco_d0_exPV;
    vector<float>   *mu_staco_z0_exPV;
+   vector<unsigned short> *mu_staco_allauthor;
+   vector<int>     *mu_staco_author;
    vector<float>   *mu_staco_me_qoverp;
    vector<float>   *mu_staco_id_qoverp;
    vector<float>   *mu_staco_me_theta;
@@ -58,6 +66,8 @@ public :
    vector<float>   *mu_muid_eta;
    vector<float>   *mu_muid_d0_exPV;
    vector<float>   *mu_muid_z0_exPV;
+   vector<unsigned short> *mu_muid_allauthor;
+   vector<int>     *mu_muid_author;
    vector<float>   *mu_muid_me_qoverp;
    vector<float>   *mu_muid_id_qoverp;
    vector<float>   *mu_muid_me_theta;
@@ -77,6 +87,12 @@ public :
    TBranch        *b_EventNumber;   //!
    TBranch        *b_isGRL;   //!
    TBranch        *b_L1_MU6;   //!
+   TBranch        *b_EF_mu10;   //!
+   TBranch        *b_EF_mu13;   //!
+   TBranch        *b_EF_mu15;   //!
+   TBranch        *b_EF_mu20;   //!
+   TBranch        *b_EF_mu4;   //!
+   TBranch        *b_EF_mu6;   //!
    TBranch        *b_mu_staco_n;   //!
    TBranch        *b_mu_staco_px;   //!
    TBranch        *b_mu_staco_py;   //!
@@ -91,6 +107,8 @@ public :
    TBranch        *b_mu_staco_eta;   //!
    TBranch        *b_mu_staco_d0_exPV;   //!
    TBranch        *b_mu_staco_z0_exPV;   //!
+   TBranch        *b_mu_staco_allauthor;   //!
+   TBranch        *b_mu_staco_author;   //!
    TBranch        *b_mu_staco_me_qoverp;   //!
    TBranch        *b_mu_staco_id_qoverp;   //!
    TBranch        *b_mu_staco_me_theta;   //!
@@ -112,6 +130,8 @@ public :
    TBranch        *b_mu_muid_eta;   //!
    TBranch        *b_mu_muid_d0_exPV;   //!
    TBranch        *b_mu_muid_z0_exPV;   //!
+   TBranch        *b_mu_muid_allauthor;   //!
+   TBranch        *b_mu_muid_author;   //!
    TBranch        *b_mu_muid_me_qoverp;   //!
    TBranch        *b_mu_muid_id_qoverp;   //!
    TBranch        *b_mu_muid_me_theta;   //!
@@ -144,9 +164,9 @@ offlinePhysics::offlinePhysics(TTree *tree)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("user.hod.000683._00001.WZphys.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("user.hod.000927._00024.WZphys.root");
       if (!f) {
-         f = new TFile("user.hod.000683._00001.WZphys.root");
+         f = new TFile("user.hod.000927._00024.WZphys.root");
       }
       tree = (TTree*)gDirectory->Get("offline");
 
@@ -157,7 +177,7 @@ offlinePhysics::offlinePhysics(TTree *tree)
 offlinePhysics::~offlinePhysics()
 {
    if (!fChain) return;
-   delete fChain->GetCurrentFile();
+   //delete fChain->GetCurrentFile();
 }
 
 Int_t offlinePhysics::GetEntry(Long64_t entry)
@@ -205,6 +225,8 @@ void offlinePhysics::Init(TTree *tree)
    mu_staco_eta = 0;
    mu_staco_d0_exPV = 0;
    mu_staco_z0_exPV = 0;
+   mu_staco_allauthor = 0;
+   mu_staco_author = 0;
    mu_staco_me_qoverp = 0;
    mu_staco_id_qoverp = 0;
    mu_staco_me_theta = 0;
@@ -225,6 +247,8 @@ void offlinePhysics::Init(TTree *tree)
    mu_muid_eta = 0;
    mu_muid_d0_exPV = 0;
    mu_muid_z0_exPV = 0;
+   mu_muid_allauthor = 0;
+   mu_muid_author = 0;
    mu_muid_me_qoverp = 0;
    mu_muid_id_qoverp = 0;
    mu_muid_me_theta = 0;
@@ -247,6 +271,12 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("EventNumber", &EventNumber, &b_EventNumber);
    fChain->SetBranchAddress("isGRL", &isGRL, &b_isGRL);
    fChain->SetBranchAddress("L1_MU6", &L1_MU6, &b_L1_MU6);
+   fChain->SetBranchAddress("EF_mu10", &EF_mu10, &b_EF_mu10);
+   fChain->SetBranchAddress("EF_mu13", &EF_mu13, &b_EF_mu13);
+   fChain->SetBranchAddress("EF_mu15", &EF_mu15, &b_EF_mu15);
+   fChain->SetBranchAddress("EF_mu20", &EF_mu20, &b_EF_mu20);
+   fChain->SetBranchAddress("EF_mu4", &EF_mu4, &b_EF_mu4);
+   fChain->SetBranchAddress("EF_mu6", &EF_mu6, &b_EF_mu6);
    fChain->SetBranchAddress("mu_staco_n", &mu_staco_n, &b_mu_staco_n);
    fChain->SetBranchAddress("mu_staco_px", &mu_staco_px, &b_mu_staco_px);
    fChain->SetBranchAddress("mu_staco_py", &mu_staco_py, &b_mu_staco_py);
@@ -261,6 +291,8 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("mu_staco_eta", &mu_staco_eta, &b_mu_staco_eta);
    fChain->SetBranchAddress("mu_staco_d0_exPV", &mu_staco_d0_exPV, &b_mu_staco_d0_exPV);
    fChain->SetBranchAddress("mu_staco_z0_exPV", &mu_staco_z0_exPV, &b_mu_staco_z0_exPV);
+   fChain->SetBranchAddress("mu_staco_allauthor", &mu_staco_allauthor, &b_mu_staco_allauthor);
+   fChain->SetBranchAddress("mu_staco_author", &mu_staco_author, &b_mu_staco_author);
    fChain->SetBranchAddress("mu_staco_me_qoverp", &mu_staco_me_qoverp, &b_mu_staco_me_qoverp);
    fChain->SetBranchAddress("mu_staco_id_qoverp", &mu_staco_id_qoverp, &b_mu_staco_id_qoverp);
    fChain->SetBranchAddress("mu_staco_me_theta", &mu_staco_me_theta, &b_mu_staco_me_theta);
@@ -282,6 +314,8 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("mu_muid_eta", &mu_muid_eta, &b_mu_muid_eta);
    fChain->SetBranchAddress("mu_muid_d0_exPV", &mu_muid_d0_exPV, &b_mu_muid_d0_exPV);
    fChain->SetBranchAddress("mu_muid_z0_exPV", &mu_muid_z0_exPV, &b_mu_muid_z0_exPV);
+   fChain->SetBranchAddress("mu_muid_allauthor", &mu_muid_allauthor, &b_mu_muid_allauthor);
+   fChain->SetBranchAddress("mu_muid_author", &mu_muid_author, &b_mu_muid_author);
    fChain->SetBranchAddress("mu_muid_me_qoverp", &mu_muid_me_qoverp, &b_mu_muid_me_qoverp);
    fChain->SetBranchAddress("mu_muid_id_qoverp", &mu_muid_id_qoverp, &b_mu_muid_id_qoverp);
    fChain->SetBranchAddress("mu_muid_me_theta", &mu_muid_me_theta, &b_mu_muid_me_theta);

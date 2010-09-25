@@ -45,6 +45,7 @@ void offlineTreeDigest::setBranches()
 	mu_staco_ptcone30  = new vector<float>;
 	mu_staco_ptcone40  = new vector<float>;
 	mu_staco_eta       = new vector<float>;
+	mu_staco_phi       = new vector<float>;
 	mu_staco_d0_exPV   = new vector<float>;
 	mu_staco_z0_exPV   = new vector<float>;
 	mu_staco_me_qoverp = new vector<float>;
@@ -56,6 +57,8 @@ void offlineTreeDigest::setBranches()
 	mu_staco_nPixHits  = new vector<int>;
 	mu_staco_allauthor = new vector<unsigned short>;
 	mu_staco_author    = new vector<int>;
+	mu_staco_matchchi2 = new vector<float>;
+	mu_staco_matchndof = new vector<int>;
 	
 	// muid
 	//mu_muid_m         = new vector<float>;
@@ -69,6 +72,7 @@ void offlineTreeDigest::setBranches()
 	//mu_muid_ptcone30  = new vector<float>;
 	//mu_muid_ptcone40  = new vector<float>;
 	//mu_muid_eta       = new vector<float>;
+	//mu_muid_phi       = new vector<float>;
 	//mu_muid_d0_exPV   = new vector<float>;
 	//mu_muid_z0_exPV   = new vector<float>;
 	//mu_muid_me_qoverp = new vector<float>;
@@ -80,6 +84,8 @@ void offlineTreeDigest::setBranches()
 	//mu_muid_nPixHits  = new vector<int>;
 	//mu_muid_allauthor = new vector<unsigned short>;
 	//mu_muid_author    = new vector<int>;
+	//mu_muid_matchchi2 = new vector<float>;
+	//mu_muid_matchndof = new vector<int>;
 	
 	vxp_z       = new vector<float>;
 	vxp_z_err   = new vector<float>;
@@ -116,6 +122,7 @@ void offlineTreeDigest::setBranches()
 	m_tree->Branch( "mu_staco_ptcone30",  &mu_staco_ptcone30 );
 	m_tree->Branch( "mu_staco_ptcone40",  &mu_staco_ptcone40 );
 	m_tree->Branch( "mu_staco_eta",       &mu_staco_eta );
+	m_tree->Branch( "mu_staco_phi",       &mu_staco_phi );
 	m_tree->Branch( "mu_staco_d0_exPV",   &mu_staco_d0_exPV );
 	m_tree->Branch( "mu_staco_z0_exPV",   &mu_staco_z0_exPV );
 	m_tree->Branch( "mu_staco_me_qoverp",       &mu_staco_me_qoverp );
@@ -127,31 +134,36 @@ void offlineTreeDigest::setBranches()
 	m_tree->Branch( "mu_staco_nPixHits",        &mu_staco_nPixHits );
 	m_tree->Branch( "mu_staco_allauthor",       &mu_staco_allauthor );
 	m_tree->Branch( "mu_staco_author",          &mu_staco_author );
+	m_tree->Branch( "mu_staco_matchchi2",       &mu_staco_matchchi2 );
+	m_tree->Branch( "mu_staco_matchndof",       &mu_staco_matchndof );
 	
 	// //mu_muid
-	//m_tree->Branch( "mu_muid_n",         &//mu_muid_n );
-	//m_tree->Branch( "mu_muid_px",        &//mu_muid_px );
-	//m_tree->Branch( "mu_muid_py",        &//mu_muid_py );
-	//m_tree->Branch( "mu_muid_pz",        &//mu_muid_pz );
-	//m_tree->Branch( "mu_muid_E",         &//mu_muid_E );
-	//m_tree->Branch( "mu_muid_m",         &//mu_muid_m );
-	//m_tree->Branch( "mu_muid_charge",    &//mu_muid_charge );
-	//m_tree->Branch( "mu_muid_pt",        &//mu_muid_pt );
-	//m_tree->Branch( "mu_muid_ptcone20",  &//mu_muid_ptcone20 );
-	//m_tree->Branch( "mu_muid_ptcone30",  &//mu_muid_ptcone30 );
-	//m_tree->Branch( "mu_muid_ptcone40",  &//mu_muid_ptcone40 );
-	//m_tree->Branch( "mu_muid_eta",       &//mu_muid_eta );
-	//m_tree->Branch( "mu_muid_d0_exPV",   &//mu_muid_d0_exPV );
-	//m_tree->Branch( "mu_muid_z0_exPV",   &//mu_muid_z0_exPV );
-	//m_tree->Branch( "mu_muid_me_qoverp",       &//mu_muid_me_qoverp );
-	//m_tree->Branch( "mu_muid_id_qoverp",       &//mu_muid_id_qoverp );
-	//m_tree->Branch( "mu_muid_me_theta",        &//mu_muid_me_theta );
-	//m_tree->Branch( "mu_muid_id_theta",        &//mu_muid_id_theta );
-	//m_tree->Branch( "mu_muid_isCombinedMuon",  &//mu_muid_isCombinedMuon );
-	//m_tree->Branch( "mu_muid_nSCTHits",        &//mu_muid_nSCTHits );
-	//m_tree->Branch( "mu_muid_nPixHits",        &//mu_muid_nPixHits );
-	//m_tree->Branch( "mu_muid_allauthor",        &mu_muid_allauthor );
-	//m_tree->Branch( "mu_muid_author",           &mu_muid_author );
+	//m_tree->Branch( "mu_muid_n",         &mu_muid_n );
+	//m_tree->Branch( "mu_muid_px",        &mu_muid_px );
+	//m_tree->Branch( "mu_muid_py",        &mu_muid_py );
+	//m_tree->Branch( "mu_muid_pz",        &mu_muid_pz );
+	//m_tree->Branch( "mu_muid_E",         &mu_muid_E );
+	//m_tree->Branch( "mu_muid_m",         &mu_muid_m );
+	//m_tree->Branch( "mu_muid_charge",    &mu_muid_charge );
+	//m_tree->Branch( "mu_muid_pt",        &mu_muid_pt );
+	//m_tree->Branch( "mu_muid_ptcone20",  &mu_muid_ptcone20 );
+	//m_tree->Branch( "mu_muid_ptcone30",  &mu_muid_ptcone30 );
+	//m_tree->Branch( "mu_muid_ptcone40",  &mu_muid_ptcone40 );
+	//m_tree->Branch( "mu_muid_eta",       &mu_muid_eta );
+	//m_tree->Branch( "mu_muid_eta",       &mu_muid_phi );
+	//m_tree->Branch( "mu_muid_d0_exPV",   &mu_muid_d0_exPV );
+	//m_tree->Branch( "mu_muid_z0_exPV",   &mu_muid_z0_exPV );
+	//m_tree->Branch( "mu_muid_me_qoverp",       &mu_muid_me_qoverp );
+	//m_tree->Branch( "mu_muid_id_qoverp",       &mu_muid_id_qoverp );
+	//m_tree->Branch( "mu_muid_me_theta",        &mu_muid_me_theta );
+	//m_tree->Branch( "mu_muid_id_theta",        &mu_muid_id_theta );
+	//m_tree->Branch( "mu_muid_isCombinedMuon",  &mu_muid_isCombinedMuon );
+	//m_tree->Branch( "mu_muid_nSCTHits",        &mu_muid_nSCTHits );
+	//m_tree->Branch( "mu_muid_nPixHits",        &mu_muid_nPixHits );
+	//m_tree->Branch( "mu_muid_allauthor",       &mu_muid_allauthor );
+	//m_tree->Branch( "mu_muid_author",          &mu_muid_author );
+	//m_tree->Branch( "mu_muid_matchchi2",       &mu_muid_matchchi2 );
+	//m_tree->Branch( "mu_muid_matchndof",       &mu_muid_matchndof );
 	
 	// vertex branches
 	m_tree->Branch( "vxp_n",       &vxp_n );
@@ -209,6 +221,8 @@ void offlineTreeDigest::fill(int a, int b, int v)
 	mu_staco_ptcone40->push_back( m_offPhys->mu_staco_ptcone40->at(b) );
 	mu_staco_eta->push_back( m_offPhys->mu_staco_eta->at(a) );
 	mu_staco_eta->push_back( m_offPhys->mu_staco_eta->at(b) );
+	mu_staco_phi->push_back( m_offPhys->mu_staco_phi->at(a) );
+	mu_staco_phi->push_back( m_offPhys->mu_staco_phi->at(b) );
 	mu_staco_d0_exPV->push_back( m_offPhys->mu_staco_d0_exPV->at(a) );
 	mu_staco_d0_exPV->push_back( m_offPhys->mu_staco_d0_exPV->at(b) );
 	mu_staco_z0_exPV->push_back( m_offPhys->mu_staco_z0_exPV->at(a) );
@@ -231,53 +245,64 @@ void offlineTreeDigest::fill(int a, int b, int v)
 	mu_staco_allauthor->push_back( m_offPhys->mu_staco_allauthor->at(b) );
 	mu_staco_author->push_back( m_offPhys->mu_staco_author->at(a) );
 	mu_staco_author->push_back( m_offPhys->mu_staco_author->at(b) );
+	mu_staco_matchchi2->push_back( m_offPhys->mu_staco_matchchi2->at(a) );
+	mu_staco_matchchi2->push_back( m_offPhys->mu_staco_matchchi2->at(b) );
+	mu_staco_matchndof->push_back( m_offPhys->mu_staco_matchndof->at(a) );
+	mu_staco_matchndof->push_back( m_offPhys->mu_staco_matchndof->at(b) );
+	
 	
 	// muid
-	//mu_muid_n = m_offPhys->//mu_muid_n;
-	//mu_muid_px->push_back( m_offPhys->//mu_muid_px->at(a) );
-	//mu_muid_px->push_back( m_offPhys->//mu_muid_px->at(b) );
-	//mu_muid_py->push_back( m_offPhys->//mu_muid_py->at(a) );
-	//mu_muid_py->push_back( m_offPhys->//mu_muid_py->at(b) );
-	//mu_muid_pz->push_back( m_offPhys->//mu_muid_pz->at(a) );
-	//mu_muid_pz->push_back( m_offPhys->//mu_muid_pz->at(b) );
-	//mu_muid_E->push_back( m_offPhys->//mu_muid_E->at(a) );
-	//mu_muid_E->push_back( m_offPhys->//mu_muid_E->at(b) );
-	//mu_muid_m->push_back( m_offPhys->//mu_muid_m->at(a) );
-	//mu_muid_m->push_back( m_offPhys->//mu_muid_m->at(b) );
-	//mu_muid_charge->push_back( m_offPhys->//mu_muid_charge->at(a) );
-	//mu_muid_charge->push_back( m_offPhys->//mu_muid_charge->at(b) );
-	//mu_muid_pt->push_back( m_offPhys->//mu_muid_pt->at(a) );
-	//mu_muid_pt->push_back( m_offPhys->//mu_muid_pt->at(b) );
-	//mu_muid_ptcone20->push_back( m_offPhys->//mu_muid_ptcone20->at(a) );
-	//mu_muid_ptcone20->push_back( m_offPhys->//mu_muid_ptcone20->at(b) );
-	//mu_muid_ptcone30->push_back( m_offPhys->//mu_muid_ptcone30->at(a) );
-	//mu_muid_ptcone30->push_back( m_offPhys->//mu_muid_ptcone30->at(b) );
-	//mu_muid_ptcone40->push_back( m_offPhys->//mu_muid_ptcone40->at(a) );
-	//mu_muid_ptcone40->push_back( m_offPhys->//mu_muid_ptcone40->at(b) );
-	//mu_muid_eta->push_back( m_offPhys->//mu_muid_eta->at(a) );
-	//mu_muid_eta->push_back( m_offPhys->//mu_muid_eta->at(b) );
-	//mu_muid_d0_exPV->push_back( m_offPhys->//mu_muid_d0_exPV->at(a) );
-	//mu_muid_d0_exPV->push_back( m_offPhys->//mu_muid_d0_exPV->at(b) );
-	//mu_muid_z0_exPV->push_back( m_offPhys->//mu_muid_z0_exPV->at(a) );
-	//mu_muid_z0_exPV->push_back( m_offPhys->//mu_muid_z0_exPV->at(b) );
-	//mu_muid_me_qoverp->push_back( m_offPhys->//mu_muid_me_qoverp->at(a) );
-	//mu_muid_me_qoverp->push_back( m_offPhys->//mu_muid_me_qoverp->at(b) );
-	//mu_muid_id_qoverp->push_back( m_offPhys->//mu_muid_id_qoverp->at(a) );
-	//mu_muid_id_qoverp->push_back( m_offPhys->//mu_muid_id_qoverp->at(b) );
-	//mu_muid_me_theta->push_back( m_offPhys->//mu_muid_me_theta->at(a) );
-	//mu_muid_me_theta->push_back( m_offPhys->//mu_muid_me_theta->at(b) );
-	//mu_muid_id_theta->push_back( m_offPhys->//mu_muid_id_theta->at(a) );
-	//mu_muid_id_theta->push_back( m_offPhys->//mu_muid_id_theta->at(b) );
-	//mu_muid_isCombinedMuon->push_back( m_offPhys->//mu_muid_isCombinedMuon->at(a) );
-	//mu_muid_isCombinedMuon->push_back( m_offPhys->//mu_muid_isCombinedMuon->at(b) );
-	//mu_muid_nSCTHits->push_back( m_offPhys->//mu_muid_nSCTHits->at(a) );
-	//mu_muid_nSCTHits->push_back( m_offPhys->//mu_muid_nSCTHits->at(b) );
-	//mu_muid_nPixHits->push_back( m_offPhys->//mu_muid_nPixHits->at(a) );
-	//mu_muid_nPixHits->push_back( m_offPhys->//mu_muid_nPixHits->at(b) );
+	//mu_muid_n = m_offPhys->mu_muid_n;
+	//mu_muid_px->push_back( m_offPhys->mu_muid_px->at(a) );
+	//mu_muid_px->push_back( m_offPhys->mu_muid_px->at(b) );
+	//mu_muid_py->push_back( m_offPhys->mu_muid_py->at(a) );
+	//mu_muid_py->push_back( m_offPhys->mu_muid_py->at(b) );
+	//mu_muid_pz->push_back( m_offPhys->mu_muid_pz->at(a) );
+	//mu_muid_pz->push_back( m_offPhys->mu_muid_pz->at(b) );
+	//mu_muid_E->push_back( m_offPhys->mu_muid_E->at(a) );
+	//mu_muid_E->push_back( m_offPhys->mu_muid_E->at(b) );
+	//mu_muid_m->push_back( m_offPhys->mu_muid_m->at(a) );
+	//mu_muid_m->push_back( m_offPhys->mu_muid_m->at(b) );
+	//mu_muid_charge->push_back( m_offPhys->mu_muid_charge->at(a) );
+	//mu_muid_charge->push_back( m_offPhys->mu_muid_charge->at(b) );
+	//mu_muid_pt->push_back( m_offPhys->mu_muid_pt->at(a) );
+	//mu_muid_pt->push_back( m_offPhys->mu_muid_pt->at(b) );
+	//mu_muid_ptcone20->push_back( m_offPhys->mu_muid_ptcone20->at(a) );
+	//mu_muid_ptcone20->push_back( m_offPhys->mu_muid_ptcone20->at(b) );
+	//mu_muid_ptcone30->push_back( m_offPhys->mu_muid_ptcone30->at(a) );
+	//mu_muid_ptcone30->push_back( m_offPhys->mu_muid_ptcone30->at(b) );
+	//mu_muid_ptcone40->push_back( m_offPhys->mu_muid_ptcone40->at(a) );
+	//mu_muid_ptcone40->push_back( m_offPhys->mu_muid_ptcone40->at(b) );
+	//mu_muid_eta->push_back( m_offPhys->mu_muid_eta->at(a) );
+	//mu_muid_eta->push_back( m_offPhys->mu_muid_eta->at(b) );
+	//mu_muid_phi->push_back( m_offPhys->mu_muid_phi->at(a) );
+	//mu_muid_phi->push_back( m_offPhys->mu_muid_phi->at(b) );
+	//mu_muid_d0_exPV->push_back( m_offPhys->mu_muid_d0_exPV->at(a) );
+	//mu_muid_d0_exPV->push_back( m_offPhys->mu_muid_d0_exPV->at(b) );
+	//mu_muid_z0_exPV->push_back( m_offPhys->mu_muid_z0_exPV->at(a) );
+	//mu_muid_z0_exPV->push_back( m_offPhys->mu_muid_z0_exPV->at(b) );
+	//mu_muid_me_qoverp->push_back( m_offPhys->mu_muid_me_qoverp->at(a) );
+	//mu_muid_me_qoverp->push_back( m_offPhys->mu_muid_me_qoverp->at(b) );
+	//mu_muid_id_qoverp->push_back( m_offPhys->mu_muid_id_qoverp->at(a) );
+	//mu_muid_id_qoverp->push_back( m_offPhys->mu_muid_id_qoverp->at(b) );
+	//mu_muid_me_theta->push_back( m_offPhys->mu_muid_me_theta->at(a) );
+	//mu_muid_me_theta->push_back( m_offPhys->mu_muid_me_theta->at(b) );
+	//mu_muid_id_theta->push_back( m_offPhys->mu_muid_id_theta->at(a) );
+	//mu_muid_id_theta->push_back( m_offPhys->mu_muid_id_theta->at(b) );
+	//mu_muid_isCombinedMuon->push_back( m_offPhys->mu_muid_isCombinedMuon->at(a) );
+	//mu_muid_isCombinedMuon->push_back( m_offPhys->mu_muid_isCombinedMuon->at(b) );
+	//mu_muid_nSCTHits->push_back( m_offPhys->mu_muid_nSCTHits->at(a) );
+	//mu_muid_nSCTHits->push_back( m_offPhys->mu_muid_nSCTHits->at(b) );
+	//mu_muid_nPixHits->push_back( m_offPhys->mu_muid_nPixHits->at(a) );
+	//mu_muid_nPixHits->push_back( m_offPhys->mu_muid_nPixHits->at(b) );
 	//mu_muid_allauthor->push_back( m_offPhys->mu_muid_allauthor->at(a) );
 	//mu_muid_allauthor->push_back( m_offPhys->mu_muid_allauthor->at(b) );
 	//mu_muid_author->push_back( m_offPhys->mu_muid_author->at(a) );
 	//mu_muid_author->push_back( m_offPhys->mu_muid_author->at(b) );
+	//mu_muid_matchchi2->push_back( m_offPhys->mu_muid_matchchi2->at(a) );
+	//mu_muid_matchchi2->push_back( m_offPhys->mu_muid_matchchi2->at(b) );
+	//mu_muid_matchndof->push_back( m_offPhys->mu_muid_matchndof->at(a) );
+	//mu_muid_matchndof->push_back( m_offPhys->mu_muid_matchndof->at(b) );
 	
 	// vertex
 	vxp_n = m_offPhys->vxp_n;
@@ -305,6 +330,7 @@ void offlineTreeDigest::reset()
 	mu_staco_ptcone30->clear();
 	mu_staco_ptcone40->clear();
 	mu_staco_eta->clear();
+	mu_staco_phi->clear();
 	mu_staco_d0_exPV->clear();
 	mu_staco_z0_exPV->clear();
 	mu_staco_me_qoverp->clear();
@@ -316,6 +342,8 @@ void offlineTreeDigest::reset()
 	mu_staco_nPixHits->clear();
 	mu_staco_allauthor->clear();
 	mu_staco_author->clear();
+	mu_staco_matchchi2->clear();
+	mu_staco_matchndof->clear();
 	
 	// muid
 	//mu_muid_px->clear();
@@ -329,6 +357,7 @@ void offlineTreeDigest::reset()
 	//mu_muid_ptcone30->clear();
 	//mu_muid_ptcone40->clear();
 	//mu_muid_eta->clear();
+	//mu_muid_phi->clear();
 	//mu_muid_d0_exPV->clear();
 	//mu_muid_z0_exPV->clear();
 	//mu_muid_me_qoverp->clear();
@@ -340,6 +369,8 @@ void offlineTreeDigest::reset()
 	//mu_muid_nPixHits->clear();
 	//mu_muid_allauthor->clear();
 	//mu_muid_author->clear();
+	//mu_muid_matchchi2->clear();
+	//mu_muid_matchndof->clear();
 	
 	vxp_nTracks->clear();
 	vxp_type->clear();

@@ -22,18 +22,33 @@ class graphicObjects : public utilities
 		TCanvas* cnv_z0exPV;
 		TCanvas* cnv_cosmicCosth;
 		TCanvas* cnv_xyVertex;
-		TCanvas* cnv_imassAllCuts;
+		TCanvas* cnv_imassFit;
+		TCanvas* cnv_ipTdiff;
+		TCanvas* cnv_etaSum;
+		
+		// pads
+		TVirtualPad* pad_pT;
+		TVirtualPad* pad_eta;
+		TVirtualPad* pad_pT_muplus;
+		TVirtualPad* pad_eta_muplus;
+		TVirtualPad* pad_cosmicCosth;
+		TVirtualPad* pad_cosmicCosthAllCuts;
 
 		// histos
 		TH1D*    h1_imass;
 		TH1D*    h1_pT;
+		TH1D*    h1_pT_muplus;
 		TH1D*    h1_eta;
+		TH1D*    h1_eta_muplus;
 		TH1D*    h1_costh;
 		TH1D*    h1_d0exPV;
 		TH1D*    h1_z0exPV;
 		TH1D*    h1_cosmicCosth;
+		TH1D*    h1_cosmicCosthAllCuts;
 		TH2D*    h2_xyVertex;
-		TH1D*    h1_imassFinal;
+		TH1D*    h1_imassFit;
+		TH1D*    h1_ipTdiff;
+		TH1D*    h1_etaSum;
 
 		// canvases for cut flows
 		TCanvas* cnv_cutFlow_imass;
@@ -42,7 +57,8 @@ class graphicObjects : public utilities
 		// legends for the cut flow histod
 		TLegend* leg_cutFlow_imass;
 		TLegend* leg_cutFlow_pT;
-		TLegend* leg_imassFinal;
+		TLegend* leg_imassFit;
+		TLegend* leg_ipTdiff;
 
 		// map of histos
 		TMapSP2TH1D* hmap_cutFlow_imass;
@@ -62,6 +78,10 @@ class graphicObjects : public utilities
 		Int_t    imass_nbins;
 		Double_t imass_min;
 		Double_t imass_max;
+		
+		Int_t imass_fit_nbins;
+		Double_t imass_fit_min;
+		Double_t imass_fit_max;
 
 		Int_t    pT_nbins;
 		Double_t pT_min;
@@ -91,6 +111,14 @@ class graphicObjects : public utilities
 		Double_t xyVertex_min;
 		Double_t xyVertex_max;
 	
+		Int_t ipTdiff_nbins;
+		Double_t ipTdiff_min;
+		Double_t ipTdiff_max;
+		
+		Int_t etaSum_nbins;
+		Double_t etaSum_min;
+		Double_t etaSum_max;
+	
 	public:
 		graphicObjects();
 		~graphicObjects();
@@ -109,8 +137,8 @@ class graphicObjects : public utilities
 		void bookFitHistos(TDirectory* tdir);
 		void drawFitHistos(TDirectory* tdir, TF1* fGuess, TF1* fFitted);
 
-		void bookHistosMap(TMapds* cutFlowOrdered, TDirectory* tdir);
-		void drawHistosMap(TMapds* cutFlowOrdered, TDirectory* tdir);
+		void bookHistosMap(TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered, TDirectory* tdir);
+		void drawHistosMap(TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered, TDirectory* tdir);
 
 	private:
 

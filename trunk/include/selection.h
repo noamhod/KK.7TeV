@@ -22,6 +22,7 @@ public:
 	
 	TMapsvd* m_cutFlowMapSVD;
 	TMapds*  m_cutFlowOrdered;
+	TMapds*  m_cutFlowTypeOrdered;
 
 public:
 	selection();
@@ -30,7 +31,7 @@ public:
 	void sinitialize();
 	void sfinalize();
 
-	void initSelectionCuts(TMapsvd* cutFlowMapSVD, TMapds* cutFlowOrdered); // called by analysis, offlineAnalysis and digestAnalysis
+	void initSelectionCuts(TMapsvd* cutFlowMapSVD, TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered); // called by analysis, offlineAnalysis and digestAnalysis
 	
 	void buildMuonPairMap(	TMapii& mupair,
 							double ca, int ia,
@@ -54,26 +55,22 @@ public:
 	void findMostMassivePair(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iBest_a, int&iBest_b);
 	void findMostMassivePair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iBest_a, int&iBest_b);
 	
-	int getPVindex(physics* phys);
-	int getPVindex(offlinePhysics* offPhys);
+	int getPVindex(int nTracksCut, int nTypeCut, double z0Cut, physics* phys);
+	int getPVindex(int nTracksCut, int nTypeCut, double z0Cut, offlinePhysics* offPhys);
 	
-	bool findBestVertex(physics* phys);
-	bool findBestVertex(offlinePhysics* offPhys);
+	bool findBestVertex(int nTracksCut, int nTypeCut, double z0Cut, physics* phys);
+	bool findBestVertex(int nTracksCut, int nTypeCut, double z0Cut, offlinePhysics* offPhys);
 	
-	bool findHipTmuon(physics* phys);
-	bool findHipTmuon(offlinePhysics* offPhys);
+	bool findHipTmuon(double hipTmuonCut, double MShipTmuonCut, physics* phys);
+	bool findHipTmuon(double hipTmuonCut, double MShipTmuonCut, offlinePhysics* offPhys);
 	
-	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-	// * * * combined preselection * * *
-	
-	bool preselection(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int isGRL);
-	bool preselection(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap);
 	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 	// * * * simple cuts methods * * *
 	
 	bool isGRLCut( double isGRLCutVal, int isGRL );
 	bool isL1_MU6Cut( double isL1_MU6CutVal, int isL1_MU6 );
+	bool isEF_muXCut( double isEF_muXCutVal, int isEF_muX );
 	
 	bool pTCut(           double pTCutVal,           TLorentzVector* pa, TLorentzVector* pb );
 	bool etaCut(          double etaCutVal,          TLorentzVector* pa, TLorentzVector* pb );
@@ -134,6 +131,7 @@ public:
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
 private:
+	int m_iVtx;
 
 };
 #endif

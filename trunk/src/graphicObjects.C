@@ -28,18 +28,33 @@ void graphicObjects::ginitialize()
 	cnv_z0exPV       = NULL;
 	cnv_cosmicCosth  = NULL;
 	cnv_xyVertex     = NULL;
-	cnv_imassAllCuts = NULL;
+	cnv_imassFit     = NULL;
+	cnv_ipTdiff      = NULL;
+	cnv_etaSum       = NULL;
+	
+	// pads
+	pad_pT = NULL;
+	pad_eta = NULL;
+	pad_pT_muplus = NULL;
+	pad_eta_muplus = NULL;
+	pad_cosmicCosth = NULL;
+	pad_cosmicCosthAllCuts = NULL;
 	
 	// histos
 	h1_imass  = NULL;
 	h1_pT     = NULL;
+	h1_pT_muplus = NULL;
 	h1_eta    = NULL;
+	h1_eta_muplus = NULL;
 	h1_costh  = NULL;
 	h1_d0exPV = NULL;
 	h1_z0exPV = NULL;
 	h1_cosmicCosth = NULL;
+	h1_cosmicCosthAllCuts = NULL;
 	h2_xyVertex = NULL;
-	h1_imassFinal = NULL;
+	h1_imassFit = NULL;
+	h1_ipTdiff  = NULL;
+	h1_etaSum   = NULL;
 
 	// cut flow canvases
 	cnv_cutFlow_imass  = NULL;
@@ -50,14 +65,15 @@ void graphicObjects::ginitialize()
 	leg_cutFlow_pT     = NULL;
 	
 	// fit legends
-	leg_imassFinal = NULL;
+	leg_imassFit = NULL;
+	leg_ipTdiff  = NULL;
 	
 	// cut flow histos maps
 	hmap_cutFlow_imass = NULL;
 	hmap_cutFlow_pT = NULL;
 
 	// canvas size
-	canv_x = 600;
+	canv_x = 602;
 	canv_y = 400;
 
 	// legend size
@@ -70,15 +86,19 @@ void graphicObjects::ginitialize()
 	imass_min   = 0.*d_toGeV;
 	imass_max   = 2000.*d_toGeV;
 	
+	imass_fit_nbins = 40;
+	imass_fit_min   = 0.*d_toGeV;
+	imass_fit_max   = 200.*d_toGeV;
+	
 	pT_nbins    = 50;
 	pT_min      = 0.*d_toGeV;
 	pT_max      = 1000.*d_toGeV;
 
-	eta_nbins   = 25;
-	eta_min     = -4.;
-	eta_max     = 4.;
+	eta_nbins   = 24;
+	eta_min     = -3.;
+	eta_max     = 3.;
 
-	costh_nbins = 25;
+	costh_nbins = 10;
 	costh_min   = -1.;
 	costh_max   = 1.;
 
@@ -97,6 +117,14 @@ void graphicObjects::ginitialize()
 	xyVertex_nbins = 40;
 	xyVertex_min   = -200.;
 	xyVertex_max   = 200.;
+	
+	ipTdiff_nbins = 50;
+	ipTdiff_min   = -1./20000.;
+	ipTdiff_max   = +1./20000.;
+	
+	etaSum_nbins = 50;;
+	etaSum_min   = -5.;
+	etaSum_max   = +5.;
 }
 
 void graphicObjects::gfinalize()
@@ -118,6 +146,7 @@ void graphicObjects::bookBareHistos(TDirectory* tdir)
 	h1_d0exPV = new TH1D("d0exPV","d0exPV", d0exPV_nbins, d0exPV_min, d0exPV_max);
 	h1_z0exPV = new TH1D("z0exPV","z0exPV", z0exPV_nbins, z0exPV_min, z0exPV_max);
 	h1_cosmicCosth = new TH1D("cosThetaDimu","cosThetaDimu", cosmicCosth_nbins, cosmicCosth_min, cosmicCosth_max);
+	h1_cosmicCosthAllCuts = new TH1D("cosThetaDimuAllCuts","cosThetaDimuAllCuts", cosmicCosth_nbins, cosmicCosth_min, cosmicCosth_max);
 	h2_xyVertex = new TH2D("xyVertex","xyVertex",   xyVertex_nbins, xyVertex_min, xyVertex_max,
 	xyVertex_nbins, xyVertex_min, xyVertex_max);
 }
@@ -127,8 +156,12 @@ void graphicObjects::bookHistos(TDirectory* tdir)
 	if(tdir!=NULL) tdir->cd();
 
 	h1_imass = new TH1D("imass","imass", imass_nbins, imass_min, imass_max);
+	h1_ipTdiff = new TH1D("ipTdiff","ipTdiff", ipTdiff_nbins, ipTdiff_min, ipTdiff_max);
+	h1_etaSum = new TH1D("etaSum","etaSum", etaSum_nbins, etaSum_min, etaSum_max);
 	h1_pT = new TH1D("pT","pT", pT_nbins, pT_min, pT_max);
+	h1_pT_muplus = new TH1D("pT #mu^{+}","pT #mu^{+}", pT_nbins, pT_min, pT_max);
 	h1_eta = new TH1D("eta","eta", eta_nbins, eta_min, eta_max);
+	h1_eta_muplus = new TH1D("eta #mu^{+}","eta #mu^{+}", eta_nbins, eta_min, eta_max);
 	h1_costh = new TH1D("costh","costh", costh_nbins, costh_min, costh_max);
 }
 
@@ -153,9 +186,15 @@ void graphicObjects::drawBareHistos(TDirectory* tdir)
     cnv_z0exPV->Write();
 
 	cnv_cosmicCosth = new TCanvas("cosThetaDimu","cosThetaDimu",canv_x,canv_y);
+	cnv_cosmicCosth->Divide(1,2);
+	pad_cosmicCosth = cnv_cosmicCosth->cd(1);
+	pad_cosmicCosthAllCuts = cnv_cosmicCosth->cd(2);
 	cnv_cosmicCosth->Draw();
 	cnv_cosmicCosth->cd();
+	pad_cosmicCosth->cd();
 	h1_cosmicCosth->Draw();
+	pad_cosmicCosthAllCuts->cd();
+	h1_cosmicCosthAllCuts->Draw();
 	cnv_cosmicCosth->Update();
     cnv_cosmicCosth->Write();
 
@@ -180,17 +219,29 @@ void graphicObjects::drawHistos(TDirectory* tdir)
     cnv_imass->Write();
 
 	cnv_pT = new TCanvas("pT","pT",canv_x,canv_y);
-	cnv_pT->SetLogy();
+	cnv_pT->Divide(1,2);
+	pad_pT = cnv_pT->cd(1);
+	pad_pT->SetLogy();
+	pad_pT_muplus = cnv_pT->cd(2);
+	pad_pT_muplus->SetLogy();
 	cnv_pT->Draw();
 	cnv_pT->cd();
+	pad_pT->cd();
 	h1_pT->Draw();
+	pad_pT_muplus->cd();
+	h1_pT_muplus->Draw();
 	cnv_pT->Update();
     cnv_pT->Write();
 
 	cnv_eta = new TCanvas("eta","eta",canv_x,canv_y);
+	cnv_eta->Divide(1,2);
+	pad_eta = cnv_eta->cd(1);
+	pad_eta_muplus = cnv_eta->cd(2);
 	cnv_eta->Draw();
-	cnv_eta->cd();
+	pad_eta->cd();
 	h1_eta->Draw();
+	pad_eta_muplus->cd();
+	h1_eta_muplus->Draw();
 	cnv_eta->Update();
     cnv_eta->Write();
 
@@ -200,9 +251,46 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	h1_costh->Draw();
 	cnv_costh->Update();
     cnv_costh->Write();
+	
+	cnv_ipTdiff = new TCanvas("ipTdiff","ipTdiff",canv_x,canv_y);
+	cnv_ipTdiff->Draw();
+	cnv_ipTdiff->cd();
+	h1_ipTdiff->SetXTitle("1/p_{T}^{#mu+} - 1/p_{T}^{#mu-} (1/MeV)");
+	h1_ipTdiff->Draw("e1x0");
+	//-------------------------------------------------------------------------
+	TF1* f = new TF1("Lorentzian",Lorentzian,ipTdiff_min,ipTdiff_max, 3);
+	f->SetParameters(0,h1_ipTdiff->GetMaximum());
+	f->SetParLimits(0,0,h1_ipTdiff->GetEntries());
+	f->SetParameters(1,1./200000.);
+	f->SetParLimits(1,1./2000000.,1./20000.);
+	f->SetParameters(2,0.);
+	f->SetParLimits(2,0.1*ipTdiff_min,0.1*ipTdiff_max);
+	h1_ipTdiff->Fit(f,"VN","",0.8*ipTdiff_min,0.8*ipTdiff_max);
+	cout << "ipTdiff Lorentzian fit :: norm = " << f->GetParameter(0) << " +/- " << f->GetParError(0) << endl;
+	cout << "ipTdiff Lorentzian fit :: widt = " << f->GetParameter(1) << " +/- " << f->GetParError(1) << endl;
+	cout << "ipTdiff Lorentzian fit :: mean = " << f->GetParameter(2) << " +/- " << f->GetParError(2) << endl;
+	cout << "ipTdiff Lorentzian fit :: Chi2 = " << f->GetChisquare() << endl;
+	cout << "ipTdiff Lorentzian fit :: NDF  = " << f->GetNDF() << endl;
+	cout << "ipTdiff Lorentzian fit :: yield = " << f->GetParameter(0)/h1_ipTdiff->GetBinWidth(1) << " +/- " << f->GetParError(0)/h1_ipTdiff->GetBinWidth(1) << endl;
+	f->SetLineColor(kBlue);
+	f->Draw("sames");
+	leg_ipTdiff = new TLegend(leg_x1*0.8, leg_y1*2., leg_x2, leg_y2);
+	leg_ipTdiff->AddEntry( h1_ipTdiff, "Data", "lep");
+	leg_ipTdiff->AddEntry( f, "#chi^{2} fit = Lorentzian", "L");
+	leg_ipTdiff->Draw("sames");
+	//-------------------------------------------------------------------------
+	cnv_ipTdiff->Update();
+    cnv_ipTdiff->Write();
+	
+	cnv_etaSum = new TCanvas("etaSum","etaSum",canv_x,canv_y);
+	cnv_etaSum->Draw();
+	cnv_etaSum->cd();
+	h1_etaSum->Draw();
+	cnv_etaSum->Update();
+    cnv_etaSum->Write();
 }
 
-void graphicObjects::bookHistosMap(TMapds* cutFlowOrdered, TDirectory* tdir)
+void graphicObjects::bookHistosMap(TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered, TDirectory* tdir)
 {
 	if(tdir==NULL) return;
 
@@ -213,7 +301,12 @@ void graphicObjects::bookHistosMap(TMapds* cutFlowOrdered, TDirectory* tdir)
 
 	for(TMapds::iterator it=cutFlowOrdered->begin() ; it!=cutFlowOrdered->end() ; ++it)
 	{
-		double snumber = it->first; 
+		double snumber = it->first;
+		
+		///////////////////////////////////////////////////////////////
+		// ignore preselection: ///////////////////////////////////////
+		if(cutFlowTypeOrdered->operator[](snumber)=="preselection") continue; /////
+		///////////////////////////////////////////////////////////////
 
 		string sname = "";
 
@@ -229,13 +322,13 @@ void graphicObjects::bookHistosMap(TMapds* cutFlowOrdered, TDirectory* tdir)
 	}
 }
 
-void graphicObjects::drawHistosMap(TMapds* cutFlowOrdered, TDirectory* tdir)
+void graphicObjects::drawHistosMap(TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered, TDirectory* tdir)
 {
 	if(tdir==NULL) return;
 	
 	tdir->cd();
 
-	bool bfirst = true;
+	bool bfirst;
 	
 	Color_t colorStart  = 40;
 	Color_t colorOffset = 1;
@@ -252,19 +345,25 @@ void graphicObjects::drawHistosMap(TMapds* cutFlowOrdered, TDirectory* tdir)
 	cnv_cutFlow_imass->Draw();
 	cnv_cutFlow_imass->cd();
 	colorAccumulate = colorStart;
+	
+	bfirst = true;
 	for(TMapds::iterator ii=cutFlowOrdered->begin() ; ii!=cutFlowOrdered->end() ; ++ii)
 	{
-		if(ii == cutFlowOrdered->begin()) bfirst = true;
-		else bfirst = false;
+		double num = ii->first;
+		///////////////////////////////////////////////////////////////
+		// ignore preselection: ///////////////////////////////////////
+		if(cutFlowTypeOrdered->operator[](num)=="preselection") continue; /////////
+		///////////////////////////////////////////////////////////////
+	
+		//if(ii == cutFlowOrdered->begin()) bfirst = true;
+		//else bfirst = false;
 		
-		//double num = ii->first;  // irrelevant
 		string str = ii->second; 
 		it=hmap_cutFlow_imass->find("imass."+str);
 		string sname = it->first;
 		(*hmap_cutFlow_imass)[sname]->SetFillColor(colorAccumulate);
 		(*hmap_cutFlow_imass)[sname]->SetLineColor(colorAccumulate);
 		leg_cutFlow_imass->AddEntry( (*hmap_cutFlow_imass)[sname], str.c_str(), "f");
-		//if(sname=="imass.oppositeCharcge")
 		if(bfirst)
 		{
 			(*hmap_cutFlow_imass)[sname]->SetMinimum(5.e-1);
@@ -273,29 +372,39 @@ void graphicObjects::drawHistosMap(TMapds* cutFlowOrdered, TDirectory* tdir)
 		else (*hmap_cutFlow_imass)[sname]->Draw("SAMES");
 		colorAccumulate += colorOffset;
 		cout << "drawn " << sname << endl;
+		
+		bfirst = false;
 	}
 	leg_cutFlow_imass->Draw("SAMES");
 	cnv_cutFlow_imass->Update();
 	cnv_cutFlow_imass->Write();
 
+	//--------------
+	
 	cnv_cutFlow_pT = new TCanvas("pT.cutFlow","pT.cutFlow",canv_x,canv_y);
 	cnv_cutFlow_pT->SetLogy();
 	cnv_cutFlow_pT->Draw();
 	cnv_cutFlow_pT->cd();
 	colorAccumulate = colorStart;
+	
+	bfirst = true;
 	for(TMapds::iterator ii=cutFlowOrdered->begin() ; ii!=cutFlowOrdered->end() ; ++ii)
 	{
-		if(ii == cutFlowOrdered->begin()) bfirst = true;
-		else bfirst = false;
+		double num = ii->first;
+		///////////////////////////////////////////////////////////////
+		// ignore preselection: ///////////////////////////////////////
+		if(cutFlowTypeOrdered->operator[](num)=="preselection") continue; /////////
+		///////////////////////////////////////////////////////////////
 	
-		//double num = ii->first;  // irrelevant
+		//if(ii == cutFlowOrdered->begin()) bfirst = true;
+		//else bfirst = false;
+	
 		string str = ii->second;
 		it=hmap_cutFlow_pT->find("pT."+str);
 		string sname = it->first;
 		(*hmap_cutFlow_pT)[sname]->SetFillColor(colorAccumulate);
 		(*hmap_cutFlow_pT)[sname]->SetLineColor(colorAccumulate);
 		leg_cutFlow_pT->AddEntry( (*hmap_cutFlow_pT)[sname], str.c_str(), "f");
-		//if(sname=="pT.oppositeCharcge")
 		if(bfirst)
 		{
 			(*hmap_cutFlow_pT)[sname]->SetMinimum(5.e-1);
@@ -304,6 +413,8 @@ void graphicObjects::drawHistosMap(TMapds* cutFlowOrdered, TDirectory* tdir)
 		else (*hmap_cutFlow_pT)[sname]->Draw("SAMES");
 		colorAccumulate += colorOffset;
 		cout << "drawn " << sname << endl;
+		
+		bfirst = false;
 	}
 	leg_cutFlow_pT->Draw("SAMES");
 	cnv_cutFlow_pT->Update();
@@ -314,42 +425,44 @@ void graphicObjects::bookFitHistos(TDirectory* tdir)
 {
 	if(tdir!=NULL) tdir->cd();
 
-	h1_imassFinal = new TH1D("imassFinal","imassFinal", imass_nbins, imass_min, imass_max);
+	h1_imassFit = new TH1D("imassFit","imassFit", imass_fit_nbins, imass_fit_min, imass_fit_max);
 }
 
 void graphicObjects::drawFitHistos(TDirectory* tdir, TF1* fGuess, TF1* fFitted)
 {
 	if(tdir!=NULL) tdir->cd();
 	
-	leg_imassFinal = new TLegend(leg_x1, leg_y1*2., leg_x2, leg_y2);
+	leg_imassFit = new TLegend(leg_x1, leg_y1*2., leg_x2, leg_y2);
 	
-	cnv_imassAllCuts = new TCanvas("imassFinal","imassFinal",canv_x,canv_y);
-	cnv_imassAllCuts->Draw();
-	cnv_imassAllCuts->cd();
+	cnv_imassFit = new TCanvas("imassFit","imassFit",canv_x,canv_y);
+	cnv_imassFit->Draw();
+	cnv_imassFit->cd();
 	
-	h1_imassFinal->SetMarkerStyle(20);
-	h1_imassFinal->Draw("e1x0");
+	double h_max = h1_imassFit->GetMaximum();
+	double f_max = fFitted->GetMaximum(XMIN,XMAX);
+	double max = 0.;
+	max = ( f_max > h_max) ? f_max : h_max;
+	h1_imassFit->SetMaximum(1.05*max);
 	
+	h1_imassFit->SetMarkerStyle(20);
+	h1_imassFit->Draw("e1x0");
 	
 	fGuess->SetLineStyle(1);
 	fGuess->SetLineColor(kRed);
 	fGuess->SetLineWidth(2);
 	//fGuess->Draw("sames");
 	
-	cout << "after fGuess" << endl;
-	
 	fFitted->SetLineStyle(1);
 	fFitted->SetLineColor(kBlue);
 	fFitted->SetLineWidth(2);
 	fFitted->Draw("sames");
 	
+	leg_imassFit->AddEntry( h1_imassFit, "Data", "lep");
+	//leg_imassFit->AddEntry( fGuess, "Guess", "L");
+	leg_imassFit->AddEntry( fFitted, "#chi^{2} fit", "L");
+	leg_imassFit->Draw("sames");
 	
-	leg_imassFinal->AddEntry( h1_imassFinal, "Data", "lep");
-	//leg_imassFinal->AddEntry( fGuess, "Guess", "L");
-	leg_imassFinal->AddEntry( fFitted, "fit", "L");
-	leg_imassFinal->Draw("sames");
-	
-	cnv_imassAllCuts->Update();
-	cnv_imassAllCuts->Write();
+	cnv_imassFit->Update();
+	cnv_imassFit->Write();
 }
 

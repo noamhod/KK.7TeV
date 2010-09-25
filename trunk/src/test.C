@@ -28,26 +28,26 @@ void parseKeyValLine(string sLine)
 {
 	double tmpVal = 0.;
 
-        if(m_val.size()>0) m_val.clear();
+	if(m_val.size()>0) m_val.clear();
 
-        stringstream strm(sLine);
-        strm >> m_key;
+	stringstream strm(sLine);
+	strm >> m_key;
 	while(!strm.eof())
-        {
-                strm >> tmpVal;
-                m_val.push_back(tmpVal);
-        }
+	{
+		strm >> tmpVal;
+		m_val.push_back(tmpVal);
+	}
 }
 
 string getKey()
 {
-        return m_key;
+	return m_key;
 }
 
 double getVal(int valNum)
 {
-        if( valNum<0 || valNum>=(int)m_val.size() ) { cerr << "ERROR: valNum=" << valNum << " is out of range" << endl; exit(-1); }
-        return m_val[valNum];
+	if( valNum<0 || valNum>=(int)m_val.size() ) { cerr << "ERROR: valNum=" << valNum << " is out of range" << endl; exit(-1); }
+	return m_val[valNum];
 }
 
 int getNVals()
@@ -57,40 +57,42 @@ int getNVals()
 
 void readCutFlow(string sCutFlowFilePath)
 {
-        fstream file;
-        file.open( sCutFlowFilePath.c_str() );
+	fstream file;
+	file.open( sCutFlowFilePath.c_str() );
+	cout << "opened file: " << sCutFlowFilePath << endl;
+	
+	string sLine = "";
+	string skey  = "";
+	double dval  = 0.;
 
-        string sLine = "";
-        string skey  = "";
-        double dval  = 0.;
+	int nLinesRead = 0;
 
-        int nLinesRead = 0;
-
-        while(!file.eof())
-        {
+	while(!file.eof())
+	{
+		cout << "reading a new line" << endl;
 		//cout << "reading line " << nLinesRead << endl;
-                getline(file,sLine);
-                
+		getline(file,sLine);
+		
 		if(sLine == "") continue;
 
 		// parse the line:
-                parseKeyValLine(sLine);
+		parseKeyValLine(sLine);
 
-                // get the key:
-                skey = getKey();
+		// get the key:
+		skey = getKey();
 		cout << skey;
 
-                // get the 1st val:
+		// get the 1st val:
 		for(int i=0 ; i<(int)getNVals() ; i++)
 		{
-                	dval = getVal(i);
+			dval = getVal(i);
 			cout << "\t" << dval;
 		}
 
-                cout << endl;
+		cout << endl;
 
-                nLinesRead++;
-        }
-        cout << "\nread " << nLinesRead << " lines from " << sCutFlowFilePath << endl;
+		nLinesRead++;
+	}
+	cout << "\nread " << nLinesRead << " lines from " << sCutFlowFilePath << endl;
 }
 

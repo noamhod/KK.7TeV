@@ -11,23 +11,20 @@ void prepare() // do not use alone
 {
 	gROOT->Reset();
 	
-	gROOT->ProcessLine(".include ../include/");
-	gROOT->ProcessLine(".include ../src/");
 	gROOT->ProcessLine(".include ./");
 
 	gSystem->Load("libRooFit") ;
 
-	//gROOT->ProcessLine(".include ../roofit");
-	//gSystem->Load("../roofit/RooExtendedExponent_cxx.so") ;
-
-	gSystem->Load( "libCintex.so" );
-	Cintex::Cintex::Enable();
-	gROOT->ProcessLine(".L Loader.C+");
 }
 
 void compile() // for re-compilation
 {
 	prepare();
+	gROOT->ProcessLine("RooRealVar x('x','x',0.,7000000)");
+	gROOT->ProcessLine("RooRealVar a('a','a',-1.,-1.e-8)");
+	gROOT->ProcessLine("RooRealVar b('b','b',0.,10.)");
+	gROOT->ProcessLine("RooClassFactory::makePdf('RooExtendedExponent','x,a,b')");
+	
 	
 	gROOT->ProcessLine(".L digestControl.C++");
 	

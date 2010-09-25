@@ -1,19 +1,31 @@
-#ORDER#			#NAME#					#NVALUES#		#VALUE(S)#
-#0				GRL						1				1.
-1				L1_MU6					1				1.
-#2				PV						3				2.				1.			150.
-3				oppositeCharcge			1				0.
-4				pT						1				20000.
-5				eta						1				2.4
-#6				cosThetaDimu			1				-0.99
-7				imass					1				20000.
-#8				d0						1				150.
-#9				z0						1				150.
-#10				idHits					3				4.				1.			5.
-#11				pTmatchingRatio			2				2.				0.5
-12				pTmatchingAbsDiff		1				15000.
-#13				impactParameter			2				5.				1.
-#14				isolation20				1				999
-#15				isolation30				1				0.05
-16				isolation40				1				0.2
-17				isCombMu				1				1.
+#TYPE#			#ORDER#			#NAME#					#NVALUES#		#VALUE(S) [1]		[2]		[3]#
+
+# preselection (basic):
+preselection	0				GRL						1						   1.
+preselection	1				L1_MU6					1						   1.
+preselection	2				hipTmuon				2						   15000.	 10000.
+preselection	3				PV						3						   1.		 1.		 150.
+
+# dimuon - ensure a c1*c2<0 candidate with appropriate imass and not cosmic:
+selection		4				oppositeCharcge			1						   0.
+#selection		5				cosThetaDimu			1						   -0.96
+selection		6				imass					1						   20000.
+
+# more triggers:
+selection		7				EF_mu10					1						   1.
+
+# quality:
+#selection		8				idHits					3						   4.		 1.		 5.
+#selection		9				pTmatchingRatio			2						   2.		 0.5
+selection		10				pTmatchingAbsDiff		1						   15000.
+#selection		11				impactParameter			2						   5.		 1.
+#selection		12				isolation20				1						   999
+#selection		13				isolation30				1						   0.05
+selection		14				isolation40				1						   0.2
+selection		15				isCombMu				1						   1.
+
+# kinematics
+#selection		16				d0						1						   150.
+#selection		17				z0						1						   150.
+selection		18				pT						1						   20000.
+selection		19				eta						1						   2.4

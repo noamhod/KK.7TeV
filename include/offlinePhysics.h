@@ -41,10 +41,13 @@ public :
    vector<float>   *mu_staco_ptcone30;
    vector<float>   *mu_staco_ptcone40;
    vector<float>   *mu_staco_eta;
+   vector<float>   *mu_staco_phi;
    vector<float>   *mu_staco_d0_exPV;
    vector<float>   *mu_staco_z0_exPV;
    vector<unsigned short> *mu_staco_allauthor;
    vector<int>     *mu_staco_author;
+   vector<float>   *mu_staco_matchchi2;
+   vector<int>     *mu_staco_matchndof;
    vector<float>   *mu_staco_me_qoverp;
    vector<float>   *mu_staco_id_qoverp;
    vector<float>   *mu_staco_me_theta;
@@ -64,10 +67,13 @@ public :
    vector<float>   *mu_muid_ptcone30;
    vector<float>   *mu_muid_ptcone40;
    vector<float>   *mu_muid_eta;
+   vector<float>   *mu_muid_phi;
    vector<float>   *mu_muid_d0_exPV;
    vector<float>   *mu_muid_z0_exPV;
    vector<unsigned short> *mu_muid_allauthor;
    vector<int>     *mu_muid_author;
+   vector<float>   *mu_muid_matchchi2;
+   vector<int>     *mu_muid_matchndof;
    vector<float>   *mu_muid_me_qoverp;
    vector<float>   *mu_muid_id_qoverp;
    vector<float>   *mu_muid_me_theta;
@@ -105,10 +111,13 @@ public :
    TBranch        *b_mu_staco_ptcone30;   //!
    TBranch        *b_mu_staco_ptcone40;   //!
    TBranch        *b_mu_staco_eta;   //!
+   TBranch        *b_mu_staco_phi;   //!
    TBranch        *b_mu_staco_d0_exPV;   //!
    TBranch        *b_mu_staco_z0_exPV;   //!
    TBranch        *b_mu_staco_allauthor;   //!
    TBranch        *b_mu_staco_author;   //!
+   TBranch        *b_mu_staco_matchchi2;   //!
+   TBranch        *b_mu_staco_matchndof;   //!
    TBranch        *b_mu_staco_me_qoverp;   //!
    TBranch        *b_mu_staco_id_qoverp;   //!
    TBranch        *b_mu_staco_me_theta;   //!
@@ -128,10 +137,13 @@ public :
    TBranch        *b_mu_muid_ptcone30;   //!
    TBranch        *b_mu_muid_ptcone40;   //!
    TBranch        *b_mu_muid_eta;   //!
+   TBranch        *b_mu_muid_phi;   //!
    TBranch        *b_mu_muid_d0_exPV;   //!
    TBranch        *b_mu_muid_z0_exPV;   //!
    TBranch        *b_mu_muid_allauthor;   //!
    TBranch        *b_mu_muid_author;   //!
+   TBranch        *b_mu_muid_matchchi2;   //!
+   TBranch        *b_mu_muid_matchndof;   //!
    TBranch        *b_mu_muid_me_qoverp;   //!
    TBranch        *b_mu_muid_id_qoverp;   //!
    TBranch        *b_mu_muid_me_theta;   //!
@@ -223,10 +235,13 @@ void offlinePhysics::Init(TTree *tree)
    mu_staco_ptcone30 = 0;
    mu_staco_ptcone40 = 0;
    mu_staco_eta = 0;
+   mu_staco_phi = 0;
    mu_staco_d0_exPV = 0;
    mu_staco_z0_exPV = 0;
    mu_staco_allauthor = 0;
    mu_staco_author = 0;
+   mu_staco_matchchi2 = 0;
+   mu_staco_matchndof = 0;
    mu_staco_me_qoverp = 0;
    mu_staco_id_qoverp = 0;
    mu_staco_me_theta = 0;
@@ -245,10 +260,13 @@ void offlinePhysics::Init(TTree *tree)
    mu_muid_ptcone30 = 0;
    mu_muid_ptcone40 = 0;
    mu_muid_eta = 0;
+   mu_muid_phi = 0;
    mu_muid_d0_exPV = 0;
    mu_muid_z0_exPV = 0;
    mu_muid_allauthor = 0;
    mu_muid_author = 0;
+   mu_muid_matchchi2 = 0;
+   mu_muid_matchndof = 0;
    mu_muid_me_qoverp = 0;
    mu_muid_id_qoverp = 0;
    mu_muid_me_theta = 0;
@@ -289,10 +307,13 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("mu_staco_ptcone30", &mu_staco_ptcone30, &b_mu_staco_ptcone30);
    fChain->SetBranchAddress("mu_staco_ptcone40", &mu_staco_ptcone40, &b_mu_staco_ptcone40);
    fChain->SetBranchAddress("mu_staco_eta", &mu_staco_eta, &b_mu_staco_eta);
+   fChain->SetBranchAddress("mu_staco_phi", &mu_staco_phi, &b_mu_staco_phi);
    fChain->SetBranchAddress("mu_staco_d0_exPV", &mu_staco_d0_exPV, &b_mu_staco_d0_exPV);
    fChain->SetBranchAddress("mu_staco_z0_exPV", &mu_staco_z0_exPV, &b_mu_staco_z0_exPV);
    fChain->SetBranchAddress("mu_staco_allauthor", &mu_staco_allauthor, &b_mu_staco_allauthor);
    fChain->SetBranchAddress("mu_staco_author", &mu_staco_author, &b_mu_staco_author);
+   fChain->SetBranchAddress("mu_staco_matchchi2", &mu_staco_matchchi2, &b_mu_staco_matchchi2);
+   fChain->SetBranchAddress("mu_staco_matchndof", &mu_staco_matchndof, &b_mu_staco_matchndof);
    fChain->SetBranchAddress("mu_staco_me_qoverp", &mu_staco_me_qoverp, &b_mu_staco_me_qoverp);
    fChain->SetBranchAddress("mu_staco_id_qoverp", &mu_staco_id_qoverp, &b_mu_staco_id_qoverp);
    fChain->SetBranchAddress("mu_staco_me_theta", &mu_staco_me_theta, &b_mu_staco_me_theta);
@@ -312,10 +333,13 @@ void offlinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("mu_muid_ptcone30", &mu_muid_ptcone30, &b_mu_muid_ptcone30);
    fChain->SetBranchAddress("mu_muid_ptcone40", &mu_muid_ptcone40, &b_mu_muid_ptcone40);
    fChain->SetBranchAddress("mu_muid_eta", &mu_muid_eta, &b_mu_muid_eta);
+   fChain->SetBranchAddress("mu_muid_phi", &mu_muid_phi, &b_mu_muid_phi);
    fChain->SetBranchAddress("mu_muid_d0_exPV", &mu_muid_d0_exPV, &b_mu_muid_d0_exPV);
    fChain->SetBranchAddress("mu_muid_z0_exPV", &mu_muid_z0_exPV, &b_mu_muid_z0_exPV);
    fChain->SetBranchAddress("mu_muid_allauthor", &mu_muid_allauthor, &b_mu_muid_allauthor);
    fChain->SetBranchAddress("mu_muid_author", &mu_muid_author, &b_mu_muid_author);
+   fChain->SetBranchAddress("mu_muid_matchchi2", &mu_muid_matchchi2, &b_mu_muid_matchchi2);
+   fChain->SetBranchAddress("mu_muid_matchndof", &mu_muid_matchndof, &b_mu_muid_matchndof);
    fChain->SetBranchAddress("mu_muid_me_qoverp", &mu_muid_me_qoverp, &b_mu_muid_me_qoverp);
    fChain->SetBranchAddress("mu_muid_id_qoverp", &mu_muid_id_qoverp, &b_mu_muid_id_qoverp);
    fChain->SetBranchAddress("mu_muid_me_theta", &mu_muid_me_theta, &b_mu_muid_me_theta);
@@ -351,6 +375,7 @@ void offlinePhysics::Show(Long64_t entry)
 }
 Int_t offlinePhysics::Cut(Long64_t entry)
 {
+   if(false) cout << "entry=" << entry << endl;
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
 // returns -1 otherwise.

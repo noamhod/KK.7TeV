@@ -17,6 +17,7 @@ cutFlowHandler::cutFlowHandler(string sCutFlowFilePath)
 	b_print = false;
 
 	m_cutFlowOrdered = new TMapds();
+	m_cutFlowTypeOrdered = new TMapds();
 	m_cutFlowNumbers = new TMapsi();
 	m_cutFlowMapSVD  = new TMapsvd();
 	
@@ -36,14 +37,14 @@ cutFlowHandler::~cutFlowHandler()
 
 void cutFlowHandler::parseKeyValLine(string sLine)
 {
-	/* * * * * * * * * * EXAMPLE * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	#ORDER#			#NAME#					#NVALUES#		#VALUE(S)#
-	0				oppositeCharcge			1				0.
-	1				pT						1				20000.
-	2				eta						1				2.4
-	3				cosThetaDimu			1				-0.99
-	4				PV						3				2.				1.			150.
-	* * * * * * * * ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* * * * * * * * * * EXAMPLE * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	#TYPE			##ORDER#			#NAME#					#NVALUES#		#VALUE(S)#
+	selection		0					oppositeCharcge			1				0.
+	selection		1					pT						1				20000.
+	selection		2					eta						1				2.4
+	selection		3					cosThetaDimu			1				-0.99
+	preselection	0					PV						3				2.				1.			150.
+	* * * * * * * * ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 	
 	double tmpVal = 0.;
 
@@ -51,6 +52,9 @@ void cutFlowHandler::parseKeyValLine(string sLine)
 
 	// get the entire line:
 	stringstream strm(sLine);
+	
+	// get the oreder of the cut:
+	strm >> m_stype;
 	
 	// get the oreder of the cut:
 	strm >> m_inum;
@@ -67,6 +71,11 @@ void cutFlowHandler::parseKeyValLine(string sLine)
 		strm >> tmpVal;
 		m_dval.push_back(tmpVal);
 	}
+}
+
+string cutFlowHandler::getType()
+{
+	return m_stype;
 }
 
 string cutFlowHandler::getKey()
@@ -110,6 +119,7 @@ void cutFlowHandler::readCutFlow(string sCutFlowFilePath)
 	string sLine = "";
 	
 	double dnum   = 0.;
+	string stype  = "";
 	string skey   = "";
 	double nvals  = 0.;
 	vector<double> dval;
@@ -135,6 +145,9 @@ void cutFlowHandler::readCutFlow(string sCutFlowFilePath)
 		// parse the line (ownership utilitis):
 		parseKeyValLine(sLine);
 
+		// get the cut type:
+		stype = getType();
+		
 		// get the cut number:
 		dnum = getNum();
 		
@@ -152,7 +165,7 @@ void cutFlowHandler::readCutFlow(string sCutFlowFilePath)
 
 		if(b_print)
 		{
-			cout << "num=" << dnum << "\tkey=" << skey << "\tnvals=" << nvals << endl;
+			cout << "type=" << stype << "\tnum=" << dnum << "\tkey=" << skey << "\tnvals=" << nvals << endl;
 			for(int i=0 ; i<(int)getNVals() ; i++)
 			{
 				cout << "\tval[" << i << "]=" << dval[i];
@@ -160,8 +173,9 @@ void cutFlowHandler::readCutFlow(string sCutFlowFilePath)
 			cout << "\n" << endl;
 		}
 
-		// pair the map
+		// pair the maps:
 		m_cutFlowMapSVD->insert( make_pair(skey,dval) );
+		m_cutFlowTypeOrdered->insert( make_pair(dnum,stype) );
 		m_cutFlowOrdered->insert( make_pair(dnum,skey) );
 		m_cutFlowNumbers->insert( make_pair(skey,0) );
 	}
@@ -172,17 +186,19 @@ void cutFlowHandler::readCutFlow(string sCutFlowFilePath)
 
 void cutFlowHandler::printCutFlowNumbers(Long64_t chainEntries)
 {
-	cout << "+------------------------------------------------" << endl;
-	cout << "|             print cut flow numbers             " << endl;
-	cout << "|................................................" << endl;
+	cout << "+--------------------------------------------------------------------------" << endl;
+	cout << "|                          print cut flow numbers                          " << endl;
+	cout << "|.........................................................................." << endl;
 	cout << "|    all events in chain, " << chainEntries << endl;
 	cout << "|    all processed events, " << nAllEvents << endl;
 	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
 	{
+		double num = ii->first;
 		string scutname = ii->second;
-		cout << "|    events remaining after " << scutname << " cut, " << m_cutFlowNumbers->operator[](scutname) << endl;
+		if(m_cutFlowTypeOrdered->operator[](num)=="preselection") cout << "|    PRESELECTION: events remaining after " << scutname << " cut, " << m_cutFlowNumbers->operator[](scutname) << endl;
+		if(m_cutFlowTypeOrdered->operator[](num)=="selection")    cout << "|    SELECTION:    events remaining after " << scutname << " cut, " << m_cutFlowNumbers->operator[](scutname) << endl;
 	}
-	cout << "+------------------------------------------------" << endl;
+	cout << "+--------------------------------------------------------------------------" << endl;
 }
 
 
@@ -192,6 +208,11 @@ void cutFlowHandler::printCutFlowNumbers(Long64_t chainEntries)
 TMapds* cutFlowHandler::getCutFlowOrderedMapPtr()
 {
 	return m_cutFlowOrdered;
+}
+
+TMapds* cutFlowHandler::getCutFlowTypeOrderedMapPtr()
+{
+	return m_cutFlowTypeOrdered;
 }
 
 TMapsi*  cutFlowHandler::getCutFlowNumbersMapPtr()

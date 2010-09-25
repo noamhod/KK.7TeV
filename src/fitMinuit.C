@@ -288,6 +288,9 @@ void fitMinuit::minimize(bool signal_only, TH1D* h, double* yields)
 	
 	yields[0] = outpar[index_signal];
     yields[1] = outpar[0];
+	cout << "\nyields[0] = " <<  yields[0] << endl;
+	cout << "yields[1] = " <<  yields[1] << "\n" << endl;
+	cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << endl;
 	
 	///////////////////////////////////////////
 	//fFitted = (TF1*)fScaled->Clone(); ///////

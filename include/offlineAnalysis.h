@@ -60,6 +60,7 @@ public:
 	// variables
 	TMapsvd* m_cutFlowMapSVD;
 	TMapds*  m_cutFlowOrdered;
+	TMapds*  m_cutFlowTypeOrdered;
 	TMapsi*  m_cutFlowNumbers;
 	
 
@@ -72,13 +73,19 @@ public:
 	double current_imass;
 	double current_cosTheta;
 	double current_mu_pT;
+	double current_muplus_pT;
 	double current_mu_eta;
+	double current_muplus_eta;
+	double current_cosmicCosth;
+	double current_ipTdiff;
+	double current_etaSum;
 	
 	// event level
 	int runnumber;
 	int lumiblock;
 	int isGRL;
 	int isL1MU6;
+	int isEF_mu10;
 	
 	// deprecated !!!
 	double d0exPVa;

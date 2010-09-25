@@ -9,10 +9,16 @@
 #define FITFUNCTIONS_H
 
 
-double XMIN = 66000.;
-double XMAX = 116000.;
+double XMIN = 60000.;  //50000
+double XMAX = 120000.; //120000
 
-double XMAXBG = 76000.;
+double XMAXBG = 75000.;
+
+double XFULLMIN = 0.;
+double XFULLMAX = 200000.;
+
+double XFITMIN = XMIN;
+double XFITMAX = XMAX;
 
 double DATASCALE;
 double FCNINTEGRAL;

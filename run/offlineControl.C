@@ -95,16 +95,16 @@ void offlineControl::book()
 	m_graphics->bookFitHistos(m_dirFit);
 
 	m_dirCutFlow = m_histfile->mkdir("cutFlow");
-	m_graphics->bookHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_dirCutFlow );
+	m_graphics->bookHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_cutFlowHandler->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 }
 
 void offlineControl::draw()
 {
 	m_graphics->drawBareHistos(m_dirNoCuts);
 	m_graphics->drawHistos(m_dirAllCuts);
-	m_graphics->drawHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_dirCutFlow );
-	//m_graphics->drawFitHistos(m_dirFit, m_offlineAnalysis->m_fGuess, m_offlineAnalysis->m_fFitted);
-	m_graphics->drawFitHistos(m_dirFit, m_offlineAnalysis->m_fit->m_fitMinuit->guess, m_offlineAnalysis->m_fit->m_fitMinuit->fitFCN);
+	m_graphics->drawHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_cutFlowHandler->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+	m_graphics->drawFitHistos(m_dirFit, m_offlineAnalysis->m_fit->m_fitROOT->guess, m_offlineAnalysis->m_fit->m_fitROOT->fitFCN);
+	//m_graphics->drawFitHistos(m_dirFit, m_offlineAnalysis->m_fit->m_fitMinuit->guess, m_offlineAnalysis->m_fit->m_fitMinuit->fitFCN);
 
 	m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
 }
@@ -142,6 +142,11 @@ void offlineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		
 		if(l64t_jentry%100000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_offPhys->RunNumber << "\tlumiblock=" << m_offPhys->lbn << endl;
 		if(l64t_jentry%l64t_mod==0) m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
+		
+		/////////////////////////////////////////////////
+		// for period A to D6 (152844-159224) ///////////
+		// if(m_offPhys->RunNumber == 160387) break; ////
+		/////////////////////////////////////////////////
 		
 		analyze();
 	}

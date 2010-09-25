@@ -23,10 +23,11 @@ digestAnalysis::digestAnalysis(digestPhysics* digestPhysics, graphicObjects* gra
 	m_cutFlowHandler = cutFlowHandler;
 	m_cutFlowMapSVD  = m_cutFlowHandler->getCutFlowMapSVDPtr();
 	m_cutFlowOrdered = m_cutFlowHandler->getCutFlowOrderedMapPtr();
+	m_cutFlowTypeOrdered = m_cutFlowHandler->getCutFlowTypeOrderedMapPtr();
 	m_cutFlowNumbers = m_cutFlowHandler->getCutFlowNumbersMapPtr();
 	
 	// cut flow has been read out already
-	initSelectionCuts(m_cutFlowMapSVD, m_cutFlowOrdered);
+	initSelectionCuts(m_cutFlowMapSVD, m_cutFlowOrdered, m_cutFlowTypeOrdered);
 
 	m_graphicobjs = graphicobjs;
 	
@@ -52,24 +53,12 @@ void digestAnalysis::finalize()
 
 void digestAnalysis::fitter()
 {
-	string lastCutName = m_sLastCut2Hist;
-
-	// clone the last wanted histogram to preform the fit on:
-	m_graphicobjs->h1_imassFinal = (TH1D*)m_graphicobjs->hmap_cutFlow_imass->operator[]("imass."+lastCutName)->Clone("imassFinal");
 	double yields[2];
 	
 	///////////////////////////////////////////////////////////////
 	// Preform the fit ////////////////////////////////////////////
-	m_fit->minimize( false, m_graphicobjs->h1_imassFinal, yields );
+	m_fit->minimize( false, m_graphicobjs->h1_imassFit, yields );
 	///////////////////////////////////////////////////////////////
-					
-	cout << "\nyields[0] = " <<  yields[0] << endl;
-	cout << "yields[1] = " <<  yields[1] << "\n" << endl;
-	
-	//m_fGuess  = (TF1*)m_fit->m_fGuess->Clone();
-	//m_fGuess  = m_fit->m_fGuess;
-	//m_fFitted = (TF1*)m_fit->m_fFitted->Clone();
-	//m_fFitted = m_fit->m_fFitted;
 }
 
 
@@ -269,7 +258,12 @@ void digestAnalysis::executeCutFlow()
 	current_cosTheta = cosThetaCollinsSoper( pmu[ai], (double)m_digestPhys->mu_staco_charge->at(ai),
 	pmu[bi], (double)m_digestPhys->mu_staco_charge->at(bi) );
 	current_mu_pT    = (m_digestPhys->mu_staco_charge->at(ai)<0) ? m_digestPhys->mu_staco_pt->at(ai) : m_digestPhys->mu_staco_pt->at(bi);
+	current_muplus_pT    = (m_digestPhys->mu_staco_charge->at(ai)>0) ? m_digestPhys->mu_staco_pt->at(ai) : m_digestPhys->mu_staco_pt->at(bi);
 	current_mu_eta   = (m_digestPhys->mu_staco_charge->at(ai)<0) ? m_digestPhys->mu_staco_eta->at(ai) : m_digestPhys->mu_staco_eta->at(bi);
+	current_muplus_eta   = (m_digestPhys->mu_staco_charge->at(ai)>0) ? m_digestPhys->mu_staco_eta->at(ai) : m_digestPhys->mu_staco_eta->at(bi);
+	current_cosmicCosth = cosThetaDimu( pmu[ai], pmu[bi] );
+	current_ipTdiff = (current_muplus_pT!=0.  &&  current_mu_pT!=0.) ? 1./current_muplus_pT-1./current_mu_pT : -999.;
+	current_etaSum = current_muplus_eta + current_mu_eta;
 	
 	if(debugmode) cout << "### 4 ###" << endl;
 	
@@ -278,6 +272,7 @@ void digestAnalysis::executeCutFlow()
 	lumiblock  = m_digestPhys->lbn;
 	isL1MU6    = m_digestPhys->L1_MU6;
 	isGRL      = m_digestPhys->isGRL;
+	isEF_mu10  = m_digestPhys->EF_mu10;
 	
 	if(debugmode) cout << "### 5 ###" << endl;
 	
@@ -356,6 +351,21 @@ void digestAnalysis::executeCutFlow()
 	
 	if(debugmode) cout << "### 14 ###" << endl;
 	
+	
+	
+	// fill nocuts histograms
+	m_graphicobjs->h1_cosmicCosth->Fill( current_cosmicCosth );
+	m_graphicobjs->h1_d0exPV->Fill(d0exPVa);
+	m_graphicobjs->h1_d0exPV->Fill(d0exPVb);
+	m_graphicobjs->h1_z0exPV->Fill(z0exPVa);
+	m_graphicobjs->h1_z0exPV->Fill(z0exPVb);
+	//X( prtD0*cos(phi) );
+	//Y( prtD0*sin(phi) );
+	//Z( Z0 );
+	//m_graphicobjs->h2_xyVertex->Fill( d0exPVa*cos(m_digestPhys->mu_staco_phi->at(ai)), d0exPVa*sin(m_digestPhys->mu_staco_phi->at(ai)) );
+	//m_graphicobjs->h2_xyVertex->Fill( d0exPVb*cos(m_digestPhys->mu_staco_phi->at(bi)), d0exPVb*sin(m_digestPhys->mu_staco_phi->at(bi)) );
+	
+	
 	bool passCutFlow    = true;
 	bool passCurrentCut = true;
 	// fill the cut flow, stop at the relevant cut each time.
@@ -366,6 +376,13 @@ void digestAnalysis::executeCutFlow()
 	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
 	{
 		counter++;
+		
+		double num = ii->first;
+		///////////////////////////////////////////////////////////////
+		// ignore preselection: ///////////////////////////////////////
+		if(m_cutFlowTypeOrdered->operator[](num)=="preselection") continue; ///////
+		///////////////////////////////////////////////////////////////
+	
 		string sorderedcutname = ii->second;
 
 		if(debugmode) cout << "### 15 ###" << endl;
@@ -377,16 +394,9 @@ void digestAnalysis::executeCutFlow()
 		
 		if(debugmode) cout << "### 15.1 ###" << endl;
 
-		if(sorderedcutname=="GRL")
+		if(sorderedcutname=="EF_mu10")
 		{
-			passCurrentCut = ( isGRLCut((*m_cutFlowMapSVD)[sorderedcutname][0], isGRL) ) ? true : false;
-		}
-
-		if(debugmode) cout << "### 15.2 ###" << endl;
-		
-		if(sorderedcutname=="L1_MU6")
-		{
-			passCurrentCut = ( isL1_MU6Cut((*m_cutFlowMapSVD)[sorderedcutname][0], isL1MU6) ) ? true : false;
+			passCurrentCut = ( isEF_muXCut((*m_cutFlowMapSVD)[sorderedcutname][0], isEF_mu10) ) ? true : false;
 		}
 		
 		if(debugmode) cout << "### 15.3 ###" << endl;
@@ -433,7 +443,7 @@ void digestAnalysis::executeCutFlow()
 		
 		if(debugmode) cout << "### 15.9 ###" << endl;
 		
-		if(sorderedcutname=="PV")
+		if(sorderedcutname=="PV ???????")
 		{
 			double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 			double cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
@@ -521,17 +531,23 @@ void digestAnalysis::executeCutFlow()
 			{
 				// for the final histograms:
 				// i.e., not the curFlow histos
-				m_graphicobjs->h1_eta->Fill( current_mu_eta );
-				m_graphicobjs->h1_costh->Fill( current_cosTheta );
+				if(current_imass>=XMIN  &&  current_imass<=XMAX) m_graphicobjs->h1_costh->Fill( current_cosTheta );
+				m_graphicobjs->h1_cosmicCosthAllCuts->Fill( current_cosmicCosth );
 				m_graphicobjs->h1_pT->Fill( current_mu_pT );
+				m_graphicobjs->h1_pT_muplus->Fill( current_muplus_pT );
+				m_graphicobjs->h1_eta->Fill( current_mu_eta );
+				m_graphicobjs->h1_eta_muplus->Fill( current_muplus_eta );
+				m_graphicobjs->h1_ipTdiff->Fill( current_ipTdiff );
+				m_graphicobjs->h1_etaSum->Fill( current_etaSum );
 				m_graphicobjs->h1_imass->Fill( current_imass );
+				m_graphicobjs->h1_imassFit->Fill( current_imass );
 				
 				if(debugmode) cout << "### 15.17 ###" << endl;
 				
-				cout << "\n$$$$$$$$$ dimuon $$$$$$$$$" << endl;
-				cout << "\t im=" << current_imass << endl;
-				cout << "\t pTmu=" << current_mu_pT  << endl;
-				cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << endl;
+				//cout << "\n$$$$$$$$$ dimuon $$$$$$$$$" << endl;
+				//cout << "\t im=" << current_imass << endl;
+				//cout << "\t pTmu=" << current_mu_pT  << endl;
+				//cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << endl;
 				
 				// fill the xVector for the ML fit:
 				m_fit->fillXvec( current_imass );

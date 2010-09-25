@@ -21,7 +21,7 @@ double scale2data(TH1D* h)
 	for(int i=1 ; i<(int)h->GetNbinsX() ; i++)
 	{
 		double binCenter = h->GetBinCenter(i);
-		if( binCenter>XMIN  &&  binCenter<XMAX) nentries += h->GetBinContent(i);
+		if( binCenter>=XMIN  &&  binCenter<=XMAX) nentries += h->GetBinContent(i);
 	}
 	scale = nentries*h->GetBinWidth(1);
 
@@ -35,13 +35,20 @@ double scale2bg(TH1D* h)
 	for(int i=1 ; i<(int)h->GetNbinsX() ; i++)
 	{
 		double binCenter = h->GetBinCenter(i);
-		if( binCenter>XMIN  &&  binCenter<XMAXBG) nentries += h->GetBinContent(i);
+		if( binCenter>=XMIN  &&  binCenter<=XMAXBG) nentries += h->GetBinContent(i);
 	}
 	scale = nentries*h->GetBinWidth(1);
 
 	return scale;
 }
 
+///////////////////////////
+// Lorenzian Peak function
+Double_t Lorentzian(double *x, double *par)
+{
+	//return (0.5*par[0]*par[1]/TMath::Pi()) / TMath::Max( 1.e-10,(x[0]-par[2])*(x[0]-par[2]) + .25*par[1]*par[1] );
+	return (0.5*par[0]*par[1]/TMath::Pi()) / ( (x[0]-par[2])*(x[0]-par[2]) + .25*par[1]*par[1] );
+}
 
 ///////////////////////////
 // exponential background

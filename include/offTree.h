@@ -49,6 +49,7 @@ class offTree : public utilities
 		vector<float>* mu_staco_ptcone30;
 		vector<float>* mu_staco_ptcone40;
 		vector<float>* mu_staco_eta;
+		vector<float>* mu_staco_phi;
 		vector<float>* mu_staco_d0_exPV;
 		vector<float>* mu_staco_z0_exPV;
 		vector<float>* mu_staco_me_qoverp;
@@ -60,6 +61,8 @@ class offTree : public utilities
 		vector<int>*   mu_staco_nPixHits;
 		vector<unsigned short>* mu_staco_allauthor;
 		vector<int>*   mu_staco_author;
+		vector<float>* mu_staco_matchchi2;
+		vector<int>*   mu_staco_matchndof;
 		
 		
 		// muid
@@ -75,6 +78,7 @@ class offTree : public utilities
 		vector<float>* mu_muid_ptcone30;
 		vector<float>* mu_muid_ptcone40;
 		vector<float>* mu_muid_eta;
+		vector<float>* mu_muid_phi;
 		vector<float>* mu_muid_d0_exPV;
 		vector<float>* mu_muid_z0_exPV;
 		vector<float>* mu_muid_me_qoverp;
@@ -86,6 +90,8 @@ class offTree : public utilities
 		vector<int>*   mu_muid_nPixHits;
 		vector<unsigned short>* mu_muid_allauthor;
 		vector<int>*   mu_muid_author;
+		vector<float>* mu_muid_matchchi2;
+		vector<int>*   mu_muid_matchndof;
 		
 		// vertex variables
 		Int_t          vxp_n;

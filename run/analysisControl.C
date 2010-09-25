@@ -97,14 +97,14 @@ void analysisControl::book()
 	m_graphics->bookHistos(m_dirAllCuts);
 
 	m_dirCutFlow = m_histfile->mkdir("cutFlow");
-	m_graphics->bookHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_dirCutFlow );	
+	m_graphics->bookHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_cutFlowHandler->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );	
 }
 
 void analysisControl::draw()
 {
 	m_graphics->drawBareHistos(m_dirNoCuts);
 	m_graphics->drawHistos(m_dirAllCuts);
-	m_graphics->drawHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_dirCutFlow );
+	m_graphics->drawHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_cutFlowHandler->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 
 	m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
 }
@@ -144,7 +144,7 @@ void analysisControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		l64t_nbytes += l64t_nb;
 		// if (Cut(l64t_ientry) < 0) continue;
 		
-		if(l64t_jentry%10000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_phys->RunNumber << "\tlumiblock=" << m_phys->lbn << endl;
+		if(l64t_jentry%100000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_phys->RunNumber << "\tlumiblock=" << m_phys->lbn << endl;
 		if(l64t_jentry%l64t_mod==0) m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
 		
 		analyze();

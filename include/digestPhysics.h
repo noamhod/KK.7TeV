@@ -41,6 +41,7 @@ public :
    vector<float>   *mu_staco_ptcone30;
    vector<float>   *mu_staco_ptcone40;
    vector<float>   *mu_staco_eta;
+   vector<float>   *mu_staco_phi;
    vector<float>   *mu_staco_d0_exPV;
    vector<float>   *mu_staco_z0_exPV;
    vector<float>   *mu_staco_me_qoverp;
@@ -52,6 +53,8 @@ public :
    vector<int>     *mu_staco_nPixHits;
    vector<unsigned short> *mu_staco_allauthor;
    vector<int>     *mu_staco_author;
+    vector<float>  *mu_staco_matchchi2;
+   vector<int>     *mu_staco_matchndof;
    Int_t           vxp_n;
    vector<int>     *vxp_nTracks;
    vector<int>     *vxp_type;
@@ -82,6 +85,7 @@ public :
    TBranch        *b_mu_staco_ptcone30;   //!
    TBranch        *b_mu_staco_ptcone40;   //!
    TBranch        *b_mu_staco_eta;   //!
+   TBranch        *b_mu_staco_phi;   //!
    TBranch        *b_mu_staco_d0_exPV;   //!
    TBranch        *b_mu_staco_z0_exPV;   //!
    TBranch        *b_mu_staco_me_qoverp;   //!
@@ -93,6 +97,8 @@ public :
    TBranch        *b_mu_staco_nPixHits;   //!
    TBranch        *b_mu_staco_allauthor;   //!
    TBranch        *b_mu_staco_author;   //!
+   TBranch        *b_mu_staco_matchchi2;   //!
+   TBranch        *b_mu_staco_matchndof;   //!
    TBranch        *b_vxp_n;   //!
    TBranch        *b_vxp_nTracks;   //!
    TBranch        *b_vxp_type;   //!
@@ -177,6 +183,7 @@ void digestPhysics::Init(TTree *tree)
    mu_staco_ptcone30 = 0;
    mu_staco_ptcone40 = 0;
    mu_staco_eta = 0;
+   mu_staco_phi = 0;
    mu_staco_d0_exPV = 0;
    mu_staco_z0_exPV = 0;
    mu_staco_me_qoverp = 0;
@@ -188,6 +195,8 @@ void digestPhysics::Init(TTree *tree)
    mu_staco_nPixHits = 0;
    mu_staco_allauthor = 0;
    mu_staco_author = 0;
+   mu_staco_matchchi2 = 0;
+   mu_staco_matchndof = 0;
    vxp_nTracks = 0;
    vxp_type = 0;
    vxp_z = 0;
@@ -232,6 +241,8 @@ void digestPhysics::Init(TTree *tree)
    fChain->SetBranchAddress("mu_staco_nPixHits", &mu_staco_nPixHits, &b_mu_staco_nPixHits);
    fChain->SetBranchAddress("mu_staco_allauthor", &mu_staco_allauthor, &b_mu_staco_allauthor);
    fChain->SetBranchAddress("mu_staco_author", &mu_staco_author, &b_mu_staco_author);
+   fChain->SetBranchAddress("mu_staco_matchchi2", &mu_staco_matchchi2, &b_mu_staco_matchchi2);
+   fChain->SetBranchAddress("mu_staco_matchndof", &mu_staco_matchndof, &b_mu_staco_matchndof);
    fChain->SetBranchAddress("vxp_n", &vxp_n, &b_vxp_n);
    fChain->SetBranchAddress("vxp_nTracks", &vxp_nTracks, &b_vxp_nTracks);
    fChain->SetBranchAddress("vxp_type", &vxp_type, &b_vxp_type);
@@ -260,6 +271,7 @@ void digestPhysics::Show(Long64_t entry)
 }
 Int_t digestPhysics::Cut(Long64_t entry)
 {
+   if(false) cout << "entry=" << entry << endl;
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
 // returns -1 otherwise.

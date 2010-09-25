@@ -33,10 +33,11 @@ void selection::sfinalize()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
-void selection::initSelectionCuts(TMapsvd* cutFlowMapSVD, TMapds* cutFlowOrdered)
+void selection::initSelectionCuts(TMapsvd* cutFlowMapSVD, TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered)
 {
 	m_cutFlowMapSVD  = cutFlowMapSVD;
 	m_cutFlowOrdered = cutFlowOrdered;
+	m_cutFlowTypeOrdered = cutFlowTypeOrdered;
 }
 
 void selection::buildMuonPairMap( TMapii& mupair,
@@ -57,6 +58,13 @@ void selection::buildMuonPairMap( TMapii& mupair,
 	// If passed all dimuon-level cuts, then insert this pair into the muPair map.
 	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
 	{
+		double num = ii->first;
+		///////////////////////////////////////////////////////////////
+		// ignore preselection: ///////////////////////////////////////
+		if(m_cutFlowTypeOrdered->operator[](num)=="preselection") continue; /////////
+		///////////////////////////////////////////////////////////////
+	
+	
 		string scutname = ii->second;
 		//vector<double> cutValue = m_cutFlowMapSVD->operator[](scutname);
 		
@@ -221,7 +229,7 @@ void selection::findMostMassivePair(offlinePhysics* offPhys, TVectorP2VL& pmu, T
 	}
 }
 
-bool selection::findBestVertex(offlinePhysics* offPhys)
+bool selection::findBestVertex(int nTracksCut, int nTypeCut, double z0Cut, offlinePhysics* offPhys)
 {
 	bool found = false;
 
@@ -234,10 +242,7 @@ bool selection::findBestVertex(offlinePhysics* offPhys)
 		nPVtype   = offPhys->vxp_type->at(i);
 		dPVz0     = offPhys->vxp_z->at(i);
 		
-		if(nPVtracks>1  &&  nPVtype==1  &&  dPVz0<150.)
-		{
-			found = true;
-		}
+		if(nPVtracks>nTracksCut  &&  nPVtype==nTypeCut  &&  dPVz0<z0Cut) found = true;
 	}
 	
 	if(!found)
@@ -248,7 +253,7 @@ bool selection::findBestVertex(offlinePhysics* offPhys)
 	return found;
 }
 
-bool selection::findBestVertex(physics* phys)
+bool selection::findBestVertex(int nTracksCut, int nTypeCut, double z0Cut, physics* phys)
 {
 	bool found = false;
 
@@ -260,7 +265,7 @@ bool selection::findBestVertex(physics* phys)
 		nPVtracks = phys->vxp_nTracks->at(i);
 		nPVtype   = phys->vxp_type->at(i);
 		dPVz0     = phys->vxp_z->at(i);
-		if(nPVtracks>1  &&  nPVtype==1  &&  dPVz0<150.) found = true;
+		if(nPVtracks>nTracksCut  &&  nPVtype==nTypeCut  &&  dPVz0<z0Cut) found = true;
 	}
 	
 	if(!found)
@@ -271,7 +276,7 @@ bool selection::findBestVertex(physics* phys)
 	return found;
 }
 
-int selection::getPVindex(physics* phys)
+int selection::getPVindex(int nTracksCut, int nTypeCut, double z0Cut, physics* phys)
 {
 	int   nPVtracks;
 	int   nPVtype;
@@ -283,7 +288,7 @@ int selection::getPVindex(physics* phys)
 		nPVtracks = phys->vxp_nTracks->at(i);
 		nPVtype   = phys->vxp_type->at(i);
 		dPVz0     = phys->vxp_z->at(i);
-		if(nPVtracks>1  &&  nPVtype==1  &&  dPVz0<150.)
+		if(nPVtracks>nTracksCut  &&  nPVtype==nTypeCut  &&  dPVz0<z0Cut)
 		{
 			if(dPVz0<z0min)
 			{
@@ -295,7 +300,7 @@ int selection::getPVindex(physics* phys)
 	return index;
 }
 
-int selection::getPVindex(offlinePhysics* offPhys)
+int selection::getPVindex(int nTracksCut, int nTypeCut, double z0Cut, offlinePhysics* offPhys)
 {
 	int   nPVtracks;
 	int   nPVtype;
@@ -307,7 +312,7 @@ int selection::getPVindex(offlinePhysics* offPhys)
 		nPVtracks = offPhys->vxp_nTracks->at(i);
 		nPVtype   = offPhys->vxp_type->at(i);
 		dPVz0     = offPhys->vxp_z->at(i);
-		if(nPVtracks>1  &&  nPVtype==1  &&  dPVz0<150.)
+		if(nPVtracks>nTracksCut  &&  nPVtype==nTypeCut  &&  dPVz0<z0Cut)
 		{
 			if(dPVz0<z0min)
 			{
@@ -319,7 +324,7 @@ int selection::getPVindex(offlinePhysics* offPhys)
 	return index;
 }
 
-bool selection::findHipTmuon(offlinePhysics* offPhys)
+bool selection::findHipTmuon(double hipTmuonCut, double MShipTmuonCut, offlinePhysics* offPhys)
 {
 	bool found = false;
 	
@@ -335,8 +340,8 @@ bool selection::findHipTmuon(offlinePhysics* offPhys)
 		theta = offPhys->mu_staco_me_theta->at(i);
 		pTms  = (qOp!=0) ? fabs(1./qOp)*sin(theta) : 0.;
 		
-		if(pT > 15000.)   found = true;
-		if(pTms > 10000.) found = true;
+		if(pT > hipTmuonCut)   found = true;
+		if(pTms > MShipTmuonCut) found = true;
 	}
 	
 	if(!found)
@@ -347,7 +352,7 @@ bool selection::findHipTmuon(offlinePhysics* offPhys)
 	return found;
 }
 
-bool selection::findHipTmuon(physics* phys)
+bool selection::findHipTmuon(double hipTmuonCut, double MShipTmuonCut, physics* phys)
 {
 	bool found = false;
 	
@@ -363,8 +368,8 @@ bool selection::findHipTmuon(physics* phys)
 		theta = phys->mu_staco_ms_theta->at(i);
 		pTms  = (qOp!=0) ? fabs(1./qOp)*sin(theta) : 0.;
 		
-		if(pT > 15000.)   found = true;
-		if(pTms > 10000.) found = true;
+		if(pT > hipTmuonCut)   found = true;
+		if(pTms > MShipTmuonCut) found = true;
 	}
 	
 	if(!found)
@@ -375,46 +380,6 @@ bool selection::findHipTmuon(physics* phys)
 	return found;
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-
-
-bool selection::preselection(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap)
-{
-	bool passed = true;
-	
-	passed = (passed  &&  pmu.size()>1) ? true : false;
-	
-	passed = (passed  &&  offPhys->isGRL) ? true : false;
-	
-	//passed = (passed  &&  offPhys->L1_MU6) ? true : false;
-	
-	passed = (passed  &&  findHipTmuon(offPhys)) ? true : false;
-	
-	//passed = (passed  &&  findMostMassivePair(pmu, allmupairMap)) ? true : false;
-	
-	passed = (passed  &&  findBestVertex(offPhys)) ? true : false;
-	
-	return passed;
-}
-
-bool selection::preselection(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int isGRL)
-{
-	bool passed = true;
-	
-	passed = (passed  &&  pmu.size()>1) ? true : false;
-	
-	passed = (passed  &&  isGRL) ? true : false;
-	
-	//passed = (passed  &&  phys->L1_MU6) ? true : false;
-	
-	passed = (passed  &&  findHipTmuon(phys)) ? true : false;
-	
-	//passed = (passed  &&  findMostMassivePair(pmu, allmupairMap)) ? true : false;
-	
-	passed = (passed  &&  findBestVertex(phys)) ? true : false;
-	
-	return passed;
-}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -430,6 +395,12 @@ bool selection::isL1_MU6Cut( double isL1_MU6CutVal, int isL1_MU6 )
 {
 	if(b_print) cout << "in isL1_MU6Cut: isL1_MU6=" << isL1_MU6 << endl;
 	return ( (double)isL1_MU6 == isL1_MU6CutVal ) ? true : false;
+}
+
+bool selection::isEF_muXCut( double isEF_muXCutVal, int isEF_muX )
+{
+	if(b_print) cout << "in isEF_muXCut: isEF_muX=" << isEF_muX << endl;
+	return ( (double)isEF_muX == isEF_muXCutVal ) ? true : false;
 }
 
 bool selection::pTCut( double pTCutVal, TLorentzVector* pa, TLorentzVector* pb )

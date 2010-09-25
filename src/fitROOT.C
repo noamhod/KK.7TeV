@@ -23,7 +23,7 @@ void fitROOT::minimize(bool signal_only, TH1D* h, double* yields)
 	///// INITIALIZATION:  SIGNAL ONLY
 	// Breit-Wigner x Gaussian convolution (can have 3 gaussians)
 	parSignal[0] = 100.;    // Scale Signal (Ns)
-	parSignal[1] = 2500;       // Breit Wigner Width (gamma)
+	parSignal[1] = 2495.2;     // Breit Wigner Width (gamma) FIXED !!!!!
 	parSignal[2] = 90000.;     // Most probable location (peak mean) 
 	parSignal[3] = 100.;       // Gaussian sigma 1
 	parSignal[4] = 2000.;      // Gaussian sigma 2
@@ -35,12 +35,12 @@ void fitROOT::minimize(bool signal_only, TH1D* h, double* yields)
 	// Exponential
 	parSignalBackground[0] = scale2bg(h);   // Scale Background (Nb)
 	parSignalBackground[1] = scale2data(h);   // Scale Signal (Ns)
-	parSignalBackground[2] = 2.2e0;       // Exp: constant argument
-	parSignalBackground[3] = -1.7e-5; // Exp: the multiplier of the x argument
+	parSignalBackground[2] = 0.;       // Exp: constant argument
+	parSignalBackground[3] = -1.e-5; // Exp: the multiplier of the x argument
 	// Breit-Wigner x Gaussian convolution
-	parSignalBackground[4] = 2.5e3;    // Breit Wigner Width (gamma)
-	parSignalBackground[5] = 9.e4;   // Most probable location (peak mean) 
-	parSignalBackground[6] = 5.e3;     // Gaussian sigma 1
+	parSignalBackground[4] = 2495.2;    // Breit Wigner Width (gamma) FIXED !!!!!
+	parSignalBackground[5] = 9.1e4;   // Most probable location (peak mean) 
+	parSignalBackground[6] = 3.e3;     // Gaussian sigma 1
 	//parSignalBackground[7] = 3000.;    // Gaussian sigma 2 
 	//parSignalBackground[8] = 3000.;    // Gaussian sigma 3
 	
@@ -74,14 +74,21 @@ void fitROOT::minimize(bool signal_only, TH1D* h, double* yields)
 		index_sigma2 = 7;
 		index_sigma3 = 8;
 		index_signal = 1;
-		fitFCN = new TF1("fitFCN",fitFunctionSB, XMIN, XMAX ,7); // used to be 8 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		fitFCN = new TF1("fitFCN",fitFunctionSB, XMIN, XMAX ,7);
 		par = parSignalBackground;
 	}
+	//fitFCN->SetParLimits(parameter_index, min, max); ???????????????
 	
+	//////////////////////////////////////////////////////
+	// fix the BW width parameter to the known value (PDG)
+	fitFCN->FixParameter(index_gamma,2495.2); ////////////
+	//////////////////////////////////////////////////////
 
-	//--------------------------------------------------------------------------------
-	// simple root fit
-	//--------------------------------------------------------------------------------
+	//////////////////////////////////////////////////////
+	// fix the exp const parameter to 0 //////////////////
+	if(!signal_only) fitFCN->FixParameter(2,0.); /////////
+	//////////////////////////////////////////////////////
+
 	double bin_width = h->GetBinWidth(1);
 	// irrelevant
 	if(false) cout << "bin_width="  << bin_width  << endl;
@@ -90,7 +97,7 @@ void fitROOT::minimize(bool signal_only, TH1D* h, double* yields)
 	fitFCN->SetParameters(par);
 	
 	// set histogrma range and fit first time
-	h->SetAxisRange(20000,200000,"X");
+	//h->SetAxisRange(20000,200000,"X");
 	h->Fit(fitFCN,"VN","",XMIN,XMAX);        
 
 	// get fit parameters
@@ -118,17 +125,26 @@ void fitROOT::minimize(bool signal_only, TH1D* h, double* yields)
 	fitFCN->SetLineColor(kBlue);
 	fitFCN->SetLineStyle(1);
 	fitFCN->SetLineWidth(2);
-	h->Fit(fitFCN,"V","pe1",Lfit,Rfit);
+	//h->Fit(fitFCN,"V","pe1",Lfit,Rfit);
+	h->Fit(fitFCN,"VN","",XMIN,XMAX);
 
+	double chi2 = fitFCN->GetChisquare();
+	int    ndf  = fitFCN->GetNDF();
+	cout << "Chi^2 = " << chi2 << endl;
+	cout << "NDF   = " << ndf << endl;
+	
 	// get final parameters (yields)
 	ParFit = fitFCN->GetParameters();
 	yields[0] = ParFit[index_signal]/bin_width;
 	yields[1] = ParFit[0]/bin_width;
+	cout << "\nyields[0] = " <<  yields[0] << " +- " << fitFCN->GetParError(index_signal)/bin_width << endl;
+	cout << "yields[1] = " <<  yields[1] << " +- " << fitFCN->GetParError(0)/bin_width << "\n" << endl;
+	cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << endl;
+	
 	
 	/////////////////////////////////////////
 	//fFitted = (TF1*)fitFCN->Clone(); ////////
 	/////////////////////////////////////////
-	//----------------------------------------------------------------------------------
 	
 	
 	

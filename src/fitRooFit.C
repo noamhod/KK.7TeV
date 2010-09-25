@@ -8,6 +8,8 @@
 #ifdef fitRooFit_cxx
 #include "fitRooFit.h"
 
+//#include "RooExtendedExponent.h"
+
 
 fitRooFit::fitRooFit()
 {
@@ -26,12 +28,8 @@ fitRooFit::~fitRooFit()
 
 void fitRooFit::minimize(bool signal_only, TH1D* h, double* yields)
 {
-	double XFULLMIN = 0.;
-	double XFULLMAX = 200000.;
+	if(false) cout << "signal_only=" << signal_only << endl;
 
-	double XFITMIN = XMIN;
-	double XFITMAX = XMAX;
-	
 	//////////////////////////////////////////////////////
 	// NOTE: the branch name has to be exactly the same as
 	// the observable name (RooRealVar)
@@ -48,7 +46,7 @@ void fitRooFit::minimize(bool signal_only, TH1D* h, double* yields)
 
 	// --- Observable ---
 	// RooRealVar(const char* name, const char* title, Double_t value, Double_t minValue, Double_t maxValue, const char* unit = "")
-	RooRealVar imass("imass", "#hat{m} [MeV]", XFULLMIN, XFULLMAX);
+	RooRealVar imass("imass", "#hat{m}_{#mu#mu}", XFULLMIN, XFULLMAX, "MeV");
 	imass.setRange("fitRange",XFITMIN,XFITMAX);
 	
 	
@@ -64,28 +62,40 @@ void fitRooFit::minimize(bool signal_only, TH1D* h, double* yields)
 		the constructor, or with the selectFastAlgorithm() method
 	*/
 	// --- Signal Parameters
-	RooRealVar gaussMean("gaussMean", "m_{Z^{0}}", 91000., XFULLMIN, XFULLMAX);
-	RooRealVar gaussSigma("gaussSigma", "Resolution", 5000., 0., 10000.);
-	RooRealVar breitWignerMean("breitWignerMean", "m_{Z^{0}}", 91000., XFULLMIN, XFULLMAX);
-	RooRealVar breitWignerGamma("breitWignerGamma", "#Gamma", 2500., 2000., 3000.);
+	RooRealVar gaussMean("gaussMean", "m_{Z^{0}}", 91000., XFITMIN, XFITMAX);
+	RooRealVar gaussSigma("gaussSigma", "Resolution", 3000., 100., 10000.);
+	RooRealVar breitWignerMean("breitWignerMean", "m_{Z^{0}}", 91000., XFITMIN, XFITMAX);
+	RooRealVar breitWignerGamma("breitWignerGamma", "#Gamma", 2495.2);
+	
+	////////////////////////////////////////////////////////
+	// fix the BW width parameter to the known value (PDG)
+	breitWignerGamma.setConstant(kTRUE);////////////////////
+	////////////////////////////////////////////////////////
+	
 	// --- Build the convolution of the Gauss and Breit-Wigner PDFs ---
 	RooVoigtian BreitGaussSignal("BreitGauss", "Breit-Wigner #otimes Gauss PDF", imass, breitWignerMean, breitWignerGamma, gaussSigma);
 	
 	// --- BACKGROUND
 	//RooExponential(const char* name, const char* title, RooAbsReal& _x, RooAbsReal& _c)
 	// --- Background Parameters
-	RooRealVar expMeasure("expMeasure", "Exponent measure", -1.e-4, -10., 0.);
+	RooRealVar expMeasure("expMeasure", "Exponent measure", -1.e-6, -1.e-4, -1.e-8);
+	//RooRealVar expConstant("expConstant", "Exponent constant", 2., 1.e-3, 100.);
 	// --- Build the background exponential PDFs ---
 	RooExponential ExponentBG("ExponentBG", "Exponential BG", imass, expMeasure);
+	//RooExtendedExponent ExponentBG("ExponentBG", "Exponential BG", imass, expMeasure, expConstant);
 	
 	
 	// --- SUM
 	// --- Construct signal+background PDF ---
 	double sbg = scale2data(h)/h->GetBinWidth(1);
-	double bg    = scale2bg(h)/h->GetBinWidth(1);
+	double bg  = scale2bg(h)/h->GetBinWidth(1);
+	cout << "Guess Ns=" << (int)sbg << endl;
+	cout << "Guess Nb=" << (int)bg << endl;
 	int nentries = (int)h->GetEntries();
-	RooRealVar nsig("nsig","#signal events",(int)sbg,0,nentries);
-	RooRealVar nbkg("nbkg","#background events",(int)bg,0,nentries);
+	
+	RooRealVar nsig("nsig","#signal events",(int)sbg,1,nentries);
+	RooRealVar nbkg("nbkg","#background events",(int)bg,1,(int)(0.5*sbg));
+	
 	RooAddPdf model("model", "BreitGaussSignal #oplus ExponentBG", RooArgList(BreitGaussSignal,ExponentBG), RooArgList(nsig,nbkg));
 	
 	// --- get the data set ---
@@ -93,10 +103,10 @@ void fitRooFit::minimize(bool signal_only, TH1D* h, double* yields)
 	RooDataSet* data = new RooDataSet("data", "data", m_imassTree, imass /*RooArgSet(imass, boundaries)*/);
 	
 	// --- Perform extended ML fit of composite PDF to data ---
-	model.fitTo(*data, Range("fitRange"),Extended(kTRUE), "etlrh");
+	model.fitTo(*data, Range("fitRange"), Extended(kTRUE));
 		
 	// --- Plot toy data and composite PDF overlaid ---
-	TCanvas* canv_imass_roofit = new TCanvas("imass_roofit","imass_roofit",600,400);
+	TCanvas* canv_imass_roofit = new TCanvas("imass_roofit","imass_roofit",602,400);
 	canv_imass_roofit->Draw();
 	canv_imass_roofit->cd();
 	RooPlot* frame = imass.frame();
@@ -106,9 +116,9 @@ void fitRooFit::minimize(bool signal_only, TH1D* h, double* yields)
 	model.plotOn(frame,Components(BreitGaussSignal),LineColor(kRed),LineWidth(1));
 	model.plotOn(frame,Components(ExponentBG),LineStyle(kDashed),LineWidth(1));
 	
-	double leg_x1 = 0.765;
+	double leg_x1 = 0.705;
 	double leg_x2 = 0.919;
-	double leg_y1 = 0.376;
+	double leg_y1 = 0.336;
 	double leg_y2 = 0.922;
 	TLegend* leg_roofit = new TLegend(leg_x1, leg_y1*2., leg_x2, leg_y2);
 	TGraph* tgraph_dat = new TGraph();
@@ -119,9 +129,9 @@ void fitRooFit::minimize(bool signal_only, TH1D* h, double* yields)
 	TLine* tline_fit = new TLine();
 	tline_fit->SetLineWidth(2); tline_fit->SetLineColor(kBlue); tline_fit->SetLineStyle(1);
 	leg_roofit->AddEntry( tgraph_dat, "Data", "lep");
-	leg_roofit->AddEntry( tline_sig, "S", "L");
-	leg_roofit->AddEntry( tline_bg, "BG", "L");
-	leg_roofit->AddEntry( tline_fit, "ML fit", "L");
+	leg_roofit->AddEntry( tline_sig, "S = BW #otimes Gauss", "L");
+	leg_roofit->AddEntry( tline_bg, "BG = Exp", "L");
+	leg_roofit->AddEntry( tline_fit, "ML fit = S #oplus BG", "L");
 	frame->addObject(leg_roofit);
 	
 	frame->SetMinimum(1.e-5);
@@ -145,8 +155,15 @@ void fitRooFit::minimize(bool signal_only, TH1D* h, double* yields)
 	cout << "breitWignerGamma = " << breitWignerGamma.getVal() << " +- " << breitWignerGamma.getError() << endl;
 	cout << "gaussSigma = " << gaussSigma.getVal() << " +- " << gaussSigma.getError() << endl;
 	cout << "expMeasure = " << expMeasure.getVal() << " +- " << expMeasure.getError() << endl;
+	//cout << "expConstant = " << expConstant.getVal() << " +- " << expConstant.getError() << endl;
 	cout << "nsig = " << nsig.getVal() << " +- " << nsig.getError() << endl;
 	cout << "nbkg = " << nbkg.getVal() << " +- " << nbkg.getError() << endl;
+	
+	yields[0] = nsig.getVal();
+    yields[1] = nbkg.getVal();
+	cout << "\nyields[0] = " <<  yields[0] << " +- " << nsig.getError() << endl;
+	cout << "yields[1] = " <<  yields[1] << " +- " << nbkg.getError() << "\n" << endl;
+	cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << endl;
 }
 
 #endif

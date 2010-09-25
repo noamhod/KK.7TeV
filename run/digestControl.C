@@ -95,16 +95,16 @@ void digestControl::book()
 	m_graphics->bookFitHistos(m_dirFit);
 
 	m_dirCutFlow = m_histfile->mkdir("cutFlow");
-	m_graphics->bookHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_dirCutFlow );
+	m_graphics->bookHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_cutFlowHandler->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 }
 
 void digestControl::draw()
 {
 	m_graphics->drawBareHistos(m_dirNoCuts);
 	m_graphics->drawHistos(m_dirAllCuts);
-	m_graphics->drawHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_dirCutFlow );
-	//m_graphics->drawFitHistos(m_dirFit, m_digestAnalysis->m_fit->m_fitROOT->guess, m_digestAnalysis->m_fit->m_fitROOT->fitFCN);
-	m_graphics->drawFitHistos(m_dirFit, m_digestAnalysis->m_fit->m_fitMinuit->guess, m_digestAnalysis->m_fit->m_fitMinuit->fitFCN);
+	m_graphics->drawHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_cutFlowHandler->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+	m_graphics->drawFitHistos(m_dirFit, m_digestAnalysis->m_fit->m_fitROOT->guess, m_digestAnalysis->m_fit->m_fitROOT->fitFCN);
+	//m_graphics->drawFitHistos(m_dirFit, m_digestAnalysis->m_fit->m_fitMinuit->guess, m_digestAnalysis->m_fit->m_fitMinuit->fitFCN);
 
 	m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
 }

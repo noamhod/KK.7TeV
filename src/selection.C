@@ -175,6 +175,11 @@ bool selection::oppositeChargePair(offlinePhysics* offPhys, int a, int b)
 	return ( offPhys->mu_staco_charge->at(a) * offPhys->mu_staco_charge->at(b) < 0) ? true : false;
 }
 
+bool selection::oppositeChargePair(mcPhysics* mcPhys, int a, int b)
+{
+	return ( mcPhys->mu_staco_charge->at(a) * mcPhys->mu_staco_charge->at(b) < 0) ? true : false;
+}
+
 void selection::findMostMassivePair(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iBest_a, int&iBest_b)
 {
 	double current_imass;
@@ -217,6 +222,33 @@ void selection::findMostMassivePair(offlinePhysics* offPhys, TVectorP2VL& pmu, T
 		// find the mu+mu- pair with the largest invariant mass
 		// and set the incices of the two muons (by charge)
 		if( oppositeChargePair(offPhys,ai,bi) )
+		{
+			current_imass = imass(pmu[ai],pmu[bi]);
+			if(current_imass > imassMax)
+			{
+				imassMax = current_imass;
+				iBest_a = ai;
+				iBest_b = bi;
+			}
+		}
+	}
+}
+
+void selection::findMostMassivePair(mcPhysics* mcPhys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iBest_a, int&iBest_b)
+{
+	double current_imass;
+	double imassMax = 0.;
+	int ai, bi;
+	iBest_a = 0;
+	iBest_b = 0;
+	for(TMapii::iterator it=allmupairMap.begin() ; it!=allmupairMap.end() ; ++it)
+	{
+		ai = it->first;
+		bi = it->second;
+		
+		// find the mu+mu- pair with the largest invariant mass
+		// and set the incices of the two muons (by charge)
+		if( oppositeChargePair(mcPhys,ai,bi) )
 		{
 			current_imass = imass(pmu[ai],pmu[bi]);
 			if(current_imass > imassMax)
@@ -276,6 +308,30 @@ bool selection::findBestVertex(int nTracksCut, int nTypeCut, double z0Cut, physi
 	return found;
 }
 
+bool selection::findBestVertex(int nTracksCut, int nTypeCut, double z0Cut, mcPhysics* mcPhys)
+{
+	bool found = false;
+
+	int   nPVtracks;
+	int   nPVtype;
+	float dPVz0;
+	for(int i=0 ; i<(int)mcPhys->vxp_n ; i++)
+	{
+		nPVtracks = mcPhys->vxp_nTracks->at(i);
+		nPVtype   = mcPhys->vxp_type->at(i);
+		dPVz0     = mcPhys->vxp_z->at(i);
+		if(nPVtracks>nTracksCut  &&  nPVtype==nTypeCut  &&  dPVz0<z0Cut) found = true;
+	}
+	
+	if(!found)
+	{
+		if(b_print) cout << "WARNING:  in selection::findBestVertex:  didn't find any good vertex" << endl;
+	}
+	
+	return found;
+}
+
+
 int selection::getPVindex(int nTracksCut, int nTypeCut, double z0Cut, physics* phys)
 {
 	int   nPVtracks;
@@ -312,6 +368,30 @@ int selection::getPVindex(int nTracksCut, int nTypeCut, double z0Cut, offlinePhy
 		nPVtracks = offPhys->vxp_nTracks->at(i);
 		nPVtype   = offPhys->vxp_type->at(i);
 		dPVz0     = offPhys->vxp_z->at(i);
+		if(nPVtracks>nTracksCut  &&  nPVtype==nTypeCut  &&  dPVz0<z0Cut)
+		{
+			if(dPVz0<z0min)
+			{
+				z0min = dPVz0;
+				index = i;
+			}
+		}
+	}
+	return index;
+}
+
+int selection::getPVindex(int nTracksCut, int nTypeCut, double z0Cut, mcPhysics* mcPhys)
+{
+	int   nPVtracks;
+	int   nPVtype;
+	float dPVz0;
+	float z0min = 9999;
+	int   index = 0;
+	for(int i=0 ; i<(int)mcPhys->vxp_n ; i++)
+	{
+		nPVtracks = mcPhys->vxp_nTracks->at(i);
+		nPVtype   = mcPhys->vxp_type->at(i);
+		dPVz0     = mcPhys->vxp_z->at(i);
 		if(nPVtracks>nTracksCut  &&  nPVtype==nTypeCut  &&  dPVz0<z0Cut)
 		{
 			if(dPVz0<z0min)
@@ -380,6 +460,33 @@ bool selection::findHipTmuon(double hipTmuonCut, double MShipTmuonCut, physics* 
 	return found;
 }
 
+bool selection::findHipTmuon(double hipTmuonCut, double MShipTmuonCut, mcPhysics* mcPhys)
+{
+	bool found = false;
+	
+	double pT;
+	double pTms;
+	double qOp;
+	double theta;
+
+	for(int i=0 ; i<(int)mcPhys->mu_staco_n ; i++)
+	{
+		pT    = mcPhys->mu_staco_pt->at(i);
+		qOp   = mcPhys->mu_staco_ms_qoverp->at(i);
+		theta = mcPhys->mu_staco_ms_theta->at(i);
+		pTms  = (qOp!=0) ? fabs(1./qOp)*sin(theta) : 0.;
+		
+		if(pT > hipTmuonCut)   found = true;
+		if(pTms > MShipTmuonCut) found = true;
+	}
+	
+	if(!found)
+	{
+		if(b_print) cout << "WARNING:  in selection::findHipTmuon:  didn't find any hipT muon" << endl;
+	}
+	
+	return found;
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 

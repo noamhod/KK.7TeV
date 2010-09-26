@@ -52,6 +52,7 @@
 #include <RooExponential.h>
 #include <RooAddPdf.h>
 #include <RooBinning.h>
+#include <RooExtendPdf.h>
 
 
 #include <iostream>
@@ -89,6 +90,9 @@ typedef map<string, vector<double>* > TMapsP2vd;
 
 #define physics_cxx
 #include "physics.C"
+
+#define mcPhysics_cxx
+#include "mcPhysics.C"
 
 /*
 #ifdef __CINT__

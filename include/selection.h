@@ -49,19 +49,24 @@ public:
 	// * * * preselection simple methods * * *
 	
 	bool oppositeChargePair(offlinePhysics* offPhys, int a, int b);
+	bool oppositeChargePair(mcPhysics* mcPhys, int a, int b);
 	bool oppositeChargePair(physics* phys, int a, int b);
 	
 	bool findMostMassivePair(TVectorP2VL& pmu, TMapii& allmupairMap);
-	void findMostMassivePair(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iBest_a, int&iBest_b);
 	void findMostMassivePair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iBest_a, int&iBest_b);
+	void findMostMassivePair(mcPhysics* mcPhys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iBest_a, int&iBest_b);
+	void findMostMassivePair(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iBest_a, int&iBest_b);
 	
 	int getPVindex(int nTracksCut, int nTypeCut, double z0Cut, physics* phys);
+	int getPVindex(int nTracksCut, int nTypeCut, double z0Cut, mcPhysics* mcPhys);
 	int getPVindex(int nTracksCut, int nTypeCut, double z0Cut, offlinePhysics* offPhys);
 	
 	bool findBestVertex(int nTracksCut, int nTypeCut, double z0Cut, physics* phys);
+	bool findBestVertex(int nTracksCut, int nTypeCut, double z0Cut, mcPhysics* mcPhys);
 	bool findBestVertex(int nTracksCut, int nTypeCut, double z0Cut, offlinePhysics* offPhys);
 	
 	bool findHipTmuon(double hipTmuonCut, double MShipTmuonCut, physics* phys);
+	bool findHipTmuon(double hipTmuonCut, double MShipTmuonCut, mcPhysics* mcPhys);
 	bool findHipTmuon(double hipTmuonCut, double MShipTmuonCut, offlinePhysics* offPhys);
 	
 	

@@ -17,9 +17,10 @@ offTree::~offTree()
 
 }
 
-offTree::offTree(physics* phys, TFile* treeFile)
+offTree::offTree(physics* phys, mcPhysics* mcPhys, TFile* treeFile)
 {
 	m_phys = phys;
+	m_mcPhys = mcPhys;
 
 	m_treeFile = treeFile;
 
@@ -30,6 +31,11 @@ offTree::offTree(physics* phys, TFile* treeFile)
 	//m_tree->SetMaxTreeSize(50000000); // 50Mb per file
 	
 	setBranches();
+}
+
+TTree* offTree::getTree()
+{
+	return m_tree;
 }
 
 void offTree::setBranches()
@@ -122,83 +128,166 @@ void offTree::fill()
 
 void offTree::fill(int isGrl)
 {
-	// fill run branches
-	RunNumber   = m_phys->RunNumber;
-	lbn         = m_phys->lbn;
-	EventNumber = m_phys->EventNumber;
-	
-	// preselection
-	isGRL  = isGrl;
-	L1_MU6 = m_phys->L1_MU6;
-	EF_mu10         = m_phys->EF_mu10;
-	EF_mu13         = m_phys->EF_mu13;
-	EF_mu15         = m_phys->EF_mu15;
-	EF_mu20         = m_phys->EF_mu20;
-	EF_mu4          = m_phys->EF_mu4;
-	EF_mu6          = m_phys->EF_mu6;
-	
-	// staco
-	mu_staco_n        = m_phys->mu_staco_n;
-	mu_staco_px       = m_phys->mu_staco_px;
-	mu_staco_py       = m_phys->mu_staco_py;
-	mu_staco_pz       = m_phys->mu_staco_pz;
-	mu_staco_E        = m_phys->mu_staco_E;
-	mu_staco_m        = m_phys->mu_staco_m;
-	mu_staco_charge   = m_phys->mu_staco_charge;
-	mu_staco_pt       = m_phys->mu_staco_pt;
-	mu_staco_ptcone20 = m_phys->mu_staco_ptcone20;
-	mu_staco_ptcone30 = m_phys->mu_staco_ptcone30;
-	mu_staco_ptcone40 = m_phys->mu_staco_ptcone40;
-	mu_staco_eta      = m_phys->mu_staco_eta;
-	mu_staco_phi      = m_phys->mu_staco_phi;
-	mu_staco_d0_exPV  = m_phys->mu_staco_d0_exPV;
-	mu_staco_z0_exPV  = m_phys->mu_staco_z0_exPV;
-	mu_staco_allauthor= m_phys->mu_staco_allauthor;
-	mu_staco_author   = m_phys->mu_staco_author;
-	mu_staco_matchchi2   = m_phys->mu_staco_matchchi2;
-	mu_staco_matchndof   = m_phys->mu_staco_matchndof;
-	mu_staco_me_qoverp= m_phys->mu_staco_me_qoverp;
-	mu_staco_id_qoverp= m_phys->mu_staco_id_qoverp;
-	mu_staco_me_theta = m_phys->mu_staco_me_theta;
-	mu_staco_id_theta = m_phys->mu_staco_id_theta;
-	mu_staco_isCombinedMuon = m_phys->mu_staco_isCombinedMuon;
-	mu_staco_nSCTHits = m_phys->mu_staco_nSCTHits;
-	mu_staco_nPixHits = m_phys->mu_staco_nPixHits;
-	
-	// muid
-	mu_muid_n        = m_phys->mu_muid_n;
-	mu_muid_px       = m_phys->mu_muid_px;
-	mu_muid_py       = m_phys->mu_muid_py;
-	mu_muid_pz       = m_phys->mu_muid_pz;
-	mu_muid_E        = m_phys->mu_muid_E;
-	mu_muid_m        = m_phys->mu_muid_m;
-	mu_muid_charge   = m_phys->mu_muid_charge;
-	mu_muid_pt       = m_phys->mu_muid_pt;
-	mu_muid_ptcone20 = m_phys->mu_muid_ptcone20;
-	mu_muid_ptcone30 = m_phys->mu_muid_ptcone30;
-	mu_muid_ptcone40 = m_phys->mu_muid_ptcone40;
-	mu_muid_eta      = m_phys->mu_muid_eta;
-	mu_muid_phi      = m_phys->mu_muid_phi;
-	mu_muid_d0_exPV  = m_phys->mu_muid_d0_exPV;
-	mu_muid_z0_exPV  = m_phys->mu_muid_z0_exPV;
-	mu_muid_allauthor= m_phys->mu_muid_allauthor;
-	mu_muid_author   = m_phys->mu_muid_author;
-	mu_muid_matchchi2 = m_phys->mu_muid_matchchi2;
-	mu_muid_matchndof = m_phys->mu_muid_matchndof;
-	mu_muid_me_qoverp = m_phys->mu_muid_me_qoverp;
-	mu_muid_id_qoverp = m_phys->mu_muid_id_qoverp;
-	mu_muid_me_theta = m_phys->mu_muid_me_theta;
-	mu_muid_id_theta = m_phys->mu_muid_id_theta;
-	mu_muid_isCombinedMuon = m_phys->mu_muid_isCombinedMuon;
-	mu_muid_nSCTHits = m_phys->mu_muid_nSCTHits;
-	mu_muid_nPixHits = m_phys->mu_muid_nPixHits;
-	
-	// vertex
-	vxp_n       = m_phys->vxp_n;
-	vxp_nTracks = m_phys->vxp_nTracks;
-	vxp_type    = m_phys->vxp_type;
-	vxp_z       = m_phys->vxp_z;
-	vxp_z_err   = m_phys->vxp_err_z;
+	if(m_mcPhys==NULL  &&  m_phys!=NULL)
+	{
+		// fill run branches
+		RunNumber   = m_phys->RunNumber;
+		lbn         = m_phys->lbn;
+		EventNumber = m_phys->EventNumber;
+		
+		// preselection
+		isGRL   = isGrl;
+		L1_MU6  = m_phys->L1_MU6;
+		EF_mu10 = m_phys->EF_mu10;
+		EF_mu13 = m_phys->EF_mu13;
+		EF_mu15 = m_phys->EF_mu15;
+		EF_mu20 = m_phys->EF_mu20;
+		EF_mu4  = m_phys->EF_mu4;
+		EF_mu6  = m_phys->EF_mu6;
+		
+		// staco
+		mu_staco_n        = m_phys->mu_staco_n;
+		mu_staco_px       = m_phys->mu_staco_px;
+		mu_staco_py       = m_phys->mu_staco_py;
+		mu_staco_pz       = m_phys->mu_staco_pz;
+		mu_staco_E        = m_phys->mu_staco_E;
+		mu_staco_m        = m_phys->mu_staco_m;
+		mu_staco_charge   = m_phys->mu_staco_charge;
+		mu_staco_pt       = m_phys->mu_staco_pt;
+		mu_staco_ptcone20 = m_phys->mu_staco_ptcone20;
+		mu_staco_ptcone30 = m_phys->mu_staco_ptcone30;
+		mu_staco_ptcone40 = m_phys->mu_staco_ptcone40;
+		mu_staco_eta      = m_phys->mu_staco_eta;
+		mu_staco_phi      = m_phys->mu_staco_phi;
+		mu_staco_d0_exPV  = m_phys->mu_staco_d0_exPV;
+		mu_staco_z0_exPV  = m_phys->mu_staco_z0_exPV;
+		mu_staco_allauthor= m_phys->mu_staco_allauthor;
+		mu_staco_author   = m_phys->mu_staco_author;
+		mu_staco_matchchi2   = m_phys->mu_staco_matchchi2;
+		mu_staco_matchndof   = m_phys->mu_staco_matchndof;
+		mu_staco_me_qoverp= m_phys->mu_staco_me_qoverp;
+		mu_staco_id_qoverp= m_phys->mu_staco_id_qoverp;
+		mu_staco_me_theta = m_phys->mu_staco_me_theta;
+		mu_staco_id_theta = m_phys->mu_staco_id_theta;
+		mu_staco_isCombinedMuon = m_phys->mu_staco_isCombinedMuon;
+		mu_staco_nSCTHits = m_phys->mu_staco_nSCTHits;
+		mu_staco_nPixHits = m_phys->mu_staco_nPixHits;
+		
+		// muid
+		mu_muid_n        = m_phys->mu_muid_n;
+		mu_muid_px       = m_phys->mu_muid_px;
+		mu_muid_py       = m_phys->mu_muid_py;
+		mu_muid_pz       = m_phys->mu_muid_pz;
+		mu_muid_E        = m_phys->mu_muid_E;
+		mu_muid_m        = m_phys->mu_muid_m;
+		mu_muid_charge   = m_phys->mu_muid_charge;
+		mu_muid_pt       = m_phys->mu_muid_pt;
+		mu_muid_ptcone20 = m_phys->mu_muid_ptcone20;
+		mu_muid_ptcone30 = m_phys->mu_muid_ptcone30;
+		mu_muid_ptcone40 = m_phys->mu_muid_ptcone40;
+		mu_muid_eta      = m_phys->mu_muid_eta;
+		mu_muid_phi      = m_phys->mu_muid_phi;
+		mu_muid_d0_exPV  = m_phys->mu_muid_d0_exPV;
+		mu_muid_z0_exPV  = m_phys->mu_muid_z0_exPV;
+		mu_muid_allauthor= m_phys->mu_muid_allauthor;
+		mu_muid_author   = m_phys->mu_muid_author;
+		mu_muid_matchchi2 = m_phys->mu_muid_matchchi2;
+		mu_muid_matchndof = m_phys->mu_muid_matchndof;
+		mu_muid_me_qoverp = m_phys->mu_muid_me_qoverp;
+		mu_muid_id_qoverp = m_phys->mu_muid_id_qoverp;
+		mu_muid_me_theta = m_phys->mu_muid_me_theta;
+		mu_muid_id_theta = m_phys->mu_muid_id_theta;
+		mu_muid_isCombinedMuon = m_phys->mu_muid_isCombinedMuon;
+		mu_muid_nSCTHits = m_phys->mu_muid_nSCTHits;
+		mu_muid_nPixHits = m_phys->mu_muid_nPixHits;
+		
+		// vertex
+		vxp_n       = m_phys->vxp_n;
+		vxp_nTracks = m_phys->vxp_nTracks;
+		vxp_type    = m_phys->vxp_type;
+		vxp_z       = m_phys->vxp_z;
+		vxp_z_err   = m_phys->vxp_err_z;
+	}
+	else
+	{
+		// fill run branches
+		RunNumber   = m_mcPhys->RunNumber;
+		lbn         = m_mcPhys->lbn;
+		EventNumber = m_mcPhys->EventNumber;
+		
+		// preselection
+		isGRL   = isGrl;
+		L1_MU6  = m_mcPhys->L1_MU6;
+		EF_mu10 = m_mcPhys->EF_mu10;
+		EF_mu13 = m_mcPhys->EF_mu13;
+		EF_mu15 = m_mcPhys->EF_mu15;
+		EF_mu20 = m_mcPhys->EF_mu20;
+		EF_mu4  = m_mcPhys->EF_mu4;
+		EF_mu6  = m_mcPhys->EF_mu6;
+		
+		// staco
+		mu_staco_n        = m_mcPhys->mu_staco_n;
+		mu_staco_px       = m_mcPhys->mu_staco_px;
+		mu_staco_py       = m_mcPhys->mu_staco_py;
+		mu_staco_pz       = m_mcPhys->mu_staco_pz;
+		mu_staco_E        = m_mcPhys->mu_staco_E;
+		mu_staco_m        = m_mcPhys->mu_staco_m;
+		mu_staco_charge   = m_mcPhys->mu_staco_charge;
+		mu_staco_pt       = m_mcPhys->mu_staco_pt;
+		mu_staco_ptcone20 = m_mcPhys->mu_staco_ptcone20;
+		mu_staco_ptcone30 = m_mcPhys->mu_staco_ptcone30;
+		mu_staco_ptcone40 = m_mcPhys->mu_staco_ptcone40;
+		mu_staco_eta      = m_mcPhys->mu_staco_eta;
+		mu_staco_phi      = m_mcPhys->mu_staco_phi;
+		mu_staco_d0_exPV  = m_mcPhys->mu_staco_d0_exPV;
+		mu_staco_z0_exPV  = m_mcPhys->mu_staco_z0_exPV;
+		mu_staco_allauthor= m_mcPhys->mu_staco_allauthor;
+		mu_staco_author   = m_mcPhys->mu_staco_author;
+		mu_staco_matchchi2   = m_mcPhys->mu_staco_matchchi2;
+		mu_staco_matchndof   = m_mcPhys->mu_staco_matchndof;
+		mu_staco_me_qoverp= m_mcPhys->mu_staco_me_qoverp;
+		mu_staco_id_qoverp= m_mcPhys->mu_staco_id_qoverp;
+		mu_staco_me_theta = m_mcPhys->mu_staco_me_theta;
+		mu_staco_id_theta = m_mcPhys->mu_staco_id_theta;
+		mu_staco_isCombinedMuon = m_mcPhys->mu_staco_isCombinedMuon;
+		mu_staco_nSCTHits = m_mcPhys->mu_staco_nSCTHits;
+		mu_staco_nPixHits = m_mcPhys->mu_staco_nPixHits;
+		
+		// muid
+		mu_muid_n        = m_mcPhys->mu_muid_n;
+		mu_muid_px       = m_mcPhys->mu_muid_px;
+		mu_muid_py       = m_mcPhys->mu_muid_py;
+		mu_muid_pz       = m_mcPhys->mu_muid_pz;
+		mu_muid_E        = m_mcPhys->mu_muid_E;
+		mu_muid_m        = m_mcPhys->mu_muid_m;
+		mu_muid_charge   = m_mcPhys->mu_muid_charge;
+		mu_muid_pt       = m_mcPhys->mu_muid_pt;
+		mu_muid_ptcone20 = m_mcPhys->mu_muid_ptcone20;
+		mu_muid_ptcone30 = m_mcPhys->mu_muid_ptcone30;
+		mu_muid_ptcone40 = m_mcPhys->mu_muid_ptcone40;
+		mu_muid_eta      = m_mcPhys->mu_muid_eta;
+		mu_muid_phi      = m_mcPhys->mu_muid_phi;
+		mu_muid_d0_exPV  = m_mcPhys->mu_muid_d0_exPV;
+		mu_muid_z0_exPV  = m_mcPhys->mu_muid_z0_exPV;
+		mu_muid_allauthor= m_mcPhys->mu_muid_allauthor;
+		mu_muid_author   = m_mcPhys->mu_muid_author;
+		mu_muid_matchchi2 = m_mcPhys->mu_muid_matchchi2;
+		mu_muid_matchndof = m_mcPhys->mu_muid_matchndof;
+		mu_muid_me_qoverp = m_mcPhys->mu_muid_me_qoverp;
+		mu_muid_id_qoverp = m_mcPhys->mu_muid_id_qoverp;
+		mu_muid_me_theta = m_mcPhys->mu_muid_me_theta;
+		mu_muid_id_theta = m_mcPhys->mu_muid_id_theta;
+		mu_muid_isCombinedMuon = m_mcPhys->mu_muid_isCombinedMuon;
+		mu_muid_nSCTHits = m_mcPhys->mu_muid_nSCTHits;
+		mu_muid_nPixHits = m_mcPhys->mu_muid_nPixHits;
+		
+		// vertex
+		vxp_n       = m_mcPhys->vxp_n;
+		vxp_nTracks = m_mcPhys->vxp_nTracks;
+		vxp_type    = m_mcPhys->vxp_type;
+		vxp_z       = m_mcPhys->vxp_z;
+		vxp_z_err   = m_mcPhys->vxp_err_z;
+	}
 	
 	
 	///////////////////////////////

@@ -1,8 +1,19 @@
 #!/bin/bash/
 
+# mc or data ?
+mcordata=$1
+controller=""
+if [ "$mcordata" = "mc" ] ; then
+   controller=mcAnalysisGridControlRun.C
+elif [ "$mcordata" = "data" ] ; then
+   controller=analysisGridControlRun.C
+else
+   exit
+fi
+
 # the data set
 #datasetfiles=/tmp/hod/group10.phys-sm.data10_7TeV.00159224.physics_MuonswBeam.recon.ESD.x30.WZphys.100612.02.D3PD.D3PD._01067.root
-datasetfiles=$1
+datasetfiles=$2
 
 
 # the GRL version
@@ -40,4 +51,4 @@ chmod 777 Z_GRL_152844-159224.xml
 
 
 # submit the local run
-echo $datasetfiles > input.txt;  root.exe analysisGridControlRun.C;
+echo $datasetfiles > input.txt;  root.exe $controller;

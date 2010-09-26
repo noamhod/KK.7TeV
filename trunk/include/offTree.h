@@ -15,6 +15,7 @@ class offTree : public utilities
 	public:
 		// pointers
 		physics* m_phys;
+		mcPhysics* m_mcPhys;
 		TFile*   m_treeFile;
 		TTree*   m_tree;
 		
@@ -102,9 +103,10 @@ class offTree : public utilities
 	
 	public:
 		offTree();
-		offTree(physics* phys, TFile* treeFile);
+		offTree(physics* phys, mcPhysics* mcPhys, TFile* treeFile);
 		~offTree();
 		
+		TTree* getTree();
 		void setBranches();
 		void fill();
 		void fill(int isGrl);

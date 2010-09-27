@@ -1,10 +1,26 @@
 #TYPE#			#ORDER#			#NAME#					#NVALUES#		#VALUE(S) [1]		[2]		[3]#
 
-# preselection (basic):
+################
+# preselection #
+################
 preselection	0				GRL						1						   1.
 preselection	1				L1_MU6					1						   1.
 preselection	2				hipTmuon				2						   15000.	 10000.
 preselection	3				PV						3						   1.		 1.		 150.
+
+
+
+#############
+# selection #
+#############
+#-------------------------------------------------------#
+# THE 1st SELECTION CUT ***MUST*** BE "OPPOSITE CHARGE" #
+# in the looper, after the preselection part ends and   #
+# before the selection part begins, there is this line: #
+# if(m_phys->mu_staco_n<2) return;                      #
+# so the sequential oppositeCharge cut is redundant but #
+# necessary for the counting procedure                  #
+#-------------------------------------------------------#
 
 # dimuon - ensure a c1*c2<0 candidate with appropriate imass and not cosmic:
 selection		4				oppositeCharcge			1						   0.

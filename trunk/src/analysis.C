@@ -40,6 +40,7 @@ analysis::analysis(physics* phys, graphicObjects* graphicobjs, cutFlowHandler* c
 	initSelectionCuts(m_cutFlowMapSVD, m_cutFlowOrdered, m_cutFlowTypeOrdered);
 
 	m_graphicobjs = graphicobjs;
+	
 }
 
 analysis::~analysis()
@@ -49,12 +50,12 @@ analysis::~analysis()
 
 void analysis::initialize()
 {
-
+	//ofile.open("GRL.txt");
 }
 
 void analysis::finalize()
 {
-
+	//ofile.close();
 }
 
 /*
@@ -222,6 +223,13 @@ void analysis::executeCutFlow()
 	///////////////////////////////////////////////////////////////////////////////////////
 	// Good Run List //////////////////////////////////////////////////////////////////////
 	isGRL = m_analysis_grl->m_grl.HasRunLumiBlock( m_phys->RunNumber, m_phys->lbn ); //////
+	/*
+	if(!isGRL)
+	{
+		cout  << "RUN=" << m_phys->RunNumber << "\tLBN=" << m_phys->lbn << endl;
+		ofile << "RUN=" << m_phys->RunNumber << "\tLBN=" << m_phys->lbn << endl;
+	}
+	*/
 	///////////////////////////////////////////////////////////////////////////////////////
 	
 	if(debugmode) cout << "### 2 ###" << endl;
@@ -242,10 +250,6 @@ void analysis::executeCutFlow()
 	int cutFlowMapSize = (int)m_cutFlowOrdered->size();
 	int counter = 0;
 
-	////////////////////////////////////////
-	// need at least 2 muons.../////////////
-	if(m_phys->mu_staco_n<2) return; ////
-	////////////////////////////////////////
 
 	if(debugmode) cout << "### 4 ###" << endl;
 	
@@ -271,18 +275,6 @@ void analysis::executeCutFlow()
 	if(debugmode) cout << "### 6 ###" << endl;
 	
 	
-	
-	
-	
-	
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	
-	////////////////////////////////////////////////////////////////////
-	// basic preselection //////////////////////////////////////////////
-	//if( !preselection(m_phys, pmu, muPairMap, isGRL) ) return; /////////
-	// will return if pmu<=1 (and muPairMap<=1) ////////////////////////
-	////////////////////////////////////////////////////////////////////
-	
 	// preselection
 	passCutFlow    = true;
 	passCurrentCut = true;
@@ -291,11 +283,11 @@ void analysis::executeCutFlow()
 	{
 		counter++;
 		
-		double num = ii->first;
-		///////////////////////////////////////////////////////////////
-		// ignore selection: //////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////
+		// ignore selection: //////////////////////////////////////////////////////
+		double num = ii->first; ///////////////////////////////////////////////////
 		if(m_cutFlowTypeOrdered->operator[](num)=="selection") continue; //////////
-		///////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////
 		
 		string sorderedcutname = ii->second;
 
@@ -338,11 +330,19 @@ void analysis::executeCutFlow()
 	if(!passCutFlow) return; /////////////////////////////////
 	//////////////////////////////////////////////////////////
 	
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	
 	
-	
-	
+	////////////////////////////////////////
+	// need at least 2 muons.../////////////
+	// otherwise, continue /////////////////
+	// the next cut which identifies as ////
+	// the 1st selection cut, MUST be the //
+	// opposite charge cut, otherwise the //
+	// entire counting procedure will get //
+	// screwed up. This is determined in  //
+	// the cutFlow.cuts file ///////////////
+	if(m_phys->mu_staco_n<2) return; ///////
+	////////////////////////////////////////
 	
 	
 	

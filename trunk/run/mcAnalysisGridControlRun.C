@@ -100,7 +100,7 @@ void mcAnalysisGridControlRun()
 	}
 
 	
-	TString fileName ="mcWZmcPhys.root";
+	TString fileName ="mcWZPhys.root";
 	fout = new TFile(fileName, "RECREATE");
 	
 	// some includings and loadings

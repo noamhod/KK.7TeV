@@ -84,11 +84,6 @@ void mcAnalysis::executeCutFlow()
 	int cutFlowMapSize = (int)m_cutFlowOrdered->size();
 	int counter = 0;
 
-	////////////////////////////////////////
-	// need at least 2 muons.../////////////
-	if(m_mcPhys->mu_staco_n<2) return; ///////
-	////////////////////////////////////////
-
 	if(debugmode) cout << "### 4 ###" << endl;
 	
 	//////////////////////////////////////////////////////////////////
@@ -167,6 +162,20 @@ void mcAnalysis::executeCutFlow()
 	// do not continue if didn't pass the preselection ///////
 	if(!passCutFlow) return; /////////////////////////////////
 	//////////////////////////////////////////////////////////
+	
+	
+	
+	////////////////////////////////////////
+	// need at least 2 muons.../////////////
+	// otherwise, continue /////////////////
+	// the next cut which identifies as ////
+	// the 1st selection cut, MUST be the //
+	// opposite charge cut, otherwise the //
+	// entire counting procedure will get //
+	// screwed up. This is determined in  //
+	// the cutFlow.cuts file ///////////////
+	if(m_mcPhys->mu_staco_n<2) return; /////
+	////////////////////////////////////////
 	
 	
 	

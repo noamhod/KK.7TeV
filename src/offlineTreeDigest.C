@@ -221,8 +221,8 @@ void offlineTreeDigest::fill(int a, int b, int v)
 	mu_staco_ptcone40->push_back( m_offPhys->mu_staco_ptcone40->at(b) );
 	mu_staco_eta->push_back( m_offPhys->mu_staco_eta->at(a) );
 	mu_staco_eta->push_back( m_offPhys->mu_staco_eta->at(b) );
-	mu_staco_phi->push_back( m_offPhys->mu_staco_phi->at(a) );
-	mu_staco_phi->push_back( m_offPhys->mu_staco_phi->at(b) );
+	//mu_staco_phi->push_back( m_offPhys->mu_staco_phi->at(a) );
+	//mu_staco_phi->push_back( m_offPhys->mu_staco_phi->at(b) );
 	mu_staco_d0_exPV->push_back( m_offPhys->mu_staco_d0_exPV->at(a) );
 	mu_staco_d0_exPV->push_back( m_offPhys->mu_staco_d0_exPV->at(b) );
 	mu_staco_z0_exPV->push_back( m_offPhys->mu_staco_z0_exPV->at(a) );
@@ -245,10 +245,10 @@ void offlineTreeDigest::fill(int a, int b, int v)
 	mu_staco_allauthor->push_back( m_offPhys->mu_staco_allauthor->at(b) );
 	mu_staco_author->push_back( m_offPhys->mu_staco_author->at(a) );
 	mu_staco_author->push_back( m_offPhys->mu_staco_author->at(b) );
-	mu_staco_matchchi2->push_back( m_offPhys->mu_staco_matchchi2->at(a) );
-	mu_staco_matchchi2->push_back( m_offPhys->mu_staco_matchchi2->at(b) );
-	mu_staco_matchndof->push_back( m_offPhys->mu_staco_matchndof->at(a) );
-	mu_staco_matchndof->push_back( m_offPhys->mu_staco_matchndof->at(b) );
+	//mu_staco_matchchi2->push_back( m_offPhys->mu_staco_matchchi2->at(a) );
+	//mu_staco_matchchi2->push_back( m_offPhys->mu_staco_matchchi2->at(b) );
+	//mu_staco_matchndof->push_back( m_offPhys->mu_staco_matchndof->at(a) );
+	//mu_staco_matchndof->push_back( m_offPhys->mu_staco_matchndof->at(b) );
 	
 	
 	// muid

@@ -148,6 +148,11 @@ void offlineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		// if(m_offPhys->RunNumber == 160387) break; ////
 		/////////////////////////////////////////////////
 		
+		/////////////////////////////////////////////////
+		// to skip runs 152166-152777: //////////////////
+		if(m_offPhys->RunNumber < 152844) continue; /////
+		/////////////////////////////////////////////////
+		
 		analyze();
 	}
 	

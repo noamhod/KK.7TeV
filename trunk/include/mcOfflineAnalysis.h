@@ -19,14 +19,28 @@
 #define cutFlowHandler_cxx
 #include "cutFlowHandler.C"
 
-#ifndef DIGESTANALYSIS_H
-#define DIGESTANALYSIS_H
+//#define muon_staco_cxx
+//#include "muon_staco.C"
+//#define muon_muid_cxx
+//#include "muon_muid.C"
 
-class digestAnalysis : public digestPhysics, public selection, public graphicObjects
+//#define offlineTree_cxx
+//#include "offlineTree.C"
+
+//#define offTree_cxx
+//#include "offTree.C"
+
+#define mcOfflineTreeDigest_cxx
+#include "mcOfflineTreeDigest.C"
+
+#ifndef MCOFFLINEANALYSIS_H
+#define MCOFFLINEANALYSIS_H
+
+class mcOfflineAnalysis : public mcOfflinePhysics, public selection, public graphicObjects
 {
 public:
 	// pointers to classes
-	digestPhysics*        m_digestPhys;
+	mcOfflinePhysics* m_mcOffPhys;
 
 	graphicObjects* m_graphicobjs;
 
@@ -36,7 +50,12 @@ public:
 	TF1* m_fFitted;
 	TF1* m_fGuess;
 	
+	//muon_muid*      m_muid;
+	//muon_staco*     m_mustaco;
+
+	//offTree*        m_offTree;
 	TFile*		       m_treeFile;
+	mcOfflineTreeDigest* m_mcOfffTreeDigest;
 
 	// variables
 	TMapsvd* m_cutFlowMapSVD;
@@ -44,6 +63,7 @@ public:
 	TMapds*  m_cutFlowTypeOrdered;
 	TMapsi*  m_cutFlowNumbers;
 	
+
 	Bool_t b_isGRL;
 
 	string m_sLastCut2Hist;
@@ -122,9 +142,9 @@ public:
 	////////////////////////
 
 public:
-	digestAnalysis();
-	digestAnalysis(digestPhysics* offPhys, graphicObjects* m_graphicobjs, cutFlowHandler* cutFlowHandler, TFile* treeFile, string sLastCut2Hist = "GRL");
-	~digestAnalysis();
+	mcOfflineAnalysis();
+	mcOfflineAnalysis(mcOfflinePhysics* mcOffPhys, graphicObjects* m_graphicobjs, cutFlowHandler* cutFlowHandler, TFile* treeFile, string sLastCut2Hist = "GRL");
+	~mcOfflineAnalysis();
 
 	void initialize();
 	void finalize();

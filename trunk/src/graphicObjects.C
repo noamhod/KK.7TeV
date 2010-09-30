@@ -83,17 +83,30 @@ void graphicObjects::ginitialize()
 	leg_y2 = 0.922;
 
 	imass_nbins = 100;
-	imass_min   = 0.*d_toGeV;
-	imass_max   = 2000.*d_toGeV;
+	imass_min   = 10.*d_toGeV;
+	imass_max   = 2010.*d_toGeV;
 	
 	imass_fit_nbins = 40;
 	imass_fit_min   = 0.*d_toGeV;
 	imass_fit_max   = 200.*d_toGeV;
 	
-	pT_nbins    = 50;
-	pT_min      = 0.*d_toGeV;
-	pT_max      = 1000.*d_toGeV;
+	pT_nbins    = 100;
+	pT_min      = 5.*d_toGeV;
+	pT_max      = 1005.*d_toGeV;
 
+	// logarithmic boundries and bins of histograms
+	logMmin = log10(imass_min);
+	logMmax = log10(imass_max);
+	M_binwidth = (Double_t)( (logMmax-logMmin)/(Double_t)imass_nbins );
+	M_bins[0] = imass_min;
+	for (Int_t i=1 ; i<=imass_nbins ; i++) { M_bins[i] = TMath::Power( 10,(logMmin + i*M_binwidth) ); }
+	
+	logpTmin = log10(pT_min);
+	logpTmax = log10(pT_max);
+	pT_binwidth = (Double_t)( (logpTmax-logpTmin)/(Double_t)pT_nbins );
+	pT_bins[0] = pT_min;
+	for (Int_t i=1 ; i<=pT_nbins ; i++) { pT_bins[i] = TMath::Power( 10,(logpTmin + i*pT_binwidth) ); }
+	
 	eta_nbins   = 24;
 	eta_min     = -3.;
 	eta_max     = 3.;
@@ -155,11 +168,14 @@ void graphicObjects::bookHistos(TDirectory* tdir)
 {
 	if(tdir!=NULL) tdir->cd();
 
-	h1_imass = new TH1D("imass","imass", imass_nbins, imass_min, imass_max);
+	h1_imass = new TH1D("imass","imass", imass_nbins, M_bins);
+	//h1_imass = new TH1D("imass","imass", imass_nbins, imass_min, imass_max);
 	h1_ipTdiff = new TH1D("ipTdiff","ipTdiff", ipTdiff_nbins, ipTdiff_min, ipTdiff_max);
 	h1_etaSum = new TH1D("etaSum","etaSum", etaSum_nbins, etaSum_min, etaSum_max);
-	h1_pT = new TH1D("pT","pT", pT_nbins, pT_min, pT_max);
-	h1_pT_muplus = new TH1D("pT #mu^{+}","pT #mu^{+}", pT_nbins, pT_min, pT_max);
+	h1_pT = new TH1D("pT","pT", pT_nbins, pT_bins);
+	//h1_pT = new TH1D("pT","pT", pT_nbins, pT_min, pT_max);
+	h1_pT_muplus = new TH1D("pT #mu^{+}","pT #mu^{+}", pT_nbins, pT_bins);
+	//h1_pT_muplus = new TH1D("pT #mu^{+}","pT #mu^{+}", pT_nbins, pT_min, pT_max);
 	h1_eta = new TH1D("eta","eta", eta_nbins, eta_min, eta_max);
 	h1_eta_muplus = new TH1D("eta #mu^{+}","eta #mu^{+}", eta_nbins, eta_min, eta_max);
 	h1_costh = new TH1D("costh","costh", costh_nbins, costh_min, costh_max);
@@ -312,12 +328,14 @@ void graphicObjects::bookHistosMap(TMapds* cutFlowOrdered, TMapds* cutFlowTypeOr
 
 		// invariant mass cut flow histos
 		sname = "imass." + it->second;
-		hmap_cutFlow_imass->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), imass_nbins, imass_min, imass_max) ) );
+		//hmap_cutFlow_imass->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), imass_nbins, imass_min, imass_max) ) );
+		hmap_cutFlow_imass->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), imass_nbins, M_bins) ) );
 		cout << "(" << snumber << ") booked " << sname << endl;
 
 		// pT cut flow histos
 		sname = "pT." + it->second;
-		hmap_cutFlow_pT->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), pT_nbins, pT_min, pT_max) ) );
+		//hmap_cutFlow_pT->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), pT_nbins, pT_min, pT_max) ) );
+		hmap_cutFlow_pT->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), pT_nbins, pT_bins) ) );
 		cout << "(" << snumber << ") booked " << sname << endl;
 	}
 }

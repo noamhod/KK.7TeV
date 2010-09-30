@@ -61,9 +61,9 @@ chmod 777 Z_GRL_152844-159224.xml
 
 # submit the panda run with a single dataset using --writeInputToTxt
 if [ "$mcordata" = "mc" ] ; then
-   prun --exec "root.exe -b -q mcAnalysisGridControlRun.C;" --writeInputToTxt IN:input.txt  --athenaTag=15.6.9 --outDS user.hod.mcWZphys.$runnumber.$dateandhour  --outputs mcWZphys.root --inDS $datasetname  --extFile mcAnalysisGridControl_C.so, Loader_C.so, ../GoodRunsLists-00-00-84/StandAlone/libGoodRunsLists.so --workDir ../  --tmpDir /tmp/hod/prun_info  --nGBPerJob=2 
+   prun --exec "root.exe -b -q mcAnalysisGridControlRun.C;" --writeInputToTxt IN:input.txt  --athenaTag=15.6.9 --outDS user.hod.mcWZphys.$runnumber.$dateandhour  --outputs mcWZphys.root --inDS $datasetname  --extFile mcAnalysisGridControl_C.so, Loader_C.so, ../GoodRunsLists-00-00-84/StandAlone/libGoodRunsLists.so --workDir ../  --tmpDir /tmp/hod/prun_info
 elif [ "$mcordata" = "data" ] ; then
-   prun --exec "root.exe -b -q analysisGridControlRun.C;" --writeInputToTxt IN:input.txt  --athenaTag=15.6.9 --outDS user.hod.WZphys.$runnumber.$dateandhour  --outputs WZphys.root --inDS $datasetname  --extFile analysisGridControl_C.so, Loader_C.so, ../GoodRunsLists-00-00-84/StandAlone/libGoodRunsLists.so --workDir ../  --tmpDir /tmp/hod/prun_info  --nGBPerJob=2
+   prun --exec "root.exe -b -q analysisGridControlRun.C;" --writeInputToTxt IN:input.txt  --athenaTag=15.6.9 --outDS user.hod.WZphys.$runnumber.$dateandhour  --outputs WZphys.root --inDS $datasetname  --extFile analysisGridControl_C.so, Loader_C.so, ../GoodRunsLists-00-00-84/StandAlone/libGoodRunsLists.so --workDir ../  --tmpDir /tmp/hod/prun_info
 else
    exit
 fi

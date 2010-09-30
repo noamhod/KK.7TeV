@@ -28,6 +28,7 @@
 #include <TF1.h>
 #include <TAxis.h>
 #include <TLine.h>
+#include <TPaveText.h>
 
 #include <RooFit.h>
 #include <RooRealVar.h>
@@ -137,6 +138,9 @@ template class std::vector<std::vector<unsigned int> >;
 
 #define offlinePhysics_cxx
 #include "offlinePhysics.C"
+
+#define mcOfflinePhysics_cxx
+#include "mcOfflinePhysics.C"
 
 #define digestPhysics_cxx
 #include "digestPhysics.C"

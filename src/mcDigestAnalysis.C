@@ -62,6 +62,133 @@ void digestAnalysis::fitter()
 }
 
 
+/*
+void digestAnalysis::executeTree(bool isendofrun)
+{
+	if(isendofrun) cout << "--- !!! END OF RUN !!! ---" << endl;
+}
+*/
+
+void digestAnalysis::executeBasic()
+{
+	// local variables
+	TMapii      mupairMap;
+	TVectorP2VL pmu;
+
+	double im;
+	double pTa;
+	double pTb;
+	double etaa;
+	double etab;
+	double costh;
+	//double d0exPVa;
+	//double z0exPVa;
+	//double d0exPVb;
+	//double z0exPVb;
+	double cosmicCosth;
+
+	// build vector of the muons TLorentzVector
+	for(int n=0 ; n<(int)m_digestPhys->mu_staco_n ; n++)
+	{
+		pmu.push_back( new TLorentzVector() );
+		pmu[n]->SetPx( m_digestPhys->mu_staco_px->at(n) );
+		pmu[n]->SetPy( m_digestPhys->mu_staco_py->at(n) );
+		pmu[n]->SetPz( m_digestPhys->mu_staco_pz->at(n) );
+		pmu[n]->SetE( m_digestPhys->mu_staco_E->at(n) );
+	}
+
+	// build the map of the good muon pairs	
+	for(int n=0 ; n<(int)pmu.size() ; n++)
+	{
+		for(int m=0 ; m<(int)pmu.size() ; m++)
+		{
+			// dont pair with itself
+			if( m==n ) continue;
+
+			// remove overlaps
+			if( removeOverlaps(mupairMap, n, m) ) continue;
+
+			// now can insert dimuon into the index map (all the final selection criteria)
+			b_isGRL = m_digestPhys->isGRL;
+			if( b_isGRL == 1 ) // this is a cut and not overlap removal
+			{
+				if( m_digestPhys->L1_MU6 == 1 ) // this is also a cut and not overlap removal
+				{
+					buildMuonPairMap( mupairMap,
+					pmu[n], m_digestPhys->mu_staco_charge->at(n), m_digestPhys->mu_staco_d0_exPV->at(n), m_digestPhys->mu_staco_z0_exPV->at(n), n,
+					pmu[m], m_digestPhys->mu_staco_charge->at(m), m_digestPhys->mu_staco_d0_exPV->at(m), m_digestPhys->mu_staco_z0_exPV->at(m), m );
+				}
+			}
+
+			// check before cuts
+			if(m_digestPhys->mu_staco_charge->at(n) * m_digestPhys->mu_staco_charge->at(m)<0.)
+			{
+				cosmicCosth = cosThetaDimu( pmu[n], pmu[m] );
+				m_graphicobjs->h1_cosmicCosth->Fill( cosmicCosth );
+				
+				d0exPVa = m_digestPhys->mu_staco_d0_exPV->at(n);
+				d0exPVb = m_digestPhys->mu_staco_d0_exPV->at(m);
+				m_graphicobjs->h1_d0exPV->Fill(d0exPVa);
+				m_graphicobjs->h1_d0exPV->Fill(d0exPVb);
+
+				z0exPVa = m_digestPhys->mu_staco_z0_exPV->at(n);
+				z0exPVb = m_digestPhys->mu_staco_z0_exPV->at(m);
+				m_graphicobjs->h1_z0exPV->Fill(z0exPVa);
+				m_graphicobjs->h1_z0exPV->Fill(z0exPVb);
+			}
+		}
+	}
+
+	// get the pmuon pairs from the dimuon good pairs map
+	if(mupairMap.size()>0)
+	{
+		for(TMapii::iterator it=mupairMap.begin() ; it!=mupairMap.end() ; ++it)
+		{
+			int ai = it->first;
+			int bi = it->second;
+			
+			im = imass( pmu[ai], pmu[bi] );
+			pTa = pT( pmu[ai] );
+			pTb = pT( pmu[bi] );
+			etaa = eta( pmu[ai] );	
+			etab = eta( pmu[bi] );
+			costh = cosThetaCollinsSoper( 	pmu[ai], (double)m_digestPhys->mu_staco_charge->at(ai),
+			pmu[bi], (double)m_digestPhys->mu_staco_charge->at(bi) );
+			d0exPVa = m_digestPhys->mu_staco_d0_exPV->at(ai);
+			z0exPVa = m_digestPhys->mu_staco_z0_exPV->at(ai);
+			d0exPVb = m_digestPhys->mu_staco_d0_exPV->at(bi);
+			z0exPVb = m_digestPhys->mu_staco_z0_exPV->at(bi);
+			//cosmicCosth = cosThetaDimu( pmu[ai], pmu[bi] );
+
+			cout << "$$$$$$$$$ dimuon $$$$$$$$$" << endl;
+			cout << "\t im=" << im << endl;
+			cout << "\t pTa=" << pTa  << endl;
+			cout << "\t pTb=" << pTb  << endl;
+			cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << endl;
+
+			// fill the histos
+			if( m_digestPhys->mu_staco_charge->at(ai)<0. )
+			{
+				m_graphicobjs->h1_pT->Fill( pTa );
+				m_graphicobjs->h1_eta->Fill( etaa );
+			}
+			else
+			{
+				m_graphicobjs->h1_pT->Fill( pTb );
+				m_graphicobjs->h1_eta->Fill( etab );
+			}
+			
+			m_graphicobjs->h1_imass->Fill( im );
+			m_graphicobjs->h1_costh->Fill( costh );
+		}
+	}
+
+	// re-initialize
+	if(mupairMap.size()>0)    mupairMap.clear();
+	if(pmu.size()>0)          pmu.clear();
+}
+
+
 void digestAnalysis::executeAdvanced()
 {
 

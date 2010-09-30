@@ -5,26 +5,26 @@
 /* on 23/07/2010 11:24 */
 /* * * * * * * * * * * */
 
-#include "offlineAnalysis.h"
+#include "mcOfflineAnalysis.h"
 
-offlineAnalysis::offlineAnalysis()
+mcOfflineAnalysis::mcOfflineAnalysis()
 {
 	initialize();
 }
 
-offlineAnalysis::offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphicobjs, cutFlowHandler* cutFlowHandler, TFile* treeFile, string sLastCut2Hist)
+mcOfflineAnalysis::mcOfflineAnalysis(mcOfflinePhysics* mcOffPhys, graphicObjects* graphicobjs, cutFlowHandler* cutFlowHandler, TFile* treeFile, string sLastCut2Hist)
 {
 	initialize();
 
-	m_offPhys = offPhys;
+	m_mcOffPhys = mcOffPhys;
 
 	m_treeFile = treeFile;
 	
-	//m_offTree = new offTree( m_offPhys, m_treeFile );
-	m_offTreeDigest = new offlineTreeDigest( m_offPhys, m_treeFile );
+	//m_offTree = new offTree( m_mcOffPhys, m_treeFile );
+	//m_mcOfffTreeDigest = new mcOfflineTreeDigest( m_mcOffPhys, m_treeFile );
 
-	//m_muid    = new muon_muid(  m_offPhys ); // this will also "turn on" the desired branches (virtual in the base)
-	//m_mustaco = new muon_staco( m_offPhys ); // this will also  "turn on" the desired branches (virtual in the base)
+	//m_muid    = new muon_muid(  m_mcOffPhys ); // this will also "turn on" the desired branches (virtual in the base)
+	//m_mustaco = new muon_staco( m_mcOffPhys ); // this will also  "turn on" the desired branches (virtual in the base)
 	//m_dir_muon_staco = m_treeFile->mkdir("muon_staco");
 	//m_mustacotree = new muon_staco_tree( m_mustaco, m_dir_muon_staco );
 
@@ -41,27 +41,27 @@ offlineAnalysis::offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphi
 	
 	m_fit = new fit();
 	
-	m_offTreeDigest = new offlineTreeDigest( m_offPhys, m_treeFile );
+	m_mcOfffTreeDigest = new mcOfflineTreeDigest( m_mcOffPhys, m_treeFile );
 	
 	m_sLastCut2Hist = sLastCut2Hist;
 }
 
-offlineAnalysis::~offlineAnalysis()
+mcOfflineAnalysis::~mcOfflineAnalysis()
 {
 
 }
 
-void offlineAnalysis::initialize()
+void mcOfflineAnalysis::initialize()
 {
 
 }
 
-void offlineAnalysis::finalize()
+void mcOfflineAnalysis::finalize()
 {
 
 }
 
-void offlineAnalysis::fitter()
+void mcOfflineAnalysis::fitter()
 {
 	double yields[2];
 	
@@ -72,7 +72,7 @@ void offlineAnalysis::fitter()
 }
 
 
-void offlineAnalysis::executeAdvanced()
+void mcOfflineAnalysis::executeAdvanced()
 {
 
 /*
@@ -83,7 +83,7 @@ void offlineAnalysis::executeAdvanced()
 	}
 
 	// stupid example
-	if(m_offPhys->mu_staco_n>0)
+	if(m_mcOffPhys->mu_staco_n>0)
 	{
 		for(int n=0 ; n<(int)m_mustaco->getNParticles() ; n++)
 		{
@@ -94,7 +94,7 @@ void offlineAnalysis::executeAdvanced()
 */
 }
 
-void offlineAnalysis::executeCutFlow()
+void mcOfflineAnalysis::executeCutFlow()
 {
 	///////////////////////////////////////////
 	// do not skip this for correct counting //
@@ -114,13 +114,13 @@ void offlineAnalysis::executeCutFlow()
 	
 	//////////////////////////////////////////////////////////////////
 	// build vector of the muons TLorentzVector //////////////////////
-	for(int n=0 ; n<(int)m_offPhys->mu_staco_n ; n++)
+	for(int n=0 ; n<(int)m_mcOffPhys->mu_staco_n ; n++)
 	{
 		pmu.push_back( new TLorentzVector() );
-		pmu[n]->SetPx( m_offPhys->mu_staco_px->at(n) );
-		pmu[n]->SetPy( m_offPhys->mu_staco_py->at(n) );
-		pmu[n]->SetPz( m_offPhys->mu_staco_pz->at(n) );
-		pmu[n]->SetE(  m_offPhys->mu_staco_E->at(n)  );
+		pmu[n]->SetPx( m_mcOffPhys->mu_staco_px->at(n) );
+		pmu[n]->SetPy( m_mcOffPhys->mu_staco_py->at(n) );
+		pmu[n]->SetPz( m_mcOffPhys->mu_staco_pz->at(n) );
+		pmu[n]->SetE(  m_mcOffPhys->mu_staco_E->at(n)  );
 	}
 	///////////////////////////////////////////////////////////////////
 
@@ -148,12 +148,12 @@ void offlineAnalysis::executeCutFlow()
 
 		if(sorderedcutname=="GRL")
 		{
-			passCurrentCut = ( isGRLCut((*m_cutFlowMapSVD)[sorderedcutname][0], m_offPhys->isGRL) ) ? true : false;
+			passCurrentCut = ( isGRLCut((*m_cutFlowMapSVD)[sorderedcutname][0], m_mcOffPhys->isGRL) ) ? true : false;
 		}
 
 		if(sorderedcutname=="L1_MU6")
 		{
-			passCurrentCut = ( isL1_MU6Cut((*m_cutFlowMapSVD)[sorderedcutname][0], m_offPhys->L1_MU6) ) ? true : false;
+			passCurrentCut = ( isL1_MU6Cut((*m_cutFlowMapSVD)[sorderedcutname][0], m_mcOffPhys->L1_MU6) ) ? true : false;
 		}
 		
 		if(sorderedcutname=="hipTmuon")
@@ -161,10 +161,10 @@ void offlineAnalysis::executeCutFlow()
 			double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 			double cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
 			passCurrentCut = ( findHipTmuon(cutval1, cutval2,
-											(int)m_offPhys->mu_staco_n,
-											m_offPhys->mu_staco_pt,
-											m_offPhys->mu_staco_me_qoverp,
-											m_offPhys->mu_staco_me_theta) ) ? true : false;
+											(int)m_mcOffPhys->mu_staco_n,
+											m_mcOffPhys->mu_staco_pt,
+											m_mcOffPhys->mu_staco_me_qoverp,
+											m_mcOffPhys->mu_staco_me_theta) ) ? true : false;
 		}
 		
 		if(sorderedcutname=="PV")
@@ -173,10 +173,10 @@ void offlineAnalysis::executeCutFlow()
 			double cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
 			double cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
 			passCurrentCut = ( findBestVertex((int)cutval1, (int)cutval2, cutval3,
-											   (int)m_offPhys->vxp_n,
-											   m_offPhys->vxp_nTracks,
-											   m_offPhys->vxp_type,
-											   m_offPhys->vxp_z) ) ? true : false;
+											   (int)m_mcOffPhys->vxp_n,
+											   m_mcOffPhys->vxp_nTracks,
+											   m_mcOffPhys->vxp_type,
+											   m_mcOffPhys->vxp_z) ) ? true : false;
 		}
 		
 		passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
@@ -204,7 +204,7 @@ void offlineAnalysis::executeCutFlow()
 	// entire counting procedure will get //
 	// screwed up. This is determined in  //
 	// the cutFlow.cuts file ///////////////
-	if(m_offPhys->mu_staco_n<2) return; ////
+	if(m_mcOffPhys->mu_staco_n<2) return; //
 	////////////////////////////////////////
 	
 	
@@ -214,7 +214,7 @@ void offlineAnalysis::executeCutFlow()
 	double cutval1 = (*m_cutFlowMapSVD)["PV"][0]; ///////////////////////////////////////////////////////////////////////////////////
 	double cutval2 = (*m_cutFlowMapSVD)["PV"][1]; ///////////////////////////////////////////////////////////////////////////////////
 	double cutval3 = (*m_cutFlowMapSVD)["PV"][2]; ///////////////////////////////////////////////////////////////////////////////////
-	int iVtx = getPVindex( (int)cutval1, (int)cutval2, cutval3, (int)m_offPhys->vxp_n, m_offPhys->vxp_nTracks, m_offPhys->vxp_type, m_offPhys->vxp_z);
+	int iVtx = getPVindex( (int)cutval1, (int)cutval2, cutval3, (int)m_mcOffPhys->vxp_n, m_mcOffPhys->vxp_nTracks, m_mcOffPhys->vxp_type, m_mcOffPhys->vxp_z);
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	///////////////////////////////////////////////////////////////
@@ -223,7 +223,7 @@ void offlineAnalysis::executeCutFlow()
 	int ai, bi;
 	if(muPairMap.size()>1)
 	{
-		findMostMassivePair(m_offPhys->mu_staco_charge, pmu, muPairMap, ai, bi);
+		findMostMassivePair(m_mcOffPhys->mu_staco_charge, pmu, muPairMap, ai, bi);
 	}
 	if(muPairMap.size()==1)
 	{
@@ -237,75 +237,75 @@ void offlineAnalysis::executeCutFlow()
 
 	// calculate the necessary variables
 	current_imass    = imass(pmu[ai],pmu[bi]);
-	current_cosTheta = cosThetaCollinsSoper( pmu[ai], (double)m_offPhys->mu_staco_charge->at(ai),
-	pmu[bi], (double)m_offPhys->mu_staco_charge->at(bi) );
-	current_mu_pT     = (m_offPhys->mu_staco_charge->at(ai)<0) ? m_offPhys->mu_staco_pt->at(ai) : m_offPhys->mu_staco_pt->at(bi);
-	current_muplus_pT = (m_offPhys->mu_staco_charge->at(ai)>0) ? m_offPhys->mu_staco_pt->at(ai) : m_offPhys->mu_staco_pt->at(bi);
-	current_mu_eta     = (m_offPhys->mu_staco_charge->at(ai)<0) ? m_offPhys->mu_staco_eta->at(ai) : m_offPhys->mu_staco_eta->at(bi);
-	current_muplus_eta = (m_offPhys->mu_staco_charge->at(ai)>0) ? m_offPhys->mu_staco_eta->at(ai) : m_offPhys->mu_staco_eta->at(bi);
+	current_cosTheta = cosThetaCollinsSoper( pmu[ai], (double)m_mcOffPhys->mu_staco_charge->at(ai),
+	pmu[bi], (double)m_mcOffPhys->mu_staco_charge->at(bi) );
+	current_mu_pT     = (m_mcOffPhys->mu_staco_charge->at(ai)<0) ? m_mcOffPhys->mu_staco_pt->at(ai) : m_mcOffPhys->mu_staco_pt->at(bi);
+	current_muplus_pT = (m_mcOffPhys->mu_staco_charge->at(ai)>0) ? m_mcOffPhys->mu_staco_pt->at(ai) : m_mcOffPhys->mu_staco_pt->at(bi);
+	current_mu_eta     = (m_mcOffPhys->mu_staco_charge->at(ai)<0) ? m_mcOffPhys->mu_staco_eta->at(ai) : m_mcOffPhys->mu_staco_eta->at(bi);
+	current_muplus_eta = (m_mcOffPhys->mu_staco_charge->at(ai)>0) ? m_mcOffPhys->mu_staco_eta->at(ai) : m_mcOffPhys->mu_staco_eta->at(bi);
 	current_cosmicCosth = cosThetaDimu( pmu[ai], pmu[bi] );
 	current_ipTdiff = (current_muplus_pT!=0.  &&  current_mu_pT!=0.) ? 1./current_muplus_pT-1./current_mu_pT : -999.;
 	current_etaSum = current_muplus_eta + current_mu_eta;
 	
 	// event level
-	runnumber  = m_offPhys->RunNumber;
-	lumiblock  = m_offPhys->lbn;
-	isL1MU6    = m_offPhys->L1_MU6;
-	isEF_mu10  = m_offPhys->EF_mu10;
-	isGRL      = m_offPhys->isGRL;
+	runnumber  = m_mcOffPhys->RunNumber;
+	lumiblock  = m_mcOffPhys->lbn;
+	isL1MU6    = m_mcOffPhys->L1_MU6;
+	isEF_mu10  = m_mcOffPhys->EF_mu10;
+	isGRL      = m_mcOffPhys->isGRL;
 	
 	// deprecated !!!
-	d0exPVa = m_offPhys->mu_staco_d0_exPV->at(ai);
-	z0exPVa = m_offPhys->mu_staco_z0_exPV->at(ai);
-	d0exPVb = m_offPhys->mu_staco_d0_exPV->at(bi);
-	z0exPVb = m_offPhys->mu_staco_z0_exPV->at(bi);
+	d0exPVa = m_mcOffPhys->mu_staco_d0_exPV->at(ai);
+	z0exPVa = m_mcOffPhys->mu_staco_z0_exPV->at(ai);
+	d0exPVb = m_mcOffPhys->mu_staco_d0_exPV->at(bi);
+	z0exPVb = m_mcOffPhys->mu_staco_z0_exPV->at(bi);
 	
 	// primary vertex:
 	// at least one primary vtx passes the z selection
-	nPVtracksPtr = m_offPhys->vxp_nTracks; // number of tracks > 2
-	nPVtypePtr   = m_offPhys->vxp_type;    // ==1
-	PVz0Ptr      = m_offPhys->vxp_z;       // = absolute z position of primary vertex < 150mm
-	PVz0errPtr   = m_offPhys->vxp_z_err;   // = error
+	nPVtracksPtr = m_mcOffPhys->vxp_nTracks; // number of tracks > 2
+	nPVtypePtr   = m_mcOffPhys->vxp_type;    // ==1
+	PVz0Ptr      = m_mcOffPhys->vxp_z;       // = absolute z position of primary vertex < 150mm
+	PVz0errPtr   = m_mcOffPhys->vxp_z_err;   // = error
 	
 	// combined muon ?
-	isMuaComb  = m_offPhys->mu_staco_isCombinedMuon->at(ai);
-	isMubComb  = m_offPhys->mu_staco_isCombinedMuon->at(bi);	
+	isMuaComb  = m_mcOffPhys->mu_staco_isCombinedMuon->at(ai);
+	isMubComb  = m_mcOffPhys->mu_staco_isCombinedMuon->at(bi);	
 	
 	// inner detector hits
-	nSCThitsMua  = m_offPhys->mu_staco_nSCTHits->at(ai); //  SCT hits >=4
-	nSCThitsMub  = m_offPhys->mu_staco_nSCTHits->at(bi); //  SCT hits >=4
-	nPIXhitsMua  = m_offPhys->mu_staco_nPixHits->at(ai); // pixel hits >=1
-	nPIXhitsMub  = m_offPhys->mu_staco_nPixHits->at(bi); // pixel hits >=1
+	nSCThitsMua  = m_mcOffPhys->mu_staco_nSCTHits->at(ai); //  SCT hits >=4
+	nSCThitsMub  = m_mcOffPhys->mu_staco_nSCTHits->at(bi); //  SCT hits >=4
+	nPIXhitsMua  = m_mcOffPhys->mu_staco_nPixHits->at(ai); // pixel hits >=1
+	nPIXhitsMub  = m_mcOffPhys->mu_staco_nPixHits->at(bi); // pixel hits >=1
 	nIDhitsMua   = nSCThitsMua+nPIXhitsMua; // pixel+SCT hits >=5
 	nIDhitsMub   = nSCThitsMub+nPIXhitsMub; // pixel+SCT hits >=5
 	
 	// ID - MS pT matching: pT=|p|*sin(theta), qOp=charge/|p|
-	me_qOp_a   = m_offPhys->mu_staco_me_qoverp->at(ai);
-	id_qOp_a   = m_offPhys->mu_staco_id_qoverp->at(ai);
-	me_theta_a = m_offPhys->mu_staco_me_theta->at(ai);
-	id_theta_a = m_offPhys->mu_staco_id_theta->at(ai);
-	me_qOp_b   = m_offPhys->mu_staco_me_qoverp->at(bi);
-	id_qOp_b   = m_offPhys->mu_staco_id_qoverp->at(bi);
-	me_theta_b = m_offPhys->mu_staco_me_theta->at(bi);
-	id_theta_b = m_offPhys->mu_staco_id_theta->at(bi);
+	me_qOp_a   = m_mcOffPhys->mu_staco_me_qoverp->at(ai);
+	id_qOp_a   = m_mcOffPhys->mu_staco_id_qoverp->at(ai);
+	me_theta_a = m_mcOffPhys->mu_staco_me_theta->at(ai);
+	id_theta_a = m_mcOffPhys->mu_staco_id_theta->at(ai);
+	me_qOp_b   = m_mcOffPhys->mu_staco_me_qoverp->at(bi);
+	id_qOp_b   = m_mcOffPhys->mu_staco_id_qoverp->at(bi);
+	me_theta_b = m_mcOffPhys->mu_staco_me_theta->at(bi);
+	id_theta_b = m_mcOffPhys->mu_staco_id_theta->at(bi);
 	
 	// impact parameter
-	impPrmZ0 = m_offPhys->mu_staco_z0_exPV->at(ai);
-	impPrmD0 = m_offPhys->mu_staco_d0_exPV->at(ai);
+	impPrmZ0 = m_mcOffPhys->mu_staco_z0_exPV->at(ai);
+	impPrmD0 = m_mcOffPhys->mu_staco_d0_exPV->at(ai);
 	
 	// isolation
-	mu_pTa   = m_offPhys->mu_staco_pt->at(ai);
-	mu_pTb   = m_offPhys->mu_staco_pt->at(bi);
-	pTcone20a = m_offPhys->mu_staco_ptcone20->at(ai);
-	pTcone20b = m_offPhys->mu_staco_ptcone20->at(bi);
-	pTcone30a = m_offPhys->mu_staco_ptcone30->at(ai);
-	pTcone30b = m_offPhys->mu_staco_ptcone30->at(bi);
-	pTcone40a = m_offPhys->mu_staco_ptcone40->at(ai);
-	pTcone40b = m_offPhys->mu_staco_ptcone40->at(bi);
+	mu_pTa   = m_mcOffPhys->mu_staco_pt->at(ai);
+	mu_pTb   = m_mcOffPhys->mu_staco_pt->at(bi);
+	pTcone20a = m_mcOffPhys->mu_staco_ptcone20->at(ai);
+	pTcone20b = m_mcOffPhys->mu_staco_ptcone20->at(bi);
+	pTcone30a = m_mcOffPhys->mu_staco_ptcone30->at(ai);
+	pTcone30b = m_mcOffPhys->mu_staco_ptcone30->at(bi);
+	pTcone40a = m_mcOffPhys->mu_staco_ptcone40->at(ai);
+	pTcone40b = m_mcOffPhys->mu_staco_ptcone40->at(bi);
 	
 	// charge
-	mu_charge_a = m_offPhys->mu_staco_charge->at(ai);
-	mu_charge_b = m_offPhys->mu_staco_charge->at(bi);
+	mu_charge_a = m_mcOffPhys->mu_staco_charge->at(ai);
+	mu_charge_b = m_mcOffPhys->mu_staco_charge->at(bi);
 	
 	
 	
@@ -318,8 +318,8 @@ void offlineAnalysis::executeCutFlow()
 	//X( prtD0*cos(phi) );
 	//Y( prtD0*sin(phi) );
 	//Z( Z0 );
-	//m_graphicobjs->h2_xyVertex->Fill( d0exPVa*cos(m_offPhys->mu_staco_phi->at(ai)), d0exPVa*sin(m_offPhys->mu_staco_phi->at(ai)) );
-	//m_graphicobjs->h2_xyVertex->Fill( d0exPVb*cos(m_offPhys->mu_staco_phi->at(bi)), d0exPVb*sin(m_offPhys->mu_staco_phi->at(bi)) );
+	//m_graphicobjs->h2_xyVertex->Fill( d0exPVa*cos(m_mcOffPhys->mu_staco_phi->at(ai)), d0exPVa*sin(m_mcOffPhys->mu_staco_phi->at(ai)) );
+	//m_graphicobjs->h2_xyVertex->Fill( d0exPVb*cos(m_mcOffPhys->mu_staco_phi->at(bi)), d0exPVb*sin(m_mcOffPhys->mu_staco_phi->at(bi)) );
 	
 	
 	TMapsd values2fill;
@@ -485,15 +485,15 @@ void offlineAnalysis::executeCutFlow()
 	} // end for(m_cutFlowOrdered)
 	
 	// write to the digest tree only the pairs that passed the preselection
-	m_offTreeDigest->fill(ai, bi, iVtx);
+	m_mcOfffTreeDigest->fill(ai, bi, iVtx);
 
 	// re-initialize
 	if(muPairMap.size()>0) muPairMap.clear();
 	if(pmu.size()>0)       pmu.clear();
 }
 
-void offlineAnalysis::write()
+void mcOfflineAnalysis::write()
 {
 	m_treeFile->cd();
-	m_offTreeDigest->write();
+	m_mcOfffTreeDigest->write();
 }

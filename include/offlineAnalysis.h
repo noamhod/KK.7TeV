@@ -150,8 +150,7 @@ public:
 	void finalize();
 
 	void fitter();
-	
-	void executeBasic();
+
 	void executeAdvanced();
 	void executeCutFlow();
 	

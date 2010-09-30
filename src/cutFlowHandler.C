@@ -39,7 +39,7 @@ void cutFlowHandler::parseKeyValLine(string sLine)
 {
 	/* * * * * * * * * * EXAMPLE * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	#TYPE			##ORDER#			#NAME#					#NVALUES#		#VALUE(S)#
-	selection		0					oppositeCharcge			1				0.
+	selection		0					oppositeCharge			1				0.
 	selection		1					pT						1				20000.
 	selection		2					eta						1				2.4
 	selection		3					cosThetaDimu			1				-0.99

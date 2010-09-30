@@ -138,7 +138,11 @@ void mcAnalysis::executeCutFlow()
 		{
 			double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 			double cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
-			passCurrentCut = ( findHipTmuon(cutval1, cutval2, m_mcPhys) ) ? true : false;
+			passCurrentCut = ( findHipTmuon(cutval1, cutval2,
+											(int)m_mcPhys->mu_staco_n,
+											m_mcPhys->mu_staco_pt,
+											m_mcPhys->mu_staco_me_qoverp,
+											m_mcPhys->mu_staco_me_theta) ) ? true : false;
 		}
 		
 		if(sorderedcutname=="PV")
@@ -146,7 +150,11 @@ void mcAnalysis::executeCutFlow()
 			double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 			double cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
 			double cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
-			passCurrentCut = ( findBestVertex((int)cutval1, (int)cutval2, cutval3, m_mcPhys) ) ? true : false;
+			passCurrentCut = ( findBestVertex((int)cutval1, (int)cutval2, cutval3,
+											   (int)m_mcPhys->vxp_n,
+											   m_mcPhys->vxp_nTracks,
+											   m_mcPhys->vxp_type,
+											   m_mcPhys->vxp_z) ) ? true : false;
 		}
 		
 		passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
@@ -180,7 +188,11 @@ void mcAnalysis::executeCutFlow()
 	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	int iVtx = getPVindex( (int)(*m_cutFlowMapSVD)["PV"][0], (int)(*m_cutFlowMapSVD)["PV"][1], (*m_cutFlowMapSVD)["PV"][2],  m_mcPhys ); ////////
+	// get the index of the best PV /////////////////////////////////////////////////////////////////////////////////////////////////
+	double cutval1 = (*m_cutFlowMapSVD)["PV"][0]; ///////////////////////////////////////////////////////////////////////////////////
+	double cutval2 = (*m_cutFlowMapSVD)["PV"][1]; ///////////////////////////////////////////////////////////////////////////////////
+	double cutval3 = (*m_cutFlowMapSVD)["PV"][2]; ///////////////////////////////////////////////////////////////////////////////////
+	int iVtx = getPVindex( (int)cutval1, (int)cutval2, cutval3, (int)m_mcPhys->vxp_n, m_mcPhys->vxp_nTracks, m_mcPhys->vxp_type, m_mcPhys->vxp_z);
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	if(debugmode) cout << "### 7 ###" << endl;
@@ -191,7 +203,7 @@ void mcAnalysis::executeCutFlow()
 	int ai, bi;
 	if(muPairMap.size()>1)
 	{
-		findMostMassivePair(m_mcPhys, pmu, muPairMap, ai, bi);
+		findMostMassivePair(m_mcPhys->mu_staco_charge, pmu, muPairMap, ai, bi);
 	}
 	if(muPairMap.size()==1)
 	{
@@ -335,7 +347,7 @@ void mcAnalysis::executeCutFlow()
 	
 		string sorderedcutname = ii->second;
 
-		if(sorderedcutname=="oppositeCharcge")
+		if(sorderedcutname=="oppositeCharge")
 		{
 			passCurrentCut = ( oppositeChargeCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_charge_a, mu_charge_b) ) ? true : false;
 		}

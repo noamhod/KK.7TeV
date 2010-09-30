@@ -142,8 +142,6 @@ public:
 	void initialize();
 	void finalize();
 
-	//void executeTree(bool isendofrun);
-	void executeBasic();
 	void executeAdvanced();
 	void executeCutFlow();
 	

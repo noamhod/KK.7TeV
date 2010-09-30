@@ -33,41 +33,24 @@ public:
 
 	void initSelectionCuts(TMapsvd* cutFlowMapSVD, TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered); // called by analysis, offlineAnalysis and digestAnalysis
 	
-	void buildMuonPairMap(	TMapii& mupair,
-							double ca, int ia,
-							double cb, int ib);
-
-	void buildMuonPairMap(	TMapii& mupair,
-							TLorentzVector* pa, double ca, double d0a, double z0a, int ia,
-							TLorentzVector* pb, double cb, double d0b, double z0b, int ib );
-	
 	void buildMuonPairMap( TMapii& mupair, TVectorP2VL& pmu );
 
 	bool removeOverlaps(	TMapii& mupair, int ia, int ib );
 	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 	// * * * preselection simple methods * * *
-	
-	bool oppositeChargePair(offlinePhysics* offPhys, int a, int b);
-	bool oppositeChargePair(mcPhysics* mcPhys, int a, int b);
-	bool oppositeChargePair(physics* phys, int a, int b);
+	bool oppositeChargePair(vector<float>* vcharge, int a, int b);
 	
 	bool findMostMassivePair(TVectorP2VL& pmu, TMapii& allmupairMap);
-	void findMostMassivePair(offlinePhysics* offPhys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iBest_a, int&iBest_b);
-	void findMostMassivePair(mcPhysics* mcPhys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iBest_a, int&iBest_b);
-	void findMostMassivePair(physics* phys, TVectorP2VL& pmu, TMapii& allmupairMap, int& iBest_a, int&iBest_b);
+	void findMostMassivePair(vector<float>* vcharge, TVectorP2VL& pmu, TMapii& allmupairMap, int& iBest_a, int&iBest_b);
 	
-	int getPVindex(int nTracksCut, int nTypeCut, double z0Cut, physics* phys);
-	int getPVindex(int nTracksCut, int nTypeCut, double z0Cut, mcPhysics* mcPhys);
-	int getPVindex(int nTracksCut, int nTypeCut, double z0Cut, offlinePhysics* offPhys);
+	bool findBestVertex(int nTracksCut, int nTypeCut, double z0Cut, int nvxp,
+						vector<int>* v_vxp_nTracks, vector<int>* v_vxp_type, vector<float>* v_vxp_z);
+	int getPVindex(int nTracksCut, int nTypeCut, double z0Cut, int nvxp,
+				   vector<int>* v_vxp_nTracks, vector<int>* v_vxp_type, vector<float>* v_vxp_z);
 	
-	bool findBestVertex(int nTracksCut, int nTypeCut, double z0Cut, physics* phys);
-	bool findBestVertex(int nTracksCut, int nTypeCut, double z0Cut, mcPhysics* mcPhys);
-	bool findBestVertex(int nTracksCut, int nTypeCut, double z0Cut, offlinePhysics* offPhys);
-	
-	bool findHipTmuon(double hipTmuonCut, double MShipTmuonCut, physics* phys);
-	bool findHipTmuon(double hipTmuonCut, double MShipTmuonCut, mcPhysics* mcPhys);
-	bool findHipTmuon(double hipTmuonCut, double MShipTmuonCut, offlinePhysics* offPhys);
+	bool findHipTmuon(double hipTmuonCut, double MShipTmuonCut, int nmu,
+					  vector<float>* v_pT, vector<float>* v_qoverp, vector<float>* v_theta);
 	
 	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 

@@ -87,6 +87,17 @@ class graphicObjects : public utilities
 		Double_t pT_min;
 		Double_t pT_max;
 		
+		// logarithmic boundries and bins of histograms
+		Double_t logMmin ;
+		Double_t logMmax;
+		Double_t M_binwidth;
+		Double_t M_bins[100+1]; // M_bins[imass_nbins+1]; !!!!!!!!!!!!
+
+		Double_t logpTmin;
+		Double_t logpTmax;
+		Double_t pT_binwidth;
+		Double_t pT_bins[100+1]; //pT_bins[pT_nbins+1]; !!!!!!!!!!!!!!!
+		
 		Int_t eta_nbins;
 		Double_t eta_min;
 		Double_t eta_max;

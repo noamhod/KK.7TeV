@@ -131,6 +131,8 @@ void offlineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	if(stopAfterNevents <= 0)                            { l64t_stopEvent = l64t_nentries; cout << "1. stop at event " << l64t_stopEvent << endl; }
 	else if(startEvent+stopAfterNevents < l64t_nentries) { l64t_stopEvent = startEvent+stopAfterNevents; cout << "3. stop at event " << l64t_stopEvent << endl; }
 	if(startEvent+stopAfterNevents > l64t_nentries)      { l64t_stopEvent = l64t_nentries; cout << "2. stop at event " << l64t_stopEvent << endl; }
+	
+	int ignoredEvents = 0;
 
 	for (l64t_jentry=l64t_startEvent ; l64t_jentry<l64t_stopEvent/*l64t_nentries*/ ; l64t_jentry++)
 	{
@@ -145,12 +147,16 @@ void offlineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		
 		/////////////////////////////////////////////////
 		// for period A to D6 (152844-159224) ///////////
-		//if(m_offPhys->RunNumber == 160387) break; ////
+		//if(m_offPhys->RunNumber == 160387) break; ///////
 		/////////////////////////////////////////////////
 		
 		/////////////////////////////////////////////////
 		// to skip runs 152166-152777: //////////////////
-		if(m_offPhys->RunNumber < 152844) continue; /////
+		if(m_offPhys->RunNumber < 152844)
+		{
+			ignoredEvents++;
+			continue;
+		}
 		/////////////////////////////////////////////////
 		
 		analyze();
@@ -159,6 +165,10 @@ void offlineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	m_offlineAnalysis->fitter();
 	
 	draw();
+	
+	cout << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << endl;
+	cout << "$$$$$$$$$ ignored events(RunNumber<152844): " << ignoredEvents << endl;
+	cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << endl;
 	
 	//finalize();
 }

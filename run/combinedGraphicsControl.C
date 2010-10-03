@@ -26,5 +26,8 @@ combinedGraphicsControl::~combinedGraphicsControl()
 
 void combinedGraphicsControl::execute()
 {
-	m_combinedGraphics->drawCutFlow();
+	m_combinedGraphics->drawimass();
+	m_combinedGraphics->drawpT();
+	m_combinedGraphics->drawMCcutFlow();
+	m_combinedGraphics->drawDataCutFlow();
 }

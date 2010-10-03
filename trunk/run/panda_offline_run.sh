@@ -50,7 +50,6 @@ chmod 777 cutFlow.cuts
 
 # submit the panda run with a single dataset using --writeInputToTxt
 prun --exec "root.exe -b -q offlineGridControlRun.C;" --writeInputToTxt IN:offlineinput.txt  --athenaTag=15.6.9 --outDS user.hod.digestWZphys.$runnumber.$dateandhour  --outputs offlineWZphys.root --inDS $datasetname  --extFile offlineGridControl_C.so, Loader_C.so, ../GoodRunsLists-00-00-84/StandAlone/libGoodRunsLists.so --workDir ../  --tmpDir /tmp/hod/prun_info
-#prun --exec "root.exe -b -q offlineGridControlRun.C;" --writeInputToTxt IN:offlineinput.txt  --athenaTag=15.6.9 --outDS user.hod.digestWZphys.$runnumber.$dateandhour  --outputs offlineWZphys.root --inDS $datasetname  --extFile offlineGridControl_C.so, Loader_C.so, ../GoodRunsLists-00-00-84/StandAlone/libGoodRunsLists.so --workDir ../  --tmpDir /tmp/hod/prun_info --nFilesPerJo=10 --nGBPerJob=1
 #prun --site WISC_GROUP --exec "root.exe -b -q analysisGridControlRun.C;" --writeInputToTxt IN:input.txt  --athenaTag=15.6.9 --outDS user.hod.WZphys.$runnumber.$dateandhour  --outputs WZphys.root --inDS $datasetname  --extFile analysisGridControl_C.so, Loader_C.so, ../GoodRunsLists-00-00-84/StandAlone/libGoodRunsLists.so --workDir ../  --tmpDir /tmp/hod/prun_info
 
 # or, submit the panda run with a single dataset using shell echo command (can handle up to 200 files)

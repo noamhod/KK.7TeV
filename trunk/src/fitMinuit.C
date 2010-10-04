@@ -104,11 +104,11 @@ void fitMinuit::minimize(bool signal_only, TH1D* h, double* yields)
 	///// INITIALIZATION:  SIGNAL ONLY
 	// Breit-Wigner x Gaussian convolution (can have 3 gaussians)
 	parSignal[0] = 100.;    // Scale Signal (Ns)
-	parSignal[1] = 2500;       // Breit Wigner Width (gamma)
-	parSignal[2] = 90000.;     // Most probable location (peak mean) 
-	parSignal[3] = 100.;       // Gaussian sigma 1
-	parSignal[4] = 2000.;      // Gaussian sigma 2
-	parSignal[5] = 1000.;      // Gaussian sigma 3
+	parSignal[1] = 2.5*GeV2TeV;       // Breit Wigner Width (gamma)
+	parSignal[2] = 90.*GeV2TeV;     // Most probable location (peak mean) 
+	parSignal[3] = 0.1*GeV2TeV;       // Gaussian sigma 1
+	parSignal[4] = 2.*GeV2TeV;      // Gaussian sigma 2
+	parSignal[5] = 1.*GeV2TeV;      // Gaussian sigma 3
 	
 	minValSignal[0] = 1.;  // Scale Signal (Ns)
 	minValSignal[1] = 0;   // Breit Wigner Width (gamma)
@@ -146,11 +146,11 @@ void fitMinuit::minimize(bool signal_only, TH1D* h, double* yields)
 	parSignalBackground[2] = 2.2e0;       // Exp: constant argument
 	parSignalBackground[3] = -1.7e-5; // Exp: the multiplier of the x argument
 	// Breit-Wigner x Gaussian convolution
-	parSignalBackground[4] = 2.5e3;    // Breit Wigner Width (gamma)
-	parSignalBackground[5] = 9.e4;   // Most probable location (peak mean) 
-	parSignalBackground[6] = 5.e3;     // Gaussian sigma 1
-	//parSignalBackground[7] = 3000.;    // Gaussian sigma 2 
-	//parSignalBackground[8] = 3000.;    // Gaussian sigma 3
+	parSignalBackground[4] = 2.5*GeV2TeV;    // Breit Wigner Width (gamma)
+	parSignalBackground[5] = 90.*GeV2TeV;   // Most probable location (peak mean) 
+	parSignalBackground[6] = 5.*GeV2TeV;     // Gaussian sigma 1
+	//parSignalBackground[7] = 3.*GeV2TeV;    // Gaussian sigma 2 
+	//parSignalBackground[8] = 3.*GeV2TeV;    // Gaussian sigma 3
 	
 	minValSignalBackground[0] = 0;   // Scale Background (Nb)
 	minValSignalBackground[1] = 0; // Scale Signal (Ns)
@@ -308,9 +308,9 @@ void fitMinuit::minimize(bool signal_only, TH1D* h, double* yields)
 	p[2] = 2.;       // Exp: constant argument
 	p[3] = -0.00001; // Exp: the multiplier of the x argument
 	// Breit-Wigner x Gaussian convolution
-	p[4] = 2500.;    // Breit Wigner Width (gamma)
-	p[5] = 90000.;   // Most probable location (peak mean) 
-	p[6] = 2000.;    // Gaussian sigma 1
+	p[4] = 2.5*GeV2TeV;    // Breit Wigner Width (gamma)
+	p[5] = 90.*GeV2TeV;   // Most probable location (peak mean) 
+	p[6] = 2.*GeV2TeV;    // Gaussian sigma 1
 	//p[7] = 3000.;    // Gaussian sigma 2 
 	//p[8] = 3000.;    // Gaussian sigma 3
 	guess = new TF1("guess",fitFunctionSB, XMIN, XMAX ,8);

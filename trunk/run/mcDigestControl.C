@@ -116,7 +116,6 @@ void mcDigestControl::draw()
 
 void mcDigestControl::analyze()
 {
-	//m_mcDigestAnalysis->executeBasic();
 	m_mcDigestAnalysis->executeCutFlow();
 }
 

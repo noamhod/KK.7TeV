@@ -51,12 +51,12 @@ rm -f Loader_C.so
 
 # get the latest grl and cut flow
 cp -u ../conf/cutFlow.cuts .
-cp -u ../conf/Z_GRL_152844-162882.xml .
+cp -u ../conf/Z_GRL_152844-165732.xml .
 
 
 # make usable
 chmod 777 cutFlow.cuts
-chmod 777 Z_GRL_152844-159224.xml
+chmod 777 Z_GRL_152844-165732.xml
 
 
 # submit the panda run with a single dataset using --writeInputToTxt

@@ -60,8 +60,8 @@ void fitRooFit::minimize(bool signal_only, TH1D* h, double* yields)
 	
 	// --- Observable ---
 	// RooRealVar(const char* name, const char* title, Double_t value, Double_t minValue, Double_t maxValue, const char* unit = "")
-	//RooRealVar imass("imass", "#hat{m}_{#mu#mu}", XFULLMIN, XFULLMAX, "MeV");
-	RooRealVar imass("imass", "#hat{m}_{#mu#mu}", XFITMIN, XFITMAX, "MeV");
+	//RooRealVar imass("imass", "#hat{m}_{#mu#mu}", XFULLMIN, XFULLMAX, "TeV");
+	RooRealVar imass("imass", "#hat{m}_{#mu#mu}", XFITMIN, XFITMAX, "TeV");
 	imass.setRange("fitRange",XFITMIN,XFITMAX);
 	
 	
@@ -78,10 +78,10 @@ void fitRooFit::minimize(bool signal_only, TH1D* h, double* yields)
 		the constructor, or with the selectFastAlgorithm() method
 	*/
 	// --- Signal Parameters
-	RooRealVar gaussMean("mean", "m_{Z^{0}}", 91000., XFITMIN, XFITMAX);
-	RooRealVar gaussSigma("sigma", "Resolution", 3000., 100., 10000.);
-	RooRealVar breitWignerMean("mean", "m_{Z^{0}}", 91000., XFITMIN, XFITMAX);
-	RooRealVar breitWignerGamma("gamma", "#Gamma", 2495.2);
+	RooRealVar gaussMean("mean", "m_{Z^{0}}", 91.*GeV2TeV, XFITMIN, XFITMAX);
+	RooRealVar gaussSigma("sigma", "Resolution", 3.*GeV2TeV, 1.*GeV2TeV, 10.*GeV2TeV);
+	RooRealVar breitWignerMean("mean", "m_{Z^{0}}", 91.*GeV2TeV, XFITMIN, XFITMAX);
+	RooRealVar breitWignerGamma("gamma", "#Gamma", 2.4952*GeV2TeV);
 	////////////////////////////////////////////////////////
 	// fix the BW width parameter to the known value (PDG)
 	breitWignerGamma.setConstant(kTRUE);////////////////////

@@ -131,7 +131,6 @@ public:
 
 	void fitter();
 	
-	void executeBasic();
 	void executeAdvanced();
 	void executeCutFlow();
 	

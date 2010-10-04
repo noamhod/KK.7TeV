@@ -199,8 +199,8 @@ bool selection::findHipTmuon(double hipTmuonCut, double MShipTmuonCut, int nmu,
 
 	for(int i=0 ; i<nmu ; i++)
 	{
-		pT    = v_pT->at(i);     //mu_staco_pt->at(i);
-		qOp   = v_qoverp->at(i); //mu_staco_me_qoverp->at(i);
+		pT    = v_pT->at(i) * MeV2TeV;     //mu_staco_pt->at(i);
+		qOp   = v_qoverp->at(i) / MeV2TeV; //mu_staco_me_qoverp->at(i);
 		theta = v_theta->at(i);  //mu_staco_me_theta->at(i);
 		pTms  = (qOp!=0) ? fabs(1./qOp)*sin(theta) : 0.;
 		

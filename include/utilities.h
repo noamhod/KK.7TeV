@@ -15,6 +15,7 @@ class utilities
 	public:
 		// utilities
 		Double_t d_toGeV;
+		
 	public:
 		utilities();
 		~utilities();
@@ -27,8 +28,8 @@ class utilities
 
 		void   parseKeyValLine(string sLine);
 		int    getNVals();
-                string getKey();
-                double getVal(int valNum);
+		string getKey();
+		double getVal(int valNum);
 		void   parseFile(string sFilePath);
 		
 	private:

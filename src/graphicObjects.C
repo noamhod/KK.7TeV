@@ -83,16 +83,16 @@ void graphicObjects::ginitialize()
 	leg_y2 = 0.922;
 
 	imass_nbins = 100;
-	imass_min   = 10.*d_toGeV;
-	imass_max   = 2010.*d_toGeV;
+	imass_min   = 10.*GeV2TeV;
+	imass_max   = 2010.*GeV2TeV;
 	
 	imass_fit_nbins = 40;
-	imass_fit_min   = 0.*d_toGeV;
-	imass_fit_max   = 200.*d_toGeV;
+	imass_fit_min   = 0.*GeV2TeV;
+	imass_fit_max   = 200.*GeV2TeV;
 	
-	pT_nbins    = 100;
-	pT_min      = 5.*d_toGeV;
-	pT_max      = 1005.*d_toGeV;
+	pT_nbins    = 150;
+	pT_min      = 5.*GeV2TeV;
+	pT_max      = 3005.*GeV2TeV;
 
 	// logarithmic boundries and bins of histograms
 	logMmin = log10(imass_min);
@@ -132,8 +132,8 @@ void graphicObjects::ginitialize()
 	xyVertex_max   = 200.;
 	
 	ipTdiff_nbins = 50;
-	ipTdiff_min   = -1./20000.;
-	ipTdiff_max   = +1./20000.;
+	ipTdiff_min   = -1./(20.*GeV2TeV);
+	ipTdiff_max   = +1./(20.*GeV2TeV);
 	
 	etaSum_nbins = 50;;
 	etaSum_min   = -5.;
@@ -277,8 +277,8 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	TF1* f = new TF1("Lorentzian",Lorentzian,ipTdiff_min,ipTdiff_max, 3);
 	f->SetParameters(0,h1_ipTdiff->GetMaximum());
 	f->SetParLimits(0,0,h1_ipTdiff->GetEntries());
-	f->SetParameters(1,1./200000.);
-	f->SetParLimits(1,1./2000000.,1./20000.);
+	f->SetParameters(1,1./(200.*GeV2TeV));
+	f->SetParLimits(1,1./(2000.*GeV2TeV),1./(20.*GeV2TeV));
 	f->SetParameters(2,0.);
 	f->SetParLimits(2,0.1*ipTdiff_min,0.1*ipTdiff_max);
 	h1_ipTdiff->Fit(f,"VN","",0.8*ipTdiff_min,0.8*ipTdiff_max);

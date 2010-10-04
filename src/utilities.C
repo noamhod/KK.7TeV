@@ -21,6 +21,7 @@ void utilities::uinitialize()
 {
 	// other
 	d_toGeV = 1000.;
+
 }
 
 void utilities::ufinalize()

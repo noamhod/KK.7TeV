@@ -9,13 +9,13 @@
 #define FITFUNCTIONS_H
 
 
-double XMIN = 60000.;  //50000
-double XMAX = 120000.; //120000
+double XMIN = 60.*GeV2TeV;
+double XMAX = 120.*GeV2TeV;
 
-double XMAXBG = 75000.;
+double XMAXBG = 75.*GeV2TeV;
 
-double XFULLMIN = 0.;
-double XFULLMAX = 200000.;
+double XFULLMIN = 0.*GeV2TeV;
+double XFULLMAX = 200.*GeV2TeV;
 
 double XFITMIN = XMIN;
 double XFITMAX = XMAX;

@@ -58,7 +58,7 @@ TH1D* combinedGraphics::getHisto(TFile* f, string dir, string hname)
 void combinedGraphics::fixHisto(TH1D* h)
 {
 	h->SetTitle("");
-	h->SetXTitle("#hat{m}_{#mu#mu} (MeV)");
+	h->SetXTitle("#hat{m}_{#mu#mu} (TeV)");
 	h->SetYTitle("Events");
 }
 
@@ -224,12 +224,12 @@ void combinedGraphics::drawNormHistosMap(string channel, TMapds* cutFlowOrdered,
 		string sname = it->first;
 		stringstream strm;
 		string s1, s2;
-		strm << floor( (*hmap_cutFlow_imass)[sname]->GetBinWidth(1) );
+		strm << (*hmap_cutFlow_imass)[sname]->GetBinWidth(1);
 		strm >> s1;
 		strm.clear();
-		strm << floor( (*hmap_cutFlow_imass)[sname]->GetBinWidth( (*hmap_cutFlow_imass)[sname]->GetNbinsX() ) );
+		strm << (*hmap_cutFlow_imass)[sname]->GetBinWidth( (*hmap_cutFlow_imass)[sname]->GetNbinsX() );
 		strm >> s2;
-		string ytitle = "#frac{dN}{d#hat{m}} (" + s1 + "#rightarrow" + s2 + " MeV)^{-1}";
+		string ytitle = "#frac{dN}{d#hat{m}} (" + s1 + "#rightarrow" + s2 + " TeV)^{-1}";
 		/*
 		double norm = (*hmap_cutFlow_imass)[sname]->GetEntries() * (*hmap_cutFlow_imass)[sname]->GetBinWidth(1);
 		if(norm<=0)
@@ -244,7 +244,7 @@ void combinedGraphics::drawNormHistosMap(string channel, TMapds* cutFlowOrdered,
 		//NormToBinWidth( (*hmap_cutFlow_imass)[sname] );
 		//Norm( (*hmap_cutFlow_imass)[sname] );
 		(*hmap_cutFlow_imass)[sname]->SetTitle("");
-		(*hmap_cutFlow_imass)[sname]->SetXTitle("#hat{m}_{#mu#mu} (MeV)");
+		(*hmap_cutFlow_imass)[sname]->SetXTitle("#hat{m}_{#mu#mu} (TeV)");
 		(*hmap_cutFlow_imass)[sname]->SetYTitle( ytitle.c_str() );
 		(*hmap_cutFlow_imass)[sname]->SetFillColor(colorAccumulate);
 		(*hmap_cutFlow_imass)[sname]->SetLineColor(colorAccumulate);
@@ -298,7 +298,7 @@ void combinedGraphics::drawNormHistosMap(string channel, TMapds* cutFlowOrdered,
 		strm.clear();
 		strm << floor( (*hmap_cutFlow_pT)[sname]->GetBinWidth( (*hmap_cutFlow_pT)[sname]->GetNbinsX() ) );
 		strm >> s2;
-		string ytitle = "#frac{dN}{dp_{T}^{#mu^{-}}} (" + s1 + "#rightarrow" + s2 + " MeV)^{-1}";
+		string ytitle = "#frac{dN}{dp_{T}^{#mu^{-}}} (" + s1 + "#rightarrow" + s2 + " TeV)^{-1}";
 		/*
 		double norm = (*hmap_cutFlow_pT)[sname]->GetEntries() * (*hmap_cutFlow_pT)[sname]->GetBinWidth(1);
 		if(norm<=0)
@@ -313,7 +313,7 @@ void combinedGraphics::drawNormHistosMap(string channel, TMapds* cutFlowOrdered,
 		//NormToBinWidth( (*hmap_cutFlow_pT)[sname] );
 		//Norm( (*hmap_cutFlow_pT)[sname] );
 		(*hmap_cutFlow_pT)[sname]->SetTitle("");
-		(*hmap_cutFlow_pT)[sname]->SetXTitle("p_{T}^{#mu^{-}} (MeV)");
+		(*hmap_cutFlow_pT)[sname]->SetXTitle("p_{T}^{#mu^{-}} (TeV)");
 		(*hmap_cutFlow_pT)[sname]->SetYTitle( ytitle.c_str() );
 		(*hmap_cutFlow_pT)[sname]->SetFillColor(colorAccumulate);
 		(*hmap_cutFlow_pT)[sname]->SetLineColor(colorAccumulate);
@@ -527,9 +527,6 @@ void combinedGraphics::drawimass()
 	path = dir + "offlineControl.root";
 	TFile* fdata = new TFile( path.c_str(), "READ" );
 	hData = getHisto(fdata, hdir, "imass");
-	hData->SetXTitle("#hat{m}_{#mu#mu} (MeV)");
-	hData->SetYTitle("Events");
-	hData->SetTitle("");
 	leg_imass->AddEntry( hData, "Data", "lep");
 	
 	
@@ -545,6 +542,9 @@ void combinedGraphics::drawimass()
 	hMCimass->SetTitle("");
 	hMCimass->SetMinimum(1.e-2);
 	hMCimass->SetMaximum(1.e+4);
+	hMCimass->SetXTitle("#hat{m}_{#mu#mu} (TeV)");
+	hMCimass->SetYTitle("Events");
+	hMCimass->SetTitle("");
 	leg_imass->AddEntry( hMCimass, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
 	
@@ -706,9 +706,6 @@ void combinedGraphics::drawpT()
 	path = dir + "offlineControl.root";
 	TFile* fdata = new TFile( path.c_str(), "READ" );
 	hData = getHisto(fdata, hdir, "pT");
-	hData->SetXTitle("p_{T}^{#mu^{-}} (MeV)");
-	hData->SetYTitle("Events");
-	hData->SetTitle("");
 	leg_pT->AddEntry( hData, "Data", "lep");
 	
 	
@@ -724,6 +721,9 @@ void combinedGraphics::drawpT()
 	hMCpT->SetTitle("");
 	hMCpT->SetMinimum(1.e-2);
 	hMCpT->SetMaximum(1.e+4);
+	hMCpT->SetXTitle("p_{T}^{#mu^{-}} (TeV)");
+	hMCpT->SetYTitle("Events");
+	hMCpT->SetTitle("");
 	leg_pT->AddEntry( hMCpT, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
 	

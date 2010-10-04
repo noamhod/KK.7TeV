@@ -1,0 +1,51 @@
+#TYPE#			#ORDER#			#NAME#					#NVALUES#		#VALUE(S) [1]		[2]		[3]#
+
+###############################
+# all units are in TeV and mm #
+###############################
+
+################
+# preselection #
+################
+preselection	0				GRL						1						   1.
+preselection	1				L1_MU6					1						   1.
+preselection	2				hipTmuon				2						   0.015	 0.010
+preselection	3				PV						3						   1.		 1.		 150.
+
+
+
+#############
+# selection #
+#############
+#-------------------------------------------------------#
+# THE 1st SELECTION CUT ***MUST*** BE "OPPOSITE CHARGE" #
+# in the looper, after the preselection part ends and   #
+# before the selection part begins, there is this line: #
+# if(m_phys->mu_staco_n<2) return;                      #
+# so the sequential oppositeCharge cut is redundant but #
+# necessary for the counting procedure                  #
+#-------------------------------------------------------#
+
+# dimuon - ensure a c1*c2<0 candidate with appropriate imass and not cosmic:
+selection		4				oppositeCharge			1						   0.
+#selection		5				cosThetaDimu			1						   -0.96
+selection		6				imass					1						   0.02
+
+# more triggers:
+selection		7				EF_mu10					1						   1.
+
+# quality:
+#selection		8				idHits					3						   4.		 1.		 5.
+#selection		9				pTmatchingRatio			2						   2.		 0.5
+selection		10				pTmatchingAbsDiff		1						   0.015
+#selection		11				impactParameter			2						   5.		 1.
+#selection		12				isolation20				1						   999
+#selection		13				isolation30				1						   0.05
+selection		14				isolation40				1						   0.2
+selection		15				isCombMu				1						   1.
+
+# kinematics
+#selection		16				d0						1						   150.
+#selection		17				z0						1						   150.
+selection		18				pT						1						   0.02
+selection		19				eta						1						   2.4

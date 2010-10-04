@@ -31,7 +31,7 @@ mcOfflineControl::mcOfflineControl()
 	str = checkANDsetFilepath("PWD", "/../data/mcOfflineControl_"+sMCsample+".root");
 	m_histfile = new TFile( str.c_str(), "RECREATE");
 	m_histfile->cd();
-
+	
 	m_graphics = new graphicObjects();
 	m_graphics->setStyle();
 
@@ -41,7 +41,7 @@ mcOfflineControl::mcOfflineControl()
 	
 	string sLastCut2Hist = "isCombMu"; // "cosThetaDimu"
 	m_mcOfflineAnalysis = new mcOfflineAnalysis( m_mcOffPhys, m_graphics, m_cutFlowHandler, m_treefile, sLastCut2Hist );
-
+	
 	book();
 }
 

@@ -90,9 +90,9 @@ void graphicObjects::ginitialize()
 	imass_fit_min   = 0.*GeV2TeV;
 	imass_fit_max   = 200.*GeV2TeV;
 	
-	pT_nbins    = 150;
+	pT_nbins    = 100;
 	pT_min      = 5.*GeV2TeV;
-	pT_max      = 3005.*GeV2TeV;
+	pT_max      = 2005.*GeV2TeV;
 
 	// logarithmic boundries and bins of histograms
 	logMmin = log10(imass_min);

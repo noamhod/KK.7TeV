@@ -271,7 +271,7 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	cnv_ipTdiff = new TCanvas("ipTdiff","ipTdiff",canv_x,canv_y);
 	cnv_ipTdiff->Draw();
 	cnv_ipTdiff->cd();
-	h1_ipTdiff->SetXTitle("1/p_{T}^{#mu+} - 1/p_{T}^{#mu-} (1/MeV)");
+	h1_ipTdiff->SetXTitle("1/p_{T}^{#mu+} - 1/p_{T}^{#mu-} (1/TeV)");
 	h1_ipTdiff->Draw("e1x0");
 	//-------------------------------------------------------------------------
 	TF1* f = new TF1("Lorentzian",Lorentzian,ipTdiff_min,ipTdiff_max, 3);

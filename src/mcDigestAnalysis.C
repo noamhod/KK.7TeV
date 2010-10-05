@@ -235,8 +235,8 @@ void digestAnalysis::executeCutFlow()
 	//X( prtD0*cos(phi) );
 	//Y( prtD0*sin(phi) );
 	//Z( Z0 );
-	//m_graphicobjs->h2_xyVertex->Fill( d0exPVa*cos(m_digestPhys->mu_staco_phi->at(ai)), d0exPVa*sin(m_digestPhys->mu_staco_phi->at(ai)) );
-	//m_graphicobjs->h2_xyVertex->Fill( d0exPVb*cos(m_digestPhys->mu_staco_phi->at(bi)), d0exPVb*sin(m_digestPhys->mu_staco_phi->at(bi)) );
+	m_graphicobjs->h2_xyVertex->Fill( d0exPVa*cos(m_digestPhys->mu_staco_phi->at(ai)), d0exPVa*sin(m_digestPhys->mu_staco_phi->at(ai)) );
+	m_graphicobjs->h2_xyVertex->Fill( d0exPVb*cos(m_digestPhys->mu_staco_phi->at(bi)), d0exPVb*sin(m_digestPhys->mu_staco_phi->at(bi)) );
 	
 	
 	bool passCutFlow    = true;

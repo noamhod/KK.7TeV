@@ -33,6 +33,11 @@ combinedGraphics::combinedGraphics(cutFlowHandler* cutFlowHandler)
 	
 	//vcolors = new vector<Color_t>;
 	//vcolors->push_back();
+	
+	/////////////////////////////////////////////////
+	// integrated luminosity of the data in 1/pb ////
+	dataLumi_ipb = 6.865632; ////////////////////////
+	/////////////////////////////////////////////////
 }
 
 combinedGraphics::~combinedGraphics()
@@ -293,10 +298,10 @@ void combinedGraphics::drawNormHistosMap(string channel, TMapds* cutFlowOrdered,
 		string sname = it->first;
 		stringstream strm;
 		string s1, s2;
-		strm << floor( (*hmap_cutFlow_pT)[sname]->GetBinWidth(1) );
+		strm << (*hmap_cutFlow_pT)[sname]->GetBinWidth(1);
 		strm >> s1;
 		strm.clear();
-		strm << floor( (*hmap_cutFlow_pT)[sname]->GetBinWidth( (*hmap_cutFlow_pT)[sname]->GetNbinsX() ) );
+		strm << (*hmap_cutFlow_pT)[sname]->GetBinWidth( (*hmap_cutFlow_pT)[sname]->GetNbinsX() );
 		strm >> s2;
 		string ytitle = "#frac{dN}{dp_{T}^{#mu^{-}}} (" + s1 + "#rightarrow" + s2 + " TeV)^{-1}";
 		/*
@@ -364,7 +369,7 @@ void combinedGraphics::drawMCcutFlow()
 	// pads
 	path = dir + "mcOfflineControl_Zmumu.root";
 	channel = "Z #rightarrow #mu^{+}#mu^{-}";
-	setNormVals(989., 1., 299811, 3.37);
+	setNormVals(989., 1., 299811, dataLumi_ipb);
 	TFile* fZmumu = new TFile( path.c_str(), "READ" );
 	getHistosMap(fZmumu, hdir, m_cutFlowOrdered, m_cutFlowTypeOrdered);
 	drawNormHistosMap(channel, m_cutFlowOrdered, m_cutFlowTypeOrdered);
@@ -375,7 +380,7 @@ void combinedGraphics::drawMCcutFlow()
 	
 	path = dir + "mcOfflineControl_Wmunu.root";
 	channel = "W #rightarrow #mu#nuX";
-	setNormVals(10454., 1., 989886, 3.37);
+	setNormVals(10454., 1., 989886, dataLumi_ipb);
 	TFile* fWmunu = new TFile( path.c_str(), "READ" );
 	getHistosMap(fWmunu, hdir, m_cutFlowOrdered, m_cutFlowTypeOrdered);
 	drawNormHistosMap(channel, m_cutFlowOrdered, m_cutFlowTypeOrdered);
@@ -386,7 +391,7 @@ void combinedGraphics::drawMCcutFlow()
 	
 	path = dir + "mcOfflineControl_Ztautau.root";
 	channel = "Z #rightarrow #tau^{+}#tau^{-}";
-	setNormVals(989., 1., 1998598, 3.37);
+	setNormVals(989., 1., 1998598, dataLumi_ipb);
 	TFile* fZtautau = new TFile( path.c_str(), "READ" );
 	getHistosMap(fZtautau, hdir, m_cutFlowOrdered, m_cutFlowTypeOrdered);
 	drawNormHistosMap(channel, m_cutFlowOrdered, m_cutFlowTypeOrdered);
@@ -397,7 +402,7 @@ void combinedGraphics::drawMCcutFlow()
 	
 	path = dir + "mcOfflineControl_TTbar.root";
 	channel = "t #bar{t} #rightarrow #mu^{+}#mu^{-}X";
-	setNormVals(161., 1., 199838, 3.37);
+	setNormVals(161., 1., 199838, dataLumi_ipb);
 	TFile* fTTbar = new TFile( path.c_str(), "READ" );
 	getHistosMap(fTTbar, hdir, m_cutFlowOrdered, m_cutFlowTypeOrdered);
 	drawNormHistosMap(channel, m_cutFlowOrdered, m_cutFlowTypeOrdered);
@@ -408,7 +413,7 @@ void combinedGraphics::drawMCcutFlow()
 	
 	path = dir + "mcOfflineControl_bbmuX15.root";
 	channel = "b #bar{b} #rightarrow #mu^{+}#mu^{-}X";
-	setNormVals(7.39e+4, 1., 4388911, 3.37);
+	setNormVals(7.39e+4, 1., 4388911, dataLumi_ipb);
 	TFile* fbbmuX15 = new TFile( path.c_str(), "READ" );
 	getHistosMap(fbbmuX15, hdir, m_cutFlowOrdered, m_cutFlowTypeOrdered);
 	drawNormHistosMap(channel, m_cutFlowOrdered, m_cutFlowTypeOrdered);
@@ -419,7 +424,7 @@ void combinedGraphics::drawMCcutFlow()
 	
 	path = dir + "mcOfflineControl_ccmuX15.root";
 	channel = "c #bar{c} #rightarrow #mu^{+}#mu^{-}X";
-	setNormVals(2.84e+4, 1., 1499257, 3.37);
+	setNormVals(2.84e+4, 1., 1499257, dataLumi_ipb);
 	TFile* fccmuX15 = new TFile( path.c_str(), "READ" );
 	getHistosMap(fccmuX15, hdir, m_cutFlowOrdered, m_cutFlowTypeOrdered);
 	drawNormHistosMap(channel, m_cutFlowOrdered, m_cutFlowTypeOrdered);
@@ -496,7 +501,7 @@ void combinedGraphics::drawimass()
 	leg_imass = new TLegend(0.7173913,0.3172043,0.8712375,0.8629032,NULL,"brNDC");
 	leg_imass->SetFillColor(kWhite);
 	
-	m_dataLumi_pb = 3.37;
+	m_dataLumi_pb = dataLumi_ipb;
 	
 	stringstream strm;
 	string L;
@@ -535,7 +540,7 @@ void combinedGraphics::drawimass()
 	channel = "SM(sig+bkg)";
 	TFile* fFirstHist = new TFile( path.c_str(), "READ" );
 	hMCimass = getHisto(fFirstHist, hdir, "imass");
-	setNormVals(989., 1., 299811, 3.37);
+	setNormVals(989., 1., 299811, dataLumi_ipb);
 	NormToDataLumi( hMCimass, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
 	hMCimass->SetFillColor(colorAccumulate);
 	hMCimass->SetLineColor(colorAccumulate);
@@ -553,7 +558,7 @@ void combinedGraphics::drawimass()
 	channel = "Z #rightarrow #mu^{+}#mu^{-}";
 	TFile* fZmumu = new TFile( path.c_str(), "READ" );
 	hZmumu = getHisto(fZmumu, hdir, "imass");
-	setNormVals(989., 1., 299811, 3.37);
+	setNormVals(989., 1., 299811, dataLumi_ipb);
 	NormToDataLumi( hZmumu, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
 	hZmumu->SetFillColor(colorAccumulate);
 	hZmumu->SetLineColor(colorAccumulate);
@@ -566,7 +571,7 @@ void combinedGraphics::drawimass()
 	channel = "t #bar{t} #rightarrow #mu^{+}#mu^{-}X";
 	TFile* fTTbar = new TFile( path.c_str(), "READ" );
 	hTTbar = getHisto(fTTbar, hdir, "imass");
-	setNormVals(161., 1., 199838, 3.37);
+	setNormVals(161., 1., 199838, dataLumi_ipb);
 	NormToDataLumi( hTTbar, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
 	hTTbar->SetFillColor(colorAccumulate);
 	hTTbar->SetLineColor(colorAccumulate);
@@ -578,7 +583,7 @@ void combinedGraphics::drawimass()
 	channel = "Z #rightarrow #tau^{+}#tau^{-}";
 	TFile* fZtautau = new TFile( path.c_str(), "READ" );
 	hZtautau = getHisto(fZtautau, hdir, "imass");
-	setNormVals(989., 1., 1998598, 3.37);
+	setNormVals(989., 1., 1998598, dataLumi_ipb);
 	NormToDataLumi( hZtautau, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
 	hZtautau->SetFillColor(colorAccumulate);
 	hZtautau->SetLineColor(colorAccumulate);
@@ -590,7 +595,7 @@ void combinedGraphics::drawimass()
 	channel = "b #bar{b} #rightarrow #mu^{+}#mu^{-}X";
 	TFile* fbbmuX15 = new TFile( path.c_str(), "READ" );
 	hbbmuX15 = getHisto(fbbmuX15, hdir, "imass");
-	setNormVals(7.39e+4, 1., 4388911, 3.37);
+	setNormVals(7.39e+4, 1., 4388911, dataLumi_ipb);
 	NormToDataLumi( hbbmuX15, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
 	hbbmuX15->SetFillColor(colorAccumulate);
 	hbbmuX15->SetLineColor(colorAccumulate);
@@ -602,7 +607,7 @@ void combinedGraphics::drawimass()
 	channel = "W #rightarrow #mu#nuX";
 	TFile* fWmunu = new TFile( path.c_str(), "READ" );
 	hWmunu = getHisto(fWmunu, hdir, "imass");
-	setNormVals(10454., 1., 989886, 3.37);
+	setNormVals(10454., 1., 989886, dataLumi_ipb);
 	NormToDataLumi( hWmunu, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
 	hWmunu->SetFillColor(colorAccumulate);
 	hWmunu->SetLineColor(colorAccumulate);
@@ -614,7 +619,7 @@ void combinedGraphics::drawimass()
 	channel = "c #bar{c} #rightarrow #mu^{+}#mu^{-}X";
 	TFile* fccmuX15 = new TFile( path.c_str(), "READ" );
 	hccmuX15 = getHisto(fccmuX15, hdir, "imass");
-	setNormVals(2.84e+4, 1., 1499257, 3.37);
+	setNormVals(2.84e+4, 1., 1499257, dataLumi_ipb);
 	NormToDataLumi( hccmuX15, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
 	hccmuX15->SetFillColor(colorAccumulate);
 	hccmuX15->SetLineColor(colorAccumulate);
@@ -675,7 +680,7 @@ void combinedGraphics::drawpT()
 	leg_pT = new TLegend(0.7173913,0.3172043,0.8712375,0.8629032,NULL,"brNDC");
 	leg_pT->SetFillColor(kWhite);
 	
-	m_dataLumi_pb = 3.37;
+	m_dataLumi_pb = dataLumi_ipb;
 	
 	stringstream strm;
 	string L;
@@ -714,7 +719,7 @@ void combinedGraphics::drawpT()
 	channel = "SM(sig+bkg)";
 	TFile* fFirstHist = new TFile( path.c_str(), "READ" );
 	hMCpT = getHisto(fFirstHist, hdir, "pT");
-	setNormVals(989., 1., 299811, 3.37);
+	setNormVals(989., 1., 299811, dataLumi_ipb);
 	NormToDataLumi( hMCpT, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
 	hMCpT->SetFillColor(colorAccumulate);
 	hMCpT->SetLineColor(colorAccumulate);
@@ -732,7 +737,7 @@ void combinedGraphics::drawpT()
 	channel = "Z #rightarrow #mu^{+}#mu^{-}";
 	TFile* fZmumu = new TFile( path.c_str(), "READ" );
 	hZmumu = getHisto(fZmumu, hdir, "pT");
-	setNormVals(989., 1., 299811, 3.37);
+	setNormVals(989., 1., 299811, dataLumi_ipb);
 	NormToDataLumi( hZmumu, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
 	hZmumu->SetFillColor(colorAccumulate);
 	hZmumu->SetLineColor(colorAccumulate);
@@ -745,7 +750,7 @@ void combinedGraphics::drawpT()
 	channel = "t #bar{t} #rightarrow #mu^{+}#mu^{-}X";
 	TFile* fTTbar = new TFile( path.c_str(), "READ" );
 	hTTbar = getHisto(fTTbar, hdir, "pT");
-	setNormVals(161., 1., 199838, 3.37);
+	setNormVals(161., 1., 199838, dataLumi_ipb);
 	NormToDataLumi( hTTbar, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
 	hTTbar->SetFillColor(colorAccumulate);
 	hTTbar->SetLineColor(colorAccumulate);
@@ -757,7 +762,7 @@ void combinedGraphics::drawpT()
 	channel = "Z #rightarrow #tau^{+}#tau^{-}";
 	TFile* fZtautau = new TFile( path.c_str(), "READ" );
 	hZtautau = getHisto(fZtautau, hdir, "pT");
-	setNormVals(989., 1., 1998598, 3.37);
+	setNormVals(989., 1., 1998598, dataLumi_ipb);
 	NormToDataLumi( hZtautau, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
 	hZtautau->SetFillColor(colorAccumulate);
 	hZtautau->SetLineColor(colorAccumulate);
@@ -769,7 +774,7 @@ void combinedGraphics::drawpT()
 	channel = "b #bar{b} #rightarrow #mu^{+}#mu^{-}X";
 	TFile* fbbmuX15 = new TFile( path.c_str(), "READ" );
 	hbbmuX15 = getHisto(fbbmuX15, hdir, "pT");
-	setNormVals(7.39e+4, 1., 4388911, 3.37);
+	setNormVals(7.39e+4, 1., 4388911, dataLumi_ipb);
 	NormToDataLumi( hbbmuX15, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
 	hbbmuX15->SetFillColor(colorAccumulate);
 	hbbmuX15->SetLineColor(colorAccumulate);
@@ -781,7 +786,7 @@ void combinedGraphics::drawpT()
 	channel = "W #rightarrow #mu#nuX";
 	TFile* fWmunu = new TFile( path.c_str(), "READ" );
 	hWmunu = getHisto(fWmunu, hdir, "pT");
-	setNormVals(10454., 1., 989886, 3.37);
+	setNormVals(10454., 1., 989886, dataLumi_ipb);
 	NormToDataLumi( hWmunu, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
 	hWmunu->SetFillColor(colorAccumulate);
 	hWmunu->SetLineColor(colorAccumulate);
@@ -793,7 +798,7 @@ void combinedGraphics::drawpT()
 	channel = "c #bar{c} #rightarrow #mu^{+}#mu^{-}X";
 	TFile* fccmuX15 = new TFile( path.c_str(), "READ" );
 	hccmuX15 = getHisto(fccmuX15, hdir, "pT");
-	setNormVals(2.84e+4, 1., 1499257, 3.37);
+	setNormVals(2.84e+4, 1., 1499257, dataLumi_ipb);
 	NormToDataLumi( hccmuX15, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
 	hccmuX15->SetFillColor(colorAccumulate);
 	hccmuX15->SetLineColor(colorAccumulate);

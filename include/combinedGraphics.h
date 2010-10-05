@@ -16,6 +16,8 @@
 class combinedGraphics : public utilities
 {
 	public:
+		// integrated luminosity of the data in 1/pb
+		double dataLumi_ipb;
 	
 		// cutFlowHandler
 		cutFlowHandler* m_cutFlowHandler;

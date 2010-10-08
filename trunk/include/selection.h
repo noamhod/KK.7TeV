@@ -62,6 +62,7 @@ public:
 	
 	bool pTCut(           double pTCutVal,           TLorentzVector* pa, TLorentzVector* pb );
 	bool etaCut(          double etaCutVal,          TLorentzVector* pa, TLorentzVector* pb );
+	bool etaTightCut(     double etaTightCutVal,     TLorentzVector* pa, TLorentzVector* pb );
 	bool cosThetaDimuCut( double cosThetaDimuCutVal, TLorentzVector* pa, TLorentzVector* pb );
 	bool imassCut(        double imassCutVal,        TLorentzVector* pa, TLorentzVector* pb );
 

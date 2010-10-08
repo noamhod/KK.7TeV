@@ -63,6 +63,9 @@ class graphicObjects : public utilities
 		// map of histos
 		TMapSP2TH1D* hmap_cutFlow_imass;
 		TMapSP2TH1D* hmap_cutFlow_pT;
+		
+		// map of cutFlow
+		TMapsvd* cut_cutFlowMapSVD;
 
 		// for the canvases
 		Int_t    canv_x;
@@ -77,7 +80,9 @@ class graphicObjects : public utilities
 		// for the histos
 		Int_t    imass_nbins;
 		Double_t imass_min;
+		Double_t imass_min_cut;
 		Double_t imass_max;
+		Double_t imass_max_cut;
 		
 		Int_t imass_fit_nbins;
 		Double_t imass_fit_min;
@@ -85,18 +90,28 @@ class graphicObjects : public utilities
 
 		Int_t    pT_nbins;
 		Double_t pT_min;
+		Double_t pT_min_cut;
 		Double_t pT_max;
+		Double_t pT_max_cut;
 		
 		// logarithmic boundries and bins of histograms
-		Double_t logMmin ;
+		Double_t logMmin;
+		Double_t logMmin_cut;
 		Double_t logMmax;
+		Double_t logMmax_cut;
 		Double_t M_binwidth;
+		Double_t M_binwidth_cut;
 		Double_t M_bins[100+1]; // M_bins[imass_nbins+1]; !!!!!!!!!!!!
+		Double_t M_bins_cut[100+1]; // M_bins[imass_nbins+1]; !!!!!!!!!!!!
 
 		Double_t logpTmin;
+		Double_t logpTmin_cut;
 		Double_t logpTmax;
+		Double_t logpTmax_cut;
 		Double_t pT_binwidth;
+		Double_t pT_binwidth_cut;
 		Double_t pT_bins[100+1]; //pT_bins[pT_nbins+1]; !!!!!!!!!!!!!!!
+		Double_t pT_bins_cut[100+1]; //pT_bins[pT_nbins+1]; !!!!!!!!!!!!!!!
 		
 		Int_t eta_nbins;
 		Double_t eta_min;
@@ -138,6 +153,8 @@ class graphicObjects : public utilities
 		void gfinalize();
 
 		void setStyle();
+		
+		void setCutFlowMapSVDPtr(TMapsvd* cutFlowMapSVD);
 
 		void bookBareHistos(TDirectory* tdir);
 		void drawBareHistos(TDirectory* tdir);

@@ -7,14 +7,14 @@
 
 
 # A-D6
-# source panda_run.sh   data   00152166   group10.phys-sm.data10_7TeV.00152166.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
-# source panda_run.sh   data   00152214   group10.phys-sm.data10_7TeV.00152214.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
-# source panda_run.sh   data   00152221   group10.phys-sm.data10_7TeV.00152221.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
-# source panda_run.sh   data   00152345   group10.phys-sm.data10_7TeV.00152345.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
-# source panda_run.sh   data   00152409   group10.phys-sm.data10_7TeV.00152409.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
-# source panda_run.sh   data   00152441   group10.phys-sm.data10_7TeV.00152441.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
-# source panda_run.sh   data   00152508   group10.phys-sm.data10_7TeV.00152508.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
-# source panda_run.sh   data   00152777   group10.phys-sm.data10_7TeV.00152777.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
+ source panda_run.sh   data   00152166   group10.phys-sm.data10_7TeV.00152166.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
+ source panda_run.sh   data   00152214   group10.phys-sm.data10_7TeV.00152214.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
+ source panda_run.sh   data   00152221   group10.phys-sm.data10_7TeV.00152221.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
+ source panda_run.sh   data   00152345   group10.phys-sm.data10_7TeV.00152345.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
+ source panda_run.sh   data   00152409   group10.phys-sm.data10_7TeV.00152409.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
+ source panda_run.sh   data   00152441   group10.phys-sm.data10_7TeV.00152441.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
+ source panda_run.sh   data   00152508   group10.phys-sm.data10_7TeV.00152508.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
+ source panda_run.sh   data   00152777   group10.phys-sm.data10_7TeV.00152777.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
  source panda_run.sh   data   00152844   group10.phys-sm.data10_7TeV.00152844.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
  source panda_run.sh   data   00152845   group10.phys-sm.data10_7TeV.00152845.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
  source panda_run.sh   data   00152878   group10.phys-sm.data10_7TeV.00152878.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.02.D3PD
@@ -104,8 +104,16 @@
  source panda_run.sh   data   00162843	 group10.phys-sm.data10_7TeV.00162843.physics_Muons.recon.ESD.f28.WZphys.100612.18.D3PD/
  source panda_run.sh   data   00162882	 group10.phys-sm.data10_7TeV.00162882.physics_Muons.recon.ESD.f28.WZphys.100612.19.D3PD/
  
- # G
+ # G1-2
  source panda_run.sh   data   00165591   group10.phys-sm.data10_7TeV.00165591.physics_Muons.recon.ESD.f292.WZphys.100612.21.D3PD/
  source panda_run.sh   data   00165632   group10.phys-sm.data10_7TeV.00165632.physics_Muons.recon.ESD.f293.WZphys.100612.21.D3PD/
  source panda_run.sh   data   00165703   group10.phys-sm.data10_7TeV.00165703.physics_Muons.recon.ESD.f293.WZphys.100612.21.D3PD/
  source panda_run.sh   data   00165732   group10.phys-sm.data10_7TeV.00165732.physics_Muons.recon.ESD.f293.WZphys.100612.21.D3PD/
+ 
+ 
+ # G3-4
+ source panda_run.sh   data   00165767   group10.phys-sm.data10_7TeV.00165767.physics_Muons.recon.ESD.f293.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00165815   group10.phys-sm.data10_7TeV.00165815.physics_Muons.recon.ESD.f293.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00165817   group10.phys-sm.data10_7TeV.00165817.physics_Muons.recon.ESD.f293.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00165818   group10.phys-sm.data10_7TeV.00165818.physics_Muons.recon.ESD.f293.WZphys.100612.01.D3PD/
+ 

@@ -16,7 +16,7 @@ mcOfflineControl::mcOfflineControl()
 
 	///////////////////////////////
 	// chose the MC sample here ///
-	string sMCsample = "Zmumu";
+	string sMCsample = "ccmuX15";
 	///////////////////////////////
 	
 	str = checkANDsetFilepath("PWD", "/../conf/offline_mc_dataset_"+sMCsample+".list");

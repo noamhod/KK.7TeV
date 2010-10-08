@@ -29,16 +29,16 @@ void compile() // for re-compilation
 {
 	prepare();
 	
-	gROOT->ProcessLine(".L digestControl.C++");
+	gROOT->ProcessLine(".L mcDigestControl.C++");
 	
-	gROOT->ProcessLine("digestControl dc");
+	gROOT->ProcessLine("mcDigestControl mcdc");
 }
 
 void load() // only for loading, if already compiled
 {
 	prepare();
 
-	gROOT->ProcessLine(".L digestControl_C.so");
+	gROOT->ProcessLine(".L mcDigestControl_C.so");
 
-	gROOT->ProcessLine("digestControl dc");
+	gROOT->ProcessLine("mcDigestControl mcdc");
 }

@@ -5,18 +5,18 @@
 /* on 23/07/2010 11:24 */
 /* * * * * * * * * * * */
 
-#include "digestAnalysis.h"
+#include "mcDigestAnalysis.h"
 
-digestAnalysis::digestAnalysis()
+mcDigestAnalysis::mcDigestAnalysis()
 {
 	initialize();
 }
 
-digestAnalysis::digestAnalysis(digestPhysics* digestPhysics, graphicObjects* graphicobjs, cutFlowHandler* cutFlowHandler, TFile* treeFile, string sLastCut2Hist)
+mcDigestAnalysis::mcDigestAnalysis(mcDigestPhysics* mcDigestPhysics, graphicObjects* graphicobjs, cutFlowHandler* cutFlowHandler, TFile* treeFile, string sLastCut2Hist)
 {
 	initialize();
 
-	m_digestPhys = digestPhysics;
+	m_mcDigestPhys = mcDigestPhysics;
 
 	m_treeFile = treeFile;
 
@@ -30,28 +30,30 @@ digestAnalysis::digestAnalysis(digestPhysics* digestPhysics, graphicObjects* gra
 	initSelectionCuts(m_cutFlowMapSVD, m_cutFlowOrdered, m_cutFlowTypeOrdered);
 
 	m_graphicobjs = graphicobjs;
+	m_graphicobjs->setCutFlowMapSVDPtr( m_cutFlowMapSVD );
+	m_graphicobjs->ginitialize();
 	
 	m_fit = new fit();
 	
 	m_sLastCut2Hist = sLastCut2Hist;
 }
 
-digestAnalysis::~digestAnalysis()
+mcDigestAnalysis::~mcDigestAnalysis()
 {
 
 }
 
-void digestAnalysis::initialize()
+void mcDigestAnalysis::initialize()
 {
 
 }
 
-void digestAnalysis::finalize()
+void mcDigestAnalysis::finalize()
 {
 
 }
 
-void digestAnalysis::fitter()
+void mcDigestAnalysis::fitter()
 {
 	double yields[2];
 	
@@ -62,7 +64,7 @@ void digestAnalysis::fitter()
 }
 
 
-void digestAnalysis::executeAdvanced()
+void mcDigestAnalysis::executeAdvanced()
 {
 
 /*
@@ -73,7 +75,7 @@ void digestAnalysis::executeAdvanced()
 	}
 
 	// stupid example
-	if(m_digestPhys->mu_staco_n>0)
+	if(m_mcDigestPhys->mu_staco_n>0)
 	{
 		for(int n=0 ; n<(int)m_mustaco->getNParticles() ; n++)
 		{
@@ -84,7 +86,7 @@ void digestAnalysis::executeAdvanced()
 */
 }
 
-void digestAnalysis::executeCutFlow()
+void mcDigestAnalysis::executeCutFlow()
 {
 	bool debugmode = false;
 
@@ -107,13 +109,13 @@ void digestAnalysis::executeCutFlow()
     // this needs to be looped acording to the size of the vector rather
 	// than according to the value of mu_staco_n since in the digest tree
 	// only the successive COUPLE is written.
-	for(int n=0 ; n<(int)m_digestPhys->mu_staco_m->size() ; n++)
+	for(int n=0 ; n<(int)m_mcDigestPhys->mu_staco_m->size() ; n++)
 	{
 		pmu.push_back( new TLorentzVector() );
-		pmu[n]->SetPx( m_digestPhys->mu_staco_px->at(n)*MeV2TeV );
-		pmu[n]->SetPy( m_digestPhys->mu_staco_py->at(n)*MeV2TeV );
-		pmu[n]->SetPz( m_digestPhys->mu_staco_pz->at(n)*MeV2TeV );
-		pmu[n]->SetE(  m_digestPhys->mu_staco_E->at(n)*MeV2TeV  );
+		pmu[n]->SetPx( m_mcDigestPhys->mu_staco_px->at(n)*MeV2TeV );
+		pmu[n]->SetPy( m_mcDigestPhys->mu_staco_py->at(n)*MeV2TeV );
+		pmu[n]->SetPz( m_mcDigestPhys->mu_staco_pz->at(n)*MeV2TeV );
+		pmu[n]->SetE(  m_mcDigestPhys->mu_staco_E->at(n)*MeV2TeV  );
 	}
 	///////////////////////////////////////////////////////////////////
 	
@@ -128,12 +130,12 @@ void digestAnalysis::executeCutFlow()
 
 	// calculate the necessary variables
 	current_imass    = imass(pmu[ai],pmu[bi]);
-	current_cosTheta = cosThetaCollinsSoper( pmu[ai], (double)m_digestPhys->mu_staco_charge->at(ai),
-											 pmu[bi], (double)m_digestPhys->mu_staco_charge->at(bi) );
-	current_mu_pT     = (m_digestPhys->mu_staco_charge->at(ai)<0) ? m_digestPhys->mu_staco_pt->at(ai)*MeV2TeV : m_digestPhys->mu_staco_pt->at(bi)*MeV2TeV;
-	current_muplus_pT = (m_digestPhys->mu_staco_charge->at(ai)>0) ? m_digestPhys->mu_staco_pt->at(ai)*MeV2TeV : m_digestPhys->mu_staco_pt->at(bi)*MeV2TeV;
-	current_mu_eta   = (m_digestPhys->mu_staco_charge->at(ai)<0) ? m_digestPhys->mu_staco_eta->at(ai) : m_digestPhys->mu_staco_eta->at(bi);
-	current_muplus_eta   = (m_digestPhys->mu_staco_charge->at(ai)>0) ? m_digestPhys->mu_staco_eta->at(ai) : m_digestPhys->mu_staco_eta->at(bi);
+	current_cosTheta = cosThetaCollinsSoper( pmu[ai], (double)m_mcDigestPhys->mu_staco_charge->at(ai),
+											 pmu[bi], (double)m_mcDigestPhys->mu_staco_charge->at(bi) );
+	current_mu_pT     = (m_mcDigestPhys->mu_staco_charge->at(ai)<0) ? m_mcDigestPhys->mu_staco_pt->at(ai)*MeV2TeV : m_mcDigestPhys->mu_staco_pt->at(bi)*MeV2TeV;
+	current_muplus_pT = (m_mcDigestPhys->mu_staco_charge->at(ai)>0) ? m_mcDigestPhys->mu_staco_pt->at(ai)*MeV2TeV : m_mcDigestPhys->mu_staco_pt->at(bi)*MeV2TeV;
+	current_mu_eta   = (m_mcDigestPhys->mu_staco_charge->at(ai)<0) ? m_mcDigestPhys->mu_staco_eta->at(ai) : m_mcDigestPhys->mu_staco_eta->at(bi);
+	current_muplus_eta   = (m_mcDigestPhys->mu_staco_charge->at(ai)>0) ? m_mcDigestPhys->mu_staco_eta->at(ai) : m_mcDigestPhys->mu_staco_eta->at(bi);
 	current_cosmicCosth = cosThetaDimu( pmu[ai], pmu[bi] );
 	current_ipTdiff = (current_muplus_pT!=0.  &&  current_mu_pT!=0.) ? 1./current_muplus_pT-1./current_mu_pT : -999.;
 	current_etaSum = current_muplus_eta + current_mu_eta;
@@ -141,80 +143,80 @@ void digestAnalysis::executeCutFlow()
 	if(debugmode) cout << "### 4 ###" << endl;
 	
 	// event level
-	runnumber  = m_digestPhys->RunNumber;
-	lumiblock  = m_digestPhys->lbn;
-	isL1MU6    = m_digestPhys->L1_MU6;
-	isGRL      = m_digestPhys->isGRL;
-	isEF_mu10  = m_digestPhys->EF_mu10;
+	runnumber  = m_mcDigestPhys->RunNumber;
+	lumiblock  = m_mcDigestPhys->lbn;
+	isL1MU6    = m_mcDigestPhys->L1_MU6;
+	isGRL      = m_mcDigestPhys->isGRL;
+	isEF_mu10  = m_mcDigestPhys->EF_mu10;
 	
 	if(debugmode) cout << "### 5 ###" << endl;
 	
 	// deprecated !!!
-	d0exPVa = m_digestPhys->mu_staco_d0_exPV->at(ai);
-	z0exPVa = m_digestPhys->mu_staco_z0_exPV->at(ai);
-	d0exPVb = m_digestPhys->mu_staco_d0_exPV->at(bi);
-	z0exPVb = m_digestPhys->mu_staco_z0_exPV->at(bi);
+	d0exPVa = m_mcDigestPhys->mu_staco_d0_exPV->at(ai);
+	z0exPVa = m_mcDigestPhys->mu_staco_z0_exPV->at(ai);
+	d0exPVb = m_mcDigestPhys->mu_staco_d0_exPV->at(bi);
+	z0exPVb = m_mcDigestPhys->mu_staco_z0_exPV->at(bi);
 	
 	if(debugmode) cout << "### 6 ###" << endl;
 	
 	// primary vertex:
 	// at least one primary vtx passes the z selection
-	nPVtracksPtr = m_digestPhys->vxp_nTracks; // number of tracks > 2
-	nPVtypePtr   = m_digestPhys->vxp_type;    // ==1
-	PVz0Ptr      = m_digestPhys->vxp_z;       // = absolute z position of primary vertex < 150mm
-	PVz0errPtr   = m_digestPhys->vxp_z_err;   // = error
+	nPVtracksPtr = m_mcDigestPhys->vxp_nTracks; // number of tracks > 2
+	nPVtypePtr   = m_mcDigestPhys->vxp_type;    // ==1
+	PVz0Ptr      = m_mcDigestPhys->vxp_z;       // = absolute z position of primary vertex < 150mm
+	PVz0errPtr   = m_mcDigestPhys->vxp_z_err;   // = error
 	
 	if(debugmode) cout << "### 7 ###" << endl;
 	
 	// combined muon ?
-	isMuaComb  = m_digestPhys->mu_staco_isCombinedMuon->at(ai);
-	isMubComb  = m_digestPhys->mu_staco_isCombinedMuon->at(bi);	
+	isMuaComb  = m_mcDigestPhys->mu_staco_isCombinedMuon->at(ai);
+	isMubComb  = m_mcDigestPhys->mu_staco_isCombinedMuon->at(bi);	
 	
 	if(debugmode) cout << "### 8 ###" << endl;
 	
 	// inner detector hits
-	nSCThitsMua  = m_digestPhys->mu_staco_nSCTHits->at(ai); //  SCT hits >=4
-	nSCThitsMub  = m_digestPhys->mu_staco_nSCTHits->at(bi); //  SCT hits >=4
-	nPIXhitsMua  = m_digestPhys->mu_staco_nPixHits->at(ai); // pixel hits >=1
-	nPIXhitsMub  = m_digestPhys->mu_staco_nPixHits->at(bi); // pixel hits >=1
+	nSCThitsMua  = m_mcDigestPhys->mu_staco_nSCTHits->at(ai); //  SCT hits >=4
+	nSCThitsMub  = m_mcDigestPhys->mu_staco_nSCTHits->at(bi); //  SCT hits >=4
+	nPIXhitsMua  = m_mcDigestPhys->mu_staco_nPixHits->at(ai); // pixel hits >=1
+	nPIXhitsMub  = m_mcDigestPhys->mu_staco_nPixHits->at(bi); // pixel hits >=1
 	nIDhitsMua   = nSCThitsMua+nPIXhitsMua; // pixel+SCT hits >=5
 	nIDhitsMub   = nSCThitsMub+nPIXhitsMub; // pixel+SCT hits >=5
 	
 	if(debugmode) cout << "### 9 ###" << endl;
 	
 	// ID - MS pT matching: pT=|p|*sin(theta), qOp=charge/|p|
-	me_qOp_a   = m_digestPhys->mu_staco_me_qoverp->at(ai)/MeV2TeV;
-	id_qOp_a   = m_digestPhys->mu_staco_id_qoverp->at(ai)/MeV2TeV;
-	me_theta_a = m_digestPhys->mu_staco_me_theta->at(ai);
-	id_theta_a = m_digestPhys->mu_staco_id_theta->at(ai);
-	me_qOp_b   = m_digestPhys->mu_staco_me_qoverp->at(bi)/MeV2TeV;
-	id_qOp_b   = m_digestPhys->mu_staco_id_qoverp->at(bi)/MeV2TeV;
-	me_theta_b = m_digestPhys->mu_staco_me_theta->at(bi);
-	id_theta_b = m_digestPhys->mu_staco_id_theta->at(bi);
+	me_qOp_a   = m_mcDigestPhys->mu_staco_me_qoverp->at(ai)/MeV2TeV;
+	id_qOp_a   = m_mcDigestPhys->mu_staco_id_qoverp->at(ai)/MeV2TeV;
+	me_theta_a = m_mcDigestPhys->mu_staco_me_theta->at(ai);
+	id_theta_a = m_mcDigestPhys->mu_staco_id_theta->at(ai);
+	me_qOp_b   = m_mcDigestPhys->mu_staco_me_qoverp->at(bi)/MeV2TeV;
+	id_qOp_b   = m_mcDigestPhys->mu_staco_id_qoverp->at(bi)/MeV2TeV;
+	me_theta_b = m_mcDigestPhys->mu_staco_me_theta->at(bi);
+	id_theta_b = m_mcDigestPhys->mu_staco_id_theta->at(bi);
 	
 	if(debugmode) cout << "### 10 ###" << endl;
 	
 	// impact parameter
-	impPrmZ0 = m_digestPhys->mu_staco_z0_exPV->at(ai);
-	impPrmD0 = m_digestPhys->mu_staco_d0_exPV->at(ai);
+	impPrmZ0 = m_mcDigestPhys->mu_staco_z0_exPV->at(ai);
+	impPrmD0 = m_mcDigestPhys->mu_staco_d0_exPV->at(ai);
 	
 	if(debugmode) cout << "### 11 ###" << endl;
 	
 	// isolation
-	mu_pTa   = m_digestPhys->mu_staco_pt->at(ai)*MeV2TeV;
-	mu_pTb   = m_digestPhys->mu_staco_pt->at(bi)*MeV2TeV;
-	pTcone20a = m_digestPhys->mu_staco_ptcone20->at(ai)*MeV2TeV;
-	pTcone20b = m_digestPhys->mu_staco_ptcone20->at(bi)*MeV2TeV;
-	pTcone30a = m_digestPhys->mu_staco_ptcone30->at(ai)*MeV2TeV;
-	pTcone30b = m_digestPhys->mu_staco_ptcone30->at(bi)*MeV2TeV;
-	pTcone40a = m_digestPhys->mu_staco_ptcone40->at(ai)*MeV2TeV;
-	pTcone40b = m_digestPhys->mu_staco_ptcone40->at(bi)*MeV2TeV;
+	mu_pTa   = m_mcDigestPhys->mu_staco_pt->at(ai)*MeV2TeV;
+	mu_pTb   = m_mcDigestPhys->mu_staco_pt->at(bi)*MeV2TeV;
+	pTcone20a = m_mcDigestPhys->mu_staco_ptcone20->at(ai)*MeV2TeV;
+	pTcone20b = m_mcDigestPhys->mu_staco_ptcone20->at(bi)*MeV2TeV;
+	pTcone30a = m_mcDigestPhys->mu_staco_ptcone30->at(ai)*MeV2TeV;
+	pTcone30b = m_mcDigestPhys->mu_staco_ptcone30->at(bi)*MeV2TeV;
+	pTcone40a = m_mcDigestPhys->mu_staco_ptcone40->at(ai)*MeV2TeV;
+	pTcone40b = m_mcDigestPhys->mu_staco_ptcone40->at(bi)*MeV2TeV;
 	
 	if(debugmode) cout << "### 12 ###" << endl;
 	
 	// charge
-	mu_charge_a = m_digestPhys->mu_staco_charge->at(ai);
-	mu_charge_b = m_digestPhys->mu_staco_charge->at(bi);
+	mu_charge_a = m_mcDigestPhys->mu_staco_charge->at(ai);
+	mu_charge_b = m_mcDigestPhys->mu_staco_charge->at(bi);
 	
 	if(debugmode) cout << "### 13 ###" << endl;
 	
@@ -235,8 +237,8 @@ void digestAnalysis::executeCutFlow()
 	//X( prtD0*cos(phi) );
 	//Y( prtD0*sin(phi) );
 	//Z( Z0 );
-	m_graphicobjs->h2_xyVertex->Fill( d0exPVa*cos(m_digestPhys->mu_staco_phi->at(ai)), d0exPVa*sin(m_digestPhys->mu_staco_phi->at(ai)) );
-	m_graphicobjs->h2_xyVertex->Fill( d0exPVb*cos(m_digestPhys->mu_staco_phi->at(bi)), d0exPVb*sin(m_digestPhys->mu_staco_phi->at(bi)) );
+	m_graphicobjs->h2_xyVertex->Fill( d0exPVa*cos(m_mcDigestPhys->mu_staco_phi->at(ai)), d0exPVa*sin(m_mcDigestPhys->mu_staco_phi->at(ai)) );
+	m_graphicobjs->h2_xyVertex->Fill( d0exPVb*cos(m_mcDigestPhys->mu_staco_phi->at(bi)), d0exPVb*sin(m_mcDigestPhys->mu_staco_phi->at(bi)) );
 	
 	
 	bool passCutFlow    = true;
@@ -266,11 +268,6 @@ void digestAnalysis::executeCutFlow()
 		}
 		
 		if(debugmode) cout << "### 15.1 ###" << endl;
-
-		if(sorderedcutname=="EF_mu10")
-		{
-			passCurrentCut = ( isEF_muXCut((*m_cutFlowMapSVD)[sorderedcutname][0], isEF_mu10) ) ? true : false;
-		}
 		
 		if(debugmode) cout << "### 15.3 ###" << endl;
 
@@ -291,6 +288,11 @@ void digestAnalysis::executeCutFlow()
 		if(sorderedcutname=="eta")
 		{
 			passCurrentCut = ( etaCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
+		}
+		
+		if(sorderedcutname=="etaTight")
+		{
+			passCurrentCut = ( etaTightCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
 		}
 		
 		if(debugmode) cout << "### 15.6 ###" << endl;
@@ -445,7 +447,7 @@ void digestAnalysis::executeCutFlow()
 	if(debugmode) cout << "### 17 ###" << endl;
 }
 
-void digestAnalysis::write()
+void mcDigestAnalysis::write()
 {
 	//m_treeFile->cd();
 	//m_offTreeDigest->write();

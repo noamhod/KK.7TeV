@@ -30,6 +30,8 @@ digestAnalysis::digestAnalysis(digestPhysics* digestPhysics, graphicObjects* gra
 	initSelectionCuts(m_cutFlowMapSVD, m_cutFlowOrdered, m_cutFlowTypeOrdered);
 
 	m_graphicobjs = graphicobjs;
+	m_graphicobjs->setCutFlowMapSVDPtr( m_cutFlowMapSVD );
+	m_graphicobjs->ginitialize();
 	
 	m_fit = new fit();
 	
@@ -266,11 +268,6 @@ void digestAnalysis::executeCutFlow()
 		}
 		
 		if(debugmode) cout << "### 15.1 ###" << endl;
-
-		if(sorderedcutname=="EF_mu10")
-		{
-			passCurrentCut = ( isEF_muXCut((*m_cutFlowMapSVD)[sorderedcutname][0], isEF_mu10) ) ? true : false;
-		}
 		
 		if(debugmode) cout << "### 15.3 ###" << endl;
 
@@ -291,6 +288,11 @@ void digestAnalysis::executeCutFlow()
 		if(sorderedcutname=="eta")
 		{
 			passCurrentCut = ( etaCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
+		}
+		
+		if(sorderedcutname=="etaTight")
+		{
+			passCurrentCut = ( etaTightCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
 		}
 		
 		if(debugmode) cout << "### 15.6 ###" << endl;

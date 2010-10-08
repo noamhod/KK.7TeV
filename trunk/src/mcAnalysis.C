@@ -33,6 +33,8 @@ mcAnalysis::mcAnalysis(mcPhysics* mcPhys, graphicObjects* graphicobjs, cutFlowHa
 	initSelectionCuts(m_cutFlowMapSVD, m_cutFlowOrdered, m_cutFlowTypeOrdered);
 
 	m_graphicobjs = graphicobjs;
+	m_graphicobjs->setCutFlowMapSVDPtr( m_cutFlowMapSVD );
+	m_graphicobjs->ginitialize();
 }
 
 mcAnalysis::~mcAnalysis()
@@ -132,6 +134,11 @@ void mcAnalysis::executeCutFlow()
 		if(sorderedcutname=="L1_MU6")
 		{
 			passCurrentCut = ( isL1_MU6Cut((*m_cutFlowMapSVD)[sorderedcutname][0], m_mcPhys->L1_MU6) ) ? true : false;
+		}
+		
+		if(sorderedcutname=="EF_mu10")
+		{
+			passCurrentCut = ( isEF_muXCut((*m_cutFlowMapSVD)[sorderedcutname][0], m_mcPhys->EF_mu10) ) ? true : false;
 		}
 		
 		if(sorderedcutname=="hipTmuon")
@@ -353,11 +360,6 @@ void mcAnalysis::executeCutFlow()
 		}
 		
 		if(debugmode) cout << "### 19.1 ###" << endl;
-
-		if(sorderedcutname=="EF_mu10")
-		{
-			passCurrentCut = ( isEF_muXCut((*m_cutFlowMapSVD)[sorderedcutname][0], isEF_mu10) ) ? true : false;
-		}
 		
 		if(debugmode) cout << "### 19.2 ###" << endl;
 
@@ -378,6 +380,11 @@ void mcAnalysis::executeCutFlow()
 		if(sorderedcutname=="eta")
 		{
 			passCurrentCut = ( etaCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
+		}
+		
+		if(sorderedcutname=="etaTight")
+		{
+			passCurrentCut = ( etaTightCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
 		}
 		
 		if(debugmode) cout << "### 19.5 ###" << endl;

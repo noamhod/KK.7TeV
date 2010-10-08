@@ -31,6 +31,7 @@ atlasStyle->SetCanvasColor(icol);
 atlasStyle->SetStatColor(icol);
 //atlasStyle->SetFillColor(icol);
 atlasStyle->SetFrameFillColor(icol);
+atlasStyle->SetTitleFillColor(icol);
 
 // set the paper & margin sizes
 atlasStyle->SetPaperSize(20,26);
@@ -64,8 +65,8 @@ atlasStyle->SetTitleSize(tsize,"z");
 
 //use bold lines and markers
 atlasStyle->SetMarkerStyle(20);
-atlasStyle->SetMarkerSize(1.2);
-atlasStyle->SetHistLineWidth(2.);
+atlasStyle->SetMarkerSize(1); //1.2
+atlasStyle->SetHistLineWidth(1.5);
 atlasStyle->SetLineStyleString(2,"[12 12]"); // postscript dashes
 
 //get rid of X error bars and y error bar caps
@@ -86,6 +87,7 @@ gROOT->SetStyle("Plain");
 
  // Stats
 
+ 
   atlasStyle->SetStatBorderSize(0);
   atlasStyle->SetStatColor(0);
   atlasStyle->SetStatX(0.92);
@@ -98,7 +100,6 @@ gROOT->SetStyle("Plain");
   atlasStyle->SetStatFormat("7.4f");
   atlasStyle->SetFitFormat("7.4f");
   atlasStyle->SetStripDecimals(kFALSE);
-
 
 
 //gStyle->SetPadTickX(1);

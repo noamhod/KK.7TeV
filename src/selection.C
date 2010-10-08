@@ -149,7 +149,7 @@ bool selection::findBestVertex(int nTracksCut, int nTypeCut, double z0Cut, int n
 	{
 		nPVtracks = v_vxp_nTracks->at(i);
 		nPVtype   = v_vxp_type->at(i);
-		dPVz0     = v_vxp_z->at(i);
+		dPVz0     = fabs( v_vxp_z->at(i) );
 		
 		if(nPVtracks>nTracksCut  &&  nPVtype==nTypeCut  &&  dPVz0<z0Cut) found = true;
 	}
@@ -174,7 +174,7 @@ int selection::getPVindex(int nTracksCut, int nTypeCut, double z0Cut, int nvxp,
 	{
 		nPVtracks = v_vxp_nTracks->at(i);
 		nPVtype   = v_vxp_type->at(i);
-		dPVz0     = v_vxp_z->at(i);
+		dPVz0     = fabs( v_vxp_z->at(i) );
 		if(nPVtracks>nTracksCut  &&  nPVtype==nTypeCut  &&  dPVz0<z0Cut)
 		{
 			if(dPVz0<z0min)
@@ -250,6 +250,12 @@ bool selection::etaCut( double etaCutVal, TLorentzVector* pa, TLorentzVector* pb
 	return ( fabs(eta(pa))<=etaCutVal  &&  fabs(eta(pb))<=etaCutVal ) ? true : false;
 }
 
+bool selection::etaTightCut( double etaTightCutVal, TLorentzVector* pa, TLorentzVector* pb )
+{
+	if(b_print) cout << "in etaTightCut: eta(pa)=" << eta(pa) << ", eta(pb)=" << eta(pb) << endl;
+	return ( fabs(eta(pa))<=etaTightCutVal  &&  fabs(eta(pb))<=etaTightCutVal ) ? true : false;
+}
+
 bool selection::imassCut( double imassCutVal, TLorentzVector* pa, TLorentzVector* pb )
 {
 	if(b_print) cout << "in imassCut: imass(pa,pb)=" << imass(pa,pb) << endl;
@@ -313,7 +319,8 @@ bool selection::isCombMuCut( double isCombMuCutVal, int isCombMua, int isCombMub
 {
 	/*mu_staco_isCombinedMuon*/
 	if(b_print) cout << "in isCombMuCut: isCombMua=" << isCombMua << ", isCombMub=" << isCombMub << endl;
-	return ( (double)isCombMua == isCombMuCutVal || (double)isCombMub == isCombMuCutVal ) ? true : false;
+	//return ( (double)isCombMua == isCombMuCutVal || (double)isCombMub == isCombMuCutVal ) ? true : false; // at least one is comb mu
+	return ( (double)isCombMua == isCombMuCutVal && (double)isCombMub == isCombMuCutVal ) ? true : false; // both are comb mu
 }
 
 bool selection::nSCThitsCut( double nSCThitsCutVal, int nSCThits )
@@ -422,7 +429,7 @@ bool selection::primaryVertexCut( double prmVtxNtracksCutVal, double prmVtxTypeC
 		
 		nPVtracks = pviPVtracks->at(i);
 		nPVtype   = pviPVtype->at(i);
-		dPVz0     = pvfPVz0->at(i);
+		dPVz0     = fabs( pvfPVz0->at(i) );
 		dPVz0err  = pvfPVz0err->at(i);
 		
 		if( !prmVtxNtracksCut(prmVtxNtracksCutVal, nPVtracks) )

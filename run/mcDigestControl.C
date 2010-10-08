@@ -16,11 +16,11 @@ mcDigestControl::mcDigestControl()
 	
 	///////////////////////////////
 	// chose the MC sample here ///
-	string sMCsample = "ccmuX15";
+	string sMCsample = "Zmumu";
 	///////////////////////////////
 
 	str = checkANDsetFilepath("PWD", "/../conf/digest_mc_dataset_"+sMCsample+".list");
-	string strb = checkANDsetFilepath("PWD", "/digest_mc_datasetdir"+sMCsample+"/"); // ln -s  ~hod/data  datasetdir
+	string strb = checkANDsetFilepath("PWD", "/digest_datasetdir/"); // ln -s  ~hod/data  datasetdir
 	makeChain(true, str, strb);
 
 	m_mcDigestPhys = new mcDigestPhysics( m_chain );
@@ -28,7 +28,7 @@ mcDigestControl::mcDigestControl()
 	str = checkANDsetFilepath("PWD", "/../data/mcDigestTreeDigest_"+sMCsample+".root");
 	m_treefile = new TFile( str.c_str(), "RECREATE");
 	
-	str = checkANDsetFilepath("PWD", "/../data/mcDigestControl"+sMCsample+".root");
+	str = checkANDsetFilepath("PWD", "/../data/mcDigestControl_"+sMCsample+".root");
 	m_histfile = new TFile( str.c_str(), "RECREATE");
 	m_histfile->cd();
 

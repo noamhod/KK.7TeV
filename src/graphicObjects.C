@@ -9,12 +9,17 @@
 
 graphicObjects::graphicObjects()
 {
-	ginitialize();
+	//ginitialize();
 }
 
 graphicObjects::~graphicObjects()
 {
 	gfinalize();
+}
+
+void graphicObjects::setCutFlowMapSVDPtr(TMapsvd* cutFlowMapSVD)
+{
+	cut_cutFlowMapSVD = cutFlowMapSVD;
 }
 
 void graphicObjects::ginitialize()
@@ -82,9 +87,15 @@ void graphicObjects::ginitialize()
 	leg_y1 = 0.376;
 	leg_y2 = 0.922;
 
-	imass_nbins = 100;
-	imass_min   = 10.*GeV2TeV;
-	imass_max   = 2010.*GeV2TeV;
+	
+	double pT_cut    = (*cut_cutFlowMapSVD)["pT"][0];
+	double imass_cut = (*cut_cutFlowMapSVD)["imass"][0];
+	
+	imass_nbins   = 100;
+	imass_min     = 10.*GeV2TeV;
+	imass_min_cut = imass_cut;
+	imass_max     = 2010.*GeV2TeV;
+	imass_max_cut = 2000.*GeV2TeV+imass_cut;
 	
 	imass_fit_nbins = 40;
 	imass_fit_min   = 0.*GeV2TeV;
@@ -92,20 +103,38 @@ void graphicObjects::ginitialize()
 	
 	pT_nbins    = 100;
 	pT_min      = 5.*GeV2TeV;
+	pT_min_cut  = pT_cut;
 	pT_max      = 2005.*GeV2TeV;
+	pT_max_cut  = 2000.*GeV2TeV+pT_cut;
 
 	// logarithmic boundries and bins of histograms
 	logMmin = log10(imass_min);
+	logMmin_cut = log10(imass_min_cut);
 	logMmax = log10(imass_max);
+	logMmax_cut = log10(imass_max_cut);
 	M_binwidth = (Double_t)( (logMmax-logMmin)/(Double_t)imass_nbins );
+	M_binwidth_cut = (Double_t)( (logMmax_cut-logMmin_cut)/(Double_t)imass_nbins );
 	M_bins[0] = imass_min;
-	for (Int_t i=1 ; i<=imass_nbins ; i++) { M_bins[i] = TMath::Power( 10,(logMmin + i*M_binwidth) ); }
+	M_bins_cut[0] = imass_min_cut;
+	for (Int_t i=1 ; i<=imass_nbins ; i++)
+	{ 
+		M_bins[i] = TMath::Power( 10,(logMmin + i*M_binwidth) );
+		M_bins_cut[i] = TMath::Power( 10,(logMmin_cut + i*M_binwidth_cut) );
+	}
 	
 	logpTmin = log10(pT_min);
+	logpTmin_cut = log10(pT_min_cut);
 	logpTmax = log10(pT_max);
+	logpTmax_cut = log10(pT_max_cut);
 	pT_binwidth = (Double_t)( (logpTmax-logpTmin)/(Double_t)pT_nbins );
+	pT_binwidth_cut = (Double_t)( (logpTmax_cut-logpTmin_cut)/(Double_t)pT_nbins );
 	pT_bins[0] = pT_min;
-	for (Int_t i=1 ; i<=pT_nbins ; i++) { pT_bins[i] = TMath::Power( 10,(logpTmin + i*pT_binwidth) ); }
+	pT_bins_cut[0] = pT_min_cut;
+	for (Int_t i=1 ; i<=pT_nbins ; i++)
+	{
+		pT_bins[i] = TMath::Power( 10,(logpTmin + i*pT_binwidth) );
+		pT_bins_cut[i] = TMath::Power( 10,(logpTmin_cut + i*pT_binwidth_cut) );
+	}
 	
 	eta_nbins   = 24;
 	eta_min     = -3.;
@@ -168,13 +197,16 @@ void graphicObjects::bookHistos(TDirectory* tdir)
 {
 	if(tdir!=NULL) tdir->cd();
 
-	h1_imass = new TH1D("imass","imass", imass_nbins, M_bins);
+	h1_imass = new TH1D("imass","imass", imass_nbins, M_bins_cut);
+	//h1_imass = new TH1D("imass","imass", imass_nbins, M_bins);
 	//h1_imass = new TH1D("imass","imass", imass_nbins, imass_min, imass_max);
 	h1_ipTdiff = new TH1D("ipTdiff","ipTdiff", ipTdiff_nbins, ipTdiff_min, ipTdiff_max);
 	h1_etaSum = new TH1D("etaSum","etaSum", etaSum_nbins, etaSum_min, etaSum_max);
-	h1_pT = new TH1D("pT","pT", pT_nbins, pT_bins);
+	h1_pT = new TH1D("pT","pT", pT_nbins, pT_bins_cut);
+	//h1_pT = new TH1D("pT","pT", pT_nbins, pT_bins);
 	//h1_pT = new TH1D("pT","pT", pT_nbins, pT_min, pT_max);
-	h1_pT_muplus = new TH1D("pT #mu^{+}","pT #mu^{+}", pT_nbins, pT_bins);
+	h1_pT_muplus = new TH1D("pT #mu^{+}","pT #mu^{+}", pT_nbins, pT_bins_cut);
+	//h1_pT_muplus = new TH1D("pT #mu^{+}","pT #mu^{+}", pT_nbins, pT_bins);
 	//h1_pT_muplus = new TH1D("pT #mu^{+}","pT #mu^{+}", pT_nbins, pT_min, pT_max);
 	h1_eta = new TH1D("eta","eta", eta_nbins, eta_min, eta_max);
 	h1_eta_muplus = new TH1D("eta #mu^{+}","eta #mu^{+}", eta_nbins, eta_min, eta_max);

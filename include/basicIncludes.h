@@ -147,6 +147,9 @@ template class std::vector<std::vector<unsigned int> >;
 #define digestPhysics_cxx
 #include "digestPhysics.C"
 
+#define mcDigestPhysics_cxx
+#include "mcDigestPhysics.C"
+
 #define particleBase_cxx
 #include "particleBase.C"
 

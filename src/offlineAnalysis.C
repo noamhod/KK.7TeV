@@ -38,6 +38,8 @@ offlineAnalysis::offlineAnalysis(offlinePhysics* offPhys, graphicObjects* graphi
 	initSelectionCuts(m_cutFlowMapSVD, m_cutFlowOrdered, m_cutFlowTypeOrdered);
 
 	m_graphicobjs = graphicobjs;
+	m_graphicobjs->setCutFlowMapSVDPtr( m_cutFlowMapSVD );
+	m_graphicobjs->ginitialize();
 	
 	m_fit = new fit();
 	
@@ -154,6 +156,11 @@ void offlineAnalysis::executeCutFlow()
 		if(sorderedcutname=="L1_MU6")
 		{
 			passCurrentCut = ( isL1_MU6Cut((*m_cutFlowMapSVD)[sorderedcutname][0], m_offPhys->L1_MU6) ) ? true : false;
+		}
+		
+		if(sorderedcutname=="EF_mu10")
+		{
+			passCurrentCut = ( isEF_muXCut((*m_cutFlowMapSVD)[sorderedcutname][0], m_offPhys->EF_mu10) ) ? true : false;
 		}
 		
 		if(sorderedcutname=="hipTmuon")
@@ -347,11 +354,6 @@ void offlineAnalysis::executeCutFlow()
 		if(sorderedcutname=="oppositeCharge")
 		{
 			passCurrentCut = ( oppositeChargeCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_charge_a, mu_charge_b) ) ? true : false;
-		}
-
-		if(sorderedcutname=="EF_mu10")
-		{
-			passCurrentCut = ( isEF_muXCut((*m_cutFlowMapSVD)[sorderedcutname][0], isEF_mu10) ) ? true : false;
 		}		
 
 		if(sorderedcutname=="imass")
@@ -367,6 +369,11 @@ void offlineAnalysis::executeCutFlow()
 		if(sorderedcutname=="eta")
 		{
 			passCurrentCut = ( etaCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
+		}
+		
+		if(sorderedcutname=="etaTight")
+		{
+			passCurrentCut = ( etaTightCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
 		}
 
 		if(sorderedcutname=="cosThetaDimu")

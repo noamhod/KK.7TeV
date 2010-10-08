@@ -19,14 +19,14 @@
 #define cutFlowHandler_cxx
 #include "cutFlowHandler.C"
 
-#ifndef DIGESTANALYSIS_H
-#define DIGESTANALYSIS_H
+#ifndef MCDIGESTANALYSIS_H
+#define MCDIGESTANALYSIS_H
 
-class digestAnalysis : public digestPhysics, public selection, public graphicObjects
+class mcDigestAnalysis : public mcDigestPhysics, public selection, public graphicObjects
 {
 public:
 	// pointers to classes
-	digestPhysics*        m_digestPhys;
+	mcDigestPhysics*        m_mcDigestPhys;
 
 	graphicObjects* m_graphicobjs;
 
@@ -122,9 +122,9 @@ public:
 	////////////////////////
 
 public:
-	digestAnalysis();
-	digestAnalysis(digestPhysics* offPhys, graphicObjects* m_graphicobjs, cutFlowHandler* cutFlowHandler, TFile* treeFile, string sLastCut2Hist = "GRL");
-	~digestAnalysis();
+	mcDigestAnalysis();
+	mcDigestAnalysis(mcDigestPhysics* offPhys, graphicObjects* m_graphicobjs, cutFlowHandler* cutFlowHandler, TFile* treeFile, string sLastCut2Hist = "GRL");
+	~mcDigestAnalysis();
 
 	void initialize();
 	void finalize();

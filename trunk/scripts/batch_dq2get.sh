@@ -141,3 +141,14 @@ source dq2get_dataset.sh   00165767   07102010   1217
 source dq2get_dataset.sh   00165815   07102010   1219
 source dq2get_dataset.sh   00165817   07102010   1220
 source dq2get_dataset.sh   00165818   07102010   1221
+
+# 8
+###############################################################
+# 9 (period G5)
+
+source dq2get_dataset.sh   00165821   08102010   1432
+source dq2get_dataset.sh   00165954   08102010   1433
+source dq2get_dataset.sh   00165956   08102010   1434
+source dq2get_dataset.sh   00166097   08102010   1435
+source dq2get_dataset.sh   00166142   08102010   1436
+source dq2get_dataset.sh   00166143   08102010   1437

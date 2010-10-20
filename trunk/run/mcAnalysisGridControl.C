@@ -31,7 +31,9 @@ mcAnalysisGridControl::mcAnalysisGridControl( TChain* inchain, TFile* outfile )
 	str = "cutFlow.cuts";
 	m_cutFlowHandler = new cutFlowHandler(str);
 	
-	m_mcAnalysis = new mcAnalysis( m_mcPhys, m_graphics, m_cutFlowHandler, m_rootfile );
+	m_fitter = new fit();
+	
+	m_mcAnalysis = new mcAnalysis( m_mcPhys, m_graphics, m_cutFlowHandler, m_fitter, m_rootfile );
 
 	book();
 }

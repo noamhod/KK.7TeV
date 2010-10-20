@@ -16,7 +16,7 @@ combinedGraphicsControl::combinedGraphicsControl()
 	str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
 	m_cutFlowHandler = new cutFlowHandler(str);
 	
-	m_combinedGraphics = new combinedGraphics(m_cutFlowHandler);
+	m_combinedGraphics = new combinedGraphics(m_cutFlowHandler, "digest");
 }
 
 combinedGraphicsControl::~combinedGraphicsControl()

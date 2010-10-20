@@ -13,7 +13,7 @@
 #ifndef SELECTION_H
 #define SELECTION_H
 
-class selection : public kinematics
+class selection : public kinematics, public utilities
 {
 public:
 	utilities* m_util;

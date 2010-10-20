@@ -11,7 +11,7 @@
 ################
 preselection	0				GRL						1				 1.
 #preselection	1				L1_MU6					1				 1.
-preselection	2				EF_mu13					1				 1.
+preselection	2				EF_mu10					1				 1.
 preselection	3				hipTmuon				2				 0.015	 	0.010
 preselection	4				PV						3				 1.		 	1.		 150.
 
@@ -49,10 +49,11 @@ selection		53				pTmatchingAbsDiff		1						   0.015
 #selection		56				isolation30				1						   0.05
 selection		57				isolation40				1						   0.2
 selection		58				isCombMu				1						   1.
-selection		59				d0						1						   1.
-selection		60				z0						1						   5.
+
 
 # KINEMATICS
+#selection		71				d0						1						   150.
+#selection		72				z0						1						   150.
 selection		73				pT						1						   0.02
 selection		74				eta						1						   2.4
 #selection		75				etaTight				1						   2.0

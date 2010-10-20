@@ -17,8 +17,10 @@ class mcAnalysisGridControl : public mcAnalysis
 {
 	public:
 		// from MakeClass
-		mcPhysics* m_mcPhys;		
+		mcPhysics*      m_mcPhys;		
+		cutFlowHandler* m_cutFlowHandler;
 
+		
 		// pointers
 		TFile*          m_rootfile;
 		TChain*			m_chain;
@@ -27,10 +29,10 @@ class mcAnalysisGridControl : public mcAnalysis
 		TDirectory* 	m_dirNoCuts;
 		TDirectory* 	m_dirCutFlow;
 		
-		mcAnalysis*       m_mcAnalysis;
+		mcAnalysis*     m_mcAnalysis;
 		graphicObjects* m_graphics;
-		cutFlowHandler* m_cutFlowHandler;
-
+		fit*            m_fitter;
+	
 		// run control
 		Long64_t l64t_nentries;
 		Long64_t l64t_nbytes;
@@ -50,6 +52,7 @@ class mcAnalysisGridControl : public mcAnalysis
 		void   finalize();
 		void   book();
 		void   draw();
+		void   fits();
 		void   analyze();
 		void   loop(Long64_t startEvent = 0, Long64_t stopAfterNevents = 0);
 

@@ -34,6 +34,7 @@ class mcDigestControl : public digestChains, public mcDigestAnalysis
 		
 		mcDigestAnalysis* m_mcDigestAnalysis;
 		graphicObjects*  m_graphics;
+		fit*            m_fitter;
 
 		// run control
 		Long64_t l64t_nentries;
@@ -61,11 +62,10 @@ class mcDigestControl : public digestChains, public mcDigestAnalysis
 		~mcDigestControl();
 		void   initialize();
 		void   finalize();
-		
-		void resetLastCut2Hist(string sLastCut2Hist = "GRL") {m_mcDigestAnalysis->m_sLastCut2Hist = sLastCut2Hist;}
-		
+				
 		void   book();
 		void   draw();
+		void   fits();
 		void   analyze();
 		void   loop(Long64_t startEvent = 0, Long64_t stopAfterNevents = kMaxLong64);
 		

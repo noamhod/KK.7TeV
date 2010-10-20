@@ -7,34 +7,30 @@
 
 #include "basicIncludes.h"
 
-#define chains_cxx
-#include "chains.C"
+#define offlineAnalysis_cxx
+#include "offlineAnalysis.C"
 
-#define analysis_cxx
-#include "analysis.C"
+#ifndef OFFLINEGRIDCONTROL_H
+#define OFFLINEGRIDCONTROL_H
 
-#ifndef ANALYSISCONTROL_H
-#define ANALYSISCONTROL_H
-
-class analysisControl : public chains, public analysis
+class offlineGridControl : public offlineAnalysis
 {
 	public:
 		// from MakeClass
-		physics*        m_phys;
-		cutFlowHandler* m_cutFlowHandler;
+		offlinePhysics* m_offPhys;		
 
 		// pointers
-		TFile*          m_histfile;
-		TFile*          m_treefile;
+		TFile*          m_rootfile;
+		TChain*			m_chain;
 		
 		TDirectory*     m_dirAllCuts;
 		TDirectory* 	m_dirNoCuts;
 		TDirectory* 	m_dirCutFlow;
 		
-		analysis*       m_analysis;
-		graphicObjects* m_graphics;
-		fit*            m_fitter;
-		GRLinterface*   m_GRL;
+		offlineAnalysis* m_offlineAnalysis;
+		graphicObjects*  m_graphics;
+		//GRLinterface*   m_GRL; 
+		cutFlowHandler* m_cutFlowHandler;
 
 		// run control
 		Long64_t l64t_nentries;
@@ -48,13 +44,13 @@ class analysisControl : public chains, public analysis
 		Long64_t l64t_stopEvent;
 	
 	public:
-		analysisControl();
-		~analysisControl();
+		offlineGridControl();
+		offlineGridControl( TChain* inchain, TFile* outfile );
+		~offlineGridControl();
 		void   initialize();
 		void   finalize();
 		void   book();
 		void   draw();
-		void   fits();
 		void   analyze();
 		void   loop(Long64_t startEvent = 0, Long64_t stopAfterNevents = 0);
 

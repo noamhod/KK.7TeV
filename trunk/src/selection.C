@@ -21,14 +21,12 @@ selection::~selection()
 
 void selection::sinitialize()
 {
-	m_util = new utilities();	
-
 	b_print     = false;
 }
 
 void selection::sfinalize()
 {
-	//delete m_util;
+
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -283,13 +281,13 @@ bool selection::oppositeChargeCut( double oppositeChargeCutVal, double ca, doubl
 bool selection::d0Cut( double d0CutVal, double d0a, double d0b )
 {
 	if(b_print) cout << "in d0Cut: d0=" << d0a << ", d0b=" << d0b << endl;
-	return ( fabs(d0a)<=d0CutVal  &&  fabs(d0b)<=d0CutVal ) ? true : false;
+	return ( fabs(d0a)<d0CutVal  &&  fabs(d0b)<d0CutVal ) ? true : false;
 }
 
 bool selection::z0Cut( double z0CutVal, double z0a, double z0b )
 {
 	if(b_print) cout << "in d0Cut: z0=" << z0a << ", z0b=" << z0b << endl;
-	return ( fabs(z0a)<=z0CutVal  &&  fabs(z0b)<=z0CutVal ) ? true : false;
+	return ( fabs(z0a)<z0CutVal  &&  fabs(z0b)<z0CutVal ) ? true : false;
 }
 
 bool selection::prmVtxNtracksCut( double prmVtxNtracksCutVal, int nPVtracks )
@@ -560,7 +558,7 @@ double impPrmZ0, double impPrmD0 )
 }
 
 bool selection::pairXXisolation( double isolationCutVal, string sIsoValName,
-double pTmua, double pTmub, double pTconea, double pTconeb )
+								 double pTmua, double pTmub, double pTconea, double pTconeb )
 {
 	bool bPassed = true;
 	

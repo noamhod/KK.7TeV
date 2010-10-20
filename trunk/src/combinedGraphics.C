@@ -39,7 +39,7 @@ combinedGraphics::combinedGraphics(cutFlowHandler* cutFlowHandler, string analys
 	
 	/////////////////////////////////////////////////
 	// integrated luminosity of the data in 1/pb ////
-	dataLumi_ipb = 6.8401674; ///////////////////////
+	dataLumi_ipb = 8.6938974; ///////////////////////
 	/////////////////////////////////////////////////
 	
 	setStyle();
@@ -249,8 +249,8 @@ void combinedGraphics::ratio(double xmin, double xmax, TH1D* hInp, TH1D* hRef, T
 
 void combinedGraphics::drawRatio(double xmin, double xmax, TH1D* hRat)
 {
-	double hmin = 5.e-2;
-	double hmax = 2.e+1;
+	double hmin = 2.e-3;
+	double hmax = 5.e+2;
 
 	TH1D* hRatFrame = (TH1D*)hRat->Clone("");
 	hRatFrame->Reset();
@@ -408,6 +408,7 @@ void combinedGraphics::drawNormHistosMap(string channel, TMapds* cutFlowOrdered,
 	stringstream strm;
 	string L;
 	string lumilabel = "";
+	strm << setprecision(2);
 	strm << dataLumi_ipb;
 	strm >> L;
 	lumilabel = "#intLdt~" + L + " pb^{-1}";
@@ -515,7 +516,7 @@ void combinedGraphics::drawNormHistosMap(string channel, TMapds* cutFlowOrdered,
 		strm << setprecision(2);
 		strm << (*hmap_cutFlow_pT)[sname]->GetBinWidth( (*hmap_cutFlow_pT)[sname]->GetNbinsX() );
 		strm >> s2;
-		string ytitle = "#frac{dN}{dp_{T}(#mu^{-})} (" + s1 + "#rightarrow" + s2 + " TeV)^{-1}";
+		string ytitle = "#frac{dN}{dp_{T}^{#mu}} (" + s1 + "#rightarrow" + s2 + " TeV)^{-1}";
 		/*
 		double norm = (*hmap_cutFlow_pT)[sname]->GetEntries() * (*hmap_cutFlow_pT)[sname]->GetBinWidth(1);
 		if(norm<=0)
@@ -530,7 +531,7 @@ void combinedGraphics::drawNormHistosMap(string channel, TMapds* cutFlowOrdered,
 		//NormToBinWidth( (*hmap_cutFlow_pT)[sname] );
 		//Norm( (*hmap_cutFlow_pT)[sname] );
 		(*hmap_cutFlow_pT)[sname]->SetTitle("");
-		(*hmap_cutFlow_pT)[sname]->SetXTitle("p_{T}(#mu^{-}) (TeV)");
+		(*hmap_cutFlow_pT)[sname]->SetXTitle("p_{T}^{#mu} (TeV)");
 		(*hmap_cutFlow_pT)[sname]->SetYTitle( ytitle.c_str() );
 		(*hmap_cutFlow_pT)[sname]->SetFillColor(colorAccumulate);
 		(*hmap_cutFlow_pT)[sname]->SetLineColor(colorAccumulate);
@@ -701,6 +702,7 @@ void combinedGraphics::drawimass()
 	stringstream strm;
 	string L;
 	string lumilabel = "";
+	strm << setprecision(2);
 	strm << dataLumi_ipb;
 	strm >> L;
 	lumilabel = "#intLdt~" + L + " pb^{-1}";
@@ -720,7 +722,7 @@ void combinedGraphics::drawimass()
 	pad_imass->SetLogy();
 	
 	pad_imass_ratio = cnv_imass->cd(2);
-	pad_imass_ratio->SetPad(0.009197324,0.01036269,0.9899666,0.2085492);
+	pad_imass_ratio->SetPad(0.009197324,0.01036269,0.9899666,0.253886);
 	pad_imass_ratio->SetFillColor(kWhite);
 	pad_imass_ratio->SetLogx();
 	pad_imass_ratio->SetLogy();
@@ -907,6 +909,7 @@ void combinedGraphics::drawpT()
 	stringstream strm;
 	string L;
 	string lumilabel = "";
+	strm << setprecision(2);
 	strm << m_dataLumi_pb;
 	strm >> L;
 	lumilabel = "#intLdt~" + L + " pb^{-1}";
@@ -926,7 +929,7 @@ void combinedGraphics::drawpT()
 	pad_pT->SetLogy();
 	
 	pad_pT_ratio = cnv_pT->cd(2);
-	pad_pT_ratio->SetPad(0.009197324,0.01036269,0.9899666,0.2085492);
+	pad_pT_ratio->SetPad(0.009197324,0.01036269,0.9899666,0.253886);
 	pad_pT_ratio->SetFillColor(kWhite);
 	pad_pT_ratio->SetLogx();
 	pad_pT_ratio->SetLogy();
@@ -970,7 +973,7 @@ void combinedGraphics::drawpT()
 	strm >> s2;
 	string ytitle = "#frac{dN}{dp_{T}} (" + s1 + "#rightarrow" + s2 + " TeV)^{-1}";
 	hMCpT->SetTitle("");
-	hMCpT->SetXTitle("p_{T}(#mu^{-}) (TeV)");
+	hMCpT->SetXTitle("p_{T}^{#mu} (TeV)");
 	hMCpT->SetYTitle( ytitle.c_str() );
 	hMCpT->SetTitle("");
 	leg_pT->AddEntry( hMCpT, channel.c_str(), "f");

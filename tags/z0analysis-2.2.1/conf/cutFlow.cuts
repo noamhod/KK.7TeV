@@ -1,0 +1,58 @@
+############################################
+# !!! NOTE !!! all units are in TeV and mm #
+############################################
+
+#TYPE#			#ORDER#			#NAME#					#NVALUES#		#VALUE(S)
+#																		 [1]		[2]		[3]#
+
+
+################
+# PRESELECTION #
+################
+preselection	0				GRL						1				 1.
+#preselection	1				L1_MU6					1				 1.
+preselection	2				EF_mu13					1				 1.
+preselection	3				hipTmuon				2				 0.015	 	0.010
+preselection	4				PV						3				 1.		 	1.		 150.
+
+
+
+#############
+# SELECTION #
+#############
+#-------------------------------------------------------#
+# THE 1st SELECTION CUT ***MUST*** BE "OPPOSITE CHARGE" #
+# In the looper, after the preselection part ends and   #
+# before the selection part begins, there is this line: #
+# if(m_phys->mu_staco_n<2) return;                      #
+# so the sequential oppositeCharge cut is redundant but #
+# necessary for the counting procedure                  #
+#-------------------------------------------------------#
+
+
+# DIMUON - ensure a c1*c2<0 candidate with appropriate imass and not cosmic:
+selection		20				oppositeCharge			1						   0.
+#selection		21				cosThetaDimu			1						   -0.96
+selection		22				imass					1						   0.06
+
+
+# MORE TRIGGERS:
+#selection		40				EF_mu10					1						   1.
+
+
+# QUALITY:
+#selection		51				idHits					3						   4.		 1.		 5.
+#selection		52				pTmatchingRatio			2						   2.		 0.5
+selection		53				pTmatchingAbsDiff		1						   0.015
+#selection		54				impactParameter			2						   5.		 1.
+#selection		55				isolation20				1						   999
+#selection		56				isolation30				1						   0.05
+selection		57				isolation40				1						   0.2
+selection		58				isCombMu				1						   1.
+selection		59				d0						1						   1.
+selection		60				z0						1						   5.
+
+# KINEMATICS
+selection		73				pT						1						   0.02
+selection		74				eta						1						   2.4
+#selection		75				etaTight				1						   2.0

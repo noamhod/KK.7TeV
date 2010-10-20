@@ -37,7 +37,9 @@ analysisControl::analysisControl()
 	str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
 	m_cutFlowHandler = new cutFlowHandler(str);
 	
-	m_analysis = new analysis( m_mcPhys, m_graphics, m_cutFlowHandler, m_treefile );
+	m_fitter = new fit();
+	
+	m_analysis = new analysis( m_mcPhys, m_graphics, m_cutFlowHandler, m_fitter, m_treefile );
 
 	book();
 }

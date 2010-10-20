@@ -17,7 +17,8 @@ class analysisGridControl : public analysis
 {
 	public:
 		// from MakeClass
-		physics* m_phys;		
+		physics*        m_phys;
+		cutFlowHandler* m_cutFlowHandler;
 
 		// pointers
 		TFile*          m_rootfile;
@@ -29,8 +30,9 @@ class analysisGridControl : public analysis
 		
 		analysis*       m_analysis;
 		graphicObjects* m_graphics;
+		fit*            m_fitter;
 		GRLinterface*   m_GRL; 
-		cutFlowHandler* m_cutFlowHandler;
+		
 
 		// run control
 		Long64_t l64t_nentries;
@@ -51,6 +53,7 @@ class analysisGridControl : public analysis
 		void   finalize();
 		void   book();
 		void   draw();
+		void   fits();
 		void   analyze();
 		void   loop(Long64_t startEvent = 0, Long64_t stopAfterNevents = 0);
 

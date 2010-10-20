@@ -16,7 +16,7 @@ mcOfflineControl::mcOfflineControl()
 
 	///////////////////////////////
 	// chose the MC sample here ///
-	string sMCsample = "ccmuX15";
+	string sMCsample = "Zmumu";
 	///////////////////////////////
 	
 	str = checkANDsetFilepath("PWD", "/../conf/offline_mc_dataset_"+sMCsample+".list");
@@ -39,8 +39,9 @@ mcOfflineControl::mcOfflineControl()
 	str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
 	m_cutFlowHandler = new cutFlowHandler(str);
 	
-	string sLastCut2Hist = "isCombMu"; // "cosThetaDimu"
-	m_mcOfflineAnalysis = new mcOfflineAnalysis( m_mcOffPhys, m_graphics, m_cutFlowHandler, m_treefile, sLastCut2Hist );
+	m_fitter = new fit();
+	
+	m_mcOfflineAnalysis = new mcOfflineAnalysis( m_mcOffPhys, m_graphics, m_cutFlowHandler, m_fitter, m_treefile );
 	
 	book();
 }

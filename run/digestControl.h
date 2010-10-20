@@ -33,7 +33,8 @@ class digestControl : public digestChains, public digestAnalysis
 		TDirectory* 	m_dirFit;
 		
 		digestAnalysis* m_digestAnalysis;
-		graphicObjects*  m_graphics;
+		graphicObjects* m_graphics;
+		fit*            m_fitter;
 
 		// run control
 		Long64_t l64t_nentries;
@@ -47,14 +48,15 @@ class digestControl : public digestChains, public digestAnalysis
 		Long64_t l64t_stopEvent;
 		
 		// for matching candidates
-		vector<double> runNumber;
-		vector<double> lumiBlock;
-		vector<double> eventNumber;
-		vector<double> mass_cb;
-		vector<double> mass_id;
-		vector<double> mass_me;
-		vector<double> pT1;
-		vector<double> pT2;
+                vector<double> runNumber;
+                vector<double> lumiBlock;
+                vector<double> eventNumber;
+                vector<double> mass_cb;
+                vector<double> mass_id;
+                vector<double> mass_me;
+                vector<double> pT1;
+                vector<double> pT2;
+	
 	
 	public:
 		digestControl();
@@ -62,9 +64,8 @@ class digestControl : public digestChains, public digestAnalysis
 		void   initialize();
 		void   finalize();
 		
-		void resetLastCut2Hist(string sLastCut2Hist = "GRL") {m_digestAnalysis->m_sLastCut2Hist = sLastCut2Hist;}
-		
 		void   book();
+		void   fits();
 		void   draw();
 		void   analyze();
 		void   loop(Long64_t startEvent = 0, Long64_t stopAfterNevents = kMaxLong64);

@@ -28,8 +28,8 @@ analysisGridControl::analysisGridControl( TChain* inchain, TFile* outfile )
 	m_graphics = new graphicObjects();
 	m_graphics->setStyle();
 
-	//str = checkANDsetFilepath("PWD", "/../conf/Z_GRL_152844-159224.xml");
-	str = "Z_GRL_152844-165818.xml";
+	//str = checkANDsetFilepath("PWD", "/../conf/Z_GRL_CURRENT.xml");
+	str = "Z_GRL_CURRENT.xml";
 	m_GRL = new GRLinterface();
 	m_GRL->glrinitialize( (TString)str );
 
@@ -38,7 +38,9 @@ analysisGridControl::analysisGridControl( TChain* inchain, TFile* outfile )
 	str = "cutFlow.cuts";
 	m_cutFlowHandler = new cutFlowHandler(str);
 	
-	m_analysis = new analysis( m_phys, m_graphics, m_cutFlowHandler, m_GRL, m_rootfile );
+	m_fitter = new fit();
+	
+	m_analysis = new analysis( m_phys, m_graphics, m_cutFlowHandler, m_fitter, m_GRL, m_rootfile );
 
 	book();
 }

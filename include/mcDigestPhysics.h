@@ -272,6 +272,7 @@ void mcDigestPhysics::Show(Long64_t entry)
 }
 Int_t mcDigestPhysics::Cut(Long64_t entry)
 {
+   if(false) cout << "entry=" << entry << endl;
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
 // returns -1 otherwise.

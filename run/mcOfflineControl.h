@@ -34,6 +34,7 @@ class mcOfflineControl : public offlineChains, public mcOfflineAnalysis
 		
 		mcOfflineAnalysis* m_mcOfflineAnalysis;
 		graphicObjects*  m_graphics;
+		fit*            m_fitter;
 
 		// run control
 		Long64_t l64t_nentries;
@@ -62,10 +63,9 @@ class mcOfflineControl : public offlineChains, public mcOfflineAnalysis
 		void   initialize();
 		void   finalize();
 		
-		void resetLastCut2Hist(string sLastCut2Hist = "GRL") {m_mcOfflineAnalysis->m_sLastCut2Hist = sLastCut2Hist;}
-		
 		void   book();
 		void   draw();
+		void   fits();
 		void   analyze();
 		void   loop(Long64_t startEvent = 0, Long64_t stopAfterNevents = kMaxLong64);
 		

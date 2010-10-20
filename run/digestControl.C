@@ -34,8 +34,9 @@ digestControl::digestControl()
 	str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
 	m_cutFlowHandler = new cutFlowHandler(str);
 	
-	string sLastCut2Hist = "isCombMu"; // "cosThetaDimu"
-	m_digestAnalysis = new digestAnalysis( m_digestPhys, m_graphics, m_cutFlowHandler, m_treefile, sLastCut2Hist );
+	m_fitter = new fit();
+	
+	m_digestAnalysis = new digestAnalysis( m_digestPhys, m_graphics, m_cutFlowHandler, m_fitter, m_treefile );
 
 	book();
 }
@@ -58,6 +59,7 @@ void digestControl::initialize()
 	m_digestPhys     = NULL;
 	m_digestAnalysis = NULL;
 	m_graphics = NULL;
+	m_fitter   = NULL;
 	m_histfile = NULL;
 	m_treefile = NULL;
 
@@ -98,20 +100,29 @@ void digestControl::book()
 	m_graphics->bookHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_cutFlowHandler->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 }
 
+void digestControl::fits()
+{
+	cout << "### in fits ####" << endl;
+
+	double yields[2];
+	
+	// Preform the fit
+	m_fitter->minimize( false, m_graphics->h1_imassFit, yields );
+}
+
 void digestControl::draw()
 {
 	m_graphics->drawBareHistos(m_dirNoCuts);
 	m_graphics->drawHistos(m_dirAllCuts);
 	m_graphics->drawHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_cutFlowHandler->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
-	m_graphics->drawFitHistos(m_dirFit, m_digestAnalysis->m_fit->m_fitROOT->guess, m_digestAnalysis->m_fit->m_fitROOT->fitFCN);
-	//m_graphics->drawFitHistos(m_dirFit, m_digestAnalysis->m_fit->m_fitMinuit->guess, m_digestAnalysis->m_fit->m_fitMinuit->fitFCN);
+	m_graphics->drawFitHistos(m_dirFit, m_fitter->m_fitROOT->guess, m_fitter->m_fitROOT->fitFCN);
+	//m_graphics->drawFitHistos(m_dirFit, m_fitter->m_fitMinuit->guess, m_fitter->m_fitMinuit->fitFCN);
 
 	m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
 }
 
 void digestControl::analyze()
 {
-	//m_digestAnalysis->executeBasic();
 	m_digestAnalysis->executeCutFlow();
 }
 
@@ -146,7 +157,8 @@ void digestControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		analyze();
 	}
 	
-	m_digestAnalysis->fitter();
+	//m_digestAnalysis->fitter();
+	fits();
 	
 	draw();
 	

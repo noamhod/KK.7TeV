@@ -34,8 +34,9 @@ offlineControl::offlineControl()
 	str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
 	m_cutFlowHandler = new cutFlowHandler(str);
 	
-	string sLastCut2Hist = "isCombMu"; // "cosThetaDimu"
-	m_offlineAnalysis = new offlineAnalysis( m_offPhys, m_graphics, m_cutFlowHandler, m_treefile, sLastCut2Hist );
+	m_fitter = new fit();
+	
+	m_offlineAnalysis = new offlineAnalysis( m_offPhys, m_graphics, m_cutFlowHandler, m_fitter, m_treefile );
 
 	book();
 }

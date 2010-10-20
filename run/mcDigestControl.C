@@ -16,7 +16,7 @@ mcDigestControl::mcDigestControl()
 	
 	///////////////////////////////
 	// chose the MC sample here ///
-	string sMCsample = "Zmumu";
+	string sMCsample = "ccmuX15";
 	///////////////////////////////
 
 	str = checkANDsetFilepath("PWD", "/../conf/digest_mc_dataset_"+sMCsample+".list");
@@ -39,8 +39,9 @@ mcDigestControl::mcDigestControl()
 	str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
 	m_cutFlowHandler = new cutFlowHandler(str);
 	
-	string sLastCut2Hist = "isCombMu"; // "cosThetaDimu"
-	m_mcDigestAnalysis = new mcDigestAnalysis( m_mcDigestPhys, m_graphics, m_cutFlowHandler, m_treefile, sLastCut2Hist );
+	m_fitter = new fit();
+	
+	m_mcDigestAnalysis = new mcDigestAnalysis( m_mcDigestPhys, m_graphics, m_cutFlowHandler, m_fitter, m_treefile);
 
 	book();
 }

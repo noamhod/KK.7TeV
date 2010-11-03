@@ -33,9 +33,6 @@ class cutFlowHandler
 		cutFlowHandler();
 		cutFlowHandler(string sCutFlowFilePath);
 		~cutFlowHandler();
-
-		void initialize();
-		void finalize();
 		
 		void   parseKeyValLine(string sLine);
 		int    getNVals();

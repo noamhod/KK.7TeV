@@ -13,21 +13,23 @@
 #ifndef MCDIGESTANALYSIS_H
 #define MCDIGESTANALYSIS_H
 
-class mcDigestAnalysis : public mcDigestPhysics, public combinedSelection
+class mcDigestAnalysis : public mcDigestPhysics, public analysisSkeleton
 {
 public:
 	// pointers to classes
-	mcDigestPhysics*        m_mcDigestPhys;
-	
-	TFile*		       m_treeFile;
+	mcDigestPhysics*  m_mcDigestPhys;
+	TFile*		      m_treeFile;
 
 public:
 	mcDigestAnalysis();
-	mcDigestAnalysis(mcDigestPhysics* offPhys, graphicObjects* m_graphicobjs, cutFlowHandler* cutFlowHandler, fit* fitter, TFile* treeFile);
+	mcDigestAnalysis(mcDigestPhysics* offPhys, TFile* treeFile,
+					 string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath ) :
+	analysisSkeleton(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
+	{
+		m_mcDigestPhys = mcDigestPhysics;
+		m_treeFile     = treeFile;
+	}
 	~mcDigestAnalysis();
-
-	void initialize();
-	void finalize();
 	
 	void executeAdvanced();
 	void executeCutFlow();

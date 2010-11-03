@@ -7,8 +7,8 @@
 
 #include "basicIncludes.h"
 
-#define combinedSelection_cxx
-#include "combinedSelection.C"
+#define analysisSkeleton_cxx
+#include "analysisSkeleton.C"
 
 #define mcOfflineTreeDigest_cxx
 #include "mcOfflineTreeDigest.C"
@@ -16,22 +16,25 @@
 #ifndef MCOFFLINEANALYSIS_H
 #define MCOFFLINEANALYSIS_H
 
-class mcOfflineAnalysis : public mcOfflinePhysics, public combinedSelection
+class mcOfflineAnalysis : public mcOfflinePhysics, public analysisSkeleton
 {
 public:
 	// pointers to classes
-	mcOfflinePhysics* m_mcOffPhys;
-
-	TFile*		       m_treeFile;
+	mcOfflinePhysics*    m_mcOffPhys;
+	TFile*		         m_treeFile;
 	mcOfflineTreeDigest* m_mcOfffTreeDigest;
 
 public:
 	mcOfflineAnalysis();
-	mcOfflineAnalysis(mcOfflinePhysics* mcOffPhys, graphicObjects* m_graphicobjs, cutFlowHandler* cutFlowHandler, fit* fitter, TFile* treeFile);
+	mcOfflineAnalysis(mcOfflinePhysics* mcOffPhys, TFile* treeFile,
+					  string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath ) :
+	analysisSkeleton(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
+	{
+		m_mcOffPhys = mcOffPhys;
+		m_treeFile = treeFile;
+		m_mcOfffTreeDigest = new mcOfflineTreeDigest( m_mcOffPhys, m_treeFile );
+	}
 	~mcOfflineAnalysis();
-
-	void initialize();
-	void finalize();
 	
 	void executeAdvanced();
 	void executeCutFlow();

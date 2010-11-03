@@ -16,24 +16,19 @@
 #ifndef MCANALYSISCONTROL_H
 #define MCANALYSISCONTROL_H
 
-class mcAnalysisControl : public chains, public mcAnalysis
+class mcAnalysisControl : public chains
 {
 	public:
 		// from MakeClass
 		mcPhysics*      m_mcPhys;
-		cutFlowHandler* m_cutFlowHandler;
-
-		// pointers
 		TFile*          m_histfile;
 		TFile*          m_treefile;
+		mcAnalysis*     m_mcAnalysis;
 		
 		TDirectory*     m_dirAllCuts;
 		TDirectory* 	m_dirNoCuts;
 		TDirectory* 	m_dirCutFlow;
-		
-		mcAnalysis*     m_mcAnalysis;
-		graphicObjects* m_graphics;
-		fit*            m_fitter;
+
 
 		// run control
 		Long64_t l64t_nentries;

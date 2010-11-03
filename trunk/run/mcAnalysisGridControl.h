@@ -13,25 +13,19 @@
 #ifndef MCANALYSISGRIDCONTROL_H
 #define MCANALYSISGRIDCONTROL_H
 
-class mcAnalysisGridControl : public mcAnalysis
+class mcAnalysisGridControl
 {
 	public:
 		// from MakeClass
-		mcPhysics*      m_mcPhys;		
-		cutFlowHandler* m_cutFlowHandler;
-
-		
-		// pointers
+		mcPhysics*      m_mcPhys;
 		TFile*          m_rootfile;
 		TChain*			m_chain;
+		mcAnalysis*     m_mcAnalysis;
 		
 		TDirectory*     m_dirAllCuts;
 		TDirectory* 	m_dirNoCuts;
 		TDirectory* 	m_dirCutFlow;
-		
-		mcAnalysis*     m_mcAnalysis;
-		graphicObjects* m_graphics;
-		fit*            m_fitter;
+
 	
 		// run control
 		Long64_t l64t_nentries;

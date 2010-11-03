@@ -16,25 +16,19 @@
 #ifndef ANALYSISCONTROL_H
 #define ANALYSISCONTROL_H
 
-class analysisControl : public chains, public analysis
+class analysisControl : public chains
 {
 	public:
 		// from MakeClass
 		physics*        m_phys;
-		cutFlowHandler* m_cutFlowHandler;
-
-		// pointers
 		TFile*          m_histfile;
 		TFile*          m_treefile;
+		GRLinterface*   m_GRL;
+		analysis*       m_analysis;
 		
 		TDirectory*     m_dirAllCuts;
 		TDirectory* 	m_dirNoCuts;
 		TDirectory* 	m_dirCutFlow;
-		
-		analysis*       m_analysis;
-		graphicObjects* m_graphics;
-		fit*            m_fitter;
-		GRLinterface*   m_GRL;
 
 		// run control
 		Long64_t l64t_nentries;

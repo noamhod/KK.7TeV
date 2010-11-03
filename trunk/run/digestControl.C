@@ -27,16 +27,10 @@ digestControl::digestControl()
 	m_histfile = new TFile( str.c_str(), "RECREATE");
 	m_histfile->cd();
 
-	m_graphics = new graphicObjects();
-	m_graphics->setStyle();
-
-	// read the cut flow (ownership: selection class which digestAnalysis inherits from)
-	str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
-	m_cutFlowHandler = new cutFlowHandler(str);
+	string str1 = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
+	string str2 = checkANDsetFilepath("PWD", "/../conf/dataPeriods.data");
 	
-	m_fitter = new fit();
-	
-	m_digestAnalysis = new digestAnalysis( m_digestPhys, m_graphics, m_cutFlowHandler, m_fitter, m_treefile );
+	m_digestAnalysis = new digestAnalysis( m_digestPhys, m_treefile, str1, str2, "digestAnalysis_interestingEvents.dump" );
 
 	book();
 }
@@ -58,14 +52,8 @@ void digestControl::initialize()
 	// pointers
 	m_digestPhys     = NULL;
 	m_digestAnalysis = NULL;
-	m_graphics = NULL;
-	m_fitter   = NULL;
 	m_histfile = NULL;
 	m_treefile = NULL;
-
-	cinitialize();
-	kinitialize();
-	uinitialize();
 }
 
 void digestControl::finalize()
@@ -79,25 +67,32 @@ void digestControl::finalize()
 
 	m_treefile->Write();
 	m_treefile->Close();
-	
-	cfinalize();
-	kfinalize();
-	ufinalize();
 }
 
 void digestControl::book()
 {
 	m_dirNoCuts = m_histfile->mkdir("noCuts");
-	m_graphics->bookBareHistos(m_dirNoCuts);
+	m_digestAnalysis->bookBareHistos(m_dirNoCuts);
 
 	m_dirAllCuts = m_histfile->mkdir("allCuts");
-	m_graphics->bookHistos(m_dirAllCuts);
+	m_digestAnalysis->bookHistos(m_dirAllCuts);
 	
 	m_dirFit = m_histfile->mkdir("fit");
-	m_graphics->bookFitHistos(m_dirFit);
+	m_digestAnalysis->bookFitHistos(m_dirFit);
 
 	m_dirCutFlow = m_histfile->mkdir("cutFlow");
-	m_graphics->bookHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_cutFlowHandler->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+	m_digestAnalysis->bookHistosMap( m_digestAnalysis->getCutFlowOrderedMapPtr(), m_digestAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+}
+
+void digestControl::draw()
+{
+	m_digestAnalysis->drawBareHistos(m_dirNoCuts);
+	m_digestAnalysis->drawHistos(m_dirAllCuts);
+	m_digestAnalysis->drawHistosMap( m_digestAnalysis->getCutFlowOrderedMapPtr(), m_digestAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+	m_digestAnalysis->drawFitHistos(m_dirFit, m_digestAnalysis->m_fitROOT->guess, m_digestAnalysis->m_fitROOT->fitFCN);
+	//m_digestAnalysis->drawFitHistos(m_dirFit, m_digestAnalysis->m_fitMinuit->guess, m_digestAnalysis->m_fitMinuit->fitFCN);
+
+	m_digestAnalysis->printCutFlowNumbers(l64t_nentries);
 }
 
 void digestControl::fits()
@@ -107,18 +102,7 @@ void digestControl::fits()
 	double yields[2];
 	
 	// Preform the fit
-	m_fitter->minimize( false, m_graphics->h1_imassFit, yields );
-}
-
-void digestControl::draw()
-{
-	m_graphics->drawBareHistos(m_dirNoCuts);
-	m_graphics->drawHistos(m_dirAllCuts);
-	m_graphics->drawHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_cutFlowHandler->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
-	m_graphics->drawFitHistos(m_dirFit, m_fitter->m_fitROOT->guess, m_fitter->m_fitROOT->fitFCN);
-	//m_graphics->drawFitHistos(m_dirFit, m_fitter->m_fitMinuit->guess, m_fitter->m_fitMinuit->fitFCN);
-
-	m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
+	m_digestAnalysis->minimize( false, m_digestAnalysis->h1_imassFit, yields );
 }
 
 void digestControl::analyze()
@@ -152,12 +136,11 @@ void digestControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		// if (Cut(l64t_ientry) < 0) continue;
 		
 		if(l64t_jentry%10000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_digestPhys->RunNumber << "\tlumiblock=" << m_digestPhys->lbn << endl;
-		if(l64t_jentry%l64t_mod==0) m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
+		if(l64t_jentry%l64t_mod==0) m_digestAnalysis->printCutFlowNumbers(l64t_nentries);
 		
 		analyze();
 	}
 	
-	//m_digestAnalysis->fitter();
 	fits();
 	
 	draw();

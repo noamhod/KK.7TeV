@@ -19,8 +19,6 @@ class utilities
 	public:
 		utilities();
 		~utilities();
-		void   uinitialize();
-		void   ufinalize();
 
 		string checkANDsetFilepath(string envPath, string fileName);
 		string removeDoubleDot(string spath);

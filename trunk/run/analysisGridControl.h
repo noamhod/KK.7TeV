@@ -10,28 +10,23 @@
 #define analysis_cxx
 #include "analysis.C"
 
-#ifndef analysisGridControl_H
-#define analysisGridControl_H
+#ifndef ANALYSISGRIDCONTROL_H
+#define ANALYSISGRIDCONTROL_H
 
-class analysisGridControl : public analysis
+class analysisGridControl
 {
 	public:
-		// from MakeClass
-		physics*        m_phys;
-		cutFlowHandler* m_cutFlowHandler;
-
 		// pointers
+		physics*        m_phys;
+		GRLinterface*   m_GRL;
 		TFile*          m_rootfile;
 		TChain*			m_chain;
+		analysis*       m_analysis;
 		
+		// more pointers
 		TDirectory*     m_dirAllCuts;
 		TDirectory* 	m_dirNoCuts;
 		TDirectory* 	m_dirCutFlow;
-		
-		analysis*       m_analysis;
-		graphicObjects* m_graphics;
-		fit*            m_fitter;
-		GRLinterface*   m_GRL; 
 		
 
 		// run control

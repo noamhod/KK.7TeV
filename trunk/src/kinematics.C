@@ -12,17 +12,6 @@ kinematics::kinematics() {}
 
 kinematics::~kinematics() {}
 
-
-void kinematics::kinitialize()
-{
-
-}
-
-void kinematics::kfinalize()
-{
-
-}
-
 double kinematics::imass( TLorentzVector* pa, TLorentzVector* pb )
 {
 	m_pTmp = (*pa)+(*pb);

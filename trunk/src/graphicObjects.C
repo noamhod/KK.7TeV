@@ -24,6 +24,11 @@ void graphicObjects::setCutFlowMapSVDPtr(TMapsvd* cutFlowMapSVD)
 
 void graphicObjects::ginitialize()
 {
+	/////////////////////////////
+	setStyle(); /////////////////
+	/////////////////////////////
+
+
 	// canvases
 	cnv_imass        = NULL;
 	cnv_pT           = NULL;

@@ -14,13 +14,11 @@ analysisControl::analysisControl()
 	string str = "";
 
 	str = checkANDsetFilepath("PWD", "/../conf/dataset.list");
-	string strb = checkANDsetFilepath("PWD", "/datasetdir/"); // ln -s /data/hod/D3PDs/group10.phys-sm.data10_7TeV_physics_MuonswBeam_WZphys_D3PD datasetdir
-	//string strb = ""; // ln -s /tmp/hod/file1.root file1.root 
+	string strb = checkANDsetFilepath("PWD", "/datasetdir/");
 	makeChain(true, str, strb);
 
 	m_phys = new physics( m_chain );
 
-	//str = checkANDsetFilepath("PWD", "/../data/analysisTrees.root");
 	str = "analysisTrees.root";
 	m_treefile = new TFile( str.c_str(), "RECREATE");
 	m_treefile->cd();
@@ -29,20 +27,15 @@ analysisControl::analysisControl()
 	m_histfile = new TFile( str.c_str(), "RECREATE");
 	m_histfile->cd();
 
-	m_graphics = new graphicObjects();
-	m_graphics->setStyle();
-
 	str = checkANDsetFilepath("PWD", "/../conf/Z_GRL_CURRENT.xml");
 	m_GRL = new GRLinterface();
 	m_GRL->glrinitialize( (TString)str );
 
-	// read the cut flow (ownership: selection class which analysis inherits from)
-	str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
-	m_cutFlowHandler = new cutFlowHandler(str);
 	
-	m_fitter = new fit();
+	string str1 = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
+	string str2 = checkANDsetFilepath("PWD", "/../conf/dataPeriods.data");
 	
-	m_analysis = new analysis( m_phys, m_graphics, m_cutFlowHandler, m_fitter, m_GRL, m_treefile );
+	m_analysis = new analysis( m_phys, m_GRL, m_treefile, str1, str2, "" );
 
 	book();
 }
@@ -64,13 +57,8 @@ void analysisControl::initialize()
 	// pointers
 	m_phys     = NULL;
 	m_analysis = NULL;
-	m_graphics = NULL;
 	m_histfile = NULL;
 	m_treefile = NULL;
-
-	cinitialize();
-	kinitialize();
-	uinitialize();
 }
 
 void analysisControl::finalize()
@@ -84,31 +72,39 @@ void analysisControl::finalize()
 
 	m_treefile->Write();
 	m_treefile->Close();
-	
-	cfinalize();
-	kfinalize();
-	ufinalize();
 }
 
 void analysisControl::book()
 {
 	m_dirNoCuts = m_histfile->mkdir("noCuts");
-	m_graphics->bookBareHistos(m_dirNoCuts);
+	m_analysis->bookBareHistos(m_dirNoCuts);
 
 	m_dirAllCuts = m_histfile->mkdir("allCuts");
-	m_graphics->bookHistos(m_dirAllCuts);
+	m_analysis->bookHistos(m_dirAllCuts);
 
 	m_dirCutFlow = m_histfile->mkdir("cutFlow");
-	m_graphics->bookHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_cutFlowHandler->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );	
+	m_analysis->bookHistosMap( m_analysis->getCutFlowOrderedMapPtr(), m_analysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+	
+	m_analysis->bookFitHistos(m_dirAllCuts);
 }
 
 void analysisControl::draw()
 {
-	m_graphics->drawBareHistos(m_dirNoCuts);
-	m_graphics->drawHistos(m_dirAllCuts);
-	m_graphics->drawHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_cutFlowHandler->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+	m_analysis->drawBareHistos(m_dirNoCuts);
+	m_analysis->drawHistos(m_dirAllCuts);
+	m_analysis->drawHistosMap( m_analysis->getCutFlowOrderedMapPtr(), m_analysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 
-	m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
+	m_analysis->printCutFlowNumbers(l64t_nentries);
+}
+
+void analysisControl::fits()
+{
+	cout << "### in fits ####" << endl;
+
+	double yields[2];
+	
+	// Preform the fit
+	m_analysis->minimize( false, m_analysis->h1_imassFit, yields );
 }
 
 void analysisControl::analyze()
@@ -147,7 +143,7 @@ void analysisControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		// if (Cut(l64t_ientry) < 0) continue;
 		
 		if(l64t_jentry%100000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_phys->RunNumber << "\tlumiblock=" << m_phys->lbn << endl;
-		if(l64t_jentry%l64t_mod==0) m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
+		if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries);
 		
 		analyze();
 	}

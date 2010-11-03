@@ -20,9 +20,6 @@ class kinematics
 		kinematics();
 		~kinematics();
 		
-		void kinitialize();
-		void kfinalize();
-		
 		double pT(   TLorentzVector* p );
 		double eta(  TLorentzVector* p );
 		double pAbs( TLorentzVector* p );

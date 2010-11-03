@@ -7,58 +7,15 @@
 
 #include "basicIncludes.h"
 
-/*
-#define fit_cxx
-#include "fit.C"
-
-#define selection_cxx
-#include "selection.C"
-
-#define graphicObjects_cxx
-#include "graphicObjects.C"
-
-#define cutFlowHandler_cxx
-#include "cutFlowHandler.C"
-
-#define periodHandler_cxx
-#include "periodHandler.C"
-
-#define eventDumper_cxx
-#include "eventDumper.C"
-*/
-
 #define analysisModules_cxx
 #include "analysisModules.C"
 
-#ifndef COMBINEDSELECTION_H
-#define COMBINEDSELECTION_H
+#ifndef ANALYSISSKELETON_H
+#define ANALYSISSKELETON_H
 
-class combinedSelection : public analysisModules, public selection
+class analysisSkeleton : public analysisModules, public selection
 {
 public:
-	///////////////////////
-	// pointers
-	/*
-	graphicObjects* m_graphicobjs;
-	
-	cutFlowHandler* m_cutFlowHandler;
-	TMapsvd* m_cutFlowMapSVD;
-	TMapds*  m_cutFlowOrdered;
-	TMapds*  m_cutFlowTypeOrdered;
-	TMapsi*  m_cutFlowNumbers;
-	
-	periodHandler* m_periodHandler;
-	TMapis*  m_firstrun2periodMap;
-	TMapis*  m_lastrun2periodMap;
-	TMapsvs* m_period2triggerMap;
-	
-	
-	eventDumper* m_eventDumper;
-	bool doEventDump;
-	
-	fit* m_fitter;
-	*/
-	
 	//////////////////////
 	// basic local vars
 	TMapii muPairMap;
@@ -74,7 +31,7 @@ public:
 	int currentRun;
 	string sPeriod;
 	string sCurrentPeriod;
-	vector<string> vTriggers;
+	vector<string>* vTriggers;
 	
 	// * * * * * * * * * * * *  * * * * * * * * * * * * * * * * * * * * * * * *
 	// muon & vertex variables for preselection
@@ -171,6 +128,55 @@ public:
 	int nIDhitsMua;
 	int nIDhitsMub;
 	
+	// MS hits
+	int nMDTBIHitsMua;
+	int nMDTBMHitsMua;
+	int nMDTBOHitsMua;
+	int nMDTBEEHitsMua;
+	int nMDTBIS78HitsMua;
+	int nMDTEIHitsMua;
+	int nMDTEMHitsMua;
+	int nMDTEOHitsMua;
+	int nMDTEEHitsMua;
+	int nRPCLayer1EtaHitsMua;
+	int nRPCLayer2EtaHitsMua;
+	int nRPCLayer3EtaHitsMua;
+	int nRPCLayer1PhiHitsMua;
+	int nRPCLayer2PhiHitsMua;
+	int nRPCLayer3PhiHitsMua;
+	int nTGCLayer1EtaHitsMua;
+	int nTGCLayer2EtaHitsMua;
+	int nTGCLayer3EtaHitsMua;
+	int nTGCLayer4EtaHitsMua;
+	int nTGCLayer1PhiHitsMua;
+	int nTGCLayer2PhiHitsMua;
+	int nTGCLayer3PhiHitsMua;
+	int nTGCLayer4PhiHitsMua;
+	
+	int nMDTBIHitsMub;
+	int nMDTBMHitsMub;
+	int nMDTBOHitsMub;
+	int nMDTBEEHitsMub;
+	int nMDTBIS78HitsMub;
+	int nMDTEIHitsMub;
+	int nMDTEMHitsMub;
+	int nMDTEOHitsMub;
+	int nMDTEEHitsMub;
+	int nRPCLayer1EtaHitsMub;
+	int nRPCLayer2EtaHitsMub;
+	int nRPCLayer3EtaHitsMub;
+	int nRPCLayer1PhiHitsMub;
+	int nRPCLayer2PhiHitsMub;
+	int nRPCLayer3PhiHitsMub;
+	int nTGCLayer1EtaHitsMub;
+	int nTGCLayer2EtaHitsMub;
+	int nTGCLayer3EtaHitsMub;
+	int nTGCLayer4EtaHitsMub;
+	int nTGCLayer1PhiHitsMub;
+	int nTGCLayer2PhiHitsMub;
+	int nTGCLayer3PhiHitsMub;
+	int nTGCLayer4PhiHitsMub;
+	
 	// ID - MS pT matching: pT=|p|*sin(theta), qOp=charge/|p|
 	double me_qOp_a;
 	double id_qOp_a;
@@ -203,19 +209,18 @@ public:
 	////////////////////////
 
 public:
-	combinedSelection();
-	~combinedSelection();
+	analysisSkeleton();
+	analysisSkeleton(string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath) :
+	analysisModules(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
+	{
+		currentRun = 0;
+		sCurrentPeriod = "";
+	}
+	~analysisSkeleton();
 	
-	/*
-	void initCombinedSelection(graphicObjects* graphicobjs,
-							   cutFlowHandler* cutFlowHandler,
-							   periodHandler* periods,
-							   fit* fitter,
-							   string sEventDumpFilePath = "");
-
-	*/
-	
-	string getPeriodName();
+	string          getPeriodName();
+	vector<string>* getPeriodTriggers();
+	int             isTrigger(string trigName);
 	
 	/* MUST BE CALLED AFTER THE ALLOCATION OF PRESELECTION VARIABLES */
 	bool applyPreselection(string sRunType = "offline");

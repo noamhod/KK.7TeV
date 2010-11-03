@@ -15,10 +15,18 @@ eventDumper::eventDumper()
 eventDumper::eventDumper(string sEventDumpFilePath)
 {
 	b_print = false;
-
-	file = new ofstream();
+	doEventDump = false;
 	
-	file->open( sEventDumpFilePath.c_str() );
+	if(sEventDumpFilePath != "")
+	{
+		doEventDump = true;
+		file = new ofstream();
+		file->open( sEventDumpFilePath.c_str() );
+	}
+	else
+	{
+		doEventDump = false;
+	}	
 }
 
 eventDumper::~eventDumper()

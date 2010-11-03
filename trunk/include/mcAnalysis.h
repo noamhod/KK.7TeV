@@ -7,8 +7,8 @@
 
 #include "basicIncludes.h"
 
-#define combinedSelection_cxx
-#include "combinedSelection.C"
+#define analysisSkeleton_cxx
+#include "analysisSkeleton.C"
 
 #define offTree_cxx
 #include "offTree.C"
@@ -19,24 +19,26 @@
 #ifndef MCANALYSIS_H
 #define MCANALYSIS_H
 
-class mcAnalysis : public mcPhysics, public combinedSelection
+class mcAnalysis : public mcPhysics, public analysisSkeleton
 {
 public:
 	// pointers to classes
-	mcPhysics*        m_mcPhys;
-
-	offTree*        m_offTree;
-	mcOffTree*      m_mcOffTree;
-	
-	TFile* m_treeFile;
+	mcPhysics* m_mcPhys;
+	offTree*   m_offTree;
+	mcOffTree* m_mcOffTree;
+	TFile*     m_treeFile;
 
 public:
 	mcAnalysis();
-	mcAnalysis(mcPhysics* mcPhys, graphicObjects* m_graphicobjs, cutFlowHandler* cutFlowHandler, fit* fitter, TFile* treeFile);
+	mcAnalysis(mcPhysics* mcPhys, TFile* treeFile, string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath ) :
+	analysisSkeleton(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
+	{
+		m_mcPhys = mcPhys;
+		m_treeFile = treeFile;
+		m_offTree = new offTree( NULL, m_mcPhys, m_treeFile ); // the NULL arg is the [physics* m_phys;] variable
+		m_mcOffTree = new mcOffTree( m_mcPhys, m_treeFile,  m_offTree->getTree() );
+	}
 	~mcAnalysis();
-
-	void initialize();
-	void finalize();
 
 	void executeCutFlow();
 	

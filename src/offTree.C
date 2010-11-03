@@ -40,20 +40,44 @@ TTree* offTree::getTree()
 
 void offTree::setBranches()
 {	
+	// external
+	m_tree->Branch( "isGRL",    &isGRL );
+	m_tree->Branch( "period",   &period );
+	m_tree->Branch( "triggers", &triggers );
+
 	// run variables branches
 	m_tree->Branch( "RunNumber",   &RunNumber );
 	m_tree->Branch( "lbn",         &lbn );
 	m_tree->Branch( "EventNumber", &EventNumber );
+
 	
-	// preselection
-	m_tree->Branch( "isGRL",  &isGRL );
+	// L1 triggers
+	m_tree->Branch( "L1_MU0", &L1_MU0 );
+	m_tree->Branch( "L1_MU10", &L1_MU10 );
+	m_tree->Branch( "L1_MU15", &L1_MU15 );
+	m_tree->Branch( "L1_MU20", &L1_MU20 );
 	m_tree->Branch( "L1_MU6", &L1_MU6 );
+	// EF triggers
 	m_tree->Branch( "EF_mu10", &EF_mu10 );
+	m_tree->Branch( "EF_mu10_MG", &EF_mu10_MG );
+	m_tree->Branch( "EF_mu10_MSonly", &EF_mu10_MSonly );
+	m_tree->Branch( "EF_mu10_MSonly_tight", &EF_mu10_MSonly_tight );
+	m_tree->Branch( "EF_mu10_NoAlg", &EF_mu10_NoAlg );
+	m_tree->Branch( "EF_mu10_tight", &EF_mu10_tight );
+	m_tree->Branch( "EF_mu10i_loose", &EF_mu10i_loose );
 	m_tree->Branch( "EF_mu13", &EF_mu13 );
+	m_tree->Branch( "EF_mu13_MG", &EF_mu13_MG );
+	m_tree->Branch( "EF_mu13_MG_tight", &EF_mu13_MG_tight );
+	m_tree->Branch( "EF_mu13_tight", &EF_mu13_tight );
 	m_tree->Branch( "EF_mu15", &EF_mu15 );
+	m_tree->Branch( "EF_mu15_NoAlg", &EF_mu15_NoAlg );
 	m_tree->Branch( "EF_mu20", &EF_mu20 );
+	m_tree->Branch( "EF_mu20_MSonly", &EF_mu20_MSonly );
+	m_tree->Branch( "EF_mu20_NoAlg", &EF_mu20_NoAlg );
+	m_tree->Branch( "EF_mu20_slow", &EF_mu20_slow );
+	m_tree->Branch( "EF_mu30_MSonly", &EF_mu30_MSonly );
 	m_tree->Branch( "EF_mu4", &EF_mu4 );
-	m_tree->Branch( "EF_mu6", &EF_mu6 );
+	m_tree->Branch( "EF_mu40_MSonly", &EF_mu40_MSonly );
 	
 	// mu_staco
 	m_tree->Branch( "mu_staco_n",         &mu_staco_n );
@@ -82,6 +106,29 @@ void offTree::setBranches()
 	m_tree->Branch( "mu_staco_isCombinedMuon",  &mu_staco_isCombinedMuon );
 	m_tree->Branch( "mu_staco_nSCTHits",        &mu_staco_nSCTHits );
 	m_tree->Branch( "mu_staco_nPixHits",        &mu_staco_nPixHits );
+	m_tree->Branch( "mu_staco_nMDTBIHits",        &mu_staco_nMDTBIHits );
+	m_tree->Branch( "mu_staco_nMDTBMHits",        &mu_staco_nMDTBMHits );
+	m_tree->Branch( "mu_staco_nMDTBOHits",        &mu_staco_nMDTBOHits );
+	m_tree->Branch( "mu_staco_nMDTBEEHits",       &mu_staco_nMDTBEEHits );
+	m_tree->Branch( "mu_staco_nMDTBIS78Hits",     &mu_staco_nMDTBIS78Hits );
+	m_tree->Branch( "mu_staco_nMDTEIHits",        &mu_staco_nMDTEIHits );
+	m_tree->Branch( "mu_staco_nMDTEMHits",        &mu_staco_nMDTEMHits );
+	m_tree->Branch( "mu_staco_nMDTEOHits",        &mu_staco_nMDTEOHits );
+	m_tree->Branch( "mu_staco_nMDTEEHits",        &mu_staco_nMDTEEHits );
+	m_tree->Branch( "mu_staco_nRPCLayer1EtaHits", &mu_staco_nRPCLayer1EtaHits );
+	m_tree->Branch( "mu_staco_nRPCLayer2EtaHits", &mu_staco_nRPCLayer2EtaHits );
+	m_tree->Branch( "mu_staco_nRPCLayer3EtaHits", &mu_staco_nRPCLayer3EtaHits );
+	m_tree->Branch( "mu_staco_nRPCLayer1PhiHits", &mu_staco_nRPCLayer1PhiHits );
+	m_tree->Branch( "mu_staco_nRPCLayer2PhiHits", &mu_staco_nRPCLayer2PhiHits );
+	m_tree->Branch( "mu_staco_nRPCLayer3PhiHits", &mu_staco_nRPCLayer3PhiHits );
+	m_tree->Branch( "mu_staco_nTGCLayer1EtaHits", &mu_staco_nTGCLayer1EtaHits );
+	m_tree->Branch( "mu_staco_nTGCLayer2EtaHits", &mu_staco_nTGCLayer2EtaHits );
+	m_tree->Branch( "mu_staco_nTGCLayer3EtaHits", &mu_staco_nTGCLayer3EtaHits );
+	m_tree->Branch( "mu_staco_nTGCLayer4EtaHits", &mu_staco_nTGCLayer4EtaHits );
+	m_tree->Branch( "mu_staco_nTGCLayer1PhiHits", &mu_staco_nTGCLayer1PhiHits );
+	m_tree->Branch( "mu_staco_nTGCLayer2PhiHits", &mu_staco_nTGCLayer2PhiHits );
+	m_tree->Branch( "mu_staco_nTGCLayer3PhiHits", &mu_staco_nTGCLayer3PhiHits );
+	m_tree->Branch( "mu_staco_nTGCLayer4PhiHits", &mu_staco_nTGCLayer4PhiHits );
 	
 	// mu_muid
 	m_tree->Branch( "mu_muid_n",         &mu_muid_n );
@@ -110,6 +157,29 @@ void offTree::setBranches()
 	m_tree->Branch( "mu_muid_isCombinedMuon",  &mu_muid_isCombinedMuon );
 	m_tree->Branch( "mu_muid_nSCTHits",        &mu_muid_nSCTHits );
 	m_tree->Branch( "mu_muid_nPixHits",        &mu_muid_nPixHits );
+	m_tree->Branch( "mu_muid_nMDTBIHits",        &mu_muid_nMDTBIHits );
+	m_tree->Branch( "mu_muid_nMDTBMHits",        &mu_muid_nMDTBMHits );
+	m_tree->Branch( "mu_muid_nMDTBOHits",        &mu_muid_nMDTBOHits );
+	m_tree->Branch( "mu_muid_nMDTBEEHits",       &mu_muid_nMDTBEEHits );
+	m_tree->Branch( "mu_muid_nMDTBIS78Hits",     &mu_muid_nMDTBIS78Hits );
+	m_tree->Branch( "mu_muid_nMDTEIHits",        &mu_muid_nMDTEIHits );
+	m_tree->Branch( "mu_muid_nMDTEMHits",        &mu_muid_nMDTEMHits );
+	m_tree->Branch( "mu_muid_nMDTEOHits",        &mu_muid_nMDTEOHits );
+	m_tree->Branch( "mu_muid_nMDTEEHits",        &mu_muid_nMDTEEHits );
+	m_tree->Branch( "mu_muid_nRPCLayer1EtaHits", &mu_muid_nRPCLayer1EtaHits );
+	m_tree->Branch( "mu_muid_nRPCLayer2EtaHits", &mu_muid_nRPCLayer2EtaHits );
+	m_tree->Branch( "mu_muid_nRPCLayer3EtaHits", &mu_muid_nRPCLayer3EtaHits );
+	m_tree->Branch( "mu_muid_nRPCLayer1PhiHits", &mu_muid_nRPCLayer1PhiHits );
+	m_tree->Branch( "mu_muid_nRPCLayer2PhiHits", &mu_muid_nRPCLayer2PhiHits );
+	m_tree->Branch( "mu_muid_nRPCLayer3PhiHits", &mu_muid_nRPCLayer3PhiHits );
+	m_tree->Branch( "mu_muid_nTGCLayer1EtaHits", &mu_muid_nTGCLayer1EtaHits );
+	m_tree->Branch( "mu_muid_nTGCLayer2EtaHits", &mu_muid_nTGCLayer2EtaHits );
+	m_tree->Branch( "mu_muid_nTGCLayer3EtaHits", &mu_muid_nTGCLayer3EtaHits );
+	m_tree->Branch( "mu_muid_nTGCLayer4EtaHits", &mu_muid_nTGCLayer4EtaHits );
+	m_tree->Branch( "mu_muid_nTGCLayer1PhiHits", &mu_muid_nTGCLayer1PhiHits );
+	m_tree->Branch( "mu_muid_nTGCLayer2PhiHits", &mu_muid_nTGCLayer2PhiHits );
+	m_tree->Branch( "mu_muid_nTGCLayer3PhiHits", &mu_muid_nTGCLayer3PhiHits );
+	m_tree->Branch( "mu_muid_nTGCLayer4PhiHits", &mu_muid_nTGCLayer4PhiHits );
 	
 	// vertex branches
 	m_tree->Branch( "vxp_n",       &vxp_n );
@@ -119,15 +189,13 @@ void offTree::setBranches()
 	m_tree->Branch( "vxp_z_err",   &vxp_z_err );	
 }
 
-void offTree::fill()
-{
-	///////////////////////////////
-	m_tree->Fill(); ///////////////
-	///////////////////////////////
-}
+void offTree::fill(int isGrl, string sPeriod, vector<string>* vsTriggers)
+{ 
+	// external
+	isGRL    = isGrl;
+	period   = sPeriod;
+	triggers = vsTriggers;
 
-void offTree::fill(int isGrl)
-{
 	if(m_mcPhys==NULL  &&  m_phys!=NULL)
 	{
 		// fill run branches
@@ -135,15 +203,34 @@ void offTree::fill(int isGrl)
 		lbn         = m_phys->lbn;
 		EventNumber = m_phys->EventNumber;
 		
-		// preselection
-		isGRL   = isGrl;
-		L1_MU6  = m_phys->L1_MU6;
+		// L1 triggers
+		L1_MU0 = m_phys->L1_MU0;
+		L1_MU10 = m_phys->L1_MU10;
+		L1_MU15 = m_phys->L1_MU15;
+		L1_MU20 = m_phys->L1_MU20;
+		L1_MU6 = m_phys->L1_MU6; 
+		
+		// EF triggers
 		EF_mu10 = m_phys->EF_mu10;
+		EF_mu10_MG = m_phys->EF_mu10_MG;
+		EF_mu10_MSonly = m_phys->EF_mu10_MSonly;
+		EF_mu10_MSonly_tight = m_phys->EF_mu10_MSonly_tight;
+		EF_mu10_NoAlg = m_phys->EF_mu10_NoAlg;
+		EF_mu10_tight = m_phys->EF_mu10_tight;
+		EF_mu10i_loose = m_phys->EF_mu10i_loose;
 		EF_mu13 = m_phys->EF_mu13;
+		EF_mu13_MG = m_phys->EF_mu13_MG;
+		EF_mu13_MG_tight = m_phys->EF_mu13_MG_tight;
+		EF_mu13_tight = m_phys->EF_mu13_tight;
 		EF_mu15 = m_phys->EF_mu15;
+		EF_mu15_NoAlg = m_phys->EF_mu15_NoAlg;
 		EF_mu20 = m_phys->EF_mu20;
-		EF_mu4  = m_phys->EF_mu4;
-		EF_mu6  = m_phys->EF_mu6;
+		EF_mu20_MSonly = m_phys->EF_mu20_MSonly;
+		EF_mu20_NoAlg = m_phys->EF_mu20_NoAlg;
+		EF_mu20_slow = m_phys->EF_mu20_slow;
+		EF_mu30_MSonly = m_phys->EF_mu30_MSonly;
+		EF_mu4 = m_phys->EF_mu4;
+		EF_mu40_MSonly = m_phys->EF_mu40_MSonly;
 		
 		// staco
 		mu_staco_n        = m_phys->mu_staco_n;
@@ -165,13 +252,37 @@ void offTree::fill(int isGrl)
 		mu_staco_author   = m_phys->mu_staco_author;
 		mu_staco_matchchi2   = m_phys->mu_staco_matchchi2;
 		mu_staco_matchndof   = m_phys->mu_staco_matchndof;
-		mu_staco_me_qoverp= m_phys->mu_staco_me_qoverp;
-		mu_staco_id_qoverp= m_phys->mu_staco_id_qoverp;
-		mu_staco_me_theta = m_phys->mu_staco_me_theta;
-		mu_staco_id_theta = m_phys->mu_staco_id_theta;
+		mu_staco_me_qoverp = m_phys->mu_staco_me_qoverp;
+		mu_staco_id_qoverp = m_phys->mu_staco_id_qoverp;
+		mu_staco_me_theta  = m_phys->mu_staco_me_theta;
+		mu_staco_id_theta  = m_phys->mu_staco_id_theta;
 		mu_staco_isCombinedMuon = m_phys->mu_staco_isCombinedMuon;
 		mu_staco_nSCTHits = m_phys->mu_staco_nSCTHits;
 		mu_staco_nPixHits = m_phys->mu_staco_nPixHits;
+		
+		mu_staco_nMDTBIHits =      m_phys->mu_staco_nMDTBIHits;
+		mu_staco_nMDTBMHits =      m_phys->mu_staco_nMDTBMHits;
+		mu_staco_nMDTBOHits =      m_phys->mu_staco_nMDTBOHits;
+		mu_staco_nMDTBEEHits =     m_phys->mu_staco_nMDTBEEHits;
+		mu_staco_nMDTBIS78Hits =   m_phys->mu_staco_nMDTBIS78Hits;
+		mu_staco_nMDTEIHits    =   m_phys->mu_staco_nMDTEIHits;
+		mu_staco_nMDTEMHits    =   m_phys->mu_staco_nMDTEMHits;
+		mu_staco_nMDTEOHits    =   m_phys->mu_staco_nMDTEOHits;
+		mu_staco_nMDTEEHits    =   m_phys->mu_staco_nMDTEEHits;
+		mu_staco_nRPCLayer1EtaHits = m_phys->mu_staco_nRPCLayer1EtaHits;
+		mu_staco_nRPCLayer2EtaHits = m_phys->mu_staco_nRPCLayer2EtaHits;
+		mu_staco_nRPCLayer3EtaHits = m_phys->mu_staco_nRPCLayer3EtaHits;
+		mu_staco_nRPCLayer1PhiHits = m_phys->mu_staco_nRPCLayer1PhiHits;
+		mu_staco_nRPCLayer2PhiHits = m_phys->mu_staco_nRPCLayer2PhiHits;
+		mu_staco_nRPCLayer3PhiHits = m_phys->mu_staco_nRPCLayer3PhiHits;
+		mu_staco_nTGCLayer1EtaHits = m_phys->mu_staco_nTGCLayer1EtaHits;
+		mu_staco_nTGCLayer2EtaHits = m_phys->mu_staco_nTGCLayer2EtaHits;
+		mu_staco_nTGCLayer3EtaHits = m_phys->mu_staco_nTGCLayer3EtaHits;
+		mu_staco_nTGCLayer4EtaHits = m_phys->mu_staco_nTGCLayer4EtaHits;
+		mu_staco_nTGCLayer1PhiHits = m_phys->mu_staco_nTGCLayer1PhiHits;
+		mu_staco_nTGCLayer2PhiHits = m_phys->mu_staco_nTGCLayer2PhiHits;
+		mu_staco_nTGCLayer3PhiHits = m_phys->mu_staco_nTGCLayer3PhiHits;
+		mu_staco_nTGCLayer4PhiHits = m_phys->mu_staco_nTGCLayer4PhiHits;
 		
 		// muid
 		mu_muid_n        = m_phys->mu_muid_n;
@@ -200,6 +311,30 @@ void offTree::fill(int isGrl)
 		mu_muid_isCombinedMuon = m_phys->mu_muid_isCombinedMuon;
 		mu_muid_nSCTHits = m_phys->mu_muid_nSCTHits;
 		mu_muid_nPixHits = m_phys->mu_muid_nPixHits;
+		mu_muid_nMDTBIHits =      m_phys->mu_muid_nMDTBIHits;
+		mu_muid_nMDTBMHits =      m_phys->mu_muid_nMDTBMHits;
+		mu_muid_nMDTBOHits =      m_phys->mu_muid_nMDTBOHits;
+		mu_muid_nMDTBEEHits =     m_phys->mu_muid_nMDTBEEHits;
+		mu_muid_nMDTBIS78Hits =   m_phys->mu_muid_nMDTBIS78Hits;
+		mu_muid_nMDTEIHits =      m_phys->mu_muid_nMDTEIHits;
+		mu_muid_nMDTEMHits =      m_phys->mu_muid_nMDTEMHits;
+		mu_muid_nMDTEOHits =      m_phys->mu_muid_nMDTEOHits;
+		mu_muid_nMDTEEHits =      m_phys->mu_muid_nMDTEEHits;
+		
+		mu_muid_nRPCLayer1EtaHits = m_phys->mu_muid_nRPCLayer1EtaHits;
+		mu_muid_nRPCLayer2EtaHits = m_phys->mu_muid_nRPCLayer2EtaHits;
+		mu_muid_nRPCLayer3EtaHits = m_phys->mu_muid_nRPCLayer3EtaHits;
+		mu_muid_nRPCLayer1PhiHits = m_phys->mu_muid_nRPCLayer1PhiHits;
+		mu_muid_nRPCLayer2PhiHits = m_phys->mu_muid_nRPCLayer2PhiHits;
+		mu_muid_nRPCLayer3PhiHits = m_phys->mu_muid_nRPCLayer3PhiHits;
+		mu_muid_nTGCLayer1EtaHits = m_phys->mu_muid_nTGCLayer1EtaHits;
+		mu_muid_nTGCLayer2EtaHits = m_phys->mu_muid_nTGCLayer2EtaHits;
+		mu_muid_nTGCLayer3EtaHits = m_phys->mu_muid_nTGCLayer3EtaHits;
+		mu_muid_nTGCLayer4EtaHits = m_phys->mu_muid_nTGCLayer4EtaHits;
+		mu_muid_nTGCLayer1PhiHits = m_phys->mu_muid_nTGCLayer1PhiHits;
+		mu_muid_nTGCLayer2PhiHits = m_phys->mu_muid_nTGCLayer2PhiHits;
+		mu_muid_nTGCLayer3PhiHits = m_phys->mu_muid_nTGCLayer3PhiHits;
+		mu_muid_nTGCLayer4PhiHits = m_phys->mu_muid_nTGCLayer4PhiHits;
 		
 		// vertex
 		vxp_n       = m_phys->vxp_n;
@@ -215,15 +350,60 @@ void offTree::fill(int isGrl)
 		lbn         = m_mcPhys->lbn;
 		EventNumber = m_mcPhys->EventNumber;
 		
-		// preselection
-		isGRL   = isGrl;
-		L1_MU6  = m_mcPhys->L1_MU6;
+		// L1 triggers
+		L1_MU0 = m_mcPhys->L1_MU0;
+		L1_MU10 = m_mcPhys->L1_MU10;
+		L1_MU15 = m_mcPhys->L1_MU15;
+		L1_MU20 = m_mcPhys->L1_MU20;
+		L1_MU6 = m_mcPhys->L1_MU6;
+		
+		///////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////
+		/*
+		// EF triggers
 		EF_mu10 = m_mcPhys->EF_mu10;
+		EF_mu10_MG = m_mcPhys->EF_mu10_MG;
+		EF_mu10_MSonly = m_mcPhys->EF_mu10_MSonly;
+		EF_mu10_MSonly_tight = m_mcPhys->EF_mu10_MSonly_tight;
+		EF_mu10_NoAlg = m_mcPhys->EF_mu10_NoAlg;
+		EF_mu10_tight = m_mcPhys->EF_mu10_tight;
+		EF_mu10i_loose = m_mcPhys->EF_mu10i_loose;
 		EF_mu13 = m_mcPhys->EF_mu13;
+		EF_mu13_MG = m_mcPhys->EF_mu13_MG;
+		EF_mu13_MG_tight = m_mcPhys->EF_mu13_MG_tight;
+		EF_mu13_tight = m_mcPhys->EF_mu13_tight;
 		EF_mu15 = m_mcPhys->EF_mu15;
+		EF_mu15_NoAlg = m_mcPhys->EF_mu15_NoAlg;
 		EF_mu20 = m_mcPhys->EF_mu20;
-		EF_mu4  = m_mcPhys->EF_mu4;
-		EF_mu6  = m_mcPhys->EF_mu6;
+		EF_mu20_MSonly = m_mcPhys->EF_mu20_MSonly;
+		EF_mu20_NoAlg = m_mcPhys->EF_mu20_NoAlg;
+		EF_mu20_slow = m_mcPhys->EF_mu20_slow;
+		EF_mu30_MSonly = m_mcPhys->EF_mu30_MSonly;
+		EF_mu4 = m_mcPhys->EF_mu4;
+		EF_mu40_MSonly = m_mcPhys->EF_mu40_MSonly;
+		*/
+		EF_mu10 = 0;
+		EF_mu10_MG = 0;
+		EF_mu10_MSonly = 0;
+		EF_mu10_MSonly_tight = 0;
+		EF_mu10_NoAlg = 0;
+		EF_mu10_tight = 0;
+		EF_mu10i_loose = 0;
+		EF_mu13 = 0;
+		EF_mu13_MG = 0;
+		EF_mu13_MG_tight = 0;
+		EF_mu13_tight = 0;
+		EF_mu15 = 0;
+		EF_mu15_NoAlg = 0;
+		EF_mu20 = 0;
+		EF_mu20_MSonly = 0;
+		EF_mu20_NoAlg = 0;
+		EF_mu20_slow = 0;
+		EF_mu30_MSonly = 0;
+		EF_mu4 = 0;
+		EF_mu40_MSonly = 0;
+		///////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////
 		
 		// staco
 		mu_staco_n        = m_mcPhys->mu_staco_n;
@@ -253,6 +433,30 @@ void offTree::fill(int isGrl)
 		mu_staco_nSCTHits = m_mcPhys->mu_staco_nSCTHits;
 		mu_staco_nPixHits = m_mcPhys->mu_staco_nPixHits;
 		
+		mu_staco_nMDTBIHits =    m_mcPhys->mu_staco_nMDTBIHits;
+		mu_staco_nMDTBMHits =    m_mcPhys->mu_staco_nMDTBMHits;
+		mu_staco_nMDTBOHits =    m_mcPhys->mu_staco_nMDTBOHits;
+		mu_staco_nMDTBEEHits =   m_mcPhys->mu_staco_nMDTBEEHits;
+		mu_staco_nMDTBIS78Hits = m_mcPhys->mu_staco_nMDTBIS78Hits;
+		mu_staco_nMDTEIHits =    m_mcPhys->mu_staco_nMDTEIHits;
+		mu_staco_nMDTEMHits =    m_mcPhys->mu_staco_nMDTEMHits;
+		mu_staco_nMDTEOHits =    m_mcPhys->mu_staco_nMDTEOHits;
+		mu_staco_nMDTEEHits =    m_mcPhys->mu_staco_nMDTEEHits;
+		mu_staco_nRPCLayer1EtaHits = m_mcPhys->mu_staco_nRPCLayer1EtaHits;
+		mu_staco_nRPCLayer2EtaHits = m_mcPhys->mu_staco_nRPCLayer2EtaHits;
+		mu_staco_nRPCLayer3EtaHits = m_mcPhys->mu_staco_nRPCLayer3EtaHits;
+		mu_staco_nRPCLayer1PhiHits = m_mcPhys->mu_staco_nRPCLayer1PhiHits;
+		mu_staco_nRPCLayer2PhiHits = m_mcPhys->mu_staco_nRPCLayer2PhiHits;
+		mu_staco_nRPCLayer3PhiHits = m_mcPhys->mu_staco_nRPCLayer3PhiHits;
+		mu_staco_nTGCLayer1EtaHits = m_mcPhys->mu_staco_nTGCLayer1EtaHits;
+		mu_staco_nTGCLayer2EtaHits = m_mcPhys->mu_staco_nTGCLayer2EtaHits;
+		mu_staco_nTGCLayer3EtaHits = m_mcPhys->mu_staco_nTGCLayer3EtaHits;
+		mu_staco_nTGCLayer4EtaHits = m_mcPhys->mu_staco_nTGCLayer4EtaHits;
+		mu_staco_nTGCLayer1PhiHits = m_mcPhys->mu_staco_nTGCLayer1PhiHits;
+		mu_staco_nTGCLayer2PhiHits = m_mcPhys->mu_staco_nTGCLayer2PhiHits;
+		mu_staco_nTGCLayer3PhiHits = m_mcPhys->mu_staco_nTGCLayer3PhiHits;
+		mu_staco_nTGCLayer4PhiHits = m_mcPhys->mu_staco_nTGCLayer4PhiHits;
+		
 		// muid
 		mu_muid_n        = m_mcPhys->mu_muid_n;
 		mu_muid_px       = m_mcPhys->mu_muid_px;
@@ -280,6 +484,30 @@ void offTree::fill(int isGrl)
 		mu_muid_isCombinedMuon = m_mcPhys->mu_muid_isCombinedMuon;
 		mu_muid_nSCTHits = m_mcPhys->mu_muid_nSCTHits;
 		mu_muid_nPixHits = m_mcPhys->mu_muid_nPixHits;
+		mu_muid_nMDTBIHits =      m_mcPhys->mu_muid_nMDTBIHits;
+		mu_muid_nMDTBMHits =      m_mcPhys->mu_muid_nMDTBMHits;
+		mu_muid_nMDTBOHits =      m_mcPhys->mu_muid_nMDTBOHits;
+		mu_muid_nMDTBEEHits =     m_mcPhys->mu_muid_nMDTBEEHits;
+		mu_muid_nMDTBIS78Hits =   m_mcPhys->mu_muid_nMDTBIS78Hits;
+		mu_muid_nMDTEIHits =      m_mcPhys->mu_muid_nMDTEIHits;
+		mu_muid_nMDTEMHits =      m_mcPhys->mu_muid_nMDTEMHits;
+		mu_muid_nMDTEOHits =      m_mcPhys->mu_muid_nMDTEOHits;
+		mu_muid_nMDTEEHits =      m_mcPhys->mu_muid_nMDTEEHits;
+		
+		mu_muid_nRPCLayer1EtaHits = m_mcPhys->mu_muid_nRPCLayer1EtaHits;
+		mu_muid_nRPCLayer2EtaHits = m_mcPhys->mu_muid_nRPCLayer2EtaHits;
+		mu_muid_nRPCLayer3EtaHits = m_mcPhys->mu_muid_nRPCLayer3EtaHits;
+		mu_muid_nRPCLayer1PhiHits = m_mcPhys->mu_muid_nRPCLayer1PhiHits;
+		mu_muid_nRPCLayer2PhiHits = m_mcPhys->mu_muid_nRPCLayer2PhiHits;
+		mu_muid_nRPCLayer3PhiHits = m_mcPhys->mu_muid_nRPCLayer3PhiHits;
+		mu_muid_nTGCLayer1EtaHits = m_mcPhys->mu_muid_nTGCLayer1EtaHits;
+		mu_muid_nTGCLayer2EtaHits = m_mcPhys->mu_muid_nTGCLayer2EtaHits;
+		mu_muid_nTGCLayer3EtaHits = m_mcPhys->mu_muid_nTGCLayer3EtaHits;
+		mu_muid_nTGCLayer4EtaHits = m_mcPhys->mu_muid_nTGCLayer4EtaHits;
+		mu_muid_nTGCLayer1PhiHits = m_mcPhys->mu_muid_nTGCLayer1PhiHits;
+		mu_muid_nTGCLayer2PhiHits = m_mcPhys->mu_muid_nTGCLayer2PhiHits;
+		mu_muid_nTGCLayer3PhiHits = m_mcPhys->mu_muid_nTGCLayer3PhiHits;
+		mu_muid_nTGCLayer4PhiHits = m_mcPhys->mu_muid_nTGCLayer4PhiHits;
 		
 		// vertex
 		vxp_n       = m_mcPhys->vxp_n;
@@ -288,7 +516,6 @@ void offTree::fill(int isGrl)
 		vxp_z       = m_mcPhys->vxp_z;
 		vxp_z_err   = m_mcPhys->vxp_err_z;
 	}
-	
 	
 	///////////////////////////////
 	m_tree->Fill(); ///////////////
@@ -328,6 +555,29 @@ void offTree::reset()
 	mu_staco_isCombinedMuon  = NULL;
 	mu_staco_nSCTHits  = NULL;
 	mu_staco_nPixHits  = NULL;
+	mu_staco_nMDTBIHits = NULL;
+	mu_staco_nMDTBMHits = NULL;
+	mu_staco_nMDTBOHits = NULL;
+	mu_staco_nMDTBEEHits = NULL;
+	mu_staco_nMDTBIS78Hits = NULL;
+	mu_staco_nMDTEIHits = NULL;
+	mu_staco_nMDTEMHits = NULL;
+	mu_staco_nMDTEOHits = NULL;
+	mu_staco_nMDTEEHits = NULL;
+	mu_staco_nRPCLayer1EtaHits = NULL;
+	mu_staco_nRPCLayer2EtaHits = NULL;
+	mu_staco_nRPCLayer3EtaHits = NULL;
+	mu_staco_nRPCLayer1PhiHits = NULL;
+	mu_staco_nRPCLayer2PhiHits = NULL;
+	mu_staco_nRPCLayer3PhiHits = NULL;
+	mu_staco_nTGCLayer1EtaHits = NULL;
+	mu_staco_nTGCLayer2EtaHits = NULL;
+	mu_staco_nTGCLayer3EtaHits = NULL;
+	mu_staco_nTGCLayer4EtaHits = NULL;
+	mu_staco_nTGCLayer1PhiHits = NULL;
+	mu_staco_nTGCLayer2PhiHits = NULL;
+	mu_staco_nTGCLayer3PhiHits = NULL;
+	mu_staco_nTGCLayer4PhiHits = NULL;
 	
 	// muid
 	mu_muid_m         = NULL;
@@ -355,6 +605,30 @@ void offTree::reset()
 	mu_muid_isCombinedMuon  = NULL;
 	mu_muid_nSCTHits  = NULL;
 	mu_muid_nPixHits  = NULL;
+	mu_muid_nMDTBIHits = NULL;
+	mu_muid_nMDTBMHits = NULL;
+	mu_muid_nMDTBOHits = NULL;
+	mu_muid_nMDTBEEHits = NULL;
+	mu_muid_nMDTBIS78Hits = NULL;
+	mu_muid_nMDTEIHits = NULL;
+	mu_muid_nMDTEMHits = NULL;
+	mu_muid_nMDTEOHits = NULL;
+	mu_muid_nMDTEEHits = NULL;
+	mu_muid_nRPCLayer1EtaHits = NULL;
+	mu_muid_nRPCLayer2EtaHits = NULL;
+	mu_muid_nRPCLayer3EtaHits = NULL;
+	mu_muid_nRPCLayer1PhiHits = NULL;
+	mu_muid_nRPCLayer2PhiHits = NULL;
+	mu_muid_nRPCLayer3PhiHits = NULL;
+	mu_muid_nTGCLayer1EtaHits = NULL;
+	mu_muid_nTGCLayer2EtaHits = NULL;
+	mu_muid_nTGCLayer3EtaHits = NULL;
+	mu_muid_nTGCLayer4EtaHits = NULL;
+	mu_muid_nTGCLayer1PhiHits = NULL;
+	mu_muid_nTGCLayer2PhiHits = NULL;
+	mu_muid_nTGCLayer3PhiHits = NULL;
+	mu_muid_nTGCLayer4PhiHits = NULL;
+	
 	
 	// vertex variables
 	vxp_z       = NULL;

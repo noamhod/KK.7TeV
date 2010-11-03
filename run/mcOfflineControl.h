@@ -16,25 +16,19 @@
 #ifndef MCOFFLINECONTROL_H
 #define MCOFFLINECONTROL_H
 
-class mcOfflineControl : public offlineChains, public mcOfflineAnalysis
+class mcOfflineControl : public offlineChains
 {
 	public:
 		// from MakeClass
-		mcOfflinePhysics* m_mcOffPhys;
-		cutFlowHandler* m_cutFlowHandler;
-		
-		// pointers
-		TFile*          m_histfile;
-		TFile*          m_treefile;
+		mcOfflinePhysics*  m_mcOffPhys;
+		TFile*             m_histfile;
+		TFile*             m_treefile;
+		mcOfflineAnalysis* m_mcOfflineAnalysis;
 		
 		TDirectory*     m_dirAllCuts;
 		TDirectory* 	m_dirNoCuts;
 		TDirectory* 	m_dirCutFlow;
 		TDirectory* 	m_dirFit;
-		
-		mcOfflineAnalysis* m_mcOfflineAnalysis;
-		graphicObjects*  m_graphics;
-		fit*            m_fitter;
 
 		// run control
 		Long64_t l64t_nentries;

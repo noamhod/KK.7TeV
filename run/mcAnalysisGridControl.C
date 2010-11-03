@@ -24,16 +24,8 @@ mcAnalysisGridControl::mcAnalysisGridControl( TChain* inchain, TFile* outfile )
 	m_mcPhys = new mcPhysics( m_chain );
 
 	m_rootfile->cd();
-
-	m_graphics = new graphicObjects();
-	m_graphics->setStyle();
-
-	str = "cutFlow.cuts";
-	m_cutFlowHandler = new cutFlowHandler(str);
 	
-	m_fitter = new fit();
-	
-	m_mcAnalysis = new mcAnalysis( m_mcPhys, m_graphics, m_cutFlowHandler, m_fitter, m_rootfile );
+	m_mcAnalysis = new mcAnalysis( m_mcPhys, m_rootfile, "cutFlow.cuts", "dataPeriods.data", "" );
 
 	book();
 }
@@ -55,12 +47,8 @@ void mcAnalysisGridControl::initialize()
 	// pointers
 	m_mcPhys     = NULL;
 	m_mcAnalysis = NULL;
-	m_graphics = NULL;
 	m_rootfile = NULL;
 	m_rootfile = NULL;
-
-	kinitialize();
-	uinitialize();
 }
 
 void mcAnalysisGridControl::finalize()
@@ -71,30 +59,39 @@ void mcAnalysisGridControl::finalize()
 	// file
 	m_rootfile->Write();
 	m_rootfile->Close();
-
-	kfinalize();
-	ufinalize();
 }
 
 void mcAnalysisGridControl::book()
 {
 	m_dirNoCuts = m_rootfile->mkdir("noCuts");
-	m_graphics->bookBareHistos(m_dirNoCuts);
+	m_mcAnalysis->bookBareHistos(m_dirNoCuts);
 
 	m_dirAllCuts = m_rootfile->mkdir("allCuts");
-	m_graphics->bookHistos(m_dirAllCuts);
+	m_mcAnalysis->bookHistos(m_dirAllCuts);
 
 	m_dirCutFlow = m_rootfile->mkdir("cutFlow");
-	m_graphics->bookHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_cutFlowHandler->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );	
+	m_mcAnalysis->bookHistosMap( m_mcAnalysis->getCutFlowOrderedMapPtr(), m_mcAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );	
+	
+	m_mcAnalysis->bookFitHistos(m_dirAllCuts);	
 }
 
 void mcAnalysisGridControl::draw()
 {
-	m_graphics->drawBareHistos(m_dirNoCuts);
-	m_graphics->drawHistos(m_dirAllCuts);
-	m_graphics->drawHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_cutFlowHandler->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+	m_mcAnalysis->drawBareHistos(m_dirNoCuts);
+	m_mcAnalysis->drawHistos(m_dirAllCuts);
+	m_mcAnalysis->drawHistosMap( m_mcAnalysis->getCutFlowOrderedMapPtr(), m_mcAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 
-	m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
+	m_mcAnalysis->printCutFlowNumbers(l64t_nentries);
+}
+
+void mcAnalysisGridControl::fits()
+{
+	cout << "### in fits ####" << endl;
+
+	double yields[2];
+	
+	// Preform the fit
+	m_mcAnalysis->minimize( false, m_mcAnalysis->h1_imassFit, yields );
 }
 
 void mcAnalysisGridControl::analyze()
@@ -128,7 +125,7 @@ void mcAnalysisGridControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		// if (Cut(l64t_ientry) < 0) continue;
 		
 		if(l64t_jentry%100000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_mcPhys->RunNumber << "\tlumiblock=" << m_mcPhys->lbn << endl;
-		if(l64t_jentry%l64t_mod==0) m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
+		if(l64t_jentry%l64t_mod==0) m_mcAnalysis->printCutFlowNumbers(l64t_nentries);
 		
 		analyze();
 	}

@@ -31,12 +31,6 @@ void selection::sfinalize()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
-void selection::initSelectionCuts(TMapsvd* cutFlowMapSVD, TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered)
-{
-	m_cutFlowMapSVD  = cutFlowMapSVD;
-	m_cutFlowOrdered = cutFlowOrdered;
-	m_cutFlowTypeOrdered = cutFlowTypeOrdered;
-}
 
 bool selection::removeOverlaps( TMapii& mupair, int ia, int ib)
 {
@@ -236,10 +230,27 @@ bool selection::isEF_muXCut( double isEF_muXCutVal, int isEF_muX )
 	return ( (double)isEF_muX == isEF_muXCutVal ) ? true : false;
 }
 
+bool selection::triggerCut( double triggerCutVal, int isTrigger, string triggerName )
+{
+	if(b_print) cout << "in triggerCut: triggerName=" << triggerName << " value=" << isTrigger << endl;
+	return ( (double)isTrigger == triggerCutVal ) ? true : false;
+}
+
 bool selection::pTCut( double pTCutVal, TLorentzVector* pa, TLorentzVector* pb )
 {
 	if(b_print) cout << "in pTCut: pT(pa)=" << pT(pa) << ", pT(pb)=" << pT(pb) << endl;
 	return ( fabs(pT(pa))>=pTCutVal  &&  fabs(pT(pb))>=pTCutVal ) ? true : false;
+}
+
+bool selection::pTCut( double pTCutVal, double me_qOp_a, double me_theta_a, double me_qOp_b, double me_theta_b )
+{
+	// pT=|p|*sin(theta)
+	// qOp=charge/|p|
+	double pT_a = (me_qOp_a!=0) ? fabs((1./me_qOp_a)*sin(me_theta_a)) : 0.;
+	double pT_b = (me_qOp_b!=0) ? fabs((1./me_qOp_b)*sin(me_theta_b)) : 0.;
+
+	if(b_print) cout << "in pTCut: pT(a)=" << pT_a << ", pT(b)=" << pT_b << endl;
+	return ( fabs(pT_a)>=pTCutVal  &&  fabs(pT_b)>=pTCutVal ) ? true : false;
 }
 
 bool selection::etaCut( double etaCutVal, TLorentzVector* pa, TLorentzVector* pb )
@@ -264,6 +275,13 @@ bool selection::cosThetaDimuCut( double cosThetaDimuCutVal, TLorentzVector* pa, 
 {
 	if(b_print) cout << "in cosThetaDimuCut: cosThetaDimu(pa,pb)=" << cosThetaDimu(pa,pb) << endl;
 	return ( cosThetaDimu(pa,pb) > cosThetaDimuCutVal ) ? true : false;
+}
+
+bool selection::etaSumCut( double etaSumCutVal, TLorentzVector* pa, TLorentzVector* pb )
+{
+	double etasum = eta(pa) + eta(pb);
+	if(b_print) cout << "in etaSum: etaSum(a,b)=" << etasum << endl;
+	return ( fabs(etasum) < etaSumCutVal ) ? true : false;
 }
 
 bool selection::oppositeChargeCut( double ca, double cb )
@@ -342,8 +360,8 @@ double id_qOp, double id_theta )
 {
 	// pT=|p|*sin(theta)
 	// qOp=charge/|p|
-	double pT_id = (id_qOp!=0) ? fabs(1./id_qOp)*sin(id_theta) : 0.;
-	double pT_ms = (me_qOp!=0) ? fabs(1./me_qOp)*sin(me_theta) : 0.;
+	double pT_id = (id_qOp!=0) ? fabs((1./id_qOp)*sin(id_theta)) : 0.;
+	double pT_ms = (me_qOp!=0) ? fabs((1./me_qOp)*sin(me_theta)) : 0.;
 	
 	double ratio = (pT_id!=0.) ? fabs(pT_ms/pT_id) : 0.;
 	
@@ -359,8 +377,8 @@ double id_qOp, double id_theta )
 {
 	// pT=|p|*sin(theta)
 	// qOp=charge/|p|
-	double pT_id = (id_qOp!=0) ? fabs(1./id_qOp)*sin(id_theta) : 0.;
-	double pT_ms = (me_qOp!=0) ? fabs(1./me_qOp)*sin(me_theta) : 0.;
+	double pT_id = (id_qOp!=0) ? fabs((1./id_qOp)*sin(id_theta)) : 0.;
+	double pT_ms = (me_qOp!=0) ? fabs((1./me_qOp)*sin(me_theta)) : 0.;
 	
 	double diff = fabs(pT_ms - pT_id);
 	

@@ -73,18 +73,20 @@ using namespace std;
 using namespace RooFit;
 
 typedef multimap<int, int>      TMapii;
+typedef multimap<int, string>   TMapis;
 typedef map<double, double>     TMapdd;
-
 typedef vector<TLorentzVector*> TVectorP2VL;
 typedef map<string, TH1D*>      TMapSP2TH1D;
-
 typedef map<string, double>     TMapsd;
 typedef map<string, int>        TMapsi;
 typedef map<string, bool>       TMapsb;
 typedef map<double, string>     TMapds;
-
 typedef map<string, vector<double> >  TMapsvd;
 typedef map<string, vector<double>* > TMapsP2vd;
+typedef map<string, string> TMapss;
+typedef map<string, vector<string> > TMapsvs;
+typedef map<string, vector<string>* > TMapsP2vs;
+typedef map<int, vector<string>* >    TMapiP2vs; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 #define utilities_cxx
 #include "utilities.C"

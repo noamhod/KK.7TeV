@@ -7,13 +7,13 @@
 
 #include "basicIncludes.h"
 
-#define combinedSelection_cxx
-#include "combinedSelection.C"
+#define analysisSkeleton_cxx
+#include "analysisSkeleton.C"
 
 #ifndef DIGESTANALYSIS_H
 #define DIGESTANALYSIS_H
 
-class digestAnalysis : public combinedSelection
+class digestAnalysis : public analysisSkeleton
 {
 public:
 	// pointers to classes
@@ -23,11 +23,14 @@ public:
 
 public:
 	digestAnalysis();
-	digestAnalysis(digestPhysics* offPhys, graphicObjects* m_graphicobjs, cutFlowHandler* cutFlowHandler, fit* fitter, TFile* treeFile);
+	digestAnalysis(digestPhysics* offPhys, TFile* treeFile,
+				   string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath ) :
+	analysisSkeleton(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
+	{
+		m_digestPhys = digestPhysics;
+		m_treeFile   = treeFile;
+	}
 	~digestAnalysis();
-
-	void initialize();
-	void finalize();
 	
 	void executeAdvanced();
 	void executeCutFlow();

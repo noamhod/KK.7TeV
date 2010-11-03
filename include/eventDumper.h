@@ -16,6 +16,7 @@ class eventDumper
 		ofstream* file;
 	
 		bool b_print;
+		bool doEventDump;
 		double m_massThreshold;
 		double m_currentEventMass;
 

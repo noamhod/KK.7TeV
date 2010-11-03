@@ -20,10 +20,12 @@ public:
 	
 	bool   b_print;
 	
+	/*
 	TMapsvd* m_cutFlowMapSVD;
 	TMapds*  m_cutFlowOrdered;
 	TMapds*  m_cutFlowTypeOrdered;
-
+	*/
+	
 public:
 	selection();
 	~selection();
@@ -31,7 +33,7 @@ public:
 	void sinitialize();
 	void sfinalize();
 
-	void initSelectionCuts(TMapsvd* cutFlowMapSVD, TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered); // called by analysis, offlineAnalysis and digestAnalysis
+	//void initSelectionCuts(TMapsvd* cutFlowMapSVD, TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered); // called by analysis, offlineAnalysis and digestAnalysis
 	
 	void buildMuonPairMap( TMapii& mupair, TVectorP2VL& pmu );
 
@@ -56,14 +58,17 @@ public:
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 	// * * * simple cuts methods * * *
 	
-	bool isGRLCut( double isGRLCutVal, int isGRL );
+	bool isGRLCut(    double isGRLCutVal,    int isGRL );
 	bool isL1_MU6Cut( double isL1_MU6CutVal, int isL1_MU6 );
 	bool isEF_muXCut( double isEF_muXCutVal, int isEF_muX );
+	bool triggerCut(  double triggerCutVal,  int isTrigger, string triggerName );
 	
 	bool pTCut(           double pTCutVal,           TLorentzVector* pa, TLorentzVector* pb );
+	bool pTCut(           double pTCutVal,           double me_qOp_a, double me_theta_a, double me_qOp_b, double me_theta_b );
 	bool etaCut(          double etaCutVal,          TLorentzVector* pa, TLorentzVector* pb );
 	bool etaTightCut(     double etaTightCutVal,     TLorentzVector* pa, TLorentzVector* pb );
 	bool cosThetaDimuCut( double cosThetaDimuCutVal, TLorentzVector* pa, TLorentzVector* pb );
+	bool etaSumCut(       double etaSumCutVal,       TLorentzVector* pa, TLorentzVector* pb );
 	bool imassCut(        double imassCutVal,        TLorentzVector* pa, TLorentzVector* pb );
 
 	bool d0Cut(          double d0CutVal, double d0a, double d0b ); // deprecated !!!!!!!!!!!!!!!!!!!!!!!!!!!!!

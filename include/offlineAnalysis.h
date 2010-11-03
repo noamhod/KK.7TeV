@@ -7,8 +7,8 @@
 
 #include "basicIncludes.h"
 
-#define combinedSelection_cxx
-#include "combinedSelection.C"
+#define analysisSkeleton_cxx
+#include "analysisSkeleton.C"
 
 #define offlineTreeDigest_cxx
 #include "offlineTreeDigest.C"
@@ -16,22 +16,25 @@
 #ifndef OFFLINEANALYSIS_H
 #define OFFLINEANALYSIS_H
 
-class offlineAnalysis : public offlinePhysics, public combinedSelection
+class offlineAnalysis : public offlinePhysics, public analysisSkeleton
 {
 public:
 	// pointers to classes
-	offlinePhysics*        m_offPhys;
-
+	offlinePhysics*    m_offPhys;
 	TFile*		       m_treeFile;
 	offlineTreeDigest* m_offTreeDigest;
 
 public:
 	offlineAnalysis();
-	offlineAnalysis(offlinePhysics* offPhys, graphicObjects* m_graphicobjs, cutFlowHandler* cutFlowHandler, fit* fitter, TFile* treeFile);
+	offlineAnalysis(offlinePhysics* offPhys, TFile* treeFile,
+					string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath ) :
+	analysisSkeleton(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
+	{
+		m_offPhys = offPhys;
+		m_treeFile = treeFile;
+		m_offTreeDigest = new offlineTreeDigest( m_offPhys, m_treeFile );
+	}
 	~offlineAnalysis();
-
-	void initialize();
-	void finalize();
 
 	void executeAdvanced();
 	void executeCutFlow();

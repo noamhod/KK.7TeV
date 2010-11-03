@@ -16,25 +16,19 @@
 #ifndef MCDIGESTCONTROL_H
 #define MCDIGESTCONTROL_H
 
-class mcDigestControl : public digestChains, public mcDigestAnalysis
+class mcDigestControl : public digestChains
 {
 	public:
 		// from MakeClass
-		mcDigestPhysics* m_mcDigestPhys;
-		cutFlowHandler* m_cutFlowHandler;
-		
-		// pointers
-		TFile*          m_histfile;
-		TFile*          m_treefile;
+		mcDigestPhysics*  m_mcDigestPhys;
+		TFile*            m_histfile;
+		TFile*            m_treefile;
+		mcDigestAnalysis* m_mcDigestAnalysis;
 		
 		TDirectory*     m_dirAllCuts;
 		TDirectory* 	m_dirNoCuts;
 		TDirectory* 	m_dirCutFlow;
 		TDirectory* 	m_dirFit;
-		
-		mcDigestAnalysis* m_mcDigestAnalysis;
-		graphicObjects*  m_graphics;
-		fit*            m_fitter;
 
 		// run control
 		Long64_t l64t_nentries;

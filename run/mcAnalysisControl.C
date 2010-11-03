@@ -5,22 +5,20 @@
 /* on 23/07/2010 11:24 */
 /* * * * * * * * * * * */
 
-#include "analysisControl.h"
+#include "mcAnalysisControl.h"
 
-analysisControl::analysisControl()
+mcAnalysisControl::mcAnalysisControl()
 {
 	initialize();
 	
 	string str = "";
 
 	str = checkANDsetFilepath("PWD", "/../conf/mcdataset.list");
-	string strb = checkANDsetFilepath("PWD", "/mcdatasetdir/"); // ln -s /data/hod/D3PDs/group10.mcPhys-sm.data10_7TeV_mcPhysics_MuonswBeam_WZmcPhys_D3PD datasetdir
-	//string strb = ""; // ln -s /tmp/hod/file1.root file1.root 
+	string strb = checkANDsetFilepath("PWD", "/mcdatasetdir/");
 	makeChain(true, str, strb);
 
 	m_mcPhys = new mcPhysics( m_chain );
 
-	//str = checkANDsetFilepath("PWD", "/../data/mcAnalysisTrees.root");
 	str = "mcAnalysisTrees.root";
 	m_treefile = new TFile( str.c_str(), "RECREATE");
 	m_treefile->cd();
@@ -29,27 +27,21 @@ analysisControl::analysisControl()
 	m_histfile = new TFile( str.c_str(), "RECREATE");
 	m_histfile->cd();
 
-	m_graphics = new graphicObjects();
-	m_graphics->setStyle();
 
-
-	// read the cut flow (ownership: selection class which analysis inherits from)
-	str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
-	m_cutFlowHandler = new cutFlowHandler(str);
+	string str1 = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
+	string str2 = checkANDsetFilepath("PWD", "/../conf/dataPeriods.data");
 	
-	m_fitter = new fit();
-	
-	m_analysis = new analysis( m_mcPhys, m_graphics, m_cutFlowHandler, m_fitter, m_treefile );
+	m_mcAnalysis = new analysis( m_mcPhys, m_treefile, str1, str2, "" );
 
 	book();
 }
 
-analysisControl::~analysisControl()
+mcAnalysisControl::~mcAnalysisControl()
 {
 	//finalize();
 }
 
-void analysisControl::initialize()
+void mcAnalysisControl::initialize()
 {
 	// run control
 	l64t_nentries = 0;
@@ -60,20 +52,15 @@ void analysisControl::initialize()
 
 	// pointers
 	m_mcPhys     = NULL;
-	m_analysis = NULL;
-	m_graphics = NULL;
+	m_mcAnalysis = NULL;
 	m_histfile = NULL;
 	m_treefile = NULL;
-
-	cinitialize();
-	kinitialize();
-	uinitialize();
 }
 
-void analysisControl::finalize()
+void mcAnalysisControl::finalize()
 {
 	// write the tree
-	m_analysis->write();
+	m_mcAnalysis->write();
 
 	// files
 	m_histfile->Write();
@@ -81,39 +68,47 @@ void analysisControl::finalize()
 
 	m_treefile->Write();
 	m_treefile->Close();
-	
-	cfinalize();
-	kfinalize();
-	ufinalize();
 }
 
-void analysisControl::book()
+void mcAnalysisControl::book()
 {
 	m_dirNoCuts = m_histfile->mkdir("noCuts");
-	m_graphics->bookBareHistos(m_dirNoCuts);
+	m_mcAnalysis->bookBareHistos(m_dirNoCuts);
 
 	m_dirAllCuts = m_histfile->mkdir("allCuts");
-	m_graphics->bookHistos(m_dirAllCuts);
+	m_mcAnalysis->bookHistos(m_dirAllCuts);
 
 	m_dirCutFlow = m_histfile->mkdir("cutFlow");
-	m_graphics->bookHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_cutFlowHandler->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );	
+	m_mcAnalysis->bookHistosMap( m_mcAnalysis->getCutFlowOrderedMapPtr(), m_mcAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+
+	m_mcAnalysis->bookFitHistos(m_dirAllCuts);	
 }
 
-void analysisControl::draw()
+void mcAnalysisControl::draw()
 {
-	m_graphics->drawBareHistos(m_dirNoCuts);
-	m_graphics->drawHistos(m_dirAllCuts);
-	m_graphics->drawHistosMap( m_cutFlowHandler->getCutFlowOrderedMapPtr(), m_cutFlowHandler->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+	m_mcAnalysis->drawBareHistos(m_dirNoCuts);
+	m_mcAnalysis->drawHistos(m_dirAllCuts);
+	m_mcAnalysis->drawHistosMap( m_mcAnalysis->getCutFlowOrderedMapPtr(), m_mcAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 
-	m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
+	m_mcAnalysis->printCutFlowNumbers(l64t_nentries);
 }
 
-void analysisControl::analyze()
+void mcAnalysisControl::fits()
 {
-	m_analysis->executeCutFlow();
+	cout << "### in fits ####" << endl;
+
+	double yields[2];
+	
+	// Preform the fit
+	m_mcAnalysis->minimize( false, m_mcAnalysis->h1_imassFit, yields );
 }
 
-void analysisControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
+void mcAnalysisControl::analyze()
+{
+	m_mcAnalysis->executeCutFlow();
+}
+
+void mcAnalysisControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 {
 	if (m_mcPhys->fChain == 0)  return;
 
@@ -139,7 +134,7 @@ void analysisControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		// if (Cut(l64t_ientry) < 0) continue;
 		
 		if(l64t_jentry%100000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_mcPhys->RunNumber << "\tlumiblock=" << m_mcPhys->lbn << endl;
-		if(l64t_jentry%l64t_mod==0) m_cutFlowHandler->printCutFlowNumbers(l64t_nentries);
+		if(l64t_jentry%l64t_mod==0) m_mcAnalysis->printCutFlowNumbers(l64t_nentries);
 		
 		analyze();
 	}

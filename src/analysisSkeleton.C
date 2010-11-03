@@ -6,120 +6,110 @@
 /* on 23/07/2010 11:24 */
 /* * * * * * * * * * * */
 
-#include "combinedSelection.h"
+#include "analysisSkeleton.h"
 
-combinedSelection::combinedSelection()
+analysisSkeleton::analysisSkeleton()
 {
-	currentRun = 0;
-	sCurrentPeriod = "";
+	
 }
 
-combinedSelection::~combinedSelection()
+analysisSkeleton::~analysisSkeleton()
 {
 
 }
-
-/*
-void combinedSelection::initCombinedSelection(graphicObjects* graphicobjs, cutFlowHandler* cutFlowHandler, periodHandler* periods, fit* fitter, string sEventDumpFilePath)
-{
-	m_cutFlowHandler     = cutFlowHandler;
-	m_cutFlowMapSVD      = m_cutFlowHandler->getCutFlowMapSVDPtr();
-	m_cutFlowOrdered     = m_cutFlowHandler->getCutFlowOrderedMapPtr();
-	m_cutFlowTypeOrdered = m_cutFlowHandler->getCutFlowTypeOrderedMapPtr();
-	m_cutFlowNumbers     = m_cutFlowHandler->getCutFlowNumbersMapPtr();
-	
-	m_periodHandler = periods;
-	m_firstrun2periodMap = m_periodHandler->getFirstRun2PeriodMapPtr();
-	m_lastrun2periodMap  = m_periodHandler->getLastRun2PeriodMapPtr();
-	m_period2triggerMap  = m_periodHandler->getPeriod2TriggerMapPtr();
-	
-	// cut flow has been read out already
-	initSelectionCuts(m_cutFlowMapSVD, m_cutFlowOrdered, m_cutFlowTypeOrdered);
-
-	m_graphicobjs = graphicobjs;
-	m_graphicobjs->setCutFlowMapSVDPtr( m_cutFlowMapSVD );
-	m_graphicobjs->ginitialize();
-	
-	m_fitter = fitter;
-	
-	currentRun = 0;
-	
-	cout << "init combined selection OK" << endl;
-}
-*/
-
-/*
-void combinedSelection::initCombinedSelection(graphicObjects* graphicobjs, cutFlowHandler* cutFlowHandler, periodHandler* periods, fit* fitter, string sEventDumpFilePath)
-{	
-	currentRun = 0;
-}
-*/
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-/*
-void combinedSelection::setEventDumper(string sEventDumpFilePath)
-{
-	doEventDump = true;
-	m_eventDumper = new eventDumper( sEventDumpFilePath );
-	m_eventDumper->setInterestingThreshold( 250.*GeV2TeV );
-	
-	cout << "set event dumper OK" << endl;
-}
-*/
 
-string combinedSelection::getPeriodName()
+string analysisSkeleton::getPeriodName()
 {
 	string speriod = sCurrentPeriod;
 	if(runnumber != currentRun)
 	{
-		speriod = m_periodHandler->getPeriod( runnumber, m_firstrun2periodMap, m_lastrun2periodMap );
-		m_periodHandler->getTrigs(speriod, m_period2triggerMap, vTriggers);
+		speriod = getPeriod( runnumber, m_firstrun2periodMap, m_lastrun2periodMap );
 		cout << "switching to period: " << speriod << endl;
-		currentRun = runnumber;
+		currentRun     = runnumber;
+		sCurrentPeriod = speriod;
 	}
+	if(speriod=="")
+	{
+		cout << "ERROR: in analysisSkeleton::getPeriodName -> (speriod==""), exitting now" << endl;
+		exit(-1);
+	}
+	
 	return speriod;
 }
 
-void combinedSelection::runEventDumper(bool passCutFlow, int ai)
+vector<string>* analysisSkeleton::getPeriodTriggers()
+{
+	if(sPeriod==""  ||  m_period2triggerMap==NULL)
+	{
+		cout << "ERROR: in analysisSkeleton::getPeriodTriggers -> (sPeriod=="" || m_period2triggerMap==NULL), exitting now" << endl;
+		exit(-1);
+	}
+	
+	return getTrigs(sPeriod, m_period2triggerMap);
+}
+
+int analysisSkeleton::isTrigger(string trigName)
+{
+	if(trigName=="")
+	{
+		cout << "ERROR: in analysisSkeleton::isTrigger -> (trigName==""), exitting now" << endl;
+		exit(-1);
+	}
+	
+	int isTrig = 0;
+	if     (trigName=="L1_MU10") isTrig = isL1_MU10;
+	else if(trigName=="EF_mu10") isTrig = isEF_mu10;
+	else if(trigName=="EF_mu10_MG") isTrig = isEF_mu10_MG;
+	else if(trigName=="EF_mu13") isTrig = isEF_mu13;
+	else if(trigName=="EF_mu13_MG") isTrig = isEF_mu13_MG;
+	else if(trigName=="EF_mu13_tight") isTrig = isEF_mu13_tight;
+	else if(trigName=="EF_mu13_MG_tight") isTrig = isEF_mu13_MG_tight;
+	else cout << "WARNING:  in analysisSkeleton::isTrigger -> the trigger " << trigName << " was not found and the event is regected by default" << endl;
+	return isTrig;
+}
+
+void analysisSkeleton::runEventDumper(bool passCutFlow, int ai)
 {
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	// write the interesting events to a flat file ///////////////////////////////////////////////
-	if(passCutFlow  &&  m_eventDumper->doEventDump)
+	if(passCutFlow  &&  doEventDump)
 	{	
-		m_eventDumper->setCurrentEventMass( current_imass );
-		m_eventDumper->writeEventHeader(runnumber, lumiblock, eventnumber);
+		setCurrentEventMass( current_imass );
+		writeEventHeader(runnumber, lumiblock, eventnumber);
 		
-		m_eventDumper->writeProperty("$p_T$", current_mu_pT, current_muplus_pT);
-		m_eventDumper->writeProperty("$\\eta$", current_mu_eta, current_muplus_eta);
+		writeProperty("$p_T$", current_mu_pT, current_muplus_pT);
+		writeProperty("$\\eta$", current_mu_eta, current_muplus_eta);
 		
 		double ca = mu_staco_charge->at(ai);
 		if(ca<0)
 		{
-			m_eventDumper->writeProperty("$\\sum{p_T^{cone20}}/p_T$", pTcone20a/mu_pTa, pTcone20b/mu_pTb);
-			m_eventDumper->writeProperty("$\\sum{p_T^{cone30}}/p_T$", pTcone30a/mu_pTa, pTcone30b/mu_pTb);
-			m_eventDumper->writeProperty("$\\sum{p_T^{cone40}}/p_T$", pTcone40a/mu_pTa, pTcone40b/mu_pTb);
+			writeProperty("$\\sum{p_T^{cone20}}/p_T$", pTcone20a/mu_pTa, pTcone20b/mu_pTb);
+			writeProperty("$\\sum{p_T^{cone30}}/p_T$", pTcone30a/mu_pTa, pTcone30b/mu_pTb);
+			writeProperty("$\\sum{p_T^{cone40}}/p_T$", pTcone40a/mu_pTa, pTcone40b/mu_pTb);
 			
-			m_eventDumper->writeProperty("nSCThits", nSCThitsMua, nSCThitsMub);
-			m_eventDumper->writeProperty("nPIXhits", nPIXhitsMua, nPIXhitsMub);
-			m_eventDumper->writeProperty("nIDhits ", nIDhitsMua, nIDhitsMub);
+			writeProperty("nSCThits", nSCThitsMua, nSCThitsMub);
+			writeProperty("nPIXhits", nPIXhitsMua, nPIXhitsMub);
+			writeProperty("nIDhits ", nIDhitsMua, nIDhitsMub);
 		}
 		else
 		{
-			m_eventDumper->writeProperty("$\\sum{p_T^{cone20}}/p_T$", pTcone20b/mu_pTb, pTcone20a/mu_pTa);
-			m_eventDumper->writeProperty("$\\sum{p_T^{cone30}}/p_T$", pTcone30b/mu_pTb, pTcone30a/mu_pTa);
-			m_eventDumper->writeProperty("$\\sum{p_T^{cone40}}/p_T$", pTcone40b/mu_pTb, pTcone40a/mu_pTa);
+			writeProperty("$\\sum{p_T^{cone20}}/p_T$", pTcone20b/mu_pTb, pTcone20a/mu_pTa);
+			writeProperty("$\\sum{p_T^{cone30}}/p_T$", pTcone30b/mu_pTb, pTcone30a/mu_pTa);
+			writeProperty("$\\sum{p_T^{cone40}}/p_T$", pTcone40b/mu_pTb, pTcone40a/mu_pTa);
 			
-			m_eventDumper->writeProperty("nSCThits", nSCThitsMub, nSCThitsMua);
-			m_eventDumper->writeProperty("nPIXhits", nPIXhitsMub, nPIXhitsMua);
-			m_eventDumper->writeProperty("nIDhits ", nIDhitsMub, nIDhitsMua);
+			writeProperty("nSCThits", nSCThitsMub, nSCThitsMua);
+			writeProperty("nPIXhits", nPIXhitsMub, nPIXhitsMua);
+			writeProperty("nIDhits ", nIDhitsMub, nIDhitsMua);
 		}
 		
-		m_eventDumper->writeProperty("$\\hat{m}_{\\mu\\mu}$", "red", current_imass);
-		m_eventDumper->writeProperty("$\\hat{p}_{\\mu^-}\\cdot\\hat{p}_{\\mu^+}$", current_cosmicCosth);
-		m_eventDumper->writeProperty("$\\cos\\theta_{\\mu^-}$", current_cosTheta);
+		writeProperty("$\\hat{m}_{\\mu\\mu}$", "red", current_imass);
+		writeProperty("$\\hat{p}_{\\mu^-}\\cdot\\hat{p}_{\\mu^+}$", current_cosmicCosth);
+		writeProperty("$\\cos\\theta_{\\mu^-}$", current_cosTheta);
 		
-		m_eventDumper->writeEventFooter();
+		writeEventFooter();
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////
 }
@@ -128,14 +118,14 @@ void combinedSelection::runEventDumper(bool passCutFlow, int ai)
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 
-void combinedSelection::fillAfterCuts(bool passCutFlow, int counter, string sorderedcutname, TMapsd& values2fill)
+void analysisSkeleton::fillAfterCuts(bool passCutFlow, int counter, string sorderedcutname, TMapsd& values2fill)
 {
 	if(passCutFlow)
 	{
 		//////////////////////////////////////////////////////
 		// for the cut flow: /////////////////////////////////
-		m_graphicobjs->hmap_cutFlow_imass->operator[]("imass."+sorderedcutname)->Fill( values2fill["imass"] );
-		m_graphicobjs->hmap_cutFlow_pT->operator[]("pT."+sorderedcutname)->Fill( values2fill["pT"] );
+		hmap_cutFlow_imass->operator[]("imass."+sorderedcutname)->Fill( values2fill["imass"] );
+		hmap_cutFlow_pT->operator[]("pT."+sorderedcutname)->Fill( values2fill["pT"] );
 		//////////////////////////////////////////////////////
 		
 		//////////////////////////////////////////////////////
@@ -149,16 +139,17 @@ void combinedSelection::fillAfterCuts(bool passCutFlow, int counter, string sord
 		{
 			// for the final histograms:
 			// i.e., not the curFlow histos
-			if(current_imass>=XMIN  &&  current_imass<=XMAX) m_graphicobjs->h1_costh->Fill( current_cosTheta );
-			m_graphicobjs->h1_cosmicCosthAllCuts->Fill( current_cosmicCosth );
-			m_graphicobjs->h1_pT->Fill( current_mu_pT );
-			m_graphicobjs->h1_pT_muplus->Fill( current_muplus_pT );
-			m_graphicobjs->h1_eta->Fill( current_mu_eta );
-			m_graphicobjs->h1_eta_muplus->Fill( current_muplus_eta );
-			m_graphicobjs->h1_ipTdiff->Fill( current_ipTdiff );
-			m_graphicobjs->h1_etaSum->Fill( current_etaSum );
-			m_graphicobjs->h1_imass->Fill( current_imass );
-			m_graphicobjs->h1_imassFit->Fill( current_imass );
+			if(current_imass>=XMIN  &&  current_imass<=XMAX) h1_costh->Fill( current_cosTheta );
+			
+			h1_cosmicCosthAllCuts->Fill( current_cosmicCosth );
+			h1_pT->Fill( current_mu_pT );
+			h1_pT_muplus->Fill( current_muplus_pT );
+			h1_eta->Fill( current_mu_eta );
+			h1_eta_muplus->Fill( current_muplus_eta );
+			h1_ipTdiff->Fill( current_ipTdiff );
+			h1_etaSum->Fill( current_etaSum );
+			h1_imass->Fill( current_imass );
+			h1_imassFit->Fill( current_imass );
 			
 			cout << "\n$$$$$$$$$ dimuon $$$$$$$$$" << endl;
 			cout << "\t im=" << current_imass << endl;
@@ -166,36 +157,36 @@ void combinedSelection::fillAfterCuts(bool passCutFlow, int counter, string sord
 			cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << endl;
 			
 			// fill the xVector for the ML fit:
-			m_fitter->fillXvec( current_imass );
+			fillXvec( current_imass );
 		}
 		///////////////////////////////////////////////////////////
 	} // end if(passCutFlow)
 }
 
-void combinedSelection::fillBeforeCuts()
+void analysisSkeleton::fillBeforeCuts()
 {
 	// fill nocuts histograms
-	m_graphicobjs->h1_cosmicCosth->Fill( current_cosmicCosth );
-	m_graphicobjs->h1_d0exPV->Fill(d0exPVa);
-	m_graphicobjs->h1_d0exPV->Fill(d0exPVb);
-	m_graphicobjs->h1_z0exPV->Fill(z0exPVa);
-	m_graphicobjs->h1_z0exPV->Fill(z0exPVb);
+	h1_cosmicCosth->Fill( current_cosmicCosth );
+	h1_d0exPV->Fill(d0exPVa);
+	h1_d0exPV->Fill(d0exPVb);
+	h1_z0exPV->Fill(z0exPVa);
+	h1_z0exPV->Fill(z0exPVb);
 	//X( prtD0*cos(phi) );
 	//Y( prtD0*sin(phi) );
 	//Z( Z0 );
-	m_graphicobjs->h2_xyVertex->Fill( d0exPVa*cos(phi_a), d0exPVa*sin(phi_a) );
-	m_graphicobjs->h2_xyVertex->Fill( d0exPVb*cos(phi_b), d0exPVb*sin(phi_b) );
+	h2_xyVertex->Fill( d0exPVa*cos(phi_a), d0exPVa*sin(phi_a) );
+	h2_xyVertex->Fill( d0exPVb*cos(phi_b), d0exPVb*sin(phi_b) );
 }
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 
-bool combinedSelection::applyPreselection(string sRunType)
+bool analysisSkeleton::applyPreselection(string sRunType)
 {
 	///////////////////////////////////////////
 	// do not skip this for correct counting //
-	m_cutFlowHandler->nAllEvents++; ///////////
+	nAllEvents++; ///////////
 	///////////////////////////////////////////
 	
 	
@@ -234,6 +225,14 @@ bool combinedSelection::applyPreselection(string sRunType)
 		}
 		
 		
+		if(sorderedcutname=="Trigger")
+		{
+			string trigName = vTriggers->at(0);
+			int trigVal = isTrigger(trigName);
+			passCurrentCut = ( triggerCut((*m_cutFlowMapSVD)[sorderedcutname][0], trigVal, trigName) ) ? true : false;
+		}
+		
+		
 		if(sorderedcutname=="EF_mu13")
 		{
 			passCurrentCut = ( isEF_muXCut((*m_cutFlowMapSVD)[sorderedcutname][0], isEF_mu13) ) ? true : false;
@@ -256,8 +255,6 @@ bool combinedSelection::applyPreselection(string sRunType)
 			double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 			double cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
 			double cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
-			//passCurrentCut = ( findBestVertex((int)cutval1, (int)cutval2, cutval3,
-			//								   vxp_n, vxp_nTracks, vxp_type, vxp_z) ) ? true : false;
 			passCurrentCut = ( findBestVertex((int)cutval1, (int)cutval2, cutval3,
 											   (int)vxp_type->size(), vxp_nTracks, vxp_type, vxp_z) ) ? true : false;
 		}
@@ -277,7 +274,7 @@ bool combinedSelection::applyPreselection(string sRunType)
 }
 
 
-bool combinedSelection::setMUindices(TVectorP2VL& pmu, string sRunType)
+bool analysisSkeleton::setMUindices(TVectorP2VL& pmu, string sRunType)
 {
 	////////////////////////////////////////
 	// need at least 2 muons.../////////////
@@ -333,7 +330,7 @@ bool combinedSelection::setMUindices(TVectorP2VL& pmu, string sRunType)
 
 
 
-void combinedSelection::applySelection(TVectorP2VL& pmu, TMapsd& values2fill)
+void analysisSkeleton::applySelection(TVectorP2VL& pmu, TMapsd& values2fill)
 {	
 	//////////////////////////////////////////////
 	// double check on the setMUindices method ///
@@ -381,6 +378,11 @@ void combinedSelection::applySelection(TVectorP2VL& pmu, TMapsd& values2fill)
 			passCurrentCut = ( pTCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
 		}
 		
+		if(sorderedcutname=="pT_use_qOp_and_theta")
+		{
+			passCurrentCut = ( pTCut((*m_cutFlowMapSVD)[sorderedcutname][0], me_qOp_a, me_theta_a, me_qOp_b, me_theta_b) ) ? true : false;
+		}
+		
 		if(sorderedcutname=="eta")
 		{
 			passCurrentCut = ( etaCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
@@ -394,6 +396,11 @@ void combinedSelection::applySelection(TVectorP2VL& pmu, TMapsd& values2fill)
 		if(sorderedcutname=="cosThetaDimu")
 		{
 			passCurrentCut = ( cosThetaDimuCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
+		}
+		
+		if(sorderedcutname=="etaSum")
+		{
+			passCurrentCut = ( etaSumCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
 		}
 
 		if(sorderedcutname=="d0")
@@ -421,15 +428,15 @@ void combinedSelection::applySelection(TVectorP2VL& pmu, TMapsd& values2fill)
 			passCurrentCut = ( isCombMuCut((*m_cutFlowMapSVD)[sorderedcutname][0],isMuaComb,isMubComb) ) ? true : false;
 		}
 		
-		/*
+		
 		if(sorderedcutname=="idHits")
 		{
 			double cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 			double cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
 			double cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
-			passCurrentCut = ( nIDhitsCut( cutval1,cutval2,cutval3,nSCThits,nPIXhits ) ) ? true : false;
+			passCurrentCut = ( nIDhitsCut( cutval1,cutval2,cutval3,nSCThitsMua,nPIXhitsMub ) ) ? true : false;
 		}
-		*/
+		
 		
 		if(sorderedcutname=="isolation40")
 		{
@@ -472,7 +479,7 @@ void combinedSelection::applySelection(TVectorP2VL& pmu, TMapsd& values2fill)
 	} // end for(m_cutFlowOrdered)
 	
 	////////////////////////////////////////////////////////////
-	// dump events. only if m_eventDumper->doEventDump==true ///
+	// dump events. only if doEventDump==true ///
 	runEventDumper(passCutFlow, ai); ///////////////////////////
 	////////////////////////////////////////////////////////////
 

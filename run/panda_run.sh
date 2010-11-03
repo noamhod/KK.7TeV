@@ -51,11 +51,13 @@ rm -f Loader_C.so
 
 # get the latest grl and cut flow
 cp -u ../conf/cutFlow.cuts .
+cp -u ../conf/dataPeriods.data .
 cp -u ../conf/Z_GRL_CURRENT.xml .
 
 
 # make usable
 chmod 777 cutFlow.cuts
+chmod 777 dataPeriods.data
 chmod 777 Z_GRL_CURRENT.xml
 
 

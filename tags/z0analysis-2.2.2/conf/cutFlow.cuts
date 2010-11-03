@@ -1,0 +1,58 @@
+############################################
+# !!! NOTE !!! all units are in TeV and mm #
+############################################
+
+#TYPE#			#ORDER#			#NAME#					#NVALUES#		#VALUE(S)
+#																		 [1]		[2]		[3]#
+
+
+################
+# PRESELECTION #
+################
+preselection	0				GRL						1				 1.
+preselection	1				Trigger					1				 1.
+preselection	2				PV						3				 1.		 	1.		 150.
+#preselection	3				hipTmuon				2				 0.015	 	0.010
+
+
+
+#############
+# SELECTION #
+#############
+#-------------------------------------------------------#
+# THE 1st SELECTION CUT ***MUST*** BE "isCombMu" or     #
+# "oppositeCharge" or any cut that ensures 2 muons.     #
+# In the looper, after the preselection part ends and   #
+# before the selection part begins, there is this line: #
+# if(m_phys->mu_staco_n<2) return;                      #
+# so the sequential oppositeCharge cut is redundant but #
+# necessary for the counting procedure                  #
+#-------------------------------------------------------#
+
+selection		10				isCombMu				1						   1.
+selection		11				pT						1						   0.025
+#selection		12				pT_use_qOp_and_theta	1						   0.025
+selection		13				eta						1						   2.4
+#selection		14				etaTight				1						   2.0
+
+#selection		20				msHits
+selection		21				idHits					3						   4.		 1.		 6.
+selection		22				pTmatchingRatio			2						   2.		 0.5
+#selection		23				pTmatchingAbsDiff		1						   0.015
+
+selection		30				d0						1						   1.
+selection		31				z0						1						   5.
+
+#selection		40				isolation20				1						   999
+selection		41				isolation30				1						   0.05
+#selection		42				isolation40				1						   0.2
+
+selection		51				oppositeCharge			1						   0.
+selection		52				imass					1						   0.06
+
+
+#selection		60				cosThetaDimu			1						   -0.96
+#selection		61				etaSum					1						   0.01
+#selection		70				EF_mu10					1						   1.
+#selection		71				impactParameter			2						   5.		 1.
+

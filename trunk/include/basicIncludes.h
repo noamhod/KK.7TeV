@@ -81,6 +81,7 @@ typedef map<string, double>     TMapsd;
 typedef map<string, int>        TMapsi;
 typedef map<string, bool>       TMapsb;
 typedef map<double, string>     TMapds;
+typedef map<double, int>        TMapdi;
 typedef map<string, vector<double> >  TMapsvd;
 typedef map<string, vector<double>* > TMapsP2vd;
 typedef map<string, string> TMapss;

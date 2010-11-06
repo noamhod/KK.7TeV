@@ -21,6 +21,7 @@ class kinematics
 		~kinematics();
 		
 		double pT(   TLorentzVector* p );
+		double pT(   double qOp, double theta);
 		double eta(  TLorentzVector* p );
 		double pAbs( TLorentzVector* p );
 		double y(    TLorentzVector* p );

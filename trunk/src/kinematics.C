@@ -23,6 +23,11 @@ double kinematics::pT( TLorentzVector* p )
 	return p->Perp();
 }
 
+double kinematics::pT( double qOp, double theta )
+{ 
+	return (qOp!=0) ? fabs(1./qOp)*sin(theta) : 0.;
+}
+
 double kinematics::eta( TLorentzVector* p )
 {
 	return p->PseudoRapidity();

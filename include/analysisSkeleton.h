@@ -19,9 +19,10 @@ public:
 	//////////////////////
 	// basic local vars
 	TMapii muPairMap;
-	//TMapsd values2fill;
 	bool passCutFlow;
 	bool passCurrentCut;
+	bool twoMusPass;
+	bool thisMuPass;
 	int cutFlowMapSize;
 	int counter;
 	int ai;
@@ -32,6 +33,11 @@ public:
 	string sPeriod;
 	string sCurrentPeriod;
 	vector<string>* vTriggers;
+	vector<bool> muQAflags;
+	int nMusPassed;
+	TMapdi pTtoIndexMap;
+	TVectorP2VL	pmu;
+	TMapsd values2fill;
 	
 	// * * * * * * * * * * * *  * * * * * * * * * * * * * * * * * * * * * * * *
 	// muon & vertex variables for preselection
@@ -72,24 +78,74 @@ public:
 	int isEF_mu40_MSonly;
    
 	
-	// mu staco (for the hipTmuon preselection)
-	int mu_staco_n;
-	vector<float>* mu_staco_pt;
-	vector<float>* mu_staco_me_qoverp;
-	vector<float>* mu_staco_me_theta;
-	
 	// vertexes (for the PV preselection)
 	int vxp_n;
 	vector<int>*   vxp_nTracks;
 	vector<int>*   vxp_type;
 	vector<float>* vxp_z;
+	
+	// muon
+	int mu_n;
+	vector<float>* mu_m;
+	vector<float>* mu_px;
+	vector<float>* mu_py;
+	vector<float>* mu_pz;
+	vector<float>* mu_E;
+	vector<float>* mu_eta;
+	vector<float>* mu_phi;
+	vector<float>* mu_pt;
+	vector<float>* mu_charge;
+	
+	// isolation
+	vector<float>* mu_ptcone20;
+	vector<float>* mu_ptcone30;
+	vector<float>* mu_ptcone40;
+	
+	// for pT
+	vector<float>* mu_me_qoverp;
+	vector<float>* mu_id_qoverp;
+	vector<float>* mu_me_theta;
+	vector<float>* mu_id_theta;
+	
+	// for impact parameter
+	vector<float>* mu_d0_exPV;
+	vector<float>* mu_z0_exPV;
+	
+	// combined muons
+	vector<int>* mu_isCombinedMuon;
+	
+	// inner detector hits
+	vector<int>* mu_nSCTHits;
+	vector<int>* mu_nPixHits; 
+
+	// muon spectrometer hits
+	vector<int>* mu_nMDTBIHits;
+	vector<int>* mu_nMDTBMHits;
+	vector<int>* mu_nMDTBOHits;
+	vector<int>* mu_nMDTBEEHits;
+	vector<int>* mu_nMDTBIS78Hits;
+	vector<int>* mu_nMDTEIHits;
+	vector<int>* mu_nMDTEMHits;
+	vector<int>* mu_nMDTEOHits;
+	vector<int>* mu_nMDTEEHits;
+	vector<int>* mu_nRPCLayer1EtaHits;
+	vector<int>* mu_nRPCLayer2EtaHits;
+	vector<int>* mu_nRPCLayer3EtaHits;
+	vector<int>* mu_nRPCLayer1PhiHits;
+	vector<int>* mu_nRPCLayer2PhiHits;
+	vector<int>* mu_nRPCLayer3PhiHits;
+	vector<int>* mu_nTGCLayer1EtaHits;
+	vector<int>* mu_nTGCLayer2EtaHits;
+	vector<int>* mu_nTGCLayer3EtaHits;
+	vector<int>* mu_nTGCLayer4EtaHits;
+	vector<int>* mu_nTGCLayer1PhiHits;
+	vector<int>* mu_nTGCLayer2PhiHits;
+	vector<int>* mu_nTGCLayer3PhiHits;
+	vector<int>* mu_nTGCLayer4PhiHits;
 
 	
 	// * * * * * * * * * * * *  * * * * * * * * * * * * * * * * * * * * * * * *
 	// muon variables for selection
-	
-	// for the indices
-	vector<float>* mu_staco_charge;
 	
 	////////////////////////
 	// more variables
@@ -108,13 +164,6 @@ public:
 	double z0exPVa;
 	double d0exPVb;
 	double z0exPVb;
-	
-	// primary vertex:
-	// at least one primary vtx passes the z selection
-	vector<int>*   nPVtracksPtr;
-	vector<int>*   nPVtypePtr;
-	vector<float>* PVz0Ptr;
-	vector<float>* PVz0errPtr;
 	
 	// combined muon ?
 	int isMuaComb;
@@ -218,6 +267,8 @@ public:
 	}
 	~analysisSkeleton();
 	
+	void resetMuQAflags(int nMus);
+	
 	string          getPeriodName();
 	vector<string>* getPeriodTriggers();
 	int             isTrigger(string trigName);
@@ -225,19 +276,21 @@ public:
 	/* MUST BE CALLED AFTER THE ALLOCATION OF PRESELECTION VARIABLES */
 	bool applyPreselection(string sRunType = "offline");
 	
-	/* SHOULD BE CALLED AFTER THE applyPreselection METHOD */
-	bool setMUindices(TVectorP2VL& pmu, string sRunType = "offline"); 
-	
 	/* MUST BE CALLED AFTER THE setMUindices METHOD */
 	/* MUST BE CALLED AFTER THE ALLOCATION OF MUON VARIABLES */
-	void applySelection(TVectorP2VL& pmu, TMapsd& values2fill);
+	bool applySingleMuonSelection();
+	int  countQAflags();
+	void buildMU4Vector(int nMus);
+	void buildMU4Vector(int nMus, string fromAngles = "");
+	bool applyDoubleMuonSelection();
 
 private:
 	//void setEventDumper(string sEventDumpFilePath);
-	void runEventDumper(bool passCutFlow, int ai);
+	void runEventDumper();
 	
-	void fillAfterCuts(bool passCutFlow, int counter, string sorderedcutname, TMapsd& values2fill);
+	void fillAfterCuts();
 	void fillBeforeCuts();
+	void fillCutFlow(string sorderedcutname, string sIsPreselection = "");
 
 };
 #endif

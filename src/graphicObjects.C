@@ -9,12 +9,12 @@
 
 graphicObjects::graphicObjects()
 {
-	//ginitialize();
+
 }
 
 graphicObjects::~graphicObjects()
 {
-	gfinalize();
+
 }
 
 void graphicObjects::setCutFlowMapSVDPtr(TMapsvd* cutFlowMapSVD)
@@ -24,11 +24,6 @@ void graphicObjects::setCutFlowMapSVDPtr(TMapsvd* cutFlowMapSVD)
 
 void graphicObjects::ginitialize()
 {
-	/////////////////////////////
-	setStyle(); /////////////////
-	/////////////////////////////
-
-
 	// canvases
 	cnv_imass        = NULL;
 	cnv_pT           = NULL;
@@ -43,28 +38,28 @@ void graphicObjects::ginitialize()
 	cnv_etaSum       = NULL;
 	
 	// pads
-	pad_pT = NULL;
-	pad_eta = NULL;
-	pad_pT_muplus = NULL;
-	pad_eta_muplus = NULL;
-	pad_cosmicCosth = NULL;
+	pad_pT                 = NULL;
+	pad_eta                = NULL;
+	pad_pT_muplus          = NULL;
+	pad_eta_muplus         = NULL;
+	pad_cosmicCosth        = NULL;
 	pad_cosmicCosthAllCuts = NULL;
 	
 	// histos
-	h1_imass  = NULL;
-	h1_pT     = NULL;
-	h1_pT_muplus = NULL;
-	h1_eta    = NULL;
-	h1_eta_muplus = NULL;
-	h1_costh  = NULL;
-	h1_d0exPV = NULL;
-	h1_z0exPV = NULL;
-	h1_cosmicCosth = NULL;
+	h1_imass              = NULL;
+	h1_pT                 = NULL;
+	h1_pT_muplus          = NULL;
+	h1_eta                = NULL;
+	h1_eta_muplus         = NULL;
+	h1_costh              = NULL;
+	h1_d0exPV             = NULL;
+	h1_z0exPV             = NULL;
+	h1_cosmicCosth        = NULL;
 	h1_cosmicCosthAllCuts = NULL;
-	h2_xyVertex = NULL;
-	h1_imassFit = NULL;
-	h1_ipTdiff  = NULL;
-	h1_etaSum   = NULL;
+	h2_xyVertex           = NULL;
+	h1_imassFit           = NULL;
+	h1_ipTdiff            = NULL;
+	h1_etaSum             = NULL;
 
 	// cut flow canvases
 	cnv_cutFlow_imass  = NULL;
@@ -80,7 +75,7 @@ void graphicObjects::ginitialize()
 	
 	// cut flow histos maps
 	hmap_cutFlow_imass = NULL;
-	hmap_cutFlow_pT = NULL;
+	hmap_cutFlow_pT    = NULL;
 
 	// canvas size
 	canv_x = 602;
@@ -92,9 +87,23 @@ void graphicObjects::ginitialize()
 	leg_y1 = 0.376;
 	leg_y2 = 0.922;
 
-	
-	double pT_cut    = (*cut_cutFlowMapSVD)["pT"][0];
+	// get the cut value from the cutFlow map
+	string pTcutNmae;
+	TMapsvd::iterator it1=cut_cutFlowMapSVD->find("pT");
+	TMapsvd::iterator it2=cut_cutFlowMapSVD->find("pT_use_qOp_and_theta");
+	TMapsvd::iterator it3=cut_cutFlowMapSVD->find("pTandEtaTight");
+	TMapsvd::iterator itEnd=cut_cutFlowMapSVD->end();
+	if     ( it1 != itEnd ) pTcutNmae = "pT";
+	else if( it2 != itEnd ) pTcutNmae = "pT_use_qOp_and_theta";
+	else if( it3 != itEnd ) pTcutNmae = "pTandEtaTight";
+	else 
+	{
+		cout << "ERROR: in graphicObjects::ginitialize(): pT cut value was not found, exitting now" << endl;
+		exit(-1);
+	}
+	double pT_cut    = (*cut_cutFlowMapSVD)[pTcutNmae][0];
 	double imass_cut = (*cut_cutFlowMapSVD)["imass"][0];
+	
 	
 	imass_nbins   = 100;
 	imass_min     = 10.*GeV2TeV;
@@ -140,6 +149,7 @@ void graphicObjects::ginitialize()
 		pT_bins[i] = TMath::Power( 10,(logpTmin + i*pT_binwidth) );
 		pT_bins_cut[i] = TMath::Power( 10,(logpTmin_cut + i*pT_binwidth_cut) );
 	}
+
 	
 	eta_nbins   = 24;
 	eta_min     = -3.;
@@ -172,11 +182,6 @@ void graphicObjects::ginitialize()
 	etaSum_nbins = 50;;
 	etaSum_min   = -5.;
 	etaSum_max   = +5.;
-}
-
-void graphicObjects::gfinalize()
-{
-
 }
 
 void graphicObjects::setStyle()

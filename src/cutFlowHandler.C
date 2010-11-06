@@ -163,15 +163,15 @@ void cutFlowHandler::readCutFlow(string sCutFlowFilePath)
 
 		nLinesRead++;
 
-		if(b_print)
-		{
-			cout << "type=" << stype << "\tnum=" << dnum << "\tkey=" << skey << "\tnvals=" << nvals << endl;
+		//if(b_print)
+		//{
+			cout << "type=" << stype << "\tnum=" << dnum << "\tkey=" << skey << "\tnvals=" << nvals << "\t";
 			for(int i=0 ; i<(int)getNVals() ; i++)
 			{
-				cout << "\tval[" << i << "]=" << dval[i];
+				cout << "   val[" << i << "]=" << dval[i];
 			}
-			cout << "\n" << endl;
-		}
+			cout << endl;
+		//}
 
 		// pair the maps:
 		m_cutFlowMapSVD->insert( make_pair(skey,dval) );

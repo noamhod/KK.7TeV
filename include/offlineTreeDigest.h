@@ -10,7 +10,7 @@
 #ifndef OFFLINETREEDIGEST_H
 #define OFFLINETREEDIGEST_H
 
-class offlineTreeDigest : public utilities
+class offlineTreeDigest
 {
 	public:
 		// pointers

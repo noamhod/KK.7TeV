@@ -8,147 +8,168 @@ source $HOME/setupGrid.sh
 #---------------------------------------------------
 
 
-source dq2get_dataset.sh   00152844   04102010   1819
-source dq2get_dataset.sh   00152845   04102010   1821
-source dq2get_dataset.sh   00152878   04102010   1822
-source dq2get_dataset.sh   00152933   04102010   1824
-source dq2get_dataset.sh   00152994   04102010   1825
-source dq2get_dataset.sh   00153030   05102010   1039
-source dq2get_dataset.sh   00153134   05102010   1040
-source dq2get_dataset.sh   00153136   04102010   1838
-source dq2get_dataset.sh   00153159   04102010   1838
-source dq2get_dataset.sh   00153200   04102010   1839
-source dq2get_dataset.sh   00153565   05102010   1040
-source dq2get_dataset.sh   00153599   05102010   1041
-source dq2get_dataset.sh   00154810   05102010   1042
-source dq2get_dataset.sh   00154813   04102010   1842
-source dq2get_dataset.sh   00154815   04102010   1843
-source dq2get_dataset.sh   00154817   05102010   1043
-source dq2get_dataset.sh   00154822   04102010   2247
-source dq2get_dataset.sh   00155073   05102010   1044
-source dq2get_dataset.sh   00155112   05102010   1045
-source dq2get_dataset.sh   00155116   05102010   1046
-source dq2get_dataset.sh   00155118   04102010   1848
+source dq2get_dataset.sh   00152844   06112010   1419
+source dq2get_dataset.sh   00152845   06112010   1420
+source dq2get_dataset.sh   00152878   06112010   1422
+source dq2get_dataset.sh   00152933   06112010   1422
+source dq2get_dataset.sh   00152994   06112010   1423
+source dq2get_dataset.sh   00153030   06112010   1424
+source dq2get_dataset.sh   00153134   06112010   1425
+source dq2get_dataset.sh   00153136   06112010   1426
+source dq2get_dataset.sh   00153159   06112010   1427
+source dq2get_dataset.sh   00153200   06112010   1427
+source dq2get_dataset.sh   00153565   06112010   1428
+source dq2get_dataset.sh   00153599   06112010   1429
+source dq2get_dataset.sh   00154810   06112010   1430
+source dq2get_dataset.sh   00154813   06112010   1430
+source dq2get_dataset.sh   00154815   06112010   1431
+source dq2get_dataset.sh   00154817   06112010   1432
+source dq2get_dataset.sh   00154822   06112010   1433
+source dq2get_dataset.sh   00155073   06112010   1434
+source dq2get_dataset.sh   00155112   07112010   0905
+source dq2get_dataset.sh   00155116   06112010   1728
+source dq2get_dataset.sh   00155118   06112010   1437
 
 # 0
 ###############################################################
 # 1
 
-source dq2get_dataset.sh   00155160   05102010   1047
-source dq2get_dataset.sh   00155228   05102010   1047
-source dq2get_dataset.sh   00155280   05102010   1048
-source dq2get_dataset.sh   00155569   05102010   1049
-source dq2get_dataset.sh   00155634   04102010   1852 
-source dq2get_dataset.sh   00155669   04102010   1853
-source dq2get_dataset.sh   00155678   05102010   1050
-source dq2get_dataset.sh   00155697   04102010   1855
-source dq2get_dataset.sh   00156682   05102010   1051
-source dq2get_dataset.sh   00158045   05102010   1052
-source dq2get_dataset.sh   00158116   04102010   1858
+source dq2get_dataset.sh   00155160   06112010   1438
+source dq2get_dataset.sh   00155228   06112010   1439
+source dq2get_dataset.sh   00155280   06112010   1440
+source dq2get_dataset.sh   00155569   06112010   1441
+source dq2get_dataset.sh   00155634   06112010   1442
+source dq2get_dataset.sh   00155669   06112010   1443
+source dq2get_dataset.sh   00155678   06112010   1445
+source dq2get_dataset.sh   00155697   06112010   1446
+source dq2get_dataset.sh   00156682   06112010   1448
+source dq2get_dataset.sh   00158045   07112010   0907
+source dq2get_dataset.sh   00158116   06112010   1450
 
 # 1
 ###############################################################
 # 2
 
-source dq2get_dataset.sh   00158269   04102010   1900
-source dq2get_dataset.sh   00158299   04102010   1900
-source dq2get_dataset.sh   00158392   04102010   1901
-source dq2get_dataset.sh   00158443   04102010   1902
-source dq2get_dataset.sh   00158466   04102010   1903
-source dq2get_dataset.sh   00158545   04102010   1904
-source dq2get_dataset.sh   00158548   04102010   1904
-source dq2get_dataset.sh   00158549   04102010   1906
-source dq2get_dataset.sh   00158582   04102010   1907
-source dq2get_dataset.sh   00158632   04102010   1910
-source dq2get_dataset.sh   00158801   04102010   1912
-source dq2get_dataset.sh   00158975   04102010   1913
-source dq2get_dataset.sh   00159041   04102010   1915
+source dq2get_dataset.sh   00158269   06112010   1451
+source dq2get_dataset.sh   00158299   06112010   1452
+source dq2get_dataset.sh   00158392   06112010   1453
+source dq2get_dataset.sh   00158443   06112010   1455
+source dq2get_dataset.sh   00158466   06112010   1456
+source dq2get_dataset.sh   00158545   06112010   1457
+source dq2get_dataset.sh   00158548   06112010   1458
+source dq2get_dataset.sh   00158549   06112010   1459
+source dq2get_dataset.sh   00158582   06112010   1500
+source dq2get_dataset.sh   00158632   06112010   1503
+source dq2get_dataset.sh   00158801   06112010   1504
+source dq2get_dataset.sh   00158975   06112010   1505
+source dq2get_dataset.sh   00159041   06112010   1507
 
 # 2
 ###############################################################
 # 3
 
-source dq2get_dataset.sh   00159086   04102010   1917
-source dq2get_dataset.sh   00159113   04102010   2251
-source dq2get_dataset.sh   00159179   04102010   1920
-source dq2get_dataset.sh   00159202   04102010   1921
-source dq2get_dataset.sh   00159203   04102010   1922
-source dq2get_dataset.sh   00159224   04102010   1923
+source dq2get_dataset.sh   00159086   06112010   1509
+source dq2get_dataset.sh   00159113   06112010   1728
+source dq2get_dataset.sh   00159179   06112010   1512
+source dq2get_dataset.sh   00159202   06112010   1513
+source dq2get_dataset.sh   00159203   06112010   1514
+source dq2get_dataset.sh   00159224   06112010   1515
 
 # 3
 ###############################################################
 # 4 (period E (1))
  
-source dq2get_dataset.sh   00160387   04102010   1925
-source dq2get_dataset.sh   00160472   04102010   1926
-source dq2get_dataset.sh   00160479   04102010   1928
-source dq2get_dataset.sh   00160530   04102010   1929
-source dq2get_dataset.sh   00160613   04102010   1930
-source dq2get_dataset.sh   00160736   04102010   1931
-source dq2get_dataset.sh   00160800   04102010   1932
-source dq2get_dataset.sh   00160801   04102010   2253
-source dq2get_dataset.sh   00160879   07102010   1237
-source dq2get_dataset.sh   00160899   04102010   1936
-source dq2get_dataset.sh   00160953   04102010   1937
-source dq2get_dataset.sh   00160954   04102010   1938
+source dq2get_dataset.sh   00160387   06112010   1516
+source dq2get_dataset.sh   00160472   06112010   1517
+source dq2get_dataset.sh   00160479   06112010   1519
+source dq2get_dataset.sh   00160530   06112010   1520
+source dq2get_dataset.sh   00160613   06112010   1522
+source dq2get_dataset.sh   00160736   06112010   1523
+source dq2get_dataset.sh   00160800   06112010   1524
+source dq2get_dataset.sh   00160801   07112010   0908
+source dq2get_dataset.sh   00160879   06112010   1527
+source dq2get_dataset.sh   00160899   06112010   1527
+source dq2get_dataset.sh   00160953   06112010   1529
+source dq2get_dataset.sh   00160954   06112010   1730
 
 # 4
 ###############################################################
 # 5 (period E (2))
 
-source dq2get_dataset.sh   00160958   04102010   1939
-source dq2get_dataset.sh   00160963   04102010   1940
-source dq2get_dataset.sh   00160975   04102010   1941
-source dq2get_dataset.sh   00160980   07102010   1239
-source dq2get_dataset.sh   00161114   04102010   1942
-source dq2get_dataset.sh   00161116   04102010   1943
-source dq2get_dataset.sh   00161118   04102010   1944
-source dq2get_dataset.sh   00161379   04102010   1945
-source dq2get_dataset.sh   00161407   04102010   1946
-source dq2get_dataset.sh   00161520   04102010   1947
-source dq2get_dataset.sh   00161562   04102010   1948
-source dq2get_dataset.sh   00161948   04102010   1949
+source dq2get_dataset.sh   00160958   06112010   1531
+source dq2get_dataset.sh   00160963   06112010   1532
+source dq2get_dataset.sh   00160975   06112010   1533
+source dq2get_dataset.sh   00160980   06112010   1534
+source dq2get_dataset.sh   00161114   06112010   1535
+source dq2get_dataset.sh   00161116   06112010   1535
+source dq2get_dataset.sh   00161118   06112010   1536
+source dq2get_dataset.sh   00161379   06112010   1537
+source dq2get_dataset.sh   00161407   06112010   1538
+source dq2get_dataset.sh   00161520   06112010   1539
+source dq2get_dataset.sh   00161562   06112010   1541
+source dq2get_dataset.sh   00161948   07112010   0910
 
 # 5
 ###############################################################
 # 6 (period F)
 
-source dq2get_dataset.sh   00162347   04102010   1951
-source dq2get_dataset.sh   00162526   04102010   1952
-source dq2get_dataset.sh   00162576   04102010   1954
-source dq2get_dataset.sh   00162577   04102010   1955
-source dq2get_dataset.sh   00162620   04102010   1955
-source dq2get_dataset.sh   00162623   04102010   1956
-source dq2get_dataset.sh   00162690   04102010   1958
-source dq2get_dataset.sh   00162764   04102010   2255
-source dq2get_dataset.sh   00162843   04102010   2000
-source dq2get_dataset.sh   00162882   04102010   2001
+source dq2get_dataset.sh   00162347   06112010   1544
+source dq2get_dataset.sh   00162526   07112010   0911
+source dq2get_dataset.sh   00162576   07112010   0913
+source dq2get_dataset.sh   00162577   06112010   1548
+source dq2get_dataset.sh   00162620   06112010   1549
+source dq2get_dataset.sh   00162623   06112010   1550
+source dq2get_dataset.sh   00162690   07112010   0914
+source dq2get_dataset.sh   00162764   07112010   0916
+source dq2get_dataset.sh   00162843   06112010   1554
+source dq2get_dataset.sh   00162882   07112010   0917
 
 # 6
 ###############################################################
-# 7 (period G1-2)
+# 7 (period G1-6)
 
-source dq2get_dataset.sh   00165591   04102010   2003
-source dq2get_dataset.sh   00165632   04102010   2004
-source dq2get_dataset.sh   00165703   04102010   2005
-source dq2get_dataset.sh   00165732   04102010   2006
+source dq2get_dataset.sh   00165591   07112010   0918
+source dq2get_dataset.sh   00165632   06112010   1558
+source dq2get_dataset.sh   00165703   06112010   1559
+source dq2get_dataset.sh   00165732   07112010   0920
+source dq2get_dataset.sh   00165767   06112010   1601
+source dq2get_dataset.sh   00165815   06112010   1603
+source dq2get_dataset.sh   00165817   06112010   1604
+source dq2get_dataset.sh   00165818   06112010   1605
+source dq2get_dataset.sh   00165821   06112010   1606
+source dq2get_dataset.sh   00165954   06112010   1607
+source dq2get_dataset.sh   00165956   06112010   1608
+source dq2get_dataset.sh   00166094   06112010   1608
+source dq2get_dataset.sh   00166097   06112010   1609
+source dq2get_dataset.sh   00166142   07112010   1012
+source dq2get_dataset.sh   00166143   07112010   0929
+source dq2get_dataset.sh   00166198   07112010   1009
+source dq2get_dataset.sh   00166305   07112010   0930
+source dq2get_dataset.sh   00166383   07112010   0931
 
 # 7
 ###############################################################
-# 8 (period G3-4)
+# 8 (period H1-2)
 
-source dq2get_dataset.sh   00165767   07102010   1217
-source dq2get_dataset.sh   00165815   07102010   1219
-source dq2get_dataset.sh   00165817   07102010   1220
-source dq2get_dataset.sh   00165818   07102010   1221
+source dq2get_dataset.sh   00166466   06112010   1615
+source dq2get_dataset.sh   00166658   06112010   1616
+source dq2get_dataset.sh   00166786   06112010   1617
+source dq2get_dataset.sh   00166850   06112010   1619
+source dq2get_dataset.sh   00166856   06112010   1619
+source dq2get_dataset.sh   00166924   06112010   1620
+source dq2get_dataset.sh   00166925   06112010   1621
+source dq2get_dataset.sh   00166927   06112010   1622
+source dq2get_dataset.sh   00166964	  06112010   1623
 
 # 8
 ###############################################################
-# 9 (period G5)
+# 9 (period I1-2)
 
-source dq2get_dataset.sh   00165821   08102010   1432
-source dq2get_dataset.sh   00165954   08102010   1433
-source dq2get_dataset.sh   00165956   08102010   1434
-source dq2get_dataset.sh   00166097   08102010   1435
-source dq2get_dataset.sh   00166142   08102010   1436
-source dq2get_dataset.sh   00166143   08102010   1437
+source dq2get_dataset.sh   00167575	  06112010   1624
+source dq2get_dataset.sh   00167576	  06112010   1624
+source dq2get_dataset.sh   00167607	  06112010   1627
+source dq2get_dataset.sh   00167661	  06112010   1629
+source dq2get_dataset.sh   00167680   06112010   1630
+source dq2get_dataset.sh   00167776	  06112010   1631
+source dq2get_dataset.sh   00167844	  06112010   1634
+

@@ -77,8 +77,8 @@ bool selection::oppositeChargePair(vector<float>* vcharge, int a, int b)
 bool selection::findMostMassivePair(TVectorP2VL& pmu, TMapii& allmupairMap)
 {
 	bool found = false;
-	double current_imass;
-	double imassMax = 0.;
+	float current_imass;
+	float imassMax = 0.;
 	int ai, bi;
 	for(TMapii::iterator it=allmupairMap.begin() ; it!=allmupairMap.end() ; ++it)
 	{
@@ -104,8 +104,8 @@ bool selection::findMostMassivePair(TVectorP2VL& pmu, TMapii& allmupairMap)
 
 void selection::findMostMassivePair(vector<float>* vcharge, TVectorP2VL& pmu, TMapii& allmupairMap, int& iBest_a, int&iBest_b)
 {
-	double current_imass;
-	double imassMax = 0.;
+	float current_imass;
+	float imassMax = 0.;
 	int ai, bi;
 	iBest_a = 0;
 	iBest_b = 0;
@@ -143,7 +143,7 @@ void selection::findMostHipTPair(vector<float>* mu_pt, int& iBest_a, int&iBest_b
 	}
 }
 
-bool selection::findBestVertex(int nTracksCut, int nTypeCut, double z0Cut, int nvxp,
+bool selection::findBestVertex(int nTracksCut, int nTypeCut, float z0Cut, int nvxp,
 							   vector<int>* v_vxp_nTracks, vector<int>* v_vxp_type, vector<float>* v_vxp_z)
 {
 	bool found = false;
@@ -168,7 +168,7 @@ bool selection::findBestVertex(int nTracksCut, int nTypeCut, double z0Cut, int n
 	return found;
 }
 
-int selection::getPVindex(int nTracksCut, int nTypeCut, double z0Cut, int nvxp,
+int selection::getPVindex(int nTracksCut, int nTypeCut, float z0Cut, int nvxp,
 						  vector<int>* v_vxp_nTracks, vector<int>* v_vxp_type, vector<float>* v_vxp_z)
 {
 	int   nPVtracks;
@@ -193,15 +193,15 @@ int selection::getPVindex(int nTracksCut, int nTypeCut, double z0Cut, int nvxp,
 	return index;
 }
 
-bool selection::findHipTmuon(double hipTmuonCut, double MShipTmuonCut, int nmu,
+bool selection::findHipTmuon(float hipTmuonCut, float MShipTmuonCut, int nmu,
 							 vector<float>* v_pT, vector<float>* v_qoverp, vector<float>* v_theta )
 {
 	bool found = false;
 	
-	double pt;
-	double pTms;
-	double qOp;
-	double theta;
+	float pt;
+	float pTms;
+	float qOp;
+	float theta;
 
 	for(int i=0 ; i<nmu ; i++)
 	{
@@ -226,49 +226,49 @@ bool selection::findHipTmuon(double hipTmuonCut, double MShipTmuonCut, int nmu,
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
 
-bool selection::isGRLCut( double isGRLCutVal, int isGRL )
+bool selection::isGRLCut( float isGRLCutVal, int isGRL )
 {
 	if(b_print) cout << "in isGRLCut: isGRL=" << isGRL << endl;
-	return ( (double)isGRL == isGRLCutVal ) ? true : false;
+	return ( (float)isGRL == isGRLCutVal ) ? true : false;
 }
 
-bool selection::isL1_MU6Cut( double isL1_MU6CutVal, int isL1_MU6 )
+bool selection::isL1_MU6Cut( float isL1_MU6CutVal, int isL1_MU6 )
 {
 	if(b_print) cout << "in isL1_MU6Cut: isL1_MU6=" << isL1_MU6 << endl;
-	return ( (double)isL1_MU6 == isL1_MU6CutVal ) ? true : false;
+	return ( (float)isL1_MU6 == isL1_MU6CutVal ) ? true : false;
 }
 
-bool selection::isEF_muXCut( double isEF_muXCutVal, int isEF_muX )
+bool selection::isEF_muXCut( float isEF_muXCutVal, int isEF_muX )
 {
 	if(b_print) cout << "in isEF_muXCut: isEF_muX=" << isEF_muX << endl;
-	return ( (double)isEF_muX == isEF_muXCutVal ) ? true : false;
+	return ( (float)isEF_muX == isEF_muXCutVal ) ? true : false;
 }
 
-bool selection::triggerCut( double triggerCutVal, int isTrigger, string triggerName )
+bool selection::triggerCut( float triggerCutVal, int isTrigger, string triggerName )
 {
 	if(b_print) cout << "in triggerCut: triggerName=" << triggerName << " value=" << isTrigger << endl;
-	return ( (double)isTrigger == triggerCutVal ) ? true : false;
+	return ( (float)isTrigger == triggerCutVal ) ? true : false;
 }
 
-bool selection::pTCut( double pTCutVal, TLorentzVector* pa, TLorentzVector* pb )
+bool selection::pTCut( float pTCutVal, TLorentzVector* pa, TLorentzVector* pb )
 {
 	if(b_print) cout << "in pTCut: pT(pa)=" << pT(pa) << ", pT(pb)=" << pT(pb) << endl;
 	return ( fabs(pT(pa))>pTCutVal  &&  fabs(pT(pb))>pTCutVal ) ? true : false;
 }
 
-bool selection::pTCut( double pTCutVal, double pT )
+bool selection::pTCut( float pTCutVal, float pT )
 {
 	pT *= MeV2TeV;
 	if(b_print) cout << "in pTCut: pT=" << pT << endl;
 	return ( fabs(pT)>pTCutVal ) ? true : false;
 }
 
-bool selection::pTCut( double pTCutVal, double me_qOp_a, double me_theta_a, double me_qOp_b, double me_theta_b )
+bool selection::pTCut( float pTCutVal, float me_qOp_a, float me_theta_a, float me_qOp_b, float me_theta_b )
 {
 	// pT=|p|*sin(theta)
 	// qOp=charge/|p|
-	double pT_a = pT(me_qOp_a, me_theta_a);
-	double pT_b = pT(me_qOp_b,me_theta_b);
+	float pT_a = pT(me_qOp_a, me_theta_a);
+	float pT_b = pT(me_qOp_b,me_theta_b);
 	pT_a *= MeV2TeV;
 	pT_b *= MeV2TeV;
 	
@@ -276,123 +276,123 @@ bool selection::pTCut( double pTCutVal, double me_qOp_a, double me_theta_a, doub
 	return ( fabs(pT_a)>pTCutVal  &&  fabs(pT_b)>pTCutVal ) ? true : false;
 }
 
-bool selection::pTCut( double pTCutVal, double me_qOp, double me_theta )
+bool selection::pTCut( float pTCutVal, float me_qOp, float me_theta )
 {
 	// pT=|p|*sin(theta)
 	// qOp=charge/|p|
-	double pt = pT(me_qOp,me_theta);
+	float pt = pT(me_qOp,me_theta);
 	pt *= MeV2TeV;
 	
 	if(b_print) cout << "in pTCut: pT=" << pt << endl;
 	return ( fabs(pt)>pTCutVal ) ? true : false;
 }
 
-bool selection::etaCut( double etaCutVal, TLorentzVector* pa, TLorentzVector* pb )
+bool selection::etaCut( float etaCutVal, TLorentzVector* pa, TLorentzVector* pb )
 {
 	if(b_print) cout << "in etaCut: eta(pa)=" << eta(pa) << ", eta(pb)=" << eta(pb) << endl;
 	return ( fabs(eta(pa))<etaCutVal  &&  fabs(eta(pb))<etaCutVal ) ? true : false;
 }
 
-bool selection::etaCut( double etaCutVal, double eta_a, double eta_b )
+bool selection::etaCut( float etaCutVal, float eta_a, float eta_b )
 {
 	if(b_print) cout << "in etaCut: eta_a=" << eta_a << ", eta_b=" << eta_b << endl;
 	return ( fabs(eta_a)<etaCutVal  &&  fabs(eta_b)<etaCutVal ) ? true : false;
 }
 
-bool selection::etaCut( double etaCutVal, double eta )
+bool selection::etaCut( float etaCutVal, float eta )
 {
 	if(b_print) cout << "in etaCut: eta=" << eta << endl;
 	return ( fabs(eta)<etaCutVal ) ? true : false;
 }
 
-bool selection::etaTightCut( double etaTightCutVal, TLorentzVector* pa, TLorentzVector* pb )
+bool selection::etaTightCut( float etaTightCutVal, TLorentzVector* pa, TLorentzVector* pb )
 {
 	if(b_print) cout << "in etaTightCut: eta(pa)=" << eta(pa) << ", eta(pb)=" << eta(pb) << endl;
 	return ( fabs(eta(pa))<etaTightCutVal  &&  fabs(eta(pb))<etaTightCutVal ) ? true : false;
 }
 
-bool selection::etaTightCut( double etaTightCutVal, double eta_a, double eta_b )
+bool selection::etaTightCut( float etaTightCutVal, float eta_a, float eta_b )
 {
 	if(b_print) cout << "in etaTightCut: eta_a=" << eta_a << ", eta_b=" << eta_b << endl;
 	return ( fabs(eta_a)<etaTightCutVal  &&  fabs(eta_b)<etaTightCutVal ) ? true : false;
 }
 
-bool selection::etaTightCut( double etaTightCutVal, double eta )
+bool selection::etaTightCut( float etaTightCutVal, float eta )
 {
 	if(b_print) cout << "in etaTightCut: eta=" << eta << endl;
 	return ( fabs(eta)<etaTightCutVal ) ? true : false;
 }
 
-bool selection::imassCut( double imassCutVal, TLorentzVector* pa, TLorentzVector* pb )
+bool selection::imassCut( float imassCutVal, TLorentzVector* pa, TLorentzVector* pb )
 {
 	if(b_print) cout << "in imassCut: imass(pa,pb)=" << imass(pa,pb) << endl;
 	return ( imass(pa,pb) > imassCutVal ) ? true : false;
 }
 
-bool selection::cosThetaDimuCut( double cosThetaDimuCutVal, TLorentzVector* pa, TLorentzVector* pb )
+bool selection::cosThetaDimuCut( float cosThetaDimuCutVal, TLorentzVector* pa, TLorentzVector* pb )
 {
 	if(b_print) cout << "in cosThetaDimuCut: cosThetaDimu(pa,pb)=" << cosThetaDimu(pa,pb) << endl;
 	return ( cosThetaDimu(pa,pb) > cosThetaDimuCutVal ) ? true : false;
 }
 
-bool selection::etaSumCut( double etaSumCutVal, TLorentzVector* pa, TLorentzVector* pb )
+bool selection::etaSumCut( float etaSumCutVal, TLorentzVector* pa, TLorentzVector* pb )
 {
-	double etasum = eta(pa) + eta(pb);
+	float etasum = eta(pa) + eta(pb);
 	if(b_print) cout << "in etaSum: etaSum(a,b)=" << etasum << endl;
 	return ( fabs(etasum) < etaSumCutVal ) ? true : false;
 }
 
-bool selection::oppositeChargeCut( double ca, double cb )
+bool selection::oppositeChargeCut( float ca, float cb )
 {
 	if(b_print) cout << "in oppositeCharge: ca=" << ca << ", cb=" << cb << endl;
 	return ( ca*cb<0 ) ? true : false;
 }
 
-bool selection::oppositeChargeCut( double oppositeChargeCutVal, double ca, double cb )
+bool selection::oppositeChargeCut( float oppositeChargeCutVal, float ca, float cb )
 {
 	if(b_print) cout << "in oppositeCharge: ca=" << ca << ", cb=" << cb << endl;
 	return ( ca*cb<oppositeChargeCutVal ) ? true : false;
 }
 
-bool selection::d0Cut( double d0CutVal, double d0a, double d0b )
+bool selection::d0Cut( float d0CutVal, float d0a, float d0b )
 {
 	if(b_print) cout << "in d0Cut: d0=" << d0a << ", d0b=" << d0b << endl;
 	return ( fabs(d0a)<d0CutVal  &&  fabs(d0b)<d0CutVal ) ? true : false;
 }
 
-bool selection::d0Cut( double d0CutVal, double d0 )
+bool selection::d0Cut( float d0CutVal, float d0 )
 {
 	if(b_print) cout << "in d0Cut: d0=" << d0 << endl;
 	return ( fabs(d0)<d0CutVal ) ? true : false;
 }
 
-bool selection::z0Cut( double z0CutVal, double z0a, double z0b )
+bool selection::z0Cut( float z0CutVal, float z0a, float z0b )
 {
 	if(b_print) cout << "in z0Cut: z0=" << z0a << ", z0b=" << z0b << endl;
 	return ( fabs(z0a)<z0CutVal  &&  fabs(z0b)<z0CutVal ) ? true : false;
 }
 
-bool selection::z0Cut( double z0CutVal, double z0 )
+bool selection::z0Cut( float z0CutVal, float z0 )
 {
 	if(b_print) cout << "in z0Cut: z0=" << z0 << endl;
 	return ( fabs(z0)<z0CutVal ) ? true : false;
 }
 
-bool selection::prmVtxNtracksCut( double prmVtxNtracksCutVal, int nPVtracks )
+bool selection::prmVtxNtracksCut( float prmVtxNtracksCutVal, int nPVtracks )
 {
 	/*vxp_nTracks=number of tracks > 2*/
 	if(b_print) cout << "in prmVtxNtracksCut: nPVtracks=" << nPVtracks << endl;
-	return ( (double)nPVtracks > prmVtxNtracksCutVal ) ? true : false;
+	return ( (float)nPVtracks > prmVtxNtracksCutVal ) ? true : false;
 }
 
-bool selection::prmVtxTypeCut( double prmVtxTypeCutVal, int nPVtype )
+bool selection::prmVtxTypeCut( float prmVtxTypeCutVal, int nPVtype )
 {
 	/*vxp_type==1*/
 	if(b_print) cout << "in prmVtxTypeCut: nPVtype=" << nPVtype << endl;
-	return ( (double)nPVtype == prmVtxTypeCutVal ) ? true : false;
+	return ( (float)nPVtype == prmVtxTypeCutVal ) ? true : false;
 }
 
-bool selection::prmVtxZ0Cut( double prmVtxZ0CutVal, double dPVz0, double dPVz0err )
+bool selection::prmVtxZ0Cut( float prmVtxZ0CutVal, float dPVz0, float dPVz0err )
 {
 	dPVz0err = 0; // USE IT ??????????????????????????????????????????????
 	
@@ -401,47 +401,47 @@ bool selection::prmVtxZ0Cut( double prmVtxZ0CutVal, double dPVz0, double dPVz0er
 	return ( fabs(dPVz0) < prmVtxZ0CutVal ) ? true : false;
 }
 
-bool selection::isCombMuCut( double isCombMuCutVal, int isCombMua, int isCombMub )
+bool selection::isCombMuCut( float isCombMuCutVal, int isCombMua, int isCombMub )
 {
 	/*mu_staco_isCombinedMuon*/
 	if(b_print) cout << "in isCombMuCut: isCombMua=" << isCombMua << ", isCombMub=" << isCombMub << endl;
-	return ( (double)isCombMua == isCombMuCutVal && (double)isCombMub == isCombMuCutVal ) ? true : false; // both are comb mu
+	return ( (float)isCombMua == isCombMuCutVal && (float)isCombMub == isCombMuCutVal ) ? true : false; // both are comb mu
 }
 
-bool selection::isCombMuCut( double isCombMuCutVal, int isCombMu )
+bool selection::isCombMuCut( float isCombMuCutVal, int isCombMu )
 {
 	/*mu_staco_isCombinedMuon*/
 	if(b_print) cout << "in isCombMuCut: isCombMu=" << isCombMu << endl;
-	return ( (double)isCombMu == isCombMuCutVal ) ? true : false;
+	return ( (float)isCombMu == isCombMuCutVal ) ? true : false;
 }
 
-bool selection::nSCThitsCut( double nSCThitsCutVal, int nSCThits )
+bool selection::nSCThitsCut( float nSCThitsCutVal, int nSCThits )
 {
 	/*mu_staco_nSCTHits :  SCT hits >=4*/
 	if(b_print) cout << "in nSCThitsCut: nSCThits=" << nSCThits << endl;
-	return ( (double)nSCThits >= nSCThitsCutVal ) ? true : false;
+	return ( (float)nSCThits >= nSCThitsCutVal ) ? true : false;
 }
 
-bool selection::nPIXhitsCut( double nPIXhitsCutVal, int nPIXhits )
+bool selection::nPIXhitsCut( float nPIXhitsCutVal, int nPIXhits )
 {
 	/*mu_staco_nPixHitss  :  pixel hits >=1*/
 	if(b_print) cout << "in nPIXhitsCut: nPIXhits=" << nPIXhits << endl;
-	return ( (double)nPIXhits >= nPIXhitsCutVal ) ? true : false;
+	return ( (float)nPIXhits >= nPIXhitsCutVal ) ? true : false;
 }
 
-bool selection::pTmatchRatioCut(double pTmatchHighRatioCutVal,
-								double pTmatchLowRatioCutVal,
-								double me_qOp, double me_theta,
-								double id_qOp, double id_theta )
+bool selection::pTmatchRatioCut(float pTmatchHighRatioCutVal,
+								float pTmatchLowRatioCutVal,
+								float me_qOp, float me_theta,
+								float id_qOp, float id_theta )
 {
 	// pT=|p|*sin(theta)
 	// qOp=charge/|p|
-	double pT_id = pT(id_qOp,id_theta);
-	double pT_ms = pT(me_qOp,me_theta);
+	float pT_id = pT(id_qOp,id_theta);
+	float pT_ms = pT(me_qOp,me_theta);
 	pT_id *= MeV2TeV;
 	pT_ms *= MeV2TeV;
 	
-	double ratio = (pT_id!=0.) ? fabs(pT_ms/pT_id) : 0.;
+	float ratio = (pT_id!=0.) ? fabs(pT_ms/pT_id) : 0.;
 	
 	/* mu_staco_me_qover_p, mu_staco_me_theta, mu_staco_id_qover_p, mu_staco_id_theta */
 	// pT ratio of Muon Extrapolated track to ID track greater than 0.5
@@ -449,18 +449,18 @@ bool selection::pTmatchRatioCut(double pTmatchHighRatioCutVal,
 	return ( ratio > pTmatchLowRatioCutVal  &&  ratio < pTmatchHighRatioCutVal) ? true : false;
 }
 
-bool selection::pTmatchAbsDiffCut(double pTmatchDiffCutVal,
-								  double me_qOp, double me_theta,
-								  double id_qOp, double id_theta )
+bool selection::pTmatchAbsDiffCut(float pTmatchDiffCutVal,
+								  float me_qOp, float me_theta,
+								  float id_qOp, float id_theta )
 {
 	// pT=|p|*sin(theta)
 	// qOp=charge/|p|
-	double pT_id = pT(id_qOp,id_theta);
-	double pT_ms = pT(me_qOp,me_theta);
+	float pT_id = pT(id_qOp,id_theta);
+	float pT_ms = pT(me_qOp,me_theta);
 	pT_id *= MeV2TeV;
 	pT_ms *= MeV2TeV;
 	
-	double diff = fabs(pT_ms - pT_id);
+	float diff = fabs(pT_ms - pT_id);
 	
 	/* mu_staco_me_qover_p, mu_staco_me_theta, mu_staco_id_qover_p, mu_staco_id_theta */
 	// pT ratio of Muon Extrapolated track to ID track greater than 0.5
@@ -468,22 +468,32 @@ bool selection::pTmatchAbsDiffCut(double pTmatchDiffCutVal,
 	return ( diff < pTmatchDiffCutVal) ? true : false;
 }
 
-bool selection::isolationXXCut( double isolationCutVal, string sIsoValName, double pTmu, double pTcone )
+bool selection::isolationXXCut( float isolationCutVal, string sIsoValName, float pTmu, float pTcone )
 {
 	/*mu_staco_ptcone20, mu_staco_pt*/
 	// track sum pT in 0.2 cone relative to muon pT less than 0.05
 	pTmu   *= MeV2TeV;
 	pTcone *= MeV2TeV;
-	double isolation = (pTmu==0) ? 999 : pTcone/pTmu;
+	float isolation = (pTmu==0) ? 999 : pTcone/pTmu;
 	
 	if(b_print) cout << "in isolationXXCut: isolation(" << sIsoValName << ")=" << isolation << endl;
 	return ( isolation < isolationCutVal ) ? true : false;
 }
 
 
+bool selection::isolationXXCut( float isolationCutVal, string sIsoValName, float qOp, float theta, float pTcone )
+{
+	pTcone *= MeV2TeV;
+	float pTmu = pT(qOp, theta)*MeV2TeV;
+	float isolation = (pTmu==0) ? 999 : pTcone/pTmu;
+	
+	if(b_print) cout << "in isolationXXCut: isolation(" << sIsoValName << ")=" << isolation << endl;
+	return ( isolation < isolationCutVal ) ? true : false;
+}
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
-bool selection::primaryVertexCut( double prmVtxNtracksCutVal, double prmVtxTypeCutVal, double prmVtxZ0CutVal,
+bool selection::primaryVertexCut( float prmVtxNtracksCutVal, float prmVtxTypeCutVal, float prmVtxZ0CutVal,
 								  vector<int>* pviPVtracks,
 								  vector<int>* pviPVtype,
 								  vector<float>* pvfPVz0,
@@ -495,7 +505,7 @@ bool selection::primaryVertexCut( double prmVtxNtracksCutVal, double prmVtxTypeC
 	int nPVtype;
 	float dPVz0;
 	float dPVz0err;
-	double minPVz0 = prmVtxZ0CutVal;
+	float minPVz0 = prmVtxZ0CutVal;
 	
 	int nPassed = 0;
 	
@@ -542,7 +552,7 @@ bool selection::primaryVertexCut( double prmVtxNtracksCutVal, double prmVtxTypeC
 	return (nPassed>0) ? true : false; // MOVE THIS HARD-CODED VALUE TO THE CUTFLOW FILE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 
-bool selection::nIDhitsCut( double nSCThitsCutVal, double nPIXhitsCutVal, double nIDhitsCutVal, int nSCThits, int nPIXhits )
+bool selection::nIDhitsCut( float nSCThitsCutVal, float nPIXhitsCutVal, float nIDhitsCutVal, int nSCThits, int nPIXhits )
 {
 	if( !nSCThitsCut(nSCThitsCutVal,nSCThits) )
 	{
@@ -565,7 +575,7 @@ bool selection::nIDhitsCut( double nSCThitsCutVal, double nPIXhitsCutVal, double
 	return true;
 }
 
-bool selection::nMS3stationsMDThits(double nMDTIHitsCutVal, double nMDTMHitsCutVal, double nMDTOHitsCutVal, double nMDTBEEHitsCutVal, double nMDTBIS78HitsCutVal,
+bool selection::nMS3stationsMDThits(float nMDTIHitsCutVal, float nMDTMHitsCutVal, float nMDTOHitsCutVal, float nMDTBEEHitsCutVal, float nMDTBIS78HitsCutVal,
 									int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,
 									int nMDTEIHits, int nMDTEMHits, int nMDTEOHits,
 									int nMDTBEEHits, int nMDTBIS78Hits)
@@ -590,12 +600,12 @@ bool selection::nMS3stationsMDThits(double nMDTIHitsCutVal, double nMDTMHitsCutV
 	return passed;
 }
 
-bool selection::pTmatchingRatioCut( double pTmatchHighRatioCutVal,
-									double pTmatchLowRatioCutVal,
-									double me_qOp_a, double me_theta_a,
-									double id_qOp_a, double id_theta_a,
-									double me_qOp_b, double me_theta_b,
-									double id_qOp_b, double id_theta_b
+bool selection::pTmatchingRatioCut( float pTmatchHighRatioCutVal,
+									float pTmatchLowRatioCutVal,
+									float me_qOp_a, float me_theta_a,
+									float id_qOp_a, float id_theta_a,
+									float me_qOp_b, float me_theta_b,
+									float id_qOp_b, float id_theta_b
 								   )
 {
 	// at least one has to pass
@@ -617,11 +627,11 @@ bool selection::pTmatchingRatioCut( double pTmatchHighRatioCutVal,
 	return (bPassed || nPassed>0) ? true : false;
 }
 
-bool selection::pTmatchingAbsDiffCut( double pTmatchDiffCutVal,
-									  double me_qOp_a, double me_theta_a,
-									  double id_qOp_a, double id_theta_a,
-									  double me_qOp_b, double me_theta_b,
-									  double id_qOp_b, double id_theta_b
+bool selection::pTmatchingAbsDiffCut( float pTmatchDiffCutVal,
+									  float me_qOp_a, float me_theta_a,
+									  float id_qOp_a, float id_theta_a,
+									  float me_qOp_b, float me_theta_b,
+									  float id_qOp_b, float id_theta_b
 									)
 {
 	// at least one has to pass
@@ -644,9 +654,9 @@ bool selection::pTmatchingAbsDiffCut( double pTmatchDiffCutVal,
 	return (bPassed || nPassed>0) ? true : false;
 }
 
-bool selection::impactParameterCut( double d0CutVal, double z0CutVal,
-									double d0a, double d0b,
-									double z0a, double z0b )
+bool selection::impactParameterCut( float d0CutVal, float z0CutVal,
+									float d0a, float d0b,
+									float z0a, float z0b )
 {
 	bool bPassed = true;
 
@@ -664,7 +674,7 @@ bool selection::impactParameterCut( double d0CutVal, double z0CutVal,
 	return (bPassed) ? true : false;
 }
 
-bool selection::impactParameterCut( double d0CutVal, double z0CutVal, double d0, double z0 )
+bool selection::impactParameterCut( float d0CutVal, float z0CutVal, float d0, float z0 )
 {
 	if( !d0Cut(d0CutVal, d0) ) return false;
 	if( !z0Cut(z0CutVal, z0) ) return false;
@@ -672,7 +682,7 @@ bool selection::impactParameterCut( double d0CutVal, double z0CutVal, double d0,
 	return true;
 }
 
-bool selection::pTandEtaTightCut( double pTCutVal, double etaTightCutVal, double me_qOp, double me_theta, double eta )
+bool selection::pTandEtaTightCut( float pTCutVal, float etaTightCutVal, float me_qOp, float me_theta, float eta )
 {
 	if( !etaTightCut( etaTightCutVal, eta ) )  return false;
 	if( !pTCut( pTCutVal, me_qOp, me_theta ) ) return false;
@@ -680,7 +690,7 @@ bool selection::pTandEtaTightCut( double pTCutVal, double etaTightCutVal, double
 	return true;
 }
 
-bool selection::pTandEtaTightCut( double pTCutVal, double etaTightCutVal, double pT, double eta )
+bool selection::pTandEtaTightCut( float pTCutVal, float etaTightCutVal, float pT, float eta )
 {
 	if( !etaTightCut( etaTightCutVal, eta ) )  return false;
 	if( !pTCut( pTCutVal, pT ) )               return false;
@@ -688,8 +698,8 @@ bool selection::pTandEtaTightCut( double pTCutVal, double etaTightCutVal, double
 	return true;
 }
 
-bool selection::pairXXisolation( double isolationCutVal, string sIsoValName,
-								 double pTmua, double pTmub, double pTconea, double pTconeb )
+bool selection::pairXXisolation( float isolationCutVal, string sIsoValName,
+								 float pTmua, float pTmub, float pTconea, float pTconeb )
 {
 	bool bPassed = true;
 	

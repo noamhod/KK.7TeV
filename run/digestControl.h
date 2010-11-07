@@ -16,7 +16,7 @@
 #ifndef DIGESTCONTROL_H
 #define DIGESTCONTROL_H
 
-class digestControl : public digestChains
+class digestControl : public digestChains, public utilities
 {
 public:
 	// from MakeClass

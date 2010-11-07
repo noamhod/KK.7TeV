@@ -16,7 +16,7 @@
 #ifndef MCANALYSISCONTROL_H
 #define MCANALYSISCONTROL_H
 
-class mcAnalysisControl : public chains
+class mcAnalysisControl : public chains, public utilities
 {
 	public:
 		// from MakeClass

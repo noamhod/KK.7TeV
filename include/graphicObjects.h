@@ -10,7 +10,7 @@
 #ifndef GRAPHICOBJECTS_H
 #define GRAPHICOBJECTS_H
 
-class graphicObjects : public utilities
+class graphicObjects// : public utilities
 {
 	public:
 		// canvases

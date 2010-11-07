@@ -16,7 +16,7 @@
 #ifndef OFFLINECONTROL_H
 #define OFFLINECONTROL_H
 
-class offlineControl : public offlineChains
+class offlineControl : public offlineChains, public utilities
 {
 	public:
 		// from MakeClass

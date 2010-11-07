@@ -82,6 +82,7 @@ void mcAnalysisGridControl::draw()
 	m_mcAnalysis->drawHistosMap( m_mcAnalysis->getCutFlowOrderedMapPtr(), m_mcAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 
 	m_mcAnalysis->printCutFlowNumbers(l64t_nentries);
+	cout << "nMultiMuonEvents = " << m_mcAnalysis->nMultiMuonEvents << endl;
 }
 
 void mcAnalysisGridControl::fits()

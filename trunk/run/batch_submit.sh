@@ -110,17 +110,38 @@
  source panda_run.sh   data   00165703   group10.phys-sm.data10_7TeV.00165703.physics_Muons.recon.ESD.f293.WZphys.100612.21.D3PD/
  source panda_run.sh   data   00165732   group10.phys-sm.data10_7TeV.00165732.physics_Muons.recon.ESD.f293.WZphys.100612.21.D3PD/
  
- 
  # G3-4
  source panda_run.sh   data   00165767   group10.phys-sm.data10_7TeV.00165767.physics_Muons.recon.ESD.f293.WZphys.100612.01.D3PD/
  source panda_run.sh   data   00165815   group10.phys-sm.data10_7TeV.00165815.physics_Muons.recon.ESD.f293.WZphys.100612.01.D3PD/
  source panda_run.sh   data   00165817   group10.phys-sm.data10_7TeV.00165817.physics_Muons.recon.ESD.f293.WZphys.100612.01.D3PD/
  source panda_run.sh   data   00165818   group10.phys-sm.data10_7TeV.00165818.physics_Muons.recon.ESD.f293.WZphys.100612.01.D3PD/
 
- #G5
+ # G5-6
  source panda_run.sh   data   00165821   group10.phys-sm.data10_7TeV.00165821.physics_Muons.recon.ESD.f293.WZphys.100612.01.D3PD/
  source panda_run.sh   data   00165954   group10.phys-sm.data10_7TeV.00165954.physics_Muons.recon.ESD.f294.WZphys.100612.01.D3PD/
  source panda_run.sh   data   00165956   group10.phys-sm.data10_7TeV.00165956.physics_Muons.recon.ESD.f294.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00166094   group10.phys-sm.data10_7TeV.00166094.physics_Muons.recon.ESD.f294.WZphys.100612.01.D3PD/
  source panda_run.sh   data   00166097   group10.phys-sm.data10_7TeV.00166097.physics_Muons.recon.ESD.f294.WZphys.100612.01.D3PD/
  source panda_run.sh   data   00166142   group10.phys-sm.data10_7TeV.00166142.physics_Muons.recon.ESD.f294.WZphys.100612.01.D3PD/
- source panda_run.sh   data   00166143   group10.phys-sm.data10_7TeV.00166143.physics_Muons.recon.ESD.f294.WZphys.100612.01.D3PD/ 
+ source panda_run.sh   data   00166143   group10.phys-sm.data10_7TeV.00166143.physics_Muons.recon.ESD.f294.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00166198   group10.phys-sm.data10_7TeV.00166198.physics_Muons.recon.ESD.f295.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00166305   group10.phys-sm.data10_7TeV.00166305.physics_Muons.recon.ESD.f295.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00166383   group10.phys-sm.data10_7TeV.00166383.physics_Muons.recon.ESD.f295.WZphys.100612.01.D3PD/
+
+  # H1-I2
+ source panda_run.sh   data   00166466   group10.phys-sm.data10_7TeV.00166466.physics_Muons.recon.ESD.f295.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00166658   group10.phys-sm.data10_7TeV.00166658.physics_Muons.recon.ESD.f295.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00166786   group10.phys-sm.data10_7TeV.00166786.physics_Muons.recon.ESD.f296.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00166850   group10.phys-sm.data10_7TeV.00166850.physics_Muons.recon.ESD.f296.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00166856   group10.phys-sm.data10_7TeV.00166856.physics_Muons.recon.ESD.f296.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00166924   group10.phys-sm.data10_7TeV.00166924.physics_Muons.recon.ESD.f296.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00166925   group10.phys-sm.data10_7TeV.00166925.physics_Muons.recon.ESD.f296.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00166927   group10.phys-sm.data10_7TeV.00166927.physics_Muons.recon.ESD.f296.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00166964   group10.phys-sm.data10_7TeV.00166964.physics_Muons.recon.ESD.f296.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00167575   group10.phys-sm.data10_7TeV.00167575.physics_Muons.recon.ESD.f298.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00167576   group10.phys-sm.data10_7TeV.00167576.physics_Muons.recon.ESD.f298.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00167607   group10.phys-sm.data10_7TeV.00167607.physics_Muons.recon.ESD.f298.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00167661   group10.phys-sm.data10_7TeV.00167661.physics_Muons.recon.ESD.f299.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00167680   group10.phys-sm.data10_7TeV.00167680.physics_Muons.recon.ESD.f299.WZphys.100612.01.D3PD/
+ source panda_run.sh   data   00167776   group10.phys-sm.data10_7TeV.00167776.physics_Muons.recon.ESD.f299.WZphys.100612.03.D3PD/
+ source panda_run.sh   data   00167844   group10.phys-sm.data10_7TeV.00167844.physics_Muons.recon.ESD.f299.WZphys.100612.01.D3PD/

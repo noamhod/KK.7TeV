@@ -20,19 +20,19 @@ class kinematics
 		kinematics();
 		~kinematics();
 		
-		double pT(   TLorentzVector* p );
-		double pT(   double qOp, double theta);
-		double eta(  TLorentzVector* p );
-		double pAbs( TLorentzVector* p );
-		double y(    TLorentzVector* p );
+		float pT(   TLorentzVector* p );
+		float pT(   float qOp, float theta);
+		float eta(  TLorentzVector* p );
+		float pAbs( TLorentzVector* p );
+		float y(    TLorentzVector* p );
 
-		double cosThetaDimu(         TLorentzVector* pa, TLorentzVector* pb );
-		double dR(                   TLorentzVector* pa, TLorentzVector* pb );
-		double imass(                TLorentzVector* pa, TLorentzVector* pb );
-		double QT(                   TLorentzVector* pa, TLorentzVector* pb );
-		double ySystem(              TLorentzVector* pa, TLorentzVector* pb );
-		double cosThetaCollinsSoper( TLorentzVector* pa, double ca,
-		TLorentzVector* pb, double cb );
+		float cosThetaDimu(         TLorentzVector* pa, TLorentzVector* pb );
+		float dR(                   TLorentzVector* pa, TLorentzVector* pb );
+		float imass(                TLorentzVector* pa, TLorentzVector* pb );
+		float QT(                   TLorentzVector* pa, TLorentzVector* pb );
+		float ySystem(              TLorentzVector* pa, TLorentzVector* pb );
+		float cosThetaCollinsSoper( TLorentzVector* pa, float ca,
+		TLorentzVector* pb, float cb );
 
 	private:
 		

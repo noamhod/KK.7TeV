@@ -396,5 +396,70 @@
       <Run>166143</Run>
       <LBRange Start="4" End="62"/>
     </LumiBlockCollection>
+    <LumiBlockCollection>
+      <Run>166198</Run>
+      <LBRange Start="93" End="157"/>
+      <LBRange Start="290" End="520"/>
+    </LumiBlockCollection>
+    <LumiBlockCollection>
+      <Run>166466</Run>
+      <LBRange Start="81" End="276"/>
+    </LumiBlockCollection>
+    <LumiBlockCollection>
+      <Run>166658</Run>
+      <LBRange Start="144" End="429"/>
+    </LumiBlockCollection>
+    <LumiBlockCollection>
+      <Run>166786</Run>
+      <LBRange Start="267" End="541"/>
+    </LumiBlockCollection>
+    <LumiBlockCollection>
+      <Run>166850</Run>
+      <LBRange Start="146" End="310"/>
+    </LumiBlockCollection>
+    <LumiBlockCollection>
+      <Run>166856</Run>
+      <LBRange Start="142" End="165"/>
+    </LumiBlockCollection>
+    <LumiBlockCollection>
+      <Run>166924</Run>
+      <LBRange Start="51" End="200"/>
+    </LumiBlockCollection>
+    <LumiBlockCollection>
+      <Run>166927</Run>
+      <LBRange Start="7" End="104"/>
+    </LumiBlockCollection>
+    <LumiBlockCollection>
+      <Run>166964</Run>
+      <LBRange Start="319" End="333"/>
+    </LumiBlockCollection>
+    <LumiBlockCollection>
+      <Run>167575</Run>
+      <LBRange Start="125" End="138"/>
+    </LumiBlockCollection>
+    <LumiBlockCollection>
+      <Run>167576</Run>
+      <LBRange Start="3" End="293"/>
+    </LumiBlockCollection>
+    <LumiBlockCollection>
+      <Run>167607</Run>
+      <LBRange Start="86" End="430"/>
+    </LumiBlockCollection>
+    <LumiBlockCollection>
+      <Run>167661</Run>
+      <LBRange Start="372" End="439"/>
+    </LumiBlockCollection>
+    <LumiBlockCollection>
+      <Run>167680</Run>
+      <LBRange Start="33" End="266"/>
+    </LumiBlockCollection>
+    <LumiBlockCollection>
+      <Run>167776</Run>
+      <LBRange Start="124" End="546"/>
+    </LumiBlockCollection>
+    <LumiBlockCollection>
+      <Run>167844</Run>
+      <LBRange Start="79" End="270"/>
+    </LumiBlockCollection>
   </NamedLumiRange>
 </LumiRangeCollection>

@@ -16,7 +16,7 @@
 #ifndef ANALYSISCONTROL_H
 #define ANALYSISCONTROL_H
 
-class analysisControl : public chains
+class analysisControl : public chains, , public utilities
 {
 	public:
 		// from MakeClass

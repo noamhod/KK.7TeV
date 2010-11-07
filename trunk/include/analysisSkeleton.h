@@ -38,6 +38,7 @@ public:
 	TMapdi pTtoIndexMap;
 	TVectorP2VL	pmu;
 	TMapsd values2fill;
+	int nMultiMuonEvents;
 	
 	// * * * * * * * * * * * *  * * * * * * * * * * * * * * * * * * * * * * * *
 	// muon & vertex variables for preselection
@@ -149,21 +150,21 @@ public:
 	
 	////////////////////////
 	// more variables
-	double current_imass;
-	double current_cosTheta;
-	double current_mu_pT;
-	double current_muplus_pT;
-	double current_mu_eta;
-	double current_muplus_eta;
-	double current_cosmicCosth;
-	double current_ipTdiff;
-	double current_etaSum;
+	float current_imass;
+	float current_cosTheta;
+	float current_mu_pT;
+	float current_muplus_pT;
+	float current_mu_eta;
+	float current_muplus_eta;
+	float current_cosmicCosth;
+	float current_ipTdiff;
+	float current_etaSum;
 	
 	// deprecated !!!
-	double d0exPVa;
-	double z0exPVa;
-	double d0exPVb;
-	double z0exPVb;
+	float d0exPVa;
+	float z0exPVa;
+	float d0exPVb;
+	float z0exPVb;
 	
 	// combined muon ?
 	int isMuaComb;
@@ -227,34 +228,34 @@ public:
 	int nTGCLayer4PhiHitsMub;
 	
 	// ID - MS pT matching: pT=|p|*sin(theta), qOp=charge/|p|
-	double me_qOp_a;
-	double id_qOp_a;
-	double me_theta_a;
-	double id_theta_a;
-	double me_qOp_b;
-	double id_qOp_b;
-	double me_theta_b;
-	double id_theta_b;
+	float me_qOp_a;
+	float id_qOp_a;
+	float me_theta_a;
+	float id_theta_a;
+	float me_qOp_b;
+	float id_qOp_b;
+	float me_theta_b;
+	float id_theta_b;
 	
 	// impact parameter
-	double impPrmZ0;
-	double impPrmD0;
-	double phi_a;
-	double phi_b;
+	float impPrmZ0;
+	float impPrmD0;
+	float phi_a;
+	float phi_b;
 	
 	// isolation
-	double mu_pTa;
-	double mu_pTb;
-	double pTcone20a;
-	double pTcone20b;
-	double pTcone30a;
-	double pTcone30b;
-	double pTcone40a;
-	double pTcone40b;
+	float mu_pTa;
+	float mu_pTb;
+	float pTcone20a;
+	float pTcone20b;
+	float pTcone30a;
+	float pTcone30b;
+	float pTcone40a;
+	float pTcone40b;
 	
 	// charge
-	double mu_charge_a;
-	double mu_charge_b;
+	float mu_charge_a;
+	float mu_charge_b;
 	////////////////////////
 
 public:
@@ -272,6 +273,7 @@ public:
 	string          getPeriodName();
 	vector<string>* getPeriodTriggers();
 	int             isTrigger(string trigName);
+	bool            digestSkim(int muSize);
 	
 	/* MUST BE CALLED AFTER THE ALLOCATION OF PRESELECTION VARIABLES */
 	bool applyPreselection(string sRunType = "offline");
@@ -280,6 +282,8 @@ public:
 	/* MUST BE CALLED AFTER THE ALLOCATION OF MUON VARIABLES */
 	bool applySingleMuonSelection();
 	int  countQAflags();
+	void pTSort();
+	void imassSort();
 	void buildMU4Vector(int nMus);
 	void buildMU4Vector(int nMus, string fromAngles = "");
 	bool applyDoubleMuonSelection();

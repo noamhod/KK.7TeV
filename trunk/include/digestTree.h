@@ -7,20 +7,17 @@
 
 #include "basicIncludes.h"
 
-#ifndef OFFTREE_H
-#define OFFTREE_H
+#ifndef DIGESTTREE_H
+#define DIGESTTREE_H
 
-class offTree
+class digestTree
 {
 	public:
 		// pointers
-		physics* m_phys;
-		mcPhysics* m_mcPhys;
+		offlinePhysics* m_offPhys;
+		mcOfflinePhysics* m_mcOffPhys;
 		TFile*   m_treeFile;
 		TTree*   m_tree;
-		
-		// check
-		Bool_t emptyEvent;
 		
 		// event info branches
 		int RunNumber;
@@ -172,13 +169,13 @@ class offTree
 		vector<int>*   vxp_type;
 	
 	public:
-		offTree();
-		offTree(physics* phys, mcPhysics* mcPhys, TFile* treeFile);
-		~offTree();
+		digestTree();
+		digestTree(offlinePhysics* offPhys, mcOfflinePhysics* mcOffPhys, TFile* treeFile);
+		~digestTree();
 		
 		TTree* getTree();
 		void setBranches();
-		void fill(int isGrl, string sPeriod, vector<string>* vsTriggers);
+		void fill();
 		void reset();
 		void write();
 

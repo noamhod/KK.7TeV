@@ -10,8 +10,8 @@
 #define analysisSkeleton_cxx
 #include "analysisSkeleton.C"
 
-#define offlineTreeDigest_cxx
-#include "offlineTreeDigest.C"
+#define digestTree_cxx
+#include "digestTree.C"
 
 #ifndef OFFLINEANALYSIS_H
 #define OFFLINEANALYSIS_H
@@ -20,9 +20,9 @@ class offlineAnalysis : public offlinePhysics, public analysisSkeleton
 {
 public:
 	// pointers to classes
-	offlinePhysics*    m_offPhys;
-	TFile*		       m_treeFile;
-	offlineTreeDigest* m_offTreeDigest;
+	offlinePhysics* m_offPhys;
+	TFile*		    m_treeFile;
+	digestTree*     m_dgsTree;
 
 public:
 	offlineAnalysis();
@@ -32,7 +32,7 @@ public:
 	{
 		m_offPhys = offPhys;
 		m_treeFile = treeFile;
-		m_offTreeDigest = new offlineTreeDigest( m_offPhys, m_treeFile );
+		m_dgsTree = new digestTree( m_offPhys, NULL, m_treeFile ); // the NULL arg is the [mcOfflinePhysics* mcOffPhys] variable
 	}
 	~offlineAnalysis();
 

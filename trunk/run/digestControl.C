@@ -10,6 +10,8 @@
 
 digestControl::digestControl()
 {
+	startTimer();
+
 	initialize();
 	
 	string str = "";
@@ -20,8 +22,9 @@ digestControl::digestControl()
 
 	m_digestPhys = new digestPhysics( m_chain );
 
-	str = checkANDsetFilepath("PWD", "/../data/digestTreeDigest.root");
-	m_treefile = new TFile( str.c_str(), "RECREATE");
+	//str = checkANDsetFilepath("PWD", "/../data/digestTreeDigest.root");
+	//m_treefile = new TFile( str.c_str(), "RECREATE");
+	m_treefile = NULL;
 	
 	str = checkANDsetFilepath("PWD", "/../data/digestControl.root");
 	m_histfile = new TFile( str.c_str(), "RECREATE");
@@ -37,7 +40,7 @@ digestControl::digestControl()
 
 digestControl::~digestControl()
 {
-	//finalize();
+
 }
 
 void digestControl::initialize()
@@ -65,8 +68,8 @@ void digestControl::finalize()
 	m_histfile->Write();
 	m_histfile->Close();
 
-	m_treefile->Write();
-	m_treefile->Close();
+	//m_treefile->Write();
+	//m_treefile->Close();
 }
 
 void digestControl::book()
@@ -146,6 +149,8 @@ void digestControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	draw();
 	
 	//finalize();
+	
+	stopTimer(true);
 }
 
 

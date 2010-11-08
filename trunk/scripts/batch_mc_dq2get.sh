@@ -81,8 +81,8 @@ source dq2get_mc_dataset.sh   105498   06112010   1749
 #group10.phys-sm.mc09_7TeV.105601.Pythia_Zprime_mumu_SSM1000.merge.AOD.e524_s765_s767_r1302_r1306.WZphys.100612.01.D3PD
 #group10.phys-sm.mc09_7TeV.105625.Pythia_Zprime_mumu_SSM1500.merge.AOD.e524_s765_s767_r1302_r1306.WZphys.100612.01.D3PD
 #group10.phys-sm.mc09_7TeV.105349.Pythia_Zprime_mumu_SSM2000.merge.AOD.e524_s765_s767_r1302_r1306.WZphys.100612.01.D3PD
-source dq2get_mc_dataset.sh   105534   06112010   
-source dq2get_mc_dataset.sh   105544   06112010   
-source dq2get_mc_dataset.sh   105601   06112010   
-source dq2get_mc_dataset.sh   105625   06112010   
-source dq2get_mc_dataset.sh   105349   06112010   
+source dq2get_mc_dataset.sh   105534   06112010   1756
+source dq2get_mc_dataset.sh   105544   06112010   1757
+source dq2get_mc_dataset.sh   105601   06112010   1758
+source dq2get_mc_dataset.sh   105625   08112010   0013
+source dq2get_mc_dataset.sh   105349   08112010   0018

@@ -347,10 +347,10 @@ void digestTree::fill()
 	else
 	{
 		// external
-		isGRL    = m_offPhys->isGRL;
-		//period   = m_offPhys->period;
+		isGRL    = m_mcOffPhys->isGRL;
+		//period   = m_mcOffPhys->period;
 		period = "NOAM ???";
-		triggers = m_offPhys->triggers;
+		triggers = m_mcOffPhys->triggers;
 	
 		// fill run branches
 		RunNumber   = m_mcOffPhys->RunNumber;

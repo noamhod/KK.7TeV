@@ -82,15 +82,16 @@ int analysisSkeleton::isTrigger(string trigName)
 // it should be called after the preselection //////
 bool analysisSkeleton::digestSkim(int muSize)
 {
-	int skim1 = 0;
+	//int skim1 = 0;
 	int skim2 = 0;
 	for(int mu=0 ; mu<muSize ; mu++)
 	{
-		if( fabs(mu_pt->at(mu))>15*GeV2MeV ) skim1++;
+		//if( fabs(mu_pt->at(mu))>15*GeV2MeV ) skim1++;
 		if( mu_isCombinedMuon->at(mu) )      skim2++;
 	}
 	
-	if( skim1>1  &&  skim2>1 ) return true;
+	//if( skim1>1  &&  skim2>1 ) return true;
+	if( skim2>1 ) return true;
 	return false;
 }
 ////////////////////////////////////////////////////

@@ -111,7 +111,7 @@ void graphicObjects::ginitialize()
 	imass_max     = 2010.*GeV2TeV;
 	imass_max_cut = 2000.*GeV2TeV+imass_cut;
 	
-	imass_fit_nbins = 40;
+	imass_fit_nbins = 100;
 	imass_fit_min   = 0.*GeV2TeV;
 	imass_fit_max   = 200.*GeV2TeV;
 	
@@ -151,7 +151,7 @@ void graphicObjects::ginitialize()
 	}
 
 	
-	eta_nbins   = 24;
+	eta_nbins   = 42;
 	eta_min     = -3.;
 	eta_max     = 3.;
 

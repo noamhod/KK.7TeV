@@ -3,6 +3,7 @@
 runnumber=$1
 directory=$2
 
+
 cd $directory
 
 ################################################
@@ -33,8 +34,10 @@ sed -i '/^[ ]*$/d' $tmpfile
 #sed -i '$d' $tmpfile
 #sed -i '$d' $tmpfile
 
+sed -i "s|^|$directory|" $tmpfile
+
 sort -t $tabchar +1 -n $tmpfile > $file
 rm -f $tmpfile
 
-mv $file ../
+mv $file ../../
 cd -

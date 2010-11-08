@@ -54,6 +54,8 @@ class mcOfflineControl : public offlineChains, public utilities
 	public:
 		mcOfflineControl();
 		~mcOfflineControl();
+		
+		string pickMCinputSampe();
 		void   initialize();
 		void   finalize();
 		

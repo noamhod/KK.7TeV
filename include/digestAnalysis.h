@@ -23,11 +23,11 @@ public:
 
 public:
 	digestAnalysis();
-	digestAnalysis(digestPhysics* offPhys, TFile* treeFile,
+	digestAnalysis(digestPhysics* digestPhys, TFile* treeFile,
 				   string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath ) :
 	analysisSkeleton(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
 	{
-		m_digestPhys = digestPhysics;
+		m_digestPhys = digestPhys;
 		m_treeFile   = treeFile;
 	}
 	~digestAnalysis();

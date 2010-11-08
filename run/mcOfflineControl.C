@@ -10,17 +10,20 @@
 
 mcOfflineControl::mcOfflineControl()
 {
+	startTimer();
+
 	initialize();
 	
 	string str = "";
 
 	///////////////////////////////
 	// chose the MC sample here ///
-	string sMCsample = "Zmumu";
+	//string sMCsample = "DYmumu_250M400";
+	string sMCsample = pickMCinputSampe();
 	///////////////////////////////
 	
 	str = checkANDsetFilepath("PWD", "/../conf/offline_mc_dataset_"+sMCsample+".list");
-	string strb = checkANDsetFilepath("PWD", "/offline_mc_datasetdir_"+sMCsample+"/"); // ln -s  ~hod/data  datasetdir
+	string strb = checkANDsetFilepath("PWD", "/offline_mc_datasetdir/"); // ln -s  ~hod/data  datasetdir
 	makeChain(true, str, strb);
 
 	m_mcOffPhys = new mcOfflinePhysics( m_chain );
@@ -43,6 +46,61 @@ mcOfflineControl::mcOfflineControl()
 mcOfflineControl::~mcOfflineControl()
 {
 	//finalize();
+}
+
+string mcOfflineControl::pickMCinputSampe()
+{
+	int n = 0;
+	TMapis mcSamplesMap;
+	
+	mcSamplesMap.insert( make_pair( 0,"Zmumu" ) ); 
+	
+	mcSamplesMap.insert( make_pair( 1,"DYmumu_75M120" ) );
+	mcSamplesMap.insert( make_pair( 2,"DYmumu_120M250" ) );
+	mcSamplesMap.insert( make_pair( 3,"DYmumu_250M400" ) );
+	mcSamplesMap.insert( make_pair( 4,"DYmumu_400M600" ) );
+	mcSamplesMap.insert( make_pair( 5,"DYmumu_600M800" ) );
+	mcSamplesMap.insert( make_pair( 6,"DYmumu_800M1000" ) );
+	mcSamplesMap.insert( make_pair( 7,"DYmumu_1000M1250" ) );
+	mcSamplesMap.insert( make_pair( 8,"DYmumu_1250M1500" ) );
+	mcSamplesMap.insert( make_pair( 9,"DYmumu_1500M1750" ) );
+	mcSamplesMap.insert( make_pair( 10,"DYmumu_1750M2000" ) );
+	mcSamplesMap.insert( make_pair( 11,"DYmumu_M2000" ) );
+
+	mcSamplesMap.insert( make_pair( 100,"DYtautau_75M120" ) );
+	mcSamplesMap.insert( make_pair( 101,"DYtautau_120M250" ) );
+	mcSamplesMap.insert( make_pair( 102,"DYtautau_250M400" ) );
+	mcSamplesMap.insert( make_pair( 103,"DYtautau_400M600" ) );
+	mcSamplesMap.insert( make_pair( 104,"DYtautau_600M800" ) );
+	mcSamplesMap.insert( make_pair( 105,"DYtautau_800M1000" ) );
+	mcSamplesMap.insert( make_pair( 106,"DYtautau_1000M1250" ) );
+	mcSamplesMap.insert( make_pair( 107,"DYtautau_1250M1500" ) );
+	mcSamplesMap.insert( make_pair( 108,"DYtautau_1500M1750" ) );
+	mcSamplesMap.insert( make_pair( 109,"DYtautau_1750M2000" ) );
+	mcSamplesMap.insert( make_pair( 110,"DYtautau_M2000" ) );
+
+	mcSamplesMap.insert( make_pair( 200,"Ztautau" ) );
+	mcSamplesMap.insert( make_pair( 201,"TTbar" ) );
+	mcSamplesMap.insert( make_pair( 202,"Wmunu" ) );
+	mcSamplesMap.insert( make_pair( 203,"bbmu15X" ) );
+	mcSamplesMap.insert( make_pair( 204,"ccmu15X" ) );
+
+	mcSamplesMap.insert( make_pair( 300,"Zprime_mumu_SSM1000" ) );
+	mcSamplesMap.insert( make_pair( 301,"Zprime_mumu_SSM1250" ) );
+	mcSamplesMap.insert( make_pair( 302,"Zprime_mumu_SSM1500" ) );
+	mcSamplesMap.insert( make_pair( 303,"Zprime_mumu_SSM1750" ) );
+	mcSamplesMap.insert( make_pair( 304,"Zprime_mumu_SSM2000" ) );
+	
+	
+	cout << "PICK AN MC CHANNEL FORM THE LIST:" << endl;
+	for(TMapis::iterator it=mcSamplesMap.begin() ; it!=mcSamplesMap.end() ; it++)
+	{
+		cout << "\t[" << it->first << "]\t" << it->second << endl;
+	}
+	cout << "...";
+	cin >> n;
+	TMapis::iterator it=mcSamplesMap.find(n);
+	return it->second;
 }
 
 void mcOfflineControl::initialize()
@@ -151,6 +209,8 @@ void mcOfflineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	draw();
 	
 	//finalize();
+	
+	stopTimer(true);
 }
 
 

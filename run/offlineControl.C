@@ -10,6 +10,8 @@
 
 offlineControl::offlineControl()
 {
+	startTimer();
+
 	initialize();
 	
 	string str = "";
@@ -152,6 +154,8 @@ void offlineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	draw();
 	
 	//finalize();
+	
+	stopTimer(true);
 }
 
 

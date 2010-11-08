@@ -68,6 +68,7 @@
 #include <fstream>
 #include <vector>
 #include <map>
+#include <ctime>
 
 using namespace std;
 using namespace RooFit;

@@ -13,12 +13,16 @@
 class utilities
 {
 	public:
-		// utilities
-		Double_t d_toGeV;
+		clock_t clockStart;
+		clock_t clockEnd;
 		
 	public:
 		utilities();
 		~utilities();
+		
+		double getRunTime();
+		void   startTimer();
+		void   stopTimer(bool print);
 
 		string checkANDsetFilepath(string envPath, string fileName);
 		string removeDoubleDot(string spath);

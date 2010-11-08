@@ -9,12 +9,28 @@
 
 utilities::utilities()
 {
-	d_toGeV = 1000.;
+
 }
 
 utilities::~utilities()
 {
 
+}
+
+void utilities::startTimer()
+{
+	clockStart = clock();
+}
+
+void utilities::stopTimer(bool print)
+{
+	clockEnd = clock();
+	if(print) cout << "RUN TIME: " << getRunTime() << " seconds" << endl;
+}
+
+double utilities::getRunTime()
+{
+	return(double)(clockEnd-clockStart)/CLOCKS_PER_SEC;
 }
 
 string utilities::checkANDsetFilepath(string envPath, string fileName)

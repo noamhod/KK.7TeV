@@ -48,8 +48,13 @@ void digestAnalysis::executeCutFlow()
 	analysisSkeleton::runnumber   = m_digestPhys->RunNumber;
 	analysisSkeleton::lumiblock   = m_digestPhys->lbn;
 	analysisSkeleton::eventnumber = m_digestPhys->EventNumber;
-	analysisSkeleton::isGRL       = m_digestPhys->isGRL;
-	analysisSkeleton::sPeriod     = m_digestPhys->period;
+	//////////////////////////////////////////////////////
+	// do this only if the run number has changed ////////
+	analysisSkeleton::sPeriod = getPeriodName(); /////////
+	analysisSkeleton::vTriggers = getPeriodTriggers(); ///
+	//////////////////////////////////////////////////////
+	//analysisSkeleton::sPeriod     = m_digestPhys->period;
+	//analysisSkeleton::vTriggers   = m_digestPhys->vTriggers;
 	
 	// L1 triggers
 	analysisSkeleton::isL1_MU0  = m_digestPhys->L1_MU0;
@@ -150,8 +155,8 @@ void digestAnalysis::executeCutFlow()
 	
 	/////////////////////////////////////////////////////
 	// preform the entire preselection //////////////////
-	bool passPreselection = applyPreselection(); ////////
-	if( !passPreselection ) return; /////////////////////
+	//bool passPreselection = applyPreselection(); ////////
+	//if( !passPreselection ) return; /////////////////////
 	/////////////////////////////////////////////////////
 	
 	/////////////////////////////////////////////////////

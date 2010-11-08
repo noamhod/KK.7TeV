@@ -50,7 +50,14 @@ void mcOfflineAnalysis::executeCutFlow()
 	analysisSkeleton::lumiblock   = m_mcOffPhys->lbn;
 	analysisSkeleton::eventnumber = m_mcOffPhys->EventNumber;
 	analysisSkeleton::isGRL       = m_mcOffPhys->isGRL;
-	analysisSkeleton::sPeriod     = m_mcOffPhys->period;
+	
+	//////////////////////////////////////////////////////
+	// do this only if the run number has changed ////////
+	analysisSkeleton::sPeriod = getPeriodName(); /////////
+	analysisSkeleton::vTriggers = getPeriodTriggers(); ///
+	//////////////////////////////////////////////////////
+	//analysisSkeleton::sPeriod     = m_mcOffPhys->period;
+	//analysisSkeleton::vTriggers   = m_mcOffPhys->vTriggers;
 	
 	// L1 triggers
 	analysisSkeleton::isL1_MU0  = m_mcOffPhys->L1_MU0;
@@ -165,6 +172,17 @@ void mcOfflineAnalysis::executeCutFlow()
 	//buildMU4Vector(nMus); /////////////////////////////
 	/////////////////////////////////////////////////////
 	
+	
+	// * * * * * * * * * * * * * * * * * * * * * * * * * *
+	/////////////////////////////////////////////////////
+	// write to the digest tree only the pairs that /////
+	// passed the preselection + skim ///////////////////
+	bool passSkim = digestSkim(nMus); ///////////////////
+	if( passSkim ) m_dgsTree->fill(); ///////////////////
+	/////////////////////////////////////////////////////
+	// * * * * * * * * * * * * * * * * * * * * * * * * * *
+	
+	
 	///////////////////////////////////////////////////////
 	// the single muon selection //////////////////////////
 	bool pass1MUselection = applySingleMuonSelection(); ///
@@ -181,5 +199,5 @@ void mcOfflineAnalysis::executeCutFlow()
 void mcOfflineAnalysis::write()
 {
 	m_treeFile->cd();
-	m_mcOfffTreeDigest->write();
+	m_dgsTree->write();
 }

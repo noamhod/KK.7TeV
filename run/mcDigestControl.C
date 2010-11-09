@@ -10,14 +10,16 @@
 
 mcDigestControl::mcDigestControl()
 {
+	startTimer();
+
 	initialize();
 	
 	string str = "";
 	
-	///////////////////////////////
-	// chose the MC sample here ///
-	string sMCsample = "ccmuX15";
-	///////////////////////////////
+	//////////////////////////////////////////
+	// prompt to chose the MC sample here ////
+	string sMCsample = pickMCinputSampe(); ///
+	//////////////////////////////////////////
 
 	str = checkANDsetFilepath("PWD", "/../conf/digest_mc_dataset_"+sMCsample+".list");
 	string strb = checkANDsetFilepath("PWD", "/digest_datasetdir/"); // ln -s  ~hod/data  datasetdir
@@ -150,7 +152,7 @@ void mcDigestControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	
 	draw();
 	
-	//finalize();
+	stopTimer(true);
 }
 
 

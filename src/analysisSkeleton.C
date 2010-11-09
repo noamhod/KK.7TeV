@@ -491,6 +491,25 @@ bool analysisSkeleton::applySingleMuonSelection()
 			}
 		}
 		
+		else if(sorderedcutname=="msHits")
+		{
+			float cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
+			float cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
+			float cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
+			float cutval4 = (*m_cutFlowMapSVD)[sorderedcutname][3];
+			float cutval5 = (*m_cutFlowMapSVD)[sorderedcutname][4];
+			for(int mu=0 ; mu<muSize ; mu++)
+			{
+				thisMuPass = ( nMShits( cutval1,cutval2,cutval3,cutval4,cutval5,
+										mu_nMDTBIHits->at(mu), mu_nMDTBMHits->at(mu), mu_nMDTBOHits->at(mu),mu_nMDTBIS78Hits->at(mu),
+										mu_nRPCLayer1PhiHits->at(mu), mu_nRPCLayer2PhiHits->at(mu), mu_nRPCLayer3PhiHits->at(mu)
+									   )
+							  ) ? true : false;
+				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
+				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
+			}
+		}
+		
 		else if(sorderedcutname=="isolation30")
 		{
 			for(int mu=0 ; mu<muSize ; mu++)

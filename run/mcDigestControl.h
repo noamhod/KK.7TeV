@@ -16,7 +16,7 @@
 #ifndef MCDIGESTCONTROL_H
 #define MCDIGESTCONTROL_H
 
-class mcDigestControl : public digestChains
+class mcDigestControl : public digestChains, public utilities
 {
 	public:
 		// from MakeClass

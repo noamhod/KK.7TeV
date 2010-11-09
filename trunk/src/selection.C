@@ -600,6 +600,34 @@ bool selection::nMS3stationsMDThits(float nMDTIHitsCutVal, float nMDTMHitsCutVal
 	return passed;
 }
 
+bool selection::nMShits(float nMDTIHitsCutVal, float nMDTMHitsCutVal, float nMDTOHitsCutVal, float nMDTBIS78HitsCutVal,
+						float nRPCPhiHitsCutVal,
+						int nMDTBIHits, int nMDTBMHits, int nMDTBOHits, int nMDTBIS78Hits,
+						int nRPCLayer1PhiHits, int nRPCLayer2PhiHits, int nRPCLayer3PhiHits
+						)
+{
+	// Require 3 stations on the muon track, i.e. hits in the Inner, Middle and Outer chambers;
+	// Reject muons with hits in BEE, BIS7 and BIS8
+	
+	bool passedMDT = true;
+	passedMDT = (passedMDT  &&  nMDTBIHits >= nMDTIHitsCutVal) ? true  : false;
+	passedMDT = (passedMDT  &&  nMDTBMHits >= nMDTMHitsCutVal) ? true  : false;
+	passedMDT = (passedMDT  &&  nMDTBOHits >= nMDTOHitsCutVal) ? true  : false;
+	passedMDT = (passedMDT  &&  nMDTBIS78Hits==nMDTBIS78HitsCutVal) ? true  : false;
+	
+	
+	bool passedRPC1 = ((nRPCLayer1PhiHits>=nRPCPhiHitsCutVal  &&  nRPCLayer2PhiHits>=nRPCPhiHitsCutVal)) ? true  : false;
+	bool passedRPC2 = ((nRPCLayer1PhiHits>=nRPCPhiHitsCutVal  &&  nRPCLayer3PhiHits>=nRPCPhiHitsCutVal)) ? true  : false;
+	bool passedRPC3 = ((nRPCLayer2PhiHits>=nRPCPhiHitsCutVal  &&  nRPCLayer3PhiHits>=nRPCPhiHitsCutVal)) ? true  : false;
+	bool passedRPC = true;
+	passedRPC = (passedRPC  &&  (passedRPC1 || passedRPC2 || passedRPC3)) ? true  : false;
+	
+	bool passed = true;
+	passed = (passed  &&  passedMDT  &&  passedRPC) ? true : false;
+	
+	return passed;
+}
+
 bool selection::pTmatchingRatioCut( float pTmatchHighRatioCutVal,
 									float pTmatchLowRatioCutVal,
 									float me_qOp_a, float me_theta_a,

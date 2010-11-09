@@ -14,6 +14,8 @@ mcAnalysisGridControl::mcAnalysisGridControl()
 
 mcAnalysisGridControl::mcAnalysisGridControl( TChain* inchain, TFile* outfile )
 {
+	startTimer();
+
 	string str = "";
 	
 	initialize();
@@ -134,5 +136,7 @@ void mcAnalysisGridControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	draw();
 	
 	finalize();
+	
+	stopTimer(true);
 }
 

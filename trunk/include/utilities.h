@@ -23,6 +23,7 @@ class utilities
 		double getRunTime();
 		void   startTimer();
 		void   stopTimer(bool print);
+		string pickMCinputSampe();
 
 		string checkANDsetFilepath(string envPath, string fileName);
 		string removeDoubleDot(string spath);

@@ -13,7 +13,7 @@
 #ifndef MCANALYSISGRIDCONTROL_H
 #define MCANALYSISGRIDCONTROL_H
 
-class mcAnalysisGridControl
+class mcAnalysisGridControl : public utilities
 {
 	public:
 		// from MakeClass

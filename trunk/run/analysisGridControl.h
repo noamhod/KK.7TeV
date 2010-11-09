@@ -13,7 +13,7 @@
 #ifndef ANALYSISGRIDCONTROL_H
 #define ANALYSISGRIDCONTROL_H
 
-class analysisGridControl
+class analysisGridControl : public utilities
 {
 	public:
 		// pointers

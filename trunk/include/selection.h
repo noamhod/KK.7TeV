@@ -109,6 +109,11 @@ public:
 							 int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,
 							 int nMDTEIHits, int nMDTEMHits, int nMDTEOHits,
 							 int nMDTBEEHits, int nMDTBIS78Hits);
+	bool nMShits(float nMDTIHitsCutVal, float nMDTMHitsCutVal, float nMDTOHitsCutVal, float nMDTBIS78HitsCutVal,
+				 float nRPCPhiHitsCutVal,
+				 int nMDTBIHits, int nMDTBMHits, int nMDTBOHits, int nMDTBIS78Hits,
+				 int nRPCLayer1PhiHits, int nRPCLayer2PhiHits, int nRPCLayer3PhiHits
+				 );
 	bool pTmatchingRatioCut( float pTmatchHighRatioCutVal,
 							 float pTmatchLowRatioCutVal,
 							 float me_qOp_a, float me_theta_a,

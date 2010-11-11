@@ -41,6 +41,7 @@ public:
 	
 	bool findBestVertex(int nTracksCut, int nTypeCut, float z0Cut, int nvxp,
 						vector<int>* v_vxp_nTracks, vector<int>* v_vxp_type, vector<float>* v_vxp_z);
+	int getPVindex();
 	int getPVindex(int nTracksCut, int nTypeCut, float z0Cut, int nvxp,
 				   vector<int>* v_vxp_nTracks, vector<int>* v_vxp_type, vector<float>* v_vxp_z);
 	
@@ -66,6 +67,7 @@ public:
 	bool etaTightCut(     float etaTightCutVal,     TLorentzVector* pa, TLorentzVector* pb );
 	bool etaTightCut(     float etaTightCutVal,     float eta_a, float eta_b );
 	bool etaTightCut(     float etaTightCutVal,     float eta );
+	bool etaBarrelCut(    float etaBarrelCutVal,    float eta );
 	bool cosThetaDimuCut( float cosThetaDimuCutVal, TLorentzVector* pa, TLorentzVector* pb );
 	bool etaSumCut(       float etaSumCutVal,       TLorentzVector* pa, TLorentzVector* pb );
 	bool imassCut(        float imassCutVal,        TLorentzVector* pa, TLorentzVector* pb );
@@ -109,9 +111,9 @@ public:
 							 int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,
 							 int nMDTEIHits, int nMDTEMHits, int nMDTEOHits,
 							 int nMDTBEEHits, int nMDTBIS78Hits);
-	bool nMShits(float nMDTIHitsCutVal, float nMDTMHitsCutVal, float nMDTOHitsCutVal, float nMDTBIS78HitsCutVal,
+	bool nMShits(float nMDTIHitsCutVal, float nMDTMHitsCutVal, float nMDTOHitsCutVal, float nMDTBIS78HitsCutVal, float nMDTBEEHitsCutVal,
 				 float nRPCPhiHitsCutVal,
-				 int nMDTBIHits, int nMDTBMHits, int nMDTBOHits, int nMDTBIS78Hits,
+				 int nMDTBIHits, int nMDTBMHits, int nMDTBOHits, int nMDTBIS78Hits, int nMDTBEEHits,
 				 int nRPCLayer1PhiHits, int nRPCLayer2PhiHits, int nRPCLayer3PhiHits
 				 );
 	bool pTmatchingRatioCut( float pTmatchHighRatioCutVal,
@@ -134,7 +136,11 @@ public:
 							 float d0, float z0 );
 	bool pTandEtaTightCut(   float pTCutVal, float etaTightCutVal,
 							 float pT, float eta );
+	bool pTandEtaBarrelCut(  float pTCutVal, float etaBarrelCutVal,
+							 float pT, float eta );
 	bool pTandEtaTightCut(   float pTCutVal, float etaTightCutVal,
+							 float me_qOp, float me_theta, float eta );
+	bool pTandEtaBarrelCut(  float pTCutVal, float etaBarrelCutVal,
 							 float me_qOp, float me_theta, float eta );
 	bool pairXXisolation( float isolationCutVal, string sIsoValName,
 						  float pTmua, float pTmub, float pTconea, float pTconeb );

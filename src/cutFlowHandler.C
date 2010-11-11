@@ -186,17 +186,18 @@ void cutFlowHandler::readCutFlow(string sCutFlowFilePath)
 
 void cutFlowHandler::printCutFlowNumbers(Long64_t chainEntries)
 {
+	if(false) cout << "chainEntries = " << chainEntries << endl;
 	cout << "+--------------------------------------------------------------------------" << endl;
 	cout << "|                          print cut flow numbers                          " << endl;
 	cout << "|.........................................................................." << endl;
-	cout << "|    in chain\t" << chainEntries << endl;
-	cout << "|    processed\t" << nAllEvents << endl;
+	//cout << "|    in chain\t" << chainEntries << endl;
+	cout << "|    processed:    all\t\t\t" << nAllEvents << endl;
 	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
 	{
 		double num = ii->first;
 		string scutname = ii->second;
-		if(m_cutFlowTypeOrdered->operator[](num)=="preselection") cout << "|    PRESELECTION: after " << scutname <<  "\t" << m_cutFlowNumbers->operator[](scutname) << endl;
-		if(m_cutFlowTypeOrdered->operator[](num)=="selection")    cout << "|    SELECTION:    after " << scutname <<  "\t" << m_cutFlowNumbers->operator[](scutname) << endl;
+		if(m_cutFlowTypeOrdered->operator[](num)=="preselection") cout << "|    PRESELECTION: " << scutname <<  "\t\t\t" << m_cutFlowNumbers->operator[](scutname) << endl;
+		if(m_cutFlowTypeOrdered->operator[](num)=="selection")    cout << "|    SELECTION:    " << scutname <<  "\t\t\t" << m_cutFlowNumbers->operator[](scutname) << endl;
 	}
 	cout << "+--------------------------------------------------------------------------" << endl;
 }

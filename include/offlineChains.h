@@ -12,22 +12,22 @@
 
 class offlineChains
 {
-	public:
-		// pointers
-		TChain* m_chain;
+public:
+	// pointers
+	TChain* m_chain;
 
-	public:
-		offlineChains();
-		~offlineChains();
+public:
+	offlineChains();
+	~offlineChains();
 	
-		void cinitialize();
-                void cfinalize();
+	void cinitialize();
+	void cfinalize();
 	
-		void list2chain(string sListFilePath, string sListContentAbsolutePath = "");
-		void makeChain(bool doList = false, string sListFilePath = "dataset.list", string sListContentAbsolutePath = "");
-		void drawFromChain();	
+	void list2chain(string sListFilePath, string sListContentAbsolutePath = "", int runNumber = 0);
+	void makeChain(bool doList = false, string sListFilePath = "dataset.list", string sListContentAbsolutePath = "", int runNumber = 0);
+	void drawFromChain();	
 
-	private:
+private:
 
 };
 #endif

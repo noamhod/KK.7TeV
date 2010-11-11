@@ -78,6 +78,8 @@ typedef multimap<int, string>   TMapis;
 typedef map<double, double>     TMapdd;
 typedef vector<TLorentzVector*> TVectorP2VL;
 typedef map<string, TH1D*>      TMapSP2TH1D;
+typedef map<string, TH2D*>      TMapSP2TH2D;
+typedef map<string, TCanvas*>   TMapSP2TCNV;
 typedef map<string, double>     TMapsd;
 typedef map<string, int>        TMapsi;
 typedef map<string, bool>       TMapsb;

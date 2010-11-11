@@ -10,15 +10,38 @@
 
 offlineControl::offlineControl()
 {
+	
+}
+
+offlineControl::~offlineControl()
+{
+	
+}
+
+void offlineControl::initialize(int runNumber)
+{
 	startTimer();
 
-	initialize();
+	// run control
+	l64t_nentries = 0;
+	l64t_nbytes   = 0;
+	l64t_nb       = 0;
+	l64t_jentry   = 0;
+	l64t_ientry   = 0;
+
+	// pointers
+	m_offPhys     = NULL;
+	m_offlineAnalysis = NULL;
+	m_histfile = NULL;
+	m_treefile = NULL;
+	
 	
 	string str = "";
-
+	
 	str = checkANDsetFilepath("PWD", "/../conf/offline_dataset.list");
 	string strb = checkANDsetFilepath("PWD", "/offline_datasetdir/"); // ln -s  ~hod/data  datasetdir
-	makeChain(true, str, strb);
+	if(runNumber==0) makeChain(true, str, strb);
+	else             makeChain(true, str, strb, runNumber);
 
 	m_offPhys = new offlinePhysics( m_chain );
 
@@ -35,27 +58,6 @@ offlineControl::offlineControl()
 	m_offlineAnalysis = new offlineAnalysis( m_offPhys, m_treefile, str1, str2, "offlineAnalysis_interestingEvents.dump" );
 
 	book();
-}
-
-offlineControl::~offlineControl()
-{
-	//finalize();
-}
-
-void offlineControl::initialize()
-{
-	// run control
-	l64t_nentries = 0;
-	l64t_nbytes   = 0;
-	l64t_nb       = 0;
-	l64t_jentry   = 0;
-	l64t_ientry   = 0;
-
-	// pointers
-	m_offPhys     = NULL;
-	m_offlineAnalysis = NULL;
-	m_histfile = NULL;
-	m_treefile = NULL;
 }
 
 void offlineControl::finalize()
@@ -145,6 +147,43 @@ void offlineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		// for period A to D6 (152844-159224) ///////////
 		//if(m_offPhys->RunNumber == 160387) break; ///////
 		/////////////////////////////////////////////////
+		
+		analyze();
+	}
+	
+	fits();
+	
+	draw();
+	
+	//finalize();
+	
+	stopTimer(true);
+}
+
+void offlineControl::loop(int runNumber)
+{
+	if (m_offPhys->fChain == 0)  return;
+
+	l64t_nentries = m_offPhys->fChain->GetEntriesFast();
+	l64t_nbytes = 0;
+	l64t_nb = 0;
+
+	l64t_mod = 100000;
+
+	for (l64t_jentry=0 ; l64t_jentry<l64t_nentries ; l64t_jentry++)
+	{
+		l64t_ientry = m_offPhys->LoadTree(l64t_jentry);
+		if (l64t_ientry < 0) break;
+		l64t_nb = m_offPhys->fChain->GetEntry(l64t_jentry);
+		l64t_nbytes += l64t_nb;
+		// if (Cut(l64t_ientry) < 0) continue;
+		
+		if(l64t_jentry%100000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_offPhys->RunNumber << "\tlumiblock=" << m_offPhys->lbn << endl;
+		
+		if(m_offPhys->RunNumber < runNumber) continue;
+		if(m_offPhys->RunNumber > runNumber) break;
+		
+		if(l64t_jentry%l64t_mod==0) m_offlineAnalysis->printCutFlowNumbers(l64t_nentries);
 		
 		analyze();
 	}

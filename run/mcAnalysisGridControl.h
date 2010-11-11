@@ -22,6 +22,7 @@ class mcAnalysisGridControl : public utilities
 		TChain*			m_chain;
 		mcAnalysis*     m_mcAnalysis;
 		
+		TDirectory*     m_dirCutProfile;
 		TDirectory*     m_dirAllCuts;
 		TDirectory* 	m_dirNoCuts;
 		TDirectory* 	m_dirCutFlow;

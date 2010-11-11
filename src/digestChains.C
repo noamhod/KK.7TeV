@@ -64,9 +64,9 @@ void digestChains::list2chain(string sListFilePath, string sListContentAbsoluteP
 	cout << "ignored " << nignored << " entries in " << sListFilePath << endl; 
 }
 
-void digestChains::makeChain(bool doList, string sListFilePath, string sListContentAbsolutePath)
+void digestChains::makeChain(bool doList, string sListFilePath, string sListContentAbsolutePath, int runNumber)
 {
-	list2chain(sListFilePath, sListContentAbsolutePath);
+	list2chain(sListFilePath, sListContentAbsolutePath, runNumber);
 	if(doList) m_chain->ls();
 }
 

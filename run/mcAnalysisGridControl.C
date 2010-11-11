@@ -72,7 +72,10 @@ void mcAnalysisGridControl::book()
 	m_mcAnalysis->bookHistos(m_dirAllCuts);
 
 	m_dirCutFlow = m_rootfile->mkdir("cutFlow");
-	m_mcAnalysis->bookHistosMap( m_mcAnalysis->getCutFlowOrderedMapPtr(), m_mcAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );	
+	m_mcAnalysis->bookHistosMap( m_mcAnalysis->getCutFlowOrderedMapPtr(), m_mcAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+	
+	m_dirCutProfile = m_rootfile->mkdir("cutsProfile");
+	m_mcAnalysis->bookCutProfileHistosMap( m_mcAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );	
 	
 	m_mcAnalysis->bookFitHistos(m_dirAllCuts);	
 }
@@ -82,6 +85,7 @@ void mcAnalysisGridControl::draw()
 	m_mcAnalysis->drawBareHistos(m_dirNoCuts);
 	m_mcAnalysis->drawHistos(m_dirAllCuts);
 	m_mcAnalysis->drawHistosMap( m_mcAnalysis->getCutFlowOrderedMapPtr(), m_mcAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+	m_mcAnalysis->drawCutProfileHistosMap( m_dirCutProfile );
 
 	m_mcAnalysis->printCutFlowNumbers(l64t_nentries);
 	cout << "nMultiMuonEvents = " << m_mcAnalysis->nMultiMuonEvents << endl;
@@ -135,7 +139,7 @@ void mcAnalysisGridControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	
 	draw();
 	
-	finalize();
+	//finalize();
 	
 	stopTimer(true);
 }

@@ -135,22 +135,27 @@ void mcAnalysis::executeCutFlow()
 	analysisSkeleton::mu_nTGCLayer3PhiHits = m_mcPhys->mu_staco_nTGCLayer3PhiHits;
 	analysisSkeleton::mu_nTGCLayer4PhiHits = m_mcPhys->mu_staco_nTGCLayer4PhiHits;
 	
-	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	
-	/////////////////////////////////////////////////////
-	// preform the entire preselection //////////////////
-	bool passPreselection = applyPreselection(); ////////
-	if( !passPreselection ) return; /////////////////////
-	/////////////////////////////////////////////////////
-	
 	/////////////////////////////////////////////////////
 	// reset the muQAflags vector with "true" flags /////
 	// build the muons TLorentzVector ///////////////////
 	// no need to do this if didn't pass preselection ///
 	int nMus = (int)m_mcPhys->mu_staco_pt->size(); //////
-	resetMuQAflags(nMus); ///////////////////////////////
 	buildMU4Vector(nMus, "angles"); /////////////////////
 	//buildMU4Vector(nMus); /////////////////////////////
+	/////////////////////////////////////////////////////
+	
+
+	
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	fillCutProfile1D();
+	fillCutProfile2D();
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	
+	
+	/////////////////////////////////////////////////////
+	// preform the entire preselection //////////////////
+	bool passPreselection = applyPreselection(); ////////
+	if( !passPreselection ) return; /////////////////////
 	/////////////////////////////////////////////////////
 	
 	///////////////////////////////////////////////////////

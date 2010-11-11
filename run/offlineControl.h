@@ -55,14 +55,15 @@ class offlineControl : public offlineChains, public utilities
 	public:
 		offlineControl();
 		~offlineControl();
-		void   initialize();
+		void   initialize(int runNumber = 0);
 		void   finalize();
 		
-		void   book();
-		void   draw();
-		void   fits();
-		void   analyze();
-		void   loop(Long64_t startEvent = 0, Long64_t stopAfterNevents = kMaxLong64);
+		void book();
+		void draw();
+		void fits();
+		void analyze();
+		void loop(Long64_t startEvent = 0, Long64_t stopAfterNevents = kMaxLong64);
+		void loop(int runNumber);
 		
 		void getCandidates(string sFilePath);
 		bool matchCandidates();

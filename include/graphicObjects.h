@@ -61,8 +61,13 @@ class graphicObjects// : public utilities
 		TLegend* leg_ipTdiff;
 
 		// map of histos
+		TMapSP2TH1D* h1map_cutProfile;
+		TMapSP2TH2D* h2map_cutProfile;
 		TMapSP2TH1D* hmap_cutFlow_imass;
 		TMapSP2TH1D* hmap_cutFlow_pT;
+		
+		// map of canvases
+		TMapSP2TCNV* cmap_cutProfile;
 		
 		// map of cutFlow
 		TMapsvd* cut_cutFlowMapSVD;
@@ -167,6 +172,9 @@ class graphicObjects// : public utilities
 
 		void bookHistosMap(TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered, TDirectory* tdir);
 		void drawHistosMap(TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered, TDirectory* tdir);
+		
+		void bookCutProfileHistosMap(TMapds* cutFlowOrdered, TDirectory* tdir);
+		void drawCutProfileHistosMap(TDirectory* tdir);
 
 	private:
 

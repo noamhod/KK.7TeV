@@ -10,9 +10,31 @@
 
 digestControl::digestControl()
 {
+	
+}
+
+digestControl::~digestControl()
+{
+
+}
+
+void digestControl::initialize()
+{
 	startTimer();
 
-	initialize();
+	// run control
+	l64t_nentries = 0;
+	l64t_nbytes   = 0;
+	l64t_nb       = 0;
+	l64t_jentry   = 0;
+	l64t_ientry   = 0;
+
+	// pointers
+	m_digestPhys     = NULL;
+	m_digestAnalysis = NULL;
+	m_histfile = NULL;
+	m_treefile = NULL;
+	
 	
 	string str = "";
 
@@ -36,27 +58,7 @@ digestControl::digestControl()
 	m_digestAnalysis = new digestAnalysis( m_digestPhys, m_treefile, str1, str2, "digestAnalysis_interestingEvents.dump" );
 
 	book();
-}
-
-digestControl::~digestControl()
-{
-
-}
-
-void digestControl::initialize()
-{
-	// run control
-	l64t_nentries = 0;
-	l64t_nbytes   = 0;
-	l64t_nb       = 0;
-	l64t_jentry   = 0;
-	l64t_ientry   = 0;
-
-	// pointers
-	m_digestPhys     = NULL;
-	m_digestAnalysis = NULL;
-	m_histfile = NULL;
-	m_treefile = NULL;
+	
 }
 
 void digestControl::finalize()

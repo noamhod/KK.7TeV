@@ -21,7 +21,7 @@ selection::~selection()
 
 void selection::sinitialize()
 {
-	b_print     = false;
+	b_print = false;
 }
 
 void selection::sfinalize()
@@ -148,6 +148,8 @@ bool selection::findBestVertex(int nTracksCut, int nTypeCut, float z0Cut, int nv
 {
 	bool found = false;
 
+	m_iVtx = -1;
+	
 	int   nPVtracks;
 	int   nPVtype;
 	float dPVz0;
@@ -157,7 +159,11 @@ bool selection::findBestVertex(int nTracksCut, int nTypeCut, float z0Cut, int nv
 		nPVtype   = v_vxp_type->at(i);
 		dPVz0     = fabs( v_vxp_z->at(i) );
 		
-		if(nPVtracks>nTracksCut  &&  nPVtype==nTypeCut  &&  dPVz0<z0Cut) found = true;
+		if(nPVtracks>nTracksCut  &&  nPVtype==nTypeCut  &&  dPVz0<z0Cut)
+		{
+			found = true;
+			m_iVtx = i;
+		}
 	}
 	
 	if(!found)
@@ -166,6 +172,11 @@ bool selection::findBestVertex(int nTracksCut, int nTypeCut, float z0Cut, int nv
 	}
 	
 	return found;
+}
+
+int selection::getPVindex()
+{
+	return m_iVtx;
 }
 
 int selection::getPVindex(int nTracksCut, int nTypeCut, float z0Cut, int nvxp,
@@ -321,6 +332,12 @@ bool selection::etaTightCut( float etaTightCutVal, float eta )
 {
 	if(b_print) cout << "in etaTightCut: eta=" << eta << endl;
 	return ( fabs(eta)<etaTightCutVal ) ? true : false;
+}
+
+bool selection::etaBarrelCut( float etaBarrelCutVal, float eta )
+{
+	if(b_print) cout << "in etaBarrelCut: eta=" << eta << endl;
+	return ( fabs(eta)<etaBarrelCutVal ) ? true : false;
 }
 
 bool selection::imassCut( float imassCutVal, TLorentzVector* pa, TLorentzVector* pb )
@@ -600,9 +617,9 @@ bool selection::nMS3stationsMDThits(float nMDTIHitsCutVal, float nMDTMHitsCutVal
 	return passed;
 }
 
-bool selection::nMShits(float nMDTIHitsCutVal, float nMDTMHitsCutVal, float nMDTOHitsCutVal, float nMDTBIS78HitsCutVal,
+bool selection::nMShits(float nMDTIHitsCutVal, float nMDTMHitsCutVal, float nMDTOHitsCutVal, float nMDTBIS78HitsCutVal, float nMDTBEEHitsCutVal,
 						float nRPCPhiHitsCutVal,
-						int nMDTBIHits, int nMDTBMHits, int nMDTBOHits, int nMDTBIS78Hits,
+						int nMDTBIHits, int nMDTBMHits, int nMDTBOHits, int nMDTBIS78Hits, int nMDTBEEHits,
 						int nRPCLayer1PhiHits, int nRPCLayer2PhiHits, int nRPCLayer3PhiHits
 						)
 {
@@ -614,6 +631,7 @@ bool selection::nMShits(float nMDTIHitsCutVal, float nMDTMHitsCutVal, float nMDT
 	passedMDT = (passedMDT  &&  nMDTBMHits >= nMDTMHitsCutVal) ? true  : false;
 	passedMDT = (passedMDT  &&  nMDTBOHits >= nMDTOHitsCutVal) ? true  : false;
 	passedMDT = (passedMDT  &&  nMDTBIS78Hits==nMDTBIS78HitsCutVal) ? true  : false;
+	passedMDT = (passedMDT  &&  nMDTBEEHits==nMDTBEEHitsCutVal) ?     true  : false;
 	
 	
 	bool passedRPC1 = ((nRPCLayer1PhiHits>=nRPCPhiHitsCutVal  &&  nRPCLayer2PhiHits>=nRPCPhiHitsCutVal)) ? true  : false;
@@ -718,9 +736,25 @@ bool selection::pTandEtaTightCut( float pTCutVal, float etaTightCutVal, float me
 	return true;
 }
 
+bool selection::pTandEtaBarrelCut( float pTCutVal, float etaBarrelCutVal, float me_qOp, float me_theta, float eta )
+{
+	if( !etaTightCut( etaBarrelCutVal, eta ) )  return false;
+	if( !pTCut( pTCutVal, me_qOp, me_theta ) ) return false;
+	
+	return true;
+}
+
 bool selection::pTandEtaTightCut( float pTCutVal, float etaTightCutVal, float pT, float eta )
 {
 	if( !etaTightCut( etaTightCutVal, eta ) )  return false;
+	if( !pTCut( pTCutVal, pT ) )               return false;
+	
+	return true;
+}
+
+bool selection::pTandEtaBarrelCut( float pTCutVal, float etaBarrelCutVal, float pT, float eta )
+{
+	if( !etaTightCut( etaBarrelCutVal, eta ) )  return false;
 	if( !pTCut( pTCutVal, pT ) )               return false;
 	
 	return true;

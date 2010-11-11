@@ -33,28 +33,28 @@ selection		10				isCombMu				1						   1.
 #selection		11				pT						1						   0.025
 #selection		12				pT_use_qOp_and_theta	1						   0.025
 #selection		13				eta						1						   2.4
-#selection		14				etaTight				1						   1.05
-selection		15				pTandEtaTight			2						   0.025	 1.05
+#selection		14				etaTight				1						   2.0
+#selection		15				etaBarrel				1						   1.05
+#selection		16				pTandEtaTight			2						   0.025	 2.0
+selection		17				pTandEtaBarrel			2						   0.025	 1.05
 
-#selection		20				msHits
-selection		21				idHits					3						   4.		 1.		 6.
-selection		22				msHits					5						   3.		 3.		 3.		0.		1.
-#selection		23				ms3stationsMDThits		5						   3.		 3.		 3.		0.		0.
-#selection		24				pTmatchingRatio			2						   2.		 0.5
-#selection		25				pTmatchingAbsDiff		1						   0.015
+selection		101				msHits					6						   3.		 3.		 3.		0.		0.		1.
+selection		102				idHits					3						   4.		 1.		 6.
+#selection		103				pTmatchingRatio			2						   2.		 0.5
+#selection		104				pTmatchingAbsDiff		1						   0.015
 
-#selection		30				d0						1						   0.2
-#selection		31				z0						1						   1.
-selection		32				impactParameter			2						   0.2		 1.
+#selection		201				d0						1						   0.2
+#selection		202				z0						1						   1.
+selection		203				impactParameter			2						   0.2		 1.
 
-#selection		40				isolation20				1						   999
-selection		41				isolation30				1						   0.05
-#selection		42				isolation40				1						   0.2
+#selection		301				isolation20				1						   999
+selection		302				isolation30				1						   0.05
+#selection		303				isolation40				1						   0.2
 
-selection		51				oppositeCharge			1						   0.
-selection		52				imass					1						   0.06
+selection		401				oppositeCharge			1						   0.
+selection		402				imass					1						   0.06
 
 
-#selection		60				cosThetaDimu			1						   -0.96
-#selection		61				etaSum					1						   0.01
-#selection		70				EF_mu10					1						   1.
+#selection		501				cosThetaDimu			1						   -0.96
+#selection		502				etaSum					1						   0.01
+#selection		503				EF_mu10					1						   1.

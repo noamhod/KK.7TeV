@@ -269,28 +269,31 @@ public:
 	~analysisSkeleton();
 	
 	void resetMuQAflags(int nMus);
+	int  countQAflags();
+	void pTSort();
+	void imassSort();
 	
 	string          getPeriodName();
 	vector<string>* getPeriodTriggers();
 	int             isTrigger(string trigName);
 	bool            digestSkim(int muSize);
 	
-	/* MUST BE CALLED AFTER THE ALLOCATION OF PRESELECTION VARIABLES */
-	bool applyPreselection(string sRunType = "offline");
-	
-	/* MUST BE CALLED AFTER THE setMUindices METHOD */
-	/* MUST BE CALLED AFTER THE ALLOCATION OF MUON VARIABLES */
-	bool applySingleMuonSelection();
-	int  countQAflags();
-	void pTSort();
-	void imassSort();
 	void buildMU4Vector(int nMus);
 	void buildMU4Vector(int nMus, string fromAngles = "");
-	bool applyDoubleMuonSelection();
+	
+	bool applyPreselection(string sRunType = "offline", string sSkipCut = "");
+	bool applySingleMuonSelection(string sSkipCut = "");
+	bool applyDoubleMuonSelection(string sSkipCut = "");
+	
+	void fillCutProfile1D();
+	void fillCutProfile2D();
 
 private:
-	//void setEventDumper(string sEventDumpFilePath);
 	void runEventDumper();
+	
+	bool preselection(string sSkipCut);
+	bool singleSelection(string sSkipCut);
+	bool doubleSelection(string sSkipCut);
 	
 	void fillAfterCuts();
 	void fillBeforeCuts();

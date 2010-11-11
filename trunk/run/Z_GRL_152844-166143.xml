@@ -3,16 +3,16 @@
 <!--This document is created by GoodRunsListWriter.-->
 <LumiRangeCollection>
   <NamedLumiRange>
-    <Name>MyLBCollection</Name>
+    <Name>Zprimemumuchannel</Name>
     <Version>20</Version>
-    <Metadata Name="Query">find run 152844-155160 and ptag data10_7TeV and lhc stablebeams true and partition ATLAS and db DATA and dq atlgl,atltor,atlsol,l1ctp,cp_mu_mmuidcb,cp_mu_mstaco LBSUMM#DetStatus-v02-repro04-01 g</Metadata>
-    <Metadata Name="RQTSVNVersion">CoolRunQuery-00-03-00</Metadata>
-    <Metadata Name="RunList">155160,155116,155112,155073,154822,154817,154815,154813,154810,153599,153565,153200,153159,153136,153134,153030,152994,152933,152878,152845,152844</Metadata>
+    <Metadata Name="Query">find run 153565-155160 and partition ATLAS and db DATA and lhc stablebeams T and ptag data10_7TeV and dq L1CTP LBSUMM#DetStatus-v03-repro04-01 g and dq ATLGL LBSUMM#DetStatus-v03-repro04-01 g and dq ATLSOL LBSUMM#DetStatus-v03-repro04-01 g and dq ATLTOR LBSUMM#DetStatus-v03-repro04-01 g and dq LUMI LBSUMM#DetStatus-v03-repro04-01 g and dq L1MUB LBSUMM#DetStatus-v03-repro04-01 g and dq TRMUO LBSUMM#DetStatus-v03-repro04-01 g and dq MDTBA LBSUMM#DetStatus-v03-repro04-01 g and dq MDTBC LBSUMM#DetStatus-v03-repro04-01 g and dq RPCBA LBSUMM#DetStatus-v03-repro04-01 g and dq RPCBC LBSUMM#DetStatus-v03-repro04-01 g and dq MSTACO LBSUMM#DetStatus-v03-repro04-01 g and dq PIX0 LBSUMM#DetStatus-v03-repro04-01 g and dq PIXB LBSUMM#DetStatus-v03-repro04-01 g and dq PIXEA LBSUMM#DetStatus-v03-repro04-01 g and dq PIXEC LBSUMM#DetStatus-v03-repro04-01 g and dq SCTB LBSUMM#DetStatus-v03-repro04-01 g and dq SCTEA LBSUMM#DetStatus-v03-repro04-01 g and dq SCTEC LBSUMM#DetStatus-v03-repro04-01 g and dq TRTB LBSUMM#DetStatus-v03-repro04-01 g and dq TRTEA LBSUMM#DetStatus-v03-repro04-01 g and dq TRTEC LBSUMM#DetStatus-v03-repro04-01 g and dq IDGL LBSUMM#DetStatus-v03-repro04-01 g and dq IDAL LBSUMM#DetStatus-v03-repro04-01 g</Metadata>
+    <Metadata Name="RQTSVNVersion">CoolRunQuery-unknown</Metadata>
+    <Metadata Name="RunList">155160,155116,155112,155073,154822,154817,154815,154813,154810,153599,153565</Metadata>
     <Metadata Name="StreamListInfo">
          </Metadata>
     <LumiBlockCollection>
       <Run>152844</Run>
-      <LBRange Start="195" End="234"/>
+      <LBRange Start="179" End="234"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>152845</Run>
@@ -24,11 +24,11 @@
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>152933</Run>
-      <LBRange Start="46" End="173"/>
+      <LBRange Start="44" End="173"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>152994</Run>
-      <LBRange Start="293" End="353"/>
+      <LBRange Start="294" End="353"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>153030</Run>
@@ -36,40 +36,36 @@
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>153134</Run>
-      <LBRange Start="354" End="573"/>
-    </LumiBlockCollection>
-    <LumiBlockCollection>
-      <Run>153136</Run>
-      <LBRange Start="249" End="253"/>
+      <LBRange Start="321" End="573"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>153159</Run>
-      <LBRange Start="87" End="177"/>
+      <LBRange Start="88" End="177"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>153200</Run>
-      <LBRange Start="145" End="178"/>
+      <LBRange Start="143" End="178"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>153565</Run>
-      <LBRange Start="258" End="953"/>
+      <LBRange Start="258" End="1148"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>153599</Run>
-      <LBRange Start="413" End="440"/>
+      <LBRange Start="413" End="519"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>154810</Run>
-      <LBRange Start="158" End="220"/>
+      <LBRange Start="159" End="220"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>154813</Run>
-      <LBRange Start="8" End="38"/>
+      <LBRange Start="8" End="17"/>
       <LBRange Start="68" End="187"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>154815</Run>
-      <LBRange Start="7" End="38"/>
+      <LBRange Start="9" End="38"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>154817</Run>
@@ -77,11 +73,11 @@
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>154822</Run>
-      <LBRange Start="177" End="365"/>
+      <LBRange Start="178" End="365"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>155073</Run>
-      <LBRange Start="82" End="407"/>
+      <LBRange Start="88" End="407"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>155112</Run>
@@ -89,15 +85,15 @@
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>155116</Run>
-      <LBRange Start="8" End="93"/>
+      <LBRange Start="9" End="93"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>155160</Run>
-      <LBRange Start="240" End="503"/>
+      <LBRange Start="242" End="503"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>155228</Run>
-      <LBRange Start="131" End="148"/>
+      <LBRange Start="133" End="148"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>155280</Run>
@@ -113,7 +109,7 @@
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>155669</Run>
-      <LBRange Start="264" End="311"/>
+      <LBRange Start="258" End="311"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>155678</Run>
@@ -125,15 +121,7 @@
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>156682</Run>
-      <LBRange Start="405" End="512"/>
-    </LumiBlockCollection>
-    <LumiBlockCollection>
-      <Run>158045</Run>
-      <LBRange Start="117" End="177"/>
-    </LumiBlockCollection>
-    <LumiBlockCollection>
-      <Run>158116</Run>
-      <LBRange Start="114" End="554"/>
+      <LBRange Start="406" End="512"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>158269</Run>
@@ -141,7 +129,7 @@
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>158299</Run>
-      <LBRange Start="378" End="434"/>
+      <LBRange Start="364" End="434"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>158392</Run>
@@ -151,7 +139,8 @@
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>158443</Run>
-      <LBRange Start="210" End="230"/>
+      <LBRange Start="209" End="213"/>
+      <LBRange Start="218" End="230"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>158466</Run>
@@ -163,15 +152,15 @@
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>158548</Run>
-      <LBRange Start="111" End="304"/>
+      <LBRange Start="110" End="304"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>158582</Run>
-      <LBRange Start="40" End="372"/>
+      <LBRange Start="39" End="372"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>158632</Run>
-      <LBRange Start="163" End="272"/>
+      <LBRange Start="157" End="272"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>158801</Run>
@@ -232,7 +221,7 @@
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>160736</Run>
-      <LBRange Start="206" End="263"/>
+      <LBRange Start="205" End="263"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>160800</Run>
@@ -260,11 +249,11 @@
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>160958</Run>
-      <LBRange Start="3" End="214"/>
+      <LBRange Start="1" End="214"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>160963</Run>
-      <LBRange Start="3" End="15"/>
+      <LBRange Start="1" End="15"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>160975</Run>
@@ -362,7 +351,7 @@
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>165815</Run>
-      <LBRange Start="123" End="165"/>
+      <LBRange Start="116" End="165"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>165817</Run>
@@ -400,6 +389,14 @@
       <Run>166198</Run>
       <LBRange Start="93" End="157"/>
       <LBRange Start="290" End="520"/>
+    </LumiBlockCollection>
+    <LumiBlockCollection>
+      <Run>166305</Run>
+      <LBRange Start="113" End="164"/>
+    </LumiBlockCollection>
+    <LumiBlockCollection>
+      <Run>166383</Run>
+      <LBRange Start="292" End="479"/>
     </LumiBlockCollection>
     <LumiBlockCollection>
       <Run>166466</Run>
@@ -453,7 +450,7 @@
       <Run>167680</Run>
       <LBRange Start="33" End="266"/>
     </LumiBlockCollection>
-    <LumiBlockCollection>
+	<LumiBlockCollection>
       <Run>167776</Run>
       <LBRange Start="124" End="546"/>
     </LumiBlockCollection>

@@ -189,12 +189,13 @@ void digestTree::setBranches()
 	m_tree->Branch( "vxp_z_err",   &vxp_z_err );	
 }
 
-void digestTree::fill()
+void digestTree::fill(int GRL)
 {
+	isGRL = GRL;
+	
 	if(m_mcOffPhys==NULL  &&  m_offPhys!=NULL)
 	{
 		// external
-		isGRL    = m_offPhys->isGRL;
 		//period   = m_offPhys->period;
 		period = "NOAM ???";
 		triggers = m_offPhys->triggers;
@@ -347,7 +348,6 @@ void digestTree::fill()
 	else
 	{
 		// external
-		isGRL    = m_mcOffPhys->isGRL;
 		//period   = m_mcOffPhys->period;
 		period = "NOAM ???";
 		triggers = m_mcOffPhys->triggers;

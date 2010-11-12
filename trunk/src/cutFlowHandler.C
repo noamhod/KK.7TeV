@@ -23,12 +23,15 @@ cutFlowHandler::cutFlowHandler(string sCutFlowFilePath)
 	
 	nAllEvents = 0;
 	
+	file = new ofstream();
+	file->open( "previousRunCutFlow.cuts" );
+	
 	readCutFlow(sCutFlowFilePath);
 }
 
 cutFlowHandler::~cutFlowHandler()
 {
-
+	file->close();
 }
 
 
@@ -190,7 +193,6 @@ void cutFlowHandler::printCutFlowNumbers(Long64_t chainEntries)
 	cout << "+--------------------------------------------------------------------------" << endl;
 	cout << "|                          print cut flow numbers                          " << endl;
 	cout << "|.........................................................................." << endl;
-	//cout << "|    in chain\t" << chainEntries << endl;
 	cout << "|    processed:    all\t\t\t" << nAllEvents << endl;
 	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
 	{
@@ -200,6 +202,21 @@ void cutFlowHandler::printCutFlowNumbers(Long64_t chainEntries)
 		if(m_cutFlowTypeOrdered->operator[](num)=="selection")    cout << "|    SELECTION:    " << scutname <<  "\t\t\t" << m_cutFlowNumbers->operator[](scutname) << endl;
 	}
 	cout << "+--------------------------------------------------------------------------" << endl;
+	
+	
+	// to file:
+	(*file) << "+--------------------------------------------------------------------------" << endl;
+	(*file) << "|                          print cut flow numbers                          " << endl;
+	(*file) << "|.........................................................................." << endl;
+	(*file) << "|    processed:    all\t\t\t" << nAllEvents << endl;
+	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
+	{
+		double num = ii->first;
+		string scutname = ii->second;
+		if(m_cutFlowTypeOrdered->operator[](num)=="preselection") (*file) << "|    PRESELECTION: " << scutname <<  "\t\t\t" << m_cutFlowNumbers->operator[](scutname) << endl;
+		if(m_cutFlowTypeOrdered->operator[](num)=="selection")    (*file) << "|    SELECTION:    " << scutname <<  "\t\t\t" << m_cutFlowNumbers->operator[](scutname) << endl;
+	}
+	(*file) << "+--------------------------------------------------------------------------\n" << endl;
 }
 
 

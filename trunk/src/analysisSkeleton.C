@@ -333,20 +333,14 @@ void analysisSkeleton::buildMU4Vector(int nMus, string fromAngles)
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 
-bool analysisSkeleton::applyPreselection(string sRunType, string sSkipCut)
+bool analysisSkeleton::applyPreselection(string sSkipCut)
 {
 	bool isSkippedCut = (sSkipCut!="") ? true : false;
 
 	///////////////////////////////////////////
 	// do not skip this for correct counting //
-	if(!isSkippedCut) nAllEvents++; ////////////
+	if(!isSkippedCut) nAllEvents++; ///////////
 	///////////////////////////////////////////
-	
-	///////////////////////////////////////////////////////////////////
-	// no need to preselect in the digest-like run ////////////////////
-	// only need to count the total number of events //////////////////
-	//if(sRunType=="digest" || sRunType=="mcDigest") return true; /////
-	///////////////////////////////////////////////////////////////////
 
 	passCutFlow = preselection(sSkipCut);
 	

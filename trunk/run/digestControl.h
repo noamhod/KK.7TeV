@@ -21,10 +21,12 @@ class digestControl : public digestChains, public utilities
 public:
 	// from MakeClass
 	digestPhysics*  m_digestPhys;
+	GRLinterface*   m_GRL;
 	TFile*          m_histfile;
 	TFile*          m_treefile;
 	digestAnalysis* m_digestAnalysis;
 	
+	TDirectory*     m_dirCutProfile;
 	TDirectory*     m_dirAllCuts;
 	TDirectory* 	m_dirNoCuts;
 	TDirectory* 	m_dirCutFlow;

@@ -48,6 +48,7 @@ void digestAnalysis::executeCutFlow()
 	analysisSkeleton::runnumber   = m_digestPhys->RunNumber;
 	analysisSkeleton::lumiblock   = m_digestPhys->lbn;
 	analysisSkeleton::eventnumber = m_digestPhys->EventNumber;
+	analysisSkeleton::isGRL       = m_digestAnalysis_grl->m_grl.HasRunLumiBlock( m_digestPhys->RunNumber, m_digestPhys->lbn );
 	//////////////////////////////////////////////////////
 	// do this only if the run number has changed ////////
 	analysisSkeleton::sPeriod = getPeriodName(); /////////
@@ -154,19 +155,29 @@ void digestAnalysis::executeCutFlow()
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	
 	/////////////////////////////////////////////////////
-	// preform the entire preselection //////////////////
-	//bool passPreselection = applyPreselection(); ////////
-	//if( !passPreselection ) return; /////////////////////
-	/////////////////////////////////////////////////////
-	
-	/////////////////////////////////////////////////////
 	// reset the muQAflags vector with "true" flags /////
 	// build the muons TLorentzVector ///////////////////
 	// no need to do this if didn't pass preselection ///
 	int nMus = (int)m_digestPhys->mu_staco_pt->size(); //
-	resetMuQAflags(nMus); ///////////////////////////////
 	buildMU4Vector(nMus, "angles"); /////////////////////
 	//buildMU4Vector(nMus); /////////////////////////////
+	/////////////////////////////////////////////////////
+	
+	
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	
+	////////////////////////////////////////
+	// execute the cut profile analysis ////
+	fillCutProfile1D(); ////////////////////
+	fillCutProfile2D(); ////////////////////
+	////////////////////////////////////////
+	
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	
+	/////////////////////////////////////////////////////
+	// preform the entire preselection //////////////////
+	bool passPreselection = applyPreselection(); ////////
+	if( !passPreselection ) return; /////////////////////
 	/////////////////////////////////////////////////////
 	
 	///////////////////////////////////////////////////////

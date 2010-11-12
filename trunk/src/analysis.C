@@ -19,7 +19,6 @@ analysis::~analysis()
 
 void analysis::executeAdvanced()
 {
-
 	// stupid example
 	if(m_muid->getNParticles()>0)
 	{
@@ -155,20 +154,33 @@ void analysis::executeCutFlow()
 	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	
-	/////////////////////////////////////////////////////
-	// preform the entire preselection //////////////////
-	bool passPreselection = applyPreselection(); ////////
-	if( !passPreselection ) return; /////////////////////
-	/////////////////////////////////////////////////////
 	
 	/////////////////////////////////////////////////////
 	// reset the muQAflags vector with "true" flags /////
 	// build the muons TLorentzVector ///////////////////
 	// no need to do this if didn't pass preselection ///
 	int nMus = (int)m_phys->mu_staco_pt->size(); ////////
-	resetMuQAflags(nMus); ///////////////////////////////
 	buildMU4Vector(nMus, "angles"); /////////////////////
 	//buildMU4Vector(nMus); /////////////////////////////
+	/////////////////////////////////////////////////////
+	
+
+	
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	
+	////////////////////////////////////////
+	// execute the cut profile analysis ////
+	fillCutProfile1D(); ////////////////////
+	fillCutProfile2D(); ////////////////////
+	////////////////////////////////////////
+	
+	
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	
+	/////////////////////////////////////////////////////
+	// preform the entire preselection //////////////////
+	bool passPreselection = applyPreselection(); ////////
+	if( !passPreselection ) return; /////////////////////
 	/////////////////////////////////////////////////////
 	
 	///////////////////////////////////////////////////////

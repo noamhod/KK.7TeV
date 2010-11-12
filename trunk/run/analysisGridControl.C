@@ -78,6 +78,9 @@ void analysisGridControl::book()
 	m_dirCutFlow = m_rootfile->mkdir("cutFlow");
 	m_analysis->bookHistosMap( m_analysis->getCutFlowOrderedMapPtr(), m_analysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 	
+	m_dirCutProfile = m_rootfile->mkdir("cutsProfile");
+	m_analysis->bookCutProfileHistosMap( m_analysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );
+	
 	m_analysis->bookFitHistos(m_dirAllCuts);	
 }
 
@@ -86,7 +89,8 @@ void analysisGridControl::draw()
 	m_analysis->drawBareHistos(m_dirNoCuts);
 	m_analysis->drawHistos(m_dirAllCuts);
 	m_analysis->drawHistosMap( m_analysis->getCutFlowOrderedMapPtr(), m_analysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
-
+	m_analysis->drawCutProfileHistosMap( m_dirCutProfile );
+	
 	m_analysis->printCutFlowNumbers(l64t_nentries);
 }
 

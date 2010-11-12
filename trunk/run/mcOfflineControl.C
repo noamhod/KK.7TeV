@@ -89,6 +89,9 @@ void mcOfflineControl::book()
 
 	m_dirCutFlow = m_histfile->mkdir("cutFlow");
 	m_mcOfflineAnalysis->bookHistosMap( m_mcOfflineAnalysis->getCutFlowOrderedMapPtr(), m_mcOfflineAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+	
+	m_dirCutProfile = m_rootfile->mkdir("cutsProfile");
+	m_mcOfflineAnalysis->bookCutProfileHistosMap( m_mcOfflineAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );	
 }
 
 void mcOfflineControl::draw()
@@ -98,6 +101,7 @@ void mcOfflineControl::draw()
 	m_mcOfflineAnalysis->drawHistosMap( m_mcOfflineAnalysis->getCutFlowOrderedMapPtr(), m_mcOfflineAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 	m_mcOfflineAnalysis->drawFitHistos(m_dirFit, m_mcOfflineAnalysis->m_fitROOT->guess, m_mcOfflineAnalysis->m_fitROOT->fitFCN);
 	//m_mcOfflineAnalysis->drawFitHistos(m_dirFit, m_mcOfflineAnalysis->m_fitMinuit->guess, m_mcOfflineAnalysis->m_fitMinuit->fitFCN);
+	m_mcOfflineAnalysis->drawCutProfileHistosMap( m_dirCutProfile );
 
 	m_mcOfflineAnalysis->printCutFlowNumbers(l64t_nentries);
 }

@@ -7,7 +7,7 @@
 
 #include <TROOT.h>
 
-void prepare() // do not use alone
+void prepare(TString sGRLtag) // do not use alone
 {
 	gROOT->Reset();
 	
@@ -18,20 +18,25 @@ void prepare() // do not use alone
 	gSystem->Load( "libCintex.so" );
 	Cintex::Cintex::Enable();
 	gROOT->ProcessLine(".L Loader.C+");
+	
+	gROOT->ProcessLine(".include ../GoodRunsLists-" + sGRLtag + "/");
+	gROOT->ProcessLine(".include ../GoodRunsLists-" + sGRLtag + "/GoodRunsLists/");
+
+	gROOT->ProcessLine(".L ../GoodRunsLists-" + sGRLtag + "/StandAlone/libGoodRunsLists.so");
 }
 
-void compile() // for re-compilation
+void compile(TString sGRLtag) // for re-compilation
 {
-	prepare();
+	prepare(sGRLtag);
 	
 	gROOT->ProcessLine(".L offlineControl.C++");
 	
 	gROOT->ProcessLine("offlineControl olc");
 }
 
-void load() // only for loading, if already compiled
+void load(TString sGRLtag) // only for loading, if already compiled
 {
-	prepare();
+	prepare(sGRLtag);
 
 	gROOT->ProcessLine(".L offlineControl_C.so");
 

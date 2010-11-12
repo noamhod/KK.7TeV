@@ -25,6 +25,7 @@ class mcOfflineControl : public offlineChains, public utilities
 		TFile*             m_treefile;
 		mcOfflineAnalysis* m_mcOfflineAnalysis;
 		
+		TDirectory*     m_dirCutProfile;
 		TDirectory*     m_dirAllCuts;
 		TDirectory* 	m_dirNoCuts;
 		TDirectory* 	m_dirCutFlow;

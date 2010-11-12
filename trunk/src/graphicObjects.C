@@ -689,6 +689,7 @@ void graphicObjects::bookCutProfileHistosMap(TMapds* cutFlowOrdered, TDirectory*
 			sname = stmp+"_2";
 			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
 			(*h1map_cutProfile)[sname]->SetXTitle("MDT BI passed hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 			
 			stmp = "nMDTBM";
 			sname = stmp+"_1";
@@ -697,6 +698,7 @@ void graphicObjects::bookCutProfileHistosMap(TMapds* cutFlowOrdered, TDirectory*
 			sname = stmp+"_2";
 			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
 			(*h1map_cutProfile)[sname]->SetXTitle("MDT BM passed hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 			
 			stmp = "nMDTBO";
 			sname = stmp+"_1";
@@ -705,6 +707,7 @@ void graphicObjects::bookCutProfileHistosMap(TMapds* cutFlowOrdered, TDirectory*
 			sname = stmp+"_2";
 			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
 			(*h1map_cutProfile)[sname]->SetXTitle("MDT BO passed hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 			
 			
 			stmp = "nRPCPhi1";
@@ -714,6 +717,7 @@ void graphicObjects::bookCutProfileHistosMap(TMapds* cutFlowOrdered, TDirectory*
 			sname = stmp+"_2";
 			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
 			(*h1map_cutProfile)[sname]->SetXTitle("RPC Phi1 passed hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 			
 			
 			stmp = "nRPCPhi2";
@@ -723,6 +727,7 @@ void graphicObjects::bookCutProfileHistosMap(TMapds* cutFlowOrdered, TDirectory*
 			sname = stmp+"_2";
 			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
 			(*h1map_cutProfile)[sname]->SetXTitle("RPC Phi2 passed hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 			
 			stmp = "nRPCPhi3";
 			sname = stmp+"_1";
@@ -731,7 +736,6 @@ void graphicObjects::bookCutProfileHistosMap(TMapds* cutFlowOrdered, TDirectory*
 			sname = stmp+"_2";
 			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
 			(*h1map_cutProfile)[sname]->SetXTitle("RPC Phi3 passed hits");
-			
 			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 			
 		}

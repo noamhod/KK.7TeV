@@ -89,6 +89,9 @@ void mcDigestControl::book()
 
 	m_dirCutFlow = m_histfile->mkdir("cutFlow");
 	m_mcDigestAnalysis->bookHistosMap( m_mcDigestAnalysis->getCutFlowOrderedMapPtr(), m_mcDigestAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+	
+	m_dirCutProfile = m_rootfile->mkdir("cutsProfile");
+	m_mcDigestAnalysis->bookCutProfileHistosMap( m_mcDigestAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );	
 }
 
 void mcDigestControl::draw()
@@ -98,7 +101,8 @@ void mcDigestControl::draw()
 	m_mcDigestAnalysis->drawHistosMap( m_mcDigestAnalysis->getCutFlowOrderedMapPtr(), m_mcDigestAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 	m_mcDigestAnalysis->drawFitHistos(m_dirFit, m_mcDigestAnalysis->m_fitROOT->guess, m_mcDigestAnalysis->m_fitROOT->fitFCN);
 	//m_mcDigestAnalysis->drawFitHistos(m_dirFit, m_mcDigestAnalysis->m_fitMinuit->guess, m_mcDigestAnalysis->m_fitMinuit->fitFCN);
-
+	m_mcDigestAnalysis->drawCutProfileHistosMap( m_dirCutProfile );
+	
 	m_mcDigestAnalysis->printCutFlowNumbers(l64t_nentries);
 }
 

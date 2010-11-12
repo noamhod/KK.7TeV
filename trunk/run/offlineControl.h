@@ -21,10 +21,12 @@ class offlineControl : public offlineChains, public utilities
 	public:
 		// from MakeClass
 		offlinePhysics*  m_offPhys;
+		GRLinterface*    m_GRL;
 		TFile*           m_histfile;
 		TFile*           m_treefile;
 		offlineAnalysis* m_offlineAnalysis;
 		
+		TDirectory*     m_dirCutProfile;
 		TDirectory*     m_dirAllCuts;
 		TDirectory* 	m_dirNoCuts;
 		TDirectory* 	m_dirCutFlow;

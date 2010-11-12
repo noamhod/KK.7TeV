@@ -175,7 +175,7 @@ class digestTree
 		
 		TTree* getTree();
 		void setBranches();
-		void fill();
+		void fill(int GRL);
 		void reset();
 		void write();
 

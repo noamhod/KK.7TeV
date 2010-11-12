@@ -38,6 +38,10 @@ void digestControl::initialize()
 	
 	string str = "";
 
+	str = str = checkANDsetFilepath("PWD", "/../conf/Z_GRL_CURRENT.xml");
+	m_GRL = new GRLinterface();
+	m_GRL->glrinitialize( (TString)str );
+	
 	str = checkANDsetFilepath("PWD", "/../conf/digest_dataset.list");
 	string strb = checkANDsetFilepath("PWD", "/digest_datasetdir/"); // ln -s  ~hod/data  datasetdir
 	makeChain(true, str, strb);
@@ -55,7 +59,7 @@ void digestControl::initialize()
 	string str1 = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
 	string str2 = checkANDsetFilepath("PWD", "/../conf/dataPeriods.data");
 	
-	m_digestAnalysis = new digestAnalysis( m_digestPhys, m_treefile, str1, str2, "digestAnalysis_interestingEvents.dump" );
+	m_digestAnalysis = new digestAnalysis( m_digestPhys, m_GRL, m_treefile, str1, str2, "digestAnalysis_interestingEvents.dump" );
 
 	book();
 	
@@ -87,6 +91,9 @@ void digestControl::book()
 
 	m_dirCutFlow = m_histfile->mkdir("cutFlow");
 	m_digestAnalysis->bookHistosMap( m_digestAnalysis->getCutFlowOrderedMapPtr(), m_digestAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+	
+	m_dirCutProfile = m_histfile->mkdir("cutsProfile");
+	m_digestAnalysis->bookCutProfileHistosMap( m_digestAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );	
 }
 
 void digestControl::draw()
@@ -96,7 +103,8 @@ void digestControl::draw()
 	m_digestAnalysis->drawHistosMap( m_digestAnalysis->getCutFlowOrderedMapPtr(), m_digestAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 	m_digestAnalysis->drawFitHistos(m_dirFit, m_digestAnalysis->m_fitROOT->guess, m_digestAnalysis->m_fitROOT->fitFCN);
 	//m_digestAnalysis->drawFitHistos(m_dirFit, m_digestAnalysis->m_fitMinuit->guess, m_digestAnalysis->m_fitMinuit->fitFCN);
-
+	m_digestAnalysis->drawCutProfileHistosMap( m_dirCutProfile );
+	
 	m_digestAnalysis->printCutFlowNumbers(l64t_nentries);
 }
 

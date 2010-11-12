@@ -24,6 +24,7 @@ class analysisGridControl : public utilities
 		analysis*       m_analysis;
 		
 		// more pointers
+		TDirectory*     m_dirCutProfile;
 		TDirectory*     m_dirAllCuts;
 		TDirectory* 	m_dirNoCuts;
 		TDirectory* 	m_dirCutFlow;

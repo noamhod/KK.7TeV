@@ -49,7 +49,7 @@ void mcOfflineAnalysis::executeCutFlow()
 	analysisSkeleton::runnumber   = m_mcOffPhys->RunNumber;
 	analysisSkeleton::lumiblock   = m_mcOffPhys->lbn;
 	analysisSkeleton::eventnumber = m_mcOffPhys->EventNumber;
-	analysisSkeleton::isGRL       = m_mcOffPhys->isGRL;
+	analysisSkeleton::isGRL       = 1;
 	
 	//////////////////////////////////////////////////////
 	// do this only if the run number has changed ////////
@@ -157,31 +157,41 @@ void mcOfflineAnalysis::executeCutFlow()
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	
 	/////////////////////////////////////////////////////
+	// reset the muQAflags vector with "true" flags /////
+	// build the muons TLorentzVector ///////////////////
+	// no need to do this if didn't pass preselection ///
+	int nMus = (int)m_mcOffPhys->mu_staco_pt->size(); ///
+	buildMU4Vector(nMus, "angles"); /////////////////////
+	//buildMU4Vector(nMus); /////////////////////////////
+	/////////////////////////////////////////////////////
+	
+
+	
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	
+	////////////////////////////////////////
+	// execute the cut profile analysis ////
+	fillCutProfile1D(); ////////////////////
+	fillCutProfile2D(); ////////////////////
+	////////////////////////////////////////
+	
+	
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	
+	/////////////////////////////////////////////////////
 	// preform the entire preselection //////////////////
 	bool passPreselection = applyPreselection(); ////////
 	if( !passPreselection ) return; /////////////////////
 	/////////////////////////////////////////////////////
 	
-	/////////////////////////////////////////////////////
-	// reset the muQAflags vector with "true" flags /////
-	// build the muons TLorentzVector ///////////////////
-	// no need to do this if didn't pass preselection ///
-	int nMus = (int)m_mcOffPhys->mu_staco_pt->size(); //////
-	resetMuQAflags(nMus); ///////////////////////////////
-	buildMU4Vector(nMus, "angles"); /////////////////////
-	//buildMU4Vector(nMus); /////////////////////////////
-	/////////////////////////////////////////////////////
-	
-	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * *
-	/////////////////////////////////////////////////////
-	// write to the digest tree only the pairs that /////
-	// passed the preselection + skim ///////////////////
-	bool passSkim = digestSkim(nMus); ///////////////////
-	if( passSkim ) m_dgsTree->fill(); ///////////////////
-	/////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////
+	// write to the digest tree only the pairs that ////////////
+	// passed the preselection + skim //////////////////////////
+	bool passSkim = digestSkim(nMus); //////////////////////////
+	if( passSkim ) m_dgsTree->fill(analysisSkeleton::isGRL); ///
+	////////////////////////////////////////////////////////////
 	// * * * * * * * * * * * * * * * * * * * * * * * * * *
-	
 	
 	///////////////////////////////////////////////////////
 	// the single muon selection //////////////////////////

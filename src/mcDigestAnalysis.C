@@ -49,8 +49,13 @@ void mcDigestAnalysis::executeCutFlow()
 	analysisSkeleton::runnumber   = m_mcDigestPhys->RunNumber;
 	analysisSkeleton::lumiblock   = m_mcDigestPhys->lbn;
 	analysisSkeleton::eventnumber = m_mcDigestPhys->EventNumber;
-	analysisSkeleton::isGRL       = m_mcDigestPhys->isGRL;
-	analysisSkeleton::sPeriod     = m_mcDigestPhys->period;
+	analysisSkeleton::isGRL       = 1;
+	
+	//////////////////////////////////////////////////////
+	// do this only if the run number has changed ////////
+	analysisSkeleton::sPeriod = getPeriodName(); /////////
+	analysisSkeleton::vTriggers = getPeriodTriggers(); ///
+	//////////////////////////////////////////////////////
 	
 	// L1 triggers
 	analysisSkeleton::isL1_MU0  = m_mcDigestPhys->L1_MU0;
@@ -150,20 +155,32 @@ void mcDigestAnalysis::executeCutFlow()
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	
 	/////////////////////////////////////////////////////
+	// reset the muQAflags vector with "true" flags /////
+	// build the muons TLorentzVector ///////////////////
+	// no need to do this if didn't pass preselection ///
+	int nMus = (int)m_mcDigestPhys->mu_staco_pt->size();
+	buildMU4Vector(nMus, "angles"); /////////////////////
+	//buildMU4Vector(nMus); /////////////////////////////
+	/////////////////////////////////////////////////////
+	
+
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	
+	////////////////////////////////////////
+	// execute the cut profile analysis ////
+	fillCutProfile1D(); ////////////////////
+	fillCutProfile2D(); ////////////////////
+	////////////////////////////////////////
+	
+	
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	
+	
+	/////////////////////////////////////////////////////
 	// preform the entire preselection //////////////////
 	bool passPreselection = applyPreselection(); ////////
 	if( !passPreselection ) return; /////////////////////
 	/////////////////////////////////////////////////////
-	
-	///////////////////////////////////////////////////////
-	// reset the muQAflags vector with "true" flags ///////
-	// build the muons TLorentzVector /////////////////////
-	// no need to do this if didn't pass preselection /////
-	int nMus = (int)m_mcDigestPhys->mu_staco_pt->size();///
-	resetMuQAflags(nMus); /////////////////////////////////
-	buildMU4Vector(nMus, "angles"); ///////////////////////
-	//buildMU4Vector(nMus); ///////////////////////////////
-	///////////////////////////////////////////////////////
 	
 	///////////////////////////////////////////////////////
 	// the single muon selection //////////////////////////

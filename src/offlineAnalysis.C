@@ -51,11 +51,12 @@ void offlineAnalysis::executeCutFlow()
 	analysisSkeleton::runnumber   = m_offPhys->RunNumber;
 	analysisSkeleton::lumiblock   = m_offPhys->lbn;
 	analysisSkeleton::eventnumber = m_offPhys->EventNumber;
-	analysisSkeleton::isGRL       = m_offPhys->isGRL;
+	//analysisSkeleton::isGRL     = m_offPhys->isGRL;
+	analysisSkeleton::isGRL       = m_offAnalysis_grl->m_grl.HasRunLumiBlock( m_offPhys->RunNumber, m_offPhys->lbn );
 	
 	//////////////////////////////////////////////////////
 	// do this only if the run number has changed ////////
-	analysisSkeleton::sPeriod = getPeriodName(); /////////
+	analysisSkeleton::sPeriod   = getPeriodName(); ///////
 	analysisSkeleton::vTriggers = getPeriodTriggers(); ///
 	//////////////////////////////////////////////////////
 	//analysisSkeleton::sPeriod     = m_offPhys->period;
@@ -158,29 +159,41 @@ void offlineAnalysis::executeCutFlow()
 	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	
-	/////////////////////////////////////////////////////
-	// preform the entire preselection //////////////////
-	bool passPreselection = applyPreselection(); ////////
-	if( !passPreselection ) return; /////////////////////
-	/////////////////////////////////////////////////////
 	
 	/////////////////////////////////////////////////////
 	// reset the muQAflags vector with "true" flags /////
 	// build the muons TLorentzVector ///////////////////
 	// no need to do this if didn't pass preselection ///
 	int nMus = (int)m_offPhys->mu_staco_pt->size(); /////
-	resetMuQAflags(nMus); ///////////////////////////////
 	buildMU4Vector(nMus, "angles"); /////////////////////
 	//buildMU4Vector(nMus); /////////////////////////////
 	/////////////////////////////////////////////////////
 	
+	
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	
+	////////////////////////////////////////
+	// execute the cut profile analysis ////
+	fillCutProfile1D(); ////////////////////
+	fillCutProfile2D(); ////////////////////
+	////////////////////////////////////////
+	
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	
+	
+	/////////////////////////////////////////////////////
+	// preform the entire preselection //////////////////
+	bool passPreselection = applyPreselection(); ////////
+	if( !passPreselection ) return; /////////////////////
+	/////////////////////////////////////////////////////
+	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * *
-	/////////////////////////////////////////////////////
-	// write to the digest tree only the pairs that /////
-	// passed the preselection + skim ///////////////////
-	bool passSkim = digestSkim(nMus); ///////////////////
-	if( passSkim ) m_dgsTree->fill(); ///////////////////
-	/////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
+	// write to the digest tree only the pairs that //////////////
+	// passed the preselection + skim ////////////////////////////
+	bool passSkim = digestSkim(nMus); ////////////////////////////
+	if( passSkim ) m_dgsTree->fill(analysisSkeleton::isGRL); /////
+	//////////////////////////////////////////////////////////////
 	// * * * * * * * * * * * * * * * * * * * * * * * * * *
 	
 	///////////////////////////////////////////////////////

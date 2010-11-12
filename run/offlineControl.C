@@ -38,6 +38,10 @@ void offlineControl::initialize(int runNumber)
 	
 	string str = "";
 	
+	str = checkANDsetFilepath("PWD", "/../conf/Z_GRL_CURRENT.xml");;
+	m_GRL = new GRLinterface();
+	m_GRL->glrinitialize( (TString)str );
+	
 	str = checkANDsetFilepath("PWD", "/../conf/offline_dataset.list");
 	string strb = checkANDsetFilepath("PWD", "/offline_datasetdir/"); // ln -s  ~hod/data  datasetdir
 	if(runNumber==0) makeChain(true, str, strb);
@@ -45,7 +49,8 @@ void offlineControl::initialize(int runNumber)
 
 	m_offPhys = new offlinePhysics( m_chain );
 
-	str = checkANDsetFilepath("PWD", "/../data/offlineTreeDigest.root");
+	//str = checkANDsetFilepath("PWD", "/../data/offlineTreeDigest.root");
+	str = checkANDsetFilepath("PWD", "/../data/digestTree.root");
 	m_treefile = new TFile( str.c_str(), "RECREATE");
 	
 	str = checkANDsetFilepath("PWD", "/../data/offlineControl.root");
@@ -55,7 +60,7 @@ void offlineControl::initialize(int runNumber)
 	string str1 = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
 	string str2 = checkANDsetFilepath("PWD", "/../conf/dataPeriods.data");
 	
-	m_offlineAnalysis = new offlineAnalysis( m_offPhys, m_treefile, str1, str2, "offlineAnalysis_interestingEvents.dump" );
+	m_offlineAnalysis = new offlineAnalysis( m_offPhys, m_GRL, m_treefile, str1, str2, "offlineAnalysis_interestingEvents.dump" );
 
 	book();
 }
@@ -86,6 +91,9 @@ void offlineControl::book()
 
 	m_dirCutFlow = m_histfile->mkdir("cutFlow");
 	m_offlineAnalysis->bookHistosMap( m_offlineAnalysis->getCutFlowOrderedMapPtr(), m_offlineAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+	
+	m_dirCutProfile = m_histfile->mkdir("cutsProfile");
+	m_offlineAnalysis->bookCutProfileHistosMap( m_offlineAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );	
 }
 
 void offlineControl::draw()
@@ -95,7 +103,8 @@ void offlineControl::draw()
 	m_offlineAnalysis->drawHistosMap( m_offlineAnalysis->getCutFlowOrderedMapPtr(), m_offlineAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 	m_offlineAnalysis->drawFitHistos(m_dirFit, m_offlineAnalysis->m_fitROOT->guess, m_offlineAnalysis->m_fitROOT->fitFCN);
 	//m_offlineAnalysis->drawFitHistos(m_dirFit, m_offlineAnalysis->m_fitMinuit->guess, m_offlineAnalysis->m_fitMinuit->fitFCN);
-
+	m_offlineAnalysis->drawCutProfileHistosMap( m_dirCutProfile );
+	
 	m_offlineAnalysis->printCutFlowNumbers(l64t_nentries);
 }
 

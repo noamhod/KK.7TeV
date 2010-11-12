@@ -25,6 +25,7 @@ class mcDigestControl : public digestChains, public utilities
 		TFile*            m_treefile;
 		mcDigestAnalysis* m_mcDigestAnalysis;
 		
+		TDirectory*     m_dirCutProfile;
 		TDirectory*     m_dirAllCuts;
 		TDirectory* 	m_dirNoCuts;
 		TDirectory* 	m_dirCutFlow;

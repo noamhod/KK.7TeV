@@ -139,7 +139,7 @@ void mcAnalysisGridControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	
 	draw();
 	
-	//finalize();
+	finalize();
 	
 	stopTimer(true);
 }

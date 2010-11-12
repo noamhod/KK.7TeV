@@ -10,6 +10,9 @@
 #define analysisSkeleton_cxx
 #include "analysisSkeleton.C"
 
+#define GRLinterface_cxx
+#include "GRLinterface.C"
+
 #ifndef DIGESTANALYSIS_H
 #define DIGESTANALYSIS_H
 
@@ -18,16 +21,18 @@ class digestAnalysis : public analysisSkeleton
 public:
 	// pointers to classes
 	digestPhysics* m_digestPhys;
+	GRLinterface*  m_digestAnalysis_grl;
 	
 	TFile* m_treeFile;
 
 public:
 	digestAnalysis();
-	digestAnalysis(digestPhysics* digestPhys, TFile* treeFile,
+	digestAnalysis(digestPhysics* digestPhys, GRLinterface* grl, TFile* treeFile,
 				   string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath ) :
 	analysisSkeleton(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
 	{
 		m_digestPhys = digestPhys;
+		m_digestAnalysis_grl = grl;	
 		m_treeFile   = treeFile;
 	}
 	~digestAnalysis();

@@ -14,6 +14,7 @@ class cutFlowHandler
 {
 	public:
 		bool b_print;
+		ofstream* file;
 		
 		// variables
 		string          m_skey;

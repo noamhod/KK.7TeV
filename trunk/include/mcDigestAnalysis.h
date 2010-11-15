@@ -7,8 +7,9 @@
 
 #include "basicIncludes.h"
 
-#define selection_cxx
-#include "selection.C"
+#define analysisSkeleton_cxx
+#include "analysisSkeleton.C"
+
 
 #ifndef MCDIGESTANALYSIS_H
 #define MCDIGESTANALYSIS_H
@@ -22,11 +23,11 @@ public:
 
 public:
 	mcDigestAnalysis();
-	mcDigestAnalysis(mcDigestPhysics* offPhys, TFile* treeFile,
+	mcDigestAnalysis(mcDigestPhysics* mcDigestPhys, TFile* treeFile,
 					 string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath ) :
 	analysisSkeleton(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
 	{
-		m_mcDigestPhys = mcDigestPhysics;
+		m_mcDigestPhys = mcDigestPhys;
 		m_treeFile     = treeFile;
 	}
 	~mcDigestAnalysis();

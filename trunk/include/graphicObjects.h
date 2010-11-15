@@ -25,6 +25,9 @@ class graphicObjects// : public utilities
 		TCanvas* cnv_imassFit;
 		TCanvas* cnv_ipTdiff;
 		TCanvas* cnv_etaSum;
+		TCanvas* cnv_pTdiff;
+		TCanvas* cnv_pTratio;
+		TCanvas* cnv_pTmevspTid;
 		
 		// pads
 		TVirtualPad* pad_pT;
@@ -33,6 +36,12 @@ class graphicObjects// : public utilities
 		TVirtualPad* pad_eta_muplus;
 		TVirtualPad* pad_cosmicCosth;
 		TVirtualPad* pad_cosmicCosthAllCuts;
+		TVirtualPad* pad_pTdiff;
+		TVirtualPad* pad_pTdiff_muplus;
+		TVirtualPad* pad_pTratio;
+		TVirtualPad* pad_pTratio_muplus;
+		TVirtualPad* pad_pTmevspTid;
+		TVirtualPad* pad_pTmevspTid_muplus;
 
 		// histos
 		TH1D*    h1_imass;
@@ -49,6 +58,12 @@ class graphicObjects// : public utilities
 		TH1D*    h1_imassFit;
 		TH1D*    h1_ipTdiff;
 		TH1D*    h1_etaSum;
+		TH1D*    h1_pTdiff;
+		TH1D*    h1_pTdiff_muplus;
+		TH1D*    h1_pTratio;
+		TH1D*    h1_pTratio_muplus;
+		TH2D*    h2_pTmevspTid;
+		TH2D*    h2_pTmevspTid_muplus;
 
 		// canvases for cut flows
 		TCanvas* cnv_cutFlow_imass;
@@ -149,6 +164,18 @@ class graphicObjects// : public utilities
 		Int_t etaSum_nbins;
 		Double_t etaSum_min;
 		Double_t etaSum_max;
+		
+		Int_t pTdiff_nbins;
+		Double_t pTdiff_min;
+		Double_t pTdiff_max;
+		
+		Int_t pTratio_nbins;
+		Double_t pTratio_min;
+		Double_t pTratio_max;
+		
+		Int_t pTmevspTid_nbins;
+		Double_t pTmevspTid_min;
+		Double_t pTmevspTid_max;
 	
 	public:
 		graphicObjects();

@@ -17,6 +17,35 @@ utilities::~utilities()
 
 }
 
+string utilities::getDateHour()
+{
+	time_t rawtime;
+	struct tm* timeinfo;
+	// get current timeinfo
+	time ( &rawtime );
+	timeinfo = localtime ( &rawtime );
+	mktime ( timeinfo );
+	stringstream strm;
+	string str;
+	
+	strm << "day" << timeinfo->tm_mday << "." << timeinfo->tm_mon+1 << "." << timeinfo->tm_year+1900 << "_hour" << timeinfo->tm_hour << "." << timeinfo->tm_min+1 << endl;
+	strm >> str;
+	/*
+	Member	Meaning	Range
+	tm_sec	seconds after the minute	0-61*
+	tm_min	minutes after the hour	0-59
+	tm_hour	hours since midnight	0-23
+	tm_mday	day of the month	1-31
+	tm_mon	months since January	0-11
+	tm_year	years since 1900	
+	tm_wday	days since Sunday	0-6
+	tm_yday	days since January 1	0-365
+	tm_isdst	Daylight Saving Time flag	
+	*/
+	
+	return str;
+}
+
 void utilities::startTimer()
 {
 	clockStart = clock();

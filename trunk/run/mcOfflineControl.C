@@ -27,7 +27,7 @@ mcOfflineControl::mcOfflineControl()
 
 	m_mcOffPhys = new mcOfflinePhysics( m_chain );
 
-	str = checkANDsetFilepath("PWD", "/../data/mcOfflineTreeDigest_"+sMCsample+".root");
+	str = checkANDsetFilepath("PWD", "/../data/mcDigestTree_"+sMCsample+".root");
 	m_treefile = new TFile( str.c_str(), "RECREATE");
 	
 	str = checkANDsetFilepath("PWD", "/../data/mcOfflineControl_"+sMCsample+".root");
@@ -90,7 +90,7 @@ void mcOfflineControl::book()
 	m_dirCutFlow = m_histfile->mkdir("cutFlow");
 	m_mcOfflineAnalysis->bookHistosMap( m_mcOfflineAnalysis->getCutFlowOrderedMapPtr(), m_mcOfflineAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 	
-	m_dirCutProfile = m_rootfile->mkdir("cutsProfile");
+	m_dirCutProfile = m_histfile->mkdir("cutsProfile");
 	m_mcOfflineAnalysis->bookCutProfileHistosMap( m_mcOfflineAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );	
 }
 

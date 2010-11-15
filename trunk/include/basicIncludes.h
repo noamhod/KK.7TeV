@@ -69,6 +69,7 @@
 #include <vector>
 #include <map>
 #include <ctime>
+#include <time.h>
 
 using namespace std;
 using namespace RooFit;

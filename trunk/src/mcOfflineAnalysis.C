@@ -175,6 +175,11 @@ void mcOfflineAnalysis::executeCutFlow()
 	fillCutProfile2D(); ////////////////////
 	////////////////////////////////////////
 	
+	////////////////////////////////////////////////////////////
+	// write to the digest tree only the pairs that pass skim //
+	bool passSkim = digestSkim(nMus); //////////////////////////
+	if( passSkim ) m_dgsTree->fill(analysisSkeleton::isGRL); ///
+	////////////////////////////////////////////////////////////
 	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	
@@ -183,15 +188,6 @@ void mcOfflineAnalysis::executeCutFlow()
 	bool passPreselection = applyPreselection(); ////////
 	if( !passPreselection ) return; /////////////////////
 	/////////////////////////////////////////////////////
-	
-	// * * * * * * * * * * * * * * * * * * * * * * * * * *
-	////////////////////////////////////////////////////////////
-	// write to the digest tree only the pairs that ////////////
-	// passed the preselection + skim //////////////////////////
-	bool passSkim = digestSkim(nMus); //////////////////////////
-	if( passSkim ) m_dgsTree->fill(analysisSkeleton::isGRL); ///
-	////////////////////////////////////////////////////////////
-	// * * * * * * * * * * * * * * * * * * * * * * * * * *
 	
 	///////////////////////////////////////////////////////
 	// the single muon selection //////////////////////////

@@ -28,7 +28,7 @@ digestTree::digestTree(offlinePhysics* offPhys, mcOfflinePhysics* mcOffPhys, TFi
 
 	m_tree = new TTree("digest", "digest");
 
-	//m_tree->SetMaxTreeSize(50000000); // 50Mb per file
+	m_tree->SetMaxTreeSize(50000000); // 50Mb per file
 	
 	setBranches();
 }

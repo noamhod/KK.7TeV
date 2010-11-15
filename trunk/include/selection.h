@@ -134,10 +134,14 @@ public:
 							 float z0a, float z0b );
 	bool impactParameterCut( float d0CutVal, float z0CutVal,
 							 float d0, float z0 );
+	bool pTandEtaCut(        float pTCutVal, float etaCutVal,
+							 float pT, float eta );
 	bool pTandEtaTightCut(   float pTCutVal, float etaTightCutVal,
 							 float pT, float eta );
 	bool pTandEtaBarrelCut(  float pTCutVal, float etaBarrelCutVal,
 							 float pT, float eta );
+	bool pTandEtaCut(        float pTCutVal, float etaCutVal,
+							 float me_qOp, float me_theta, float eta );
 	bool pTandEtaTightCut(   float pTCutVal, float etaTightCutVal,
 							 float me_qOp, float me_theta, float eta );
 	bool pTandEtaBarrelCut(  float pTCutVal, float etaBarrelCutVal,

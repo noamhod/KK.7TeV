@@ -10,7 +10,7 @@
 #ifndef CUTFLOWHANDLER_H
 #define CUTFLOWHANDLER_H
 
-class cutFlowHandler
+class cutFlowHandler : public utilities
 {
 	public:
 		bool b_print;
@@ -27,8 +27,6 @@ class cutFlowHandler
 		TMapds*         m_cutFlowTypeOrdered; // the map between the order of the cut and its type
 		TMapsi*         m_cutFlowNumbers; // the map between the name of the cut and the events surviving it
 		TMapsvd*		m_cutFlowMapSVD;  // the actual cut flow map between the cut's name and the vector of its values
-		
-		int    nAllEvents;
 
 	public:
 		cutFlowHandler();
@@ -44,6 +42,7 @@ class cutFlowHandler
 		void getVal(vector<double>& dvalVec);
 		void readCutFlow(string sCutFlowFilePath);
 		void printCutFlowNumbers(Long64_t chainEntries);
+		void incrementNallEvents();
 
 		TMapds*  getCutFlowOrderedMapPtr();
 		TMapds*  getCutFlowTypeOrderedMapPtr();
@@ -51,6 +50,7 @@ class cutFlowHandler
 		TMapsvd* getCutFlowMapSVDPtr();
 
 	private:
+		int    nAllEvents;
 
 };
 #endif

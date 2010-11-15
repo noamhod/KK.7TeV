@@ -24,7 +24,8 @@ cutFlowHandler::cutFlowHandler(string sCutFlowFilePath)
 	nAllEvents = 0;
 	
 	file = new ofstream();
-	file->open( "previousRunCutFlow.cuts" );
+	string sTime = "RunCutFlow_" + getDateHour() + ".cuts";
+	file->open( sTime.c_str() );
 	
 	readCutFlow(sCutFlowFilePath);
 }
@@ -37,6 +38,11 @@ cutFlowHandler::~cutFlowHandler()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
+
+void cutFlowHandler::incrementNallEvents()
+{
+	nAllEvents++;
+}
 
 void cutFlowHandler::parseKeyValLine(string sLine)
 {

@@ -6,6 +6,7 @@
 /* * * * * * * * * * * */
 
 #include <TROOT.h>
+#include <TString.h>
 
 void prepare(TString sGRLtag) // do not use alone
 {
@@ -47,3 +48,5 @@ void load(TString sGRLtag) // only for loading, if already compiled
 
 	gROOT->ProcessLine("digestControl dc");
 }
+
+

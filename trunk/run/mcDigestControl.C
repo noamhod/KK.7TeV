@@ -27,8 +27,9 @@ mcDigestControl::mcDigestControl()
 
 	m_mcDigestPhys = new mcDigestPhysics( m_chain );
 
-	str = checkANDsetFilepath("PWD", "/../data/mcDigestTreeDigest_"+sMCsample+".root");
-	m_treefile = new TFile( str.c_str(), "RECREATE");
+	//str = checkANDsetFilepath("PWD", "/../data/mcDigestTreeDigest_"+sMCsample+".root");
+	//m_treefile = new TFile( str.c_str(), "RECREATE");
+	m_treefile = NULL;
 	
 	str = checkANDsetFilepath("PWD", "/../data/mcDigestControl_"+sMCsample+".root");
 	m_histfile = new TFile( str.c_str(), "RECREATE");
@@ -44,7 +45,7 @@ mcDigestControl::mcDigestControl()
 
 mcDigestControl::~mcDigestControl()
 {
-	//finalize();
+
 }
 
 void mcDigestControl::initialize()
@@ -72,8 +73,8 @@ void mcDigestControl::finalize()
 	m_histfile->Write();
 	m_histfile->Close();
 
-	m_treefile->Write();
-	m_treefile->Close();
+	//m_treefile->Write();
+	//m_treefile->Close();
 }
 
 void mcDigestControl::book()
@@ -90,7 +91,7 @@ void mcDigestControl::book()
 	m_dirCutFlow = m_histfile->mkdir("cutFlow");
 	m_mcDigestAnalysis->bookHistosMap( m_mcDigestAnalysis->getCutFlowOrderedMapPtr(), m_mcDigestAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 	
-	m_dirCutProfile = m_rootfile->mkdir("cutsProfile");
+	m_dirCutProfile = m_histfile->mkdir("cutsProfile");
 	m_mcDigestAnalysis->bookCutProfileHistosMap( m_mcDigestAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );	
 }
 

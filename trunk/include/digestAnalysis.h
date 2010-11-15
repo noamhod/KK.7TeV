@@ -24,6 +24,7 @@ public:
 	GRLinterface*  m_digestAnalysis_grl;
 	
 	TFile* m_treeFile;
+	ofstream* candidatesFile;
 
 public:
 	digestAnalysis();
@@ -31,6 +32,10 @@ public:
 				   string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath ) :
 	analysisSkeleton(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
 	{
+		candidatesFile = new ofstream();
+		string sTime = "digestCandidates_" + getDateHour() + ".cuts";
+		candidatesFile->open( sTime.c_str() );
+		
 		m_digestPhys = digestPhys;
 		m_digestAnalysis_grl = grl;	
 		m_treeFile   = treeFile;

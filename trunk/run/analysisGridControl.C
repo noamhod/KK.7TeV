@@ -96,8 +96,6 @@ void analysisGridControl::draw()
 
 void analysisGridControl::fits()
 {
-	cout << "### in fits ####" << endl;
-
 	double yields[2];
 	
 	// Preform the fit

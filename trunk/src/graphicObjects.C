@@ -36,6 +36,9 @@ void graphicObjects::ginitialize()
 	cnv_imassFit     = NULL;
 	cnv_ipTdiff      = NULL;
 	cnv_etaSum       = NULL;
+	cnv_pTdiff       = NULL;
+	cnv_pTratio      = NULL;
+	cnv_pTmevspTid   = NULL;
 	
 	// pads
 	pad_pT                 = NULL;
@@ -44,6 +47,12 @@ void graphicObjects::ginitialize()
 	pad_eta_muplus         = NULL;
 	pad_cosmicCosth        = NULL;
 	pad_cosmicCosthAllCuts = NULL;
+	pad_pTdiff             = NULL;
+	pad_pTratio            = NULL;
+	pad_pTmevspTid         = NULL;
+	pad_pTdiff_muplus      = NULL;
+	pad_pTratio_muplus     = NULL;
+	pad_pTmevspTid_muplus  = NULL;
 	
 	// histos
 	h1_imass              = NULL;
@@ -60,6 +69,12 @@ void graphicObjects::ginitialize()
 	h1_imassFit           = NULL;
 	h1_ipTdiff            = NULL;
 	h1_etaSum             = NULL;
+	h1_pTdiff             = NULL;
+	h1_pTdiff_muplus      = NULL;
+	h1_pTratio            = NULL;
+	h1_pTratio_muplus     = NULL;
+	h2_pTmevspTid         = NULL;
+	h2_pTmevspTid_muplus  = NULL;
 
 	// cut flow canvases
 	cnv_cutFlow_imass  = NULL;
@@ -100,11 +115,13 @@ void graphicObjects::ginitialize()
 	TMapsvd::iterator it2=cut_cutFlowMapSVD->find("pT_use_qOp_and_theta");
 	TMapsvd::iterator it3=cut_cutFlowMapSVD->find("pTandEtaTight");
 	TMapsvd::iterator it4=cut_cutFlowMapSVD->find("pTandEtaBarrel");
+	TMapsvd::iterator it5=cut_cutFlowMapSVD->find("pTandEta");
 	TMapsvd::iterator itEnd=cut_cutFlowMapSVD->end();
 	if     ( it1 != itEnd ) pTcutNmae = "pT";
 	else if( it2 != itEnd ) pTcutNmae = "pT_use_qOp_and_theta";
 	else if( it3 != itEnd ) pTcutNmae = "pTandEtaTight";
 	else if( it4 != itEnd ) pTcutNmae = "pTandEtaBarrel";
+	else if( it5 != itEnd ) pTcutNmae = "pTandEta";
 	else 
 	{
 		cout << "ERROR: in graphicObjects::ginitialize(): pT cut value was not found, exitting now" << endl;
@@ -191,6 +208,18 @@ void graphicObjects::ginitialize()
 	etaSum_nbins = 50;;
 	etaSum_min   = -5.;
 	etaSum_max   = +5.;
+	
+	pTdiff_nbins = 100;
+	pTdiff_min   = -50.*GeV2TeV;
+	pTdiff_max   = +50.*GeV2TeV;
+	
+	pTratio_nbins = 120;
+	pTratio_min   = 0.;
+	pTratio_max   = 3.;
+	
+	pTmevspTid_nbins = 100;
+	pTmevspTid_min   = 0.*GeV2TeV;
+	pTmevspTid_max   = 500.*GeV2TeV;
 }
 
 void graphicObjects::setStyle()
@@ -230,6 +259,14 @@ void graphicObjects::bookHistos(TDirectory* tdir)
 	h1_eta = new TH1D("eta","eta", eta_nbins, eta_min, eta_max);
 	h1_eta_muplus = new TH1D("eta #mu^{+}","eta #mu^{+}", eta_nbins, eta_min, eta_max);
 	h1_costh = new TH1D("costh","costh", costh_nbins, costh_min, costh_max);
+	
+
+	h1_pTdiff = new TH1D("pTdiff_mu-", "pTdiff_mu-", pTdiff_nbins, pTdiff_min, pTdiff_max);
+	h1_pTratio = new TH1D("pTratio_mu-", "pTratio_mu-", pTratio_nbins, pTratio_min, pTratio_max);
+	h2_pTmevspTid = new TH2D("pTmevspTid_mu-", "pTmevspTid_mu-", pTmevspTid_nbins,pTmevspTid_min,pTmevspTid_max, pTmevspTid_nbins,pTmevspTid_min,pTmevspTid_max);
+	h1_pTdiff_muplus = new TH1D("pTdiff_mu+", "pTdiff_mu+", pTdiff_nbins, pTdiff_min, pTdiff_max);
+	h1_pTratio_muplus = new TH1D("pTratio_mu+", "pTratio_mu+", pTratio_nbins, pTratio_min, pTratio_max);
+	h2_pTmevspTid_muplus = new TH2D("pTmevspTid_mu+", "pTmevspTid_mu+", pTmevspTid_nbins,pTmevspTid_min,pTmevspTid_max, pTmevspTid_nbins,pTmevspTid_min,pTmevspTid_max);
 }
 
 void graphicObjects::drawBareHistos(TDirectory* tdir)
@@ -355,6 +392,43 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	h1_etaSum->Draw();
 	cnv_etaSum->Update();
     cnv_etaSum->Write();
+	
+	
+	cnv_pTdiff = new TCanvas("pTdiff","pTdiff",canv_x,canv_y);
+	cnv_pTdiff->Divide(1,2);
+	pad_pTdiff = cnv_pTdiff->cd(1);
+	pad_pTdiff_muplus = cnv_pTdiff->cd(2);
+	cnv_pTdiff->Draw();
+	pad_pTdiff->cd();
+	h1_pTdiff->Draw();
+	pad_pTdiff_muplus->cd();
+	h1_pTdiff_muplus->Draw();
+	cnv_pTdiff->Update();
+    cnv_pTdiff->Write();
+	
+	cnv_pTratio = new TCanvas("pTratio","pTratio",canv_x,canv_y);
+	cnv_pTratio->Divide(1,2);
+	pad_pTratio = cnv_pTratio->cd(1);
+	pad_pTratio_muplus = cnv_pTratio->cd(2);
+	cnv_pTratio->Draw();
+	pad_pTratio->cd();
+	h1_pTratio->Draw();
+	pad_pTratio_muplus->cd();
+	h1_pTratio_muplus->Draw();
+	cnv_pTratio->Update();
+    cnv_pTratio->Write();
+	
+	cnv_pTmevspTid = new TCanvas("pTmevspTid","pTmevspTid",canv_x,canv_y);
+	cnv_pTmevspTid->Divide(1,2);
+	pad_pTmevspTid = cnv_pTmevspTid->cd(1);
+	pad_pTmevspTid_muplus = cnv_pTmevspTid->cd(2);
+	cnv_pTmevspTid->Draw();
+	pad_pTmevspTid->cd();
+	h2_pTmevspTid->Draw("BOX");
+	pad_pTmevspTid_muplus->cd();
+	h2_pTmevspTid_muplus->Draw("BOX");
+	cnv_pTmevspTid->Update();
+    cnv_pTmevspTid->Write();
 }
 
 
@@ -650,6 +724,20 @@ void graphicObjects::bookCutProfileHistosMap(TMapds* cutFlowOrdered, TDirectory*
 			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 		}
 		
+		else if(sname=="pTandEta")
+		{
+			string stmp = sname;
+			sname = stmp+"_1";
+			h2map_cutProfile->insert( make_pair( sname, new TH2D(sname.c_str(),sname.c_str(), pT_nbins,pT_min,pT_max,  eta_nbins,eta_min,eta_max) ) );
+			(*h2map_cutProfile)[sname]->SetXTitle("p_{T}");
+			(*h2map_cutProfile)[sname]->SetYTitle("#eta_{Tight}");
+			sname = stmp+"_2";
+			h2map_cutProfile->insert( make_pair( sname, new TH2D(sname.c_str(),sname.c_str(), pT_nbins,pT_min,pT_max,  eta_nbins,eta_min,eta_max) ) );
+			(*h2map_cutProfile)[sname]->SetXTitle("p_{T}");
+			(*h2map_cutProfile)[sname]->SetYTitle("#eta_{Tight}");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+		}
+		
 		else if(sname=="pTandEtaTight")
 		{
 			string stmp = sname;
@@ -786,10 +874,10 @@ void graphicObjects::bookCutProfileHistosMap(TMapds* cutFlowOrdered, TDirectory*
 		{
 			string stmp = sname;
 			sname = stmp+"_1";
-			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 100, -1, 1) ) );
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 100, -0.5, 0.5) ) );
 			(*h1map_cutProfile)[sname]->SetXTitle("d_{0}");
 			sname = stmp+"_2";
-			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 100, -1, 1) ) );
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 100, -0.5, 0.5) ) );
 			(*h1map_cutProfile)[sname]->SetXTitle("d_{0}");
 			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 		}
@@ -798,10 +886,10 @@ void graphicObjects::bookCutProfileHistosMap(TMapds* cutFlowOrdered, TDirectory*
 		{
 			string stmp = sname;
 			sname = stmp+"_1";
-			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 100, -1, 1) ) );
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 100, -0.5, 0.5) ) );
 			(*h1map_cutProfile)[sname]->SetXTitle("z_{0}");
 			sname = stmp+"_2";
-			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 100, -1, 1) ) );
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 100, -0.5, 0.5) ) );
 			(*h1map_cutProfile)[sname]->SetXTitle("z_{0}");
 			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 		}
@@ -810,11 +898,11 @@ void graphicObjects::bookCutProfileHistosMap(TMapds* cutFlowOrdered, TDirectory*
 		{
 			string stmp = sname;
 			sname = stmp+"_1";
-			h2map_cutProfile->insert( make_pair( sname, new TH2D(sname.c_str(),sname.c_str(), 100,-1,1,  100,-1,1) ) );
+			h2map_cutProfile->insert( make_pair( sname, new TH2D(sname.c_str(),sname.c_str(), 100,-0.5,0.5,  100,-0.5,0.5) ) );
 			(*h2map_cutProfile)[sname]->SetXTitle("d_{0}");
 			(*h2map_cutProfile)[sname]->SetYTitle("z_{0}");
 			sname = stmp+"_2";
-			h2map_cutProfile->insert( make_pair( sname, new TH2D(sname.c_str(),sname.c_str(), 100,-1,1,  100,-1,1) ) );
+			h2map_cutProfile->insert( make_pair( sname, new TH2D(sname.c_str(),sname.c_str(), 100,-0.5,0.5,  100,-0.5,0.5) ) );
 			(*h2map_cutProfile)[sname]->SetXTitle("d_{0}");
 			(*h2map_cutProfile)[sname]->SetYTitle("z_{0}");
 			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
@@ -824,10 +912,10 @@ void graphicObjects::bookCutProfileHistosMap(TMapds* cutFlowOrdered, TDirectory*
 		{
 			string stmp = sname;
 			sname = stmp+"_1";
-			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 200, 0, 2) ) );
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 400, 0, 0.01) ) );
 			(*h1map_cutProfile)[sname]->SetXTitle("#sum p_{T}^{cone20}/p_{T}");
 			sname = stmp+"_2";
-			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 200, 0, 2) ) );
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 400, 0, 0.01) ) );
 			(*h1map_cutProfile)[sname]->SetXTitle("#sum p_{T}^{cone20}/p_{T}");
 			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 		}
@@ -836,10 +924,10 @@ void graphicObjects::bookCutProfileHistosMap(TMapds* cutFlowOrdered, TDirectory*
 		{
 			string stmp = sname;
 			sname = stmp+"_1";
-			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 200, 0, 2) ) );
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 400, 0, 0.01) ) );
 			(*h1map_cutProfile)[sname]->SetXTitle("#sum p_{T}^{cone30}/p_{T}");
 			sname = stmp+"_2";
-			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 200, 0, 2) ) );
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 400, 0, 0.01) ) );
 			(*h1map_cutProfile)[sname]->SetXTitle("#sum p_{T}^{cone30}/p_{T}");
 			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 		}
@@ -848,10 +936,10 @@ void graphicObjects::bookCutProfileHistosMap(TMapds* cutFlowOrdered, TDirectory*
 		{
 			string stmp = sname;
 			sname = stmp+"_1";
-			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 200, 0, 2) ) );
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 400, 0, 0.01) ) );
 			(*h1map_cutProfile)[sname]->SetXTitle("#sum p_{T}^{cone40}/p_{T}");
 			sname = stmp+"_2";
-			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 200, 0, 2) ) );
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 400, 0, 0.01) ) );
 			(*h1map_cutProfile)[sname]->SetXTitle("#sum p_{T}^{cone40}/p_{T}");
 			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 		}

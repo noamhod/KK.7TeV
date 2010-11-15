@@ -728,6 +728,14 @@ bool selection::impactParameterCut( float d0CutVal, float z0CutVal, float d0, fl
 	return true;
 }
 
+bool selection::pTandEtaCut( float pTCutVal, float etaCutVal, float me_qOp, float me_theta, float eta )
+{
+	if( !etaCut( etaCutVal, eta ) )  return false;
+	if( !pTCut( pTCutVal, me_qOp, me_theta ) ) return false;
+	
+	return true;
+}
+
 bool selection::pTandEtaTightCut( float pTCutVal, float etaTightCutVal, float me_qOp, float me_theta, float eta )
 {
 	if( !etaTightCut( etaTightCutVal, eta ) )  return false;
@@ -740,6 +748,14 @@ bool selection::pTandEtaBarrelCut( float pTCutVal, float etaBarrelCutVal, float 
 {
 	if( !etaTightCut( etaBarrelCutVal, eta ) )  return false;
 	if( !pTCut( pTCutVal, me_qOp, me_theta ) ) return false;
+	
+	return true;
+}
+
+bool selection::pTandEtaCut( float pTCutVal, float etaCutVal, float pT, float eta )
+{
+	if( !etaTightCut( etaCutVal, eta ) )  return false;
+	if( !pTCut( pTCutVal, pT ) )          return false;
 	
 	return true;
 }

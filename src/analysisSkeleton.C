@@ -189,63 +189,122 @@ void analysisSkeleton::printAllProperties(int ai, int bi, int iv)
 	printProperty("vxp_z", vxp_z->at(iv));
 	
 	// muon
-	printProperty("mu_n",mu_n);
-	printProperty("mu_m", mu_m->at(ai));
-	printProperty("mu_px", mu_px->at(ai));
-	printProperty("mu_py", mu_py->at(ai));
-	printProperty("mu_pz", mu_pz->at(ai));
-	printProperty("mu_E", mu_E->at(ai));
-	printProperty("mu_eta", mu_eta->at(ai));
-	printProperty("mu_phi", mu_phi->at(ai));
-	printProperty("mu_pt", mu_pt->at(ai));
-	printProperty("mu_charge", mu_charge->at(ai));
+	printProperty("mu_1_n",mu_n);
+	printProperty("mu_1_m", mu_m->at(ai));
+	printProperty("mu_1_px", mu_px->at(ai));
+	printProperty("mu_1_py", mu_py->at(ai));
+	printProperty("mu_1_pz", mu_pz->at(ai));
+	printProperty("mu_1_E", mu_E->at(ai));
+	printProperty("mu_1_eta", mu_eta->at(ai));
+	printProperty("mu_1_phi", mu_phi->at(ai));
+	printProperty("mu_1_pt", mu_pt->at(ai));
+	printProperty("mu_1_charge", mu_charge->at(ai));
 	
 	// isolation
-	printProperty("mu_ptcone20", mu_ptcone20->at(ai));
-	printProperty("mu_ptcone30", mu_ptcone30->at(ai));
-	printProperty("mu_ptcone40", mu_ptcone40->at(ai));
+	printProperty("mu_1_ptcone20", mu_ptcone20->at(ai));
+	printProperty("mu_1_ptcone30", mu_ptcone30->at(ai));
+	printProperty("mu_1_ptcone40", mu_ptcone40->at(ai));
 	
 	// for pT
-	printProperty("mu_me_qoverp", mu_me_qoverp->at(ai));
-	printProperty("mu_id_qoverp", mu_id_qoverp->at(ai));
-	printProperty("mu_me_theta", mu_me_theta->at(ai));
-	printProperty("mu_id_theta", mu_id_theta->at(ai));
+	printProperty("mu_1_me_qoverp", mu_me_qoverp->at(ai));
+	printProperty("mu_1_id_qoverp", mu_id_qoverp->at(ai));
+	printProperty("mu_1_me_theta", mu_me_theta->at(ai));
+	printProperty("mu_1_id_theta", mu_id_theta->at(ai));
 	
 	// for impact parameter
-	printProperty("mu_d0_exPV", mu_d0_exPV->at(ai));
-	printProperty("mu_z0_exPV", mu_z0_exPV->at(ai));
+	printProperty("mu_1_d0_exPV", mu_d0_exPV->at(ai));
+	printProperty("mu_1_z0_exPV", mu_z0_exPV->at(ai));
 	
 	// combined muons
-	printProperty("mu_isCombinedMuon", mu_isCombinedMuon->at(ai));
+	printProperty("mu_1_isCombinedMuon", mu_isCombinedMuon->at(ai));
 	
 	// inner detector hits
-	printProperty("mu_nSCTHits", mu_nSCTHits->at(ai));
-	printProperty("mu_nPixHits", mu_nPixHits->at(ai)); 
+	printProperty("mu_1_nSCTHits", mu_nSCTHits->at(ai));
+	printProperty("mu_1_nPixHits", mu_nPixHits->at(ai)); 
 
 	// muon spectrometer hits
-	printProperty("mu_nMDTBIHits", mu_nMDTBIHits->at(ai));
-	printProperty("mu_nMDTBMHits", mu_nMDTBMHits->at(ai));
-	printProperty("mu_nMDTBOHits", mu_nMDTBOHits->at(ai));
-	printProperty("mu_nMDTBEEHits", mu_nMDTBEEHits->at(ai));
-	printProperty("mu_nMDTBIS78Hits", mu_nMDTBIS78Hits->at(ai));
-	printProperty("mu_nMDTEIHits", mu_nMDTEIHits->at(ai));
-	printProperty("mu_nMDTEMHits", mu_nMDTEMHits->at(ai));
-	printProperty("mu_nMDTEOHits", mu_nMDTEOHits->at(ai));
-	printProperty("mu_nMDTEEHits", mu_nMDTEEHits->at(ai));
-	printProperty("mu_nRPCLayer1EtaHits", mu_nRPCLayer1EtaHits->at(ai));
-	printProperty("mu_nRPCLayer2EtaHits", mu_nRPCLayer2EtaHits->at(ai));
-	printProperty("mu_nRPCLayer3EtaHits", mu_nRPCLayer3EtaHits->at(ai));
-	printProperty("mu_nRPCLayer1PhiHits", mu_nRPCLayer1PhiHits->at(ai));
-	printProperty("mu_nRPCLayer2PhiHits", mu_nRPCLayer2PhiHits->at(ai));
-	printProperty("mu_nRPCLayer3PhiHits", mu_nRPCLayer3PhiHits->at(ai));
-	printProperty("mu_nTGCLayer1EtaHits", mu_nTGCLayer1EtaHits->at(ai));
-	printProperty("mu_nTGCLayer2EtaHits", mu_nTGCLayer2EtaHits->at(ai));
-	printProperty("mu_nTGCLayer3EtaHits", mu_nTGCLayer3EtaHits->at(ai));
-	printProperty("mu_nTGCLayer4EtaHits", mu_nTGCLayer4EtaHits->at(ai));
-	printProperty("mu_nTGCLayer1PhiHits", mu_nTGCLayer1PhiHits->at(ai));
-	printProperty("mu_nTGCLayer2PhiHits", mu_nTGCLayer2PhiHits->at(ai));
-	printProperty("mu_nTGCLayer3PhiHits", mu_nTGCLayer3PhiHits->at(ai));
-	printProperty("mu_nTGCLayer4PhiHits", mu_nTGCLayer4PhiHits->at(ai));
+	printProperty("mu_1_nMDTBIHits", mu_nMDTBIHits->at(ai));
+	printProperty("mu_1_nMDTBMHits", mu_nMDTBMHits->at(ai));
+	printProperty("mu_1_nMDTBOHits", mu_nMDTBOHits->at(ai));
+	printProperty("mu_1_nMDTBEEHits", mu_nMDTBEEHits->at(ai));
+	printProperty("mu_1_nMDTBIS78Hits", mu_nMDTBIS78Hits->at(ai));
+	printProperty("mu_1_nMDTEIHits", mu_nMDTEIHits->at(ai));
+	printProperty("mu_1_nMDTEMHits", mu_nMDTEMHits->at(ai));
+	printProperty("mu_1_nMDTEOHits", mu_nMDTEOHits->at(ai));
+	printProperty("mu_1_nMDTEEHits", mu_nMDTEEHits->at(ai));
+	printProperty("mu_1_nRPCLayer1EtaHits", mu_nRPCLayer1EtaHits->at(ai));
+	printProperty("mu_1_nRPCLayer2EtaHits", mu_nRPCLayer2EtaHits->at(ai));
+	printProperty("mu_1_nRPCLayer3EtaHits", mu_nRPCLayer3EtaHits->at(ai));
+	printProperty("mu_1_nRPCLayer1PhiHits", mu_nRPCLayer1PhiHits->at(ai));
+	printProperty("mu_1_nRPCLayer2PhiHits", mu_nRPCLayer2PhiHits->at(ai));
+	printProperty("mu_1_nRPCLayer3PhiHits", mu_nRPCLayer3PhiHits->at(ai));
+	printProperty("mu_1_nTGCLayer1EtaHits", mu_nTGCLayer1EtaHits->at(ai));
+	printProperty("mu_1_nTGCLayer2EtaHits", mu_nTGCLayer2EtaHits->at(ai));
+	printProperty("mu_1_nTGCLayer3EtaHits", mu_nTGCLayer3EtaHits->at(ai));
+	printProperty("mu_1_nTGCLayer4EtaHits", mu_nTGCLayer4EtaHits->at(ai));
+	printProperty("mu_1_nTGCLayer1PhiHits", mu_nTGCLayer1PhiHits->at(ai));
+	printProperty("mu_1_nTGCLayer2PhiHits", mu_nTGCLayer2PhiHits->at(ai));
+	printProperty("mu_1_nTGCLayer3PhiHits", mu_nTGCLayer3PhiHits->at(ai));
+	printProperty("mu_1_nTGCLayer4PhiHits", mu_nTGCLayer4PhiHits->at(ai));
+	
+
+
+	printProperty("mu_2_m", mu_m->at(bi));
+	printProperty("mu_2_px", mu_px->at(bi));
+	printProperty("mu_2_py", mu_py->at(bi));
+	printProperty("mu_2_pz", mu_pz->at(bi));
+	printProperty("mu_2_E", mu_E->at(bi));
+	printProperty("mu_2_eta", mu_eta->at(bi));
+	printProperty("mu_2_phi", mu_phi->at(bi));
+	printProperty("mu_2_pt", mu_pt->at(bi));
+	printProperty("mu_2_charge", mu_charge->at(bi));
+	
+	// isolation
+	printProperty("mu_2_ptcone20", mu_ptcone20->at(bi));
+	printProperty("mu_2_ptcone30", mu_ptcone30->at(bi));
+	printProperty("mu_2_ptcone40", mu_ptcone40->at(bi));
+	
+	// for pT
+	printProperty("mu_2_me_qoverp", mu_me_qoverp->at(bi));
+	printProperty("mu_2_id_qoverp", mu_id_qoverp->at(bi));
+	printProperty("mu_2_me_theta", mu_me_theta->at(bi));
+	printProperty("mu_2_id_theta", mu_id_theta->at(bi));
+	
+	// for impact parameter
+	printProperty("mu_2_d0_exPV", mu_d0_exPV->at(bi));
+	printProperty("mu_2_z0_exPV", mu_z0_exPV->at(bi));
+	
+	// combined muons
+	printProperty("mu_2_isCombinedMuon", mu_isCombinedMuon->at(bi));
+	
+	// inner detector hits
+	printProperty("mu_2_nSCTHits", mu_nSCTHits->at(bi));
+	printProperty("mu_2_nPixHits", mu_nPixHits->at(bi)); 
+
+	// muon spectrometer hits
+	printProperty("mu_2_nMDTBIHits", mu_nMDTBIHits->at(bi));
+	printProperty("mu_2_nMDTBMHits", mu_nMDTBMHits->at(bi));
+	printProperty("mu_2_nMDTBOHits", mu_nMDTBOHits->at(bi));
+	printProperty("mu_2_nMDTBEEHits", mu_nMDTBEEHits->at(bi));
+	printProperty("mu_2_nMDTBIS78Hits", mu_nMDTBIS78Hits->at(bi));
+	printProperty("mu_2_nMDTEIHits", mu_nMDTEIHits->at(bi));
+	printProperty("mu_2_nMDTEMHits", mu_nMDTEMHits->at(bi));
+	printProperty("mu_2_nMDTEOHits", mu_nMDTEOHits->at(bi));
+	printProperty("mu_2_nMDTEEHits", mu_nMDTEEHits->at(bi));
+	printProperty("mu_2_nRPCLayer1EtaHits", mu_nRPCLayer1EtaHits->at(bi));
+	printProperty("mu_2_nRPCLayer2EtaHits", mu_nRPCLayer2EtaHits->at(bi));
+	printProperty("mu_2_nRPCLayer3EtaHits", mu_nRPCLayer3EtaHits->at(bi));
+	printProperty("mu_2_nRPCLayer1PhiHits", mu_nRPCLayer1PhiHits->at(bi));
+	printProperty("mu_2_nRPCLayer2PhiHits", mu_nRPCLayer2PhiHits->at(bi));
+	printProperty("mu_2_nRPCLayer3PhiHits", mu_nRPCLayer3PhiHits->at(bi));
+	printProperty("mu_2_nTGCLayer1EtaHits", mu_nTGCLayer1EtaHits->at(bi));
+	printProperty("mu_2_nTGCLayer2EtaHits", mu_nTGCLayer2EtaHits->at(bi));
+	printProperty("mu_2_nTGCLayer3EtaHits", mu_nTGCLayer3EtaHits->at(bi));
+	printProperty("mu_2_nTGCLayer4EtaHits", mu_nTGCLayer4EtaHits->at(bi));
+	printProperty("mu_2_nTGCLayer1PhiHits", mu_nTGCLayer1PhiHits->at(bi));
+	printProperty("mu_2_nTGCLayer2PhiHits", mu_nTGCLayer2PhiHits->at(bi));
+	printProperty("mu_2_nTGCLayer3PhiHits", mu_nTGCLayer3PhiHits->at(bi));
+	printProperty("mu_2_nTGCLayer4PhiHits", mu_nTGCLayer4PhiHits->at(bi));
 }
 
 
@@ -662,11 +721,13 @@ bool analysisSkeleton::preselection(string sSkipCut)
 			//string trigName = vTriggers->at(0);
 			//int trigVal = isTrigger(trigName);
 			//passCurrentCut = ( triggerCut((*m_cutFlowMapSVD)[sorderedcutname][0], trigVal, trigName) ) ? true : false;
+			string trigName;
 			int trigVal;
 			bool pass1Trig;
 			for(int t=0 ; t<(int)vTriggers->size() ; t++)
 			{
-				trigVal   = isTrigger( vTriggers->at(t) );
+				trigName  = vTriggers->at(t);
+				trigVal   = isTrigger( trigName );
 				pass1Trig = ( triggerCut((*m_cutFlowMapSVD)[sorderedcutname][0], trigVal, trigName) ) ? true : false;
 				if(pass1Trig) break;
 			}

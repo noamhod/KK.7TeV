@@ -272,11 +272,14 @@ public:
 	int  countQAflags();
 	void pTSort();
 	void imassSort();
+	bool assignPairIndices();
 	
 	string          getPeriodName();
+	string          getPeriodName(int run);
 	vector<string>* getPeriodTriggers();
 	int             isTrigger(string trigName);
 	bool            digestSkim(int muSize);
+	void 			printAllProperties(int ai, int bi, int iv);
 	
 	void buildMU4Vector(int nMus);
 	void buildMU4Vector(int nMus, string fromAngles = "");

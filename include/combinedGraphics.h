@@ -17,6 +17,7 @@ class combinedGraphics : public utilities
 {
 	public:
 		// integrated luminosity of the data in 1/pb
+		TMapsd period2lumiMap;
 		double dataLumi_ipb;
 		string m_dataAnalysisSelector;
 		string m_mcAnalysisSelector;
@@ -78,8 +79,41 @@ class combinedGraphics : public utilities
 		TH1D* hWmunu;
 		TH1D* hZtautau;
 		TH1D* hTTbar;
-		TH1D* hbbmuX15;
-		TH1D* hccmuX15;
+		TH1D* hbbmu15X;
+		TH1D* hccmu15X;
+		TH1D* hDYmumu;
+		TH1D* hDYtautau;
+		TH1D* hZprime_mumu_SSM1000;
+		TH1D* hZprime_mumu_SSM1250;
+		TH1D* hZprime_mumu_SSM1500;
+		TH1D* hZprime_mumu_SSM1750;
+		TH1D* hZprime_mumu_SSM2000;
+		
+		/*
+		TH1D* hDYmumu75M120;
+		TH1D* hDYmumu120M250;
+		TH1D* hDYmumu250M400;
+		TH1D* hDYmumu400M600;
+		TH1D* hDYmumu600M800;
+		TH1D* hDYmumu800M1000;
+		TH1D* hDYmumu1000M1250;
+		TH1D* hDYmumu1250M1500;
+		TH1D* hDYmumu1500M1750;
+		TH1D* hDYmumu1750M2000;
+		TH1D* hDYmumuM2000;
+		
+		TH1D* hDYtautau75M120;
+		TH1D* hDYtautau120M250;
+		TH1D* hDYtautau250M400;
+		TH1D* hDYtautau400M600;
+		TH1D* hDYtautau600M800;
+		TH1D* hDYtautau800M1000;
+		TH1D* hDYtautau1000M1250;
+		TH1D* hDYtautau1250M1500;
+		TH1D* hDYtautau1500M1750;
+		TH1D* hDYtautau1750M2000;
+		TH1D* hDYtautauM2000;
+		*/
 		
 		TH1D* hRat;
 		TH1D* hRatUp;
@@ -117,6 +151,9 @@ class combinedGraphics : public utilities
 		
 		void getHistosMap(TFile* f, string dir, TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered);
 		void drawNormHistosMap(string channel, TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered);
+		
+		TH1D* getNormDYmumu(string sHistName);
+		TH1D* getNormDYtautau(string sHistName);
 		
 		void drawMCcutFlow();
 		void drawDataCutFlow();

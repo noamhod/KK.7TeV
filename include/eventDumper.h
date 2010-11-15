@@ -32,6 +32,7 @@ class eventDumper
 		void writeProperty(string sProperty, double dPropertyMua, double dPropertyMub);
 		void writeProperty(string sProperty, string sColor, double dProperty);
 		void writeProperty(string sProperty, double dProperty);
+		void printProperty(string sProperty, double dProperty);
 
 	private:
 

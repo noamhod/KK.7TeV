@@ -14,12 +14,11 @@ digestAnalysis::digestAnalysis()
 
 digestAnalysis::~digestAnalysis()
 {
-
+	candidatesFile->close();
 }
 
 void digestAnalysis::executeAdvanced()
 {
-
 /*
 	// stupid example
 	if(m_muid->getNParticles()>0)
@@ -48,7 +47,9 @@ void digestAnalysis::executeCutFlow()
 	analysisSkeleton::runnumber   = m_digestPhys->RunNumber;
 	analysisSkeleton::lumiblock   = m_digestPhys->lbn;
 	analysisSkeleton::eventnumber = m_digestPhys->EventNumber;
-	analysisSkeleton::isGRL       = m_digestAnalysis_grl->m_grl.HasRunLumiBlock( m_digestPhys->RunNumber, m_digestPhys->lbn );
+	analysisSkeleton::isGRL       = m_digestAnalysis_grl->m_grl.HasRunLumiBlock( analysisSkeleton::runnumber, analysisSkeleton::lumiblock );
+	//analysisSkeleton::isGRL     = m_digestPhys->isGRL;
+
 	//////////////////////////////////////////////////////
 	// do this only if the run number has changed ////////
 	analysisSkeleton::sPeriod = getPeriodName(); /////////
@@ -153,7 +154,7 @@ void digestAnalysis::executeCutFlow()
 	analysisSkeleton::mu_nTGCLayer4PhiHits = m_digestPhys->mu_staco_nTGCLayer4PhiHits;
 	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	
+
 	/////////////////////////////////////////////////////
 	// reset the muQAflags vector with "true" flags /////
 	// build the muons TLorentzVector ///////////////////
@@ -162,8 +163,7 @@ void digestAnalysis::executeCutFlow()
 	buildMU4Vector(nMus, "angles"); /////////////////////
 	//buildMU4Vector(nMus); /////////////////////////////
 	/////////////////////////////////////////////////////
-	
-	
+
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	
 	////////////////////////////////////////
@@ -171,7 +171,7 @@ void digestAnalysis::executeCutFlow()
 	fillCutProfile1D(); ////////////////////
 	fillCutProfile2D(); ////////////////////
 	////////////////////////////////////////
-	
+
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	
 	/////////////////////////////////////////////////////
@@ -191,6 +191,12 @@ void digestAnalysis::executeCutFlow()
 	bool pass2MUselection = applyDoubleMuonSelection(); ////
 	if( !pass2MUselection ) return; ////////////////////////
 	////////////////////////////////////////////////////////
+	
+	
+	(*candidatesFile) << "Staco run " << analysisSkeleton::runnumber
+					  << " lb " 	  << analysisSkeleton::lumiblock
+					  << " event " 	  << analysisSkeleton::eventnumber
+					  << endl;
 }
 
 void digestAnalysis::write()

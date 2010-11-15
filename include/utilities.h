@@ -20,6 +20,8 @@ class utilities
 		utilities();
 		~utilities();
 		
+		string getDateHour();
+		
 		double getRunTime();
 		void   startTimer();
 		void   stopTimer(bool print);

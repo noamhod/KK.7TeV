@@ -135,6 +135,8 @@ void digestControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 
 	l64t_startEvent = startEvent;
 	l64t_stopEvent = l64t_nentries;
+	
+	int nSkim = 0;
 
 	if(stopAfterNevents <= 0)                            { l64t_stopEvent = l64t_nentries; cout << "1. stop at event " << l64t_stopEvent << endl; }
 	else if(startEvent+stopAfterNevents < l64t_nentries) { l64t_stopEvent = startEvent+stopAfterNevents; cout << "3. stop at event " << l64t_stopEvent << endl; }
@@ -151,6 +153,23 @@ void digestControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		if(l64t_jentry%10000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_digestPhys->RunNumber << "\tlumiblock=" << m_digestPhys->lbn << endl;
 		if(l64t_jentry%l64t_mod==0) m_digestAnalysis->printCutFlowNumbers(l64t_nentries);
 		
+		
+		/////////////////////////////////////////////////////////////////////////////////////
+		//if( m_digestAnalysis->getPeriodName(m_digestPhys->RunNumber)=="I1" ) break; /////////
+		/////////////////////////////////////////////////////////////////////////////////////
+		
+		
+		int muSize = (int)m_digestPhys->mu_staco_pt->size();
+		int skim = 0;
+		for(int mu=0 ; mu<muSize ; mu++)
+		{
+			bool pass = true;
+			pass = ( pass  &&  m_digestPhys->mu_staco_isCombinedMuon->at(mu) )      ? true : false;
+			pass = ( pass  &&  fabs(m_digestPhys->mu_staco_pt->at(mu))>15*GeV2MeV ) ? true : false;
+			if(pass) skim++;
+		}
+		if(skim>1) nSkim++;
+		
 		analyze();
 	}
 	
@@ -161,6 +180,8 @@ void digestControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	//finalize();
 	
 	stopTimer(true);
+	
+	cout << "nSkim = " << nSkim << " (stopped at period=" << m_digestAnalysis->getPeriodName(m_digestPhys->RunNumber) << ", run=" << m_digestPhys->RunNumber << ", lbn=" << m_digestPhys->lbn  << ")" << endl;
 }
 
 

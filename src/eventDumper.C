@@ -104,3 +104,8 @@ void eventDumper::writeProperty(string sProperty, string sColor, double dPropert
 	}
 }
 
+void eventDumper::printProperty(string sProperty, double dProperty)
+{
+	cout << sProperty << "\t" << dProperty << endl;
+}
+

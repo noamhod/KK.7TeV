@@ -45,6 +45,11 @@ string analysisSkeleton::getPeriodName()
 	return speriod;
 }
 
+string analysisSkeleton::getPeriodName(int run)
+{
+	return getPeriod( run, m_firstrun2periodMap, m_lastrun2periodMap );
+}
+
 vector<string>* analysisSkeleton::getPeriodTriggers()
 {
 	if(sPeriod==""  ||  m_period2triggerMap==NULL)
@@ -82,16 +87,15 @@ int analysisSkeleton::isTrigger(string trigName)
 // it should be called after the preselection //////
 bool analysisSkeleton::digestSkim(int muSize)
 {
-	//int skim1 = 0;
-	int skim2 = 0;
+	int skim  = 0;
 	for(int mu=0 ; mu<muSize ; mu++)
 	{
-		//if( fabs(mu_pt->at(mu))>15*GeV2MeV ) skim1++;
-		if( mu_isCombinedMuon->at(mu) )      skim2++;
+		
+		if(mu_isCombinedMuon->at(mu)) skim++;
+		//if( fabs(mu_pt->at(mu))>=15*GeV2MeV )
 	}
+	if( skim>1 ) return true;
 	
-	//if( skim1>1  &&  skim2>1 ) return true;
-	if( skim2>1 ) return true;
 	return false;
 }
 ////////////////////////////////////////////////////
@@ -105,7 +109,7 @@ void analysisSkeleton::runEventDumper()
 	{
 		int muMinus = (mu_charge->at(ai)<0) ? ai : bi;
 		int muPlus  = (mu_charge->at(ai)>0) ? ai : bi;
-	
+		
 		current_imass       = imass(pmu[muMinus],pmu[muPlus]);
 		current_cosTheta    = cosThetaCollinsSoper( pmu[muMinus], -1, pmu[muPlus], +1 );
 		current_mu_pT       = pT(mu_me_qoverp->at(muMinus),mu_me_theta->at(muMinus))*MeV2TeV;
@@ -114,7 +118,7 @@ void analysisSkeleton::runEventDumper()
 		current_muplus_eta  = mu_eta->at(muPlus);
 		current_cosmicCosth = cosThetaDimu(pmu[muMinus],pmu[muPlus]);
 		current_etaSum      = current_muplus_eta + current_mu_eta;
-	
+		
 		setCurrentEventMass( imass(pmu[muMinus],pmu[muPlus]) );
 		writeEventHeader(runnumber, lumiblock, eventnumber);
 		
@@ -124,7 +128,7 @@ void analysisSkeleton::runEventDumper()
 		writeProperty("$\\sum{p_T^{cone20}}/p_T$", mu_ptcone20->at(muMinus)/mu_pt->at(muMinus), mu_ptcone20->at(muPlus)/mu_pt->at(muPlus));
 		writeProperty("$\\sum{p_T^{cone30}}/p_T$", mu_ptcone30->at(muMinus)/mu_pt->at(muMinus), mu_ptcone30->at(muPlus)/mu_pt->at(muPlus));
 		writeProperty("$\\sum{p_T^{cone40}}/p_T$", mu_ptcone40->at(muMinus)/mu_pt->at(muMinus), mu_ptcone40->at(muPlus)/mu_pt->at(muPlus));
-			
+		
 		writeProperty("nSCThits", mu_nSCTHits->at(muMinus), mu_nSCTHits->at(muPlus));
 		writeProperty("nPIXhits", mu_nPixHits->at(muMinus), mu_nPixHits->at(muPlus));
 		writeProperty("nIDhits ", mu_nSCTHits->at(muMinus)+mu_nPixHits->at(muMinus), mu_nSCTHits->at(muPlus)+mu_nPixHits->at(muPlus));
@@ -138,6 +142,110 @@ void analysisSkeleton::runEventDumper()
 		writeEventFooter();
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////
+}
+
+void analysisSkeleton::printAllProperties(int ai, int bi, int iv)
+{
+	// event
+	printProperty("runnumber", runnumber);
+	printProperty("lumiblock", lumiblock);
+	printProperty("eventnumber", eventnumber);
+	printProperty("isGRL", isGRL);
+	printProperty("imass", imass(pmu[ai],pmu[bi]));
+	
+	// L1 triggers
+	printProperty("isL1_MU0", isL1_MU0);
+	printProperty("isL1_MU10", isL1_MU10);
+	printProperty("isL1_MU15", isL1_MU15);
+	printProperty("isL1_MU20", isL1_MU20);
+	printProperty("isL1_MU6", isL1_MU6);
+
+	// EF triggers
+	printProperty("isEF_mu10", isEF_mu10);
+	printProperty("isEF_mu10_MG", isEF_mu10_MG);
+	printProperty("isEF_mu10_MSonly", isEF_mu10_MSonly);
+	printProperty("isEF_mu10_MSonly_tight", isEF_mu10_MSonly_tight);
+	printProperty("isEF_mu10_NoAlg", isEF_mu10_NoAlg);
+	printProperty("isEF_mu10_tight", isEF_mu10_tight);
+	printProperty("isEF_mu10i_loose", isEF_mu10i_loose);
+	printProperty("isEF_mu13", isEF_mu13);
+	printProperty("isEF_mu13_MG", isEF_mu13_MG);
+	printProperty("isEF_mu13_MG_tight", isEF_mu13_MG_tight);
+	printProperty("isEF_mu13_tight", isEF_mu13_tight);
+	printProperty("isEF_mu15", isEF_mu15);
+	printProperty("isEF_mu15_NoAlg", isEF_mu15_NoAlg);
+	printProperty("isEF_mu20", isEF_mu20);
+	printProperty("isEF_mu20_MSonly", isEF_mu20_MSonly);
+	printProperty("isEF_mu20_NoAlg", isEF_mu20_NoAlg);
+	printProperty("isEF_mu20_slow", isEF_mu20_slow);
+	printProperty("isEF_mu30_MSonly", isEF_mu30_MSonly);
+	printProperty("isEF_mu4", isEF_mu4);
+	printProperty("isEF_mu40_MSonly", isEF_mu40_MSonly);
+   
+	// vertexes (for the PV preselection)
+	printProperty("vxp_n", vxp_n);
+	printProperty("vxp_nTracks", vxp_nTracks->at(iv));
+	printProperty("vxp_type", vxp_type->at(iv));
+	printProperty("vxp_z", vxp_z->at(iv));
+	
+	// muon
+	printProperty("mu_n",mu_n);
+	printProperty("mu_m", mu_m->at(ai));
+	printProperty("mu_px", mu_px->at(ai));
+	printProperty("mu_py", mu_py->at(ai));
+	printProperty("mu_pz", mu_pz->at(ai));
+	printProperty("mu_E", mu_E->at(ai));
+	printProperty("mu_eta", mu_eta->at(ai));
+	printProperty("mu_phi", mu_phi->at(ai));
+	printProperty("mu_pt", mu_pt->at(ai));
+	printProperty("mu_charge", mu_charge->at(ai));
+	
+	// isolation
+	printProperty("mu_ptcone20", mu_ptcone20->at(ai));
+	printProperty("mu_ptcone30", mu_ptcone30->at(ai));
+	printProperty("mu_ptcone40", mu_ptcone40->at(ai));
+	
+	// for pT
+	printProperty("mu_me_qoverp", mu_me_qoverp->at(ai));
+	printProperty("mu_id_qoverp", mu_id_qoverp->at(ai));
+	printProperty("mu_me_theta", mu_me_theta->at(ai));
+	printProperty("mu_id_theta", mu_id_theta->at(ai));
+	
+	// for impact parameter
+	printProperty("mu_d0_exPV", mu_d0_exPV->at(ai));
+	printProperty("mu_z0_exPV", mu_z0_exPV->at(ai));
+	
+	// combined muons
+	printProperty("mu_isCombinedMuon", mu_isCombinedMuon->at(ai));
+	
+	// inner detector hits
+	printProperty("mu_nSCTHits", mu_nSCTHits->at(ai));
+	printProperty("mu_nPixHits", mu_nPixHits->at(ai)); 
+
+	// muon spectrometer hits
+	printProperty("mu_nMDTBIHits", mu_nMDTBIHits->at(ai));
+	printProperty("mu_nMDTBMHits", mu_nMDTBMHits->at(ai));
+	printProperty("mu_nMDTBOHits", mu_nMDTBOHits->at(ai));
+	printProperty("mu_nMDTBEEHits", mu_nMDTBEEHits->at(ai));
+	printProperty("mu_nMDTBIS78Hits", mu_nMDTBIS78Hits->at(ai));
+	printProperty("mu_nMDTEIHits", mu_nMDTEIHits->at(ai));
+	printProperty("mu_nMDTEMHits", mu_nMDTEMHits->at(ai));
+	printProperty("mu_nMDTEOHits", mu_nMDTEOHits->at(ai));
+	printProperty("mu_nMDTEEHits", mu_nMDTEEHits->at(ai));
+	printProperty("mu_nRPCLayer1EtaHits", mu_nRPCLayer1EtaHits->at(ai));
+	printProperty("mu_nRPCLayer2EtaHits", mu_nRPCLayer2EtaHits->at(ai));
+	printProperty("mu_nRPCLayer3EtaHits", mu_nRPCLayer3EtaHits->at(ai));
+	printProperty("mu_nRPCLayer1PhiHits", mu_nRPCLayer1PhiHits->at(ai));
+	printProperty("mu_nRPCLayer2PhiHits", mu_nRPCLayer2PhiHits->at(ai));
+	printProperty("mu_nRPCLayer3PhiHits", mu_nRPCLayer3PhiHits->at(ai));
+	printProperty("mu_nTGCLayer1EtaHits", mu_nTGCLayer1EtaHits->at(ai));
+	printProperty("mu_nTGCLayer2EtaHits", mu_nTGCLayer2EtaHits->at(ai));
+	printProperty("mu_nTGCLayer3EtaHits", mu_nTGCLayer3EtaHits->at(ai));
+	printProperty("mu_nTGCLayer4EtaHits", mu_nTGCLayer4EtaHits->at(ai));
+	printProperty("mu_nTGCLayer1PhiHits", mu_nTGCLayer1PhiHits->at(ai));
+	printProperty("mu_nTGCLayer2PhiHits", mu_nTGCLayer2PhiHits->at(ai));
+	printProperty("mu_nTGCLayer3PhiHits", mu_nTGCLayer3PhiHits->at(ai));
+	printProperty("mu_nTGCLayer4PhiHits", mu_nTGCLayer4PhiHits->at(ai));
 }
 
 
@@ -174,6 +282,13 @@ void analysisSkeleton::fillAfterCuts()
 	h1_imassFit->Fill(           current_imass );
 	h1_pT->Fill(                 current_mu_pT );
 	h1_pT_muplus->Fill(          current_muplus_pT );
+	
+	h1_pTdiff->Fill( pT(mu_me_qoverp->at(muMinus),mu_me_theta->at(muMinus))*MeV2TeV - pT(mu_id_qoverp->at(muMinus),mu_id_theta->at(muMinus))*MeV2TeV );
+	h1_pTdiff_muplus->Fill( pT(mu_me_qoverp->at(muPlus),mu_me_theta->at(muPlus))*MeV2TeV - pT(mu_id_qoverp->at(muPlus),mu_id_theta->at(muPlus))*MeV2TeV );
+	h1_pTratio->Fill( fabs( pT(mu_me_qoverp->at(muMinus),mu_me_theta->at(muMinus)) / pT(mu_id_qoverp->at(muMinus),mu_id_theta->at(muMinus)) ) );
+	h1_pTratio_muplus->Fill( fabs( pT(mu_me_qoverp->at(muPlus),mu_me_theta->at(muPlus)) / pT(mu_id_qoverp->at(muPlus),mu_id_theta->at(muPlus)) ) );
+	h2_pTmevspTid->Fill( pT(mu_me_qoverp->at(muMinus),mu_me_theta->at(muMinus))*MeV2TeV, pT(mu_id_qoverp->at(muMinus),mu_id_theta->at(muMinus))*MeV2TeV );
+	h2_pTmevspTid_muplus->Fill( pT(mu_me_qoverp->at(muPlus),mu_me_theta->at(muPlus))*MeV2TeV, pT(mu_id_qoverp->at(muPlus),mu_id_theta->at(muPlus))*MeV2TeV );
 	
 	//cout << "\n$$$$$$$$$ dimuon $$$$$$$$$" << endl;
 	//cout << "\t im=" << current_imass << endl;
@@ -226,18 +341,18 @@ void analysisSkeleton::fillCutFlow(string sorderedcutname, string sIsPreselectio
 	{
 		int muMinus = (mu_charge->at(0)<0) ? 0 : 1;
 		int muPlus  = (mu_charge->at(0)>0) ? 0 : 1;
-	
+		
 		if(values2fill.size()>0) values2fill.clear();
-	
+		
 		current_imass = imass(pmu[muMinus],pmu[muPlus]);
 		current_mu_pT = pT(mu_me_qoverp->at(muMinus),mu_me_theta->at(muMinus))*MeV2TeV;
-	
+		
 		///////////////////////////////////////////////////////////////////////
 		// these values go in the cutFlow histograms //////////////////////////
 		values2fill.insert( make_pair( "imass",current_imass ) ); /////////////
 		values2fill.insert( make_pair( "pT",   current_mu_pT ) ); /////////////
 		///////////////////////////////////////////////////////////////////////
-	
+		
 		///////////////////////////////////////////////////////////////////////////////////////////////
 		// fill the cut flow histopgrams //////////////////////////////////////////////////////////////
 		hmap_cutFlow_imass->operator[]("imass."+sorderedcutname)->Fill( values2fill["imass"] ); ///////
@@ -330,6 +445,31 @@ void analysisSkeleton::buildMU4Vector(int nMus, string fromAngles)
 }
 
 
+bool analysisSkeleton::assignPairIndices()
+{
+	// select the final muon pair
+	if(pTtoIndexMap.size()==2)
+	{
+		ai = 0;
+		bi = 1;
+	}
+	else if(pTtoIndexMap.size()>2)
+	{
+		pTSort();
+		//imassSort();
+		nMultiMuonEvents++;
+	}
+	else
+	{
+		cout << "WARNING: in analysisSkeleton::assignPairIndices, but there are <2 good single-muons" << endl;
+		return false;
+	}
+	return true;
+}
+
+
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 
@@ -339,15 +479,10 @@ bool analysisSkeleton::applyPreselection(string sSkipCut)
 
 	///////////////////////////////////////////
 	// do not skip this for correct counting //
-	if(!isSkippedCut) nAllEvents++; ///////////
+	if(!isSkippedCut) incrementNallEvents(); //
 	///////////////////////////////////////////
 
 	passCutFlow = preselection(sSkipCut);
-	
-	//////////////////////////////////////////////
-	// need at least 2 muons...///////////////////
-	if(mu_n<2) passCutFlow = false; //////////////
-	//////////////////////////////////////////////
 	
 	return passCutFlow;
 }
@@ -361,9 +496,6 @@ bool analysisSkeleton::applySingleMuonSelection(string sSkipCut)
 	if(!isSkippedCut) fillBeforeCuts(); ////
 	////////////////////////////////////////
 	
-	// fill the cut flow, stop at the relevant cut each time.
-	// the cut objects don't have to be "correctly" ordered
-	// since it is done by the loop on the ordered cut flow map
 	passCutFlow = singleSelection(sSkipCut);
 	
 	return passCutFlow;
@@ -372,40 +504,7 @@ bool analysisSkeleton::applySingleMuonSelection(string sSkipCut)
 bool analysisSkeleton::applyDoubleMuonSelection(string sSkipCut)
 {
 	bool isSkippedCut = (sSkipCut=="") ? false : true;
-
-	int muSize = (int)mu_pt->size();
 	
-	//////////////////////////////////////////
-	// need at least 2 muons...///////////////
-	if(muSize<2) return false; ///////////////
-	//////////////////////////////////////////
-	
-	/////////////////////////////////////////////////////
-	// count the good muons and find their id's /////////
-	int nQAflags = countQAflags(); //////////////////////
-	if(nQAflags<2) return false; ////////////////////////
-	/////////////////////////////////////////////////////
-	
-	// select the final muon pair
-	if(pTtoIndexMap.size()==2)
-	{
-		ai = 0;
-		bi = 1;
-	}
-	else if(pTtoIndexMap.size()>2)
-	{
-		//pTSort();
-		imassSort();
-		nMultiMuonEvents++;
-	}
-	else
-	{
-		cout << "WARNING: in analysisSkeleton::applyDoubleMuonSelection(TVectorP2VL& pmu) but there are <2 good single-muons" << endl;
-		return false;
-	}
-	
-	// the cut objects don't have to be "correctly" ordered
-	// since it is done by the loop on the ordered cut flow map
 	passCutFlow = doubleSelection(sSkipCut);
 	
 	if(passCutFlow  &&  !isSkippedCut)
@@ -414,7 +513,7 @@ bool analysisSkeleton::applyDoubleMuonSelection(string sSkipCut)
 		// fill the cutFlow and the allCuts items /////
 		fillAfterCuts(); //////////////////////////////
 		///////////////////////////////////////////////
-	
+		
 		////////////////////////////////////////////////////
 		// dump events. only if doEventDump==true //////////
 		runEventDumper(); //////////////////////////////////
@@ -507,11 +606,13 @@ void analysisSkeleton::fillCutProfile2D()
 			if(sname=="PV")
 			{
 				float cutval = (*m_cutFlowMapSVD)[sname][1]; // vxp_type==1 (the second cutVal)
-				for(int v=0 ; (v<vxp_n && vxp_type->at(v)==cutval) ; v++)
+				for(int v=0 ; (v<(int)vxp_type->size() && vxp_type->at(v)==cutval) ; v++)
 				{
 					(*h2map_cutProfile)[sname]->Fill( vxp_z->at(v),vxp_nTracks->at(v) );
 				}
 			}
+			else if(sname=="pTandEta_1")  (*h2map_cutProfile)[sname]->Fill( pT(mu_me_qoverp->at(ai)/MeV2TeV, mu_me_theta->at(ai)), mu_eta->at(ai) );
+			else if(sname=="pTandEta_2")  (*h2map_cutProfile)[sname]->Fill( pT(mu_me_qoverp->at(bi)/MeV2TeV, mu_me_theta->at(bi)), mu_eta->at(bi) );
 			else if(sname=="pTandEtaTight_1")  (*h2map_cutProfile)[sname]->Fill( pT(mu_me_qoverp->at(ai)/MeV2TeV, mu_me_theta->at(ai)), mu_eta->at(ai) );
 			else if(sname=="pTandEtaTight_2")  (*h2map_cutProfile)[sname]->Fill( pT(mu_me_qoverp->at(bi)/MeV2TeV, mu_me_theta->at(bi)), mu_eta->at(bi) );
 			else if(sname=="pTandEtaBarrel_1") (*h2map_cutProfile)[sname]->Fill( pT(mu_me_qoverp->at(ai)/MeV2TeV, mu_me_theta->at(ai)), mu_eta->at(ai) );
@@ -558,9 +659,18 @@ bool analysisSkeleton::preselection(string sSkipCut)
 		
 		else if(sorderedcutname=="Trigger"  &&  sorderedcutname!=sSkipCut)
 		{
-			string trigName = vTriggers->at(0);
-			int trigVal = isTrigger(trigName);
-			passCurrentCut = ( triggerCut((*m_cutFlowMapSVD)[sorderedcutname][0], trigVal, trigName) ) ? true : false;
+			//string trigName = vTriggers->at(0);
+			//int trigVal = isTrigger(trigName);
+			//passCurrentCut = ( triggerCut((*m_cutFlowMapSVD)[sorderedcutname][0], trigVal, trigName) ) ? true : false;
+			int trigVal;
+			bool pass1Trig;
+			for(int t=0 ; t<(int)vTriggers->size() ; t++)
+			{
+				trigVal   = isTrigger( vTriggers->at(t) );
+				pass1Trig = ( triggerCut((*m_cutFlowMapSVD)[sorderedcutname][0], trigVal, trigName) ) ? true : false;
+				if(pass1Trig) break;
+			}
+			passCurrentCut = pass1Trig;
 		}
 		
 		else if(sorderedcutname=="EF_mu13"  &&  sorderedcutname!=sSkipCut)
@@ -573,7 +683,7 @@ bool analysisSkeleton::preselection(string sSkipCut)
 			float cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 			float cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
 			passCurrentCut = ( findHipTmuon(cutval1, cutval2,
-											(int)mu_pt->size(), mu_pt, mu_me_qoverp, mu_me_theta) ) ? true : false;
+			(int)mu_pt->size(), mu_pt, mu_me_qoverp, mu_me_theta) ) ? true : false;
 		}
 		
 		else if(sorderedcutname=="PV"  &&  sorderedcutname!=sSkipCut)
@@ -582,7 +692,7 @@ bool analysisSkeleton::preselection(string sSkipCut)
 			float cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
 			float cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
 			passCurrentCut = ( findBestVertex((int)cutval1, (int)cutval2, cutval3,
-											  (int)vxp_type->size(), vxp_nTracks, vxp_type, vxp_z) ) ? true : false;
+			(int)vxp_type->size(), vxp_nTracks, vxp_type, vxp_z) ) ? true : false;
 			iVtx = getPVindex();
 		}
 		
@@ -627,7 +737,7 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
 			}
 		}
-	
+		
 		else if(sorderedcutname=="pT_use_qOp_and_theta"  &&  sorderedcutname!=sSkipCut)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
@@ -668,6 +778,20 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 			}
 		}
 		
+		else if(sorderedcutname=="pTandEta"  &&  sorderedcutname!=sSkipCut)
+		{
+			for(int mu=0 ; mu<muSize ; mu++)
+			{
+				float cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
+				float cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
+				thisMuPass = ( pTandEtaCut(cutval1, cutval2,
+				mu_me_qoverp->at(mu), mu_me_theta->at(mu), mu_eta->at(mu)) ) ? true : false;
+				//thisMuPass = ( pTandEtaTightCut(cutval1, cutval2, mu_pt->at(mu), mu_eta->at(mu)) ) ? true : false;
+				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
+				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
+			}
+		}
+		
 		else if(sorderedcutname=="pTandEtaTight"  &&  sorderedcutname!=sSkipCut)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
@@ -689,7 +813,7 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 				float cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 				float cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
 				thisMuPass = ( pTandEtaBarrelCut(cutval1, cutval2,
-												 mu_me_qoverp->at(mu), mu_me_theta->at(mu), mu_eta->at(mu)) ) ? true : false;
+				mu_me_qoverp->at(mu), mu_me_theta->at(mu), mu_eta->at(mu)) ) ? true : false;
 				//thisMuPass = ( pTandEtaBarrelCut(cutval1, cutval2, mu_pt->at(mu), mu_eta->at(mu)) ) ? true : false;
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
@@ -761,10 +885,10 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
 				thisMuPass = ( nMS3stationsMDThits( cutval1,cutval2,cutval3,cutval4,cutval5,
-							   mu_nMDTBIHits->at(mu), mu_nMDTBMHits->at(mu), mu_nMDTBOHits->at(mu),
-							   mu_nMDTEIHits->at(mu), mu_nMDTEMHits->at(mu), mu_nMDTEOHits->at(mu),
-							   mu_nMDTBEEHits->at(mu), mu_nMDTBIS78Hits->at(mu))
-							  ) ? true : false;
+				mu_nMDTBIHits->at(mu), mu_nMDTBMHits->at(mu), mu_nMDTBOHits->at(mu),
+				mu_nMDTEIHits->at(mu), mu_nMDTEMHits->at(mu), mu_nMDTEOHits->at(mu),
+				mu_nMDTBEEHits->at(mu), mu_nMDTBIS78Hits->at(mu))
+				) ? true : false;
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
 			}
@@ -781,10 +905,10 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
 				thisMuPass = ( nMShits( cutval1,cutval2,cutval3,cutval4,cutval5,cutval6,
-										mu_nMDTBIHits->at(mu), mu_nMDTBMHits->at(mu), mu_nMDTBOHits->at(mu),mu_nMDTBIS78Hits->at(mu), mu_nMDTBEEHits->at(mu),
-										mu_nRPCLayer1PhiHits->at(mu), mu_nRPCLayer2PhiHits->at(mu), mu_nRPCLayer3PhiHits->at(mu)
-									   )
-							  ) ? true : false;
+				mu_nMDTBIHits->at(mu), mu_nMDTBMHits->at(mu), mu_nMDTBOHits->at(mu),mu_nMDTBIS78Hits->at(mu), mu_nMDTBEEHits->at(mu),
+				mu_nRPCLayer1PhiHits->at(mu), mu_nRPCLayer2PhiHits->at(mu), mu_nRPCLayer3PhiHits->at(mu)
+				)
+				) ? true : false;
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
 			}
@@ -848,6 +972,26 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 bool analysisSkeleton::doubleSelection(string sSkipCut)
 {
 	bool isSkippedCut = (sSkipCut=="") ? false : true;
+	
+	//////////////////////////////////////////
+	// need at least 2 muons...///////////////
+	int muSize = (int)mu_pt->size(); /////////
+	if(muSize<2) return false; ///////////////
+	//////////////////////////////////////////
+	
+	/////////////////////////////////////////////////////
+	// count the good muons and find their id's /////////
+	int nQAflags = countQAflags(); //////////////////////
+	if(nQAflags<2) return false; ////////////////////////
+	/////////////////////////////////////////////////////
+	
+	/////////////////////////////////////////////////////
+	// see if there's a good pair (pT or imass sorted) //
+	// and assign the ai and bi indices /////////////////
+	bool isPair = assignPairIndices(); //////////////////
+	if(!isPair) return false; ///////////////////////////
+	/////////////////////////////////////////////////////
+	
 
 	passCutFlow    = true;
 	passCurrentCut = true;
@@ -858,7 +1002,7 @@ bool analysisSkeleton::doubleSelection(string sSkipCut)
 		float num = ii->first; ////////////////////////////////////////////////////
 		if(m_cutFlowTypeOrdered->operator[](num)=="preselection") continue; ///////
 		///////////////////////////////////////////////////////////////////////////
-	
+		
 		string sorderedcutname = ii->second;
 
 		if(sorderedcutname=="oppositeCharge"  &&  sorderedcutname!=sSkipCut)

@@ -16,7 +16,7 @@ combinedGraphicsControl::combinedGraphicsControl()
 	str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
 	m_cutFlowHandler = new cutFlowHandler(str);
 	
-	m_combinedGraphics = new combinedGraphics(m_cutFlowHandler, "digest");
+	m_combinedGraphics = new combinedGraphics(m_cutFlowHandler, "offline");
 }
 
 combinedGraphicsControl::~combinedGraphicsControl()
@@ -28,6 +28,6 @@ void combinedGraphicsControl::execute()
 {
 	m_combinedGraphics->drawimass();
 	m_combinedGraphics->drawpT();
-	m_combinedGraphics->drawMCcutFlow();
-	m_combinedGraphics->drawDataCutFlow();
+	//m_combinedGraphics->drawMCcutFlow();
+	//m_combinedGraphics->drawDataCutFlow();
 }

@@ -42,7 +42,12 @@ void digestChains::list2chain(string sListFilePath, string sListContentAbsoluteP
 		getline(file,sLine);
 		
 		pos = sLine.find(".root");
-		if (pos == string::npos) { nignored++; continue; } // if pattern ".root" is not found
+		if (pos == string::npos)
+		{
+			nignored++;
+			cout << "ignoring line (no .root): " << sLine << endl;
+			continue;
+		} // if pattern ".root" is not found
 		
 		size_t fileSize = 0;
 		ifstream infile(sLine.c_str());
@@ -50,7 +55,12 @@ void digestChains::list2chain(string sListFilePath, string sListContentAbsoluteP
 		{
 			infile.seekg(0, ios::end ); // move to end of file
 			fileSize = infile.tellg();
-			if(fileSize < min) { nignored++; continue; } // if file is too small
+			if(fileSize < min)
+			{
+				nignored++;
+				cout << "ignoring line (fileSize<min): " << sLine << endl;
+				continue;
+			} // if file is too small
 		}
 		
 		// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 

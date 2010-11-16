@@ -114,7 +114,7 @@ void mcDigestControl::fits()
 	double yields[2];
 	
 	// Preform the fit
-	m_mcDigestAnalysis->minimize( false, m_mcDigestAnalysis->h1_imassFit, yields );
+	m_mcDigestAnalysis->minimize( false, m_mcDigestAnalysis->h1_imassFit, yields, m_dirFit );
 }
 
 void mcDigestControl::analyze()

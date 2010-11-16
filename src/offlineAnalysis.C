@@ -208,6 +208,5 @@ void offlineAnalysis::executeCutFlow()
 
 void offlineAnalysis::write()
 {
-	m_treeFile->cd();
 	m_dgsTree->write();
 }

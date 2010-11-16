@@ -38,7 +38,7 @@ analysisGridControl::analysisGridControl( TChain* inchain, TFile* outfile )
 
 analysisGridControl::~analysisGridControl()
 {
-	//finalize();
+	
 }
 
 void analysisGridControl::initialize()

@@ -115,7 +115,7 @@ void digestControl::fits()
 	double yields[2];
 	
 	// Preform the fit
-	m_digestAnalysis->minimize( false, m_digestAnalysis->h1_imassFit, yields );
+	m_digestAnalysis->minimize( false, m_digestAnalysis->h1_imassFit, yields, m_dirFit );
 }
 
 void digestControl::analyze()

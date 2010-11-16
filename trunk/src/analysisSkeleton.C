@@ -723,7 +723,7 @@ bool analysisSkeleton::preselection(string sSkipCut)
 			//passCurrentCut = ( triggerCut((*m_cutFlowMapSVD)[sorderedcutname][0], trigVal, trigName) ) ? true : false;
 			string trigName;
 			int trigVal;
-			bool pass1Trig;
+			bool pass1Trig = false;
 			for(int t=0 ; t<(int)vTriggers->size() ; t++)
 			{
 				trigName  = vTriggers->at(t);

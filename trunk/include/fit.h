@@ -41,7 +41,7 @@ class fit
 
 		void fillXvec(double x);
 		
-		void minimize(bool signal_only, TH1D* h, double* yields);
+		void minimize(bool signal_only, TH1D* h, double* yields, TDirectory* tdir);
 		
 	private:
 		

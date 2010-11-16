@@ -65,15 +65,20 @@ void mcOfflineControl::initialize()
 
 void mcOfflineControl::finalize()
 {
-	// write the tree
-	m_mcOfflineAnalysis->write();
+	// tree
+	// the tree will split into multiple files
+	// since in digestTree class there is the
+	// following statement m_tree->SetMaxTreeSize(50000000);
+	// i.e., 50Mb per file
+	m_treefile = m_offlineAnalysis->m_dgsTree->m_tree->GetCurrentFile();
+	m_treefile->cd();
+	m_offlineAnalysis->m_dgsTree->m_tree->Write();
+	m_treefile->Write();
+	m_treefile->Close();
 
 	// files
 	m_histfile->Write();
 	m_histfile->Close();
-
-	m_treefile->Write();
-	m_treefile->Close();
 }
 
 void mcOfflineControl::book()
@@ -113,7 +118,7 @@ void mcOfflineControl::fits()
 	double yields[2];
 	
 	// Preform the fit
-	m_mcOfflineAnalysis->minimize( false, m_mcOfflineAnalysis->h1_imassFit, yields );
+	m_mcOfflineAnalysis->minimize( false, m_mcOfflineAnalysis->h1_imassFit, yields, m_dirFit );
 }
 
 void mcOfflineControl::analyze()

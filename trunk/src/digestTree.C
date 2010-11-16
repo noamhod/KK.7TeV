@@ -19,7 +19,7 @@ digestTree::~digestTree()
 
 digestTree::digestTree(offlinePhysics* offPhys, mcOfflinePhysics* mcOffPhys, TFile* treeFile)
 {
-	m_offPhys = offPhys;
+	m_offPhys   = offPhys;
 	m_mcOffPhys = mcOffPhys;
 
 	m_treeFile = treeFile;

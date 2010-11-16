@@ -35,7 +35,6 @@ void offlineControl::initialize(int runNumber)
 	m_histfile = NULL;
 	m_treefile = NULL;
 	
-	
 	string str = "";
 	
 	str = checkANDsetFilepath("PWD", "/../conf/Z_GRL_CURRENT.xml");;
@@ -63,19 +62,26 @@ void offlineControl::initialize(int runNumber)
 	m_offlineAnalysis = new offlineAnalysis( m_offPhys, m_GRL, m_treefile, str1, str2, "offlineAnalysis_interestingEvents.dump" );
 
 	book();
+
+	m_treefile->cd();
 }
 
 void offlineControl::finalize()
 {
-	// write the tree
-	m_offlineAnalysis->write();
-
-	// files
-	m_histfile->Write();
-	m_histfile->Close();
-
+	// tree
+	// the tree will split into multiple files
+	// since in digestTree class there is the
+	// following statement m_tree->SetMaxTreeSize(50000000);
+	// i.e., 50Mb per file
+	m_treefile = m_offlineAnalysis->m_dgsTree->m_tree->GetCurrentFile();
+	m_treefile->cd();
+	m_offlineAnalysis->m_dgsTree->m_tree->Write();
 	m_treefile->Write();
 	m_treefile->Close();
+	
+	// histos
+	m_histfile->Write();
+	m_histfile->Close();
 }
 
 void offlineControl::book()
@@ -93,7 +99,7 @@ void offlineControl::book()
 	m_offlineAnalysis->bookHistosMap( m_offlineAnalysis->getCutFlowOrderedMapPtr(), m_offlineAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 	
 	m_dirCutProfile = m_histfile->mkdir("cutsProfile");
-	m_offlineAnalysis->bookCutProfileHistosMap( m_offlineAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );	
+	m_offlineAnalysis->bookCutProfileHistosMap( m_offlineAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );
 }
 
 void offlineControl::draw()
@@ -115,7 +121,7 @@ void offlineControl::fits()
 	double yields[2];
 	
 	// Preform the fit
-	m_offlineAnalysis->minimize( false, m_offlineAnalysis->h1_imassFit, yields );
+	m_offlineAnalysis->minimize( false, m_offlineAnalysis->h1_imassFit, yields, m_dirFit );
 }
 
 void offlineControl::analyze()

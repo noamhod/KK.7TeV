@@ -40,8 +40,10 @@ void fit::fillXvec(double x)
 	//}
 }
 
-void fit::minimize(bool signal_only, TH1D* h, double* yields)
+void fit::minimize(bool signal_only, TH1D* h, double* yields, TDirectory* tdir)
 {
+	if(tdir!=NULL) tdir->cd();
+
 	cout << "\n$$$$$$$$$$$$$$ start ROOT binned fit $$$$$$$$$$$$$$" << endl;
 	m_fitROOT->minimize(signal_only, h, yields);
 	//cout << "\n$$$$$$$$$$$$$$ start TMinuit unbinned fit $$$$$$$$$$$$$$" << endl;

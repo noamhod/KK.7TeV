@@ -7,24 +7,24 @@
 
 #include "basicIncludes.h"
 
-#define offlineChains_cxx
-#include "offlineChains.C"
-
 #define combinedGraphics_cxx
 #include "combinedGraphics.C"
 
 #ifndef COMBINEDGRAPHICSCONTROL_H
 #define COMBINEDGRAPHICSCONTROL_H
 
-class combinedGraphicsControl : public offlineChains, public combinedGraphics
+class combinedGraphicsControl : public utilities
 {
 	public:
-		cutFlowHandler*   m_cutFlowHandler;
 		combinedGraphics* m_combinedGraphics;
+		TFile* m_histfile;
+		
 	
 	public:
 		combinedGraphicsControl();
 		~combinedGraphicsControl();
+		void initialize(string sAnalysisSelector);
+		void finalize();
 		void execute();
 
 	private:

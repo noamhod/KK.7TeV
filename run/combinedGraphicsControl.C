@@ -10,13 +10,7 @@
 
 combinedGraphicsControl::combinedGraphicsControl()
 {
-	string str = "";
 
-	// read the cut flow (ownership: selection class which offlineAnalysis inherits from)
-	str = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
-	m_cutFlowHandler = new cutFlowHandler(str);
-	
-	m_combinedGraphics = new combinedGraphics(m_cutFlowHandler, "offline");
 }
 
 combinedGraphicsControl::~combinedGraphicsControl()
@@ -24,10 +18,31 @@ combinedGraphicsControl::~combinedGraphicsControl()
 	
 }
 
+void combinedGraphicsControl::initialize(string sAnalysisSelector)
+{
+	string str = "";
+	
+	str = checkANDsetFilepath("PWD", "/../data/combinedGraphicsControl.root");
+	m_histfile = new TFile( str.c_str(), "RECREATE");
+	m_histfile->cd();
+
+	// read the cut flow (ownership: selection class which offlineAnalysis inherits from)
+	string sCutFlowFilePath  = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
+	string sPeriodsFilePath  = checkANDsetFilepath("PWD", "/../conf/dataPeriods.data");
+	
+	m_combinedGraphics = new combinedGraphics(sCutFlowFilePath, sPeriodsFilePath, "", sAnalysisSelector, m_histfile);
+}
+
+void  combinedGraphicsControl::finalize()
+{
+	m_histfile->Write();
+	m_histfile->Close();
+}
+
 void combinedGraphicsControl::execute()
 {
 	m_combinedGraphics->drawimass();
 	m_combinedGraphics->drawpT();
-	//m_combinedGraphics->drawMCcutFlow();
-	//m_combinedGraphics->drawDataCutFlow();
+	m_combinedGraphics->drawMCcutFlow();
+	m_combinedGraphics->drawDataCutFlow();
 }

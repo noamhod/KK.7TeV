@@ -12,17 +12,19 @@ combinedGraphics::combinedGraphics()
 
 }
 
-combinedGraphics::combinedGraphics(cutFlowHandler* cutFlowHandler, string analysisSelector)
+combinedGraphics::~combinedGraphics()
+{
+
+}
+
+void combinedGraphics::initialize(string analysisSelector)
 {
 	m_mcAnalysisSelector   = (analysisSelector=="digest") ? "mcDigest" : "mcOffline";
 	m_dataAnalysisSelector = (analysisSelector=="digest") ? "digest"   : "offline";
 
-	m_cutFlowHandler = cutFlowHandler;
+	hFile->cd();
 	
-	m_cutFlowMapSVD  = m_cutFlowHandler->getCutFlowMapSVDPtr();
-	m_cutFlowOrdered = m_cutFlowHandler->getCutFlowOrderedMapPtr();
-	m_cutFlowTypeOrdered = m_cutFlowHandler->getCutFlowTypeOrderedMapPtr();
-	m_cutFlowNumbers = m_cutFlowHandler->getCutFlowNumbersMapPtr();
+	setStyle();
 	
 	// canvas size
 	canv_x = 602;
@@ -67,28 +69,7 @@ combinedGraphics::combinedGraphics(cutFlowHandler* cutFlowHandler, string analys
 		//if(it->first == "I") continue; // skip period I for now !!!
 		dataLumi_ipb += it->second;
 	}
-	
-	//$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//dataLumi_ipb /= 1.5; //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-
-	setStyle();
 }
-
-combinedGraphics::~combinedGraphics()
-{
-
-}
-
-void combinedGraphics::setStyle()
-{
-	gROOT->ProcessLine(".x ../src/rootlogon_atlas.C");
-	gROOT->SetStyle("ATLAS");
-	gROOT->ForceStyle();
-}
-
 
 TCanvas* combinedGraphics::getCanvas(TFile* f, string dir, string cname)
 {
@@ -99,6 +80,7 @@ TCanvas* combinedGraphics::getCanvas(TFile* f, string dir, string cname)
 
 TH1D* combinedGraphics::getHisto(TFile* f, string dir, string hname)
 {
+	hFile->cd();
 	string path = dir + "/" +hname;
 	TH1D* h = (TH1D*)f->Get( path.c_str() );
 	return h;
@@ -106,13 +88,14 @@ TH1D* combinedGraphics::getHisto(TFile* f, string dir, string hname)
 
 void combinedGraphics::fixHisto(TH1D* h)
 {
+	hFile->cd();
 	h->SetTitle("");
 	h->SetXTitle("#hat{m}_{#mu#mu} (TeV)");
 	h->SetYTitle("Events");
 }
 
 void combinedGraphics::NormToBinWidth(TH1D* h)
-{ 
+{
 	/// normalise to bin width
 	for ( int i=1 ; i<=h->GetNbinsX() ; i++ )
 	{ 
@@ -151,16 +134,13 @@ void combinedGraphics::Scale(TH1D* h, double d)
 void combinedGraphics::Norm(TH1D* h)
 { 
 	double N = Integral(h);
-
 	if ( N>0 ) Scale(h,1/N);
-
 	N = Integral(h);
 }
 
 void combinedGraphics::NormToDataLumi(TH1D* h, double crossSection_pb, double branchingRatio, double nMCevents, double dataLumi_pb)
 { 
 	double mcLumi = nMCevents/(crossSection_pb*branchingRatio);
-
 	if ( mcLumi>0 ) Scale(h, dataLumi_pb/mcLumi);
 }
 
@@ -278,6 +258,8 @@ void combinedGraphics::ratio(double xmin, double xmax, TH1D* hInp, TH1D* hRef, T
 
 void combinedGraphics::drawRatio(double xmin, double xmax, TH1D* hRat)
 {
+	hFile->cd();
+
 	double hmin = 5.e-2;
 	double hmax = 1.5e+1;
 
@@ -337,6 +319,8 @@ void combinedGraphics::drawRatio(double xmin, double xmax, TH1D* hRat)
 
 void combinedGraphics::drawRatioWithBand(double xmin, double xmax, TH1D* hRat, TH1D* hRatUp, TH1D* hRatDwn)
 {
+	hFile->cd();
+
 	double hmin = 1.e-2;
 	double hmax = 1.e+2;
 
@@ -386,6 +370,8 @@ void combinedGraphics::drawRatioWithBand(double xmin, double xmax, TH1D* hRat, T
 
 void combinedGraphics::getHistosMap(TFile* f, string dir, TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered)
 {
+	hFile->cd();
+
 	hmap_cutFlow_imass = new TMapSP2TH1D();
 	hmap_cutFlow_pT    = new TMapSP2TH1D();
 
@@ -413,7 +399,9 @@ void combinedGraphics::getHistosMap(TFile* f, string dir, TMapds* cutFlowOrdered
 }
 
 void combinedGraphics::drawNormHistosMap(string channel, TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered)
-{	
+{
+	hFile->cd();
+
 	gStyle->SetOptStat(0);
 
 	bool bfirst;
@@ -588,7 +576,10 @@ void combinedGraphics::drawNormHistosMap(string channel, TMapds* cutFlowOrdered,
 
 void combinedGraphics::drawMCcutFlow()
 {
-	string dir = "/srv01/tau/hod/z0analysis/data/";
+	hFile->cd();
+
+	string dir = "/srv01/tau/hod/";
+	dir += (m_dataAnalysisSelector=="digest") ? "digestControl/" : "offlineControl/";
 	string path = "";
 	string channel = "";
 	string hdir = "cutFlow";
@@ -680,7 +671,10 @@ void combinedGraphics::drawMCcutFlow()
 
 void combinedGraphics::drawDataCutFlow()
 {
-	string dir = "/srv01/tau/hod/z0analysis/data/";
+	hFile->cd();
+
+	string dir = "/srv01/tau/hod/";
+	dir += (m_dataAnalysisSelector=="digest") ? "digestControl/" : "offlineControl/";
 	string path = "";
 	string channel = "";
 	string hdir = "cutFlow";
@@ -713,8 +707,10 @@ void combinedGraphics::drawDataCutFlow()
 
 TH1D* combinedGraphics::getNormDYmumu(string sHistName)
 {
+	hFile->cd();
 
-	string dir = "/srv01/tau/hod/z0analysis/data/";
+	string dir = "/srv01/tau/hod/";
+	dir += (m_dataAnalysisSelector=="digest") ? "digestControl/" : "offlineControl/";
 	string path = "";
 	string hdir = "allCuts";
 	string tmp = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
@@ -801,8 +797,10 @@ TH1D* combinedGraphics::getNormDYmumu(string sHistName)
 
 TH1D* combinedGraphics::getNormDYtautau(string sHistName)
 {
+	hFile->cd();
 
-	string dir = "/srv01/tau/hod/z0analysis/data/";
+	string dir = "/srv01/tau/hod/";
+	dir += (m_dataAnalysisSelector=="digest") ? "digestControl/" : "offlineControl/";
 	string path = "";
 	string hdir = "allCuts";
 	string tmp = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";	
@@ -891,7 +889,10 @@ TH1D* combinedGraphics::getNormDYtautau(string sHistName)
 
 void combinedGraphics::drawimass()
 {
-	string dir = "/srv01/tau/hod/z0analysis/data/";
+	hFile->cd();
+	
+	string dir = "/srv01/tau/hod/";
+	dir += (m_dataAnalysisSelector=="digest") ? "digestControl/" : "offlineControl/";
 	string path = "";
 	string channel = "";
 	string hdir = "allCuts";
@@ -946,7 +947,7 @@ void combinedGraphics::drawimass()
 
 	//path = dir + m_dataAnalysisSelector + "Control.root";
 	//path = dir + "offlineControl_13102010_A-I2_ZprimeGRL_etaBarrel.root";
-	path = dir + "offlineControl.15112010.A-I2.barrelEta.ZprimeGRL.root";
+	path = dir + "offlineControl_16112010_A-I2_ZprimeGRL_barrel.root";
 	TFile* fdata = new TFile( path.c_str(), "READ" );
 	hData = getHisto(fdata, hdir, "imass");
 	leg_imass->AddEntry( hData, "Data", "lep");
@@ -1110,204 +1111,10 @@ void combinedGraphics::drawimass()
 
 void combinedGraphics::drawpT()
 {
-	/*
-	string dir = "/srv01/tau/hod/z0analysis/data/";
-	string path = "";
-	string channel = "";
-	string hdir = "allCuts";
-		
-	gStyle->SetOptStat(0);
+	hFile->cd();
 
-	
-	leg_pT = new TLegend(0.8039215,0.4808014,0.9232736,0.9298832,NULL,"brNDC");
-	leg_pT->SetFillColor(kWhite);
-	
-	m_dataLumi_pb = dataLumi_ipb;
-	
-	stringstream strm;
-	string L;
-	string lumilabel = "";
-	strm << setprecision(2);
-	strm << m_dataLumi_pb;
-	strm >> L;
-	lumilabel = "#intLdt~" + L + " pb^{-1}";
-	TPaveText* pvtxt = new TPaveText(0.546462,0.6944909,0.7118499,0.8146912,"brNDC");
-	pvtxt->SetFillColor(kWhite);
-	TText* txt = pvtxt->AddText( lumilabel.c_str() );
-	
-	
-	// main canvases
-	cnv_pT = new TCanvas("cnv_pT", "cnv_pT", 0,0,1200,800);
-	cnv_pT->Divide(1,2);
-	
-	pad_pT = cnv_pT->cd(1);
-	pad_pT->SetPad(0.009197324,0.2150259,0.9899666,0.9909326);
-	pad_pT->SetFillColor(kWhite);
-	pad_pT->SetLogx();
-	pad_pT->SetLogy();
-	
-	pad_pT_ratio = cnv_pT->cd(2);
-	pad_pT_ratio->SetPad(0.009197324,0.01036269,0.9899666,0.253886);
-	pad_pT_ratio->SetFillColor(kWhite);
-	pad_pT_ratio->SetLogx();
-	pad_pT_ratio->SetLogy();
-	
-	cnv_pT->Draw();
-	cnv_pT->cd();
-	cnv_pT->Update();
-	
-	
-	Color_t colorStart  = 100;//kOrange; //40;
-	Color_t colorOffset = -10;//1;
-	Color_t colorAccumulate = colorStart;
-	
-
-	string s1, s2;
-	
-	
-	//path = dir + m_dataAnalysisSelector + "Control.root";
-	path = dir + "offlineControl_13102010_A-I2_ZprimeGRL_etaBarrel.root";
-	TFile* fdata = new TFile( path.c_str(), "READ" );
-	hData = getHisto(fdata, hdir, "pT");
-	leg_pT->AddEntry( hData, "Data", "lep");
-	
-	
-	path = dir + m_mcAnalysisSelector + "Control_Zmumu.root"; // just to get the first histo (Z->mumu)
-	channel = "SM(sig+bkg)";
-	TFile* fFirstHist = new TFile( path.c_str(), "READ" );
-	hMCpT = getHisto(fFirstHist, hdir, "pT");
-	setNormVals(989., 1., 299811, dataLumi_ipb);
-	NormToDataLumi( hMCpT, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-	hMCpT->SetFillColor(colorAccumulate);
-	hMCpT->SetLineColor(colorAccumulate);
-	hMCpT->SetMinimum(1.e-2);
-	hMCpT->SetMaximum(1.e+4);
-	strm.clear();
-	strm << setprecision(2);
-	strm << hMCpT->GetBinWidth(1);
-	strm >> s1;
-	strm.clear();
-	strm << setprecision(2);
-	strm << hMCpT->GetBinWidth( hMCpT->GetNbinsX() );
-	strm >> s2;
-	string ytitle = "#frac{dN}{dp_{T}} (" + s1 + "#rightarrow" + s2 + " TeV)^{-1}";
-	hMCpT->SetTitle("");
-	hMCpT->SetXTitle("p_{T}^{#mu} (TeV)");
-	hMCpT->SetYTitle( ytitle.c_str() );
-	hMCpT->SetTitle("");
-	leg_pT->AddEntry( hMCpT, channel.c_str(), "f");
-	colorAccumulate+=colorOffset;
-	
-	
-	path = dir + m_mcAnalysisSelector + "Control_Zmumu.root";
-	channel = "Z #rightarrow #mu^{+}#mu^{-}";
-	TFile* fZmumu = new TFile( path.c_str(), "READ" );
-	hZmumu = getHisto(fZmumu, hdir, "pT");
-	setNormVals(989., 1., 299811, dataLumi_ipb);
-	NormToDataLumi( hZmumu, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-	hZmumu->SetFillColor(colorAccumulate);
-	hZmumu->SetLineColor(colorAccumulate);
-	hZmumu->SetTitle("");
-	leg_pT->AddEntry( hZmumu, channel.c_str(), "f");
-	colorAccumulate+=colorOffset;
-	
-	
-	path = dir + m_mcAnalysisSelector + "Control_TTbar.root";
-	channel = "t #bar{t} #rightarrow #mu^{+}#mu^{-}X";
-	TFile* fTTbar = new TFile( path.c_str(), "READ" );
-	hTTbar = getHisto(fTTbar, hdir, "pT");
-	setNormVals(161., 1., 199838, dataLumi_ipb);
-	NormToDataLumi( hTTbar, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-	hTTbar->SetFillColor(colorAccumulate);
-	hTTbar->SetLineColor(colorAccumulate);
-	hTTbar->SetTitle("");
-	leg_pT->AddEntry( hTTbar, channel.c_str(), "f");
-	colorAccumulate+=colorOffset;
-	
-	path = dir + m_mcAnalysisSelector + "Control_Ztautau.root";
-	channel = "Z #rightarrow #tau^{+}#tau^{-}";
-	TFile* fZtautau = new TFile( path.c_str(), "READ" );
-	hZtautau = getHisto(fZtautau, hdir, "pT");
-	setNormVals(989., 1., 1998598, dataLumi_ipb);
-	NormToDataLumi( hZtautau, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-	hZtautau->SetFillColor(colorAccumulate);
-	hZtautau->SetLineColor(colorAccumulate);
-	hZtautau->SetTitle("");
-	leg_pT->AddEntry( hZtautau, channel.c_str(), "f");
-	colorAccumulate+=colorOffset;
-	
-	path = dir + m_mcAnalysisSelector + "Control_bbmu15X.root";
-	channel = "b #bar{b} #rightarrow #mu^{+}#mu^{-}X";
-	TFile* fbbmu15X = new TFile( path.c_str(), "READ" );
-	hbbmu15X = getHisto(fbbmu15X, hdir, "pT");
-	setNormVals(7.39e+4, 1., 4388911, dataLumi_ipb);
-	NormToDataLumi( hbbmu15X, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-	hbbmu15X->SetFillColor(colorAccumulate);
-	hbbmu15X->SetLineColor(colorAccumulate);
-	hbbmu15X->SetTitle("");
-	leg_pT->AddEntry( hbbmu15X, channel.c_str(), "f");
-	colorAccumulate+=colorOffset;
-	
-	path = dir + m_mcAnalysisSelector + "Control_Wmunu.root";
-	channel = "W #rightarrow #mu#nuX";
-	TFile* fWmunu = new TFile( path.c_str(), "READ" );
-	hWmunu = getHisto(fWmunu, hdir, "pT");
-	setNormVals(10454., 1., 989886, dataLumi_ipb);
-	NormToDataLumi( hWmunu, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-	hWmunu->SetFillColor(colorAccumulate);
-	hWmunu->SetLineColor(colorAccumulate);
-	hWmunu->SetTitle("");
-	leg_pT->AddEntry( hWmunu, channel.c_str(), "f");
-	colorAccumulate+=colorOffset;
-	
-	path = dir + m_mcAnalysisSelector + "Control_ccmu15X.root";
-	channel = "c #bar{c} #rightarrow #mu^{+}#mu^{-}X";
-	TFile* fccmu15X = new TFile( path.c_str(), "READ" );
-	hccmu15X = getHisto(fccmu15X, hdir, "pT");
-	setNormVals(2.84e+4, 1., 1499257, dataLumi_ipb);
-	NormToDataLumi( hccmu15X, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-	hccmu15X->SetFillColor(colorAccumulate);
-	hccmu15X->SetLineColor(colorAccumulate);
-	hccmu15X->SetTitle("");
-	leg_pT->AddEntry( hccmu15X, channel.c_str(), "f");
-	colorAccumulate+=colorOffset;
-	
-	
-	hMCpT->Add(hTTbar);
-	hMCpT->Add(hZtautau);
-	hMCpT->Add(hbbmu15X);
-	hMCpT->Add(hWmunu);
-	hMCpT->Add(hccmu15X);
-	
-	pad_pT->cd();
-	hMCpT->Draw();
-	hZmumu->Draw("SAMES");
-	hTTbar->Draw("SAMES");
-	hZtautau->Draw("SAMES");
-	hbbmu15X->Draw("SAMES");
-	hWmunu->Draw("SAMES");
-	hccmu15X->Draw("SAMES");
-	hData->Draw("e1x0SAMES");
-	pvtxt->Draw("SAMES");
-	leg_pT->Draw("SAMES");
-	pad_pT->RedrawAxis();
-	
-
-	
-	hRat = (TH1D*)hData->Clone("ratio");
-	hRat->Reset();
-	hRatUp = (TH1D*)hData->Clone("ratUp");
-	hRatUp->Reset();
-	hRatDwn = (TH1D*)hData->Clone("ratDwn");
-	hRatDwn->Reset();
-	
-	ratio(hRat->GetXaxis()->GetXmin(), hRat->GetXaxis()->GetXmax(), hData, hMCpT, hRat, hRatUp, hRatDwn);
-	pad_pT_ratio->cd();
-	drawRatio(hRat->GetXaxis()->GetXmin(), hRat->GetXaxis()->GetXmax(), hRat);
-	pad_pT_ratio->RedrawAxis();
-	*/
-	
-	string dir = "/srv01/tau/hod/z0analysis/data/";
+	string dir = "/srv01/tau/hod/";
+	dir += (m_dataAnalysisSelector=="digest") ? "digestControl/" : "offlineControl/";
 	string path = "";
 	string channel = "";
 	string hdir = "allCuts";
@@ -1362,7 +1169,7 @@ void combinedGraphics::drawpT()
 
 	//path = dir + m_dataAnalysisSelector + "Control.root";
 	//path = dir + "offlineControl_13102010_A-I2_ZprimeGRL_etaBarrel.root";
-	path = dir + "offlineControl.15112010.A-I2.barrelEta.ZprimeGRL.root";
+	path = dir + "offlineControl_16112010_A-I2_ZprimeGRL_barrel.root";
 	TFile* fdata = new TFile( path.c_str(), "READ" );
 	hData = getHisto(fdata, hdir, "pT");
 	leg_pT->AddEntry( hData, "Data", "lep");
@@ -1522,4 +1329,10 @@ void combinedGraphics::drawpT()
 	pad_pT_ratio->cd();
 	drawRatio(hRat->GetXaxis()->GetXmin(), hRat->GetXaxis()->GetXmax(), hRat);
 	pad_pT_ratio->RedrawAxis();
+	
+	
+	cnv_pT->Print( hFile->GetName() );
+	cnv_pT->SaveAs("pT.DATA.vs.MC.eps");
+	cnv_pT->SaveAs("pT.DATA.vs.MC.C");
+	
 }

@@ -7,28 +7,31 @@
 
 #include "basicIncludes.h"
 
-#define cutFlowHandler_cxx
-#include "cutFlowHandler.C"
+#define analysisModules_cxx
+#include "analysisModules.C"
 
 #ifndef COMBINEDGRAPHICS_H
 #define COMBINEDGRAPHICS_H
 
-class combinedGraphics : public utilities
+class combinedGraphics : public analysisModules
 {
 	public:
+		TFile* hFile;
+	
 		// integrated luminosity of the data in 1/pb
 		TMapsd period2lumiMap;
 		double dataLumi_ipb;
 		string m_dataAnalysisSelector;
 		string m_mcAnalysisSelector;
 	
+	/*
 		// cutFlowHandler
 		cutFlowHandler* m_cutFlowHandler;
 		TMapsvd* m_cutFlowMapSVD;
 		TMapds*  m_cutFlowOrdered;
 		TMapds*  m_cutFlowTypeOrdered;
 		TMapsi*  m_cutFlowNumbers;
-		
+	*/	
 		// map of histos
 		TMapSP2TH1D* hmap_cutFlow_imass;
 		TMapSP2TH1D* hmap_cutFlow_pT;
@@ -89,32 +92,6 @@ class combinedGraphics : public utilities
 		TH1D* hZprime_mumu_SSM1750;
 		TH1D* hZprime_mumu_SSM2000;
 		
-		/*
-		TH1D* hDYmumu75M120;
-		TH1D* hDYmumu120M250;
-		TH1D* hDYmumu250M400;
-		TH1D* hDYmumu400M600;
-		TH1D* hDYmumu600M800;
-		TH1D* hDYmumu800M1000;
-		TH1D* hDYmumu1000M1250;
-		TH1D* hDYmumu1250M1500;
-		TH1D* hDYmumu1500M1750;
-		TH1D* hDYmumu1750M2000;
-		TH1D* hDYmumuM2000;
-		
-		TH1D* hDYtautau75M120;
-		TH1D* hDYtautau120M250;
-		TH1D* hDYtautau250M400;
-		TH1D* hDYtautau400M600;
-		TH1D* hDYtautau600M800;
-		TH1D* hDYtautau800M1000;
-		TH1D* hDYtautau1000M1250;
-		TH1D* hDYtautau1250M1500;
-		TH1D* hDYtautau1500M1750;
-		TH1D* hDYtautau1750M2000;
-		TH1D* hDYtautauM2000;
-		*/
-		
 		TH1D* hRat;
 		TH1D* hRatUp;
 		TH1D* hRatDwn;
@@ -128,10 +105,14 @@ class combinedGraphics : public utilities
 	
 	public:
 		combinedGraphics();
-		combinedGraphics(cutFlowHandler* cutFlowHandler, string analysisSelector);
+		combinedGraphics( string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath, string sAnalysisSelector, TFile* hfile) :
+		analysisModules(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
+		{
+			hFile = hfile;
+			initialize(sAnalysisSelector);
+		}
 		~combinedGraphics();
-		
-		void setStyle();
+		void initialize(string analysisSelector);
 		
 		TCanvas* getCanvas(TFile* f, string dir, string cname);
 		TH1D*    getHisto(TFile* f, string dir, string hname);

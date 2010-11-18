@@ -30,15 +30,15 @@ class analysis : public physics, public analysisSkeleton
 public:
 	// pointers
 	physics*      m_phys;
-	
 	muon_muid*    m_muid;
 	muon_staco*   m_mustaco;
-	
 	GRLinterface* m_analysis_grl;
-
 	offTree*      m_offTree;
-
 	TFile*		  m_treeFile;
+	
+	// local
+	string sMuonRecoAlgo;
+	int nMus;
 
 public:
 	analysis();
@@ -56,6 +56,11 @@ public:
 			}
 	~analysis();
 
+
+	void setEventVariables();
+	void setStacoVariables();
+	void setMuidVariables();
+	
 	void executeAdvanced();
 	void executeCutFlow();
 	

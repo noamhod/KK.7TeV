@@ -23,6 +23,7 @@ class mcAnalysisGridControl : public utilities
 		mcAnalysis*     m_mcAnalysis;
 		
 		TDirectory*     m_dirCutProfile;
+		TDirectory*     m_dirFit;
 		TDirectory*     m_dirAllCuts;
 		TDirectory* 	m_dirNoCuts;
 		TDirectory* 	m_dirCutFlow;

@@ -20,6 +20,10 @@ public:
 	// pointers to classes
 	mcDigestPhysics*  m_mcDigestPhys;
 	TFile*		      m_treeFile;
+	
+	// local
+	string sMuonRecoAlgo;
+	int nMus;
 
 public:
 	mcDigestAnalysis();
@@ -31,6 +35,10 @@ public:
 		m_treeFile     = treeFile;
 	}
 	~mcDigestAnalysis();
+	
+	void setEventVariables();
+	void setStacoVariables();
+	void setMuidVariables();
 	
 	void executeAdvanced();
 	void executeCutFlow();

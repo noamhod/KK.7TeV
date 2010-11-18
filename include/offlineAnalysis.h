@@ -27,6 +27,10 @@ public:
 	GRLinterface*   m_offAnalysis_grl;
 	TFile*		    m_treeFile;
 	digestTree*     m_dgsTree;
+	
+	// local
+	string sMuonRecoAlgo;
+	int nMus;
 
 public:
 	offlineAnalysis();
@@ -41,6 +45,10 @@ public:
 	}
 	~offlineAnalysis();
 
+	void setEventVariables();
+	void setStacoVariables();
+	void setMuidVariables();
+	
 	void executeAdvanced();
 	void executeCutFlow();
 	

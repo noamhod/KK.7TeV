@@ -27,6 +27,10 @@ public:
 	offTree*   m_offTree;
 	mcOffTree* m_mcOffTree;
 	TFile*     m_treeFile;
+	
+	// local
+	string sMuonRecoAlgo;
+	int nMus;
 
 public:
 	mcAnalysis();
@@ -40,6 +44,10 @@ public:
 	}
 	~mcAnalysis();
 
+	void setEventVariables();
+	void setStacoVariables();
+	void setMuidVariables();
+	
 	void executeCutFlow();
 	
 	void write();

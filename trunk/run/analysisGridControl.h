@@ -25,6 +25,7 @@ class analysisGridControl : public utilities
 		
 		// more pointers
 		TDirectory*     m_dirCutProfile;
+		TDirectory*     m_dirFit;
 		TDirectory*     m_dirAllCuts;
 		TDirectory* 	m_dirNoCuts;
 		TDirectory* 	m_dirCutFlow;

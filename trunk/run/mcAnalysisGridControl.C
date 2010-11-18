@@ -56,9 +56,13 @@ void mcAnalysisGridControl::initialize()
 void mcAnalysisGridControl::finalize()
 {
 	// write the tree
-	m_mcAnalysis->write();
+	//m_mcAnalysis->write();
 
-	// file
+	// tree
+	// the tree will split into multiple files
+	m_rootfile = m_mcAnalysis->m_offTree->m_tree->GetCurrentFile();
+	m_rootfile->cd();
+	m_mcAnalysis->m_offTree->m_tree->Write();
 	m_rootfile->Write();
 	m_rootfile->Close();
 }
@@ -75,7 +79,9 @@ void mcAnalysisGridControl::book()
 	m_mcAnalysis->bookHistosMap( m_mcAnalysis->getCutFlowOrderedMapPtr(), m_mcAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 	
 	m_dirCutProfile = m_rootfile->mkdir("cutsProfile");
-	m_mcAnalysis->bookCutProfileHistosMap( m_mcAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );	
+	m_mcAnalysis->bookCutProfileHistosMap( m_mcAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );
+	
+	m_dirFit = m_rootfile->mkdir("fit");
 	
 	m_mcAnalysis->bookFitHistos(m_dirAllCuts);	
 }
@@ -98,7 +104,7 @@ void mcAnalysisGridControl::fits()
 	double yields[2];
 	
 	// Preform the fit
-	m_mcAnalysis->minimize( false, m_mcAnalysis->h1_imassFit, yields );
+	m_mcAnalysis->minimize( false, m_mcAnalysis->h1_imassFit, yields, m_dirFit );
 }
 
 void mcAnalysisGridControl::analyze()

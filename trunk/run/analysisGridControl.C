@@ -60,9 +60,13 @@ void analysisGridControl::initialize()
 void analysisGridControl::finalize()
 {
 	// write the tree
-	m_analysis->write();
+	//m_analysis->write();
 
-	// file
+	// tree
+	// the tree will split into multiple files
+	m_rootfile = m_analysis->m_offTree->m_tree->GetCurrentFile();
+	m_rootfile->cd();
+	m_analysis->m_offTree->m_tree->Write();
 	m_rootfile->Write();
 	m_rootfile->Close();
 }
@@ -80,6 +84,8 @@ void analysisGridControl::book()
 	
 	m_dirCutProfile = m_rootfile->mkdir("cutsProfile");
 	m_analysis->bookCutProfileHistosMap( m_analysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );
+	
+	m_dirFit = m_rootfile->mkdir("fit");
 	
 	m_analysis->bookFitHistos(m_dirAllCuts);	
 }
@@ -99,7 +105,7 @@ void analysisGridControl::fits()
 	double yields[2];
 	
 	// Preform the fit
-	m_analysis->minimize( false, m_analysis->h1_imassFit, yields );
+	m_analysis->minimize( false, m_analysis->h1_imassFit, yields, m_dirFit );
 }
 
 void analysisGridControl::analyze()

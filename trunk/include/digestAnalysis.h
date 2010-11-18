@@ -25,6 +25,10 @@ public:
 	
 	TFile* m_treeFile;
 	ofstream* candidatesFile;
+	
+	// local
+	string sMuonRecoAlgo;
+	int nMus;
 
 public:
 	digestAnalysis();
@@ -41,6 +45,10 @@ public:
 		m_treeFile   = treeFile;
 	}
 	~digestAnalysis();
+	
+	void setEventVariables();
+	void setStacoVariables();
+	void setMuidVariables();
 	
 	void executeAdvanced();
 	void executeCutFlow();

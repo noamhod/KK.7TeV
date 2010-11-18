@@ -23,6 +23,10 @@ public:
 	mcOfflinePhysics* m_mcOffPhys;
 	TFile*		      m_treeFile;
 	digestTree*       m_dgsTree;
+	
+	// local
+	string sMuonRecoAlgo;
+	int nMus;
 
 public:
 	mcOfflineAnalysis();
@@ -35,6 +39,10 @@ public:
 		m_dgsTree = new digestTree( NULL, m_mcOffPhys, m_treeFile ); // the NULL arg is the [offlinePhysics* offPhys] variable
 	}
 	~mcOfflineAnalysis();
+	
+	void setEventVariables();
+	void setStacoVariables();
+	void setMuidVariables();
 	
 	void executeAdvanced();
 	void executeCutFlow();

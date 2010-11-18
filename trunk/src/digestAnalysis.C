@@ -40,9 +40,68 @@ void digestAnalysis::executeAdvanced()
 
 void digestAnalysis::executeCutFlow()
 {
-	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	// start allocating the variables for the preselection
+	sMuonRecoAlgo = "muid";
 
+	///////////////////////////////////
+	// set all the event-level vars ///
+	setEventVariables(); //////////////
+	///////////////////////////////////
+	
+	/////////////////////////////////////////////////////
+	// set all the muon reco' alg vars //////////////////
+	if(sMuonRecoAlgo=="staco")
+	{
+		setStacoVariables();
+		nMus = (int)m_digestPhys->mu_staco_pt->size();
+	}
+	if(sMuonRecoAlgo=="muid")
+	{
+		setMuidVariables();
+		nMus = (int)m_digestPhys->mu_muid_pt->size();
+	}
+	/////////////////////////////////////////////////////
+	
+	/////////////////////////////////////////////////////
+	// reset the muQAflags vector with "true" flags /////
+	// build the muons TLorentzVector ///////////////////
+	// no need to do this if didn't pass preselection ///
+	buildMU4Vector(nMus, "angles"); /////////////////////
+	//buildMU4Vector(nMus); /////////////////////////////
+	/////////////////////////////////////////////////////
+
+	////////////////////////////////////////
+	// execute the cut profile analysis ////
+	fillCutProfile1D(); ////////////////////
+	fillCutProfile2D(); ////////////////////
+	////////////////////////////////////////
+
+	/////////////////////////////////////////////////////
+	// preform the entire preselection //////////////////
+	bool passPreselection = applyPreselection(); ////////
+	if( !passPreselection ) return; /////////////////////
+	/////////////////////////////////////////////////////
+	
+	///////////////////////////////////////////////////////
+	// the single muon selection //////////////////////////
+	bool pass1MUselection = applySingleMuonSelection(); ///
+	if( !pass1MUselection ) return; ///////////////////////
+	///////////////////////////////////////////////////////
+	
+	////////////////////////////////////////////////////////
+	// the double muon selection ///////////////////////////
+	bool pass2MUselection = applyDoubleMuonSelection(); ////
+	if( !pass2MUselection ) return; ////////////////////////
+	////////////////////////////////////////////////////////
+	
+	
+	(*candidatesFile) << "Staco run " << analysisSkeleton::runnumber
+					  << " lb " 	  << analysisSkeleton::lumiblock
+					  << " event " 	  << analysisSkeleton::eventnumber
+					  << endl;
+}
+
+void digestAnalysis::setEventVariables()
+{
 	// event level (for preselection)
 	analysisSkeleton::runnumber   = m_digestPhys->RunNumber;
 	analysisSkeleton::lumiblock   = m_digestPhys->lbn;
@@ -93,7 +152,10 @@ void digestAnalysis::executeCutFlow()
 	analysisSkeleton::vxp_nTracks = m_digestPhys->vxp_nTracks;
 	analysisSkeleton::vxp_type    = m_digestPhys->vxp_type;
 	analysisSkeleton::vxp_z       = m_digestPhys->vxp_z;
-	
+}
+
+void digestAnalysis::setStacoVariables()
+{
 	// muon 
 	analysisSkeleton::mu_n         = m_digestPhys->mu_staco_n;
 	analysisSkeleton::mu_m         = m_digestPhys->mu_staco_m;
@@ -152,51 +214,68 @@ void digestAnalysis::executeCutFlow()
 	analysisSkeleton::mu_nTGCLayer2PhiHits = m_digestPhys->mu_staco_nTGCLayer2PhiHits;
 	analysisSkeleton::mu_nTGCLayer3PhiHits = m_digestPhys->mu_staco_nTGCLayer3PhiHits;
 	analysisSkeleton::mu_nTGCLayer4PhiHits = m_digestPhys->mu_staco_nTGCLayer4PhiHits;
-	
-	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+}
 
-	/////////////////////////////////////////////////////
-	// reset the muQAflags vector with "true" flags /////
-	// build the muons TLorentzVector ///////////////////
-	// no need to do this if didn't pass preselection ///
-	int nMus = (int)m_digestPhys->mu_staco_pt->size(); //
-	buildMU4Vector(nMus, "angles"); /////////////////////
-	//buildMU4Vector(nMus); /////////////////////////////
-	/////////////////////////////////////////////////////
+void digestAnalysis::setMuidVariables()
+{
+	// muon 
+	analysisSkeleton::mu_n         = m_digestPhys->mu_muid_n;
+	analysisSkeleton::mu_m         = m_digestPhys->mu_muid_m;
+	analysisSkeleton::mu_px        = m_digestPhys->mu_muid_px;
+	analysisSkeleton::mu_py        = m_digestPhys->mu_muid_py;
+	analysisSkeleton::mu_pz        = m_digestPhys->mu_muid_pz;
+	analysisSkeleton::mu_E         = m_digestPhys->mu_muid_E;
+	analysisSkeleton::mu_eta       = m_digestPhys->mu_muid_eta;
+	analysisSkeleton::mu_phi       = m_digestPhys->mu_muid_phi;
+	analysisSkeleton::mu_pt        = m_digestPhys->mu_muid_pt;
+	analysisSkeleton::mu_charge    = m_digestPhys->mu_muid_charge;
+	
+	// isolation
+	analysisSkeleton::mu_ptcone20 = m_digestPhys->mu_muid_ptcone20;
+	analysisSkeleton::mu_ptcone30 = m_digestPhys->mu_muid_ptcone30;
+	analysisSkeleton::mu_ptcone40 = m_digestPhys->mu_muid_ptcone40;
+	
+	// for pT
+	analysisSkeleton::mu_me_qoverp = m_digestPhys->mu_muid_me_qoverp;
+	analysisSkeleton::mu_id_qoverp = m_digestPhys->mu_muid_id_qoverp;
+	analysisSkeleton::mu_me_theta  = m_digestPhys->mu_muid_me_theta;
+	analysisSkeleton::mu_id_theta  = m_digestPhys->mu_muid_id_theta;
+	
+	// for impact parameter
+	analysisSkeleton::mu_d0_exPV = m_digestPhys->mu_muid_d0_exPV;
+	analysisSkeleton::mu_z0_exPV = m_digestPhys->mu_muid_z0_exPV;
+	
+	// combined muons
+	analysisSkeleton::mu_isCombinedMuon  = m_digestPhys->mu_muid_isCombinedMuon;
+	
+	// inner detector hits
+	analysisSkeleton::mu_nSCTHits  = m_digestPhys->mu_muid_nSCTHits;
+	analysisSkeleton::mu_nPixHits  = m_digestPhys->mu_muid_nPixHits; 
 
-	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	
-	////////////////////////////////////////
-	// execute the cut profile analysis ////
-	fillCutProfile1D(); ////////////////////
-	fillCutProfile2D(); ////////////////////
-	////////////////////////////////////////
-
-	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	
-	/////////////////////////////////////////////////////
-	// preform the entire preselection //////////////////
-	bool passPreselection = applyPreselection(); ////////
-	if( !passPreselection ) return; /////////////////////
-	/////////////////////////////////////////////////////
-	
-	///////////////////////////////////////////////////////
-	// the single muon selection //////////////////////////
-	bool pass1MUselection = applySingleMuonSelection(); ///
-	if( !pass1MUselection ) return; ///////////////////////
-	///////////////////////////////////////////////////////
-	
-	////////////////////////////////////////////////////////
-	// the double muon selection ///////////////////////////
-	bool pass2MUselection = applyDoubleMuonSelection(); ////
-	if( !pass2MUselection ) return; ////////////////////////
-	////////////////////////////////////////////////////////
-	
-	
-	(*candidatesFile) << "Staco run " << analysisSkeleton::runnumber
-					  << " lb " 	  << analysisSkeleton::lumiblock
-					  << " event " 	  << analysisSkeleton::eventnumber
-					  << endl;
+	// muon spectrometer hits
+	analysisSkeleton::mu_nMDTBIHits = m_digestPhys->mu_muid_nMDTBIHits;
+	analysisSkeleton::mu_nMDTBMHits = m_digestPhys->mu_muid_nMDTBMHits;
+	analysisSkeleton::mu_nMDTBOHits = m_digestPhys->mu_muid_nMDTBOHits;
+	analysisSkeleton::mu_nMDTBEEHits = m_digestPhys->mu_muid_nMDTBEEHits;
+	analysisSkeleton::mu_nMDTBIS78Hits = m_digestPhys->mu_muid_nMDTBIS78Hits;
+	analysisSkeleton::mu_nMDTEIHits = m_digestPhys->mu_muid_nMDTEIHits;
+	analysisSkeleton::mu_nMDTEMHits = m_digestPhys->mu_muid_nMDTEMHits;
+	analysisSkeleton::mu_nMDTEOHits = m_digestPhys->mu_muid_nMDTEOHits;
+	analysisSkeleton::mu_nMDTEEHits = m_digestPhys->mu_muid_nMDTEEHits;
+	analysisSkeleton::mu_nRPCLayer1EtaHits = m_digestPhys->mu_muid_nRPCLayer1EtaHits;
+	analysisSkeleton::mu_nRPCLayer2EtaHits = m_digestPhys->mu_muid_nRPCLayer2EtaHits;
+	analysisSkeleton::mu_nRPCLayer3EtaHits = m_digestPhys->mu_muid_nRPCLayer3EtaHits;
+	analysisSkeleton::mu_nRPCLayer1PhiHits = m_digestPhys->mu_muid_nRPCLayer1PhiHits;
+	analysisSkeleton::mu_nRPCLayer2PhiHits = m_digestPhys->mu_muid_nRPCLayer2PhiHits;
+	analysisSkeleton::mu_nRPCLayer3PhiHits = m_digestPhys->mu_muid_nRPCLayer3PhiHits;
+	analysisSkeleton::mu_nTGCLayer1EtaHits = m_digestPhys->mu_muid_nTGCLayer1EtaHits;
+	analysisSkeleton::mu_nTGCLayer2EtaHits = m_digestPhys->mu_muid_nTGCLayer2EtaHits;
+	analysisSkeleton::mu_nTGCLayer3EtaHits = m_digestPhys->mu_muid_nTGCLayer3EtaHits;
+	analysisSkeleton::mu_nTGCLayer4EtaHits = m_digestPhys->mu_muid_nTGCLayer4EtaHits;
+	analysisSkeleton::mu_nTGCLayer1PhiHits = m_digestPhys->mu_muid_nTGCLayer1PhiHits;
+	analysisSkeleton::mu_nTGCLayer2PhiHits = m_digestPhys->mu_muid_nTGCLayer2PhiHits;
+	analysisSkeleton::mu_nTGCLayer3PhiHits = m_digestPhys->mu_muid_nTGCLayer3PhiHits;
+	analysisSkeleton::mu_nTGCLayer4PhiHits = m_digestPhys->mu_muid_nTGCLayer4PhiHits;
 }
 
 void digestAnalysis::write()

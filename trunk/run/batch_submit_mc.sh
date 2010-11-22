@@ -48,3 +48,35 @@
  source panda_run.sh   mc   105625   group10.phys-sm.mc09_7TeV.105625.Pythia_Zprime_mumu_SSM1500.merge.AOD.e524_s765_s767_r1302_r1306.WZphys.100612.01.D3PD
  source panda_run.sh   mc   105544   group10.phys-sm.mc09_7TeV.105544.Pythia_Zprime_mumu_SSM1750.merge.AOD.e524_s765_s767_r1302_r1306.WZphys.100612.01.D3PD
  source panda_run.sh   mc   105349   group10.phys-sm.mc09_7TeV.105349.Pythia_Zprime_mumu_SSM2000.merge.AOD.e524_s765_s767_r1302_r1306.WZphys.100612.01.D3PD
+
+ 
+# di-boson WW / ZZ / WZ
+ source panda_run.sh   mc   107100   group10.phys-sm.mc09_7TeV.107100.AlpgenJimmyWWlnulnuNp0.merge.AOD.e536_s765_s767_r1302_r1306.WZphys.100612.02.D3PD
+ source panda_run.sh   mc   107101   group10.phys-sm.mc09_7TeV.107101.AlpgenJimmyWWlnulnuNp1.merge.AOD.e536_s765_s767_r1302_r1306.WZphys.100612.02.D3PD
+ source panda_run.sh   mc   107102   group10.phys-sm.mc09_7TeV.107102.AlpgenJimmyWWlnulnuNp2.merge.AOD.e536_s765_s767_r1302_r1306.WZphys.100612.02.D3PD
+ source panda_run.sh   mc   107103   group10.phys-sm.mc09_7TeV.107103.AlpgenJimmyWWlnulnuNp3.merge.AOD.e536_s765_s767_r1302_r1306.WZphys.100612.02.D3PD
+
+ source panda_run.sh   mc   106014   group10.phys-sm.mc09_7TeV.106014.gg2WW0240_JIMMY_WW_munumunu.merge.AOD.e530_s765_s767_r1302_r1306.WZphys.100612.03.D3PD
+ source panda_run.sh   mc   106016   group10.phys-sm.mc09_7TeV.106016.gg2WW0240_JIMMY_WW_munutaunu.merge.AOD.e530_s765_s767_r1302_r1306.WZphys.100612.03.D3PD
+ source panda_run.sh   mc   106019   group10.phys-sm.mc09_7TeV.106019.gg2WW0240_JIMMY_WW_taunumunu.merge.AOD.e530_s765_s767_r1302_r1306.WZphys.100612.03.D3PD
+ source panda_run.sh   mc   106017   group10.phys-sm.mc09_7TeV.106017.gg2WW0240_JIMMY_WW_taunutaunu.merge.AOD.e530_s765_s767_r1302_r1306.WZphys.100612.03.D3PD
+
+ source panda_run.sh   mc   105924   group10.phys-sm.mc09_7TeV.105924.McAtNlo_JIMMY_WpWm_munumunu.merge.AOD.e532_s765_s767_r1302_r1306.WZphys.100612.03.D3PD
+ source panda_run.sh   mc   105926   group10.phys-sm.mc09_7TeV.105926.McAtNlo_JIMMY_WpWm_munutaunu.merge.AOD.e532_s765_s767_r1302_r1306.WZphys.100612.03.D3PD
+ source panda_run.sh   mc   105927   group10.phys-sm.mc09_7TeV.105927.McAtNlo_JIMMY_WpWm_taunutaunu.merge.AOD.e532_s765_s767_r1302_r1306.WZphys.100612.03.D3PD
+
+ source panda_run.sh   mc   116000   group10.phys-sm.mc09_7TeV.116000.PythiaH200zzllnunu.merge.AOD.e550_s765_s767_r1302_r1306.WZphys.100612.20.D3PD/
+ source panda_run.sh   mc   116002   group10.phys-sm.mc09_7TeV.116002.PythiaH300zzllnunu.merge.AOD.e550_s765_s767_r1302_r1306.WZphys.100612.20.D3PD/
+ source panda_run.sh   mc   116004   group10.phys-sm.mc09_7TeV.116004.PythiaH400zzllnunu.merge.AOD.e550_s765_s767_r1302_r1306.WZphys.100612.20.D3PD/
+ source panda_run.sh   mc   116006   group10.phys-sm.mc09_7TeV.116006.PythiaH500zzllnunu.merge.AOD.e550_s765_s767_r1302_r1306.WZphys.100612.20.D3PD/
+ source panda_run.sh   mc   116008   group10.phys-sm.mc09_7TeV.116008.PythiaH600zzllnunu.merge.AOD.e550_s765_s767_r1302_r1306.WZphys.100612.20.D3PD/
+
+ source panda_run.sh   mc   109291   group10.phys-sm.mc09_7TeV.109291.Pythiazz4l.merge.AOD.e530_s765_s767_r1302_r1306.WZphys.100612.06.D3PD
+ source panda_run.sh   mc   105931   group10.phys-sm.mc09_7TeV.105931.McAtNlo_JIMMY_ZZ_llll.merge.AOD.e530_s765_s767_r1302_r1306.WZphys.100612.06.D3PD
+ source panda_run.sh   mc   105932   group10.phys-sm.mc09_7TeV.105932.McAtNlo_JIMMY_ZZ_llnunu.merge.AOD.e530_s765_s767_r1302_r1306.WZphys.100612.06.D3PD
+ source panda_run.sh   mc   106036   group10.phys-sm.mc09_7TeV.106036.McAtNlo_JIMMY_ZZ_2l2tau.merge.AOD.e530_s765_s767_r1302_r1306.WZphys.100612.06.D3PD
+ source panda_run.sh   mc   105930   group10.phys-sm.mc09_7TeV.105930.McAtNlo_JIMMY_ZZ_llqq.merge.AOD.e530_s765_s767_r1302_r1306.WZphys.100612.06.D3PD
+ source panda_run.sh   mc   107108   group10.phys-sm.mc09_7TeV.107108.AlpgenJimmyZZincllNp0.merge.AOD.e536_s765_s767_r1302_r1306.WZphys.100612.06.D3PD
+ source panda_run.sh   mc   107109   group10.phys-sm.mc09_7TeV.107109.AlpgenJimmyZZincllNp1.merge.AOD.e536_s765_s767_r1302_r1306.WZphys.100612.06.D3PD
+ source panda_run.sh   mc   107110   group10.phys-sm.mc09_7TeV.107110.AlpgenJimmyZZincllNp2.merge.AOD.e536_s765_s767_r1302_r1306.WZphys.100612.06.D3PD
+ source panda_run.sh   mc   107111   group10.phys-sm.mc09_7TeV.107111.AlpgenJimmyZZincllNp3.merge.AOD.e536_s765_s767_r1302_r1306.WZphys.100612.06.D3PD

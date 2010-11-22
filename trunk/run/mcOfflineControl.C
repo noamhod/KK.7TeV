@@ -70,9 +70,9 @@ void mcOfflineControl::finalize()
 	// since in digestTree class there is the
 	// following statement m_tree->SetMaxTreeSize(50000000);
 	// i.e., 50Mb per file
-	m_treefile = m_offlineAnalysis->m_dgsTree->m_tree->GetCurrentFile();
+	m_treefile = m_mcOfflineAnalysis->m_dgsTree->m_tree->GetCurrentFile();
 	m_treefile->cd();
-	m_offlineAnalysis->m_dgsTree->m_tree->Write();
+	m_mcOfflineAnalysis->m_dgsTree->m_tree->Write();
 	m_treefile->Write();
 	m_treefile->Close();
 

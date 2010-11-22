@@ -8,81 +8,81 @@ INFO : use 4 files
 INFO : upload source files
 INFO : submit 2 subjobs to ANALY_GOEGRID
 ===================
- JobsetID  : 2208
- JobID  : 2209
+ JobsetID  : 2487
+ JobID  : 2488
  Status : 0
   > build
-    PandaID=1141759797
+    PandaID=1147411970
   > run
-    PandaID=1141759798
+    PandaID=1147411974
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00152845.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
-INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_GOEGRID
+INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_LRZ
 .
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_GOEGRID
+INFO : all files are available at ANALY_LRZ
 INFO : use 7 files
 INFO : upload source files
-INFO : submit 2 subjobs to ANALY_GOEGRID
+INFO : submit 2 subjobs to ANALY_LRZ
 ===================
- JobsetID  : 2210
- JobID  : 2211
+ JobsetID  : 2489
+ JobID  : 2490
  Status : 0
   > build
-    PandaID=1141761301
+    PandaID=1147412052
   > run
-    PandaID=1141761303
+    PandaID=1147412053
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00152878.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.02.D3PD
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
+INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_LRZ
 .
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
+INFO : all files are available at ANALY_LRZ
 INFO : use 11 files
 INFO : upload source files
-INFO : submit 2 subjobs to ANALY_AGLT2
+INFO : submit 2 subjobs to ANALY_LRZ
 ===================
- JobsetID  : 2212
- JobID  : 2213
+ JobsetID  : 2491
+ JobID  : 2492
  Status : 0
   > build
-    PandaID=1141762552
+    PandaID=1147412110
   > run
-    PandaID=1141762556
+    PandaID=1147412111
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00152933.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
-INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_GOEGRID
+INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_LRZ
 .
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_GOEGRID
+INFO : all files are available at ANALY_LRZ
 INFO : use 5 files
 INFO : upload source files
-INFO : submit 2 subjobs to ANALY_GOEGRID
+INFO : submit 2 subjobs to ANALY_LRZ
 ===================
- JobsetID  : 2214
- JobID  : 2215
+ JobsetID  : 2493
+ JobID  : 2494
  Status : 0
   > build
-    PandaID=1141763669
+    PandaID=1147412135
   > run
-    PandaID=1141763670
+    PandaID=1147412136
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00152994.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.02.D3PD
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
+INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_LRZ
 .
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
+INFO : all files are available at ANALY_LRZ
 INFO : use 10 files
 INFO : upload source files
-INFO : submit 2 subjobs to ANALY_AGLT2
+INFO : submit 2 subjobs to ANALY_LRZ
 ===================
- JobsetID  : 2216
- JobID  : 2217
+ JobsetID  : 2495
+ JobID  : 2496
  Status : 0
   > build
-    PandaID=1141764803
+    PandaID=1147412188
   > run
-    PandaID=1141764805
+    PandaID=1147412189
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00153030.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
 INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_GOEGRID
@@ -93,30 +93,30 @@ INFO : use 6 files
 INFO : upload source files
 INFO : submit 2 subjobs to ANALY_GOEGRID
 ===================
- JobsetID  : 2218
- JobID  : 2219
+ JobsetID  : 2497
+ JobID  : 2498
  Status : 0
   > build
-    PandaID=1141765147
+    PandaID=1147412389
   > run
-    PandaID=1141765150
+    PandaID=1147412390
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00153134.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.02.D3PD
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
+INFO : scanning LFC atlaslfc.nordugrid.org for ANALY_ARC
 .
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
+INFO : all files are available at ANALY_ARC
 INFO : use 9 files
 INFO : upload source files
-INFO : submit 2 subjobs to ANALY_AGLT2
+INFO : submit 2 subjobs to ANALY_ARC
 ===================
- JobsetID  : 2220
- JobID  : 2221
+ JobsetID  : 2499
+ JobID  : 2500
  Status : 0
   > build
-    PandaID=1141765516
+    PandaID=1147413161
   > run
-    PandaID=1141765517
+    PandaID=1147413873
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00153136.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
 INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_GOEGRID
@@ -127,13 +127,13 @@ INFO : use 4 files
 INFO : upload source files
 INFO : submit 2 subjobs to ANALY_GOEGRID
 ===================
- JobsetID  : 2222
- JobID  : 2223
+ JobsetID  : 2501
+ JobID  : 2502
  Status : 0
   > build
-    PandaID=1141766251
+    PandaID=1147416324
   > run
-    PandaID=1141766252
+    PandaID=1147416325
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00153159.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
 INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_GOEGRID
@@ -144,13 +144,13 @@ INFO : use 4 files
 INFO : upload source files
 INFO : submit 2 subjobs to ANALY_GOEGRID
 ===================
- JobsetID  : 2224
- JobID  : 2225
+ JobsetID  : 2503
+ JobID  : 2504
  Status : 0
   > build
-    PandaID=1141766499
+    PandaID=1147416724
   > run
-    PandaID=1141766501
+    PandaID=1147416725
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00153200.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
 INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_GOEGRID
@@ -161,30 +161,16 @@ INFO : use 4 files
 INFO : upload source files
 INFO : submit 2 subjobs to ANALY_GOEGRID
 ===================
- JobsetID  : 2226
- JobID  : 2227
+ JobsetID  : 2505
+ JobID  : 2506
  Status : 0
   > build
-    PandaID=1141766819
+    PandaID=1147417750
   > run
-    PandaID=1141766821
+    PandaID=1147417891
 DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00153565.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
-INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_GOEGRID
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_GOEGRID
-INFO : use 128 files
-INFO : upload source files
-INFO : submit 3 subjobs to ANALY_GOEGRID
-===================
- JobsetID  : 2228
- JobID  : 2229
- Status : 0
-  > build
-    PandaID=1141767236
-  > run
-    PandaID=1141767237-1141767247
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00153599.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
 INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_GOEGRID
@@ -195,13 +181,13 @@ INFO : use 15 files
 INFO : upload source files
 INFO : submit 2 subjobs to ANALY_GOEGRID
 ===================
- JobsetID  : 2230
- JobID  : 2231
+ JobsetID  : 2507
+ JobID  : 2508
  Status : 0
   > build
-    PandaID=1141767278
+    PandaID=1147423966
   > run
-    PandaID=1141767279
+    PandaID=1147423968
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00154810.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
 INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_GOEGRID
@@ -212,13 +198,13 @@ INFO : use 35 files
 INFO : upload source files
 INFO : submit 2 subjobs to ANALY_GOEGRID
 ===================
- JobsetID  : 2232
- JobID  : 2233
+ JobsetID  : 2509
+ JobID  : 2510
  Status : 0
   > build
-    PandaID=1141767450
+    PandaID=1147426113
   > run
-    PandaID=1141767451
+    PandaID=1147426115
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00154813.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
 INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_GOEGRID
@@ -229,13 +215,13 @@ INFO : use 61 files
 INFO : upload source files
 INFO : submit 2 subjobs to ANALY_GOEGRID
 ===================
- JobsetID  : 2234
- JobID  : 2235
+ JobsetID  : 2511
+ JobID  : 2512
  Status : 0
   > build
-    PandaID=1141767663
+    PandaID=1147427003
   > run
-    PandaID=1141767664
+    PandaID=1147427018
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00154815.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
 INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_GOEGRID
@@ -246,13 +232,13 @@ INFO : use 46 files
 INFO : upload source files
 INFO : submit 2 subjobs to ANALY_GOEGRID
 ===================
- JobsetID  : 2236
- JobID  : 2237
+ JobsetID  : 2513
+ JobID  : 2514
  Status : 0
   > build
-    PandaID=1141767780
+    PandaID=1147429781
   > run
-    PandaID=1141767781
+    PandaID=1147429783
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00154817.physics_MuonswBeam.merge.ESD.r1297_p161.WZphys.100612.01.D3PD
 INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_GOEGRID
@@ -263,13 +249,13 @@ INFO : use 93 files
 INFO : upload source files
 INFO : submit 3 subjobs to ANALY_GOEGRID
 ===================
- JobsetID  : 2238
- JobID  : 2239
+ JobsetID  : 2515
+ JobID  : 2516
  Status : 0
   > build
-    PandaID=1141767873
+    PandaID=1147430575
   > run
-    PandaID=1141767874-1141767875
+    PandaID=1147430576-1147430609
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00154822.physics_MuonswBeam.merge.ESD.r1299_p161.WZphys.100612.01.D3PD
 INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_GOEGRID
@@ -280,30 +266,30 @@ INFO : use 76 files
 INFO : upload source files
 INFO : submit 2 subjobs to ANALY_GOEGRID
 ===================
- JobsetID  : 2240
- JobID  : 2241
+ JobsetID  : 2517
+ JobID  : 2518
  Status : 0
   > build
-    PandaID=1141767894
+    PandaID=1147431837
   > run
-    PandaID=1141767895
+    PandaID=1147431838
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00155073.physics_MuonswBeam.merge.ESD.r1299.WZphys.100612.01.D3PD
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
+INFO : scanning LFC atlaslfc.nordugrid.org for ANALY_ARC
 .
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
+INFO : all files are available at ANALY_ARC
 INFO : use 279 files
 INFO : upload source files
-INFO : submit 4 subjobs to ANALY_AGLT2
+INFO : submit 4 subjobs to ANALY_ARC
 ===================
- JobsetID  : 2242
- JobID  : 2243
+ JobsetID  : 2519
+ JobID  : 2520
  Status : 0
   > build
-    PandaID=1141768137
+    PandaID=1147432681
   > run
-    PandaID=1141768139-1141768223
+    PandaID=1147432682-1147432745
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00155112.physics_MuonswBeam.merge.ESD.r1299_p161.WZphys.100612.01.D3PD
 INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_GOEGRID
@@ -313,14 +299,12 @@ INFO : all files are available at ANALY_GOEGRID
 INFO : use 499 files
 INFO : upload source files
 INFO : submit 7 subjobs to ANALY_GOEGRID
+ERROR submitJobs : <class 'cPickle.UnpicklingError'> invalid load key, '<'.
 ===================
- JobsetID  : 2244
- JobID  : 2245
- Status : 0
-  > build
-    PandaID=1141768849
-  > run
-    PandaID=1141768850-1141768888
+Traceback (most recent call last):
+  File "/afs/cern.ch/atlas/offline/external/GRID/DA/panda-client/0.3.16/bin/prun", line 2058, in <module>
+    if len(jobList) != len(out):
+TypeError: object of type 'NoneType' has no len()
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00155116.physics_MuonswBeam.merge.ESD.r1299_p161.WZphys.100612.01.D3PD
 INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_GOEGRID
@@ -331,13 +315,13 @@ INFO : use 85 files
 INFO : upload source files
 INFO : submit 2 subjobs to ANALY_GOEGRID
 ===================
- JobsetID  : 2246
- JobID  : 2247
+ JobsetID  : 2523
+ JobID  : 2524
  Status : 0
   > build
-    PandaID=1141769559
+    PandaID=1147435008
   > run
-    PandaID=1141769563
+    PandaID=1147435011
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00155118.physics_MuonswBeam.merge.ESD.r1299_p161.WZphys.100612.01.D3PD
 INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_GOEGRID
@@ -348,13 +332,13 @@ INFO : use 3 files
 INFO : upload source files
 INFO : submit 2 subjobs to ANALY_GOEGRID
 ===================
- JobsetID  : 2248
- JobID  : 2249
+ JobsetID  : 2525
+ JobID  : 2526
  Status : 0
   > build
-    PandaID=1141770184
+    PandaID=1147435365
   > run
-    PandaID=1141770186
+    PandaID=1147435366
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00155160.physics_MuonswBeam.merge.ESD.r1299_p161.WZphys.100612.01.D3PD
 INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_GOEGRID
@@ -365,183 +349,183 @@ INFO : use 233 files
 INFO : upload source files
 INFO : submit 4 subjobs to ANALY_GOEGRID
 ===================
- JobsetID  : 2250
- JobID  : 2251
+ JobsetID  : 2527
+ JobID  : 2528
  Status : 0
   > build
-    PandaID=1141771001
+    PandaID=1147435514
   > run
-    PandaID=1141771002-1141771010
+    PandaID=1147435515-1147435544
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00155228.physics_MuonswBeam.recon.ESD.f259.WZphys.100612.02.D3PD
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
+INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_DESY-HH
 .
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
+INFO : all files are available at ANALY_DESY-HH
 INFO : use 130 files
 INFO : upload source files
-INFO : submit 2 subjobs to ANALY_AGLT2
+INFO : submit 2 subjobs to ANALY_DESY-HH
 ===================
- JobsetID  : 2252
- JobID  : 2253
+ JobsetID  : 2529
+ JobID  : 2530
  Status : 0
   > build
-    PandaID=1141771647
+    PandaID=1147436254
   > run
-    PandaID=1141771648
+    PandaID=1147436255
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00155280.physics_MuonswBeam.recon.ESD.f259.WZphys.100612.02.D3PD
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
+INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_DESY-HH
 .
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
+INFO : all files are available at ANALY_DESY-HH
 INFO : use 347 files
 INFO : upload source files
-INFO : submit 3 subjobs to ANALY_AGLT2
+INFO : submit 3 subjobs to ANALY_DESY-HH
 ===================
- JobsetID  : 2254
- JobID  : 2255
+ JobsetID  : 2531
+ JobID  : 2532
  Status : 0
   > build
-    PandaID=1141771831
+    PandaID=1147436699
   > run
-    PandaID=1141771834-1141771885
+    PandaID=1147436700-1147436738
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00155569.physics_MuonswBeam.recon.ESD.f260.WZphys.100612.02.D3PD
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
+INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_DESY-HH
 .
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
+INFO : all files are available at ANALY_DESY-HH
 INFO : use 451 files
 INFO : upload source files
-INFO : submit 4 subjobs to ANALY_AGLT2
+INFO : submit 4 subjobs to ANALY_DESY-HH
 ===================
- JobsetID  : 2256
- JobID  : 2257
+ JobsetID  : 2533
+ JobID  : 2534
  Status : 0
   > build
-    PandaID=1141771961
+    PandaID=1147437143
   > run
-    PandaID=1141771965-1141772010
+    PandaID=1147437146-1147437169
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00155634.physics_MuonswBeam.recon.ESD.f260.WZphys.100612.02.D3PD
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
+INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_DESY-HH
 .
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
+INFO : all files are available at ANALY_DESY-HH
 INFO : use 451 files
 INFO : upload source files
-INFO : submit 4 subjobs to ANALY_AGLT2
+INFO : submit 4 subjobs to ANALY_DESY-HH
 ===================
- JobsetID  : 2258
- JobID  : 2259
+ JobsetID  : 2535
+ JobID  : 2536
  Status : 0
   > build
-    PandaID=1141772257
+    PandaID=1147437523
   > run
-    PandaID=1141772260-1141772333
+    PandaID=1147437525-1147437602
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00155669.physics_MuonswBeam.recon.ESD.f260.WZphys.100612.02.D3PD
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
+INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_DESY-HH
 .
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
+INFO : all files are available at ANALY_DESY-HH
 INFO : use 523 files
 INFO : upload source files
-INFO : submit 4 subjobs to ANALY_AGLT2
+INFO : submit 4 subjobs to ANALY_DESY-HH
 ===================
- JobsetID  : 2260
- JobID  : 2261
+ JobsetID  : 2537
+ JobID  : 2538
  Status : 0
   > build
-    PandaID=1141772591
+    PandaID=1147438157
   > run
-    PandaID=1141772593-1141772662
+    PandaID=1147438161-1147438313
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00155678.physics_MuonswBeam.recon.ESD.f261.WZphys.100612.02.D3PD
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
+INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_DESY-HH
 .
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
+INFO : all files are available at ANALY_DESY-HH
 INFO : use 604 files
 INFO : upload source files
-INFO : submit 5 subjobs to ANALY_AGLT2
+INFO : submit 5 subjobs to ANALY_DESY-HH
 ===================
- JobsetID  : 2262
- JobID  : 2263
+ JobsetID  : 2539
+ JobID  : 2540
  Status : 0
   > build
-    PandaID=1141772826
+    PandaID=1147438793
   > run
-    PandaID=1141772828-1141772919
+    PandaID=1147438794-1147439907
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00155697.physics_MuonswBeam.recon.ESD.f261.WZphys.100612.02.D3PD
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
+INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_DESY-HH
 ..
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
+INFO : all files are available at ANALY_DESY-HH
 INFO : use 1821 files
 INFO : upload source files
-INFO : submit 11 subjobs to ANALY_AGLT2
+INFO : submit 11 subjobs to ANALY_DESY-HH
 ===================
- JobsetID  : 2264
- JobID  : 2265
+ JobsetID  : 2541
+ JobID  : 2542
  Status : 0
   > build
-    PandaID=1141773096
+    PandaID=1147441107
   > run
-    PandaID=1141773097-1141773596
+    PandaID=1147441110-1147441610
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00156682.physics_MuonswBeam.recon.ESD.f265.WZphys.100612.02.D3PD
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
+INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_DESY-HH
 .
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
+INFO : all files are available at ANALY_DESY-HH
 INFO : use 783 files
 INFO : upload source files
-INFO : submit 5 subjobs to ANALY_AGLT2
+INFO : submit 5 subjobs to ANALY_DESY-HH
 ===================
- JobsetID  : 2266
- JobID  : 2267
+ JobsetID  : 2543
+ JobID  : 2544
  Status : 0
   > build
-    PandaID=1141773946
+    PandaID=1147442381
   > run
-    PandaID=1141773949-1141774171
+    PandaID=1147442405-1147442711
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00158045.physics_MuonswBeam.recon.ESD.f27.WZphys.100612.09.D3PD
-INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_GOEGRID
+INFO : scanning LFC lfc-atlas.grid.sara.nl for ANALY_NIKHEF-ELPROD
 .
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_GOEGRID
+INFO : all files are available at ANALY_NIKHEF-ELPROD
 INFO : use 391 files
 INFO : upload source files
-INFO : submit 3 subjobs to ANALY_GOEGRID
+INFO : submit 3 subjobs to ANALY_NIKHEF-ELPROD
 ===================
- JobsetID  : 2268
- JobID  : 2269
+ JobsetID  : 2545
+ JobID  : 2546
  Status : 0
   > build
-    PandaID=1141774859
+    PandaID=1147443480
   > run
-    PandaID=1141774864-1141775013
+    PandaID=1147443489-1147443541
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00158116.physics_MuonswBeam.recon.ESD.f27.WZphys.100612.10.D3PD
-INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_GOEGRID
+INFO : scanning LFC lfc-atlas.grid.sara.nl for ANALY_NIKHEF-ELPROD
 ..
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_GOEGRID
+INFO : all files are available at ANALY_NIKHEF-ELPROD
 INFO : use 1357 files
 INFO : upload source files
-INFO : submit 20 subjobs to ANALY_GOEGRID
+INFO : submit 20 subjobs to ANALY_NIKHEF-ELPROD
 ===================
- JobsetID  : 2270
- JobID  : 2271
+ JobsetID  : 2547
+ JobID  : 2548
  Status : 0
   > build
-    PandaID=1141775528
+    PandaID=1147444345
   > run
-    PandaID=1141775530-1141776045
+    PandaID=1147444348-1147444891
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00158269.physics_MuonswBeam.recon.ESD.f27.WZphys.100612.11.D3PD
 INFO : scanning LFC lfc-atlas.grid.sara.nl for ANALY_NIKHEF-ELPROD
@@ -552,13 +536,13 @@ INFO : use 163 files
 INFO : upload source files
 INFO : submit 5 subjobs to ANALY_NIKHEF-ELPROD
 ===================
- JobsetID  : 2272
- JobID  : 2273
+ JobsetID  : 2549
+ JobID  : 2550
  Status : 0
   > build
-    PandaID=1141777264
+    PandaID=1147445470
   > run
-    PandaID=1141777265-1141777272
+    PandaID=1147445471-1147445563
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00158299.physics_MuonswBeam.recon.ESD.f27.WZphys.100612.11.D3PD
 INFO : scanning LFC lfc-atlas.grid.sara.nl for ANALY_NIKHEF-ELPROD
@@ -569,13 +553,13 @@ INFO : use 215 files
 INFO : upload source files
 INFO : submit 3 subjobs to ANALY_NIKHEF-ELPROD
 ===================
- JobsetID  : 2274
- JobID  : 2275
+ JobsetID  : 2551
+ JobID  : 2552
  Status : 0
   > build
-    PandaID=1141777606
+    PandaID=1147447154
   > run
-    PandaID=1141777609-1141777675
+    PandaID=1147447157-1147447263
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00158392.physics_MuonswBeam.recon.ESD.f27.WZphys.100612.11.D3PD
 INFO : scanning LFC lfc-atlas.grid.sara.nl for ANALY_NIKHEF-ELPROD
@@ -586,13 +570,13 @@ INFO : use 583 files
 INFO : upload source files
 INFO : submit 10 subjobs to ANALY_NIKHEF-ELPROD
 ===================
- JobsetID  : 2276
- JobID  : 2277
+ JobsetID  : 2553
+ JobID  : 2554
  Status : 0
   > build
-    PandaID=1141778446
+    PandaID=1147448065
   > run
-    PandaID=1141778448-1141778658
+    PandaID=1147448068-1147448275
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00158443.physics_MuonswBeam.recon.ESD.f27.WZphys.100612.11.D3PD
 INFO : scanning LFC lfc-atlas.grid.sara.nl for ANALY_NIKHEF-ELPROD
@@ -603,13 +587,13 @@ INFO : use 93 files
 INFO : upload source files
 INFO : submit 2 subjobs to ANALY_NIKHEF-ELPROD
 ===================
- JobsetID  : 2278
- JobID  : 2279
+ JobsetID  : 2555
+ JobID  : 2556
  Status : 0
   > build
-    PandaID=1141779273
+    PandaID=1147448788
   > run
-    PandaID=1141779275
+    PandaID=1147448809
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00158466.physics_MuonswBeam.recon.ESD.f27.WZphys.100612.11.D3PD
 INFO : scanning LFC lfc-atlas.grid.sara.nl for ANALY_NIKHEF-ELPROD
@@ -620,13 +604,13 @@ INFO : use 114 files
 INFO : upload source files
 INFO : submit 2 subjobs to ANALY_NIKHEF-ELPROD
 ===================
- JobsetID  : 2280
- JobID  : 2281
+ JobsetID  : 2557
+ JobID  : 2558
  Status : 0
   > build
-    PandaID=1141779600
+    PandaID=1147449335
   > run
-    PandaID=1141779601
+    PandaID=1147449337
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00158545.physics_MuonswBeam.recon.ESD.f27.WZphys.100612.11.D3PD
 INFO : scanning LFC lfc-atlas.grid.sara.nl for ANALY_NIKHEF-ELPROD
@@ -637,13 +621,13 @@ INFO : use 111 files
 INFO : upload source files
 INFO : submit 3 subjobs to ANALY_NIKHEF-ELPROD
 ===================
- JobsetID  : 2282
- JobID  : 2283
+ JobsetID  : 2559
+ JobID  : 2560
  Status : 0
   > build
-    PandaID=1141779911
+    PandaID=1147449521
   > run
-    PandaID=1141779912-1141779934
+    PandaID=1147449523-1147449534
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00158548.physics_MuonswBeam.recon.ESD.f273.WZphys.100612.03.D3PD
 INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_GOEGRID
@@ -654,13 +638,13 @@ INFO : use 1663 files
 INFO : upload source files
 INFO : submit 13 subjobs to ANALY_GOEGRID
 ===================
- JobsetID  : 2284
- JobID  : 2285
+ JobsetID  : 2561
+ JobID  : 2562
  Status : 0
   > build
-    PandaID=1141780592
+    PandaID=1147449994
   > run
-    PandaID=1141780593-1141781031
+    PandaID=1147449995-1147450358
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00158549.physics_MuonswBeam.recon.ESD.f273.WZphys.100612.03.D3PD
 INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
@@ -671,13 +655,13 @@ INFO : use 439 files
 INFO : upload source files
 INFO : submit 4 subjobs to ANALY_AGLT2
 ===================
- JobsetID  : 2286
- JobID  : 2287
+ JobsetID  : 2563
+ JobID  : 2564
  Status : 0
   > build
-    PandaID=1141781926
+    PandaID=1147450560
   > run
-    PandaID=1141781927-1141781936
+    PandaID=1147450561-1147450578
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00158582.physics_MuonswBeam.recon.ESD.f273.WZphys.100612.03.D3PD
 INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
@@ -688,13 +672,13 @@ INFO : use 2604 files
 INFO : upload source files
 INFO : submit 19 subjobs to ANALY_AGLT2
 ===================
- JobsetID  : 2288
- JobID  : 2289
+ JobsetID  : 2565
+ JobID  : 2566
  Status : 0
   > build
-    PandaID=1141783261
+    PandaID=1147450764
   > run
-    PandaID=1141783263-1141783907
+    PandaID=1147450766-1147451129
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00158632.physics_MuonswBeam.recon.ESD.f274.WZphys.100612.01.D3PD
 INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
@@ -705,13 +689,13 @@ INFO : use 583 files
 INFO : upload source files
 INFO : submit 6 subjobs to ANALY_AGLT2
 ===================
- JobsetID  : 2290
- JobID  : 2291
+ JobsetID  : 2567
+ JobID  : 2568
  Status : 0
   > build
-    PandaID=1141784973
+    PandaID=1147451428
   > run
-    PandaID=1141784975-1141785056
+    PandaID=1147451429-1147451467
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00158801.physics_MuonswBeam.recon.ESD.f274.WZphys.100612.01.D3PD
 INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
@@ -722,13 +706,13 @@ INFO : use 853 files
 INFO : upload source files
 INFO : submit 7 subjobs to ANALY_AGLT2
 ===================
- JobsetID  : 2292
- JobID  : 2293
+ JobsetID  : 2569
+ JobID  : 2570
  Status : 0
   > build
-    PandaID=1141786502
+    PandaID=1147451506
   > run
-    PandaID=1141786506-1141786914
+    PandaID=1147451507-1147451526
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00158975.physics_MuonswBeam.recon.ESD.f275.WZphys.100612.01.D3PD
 INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
@@ -739,13 +723,13 @@ INFO : use 1703 files
 INFO : upload source files
 INFO : submit 15 subjobs to ANALY_AGLT2
 ===================
- JobsetID  : 2294
- JobID  : 2295
+ JobsetID  : 2571
+ JobID  : 2572
  Status : 0
   > build
-    PandaID=1141787889
+    PandaID=1147451569
   > run
-    PandaID=1141787891-1141788348
+    PandaID=1147451570-1147451784
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00159041.physics_MuonswBeam.recon.ESD.f275.WZphys.100612.01.D3PD
 INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
@@ -756,13 +740,13 @@ INFO : use 2000 files
 INFO : upload source files
 INFO : submit 18 subjobs to ANALY_AGLT2
 ===================
- JobsetID  : 2296
- JobID  : 2297
+ JobsetID  : 2573
+ JobID  : 2574
  Status : 0
   > build
-    PandaID=1141789675
+    PandaID=1147451987
   > run
-    PandaID=1141789682-1141790408
+    PandaID=1147452024-1147452603
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00159086.physics_MuonswBeam.recon.ESD.f275.WZphys.100612.03.D3PD
 INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
@@ -773,30 +757,30 @@ INFO : use 1802 files
 INFO : upload source files
 INFO : submit 31 subjobs to ANALY_AGLT2
 ===================
- JobsetID  : 2298
- JobID  : 2299
+ JobsetID  : 2575
+ JobID  : 2576
  Status : 0
   > build
-    PandaID=1141791013
+    PandaID=1147452875
   > run
-    PandaID=1141791014-1141791442
+    PandaID=1147452876-1147453015
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00159113.physics_MuonswBeam.recon.ESD.f275.WZphys.100612.02.D3PD
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
+INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_DESY-HH
 ...
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
+INFO : all files are available at ANALY_DESY-HH
 INFO : use 2168 files
 INFO : upload source files
-INFO : submit 17 subjobs to ANALY_AGLT2
+INFO : submit 17 subjobs to ANALY_DESY-HH
 ===================
- JobsetID  : 2300
- JobID  : 2301
+ JobsetID  : 2577
+ JobID  : 2578
  Status : 0
   > build
-    PandaID=1141792450
+    PandaID=1147453151
   > run
-    PandaID=1141792454-1141792950
+    PandaID=1147453160-1147453347
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00159179.physics_MuonswBeam.recon.ESD.f275.WZphys.100612.01.D3PD
 INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
@@ -807,13 +791,13 @@ INFO : use 522 files
 INFO : upload source files
 INFO : submit 8 subjobs to ANALY_AGLT2
 ===================
- JobsetID  : 2302
- JobID  : 2303
+ JobsetID  : 2579
+ JobID  : 2580
  Status : 0
   > build
-    PandaID=1141793583
+    PandaID=1147453612
   > run
-    PandaID=1141793584-1141793721
+    PandaID=1147453613-1147453657
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00159202.physics_MuonswBeam.recon.ESD.f275.WZphys.100612.01.D3PD
 INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
@@ -824,13 +808,13 @@ INFO : use 302 files
 INFO : upload source files
 INFO : submit 6 subjobs to ANALY_AGLT2
 ===================
- JobsetID  : 2304
- JobID  : 2305
+ JobsetID  : 2581
+ JobID  : 2582
  Status : 0
   > build
-    PandaID=1141793959
+    PandaID=1147453737
   > run
-    PandaID=1141793960-1141794126
+    PandaID=1147453738-1147453749
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00159203.physics_MuonswBeam.recon.ESD.f275.WZphys.100612.01.D3PD
 INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
@@ -841,13 +825,13 @@ INFO : use 166 files
 INFO : upload source files
 INFO : submit 5 subjobs to ANALY_AGLT2
 ===================
- JobsetID  : 2306
- JobID  : 2307
+ JobsetID  : 2583
+ JobID  : 2584
  Status : 0
   > build
-    PandaID=1141794619
+    PandaID=1147453840
   > run
-    PandaID=1141794622-1141794732
+    PandaID=1147453842-1147453890
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00159224.physics_MuonswBeam.recon.ESD.f275.WZphys.100612.01.D3PD
 INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
@@ -858,1131 +842,498 @@ INFO : use 1665 files
 INFO : upload source files
 INFO : submit 30 subjobs to ANALY_AGLT2
 ===================
- JobsetID  : 2308
- JobID  : 2309
+ JobsetID  : 2585
+ JobID  : 2586
  Status : 0
   > build
-    PandaID=1141795594
+    PandaID=1147454184
   > run
-    PandaID=1141795600-1141796226
+    PandaID=1147454185-1147454617
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00160387.physics_Muons.recon.ESD.f280.WZphys.100612.01.D3PD
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
+INFO : scanning LFC atlaslfc.nordugrid.org for ANALY_ARC
 ..
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
+INFO : all files are available at ANALY_ARC
 INFO : use 1204 files
 INFO : upload source files
-INFO : submit 15 subjobs to ANALY_AGLT2
+INFO : submit 15 subjobs to ANALY_ARC
 ===================
- JobsetID  : 2310
- JobID  : 2311
+ JobsetID  : 2587
+ JobID  : 2588
  Status : 0
   > build
-    PandaID=1141797287
+    PandaID=1147454785
   > run
-    PandaID=1141797293-1141797912
+    PandaID=1147454787-1147455139
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00160472.physics_Muons.recon.ESD.f280.WZphys.100612.01.D3PD
-INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_BNL_ATLAS_1
+INFO : scanning LFC atlaslfc.nordugrid.org for ANALY_ARC
 ..
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_BNL_ATLAS_1
+INFO : all files are available at ANALY_ARC
 INFO : use 1885 files
 INFO : upload source files
-INFO : submit 20 subjobs to ANALY_BNL_ATLAS_1
+INFO : submit 20 subjobs to ANALY_ARC
 ===================
- JobsetID  : 2312
- JobID  : 2313
+ JobsetID  : 2589
+ JobID  : 2590
  Status : 0
   > build
-    PandaID=1141798814
+    PandaID=1147455546
   > run
-    PandaID=1141798816-1141799815
+    PandaID=1147455548-1147456134
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00160479.physics_Muons.recon.ESD.f280.WZphys.100612.01.D3PD
-INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_BNL_ATLAS_1
+INFO : scanning LFC atlaslfc.nordugrid.org for ANALY_ARC
 .
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_BNL_ATLAS_1
+INFO : all files are available at ANALY_ARC
 INFO : use 118 files
 INFO : upload source files
-INFO : submit 3 subjobs to ANALY_BNL_ATLAS_1
+INFO : submit 3 subjobs to ANALY_ARC
 ===================
- JobsetID  : 2314
- JobID  : 2315
+ JobsetID  : 2591
+ JobID  : 2592
  Status : 0
   > build
-    PandaID=1141800421
+    PandaID=1147456450
   > run
-    PandaID=1141800423-1141800426
+    PandaID=1147456452-1147456497
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00160530.physics_Muons.recon.ESD.f280.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-...
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 2263 files
-INFO : upload source files
-INFO : submit 29 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2316
- JobID  : 2317
- Status : 0
-  > build
-    PandaID=1141801030
-  > run
-    PandaID=1141801031-1141801705
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00160613.physics_Muons.recon.ESD.f281.WZphys.100612.02.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-..
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 1227 files
-INFO : upload source files
-INFO : submit 16 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2318
- JobID  : 2319
- Status : 0
-  > build
-    PandaID=1141802290
-  > run
-    PandaID=1141802296-1141802722
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00160736.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 558 files
-INFO : upload source files
-INFO : submit 6 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2320
- JobID  : 2321
- Status : 0
-  > build
-    PandaID=1141803950
-  > run
-    PandaID=1141803951-1141804041
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00160800.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 740 files
-INFO : upload source files
-INFO : submit 8 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2322
- JobID  : 2323
- Status : 0
-  > build
-    PandaID=1141804343
-  > run
-    PandaID=1141804344-1141804429
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00160801.physics_Muons.recon.ESD.f282.WZphys.100612.02.D3PD/
-INFO : scanning LFC lfc-atlas.grid.sara.nl for ANALY_TR-10-ULAKBIM
-...
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_TR-10-ULAKBIM
-INFO : use 2556 files
-INFO : upload source files
-INFO : submit 29 subjobs to ANALY_TR-10-ULAKBIM
-===================
- JobsetID  : 2324
- JobID  : 2325
- Status : 0
-  > build
-    PandaID=1141804661
-  > run
-    PandaID=1141804662-1141804877
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00160879.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-....
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 3061 files
-INFO : upload source files
-INFO : submit 29 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2326
- JobID  : 2327
- Status : 0
-  > build
-    PandaID=1141805364
-  > run
-    PandaID=1141805366-1141805765
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00160899.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 109 files
-INFO : upload source files
-INFO : submit 3 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2328
- JobID  : 2329
- Status : 0
-  > build
-    PandaID=1141806246
-  > run
-    PandaID=1141806247-1141806255
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00160953.physics_Muons.recon.ESD.f282.WZphys.100612.02.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 437 files
-INFO : upload source files
-INFO : submit 8 subjobs to ANALY_AGLT2
-
-===================
-Traceback (most recent call last):
-  File "/afs/cern.ch/atlas/offline/external/GRID/DA/panda-client/0.3.10/bin/prun", line 2068, in <module>
-    if len(jobList) != len(out):
-TypeError: object of type 'NoneType' has no len()
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00160954.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-..
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 1242 files
-INFO : upload source files
-INFO : submit 15 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2332
- JobID  : 2333
- Status : 0
-  > build
-    PandaID=1141806734
-  > run
-    PandaID=1141806736-1141806992
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00160958.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 867 files
-INFO : upload source files
-INFO : submit 17 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2334
- JobID  : 2335
- Status : 0
-  > build
-    PandaID=1141807353
-  > run
-    PandaID=1141807354-1141807460
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00160963.physics_Muons.recon.ESD.f282.WZphys.100612.03.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 54 files
-INFO : upload source files
-INFO : submit 2 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2336
- JobID  : 2337
- Status : 0
-  > build
-    PandaID=1141807683
-  > run
-    PandaID=1141807684
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00160975.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 52 files
-INFO : upload source files
-INFO : submit 3 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2338
- JobID  : 2339
- Status : 0
-  > build
-    PandaID=1141808220
-  > run
-    PandaID=1141808224-1141808245
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00160980.physics_Muons.recon.ESD.f282.WZphys.100612.02.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 119 files
-INFO : upload source files
-INFO : submit 4 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2340
- JobID  : 2341
- Status : 0
-  > build
-    PandaID=1141808454
-  > run
-    PandaID=1141808457-1141808460
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00161114.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 4 files
-INFO : upload source files
-INFO : submit 2 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2342
- JobID  : 2343
- Status : 0
-  > build
-    PandaID=1141808626
-  > run
-    PandaID=1141808630
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00161116.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 4 files
-INFO : upload source files
-INFO : submit 2 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2344
- JobID  : 2345
- Status : 0
-  > build
-    PandaID=1141808722
-  > run
-    PandaID=1141808723
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00161118.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 377 files
-INFO : upload source files
-INFO : submit 9 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2346
- JobID  : 2347
- Status : 0
-  > build
-    PandaID=1141808895
-  > run
-    PandaID=1141808897-1141808939
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00161379.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-..
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : 11 files are missing or unchecked at ANALY_AGLT2
-INFO : use 1510 files
-INFO : upload source files
-INFO : submit 33 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2348
- JobID  : 2349
- Status : 0
-  > build
-    PandaID=1141809032
-  > run
-    PandaID=1141809033-1141809136
-INFO : trying other sites for the missing files
-INFO : scanning LFC lfc-atlas.grid.sara.nl for ANALY_TR-10-ULAKBIM
-.
-INFO : query files in user.hod.WZphys.00161379.d08112010.h1320/
-INFO : all files are available at ANALY_TR-10-ULAKBIM
-INFO : use 11 files
-INFO : submit 2 subjobs to ANALY_TR-10-ULAKBIM
-===================
- JobsetID  : 2348
- JobID  : 2350
- Status : 0
-  > build
-    PandaID=1141809225
-  > run
-    PandaID=1141809226
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00161407.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 405 files
-INFO : upload source files
-INFO : submit 11 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2351
- JobID  : 2352
- Status : 0
-  > build
-    PandaID=1141809519
-  > run
-    PandaID=1141809520-1141809547
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00161520.physics_Muons.recon.ESD.f283.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-..
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 1461 files
-INFO : upload source files
-INFO : submit 34 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2353
- JobID  : 2354
- Status : 0
-  > build
-    PandaID=1141809771
-  > run
-    PandaID=1141809773-1141809982
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00161562.physics_Muons.recon.ESD.f283.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-..
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 1178 files
-INFO : upload source files
-INFO : submit 28 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2355
- JobID  : 2356
- Status : 0
-  > build
-    PandaID=1141810460
-  > run
-    PandaID=1141810461-1141810822
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00161948.physics_Muons.recon.ESD.f286.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-..
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 1371 files
-INFO : upload source files
-INFO : submit 31 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2357
- JobID  : 2358
- Status : 0
-  > build
-    PandaID=1141811262
-  > run
-    PandaID=1141811265-1141811803
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00162347.physics_Muons.recon.ESD.f287.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_LONG_BNL_ATLAS
-...
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_LONG_BNL_ATLAS
-INFO : use 2766 files
-INFO : upload source files
-INFO : submit 38 subjobs to ANALY_LONG_BNL_ATLAS
-===================
- JobsetID  : 2359
- JobID  : 2360
- Status : 0
-  > build
-    PandaID=1141812288
-  > run
-    PandaID=1141812290-1141812619
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00162526.physics_Muons.recon.ESD.f287.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_LONG_BNL_ATLAS
-...
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_LONG_BNL_ATLAS
-INFO : use 2299 files
-INFO : upload source files
-INFO : submit 28 subjobs to ANALY_LONG_BNL_ATLAS
-===================
- JobsetID  : 2361
- JobID  : 2362
- Status : 0
-  > build
-    PandaID=1141813027
-  > run
-    PandaID=1141813028-1141813380
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00162576.physics_Muons.recon.ESD.f287.WZphys.100612.01.D3PD/
-INFO : scanning LFC atl-lfc.slac.stanford.edu for ANALY_SLAC
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_SLAC
-INFO : use 352 files
-INFO : upload source files
-INFO : submit 7 subjobs to ANALY_SLAC
-===================
- JobsetID  : 2363
- JobID  : 2364
- Status : 0
-  > build
-    PandaID=1141813787
-  > run
-    PandaID=1141813788-1141813852
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00162577.physics_Muons.recon.ESD.f287.WZphys.100612.01.D3PD/
-INFO : scanning LFC atl-lfc.slac.stanford.edu for ANALY_SLAC
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_SLAC
-INFO : use 57 files
-INFO : upload source files
-INFO : submit 2 subjobs to ANALY_SLAC
-===================
- JobsetID  : 2365
- JobID  : 2366
- Status : 0
-  > build
-    PandaID=1141814901
-  > run
-    PandaID=1141814902
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00162620.physics_Muons.recon.ESD.f287.WZphys.100612.01.D3PD/
-INFO : scanning LFC atl-lfc.slac.stanford.edu for ANALY_SLAC
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_SLAC
-INFO : use 410 files
-INFO : upload source files
-INFO : submit 7 subjobs to ANALY_SLAC
-===================
- JobsetID  : 2367
- JobID  : 2368
- Status : 0
-  > build
-    PandaID=1141815304
-  > run
-    PandaID=1141815306-1141815437
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00162623.physics_Muons.recon.ESD.f287.WZphys.100612.01.D3PD/
-INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_wuppertalprod
-..
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_wuppertalprod
-INFO : use 1952 files
-INFO : upload source files
-INFO : submit 26 subjobs to ANALY_wuppertalprod
-===================
- JobsetID  : 2369
- JobID  : 2370
- Status : 0
-  > build
-    PandaID=1141817129
-  > run
-    PandaID=1141817132-1141818152
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00162690.physics_Muons.recon.ESD.f287.WZphys.100612.01.D3PD/
-INFO : scanning LFC atl-lfc.slac.stanford.edu for ANALY_SLAC
-...
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_SLAC
-INFO : use 2258 files
-INFO : upload source files
-INFO : submit 31 subjobs to ANALY_SLAC
-===================
- JobsetID  : 2371
- JobID  : 2372
- Status : 0
-  > build
-    PandaID=1141820440
-  > run
-    PandaID=1141820447-1141821686
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00162764.physics_Muons.recon.ESD.f287.WZphys.100612.01.D3PD/
-INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_wuppertalprod
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_wuppertalprod
-INFO : use 586 files
-INFO : upload source files
-INFO : submit 8 subjobs to ANALY_wuppertalprod
-===================
- JobsetID  : 2373
- JobID  : 2374
- Status : 0
-  > build
-    PandaID=1141822919
-  > run
-    PandaID=1141822920-1141822945
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00162843.physics_Muons.recon.ESD.f28.WZphys.100612.18.D3PD/
-INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_wuppertalprod
-..
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_wuppertalprod
-INFO : use 1205 files
-INFO : upload source files
-INFO : submit 29 subjobs to ANALY_wuppertalprod
-===================
- JobsetID  : 2375
- JobID  : 2376
- Status : 0
-  > build
-    PandaID=1141824170
-  > run
-    PandaID=1141824171-1141824262
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00162882.physics_Muons.recon.ESD.f28.WZphys.100612.19.D3PD/
-INFO : scanning LFC atlas-lfc-fzk.gridka.de for ANALY_wuppertalprod
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_wuppertalprod
-INFO : use 982 files
-INFO : upload source files
-INFO : submit 23 subjobs to ANALY_wuppertalprod
-===================
- JobsetID  : 2377
- JobID  : 2378
- Status : 0
-  > build
-    PandaID=1141825012
-  > run
-    PandaID=1141825014-1141825165
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00165591.physics_Muons.recon.ESD.f292.WZphys.100612.21.D3PD/
 INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_BNL_ATLAS_1
-..
+...
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
 INFO : all files are available at ANALY_BNL_ATLAS_1
-INFO : use 1188 files
+INFO : use 2263 files
 INFO : upload source files
 INFO : submit 29 subjobs to ANALY_BNL_ATLAS_1
 ===================
- JobsetID  : 2379
- JobID  : 2380
+ JobsetID  : 2593
+ JobID  : 2594
  Status : 0
   > build
-    PandaID=1141825716
+    PandaID=1147457480
   > run
-    PandaID=1141825719-1141825853
+    PandaID=1147457482-1147458100
 DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00165632.physics_Muons.recon.ESD.f293.WZphys.100612.21.D3PD/
+INFO : query files in group10.phys-sm.data10_7TeV.00160613.physics_Muons.recon.ESD.f281.WZphys.100612.02.D3PD/
 INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_BNL_ATLAS_1
 ..
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
 INFO : all files are available at ANALY_BNL_ATLAS_1
-INFO : use 1013 files
+INFO : use 1227 files
 INFO : upload source files
-INFO : submit 28 subjobs to ANALY_BNL_ATLAS_1
+INFO : submit 16 subjobs to ANALY_BNL_ATLAS_1
 ===================
- JobsetID  : 2381
- JobID  : 2382
+ JobsetID  : 2595
+ JobID  : 2596
  Status : 0
   > build
-    PandaID=1141826273
+    PandaID=1147458880
   > run
-    PandaID=1141826276-1141826924
+    PandaID=1147458883-1147459414
 DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00165703.physics_Muons.recon.ESD.f293.WZphys.100612.21.D3PD/
-INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_BNL_ATLAS_1
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_BNL_ATLAS_1
-INFO : use 101 files
-INFO : upload source files
-INFO : submit 5 subjobs to ANALY_BNL_ATLAS_1
-===================
- JobsetID  : 2383
- JobID  : 2384
- Status : 0
-  > build
-    PandaID=1141827335
-  > run
-    PandaID=1141827340-1141827423
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00165732.physics_Muons.recon.ESD.f293.WZphys.100612.21.D3PD/
-INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_BNL_ATLAS_1
-..
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_BNL_ATLAS_1
-INFO : use 1049 files
-INFO : upload source files
-INFO : submit 33 subjobs to ANALY_BNL_ATLAS_1
-===================
- JobsetID  : 2385
- JobID  : 2386
- Status : 0
-  > build
-    PandaID=1141827855
-  > run
-    PandaID=1141827857-1141828333
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00165767.physics_Muons.recon.ESD.f293.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_BNL_ATLAS_1
-...
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_BNL_ATLAS_1
-INFO : use 2276 files
-INFO : upload source files
-INFO : submit 34 subjobs to ANALY_BNL_ATLAS_1
-===================
- JobsetID  : 2387
- JobID  : 2388
- Status : 0
-  > build
-    PandaID=1141829070
-  > run
-    PandaID=1141829072-1141829632
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00165815.physics_Muons.recon.ESD.f293.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_BNL_ATLAS_1
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_BNL_ATLAS_1
-INFO : use 244 files
-INFO : upload source files
-INFO : submit 6 subjobs to ANALY_BNL_ATLAS_1
-===================
- JobsetID  : 2389
- JobID  : 2390
- Status : 0
-  > build
-    PandaID=1141829759
-  > run
-    PandaID=1141829760-1141829792
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00165817.physics_Muons.recon.ESD.f293.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_BNL_ATLAS_1
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_BNL_ATLAS_1
-INFO : use 6 files
-INFO : upload source files
-INFO : submit 2 subjobs to ANALY_BNL_ATLAS_1
-===================
- JobsetID  : 2391
- JobID  : 2392
- Status : 0
-  > build
-    PandaID=1141830115
-  > run
-    PandaID=1141830116
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00165818.physics_Muons.recon.ESD.f293.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_BNL_ATLAS_1
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_BNL_ATLAS_1
-INFO : use 384 files
-INFO : upload source files
-INFO : submit 7 subjobs to ANALY_BNL_ATLAS_1
-===================
- JobsetID  : 2393
- JobID  : 2394
- Status : 0
-  > build
-    PandaID=1141830310
-  > run
-    PandaID=1141830314-1141830369
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00165821.physics_Muons.recon.ESD.f293.WZphys.100612.01.D3PD/
+INFO : query files in group10.phys-sm.data10_7TeV.00160736.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
 INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_BNL_ATLAS_1
 .
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
 INFO : all files are available at ANALY_BNL_ATLAS_1
 INFO : use 558 files
 INFO : upload source files
-INFO : submit 9 subjobs to ANALY_BNL_ATLAS_1
+INFO : submit 6 subjobs to ANALY_BNL_ATLAS_1
 ===================
- JobsetID  : 2395
- JobID  : 2396
+ JobsetID  : 2597
+ JobID  : 2598
  Status : 0
   > build
-    PandaID=1141830765
+    PandaID=1147460134
   > run
-    PandaID=1141830766-1141830856
+    PandaID=1147460145-1147460282
 DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00165954.physics_Muons.recon.ESD.f294.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc-prod.in2p3.fr for ANALY_LONG_LYON-T2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_LONG_LYON-T2
-INFO : use 258 files
-INFO : upload source files
-INFO : submit 5 subjobs to ANALY_LONG_LYON-T2
-===================
- JobsetID  : 2397
- JobID  : 2398
- Status : 0
-  > build
-    PandaID=1141831211
-  > run
-    PandaID=1141831212-1141831271
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00165956.physics_Muons.recon.ESD.f294.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc-atlas.grid.sara.nl for ANALY_IHEP
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_IHEP
-INFO : use 102 files
-INFO : upload source files
-INFO : submit 3 subjobs to ANALY_IHEP
-===================
- JobsetID  : 2399
- JobID  : 2400
- Status : 0
-  > build
-    PandaID=1141831558
-  > run
-    PandaID=1141831559-1141831560
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00166094.physics_Muons.recon.ESD.f294.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc-prod.in2p3.fr for ANALY_LONG_LYON-T2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_LONG_LYON-T2
-INFO : use 185 files
-INFO : upload source files
-INFO : submit 3 subjobs to ANALY_LONG_LYON-T2
-===================
- JobsetID  : 2401
- JobID  : 2402
- Status : 0
-  > build
-    PandaID=1141831758
-  > run
-    PandaID=1141831759-1141831783
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00166097.physics_Muons.recon.ESD.f294.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc-prod.in2p3.fr for ANALY_LONG_LYON-T2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_LONG_LYON-T2
-INFO : use 478 files
-INFO : upload source files
-INFO : submit 8 subjobs to ANALY_LONG_LYON-T2
-===================
- JobsetID  : 2403
- JobID  : 2404
- Status : 0
-  > build
-    PandaID=1141831922
-  > run
-    PandaID=1141831924-1141831973
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00166142.physics_Muons.recon.ESD.f294.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 481 files
-INFO : upload source files
-INFO : submit 14 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2405
- JobID  : 2406
- Status : 0
-  > build
-    PandaID=1141832204
-  > run
-    PandaID=1141832205-1141832406
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00166143.physics_Muons.recon.ESD.f294.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 148 files
-INFO : upload source files
-INFO : submit 6 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2407
- JobID  : 2408
- Status : 0
-  > build
-    PandaID=1141832528
-  > run
-    PandaID=1141832529-1141832620
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00166198.physics_Muons.recon.ESD.f295.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 957 files
-INFO : upload source files
-INFO : submit 27 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2409
- JobID  : 2410
- Status : 0
-  > build
-    PandaID=1141833386
-  > run
-    PandaID=1141833389-1141833646
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00166305.physics_Muons.recon.ESD.f295.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 126 files
-INFO : upload source files
-INFO : submit 6 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2411
- JobID  : 2412
- Status : 0
-  > build
-    PandaID=1141833904
-  > run
-    PandaID=1141833905-1141833909
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00166383.physics_Muons.recon.ESD.f295.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 476 files
-INFO : upload source files
-INFO : submit 18 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2413
- JobID  : 2414
- Status : 0
-  > build
-    PandaID=1141834074
-  > run
-    PandaID=1141834076-1141834128
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00166466.physics_Muons.recon.ESD.f295.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 486 files
-INFO : upload source files
-INFO : submit 17 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2415
- JobID  : 2416
- Status : 0
-  > build
-    PandaID=1141834978
-  > run
-    PandaID=1141834983-1141835195
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00166658.physics_Muons.recon.ESD.f295.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 727 files
-INFO : upload source files
-INFO : submit 25 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2417
- JobID  : 2418
- Status : 0
-  > build
-    PandaID=1141835969
-  > run
-    PandaID=1141835970-1141836396
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00166786.physics_Muons.recon.ESD.f296.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 672 files
-INFO : upload source files
-INFO : submit 23 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2419
- JobID  : 2420
- Status : 0
-  > build
-    PandaID=1141837103
-  > run
-    PandaID=1141837106-1141837618
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00166850.physics_Muons.recon.ESD.f296.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 82 files
-INFO : upload source files
-INFO : submit 2 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2421
- JobID  : 2422
- Status : 0
-  > build
-    PandaID=1141837975
-  > run
-    PandaID=1141837977
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00166856.physics_Muons.recon.ESD.f296.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 82 files
-INFO : upload source files
-INFO : submit 4 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2423
- JobID  : 2424
- Status : 0
-  > build
-    PandaID=1141838669
-  > run
-    PandaID=1141838671-1141838711
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00166924.physics_Muons.recon.ESD.f296.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 650 files
-INFO : upload source files
-INFO : submit 17 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2425
- JobID  : 2426
- Status : 0
-  > build
-    PandaID=1141838965
-  > run
-    PandaID=1141838967-1141839337
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00166925.physics_Muons.recon.ESD.f296.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 135 files
-INFO : upload source files
-INFO : submit 3 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2427
- JobID  : 2428
- Status : 0
-  > build
-    PandaID=1141839775
-  > run
-    PandaID=1141839776-1141839780
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00166927.physics_Muons.recon.ESD.f296.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 588 files
-INFO : upload source files
-INFO : submit 8 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2429
- JobID  : 2430
- Status : 0
-  > build
-    PandaID=1141840041
-  > run
-    PandaID=1141840043-1141840101
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00166964.physics_Muons.recon.ESD.f296.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfc.aglt2.org for ANALY_AGLT2
-.
-INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_AGLT2
-INFO : use 56 files
-INFO : upload source files
-INFO : submit 2 subjobs to ANALY_AGLT2
-===================
- JobsetID  : 2431
- JobID  : 2432
- Status : 0
-  > build
-    PandaID=1141840231
-  > run
-    PandaID=1141840232
-DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00167575.physics_Muons.recon.ESD.f298.WZphys.100612.01.D3PD/
+INFO : query files in group10.phys-sm.data10_7TeV.00160800.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
 INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_BNL_ATLAS_1
 .
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
 INFO : all files are available at ANALY_BNL_ATLAS_1
-INFO : use 78 files
+INFO : use 740 files
 INFO : upload source files
-INFO : submit 3 subjobs to ANALY_BNL_ATLAS_1
+INFO : submit 8 subjobs to ANALY_BNL_ATLAS_1
 ===================
- JobsetID  : 2433
- JobID  : 2434
+ JobsetID  : 2599
+ JobID  : 2600
  Status : 0
   > build
-    PandaID=1141840339
+    PandaID=1147460653
   > run
-    PandaID=1141840341-1141840342
+    PandaID=1147460658-1147460775
 DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00167576.physics_Muons.recon.ESD.f298.WZphys.100612.01.D3PD/
+INFO : query files in group10.phys-sm.data10_7TeV.00160801.physics_Muons.recon.ESD.f282.WZphys.100612.02.D3PD/
 INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_BNL_ATLAS_1
 ...
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
 INFO : all files are available at ANALY_BNL_ATLAS_1
-INFO : use 2805 files
+INFO : use 2556 files
 INFO : upload source files
-INFO : submit 42 subjobs to ANALY_BNL_ATLAS_1
+INFO : submit 29 subjobs to ANALY_BNL_ATLAS_1
 ===================
- JobsetID  : 2435
- JobID  : 2436
+ JobsetID  : 2601
+ JobID  : 2602
  Status : 0
   > build
-    PandaID=1141840642
+    PandaID=1147461111
   > run
-    PandaID=1141840644-1141842144
+    PandaID=1147461189-1147466504
 DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00167607.physics_Muons.recon.ESD.f298.WZphys.100612.01.D3PD/
+INFO : query files in group10.phys-sm.data10_7TeV.00160879.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
 INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_BNL_ATLAS_1
 ....
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
 INFO : all files are available at ANALY_BNL_ATLAS_1
-INFO : use 3235 files
+INFO : use 3061 files
 INFO : upload source files
-INFO : submit 46 subjobs to ANALY_BNL_ATLAS_1
+INFO : submit 29 subjobs to ANALY_BNL_ATLAS_1
 ===================
- JobsetID  : 2437
- JobID  : 2438
+ JobsetID  : 2603
+ JobID  : 2604
  Status : 0
   > build
-    PandaID=1141843158
+    PandaID=1147467406
   > run
-    PandaID=1141843160-1141844426
+    PandaID=1147467455-1147474196
 DATA run
-INFO : query files in group10.phys-sm.data10_7TeV.00167661.physics_Muons.recon.ESD.f299.WZphys.100612.01.D3PD/
+INFO : query files in group10.phys-sm.data10_7TeV.00160899.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
 INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_LONG_BNL_ATLAS
 .
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
 INFO : all files are available at ANALY_LONG_BNL_ATLAS
-INFO : use 622 files
+INFO : use 109 files
 INFO : upload source files
-INFO : submit 11 subjobs to ANALY_LONG_BNL_ATLAS
+INFO : submit 3 subjobs to ANALY_LONG_BNL_ATLAS
 ===================
- JobsetID  : 2439
- JobID  : 2440
+ JobsetID  : 2605
+ JobID  : 2606
  Status : 0
   > build
-    PandaID=1141845192
+    PandaID=1147474486
   > run
-    PandaID=1141845197-1141845697
+    PandaID=1147474487-1147474494
+DATA run
+INFO : query files in group10.phys-sm.data10_7TeV.00160953.physics_Muons.recon.ESD.f282.WZphys.100612.02.D3PD/
+INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_LONG_BNL_ATLAS
+.
+INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
+INFO : all files are available at ANALY_LONG_BNL_ATLAS
+INFO : use 437 files
+INFO : upload source files
+INFO : submit 8 subjobs to ANALY_LONG_BNL_ATLAS
+===================
+ JobsetID  : 2607
+ JobID  : 2608
+ Status : 0
+  > build
+    PandaID=1147474546
+  > run
+    PandaID=1147474547-1147474579
+DATA run
+INFO : query files in group10.phys-sm.data10_7TeV.00160954.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
+INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_LONG_BNL_ATLAS
+..
+INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
+INFO : all files are available at ANALY_LONG_BNL_ATLAS
+INFO : use 1242 files
+INFO : upload source files
+INFO : submit 15 subjobs to ANALY_LONG_BNL_ATLAS
+===================
+ JobsetID  : 2609
+ JobID  : 2610
+ Status : 0
+  > build
+    PandaID=1147474654
+  > run
+    PandaID=1147474655-1147474747
+DATA run
+INFO : query files in group10.phys-sm.data10_7TeV.00160958.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
+INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_LONG_BNL_ATLAS
+.
+INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
+INFO : all files are available at ANALY_LONG_BNL_ATLAS
+INFO : use 867 files
+INFO : upload source files
+INFO : submit 17 subjobs to ANALY_LONG_BNL_ATLAS
+===================
+ JobsetID  : 2611
+ JobID  : 2612
+ Status : 0
+  > build
+    PandaID=1147474803
+  > run
+    PandaID=1147474805-1147474852
+DATA run
+INFO : query files in group10.phys-sm.data10_7TeV.00160963.physics_Muons.recon.ESD.f282.WZphys.100612.03.D3PD/
+INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_LONG_BNL_ATLAS
+.
+INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
+INFO : all files are available at ANALY_LONG_BNL_ATLAS
+INFO : use 54 files
+INFO : upload source files
+INFO : submit 2 subjobs to ANALY_LONG_BNL_ATLAS
+===================
+ JobsetID  : 2613
+ JobID  : 2614
+ Status : 0
+  > build
+    PandaID=1147474926
+  > run
+    PandaID=1147474927
+DATA run
+INFO : query files in group10.phys-sm.data10_7TeV.00160975.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
+INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_LONG_BNL_ATLAS
+.
+INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
+INFO : all files are available at ANALY_LONG_BNL_ATLAS
+INFO : use 52 files
+INFO : upload source files
+INFO : submit 3 subjobs to ANALY_LONG_BNL_ATLAS
+===================
+ JobsetID  : 2615
+ JobID  : 2616
+ Status : 0
+  > build
+    PandaID=1147474988
+  > run
+    PandaID=1147474989-1147474991
+DATA run
+INFO : query files in group10.phys-sm.data10_7TeV.00160980.physics_Muons.recon.ESD.f282.WZphys.100612.02.D3PD/
+INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_LONG_BNL_ATLAS
+.
+INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
+INFO : all files are available at ANALY_LONG_BNL_ATLAS
+INFO : use 119 files
+INFO : upload source files
+INFO : submit 4 subjobs to ANALY_LONG_BNL_ATLAS
+===================
+ JobsetID  : 2617
+ JobID  : 2618
+ Status : 0
+  > build
+    PandaID=1147475056
+  > run
+    PandaID=1147475059-1147475082
+DATA run
+INFO : query files in group10.phys-sm.data10_7TeV.00161114.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
+INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_LONG_BNL_ATLAS
+.
+INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
+INFO : all files are available at ANALY_LONG_BNL_ATLAS
+INFO : use 4 files
+INFO : upload source files
+INFO : submit 2 subjobs to ANALY_LONG_BNL_ATLAS
+===================
+ JobsetID  : 2619
+ JobID  : 2620
+ Status : 0
+  > build
+    PandaID=1147475135
+  > run
+    PandaID=1147475136
+DATA run
+INFO : query files in group10.phys-sm.data10_7TeV.00161116.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
+INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_LONG_BNL_ATLAS
+.
+INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
+INFO : all files are available at ANALY_LONG_BNL_ATLAS
+INFO : use 4 files
+INFO : upload source files
+INFO : submit 2 subjobs to ANALY_LONG_BNL_ATLAS
+===================
+ JobsetID  : 2621
+ JobID  : 2622
+ Status : 0
+  > build
+    PandaID=1147475195
+  > run
+    PandaID=1147475198
+DATA run
+INFO : query files in group10.phys-sm.data10_7TeV.00161118.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
+INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_LONG_BNL_ATLAS
+.
+INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
+INFO : all files are available at ANALY_LONG_BNL_ATLAS
+INFO : use 377 files
+INFO : upload source files
+INFO : submit 9 subjobs to ANALY_LONG_BNL_ATLAS
+===================
+ JobsetID  : 2623
+ JobID  : 2624
+ Status : 0
+  > build
+    PandaID=1147475600
+  > run
+    PandaID=1147475629-1147478195
+DATA run
+INFO : query files in group10.phys-sm.data10_7TeV.00161379.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
+INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_LONG_BNL_ATLAS
+..
+INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
+INFO : all files are available at ANALY_LONG_BNL_ATLAS
+INFO : use 1521 files
+INFO : upload source files
+INFO : submit 33 subjobs to ANALY_LONG_BNL_ATLAS
+
+===================
+Traceback (most recent call last):
+  File "/afs/cern.ch/atlas/offline/external/GRID/DA/panda-client/0.3.16/bin/prun", line 2058, in <module>
+    if len(jobList) != len(out):
+TypeError: object of type 'NoneType' has no len()
+DATA run
+INFO : query files in group10.phys-sm.data10_7TeV.00161407.physics_Muons.recon.ESD.f282.WZphys.100612.01.D3PD/
+INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_LONG_BNL_ATLAS
+.
+INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
+INFO : all files are available at ANALY_LONG_BNL_ATLAS
+INFO : use 405 files
+INFO : upload source files
+INFO : submit 11 subjobs to ANALY_LONG_BNL_ATLAS
+ERROR submitJobs : <class 'cPickle.UnpicklingError'> invalid load key, '<'.
+===================
+Traceback (most recent call last):
+  File "/afs/cern.ch/atlas/offline/external/GRID/DA/panda-client/0.3.16/bin/prun", line 2058, in <module>
+    if len(jobList) != len(out):
+TypeError: object of type 'NoneType' has no len()
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
+DATA run
+<type 'exceptions.IOError'> [Errno socket error] timed out
+ERROR : could not getServer from http://pandaserver.cern.ch:25080/server/panda/getServer
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00167680.physics_Muons.recon.ESD.f299.WZphys.100612.01.D3PD/
 INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_LONG_BNL_ATLAS
@@ -1992,14 +1343,12 @@ INFO : all files are available at ANALY_LONG_BNL_ATLAS
 INFO : use 1917 files
 INFO : upload source files
 INFO : submit 17 subjobs to ANALY_LONG_BNL_ATLAS
+ERROR submitJobs : <class 'cPickle.UnpicklingError'> invalid load key, '<'.
 ===================
- JobsetID  : 2441
- JobID  : 2442
- Status : 0
-  > build
-    PandaID=1141846160
-  > run
-    PandaID=1141846161-1141846583
+Traceback (most recent call last):
+  File "/afs/cern.ch/atlas/offline/external/GRID/DA/panda-client/0.3.16/bin/prun", line 2058, in <module>
+    if len(jobList) != len(out):
+TypeError: object of type 'NoneType' has no len()
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00167776.physics_Muons.recon.ESD.f299.WZphys.100612.03.D3PD/
 INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_LONG_BNL_ATLAS
@@ -2009,28 +1358,26 @@ INFO : all files are available at ANALY_LONG_BNL_ATLAS
 INFO : use 4015 files
 INFO : upload source files
 INFO : submit 57 subjobs to ANALY_LONG_BNL_ATLAS
+ERROR submitJobs : <class 'cPickle.UnpicklingError'> invalid load key, '<'.
 ===================
- JobsetID  : 2443
- JobID  : 2444
- Status : 0
-  > build
-    PandaID=1141846982
-  > run
-    PandaID=1141846984-1141848409
+Traceback (most recent call last):
+  File "/afs/cern.ch/atlas/offline/external/GRID/DA/panda-client/0.3.16/bin/prun", line 2058, in <module>
+    if len(jobList) != len(out):
+TypeError: object of type 'NoneType' has no len()
 DATA run
 INFO : query files in group10.phys-sm.data10_7TeV.00167844.physics_Muons.recon.ESD.f299.WZphys.100612.01.D3PD/
-INFO : scanning LFC lfcatlas.pic.es for ANALY_PIC
+INFO : scanning LFC lfc.usatlas.bnl.gov for ANALY_LONG_BNL_ATLAS
 ..
 INFO : gathering files under /afs/cern.ch/user/h/hod/z0analysis
-INFO : all files are available at ANALY_PIC
+INFO : all files are available at ANALY_LONG_BNL_ATLAS
 INFO : use 1706 files
 INFO : upload source files
-INFO : submit 25 subjobs to ANALY_PIC
+INFO : submit 25 subjobs to ANALY_LONG_BNL_ATLAS
 ===================
- JobsetID  : 2445
- JobID  : 2446
+ JobsetID  : 2633
+ JobID  : 2634
  Status : 0
   > build
-    PandaID=1141849188
+    PandaID=1147487564
   > run
-    PandaID=1141849192-1141849932
+    PandaID=1147487701-1147488491

@@ -28,7 +28,7 @@ muD3PD::muD3PD(physics* phys, mcPhysics* mcPhys, TFile* treeFile)
 	m_tree = new TTree("offline", "offline");
 	m_tree->SetDirectory(m_treeFile);
 	//m_tree->SetMaxTreeSize(100000000); // 100Mb per file
-	//m_tree->OptimizeBaskets();
+	m_tree->OptimizeBaskets();
 	
 	setVectorPtrs();
 	setBranches();

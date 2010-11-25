@@ -7,10 +7,10 @@
 
 #include "basicIncludes.h"
 
-#ifndef OFFTREE_H
-#define OFFTREE_H
+#ifndef MUD3PD_H
+#define MUD3PD_H
 
-class offTree
+class muD3PD
 {
 public:
 	// pointers
@@ -19,17 +19,45 @@ public:
 	TFile*     m_treeFile;
 	TTree*     m_tree;
 	
-	// check
-	Bool_t emptyEvent;
+	// locals
+	int counter;
 	
 	// event info branches
-	int RunNumber;
-	int lbn;
-	int EventNumber;
-	string period;
+	vector<string>* period;
 	vector<string>* triggers;
 	int isGRL;
 	
+	int RunNumber;
+	int EventNumber;
+	int timestamp;
+	int timestamp_ns;
+	int lbn;
+	int bcid;
+	int detmask0;
+	int detmask1;
+	int pixelFlags;
+	int sctFlags;
+	int trtFlags;
+	int larFlags;
+	int tileFlags;
+	int muonFlags;
+	int fwdFlags;
+	int coreFlags;
+	int pixelError;
+	int sctError;
+	int trtError;
+	int larError;
+	int tileError;
+	int muonError;
+	int fwdError;
+	int coreError;
+	int lar_ncellA;
+	int lar_ncellC;
+	float lar_energyA;
+	float lar_energyC;
+	float lar_timeA;
+	float lar_timeC;
+	float lar_timeDiff;
 	
 	// L1 triggers
 	int L1_MU0;
@@ -60,9 +88,8 @@ public:
 	int EF_mu4;
 	int EF_mu40_MSonly;
 	
-	
 	// mu_staco
-	Int_t          mu_staco_n;
+	int            mu_staco_n;
 	vector<float>* mu_staco_px;
 	vector<float>* mu_staco_py;
 	vector<float>* mu_staco_pz;
@@ -111,7 +138,6 @@ public:
 	vector<int>*   mu_staco_author;
 	vector<float>* mu_staco_matchchi2;
 	vector<int>*   mu_staco_matchndof;
-	
 	vector<float>*   mu_staco_etcone20;
 	vector<float>*   mu_staco_etcone30;
 	vector<float>*   mu_staco_etcone40;
@@ -246,9 +272,8 @@ public:
 	vector<short>*   mu_staco_L1_hemisphere;
 	vector<int>*     mu_staco_L1_matched;
 	
-	
 	// muid
-	Int_t          mu_muid_n;
+	int            mu_muid_n;
 	vector<float>* mu_muid_px;
 	vector<float>* mu_muid_py;
 	vector<float>* mu_muid_pz;
@@ -297,7 +322,6 @@ public:
 	vector<int>*   mu_muid_author;
 	vector<float>* mu_muid_matchchi2;
 	vector<int>*   mu_muid_matchndof;
-	
 	vector<float>*   mu_muid_etcone20;
 	vector<float>*   mu_muid_etcone30;
 	vector<float>*   mu_muid_etcone40;
@@ -433,21 +457,22 @@ public:
 	vector<int>*     mu_muid_L1_matched;
 	
 	// vertex variables
-	Int_t          vxp_n;
+	int            vxp_n;
 	vector<float>* vxp_z;
-	vector<float>* vxp_z_err;
+	vector<float>* vxp_err_z;
 	vector<int>*   vxp_nTracks;
 	vector<int>*   vxp_type;
 	
 public:
-	offTree();
-	offTree(physics* phys, mcPhysics* mcPhys, TFile* treeFile);
-	~offTree();
+	muD3PD();
+	muD3PD(physics* phys, mcPhysics* mcPhys, TFile* treeFile);
+	~muD3PD();
 	
 	TTree* getTree();
+	void setVectorPtrs();
+	void resetVectorPtrs();
 	void setBranches();
-	void fill(int isGrl, string sPeriod, vector<string>* vsTriggers);
-	void reset();
+	void fill(int GRL, string sPeriod, vector<string>* vsTriggers);
 	void write();
 
 private:

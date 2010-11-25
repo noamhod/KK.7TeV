@@ -29,11 +29,11 @@ void analysisSkeleton::resetMuQAflags(int nMus)
 string analysisSkeleton::getPeriodName()
 {
 	string speriod = sCurrentPeriod;
-	if(runnumber != currentRun)
+	if(RunNumber != currentRun)
 	{
-		speriod = getPeriod( runnumber, m_firstrun2periodMap, m_lastrun2periodMap );
+		speriod = getPeriod( RunNumber, m_firstrun2periodMap, m_lastrun2periodMap );
 		cout << "switching to period: " << speriod << endl;
-		currentRun     = runnumber;
+		currentRun     = RunNumber;
 		sCurrentPeriod = speriod;
 	}
 	if(speriod=="")
@@ -119,7 +119,7 @@ void analysisSkeleton::runEventDumper()
 		current_etaSum      = current_muplus_eta + current_mu_eta;
 		
 		setCurrentEventMass( imass(pmu[muMinus],pmu[muPlus]) );
-		writeEventHeader(runnumber, lumiblock, eventnumber);
+		writeEventHeader(RunNumber, lbn, EventNumber);
 		
 		writeProperty("$p_T$", pT(mu_me_qoverp->at(muMinus),mu_me_theta->at(muMinus))*MeV2TeV, pT(mu_me_qoverp->at(muPlus),mu_me_theta->at(muPlus))*MeV2TeV);
 		writeProperty("$\\eta$", mu_eta->at(muMinus), mu_eta->at(muPlus));
@@ -146,9 +146,9 @@ void analysisSkeleton::runEventDumper()
 void analysisSkeleton::printAllProperties(int ai, int bi, int iv)
 {
 	// event
-	printProperty("runnumber", runnumber);
-	printProperty("lumiblock", lumiblock);
-	printProperty("eventnumber", eventnumber);
+	printProperty("RunNumber", RunNumber);
+	printProperty("lbn", lbn);
+	printProperty("EventNumber", EventNumber);
 	printProperty("isGRL", isGRL);
 	printProperty("imass", imass(pmu[ai],pmu[bi]));
 	

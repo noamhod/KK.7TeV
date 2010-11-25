@@ -98,10 +98,39 @@ void mcDigestAnalysis::executeCutFlow()
 
 void mcDigestAnalysis::setEventVariables()
 {
-	// event level (for preselection)
-	analysisSkeleton::runnumber   = m_mcDigestPhys->RunNumber;
-	analysisSkeleton::lumiblock   = m_mcDigestPhys->lbn;
-	analysisSkeleton::eventnumber = m_mcDigestPhys->EventNumber;
+		// event level (for preselection)
+	analysisSkeleton::RunNumber    = m_mcDigestPhys->RunNumber;
+	analysisSkeleton::EventNumber  = m_mcDigestPhys->EventNumber;
+	analysisSkeleton::timestamp    = m_mcDigestPhys->timestamp;
+	analysisSkeleton::timestamp_ns = m_mcDigestPhys->timestamp_ns;
+	analysisSkeleton::lbn          = m_mcDigestPhys->lbn;
+	analysisSkeleton::bcid         = m_mcDigestPhys->bcid;
+	analysisSkeleton::detmask0     = m_mcDigestPhys->detmask0;
+	analysisSkeleton::detmask1     = m_mcDigestPhys->detmask1;
+	analysisSkeleton::pixelFlags   = m_mcDigestPhys->pixelFlags;
+	analysisSkeleton::sctFlags     = m_mcDigestPhys->sctFlags;
+	analysisSkeleton::trtFlags     = m_mcDigestPhys->trtFlags;
+	analysisSkeleton::larFlags     = m_mcDigestPhys->larFlags;
+	analysisSkeleton::tileFlags    = m_mcDigestPhys->tileFlags;
+	analysisSkeleton::muonFlags    = m_mcDigestPhys->muonFlags;
+	analysisSkeleton::fwdFlags     = m_mcDigestPhys->fwdFlags;
+	analysisSkeleton::coreFlags    = m_mcDigestPhys->coreFlags;
+	analysisSkeleton::pixelError   = m_mcDigestPhys->pixelError;
+	analysisSkeleton::sctError     = m_mcDigestPhys->sctError;
+	analysisSkeleton::trtError     = m_mcDigestPhys->trtError;
+	analysisSkeleton::larError     = m_mcDigestPhys->larError;
+	analysisSkeleton::tileError    = m_mcDigestPhys->tileError;
+	analysisSkeleton::muonError    = m_mcDigestPhys->muonError;
+	analysisSkeleton::fwdError     = m_mcDigestPhys->fwdError;
+	analysisSkeleton::coreError    = m_mcDigestPhys->coreError;
+	//analysisSkeleton::lar_ncellA   = m_mcDigestPhys->lar_ncellA;
+	//analysisSkeleton::lar_ncellC   = m_mcDigestPhys->lar_ncellC;
+	//analysisSkeleton::lar_energyA  = m_mcDigestPhys->lar_energyA;
+	//analysisSkeleton::lar_energyC  = m_mcDigestPhys->lar_energyC;
+	//analysisSkeleton::lar_timeA    = m_mcDigestPhys->lar_timeA;
+	//analysisSkeleton::lar_timeC    = m_mcDigestPhys->lar_timeC;
+	//analysisSkeleton::lar_timeDiff = m_mcDigestPhys->lar_timeDiff;
+	
 	analysisSkeleton::isGRL       = 1;
 	
 	//////////////////////////////////////////////////////

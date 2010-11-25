@@ -42,7 +42,7 @@ void mcOfflineAnalysis::executeAdvanced()
 
 void mcOfflineAnalysis::executeCutFlow()
 {
-	sMuonRecoAlgo = "staco";
+	sMuonRecoAlgo = "muid";
 
 	///////////////////////////////////
 	// set all the event-level vars ///
@@ -80,7 +80,16 @@ void mcOfflineAnalysis::executeCutFlow()
 	////////////////////////////////////////////////////////////
 	// write to the digest tree only the pairs that pass skim //
 	bool passSkim = digestSkim(nMus); //////////////////////////
-	if( passSkim ) m_dgsTree->fill(analysisSkeleton::isGRL); ///
+	if( passSkim )
+	{
+		m_muSkimMCD3PD->fillMC(); // this does *not* call TTree::Fill()
+		m_muSkimD3PD->fill(analysisSkeleton::isGRL);
+		m_muSkimMCD3PD->resetVectorPtrsMC(); // in muSkimD3PD this is done internally
+											 // but in muSkimMCD3PD this has to be
+											 // done externally, i.e. here since
+											 // the tree is being filled in the
+											 // muSkimD3PD class.
+	}
 	////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////
@@ -104,10 +113,39 @@ void mcOfflineAnalysis::executeCutFlow()
 
 void mcOfflineAnalysis::setEventVariables()
 {
-		// event level (for preselection)
-	analysisSkeleton::runnumber   = m_mcOffPhys->RunNumber;
-	analysisSkeleton::lumiblock   = m_mcOffPhys->lbn;
-	analysisSkeleton::eventnumber = m_mcOffPhys->EventNumber;
+	// event level (for preselection)
+	analysisSkeleton::RunNumber    = m_mcOffPhys->RunNumber;
+	analysisSkeleton::EventNumber  = m_mcOffPhys->EventNumber;
+	analysisSkeleton::timestamp    = m_mcOffPhys->timestamp;
+	analysisSkeleton::timestamp_ns = m_mcOffPhys->timestamp_ns;
+	analysisSkeleton::lbn          = m_mcOffPhys->lbn;
+	analysisSkeleton::bcid         = m_mcOffPhys->bcid;
+	analysisSkeleton::detmask0     = m_mcOffPhys->detmask0;
+	analysisSkeleton::detmask1     = m_mcOffPhys->detmask1;
+	analysisSkeleton::pixelFlags   = m_mcOffPhys->pixelFlags;
+	analysisSkeleton::sctFlags     = m_mcOffPhys->sctFlags;
+	analysisSkeleton::trtFlags     = m_mcOffPhys->trtFlags;
+	analysisSkeleton::larFlags     = m_mcOffPhys->larFlags;
+	analysisSkeleton::tileFlags    = m_mcOffPhys->tileFlags;
+	analysisSkeleton::muonFlags    = m_mcOffPhys->muonFlags;
+	analysisSkeleton::fwdFlags     = m_mcOffPhys->fwdFlags;
+	analysisSkeleton::coreFlags    = m_mcOffPhys->coreFlags;
+	analysisSkeleton::pixelError   = m_mcOffPhys->pixelError;
+	analysisSkeleton::sctError     = m_mcOffPhys->sctError;
+	analysisSkeleton::trtError     = m_mcOffPhys->trtError;
+	analysisSkeleton::larError     = m_mcOffPhys->larError;
+	analysisSkeleton::tileError    = m_mcOffPhys->tileError;
+	analysisSkeleton::muonError    = m_mcOffPhys->muonError;
+	analysisSkeleton::fwdError     = m_mcOffPhys->fwdError;
+	analysisSkeleton::coreError    = m_mcOffPhys->coreError;
+	//analysisSkeleton::lar_ncellA   = m_mcOffPhys->lar_ncellA;
+	//analysisSkeleton::lar_ncellC   = m_mcOffPhys->lar_ncellC;
+	//analysisSkeleton::lar_energyA  = m_mcOffPhys->lar_energyA;
+	//analysisSkeleton::lar_energyC  = m_mcOffPhys->lar_energyC;
+	//analysisSkeleton::lar_timeA    = m_mcOffPhys->lar_timeA;
+	//analysisSkeleton::lar_timeC    = m_mcOffPhys->lar_timeC;
+	//analysisSkeleton::lar_timeDiff = m_mcOffPhys->lar_timeDiff;
+	
 	analysisSkeleton::isGRL       = 1;
 	
 	//////////////////////////////////////////////////////
@@ -282,5 +320,5 @@ void mcOfflineAnalysis::setMuidVariables()
 void mcOfflineAnalysis::write()
 {
 	m_treeFile->cd();
-	m_dgsTree->write();
+	m_muSkimD3PD->write();
 }

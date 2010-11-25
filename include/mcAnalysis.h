@@ -10,11 +10,11 @@
 #define analysisSkeleton_cxx
 #include "analysisSkeleton.C"
 
-#define offTree_cxx
-#include "offTree.C"
+#define muD3PD_cxx
+#include "muD3PD.C"
 
-#define mcOffTree_cxx
-#include "mcOffTree.C"
+#define muMCD3PD_cxx
+#include "muMCD3PD.C"
 
 #ifndef MCANALYSIS_H
 #define MCANALYSIS_H
@@ -24,8 +24,8 @@ class mcAnalysis : public mcPhysics, public analysisSkeleton
 public:
 	// pointers to classes
 	mcPhysics* m_mcPhys;
-	offTree*   m_offTree;
-	mcOffTree* m_mcOffTree;
+	muD3PD*    m_muD3PD;
+	muMCD3PD*  m_muMCD3PD;
 	TFile*     m_treeFile;
 	
 	// local
@@ -39,8 +39,8 @@ public:
 	{
 		m_mcPhys = mcPhys;
 		m_treeFile = treeFile;
-		m_offTree = new offTree( NULL, m_mcPhys, m_treeFile ); // the NULL arg is the [physics* m_phys;] variable
-		m_mcOffTree = new mcOffTree( m_mcPhys, m_treeFile,  m_offTree->getTree() );
+		m_muD3PD = new muD3PD( NULL, m_mcPhys, m_treeFile ); // the NULL arg is the [physics* m_phys;] variable
+		m_muMCD3PD = new muMCD3PD( m_mcPhys, m_treeFile,  m_muD3PD->getTree() );
 	}
 	~mcAnalysis();
 

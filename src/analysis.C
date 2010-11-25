@@ -47,7 +47,7 @@ void analysis::executeCutFlow()
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// fill the "offline" tree with *all* the events ////////////////////////////////////////////////////////////
-	m_offTree->fill(analysisSkeleton::isGRL, analysisSkeleton::sPeriod, analysisSkeleton::vTriggers); ///////////
+	m_muD3PD->fill(analysisSkeleton::isGRL, analysisSkeleton::sPeriod, analysisSkeleton::vTriggers); ////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/////////////////////////////////////////////////////
@@ -100,9 +100,37 @@ void analysis::executeCutFlow()
 void analysis::setEventVariables()
 {
 	// event level (for preselection)
-	analysisSkeleton::runnumber   = m_phys->RunNumber;
-	analysisSkeleton::lumiblock   = m_phys->lbn;
-	analysisSkeleton::eventnumber = m_phys->EventNumber;
+	analysisSkeleton::RunNumber    = m_phys->RunNumber;
+	analysisSkeleton::EventNumber  = m_phys->EventNumber;
+	analysisSkeleton::timestamp    = m_phys->timestamp;
+	analysisSkeleton::timestamp_ns = m_phys->timestamp_ns;
+	analysisSkeleton::lbn          = m_phys->lbn;
+	analysisSkeleton::bcid         = m_phys->bcid;
+	analysisSkeleton::detmask0     = m_phys->detmask0;
+	analysisSkeleton::detmask1     = m_phys->detmask1;
+	analysisSkeleton::pixelFlags   = m_phys->pixelFlags;
+	analysisSkeleton::sctFlags     = m_phys->sctFlags;
+	analysisSkeleton::trtFlags     = m_phys->trtFlags;
+	analysisSkeleton::larFlags     = m_phys->larFlags;
+	analysisSkeleton::tileFlags    = m_phys->tileFlags;
+	analysisSkeleton::muonFlags    = m_phys->muonFlags;
+	analysisSkeleton::fwdFlags     = m_phys->fwdFlags;
+	analysisSkeleton::coreFlags    = m_phys->coreFlags;
+	analysisSkeleton::pixelError   = m_phys->pixelError;
+	analysisSkeleton::sctError     = m_phys->sctError;
+	analysisSkeleton::trtError     = m_phys->trtError;
+	analysisSkeleton::larError     = m_phys->larError;
+	analysisSkeleton::tileError    = m_phys->tileError;
+	analysisSkeleton::muonError    = m_phys->muonError;
+	analysisSkeleton::fwdError     = m_phys->fwdError;
+	analysisSkeleton::coreError    = m_phys->coreError;
+	analysisSkeleton::lar_ncellA   = m_phys->lar_ncellA;
+	analysisSkeleton::lar_ncellC   = m_phys->lar_ncellC;
+	analysisSkeleton::lar_energyA  = m_phys->lar_energyA;
+	analysisSkeleton::lar_energyC  = m_phys->lar_energyC;
+	analysisSkeleton::lar_timeA    = m_phys->lar_timeA;
+	analysisSkeleton::lar_timeC    = m_phys->lar_timeC;
+	analysisSkeleton::lar_timeDiff = m_phys->lar_timeDiff;
 	
 	//////////////////////////////////////////////////////
 	// do this only if the run number has changed ////////
@@ -209,7 +237,6 @@ void analysis::setStacoVariables()
 	analysisSkeleton::mu_nTGCLayer2PhiHits = m_phys->mu_staco_nTGCLayer2PhiHits;
 	analysisSkeleton::mu_nTGCLayer3PhiHits = m_phys->mu_staco_nTGCLayer3PhiHits;
 	analysisSkeleton::mu_nTGCLayer4PhiHits = m_phys->mu_staco_nTGCLayer4PhiHits;
-	
 	analysisSkeleton::mu_etcone20 = m_phys->mu_staco_etcone20;
 	analysisSkeleton::mu_etcone30 = m_phys->mu_staco_etcone30;
 	analysisSkeleton::mu_etcone40 = m_phys->mu_staco_etcone40;
@@ -404,7 +431,6 @@ void analysis::setMuidVariables()
 	analysisSkeleton::mu_nTGCLayer2PhiHits = m_phys->mu_muid_nTGCLayer2PhiHits;
 	analysisSkeleton::mu_nTGCLayer3PhiHits = m_phys->mu_muid_nTGCLayer3PhiHits;
 	analysisSkeleton::mu_nTGCLayer4PhiHits = m_phys->mu_muid_nTGCLayer4PhiHits;
-	
 	analysisSkeleton::mu_etcone20 = m_phys->mu_muid_etcone20;
 	analysisSkeleton::mu_etcone30 = m_phys->mu_muid_etcone30;
 	analysisSkeleton::mu_etcone40 = m_phys->mu_muid_etcone40;
@@ -544,5 +570,6 @@ void analysis::setMuidVariables()
 void analysis::write()
 {
 	m_treeFile->cd();
-	m_offTree->write();
+	//m_offTree->write();
+	m_muD3PD->write();
 }

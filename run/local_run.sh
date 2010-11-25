@@ -18,7 +18,7 @@ datasetfiles=$2
 
 
 # the GRL version
-grlvs=00-00-84
+grlvs=00-00-91
 
 
 # add to LD_LIBRARY_PATH
@@ -38,7 +38,7 @@ dateandhour=`date +d%d%m%Y.h%H%M`
 
 # remove the arlier outputs
 rm -f input.txt
-rm -f WZphys.root
+#rm -f WZphys.root
 rm -f Loader_C.so
 
 # get the latest grl and cut flow

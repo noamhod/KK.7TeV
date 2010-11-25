@@ -28,8 +28,10 @@ void mcAnalysis::executeCutFlow()
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// fill the "offline" tree with *all* the events /////////////////////////////////////////////////////////
-	m_mcOffTree->fillMC(); // this does *not* call TTree::Fill() /////////////////////////////////////////////
-	m_offTree->fill(analysisSkeleton::isGRL, analysisSkeleton::sPeriod, analysisSkeleton::vTriggers); ////////
+	m_muMCD3PD->fillMC(); // this does *not* call TTree::Fill() //////////////////////////////////////////////
+	m_muD3PD->fill(analysisSkeleton::isGRL, analysisSkeleton::sPeriod, analysisSkeleton::vTriggers); /////////
+	m_muMCD3PD->resetVectorPtrsMC(); // in muD3PD this is done internally but in muMCD3PD this has to be /////
+	// done externally, i.e. here since the tree is being filled in the muD3PD class. ////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////
@@ -82,9 +84,37 @@ void mcAnalysis::executeCutFlow()
 void mcAnalysis::setEventVariables()
 {
 	// event level (for preselection)
-	analysisSkeleton::runnumber   = m_mcPhys->RunNumber;
-	analysisSkeleton::lumiblock   = m_mcPhys->lbn;
-	analysisSkeleton::eventnumber = m_mcPhys->EventNumber;
+	analysisSkeleton::RunNumber    = m_mcPhys->RunNumber;
+	analysisSkeleton::EventNumber  = m_mcPhys->EventNumber;
+	analysisSkeleton::timestamp    = m_mcPhys->timestamp;
+	analysisSkeleton::timestamp_ns = m_mcPhys->timestamp_ns;
+	analysisSkeleton::lbn          = m_mcPhys->lbn;
+	analysisSkeleton::bcid         = m_mcPhys->bcid;
+	analysisSkeleton::detmask0     = m_mcPhys->detmask0;
+	analysisSkeleton::detmask1     = m_mcPhys->detmask1;
+	analysisSkeleton::pixelFlags   = m_mcPhys->pixelFlags;
+	analysisSkeleton::sctFlags     = m_mcPhys->sctFlags;
+	analysisSkeleton::trtFlags     = m_mcPhys->trtFlags;
+	analysisSkeleton::larFlags     = m_mcPhys->larFlags;
+	analysisSkeleton::tileFlags    = m_mcPhys->tileFlags;
+	analysisSkeleton::muonFlags    = m_mcPhys->muonFlags;
+	analysisSkeleton::fwdFlags     = m_mcPhys->fwdFlags;
+	analysisSkeleton::coreFlags    = m_mcPhys->coreFlags;
+	analysisSkeleton::pixelError   = m_mcPhys->pixelError;
+	analysisSkeleton::sctError     = m_mcPhys->sctError;
+	analysisSkeleton::trtError     = m_mcPhys->trtError;
+	analysisSkeleton::larError     = m_mcPhys->larError;
+	analysisSkeleton::tileError    = m_mcPhys->tileError;
+	analysisSkeleton::muonError    = m_mcPhys->muonError;
+	analysisSkeleton::fwdError     = m_mcPhys->fwdError;
+	analysisSkeleton::coreError    = m_mcPhys->coreError;
+	//analysisSkeleton::lar_ncellA   = m_mcPhys->lar_ncellA;
+	//analysisSkeleton::lar_ncellC   = m_mcPhys->lar_ncellC;
+	//analysisSkeleton::lar_energyA  = m_mcPhys->lar_energyA;
+	//analysisSkeleton::lar_energyC  = m_mcPhys->lar_energyC;
+	//analysisSkeleton::lar_timeA    = m_mcPhys->lar_timeA;
+	//analysisSkeleton::lar_timeC    = m_mcPhys->lar_timeC;
+	//analysisSkeleton::lar_timeDiff = m_mcPhys->lar_timeDiff;
 	
 	//////////////////////////////////////////////////////
 	// do this only if the run number has changed ////////
@@ -193,7 +223,6 @@ void mcAnalysis::setStacoVariables()
 	analysisSkeleton::mu_nTGCLayer2PhiHits = m_mcPhys->mu_staco_nTGCLayer2PhiHits;
 	analysisSkeleton::mu_nTGCLayer3PhiHits = m_mcPhys->mu_staco_nTGCLayer3PhiHits;
 	analysisSkeleton::mu_nTGCLayer4PhiHits = m_mcPhys->mu_staco_nTGCLayer4PhiHits;
-	
 	analysisSkeleton::mu_etcone20 = m_mcPhys->mu_staco_etcone20;
 	analysisSkeleton::mu_etcone30 = m_mcPhys->mu_staco_etcone30;
 	analysisSkeleton::mu_etcone40 = m_mcPhys->mu_staco_etcone40;
@@ -388,7 +417,6 @@ void mcAnalysis::setMuidVariables()
 	analysisSkeleton::mu_nTGCLayer2PhiHits = m_mcPhys->mu_muid_nTGCLayer2PhiHits;
 	analysisSkeleton::mu_nTGCLayer3PhiHits = m_mcPhys->mu_muid_nTGCLayer3PhiHits;
 	analysisSkeleton::mu_nTGCLayer4PhiHits = m_mcPhys->mu_muid_nTGCLayer4PhiHits;
-	
 	analysisSkeleton::mu_etcone20 = m_mcPhys->mu_muid_etcone20;
 	analysisSkeleton::mu_etcone30 = m_mcPhys->mu_muid_etcone30;
 	analysisSkeleton::mu_etcone40 = m_mcPhys->mu_muid_etcone40;
@@ -527,5 +555,5 @@ void mcAnalysis::setMuidVariables()
 void mcAnalysis::write()
 {
 	m_treeFile->cd();
-	m_offTree->write();
+	m_muD3PD->write();
 }

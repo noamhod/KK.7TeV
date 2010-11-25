@@ -13,8 +13,8 @@
 #define GRLinterface_cxx
 #include "GRLinterface.C"
 
-#define digestTree_cxx
-#include "digestTree.C"
+#define muSkimD3PD_cxx
+#include "muSkimD3PD.C"
 
 #ifndef OFFLINEANALYSIS_H
 #define OFFLINEANALYSIS_H
@@ -26,7 +26,7 @@ public:
 	offlinePhysics* m_offPhys;
 	GRLinterface*   m_offAnalysis_grl;
 	TFile*		    m_treeFile;
-	digestTree*     m_dgsTree;
+	muSkimD3PD*     m_muSkimD3PD;
 	
 	// local
 	string sMuonRecoAlgo;
@@ -41,7 +41,7 @@ public:
 		m_offPhys = offPhys;
 		m_offAnalysis_grl = grl;
 		m_treeFile = treeFile;
-		m_dgsTree = new digestTree( m_offPhys, NULL, m_treeFile ); // the NULL arg is the [mcOfflinePhysics* mcOffPhys] variable
+		m_muSkimD3PD = new muSkimD3PD( m_offPhys, NULL, m_treeFile ); // the NULL arg is the [mcOfflinePhysics* mcOffPhys] variable
 	}
 	~offlineAnalysis();
 

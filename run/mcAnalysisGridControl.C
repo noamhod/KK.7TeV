@@ -30,6 +30,8 @@ mcAnalysisGridControl::mcAnalysisGridControl( TChain* inchain, TFile* outfile )
 	m_mcAnalysis = new mcAnalysis( m_mcPhys, m_rootfile, "cutFlow.cuts", "dataPeriods.data", "" );
 
 	book();
+	
+	m_rootfile->cd();
 }
 
 mcAnalysisGridControl::~mcAnalysisGridControl()
@@ -60,9 +62,9 @@ void mcAnalysisGridControl::finalize()
 
 	// tree
 	// the tree will split into multiple files
-	m_rootfile = m_mcAnalysis->m_offTree->m_tree->GetCurrentFile();
+	m_rootfile = m_mcAnalysis->m_muD3PD->m_tree->GetCurrentFile();
 	m_rootfile->cd();
-	m_mcAnalysis->m_offTree->m_tree->Write();
+	m_mcAnalysis->m_muD3PD->m_tree->Write();
 	m_rootfile->Write();
 	m_rootfile->Close();
 }
@@ -84,6 +86,8 @@ void mcAnalysisGridControl::book()
 	m_dirFit = m_rootfile->mkdir("fit");
 	
 	m_mcAnalysis->bookFitHistos(m_dirAllCuts);	
+	
+	m_dirPerformance = m_rootfile->mkdir("performance");
 }
 
 void mcAnalysisGridControl::draw()
@@ -92,6 +96,7 @@ void mcAnalysisGridControl::draw()
 	m_mcAnalysis->drawHistos(m_dirAllCuts);
 	m_mcAnalysis->drawHistosMap( m_mcAnalysis->getCutFlowOrderedMapPtr(), m_mcAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 	m_mcAnalysis->drawCutProfileHistosMap( m_dirCutProfile );
+	m_mcAnalysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
 
 	m_mcAnalysis->printCutFlowNumbers(l64t_nentries);
 	cout << "nMultiMuonEvents = " << m_mcAnalysis->nMultiMuonEvents << endl;
@@ -139,6 +144,15 @@ void mcAnalysisGridControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		
 		if(l64t_jentry%100000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_mcPhys->RunNumber << "\tlumiblock=" << m_mcPhys->lbn << endl;
 		if(l64t_jentry%l64t_mod==0) m_mcAnalysis->printCutFlowNumbers(l64t_nentries);
+		
+		if(l64t_jentry%1000==0)
+		{
+			gSystem->GetProcInfo(&pi);
+			//cout << "RES Mem=" << pi.fMemResident << " VIRT Mem=" << pi.fMemVirtual << endl;
+			vResMemory.push_back((double)pi.fMemResident);
+			vVirMemory.push_back((double)pi.fMemVirtual);
+			vEntries.push_back((int)l64t_jentry);
+		}
 		
 		analyze();
 	}

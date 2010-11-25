@@ -15,7 +15,7 @@
 #define G__ANSIHEADER
 #define G__DICTIONARY
 #define G__PRIVATE_GVALUE
-#include "cint/G__ci.h"
+#include "G__ci.h"
 extern "C" {
 extern void G__cpp_setup_tagtableTGoodRunsListsCint();
 extern void G__cpp_setup_inheritanceTGoodRunsListsCint();

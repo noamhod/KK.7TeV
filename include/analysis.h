@@ -19,8 +19,8 @@
 #define muon_muid_cxx
 #include "muon_muid.C"
 
-#define offTree_cxx
-#include "offTree.C"
+#define muD3PD_cxx
+#include "muD3PD.C"
 
 #ifndef ANALYSIS_H
 #define ANALYSIS_H
@@ -33,7 +33,7 @@ public:
 	muon_muid*    m_muid;
 	muon_staco*   m_mustaco;
 	GRLinterface* m_analysis_grl;
-	offTree*      m_offTree;
+	muD3PD*       m_muD3PD;
 	TFile*		  m_treeFile;
 	
 	// local
@@ -42,7 +42,6 @@ public:
 
 public:
 	analysis();
-	//analysis(physics* phys, graphicObjects* graphicobjs, cutFlowHandler* cutFlowHandler, periodHandler* periods, fit* fitter, GRLinterface* grl, TFile* treeFile);
 	analysis(physics* phys, GRLinterface* grl, TFile* treeFile,
 			 string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath ) :
 			 analysisSkeleton(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
@@ -50,7 +49,8 @@ public:
 				m_phys = phys;
 				m_analysis_grl = grl;	
 				m_treeFile = treeFile;
-				m_offTree = new offTree( m_phys, NULL, m_treeFile ); // the NULL arg is the [mcPhysics* m_mcPhys;] variable
+				//m_offTree = new offTree( m_phys, NULL, m_treeFile ); // the NULL arg is the [mcPhysics* m_mcPhys;] variable
+				m_muD3PD  = new muD3PD( m_phys, NULL, m_treeFile ); // the NULL arg is the [mcPhysics* m_mcPhys;] variable
 				m_muid    = new muon_muid(  m_phys ); // this will also "turn on" the desired branches (virtual in the base)
 				m_mustaco = new muon_staco( m_phys ); // this will also  "turn on" the desired branches (virtual in the base)
 			}

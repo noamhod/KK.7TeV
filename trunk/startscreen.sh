@@ -1,3 +1,4 @@
 #!/bin/bash/
-screen -S Z -c scripts/.screenrc_Z
+host=$1
+screen -S Z -c scripts/.screenrc_Z_$host
 

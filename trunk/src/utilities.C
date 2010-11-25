@@ -67,6 +67,8 @@ string utilities::pickMCinputSampe()
 	int n = 0;
 	TMapis mcSamplesMap;
 	
+	mcSamplesMap.insert( make_pair( -1,"mcWZphys_localTests" ) ); 
+	
 	mcSamplesMap.insert( make_pair( 0,"Zmumu" ) ); 
 	
 	mcSamplesMap.insert( make_pair( 1,"DYmumu_75M120" ) );

@@ -92,7 +92,9 @@ void mcDigestControl::book()
 	m_mcDigestAnalysis->bookHistosMap( m_mcDigestAnalysis->getCutFlowOrderedMapPtr(), m_mcDigestAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 	
 	m_dirCutProfile = m_histfile->mkdir("cutsProfile");
-	m_mcDigestAnalysis->bookCutProfileHistosMap( m_mcDigestAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );	
+	m_mcDigestAnalysis->bookCutProfileHistosMap( m_mcDigestAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );
+	
+	m_dirPerformance = m_histfile->mkdir("performance");
 }
 
 void mcDigestControl::draw()
@@ -103,6 +105,7 @@ void mcDigestControl::draw()
 	m_mcDigestAnalysis->drawFitHistos(m_dirFit, m_mcDigestAnalysis->m_fitROOT->guess, m_mcDigestAnalysis->m_fitROOT->fitFCN);
 	//m_mcDigestAnalysis->drawFitHistos(m_dirFit, m_mcDigestAnalysis->m_fitMinuit->guess, m_mcDigestAnalysis->m_fitMinuit->fitFCN);
 	m_mcDigestAnalysis->drawCutProfileHistosMap( m_dirCutProfile );
+	m_mcDigestAnalysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
 	
 	m_mcDigestAnalysis->printCutFlowNumbers(l64t_nentries);
 }
@@ -149,6 +152,15 @@ void mcDigestControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		
 		if(l64t_jentry%10000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_mcDigestPhys->RunNumber << "\tlumiblock=" << m_mcDigestPhys->lbn << endl;
 		if(l64t_jentry%l64t_mod==0) m_mcDigestAnalysis->printCutFlowNumbers(l64t_nentries);
+		
+		if(l64t_jentry%1000==0)
+		{
+			gSystem->GetProcInfo(&pi);
+			//cout << "RES Mem=" << pi.fMemResident << " VIRT Mem=" << pi.fMemVirtual << endl;
+			vResMemory.push_back((double)pi.fMemResident);
+			vVirMemory.push_back((double)pi.fMemVirtual);
+			vEntries.push_back((int)l64t_jentry);
+		}
 		
 		analyze();
 	}

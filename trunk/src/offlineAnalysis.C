@@ -81,8 +81,7 @@ void offlineAnalysis::executeCutFlow()
 	//////////////////////////////////////////////////////////////
 	// write to the digest tree only the pairs that pass skim ////
 	bool passSkim = digestSkim(nMus); ////////////////////////////
-	//if( passSkim ) m_dgsTree->fill(analysisSkeleton::isGRL); /////
-	if( passSkim ) m_dgsTree->fill(analysisSkeleton::isGRL, true); /////
+	if( passSkim ) m_muSkimD3PD->fill(analysisSkeleton::isGRL); //
 	//////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////
@@ -107,10 +106,38 @@ void offlineAnalysis::executeCutFlow()
 void offlineAnalysis::setEventVariables()
 {
 	// event level (for preselection)
-	analysisSkeleton::runnumber   = m_offPhys->RunNumber;
-	analysisSkeleton::lumiblock   = m_offPhys->lbn;
-	analysisSkeleton::eventnumber = m_offPhys->EventNumber;
-	//analysisSkeleton::isGRL     = m_offPhys->isGRL;
+	analysisSkeleton::RunNumber    = m_offPhys->RunNumber;
+	analysisSkeleton::EventNumber  = m_offPhys->EventNumber;
+	analysisSkeleton::timestamp    = m_offPhys->timestamp;
+	analysisSkeleton::timestamp_ns = m_offPhys->timestamp_ns;
+	analysisSkeleton::lbn          = m_offPhys->lbn;
+	analysisSkeleton::bcid         = m_offPhys->bcid;
+	analysisSkeleton::detmask0     = m_offPhys->detmask0;
+	analysisSkeleton::detmask1     = m_offPhys->detmask1;
+	analysisSkeleton::pixelFlags   = m_offPhys->pixelFlags;
+	analysisSkeleton::sctFlags     = m_offPhys->sctFlags;
+	analysisSkeleton::trtFlags     = m_offPhys->trtFlags;
+	analysisSkeleton::larFlags     = m_offPhys->larFlags;
+	analysisSkeleton::tileFlags    = m_offPhys->tileFlags;
+	analysisSkeleton::muonFlags    = m_offPhys->muonFlags;
+	analysisSkeleton::fwdFlags     = m_offPhys->fwdFlags;
+	analysisSkeleton::coreFlags    = m_offPhys->coreFlags;
+	analysisSkeleton::pixelError   = m_offPhys->pixelError;
+	analysisSkeleton::sctError     = m_offPhys->sctError;
+	analysisSkeleton::trtError     = m_offPhys->trtError;
+	analysisSkeleton::larError     = m_offPhys->larError;
+	analysisSkeleton::tileError    = m_offPhys->tileError;
+	analysisSkeleton::muonError    = m_offPhys->muonError;
+	analysisSkeleton::fwdError     = m_offPhys->fwdError;
+	analysisSkeleton::coreError    = m_offPhys->coreError;
+	analysisSkeleton::lar_ncellA   = m_offPhys->lar_ncellA;
+	analysisSkeleton::lar_ncellC   = m_offPhys->lar_ncellC;
+	analysisSkeleton::lar_energyA  = m_offPhys->lar_energyA;
+	analysisSkeleton::lar_energyC  = m_offPhys->lar_energyC;
+	analysisSkeleton::lar_timeA    = m_offPhys->lar_timeA;
+	analysisSkeleton::lar_timeC    = m_offPhys->lar_timeC;
+	analysisSkeleton::lar_timeDiff = m_offPhys->lar_timeDiff;
+	
 	analysisSkeleton::isGRL       = m_offAnalysis_grl->m_grl.HasRunLumiBlock( m_offPhys->RunNumber, m_offPhys->lbn );
 	
 	//////////////////////////////////////////////////////
@@ -285,5 +312,5 @@ void offlineAnalysis::setMuidVariables()
 
 void offlineAnalysis::write()
 {
-	m_dgsTree->write();
+	m_muSkimD3PD->write();
 }

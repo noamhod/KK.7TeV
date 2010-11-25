@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Thu Nov 18 18:04:10 2010 by ROOT version 5.22/00
+// Thu Nov 25 17:45:55 2010 by ROOT version 5.26/00
 // from TTree offline/offline
 // found on file: mcWZphys.root
 //////////////////////////////////////////////////////////
@@ -19,11 +19,39 @@ public :
 
    // Declaration of leaf types
    Int_t           isGRL;
-   string          *period;
+   vector<string>  *period;
    vector<string>  *triggers;
    Int_t           RunNumber;
-   Int_t           lbn;
    Int_t           EventNumber;
+   Int_t           timestamp;
+   Int_t           timestamp_ns;
+   Int_t           lbn;
+   Int_t           bcid;
+   Int_t           detmask0;
+   Int_t           detmask1;
+   Int_t           pixelFlags;
+   Int_t           sctFlags;
+   Int_t           trtFlags;
+   Int_t           larFlags;
+   Int_t           tileFlags;
+   Int_t           muonFlags;
+   Int_t           fwdFlags;
+   Int_t           coreFlags;
+   Int_t           pixelError;
+   Int_t           sctError;
+   Int_t           trtError;
+   Int_t           larError;
+   Int_t           tileError;
+   Int_t           muonError;
+   Int_t           fwdError;
+   Int_t           coreError;
+   Int_t           lar_ncellA;
+   Int_t           lar_ncellC;
+   Float_t         lar_energyA;
+   Float_t         lar_energyC;
+   Float_t         lar_timeA;
+   Float_t         lar_timeC;
+   Float_t         lar_timeDiff;
    Int_t           L1_MU0;
    Int_t           L1_MU10;
    Int_t           L1_MU15;
@@ -417,7 +445,7 @@ public :
    vector<int>     *vxp_nTracks;
    vector<int>     *vxp_type;
    vector<float>   *vxp_z;
-   vector<float>   *vxp_z_err;
+   vector<float>   *vxp_err_z;
    vector<float>   *mu_staco_truth_E;
    vector<float>   *mu_staco_truth_pt;
    vector<float>   *mu_staco_truth_eta;
@@ -469,8 +497,36 @@ public :
    TBranch        *b_period;   //!
    TBranch        *b_triggers;   //!
    TBranch        *b_RunNumber;   //!
-   TBranch        *b_lbn;   //!
    TBranch        *b_EventNumber;   //!
+   TBranch        *b_timestamp;   //!
+   TBranch        *b_timestamp_ns;   //!
+   TBranch        *b_lbn;   //!
+   TBranch        *b_bcid;   //!
+   TBranch        *b_detmask0;   //!
+   TBranch        *b_detmask1;   //!
+   TBranch        *b_pixelFlags;   //!
+   TBranch        *b_sctFlags;   //!
+   TBranch        *b_trtFlags;   //!
+   TBranch        *b_larFlags;   //!
+   TBranch        *b_tileFlags;   //!
+   TBranch        *b_muonFlags;   //!
+   TBranch        *b_fwdFlags;   //!
+   TBranch        *b_coreFlags;   //!
+   TBranch        *b_pixelError;   //!
+   TBranch        *b_sctError;   //!
+   TBranch        *b_trtError;   //!
+   TBranch        *b_larError;   //!
+   TBranch        *b_tileError;   //!
+   TBranch        *b_muonError;   //!
+   TBranch        *b_fwdError;   //!
+   TBranch        *b_coreError;   //!
+   TBranch        *b_lar_ncellA;   //!
+   TBranch        *b_lar_ncellC;   //!
+   TBranch        *b_lar_energyA;   //!
+   TBranch        *b_lar_energyC;   //!
+   TBranch        *b_lar_timeA;   //!
+   TBranch        *b_lar_timeC;   //!
+   TBranch        *b_lar_timeDiff;   //!
    TBranch        *b_L1_MU0;   //!
    TBranch        *b_L1_MU10;   //!
    TBranch        *b_L1_MU15;   //!
@@ -864,7 +920,7 @@ public :
    TBranch        *b_vxp_nTracks;   //!
    TBranch        *b_vxp_type;   //!
    TBranch        *b_vxp_z;   //!
-   TBranch        *b_vxp_z_err;   //!
+   TBranch        *b_vxp_err_z;   //!
    TBranch        *b_mu_staco_truth_E;   //!
    TBranch        *b_mu_staco_truth_pt;   //!
    TBranch        *b_mu_staco_truth_eta;   //!
@@ -1345,7 +1401,7 @@ void mcOfflinePhysics::Init(TTree *tree)
    vxp_nTracks = 0;
    vxp_type = 0;
    vxp_z = 0;
-   vxp_z_err = 0;
+   vxp_err_z = 0;
    mu_staco_truth_E = 0;
    mu_staco_truth_pt = 0;
    mu_staco_truth_eta = 0;
@@ -1399,8 +1455,36 @@ void mcOfflinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("period", &period, &b_period);
    fChain->SetBranchAddress("triggers", &triggers, &b_triggers);
    fChain->SetBranchAddress("RunNumber", &RunNumber, &b_RunNumber);
-   fChain->SetBranchAddress("lbn", &lbn, &b_lbn);
    fChain->SetBranchAddress("EventNumber", &EventNumber, &b_EventNumber);
+   fChain->SetBranchAddress("timestamp", &timestamp, &b_timestamp);
+   fChain->SetBranchAddress("timestamp_ns", &timestamp_ns, &b_timestamp_ns);
+   fChain->SetBranchAddress("lbn", &lbn, &b_lbn);
+   fChain->SetBranchAddress("bcid", &bcid, &b_bcid);
+   fChain->SetBranchAddress("detmask0", &detmask0, &b_detmask0);
+   fChain->SetBranchAddress("detmask1", &detmask1, &b_detmask1);
+   fChain->SetBranchAddress("pixelFlags", &pixelFlags, &b_pixelFlags);
+   fChain->SetBranchAddress("sctFlags", &sctFlags, &b_sctFlags);
+   fChain->SetBranchAddress("trtFlags", &trtFlags, &b_trtFlags);
+   fChain->SetBranchAddress("larFlags", &larFlags, &b_larFlags);
+   fChain->SetBranchAddress("tileFlags", &tileFlags, &b_tileFlags);
+   fChain->SetBranchAddress("muonFlags", &muonFlags, &b_muonFlags);
+   fChain->SetBranchAddress("fwdFlags", &fwdFlags, &b_fwdFlags);
+   fChain->SetBranchAddress("coreFlags", &coreFlags, &b_coreFlags);
+   fChain->SetBranchAddress("pixelError", &pixelError, &b_pixelError);
+   fChain->SetBranchAddress("sctError", &sctError, &b_sctError);
+   fChain->SetBranchAddress("trtError", &trtError, &b_trtError);
+   fChain->SetBranchAddress("larError", &larError, &b_larError);
+   fChain->SetBranchAddress("tileError", &tileError, &b_tileError);
+   fChain->SetBranchAddress("muonError", &muonError, &b_muonError);
+   fChain->SetBranchAddress("fwdError", &fwdError, &b_fwdError);
+   fChain->SetBranchAddress("coreError", &coreError, &b_coreError);
+   fChain->SetBranchAddress("lar_ncellA", &lar_ncellA, &b_lar_ncellA);
+   fChain->SetBranchAddress("lar_ncellC", &lar_ncellC, &b_lar_ncellC);
+   fChain->SetBranchAddress("lar_energyA", &lar_energyA, &b_lar_energyA);
+   fChain->SetBranchAddress("lar_energyC", &lar_energyC, &b_lar_energyC);
+   fChain->SetBranchAddress("lar_timeA", &lar_timeA, &b_lar_timeA);
+   fChain->SetBranchAddress("lar_timeC", &lar_timeC, &b_lar_timeC);
+   fChain->SetBranchAddress("lar_timeDiff", &lar_timeDiff, &b_lar_timeDiff);
    fChain->SetBranchAddress("L1_MU0", &L1_MU0, &b_L1_MU0);
    fChain->SetBranchAddress("L1_MU10", &L1_MU10, &b_L1_MU10);
    fChain->SetBranchAddress("L1_MU15", &L1_MU15, &b_L1_MU15);
@@ -1794,7 +1878,7 @@ void mcOfflinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("vxp_nTracks", &vxp_nTracks, &b_vxp_nTracks);
    fChain->SetBranchAddress("vxp_type", &vxp_type, &b_vxp_type);
    fChain->SetBranchAddress("vxp_z", &vxp_z, &b_vxp_z);
-   fChain->SetBranchAddress("vxp_z_err", &vxp_z_err, &b_vxp_z_err);
+   fChain->SetBranchAddress("vxp_err_z", &vxp_err_z, &b_vxp_err_z);
    fChain->SetBranchAddress("mu_staco_truth_E", &mu_staco_truth_E, &b_mu_staco_truth_E);
    fChain->SetBranchAddress("mu_staco_truth_pt", &mu_staco_truth_pt, &b_mu_staco_truth_pt);
    fChain->SetBranchAddress("mu_staco_truth_eta", &mu_staco_truth_eta, &b_mu_staco_truth_eta);

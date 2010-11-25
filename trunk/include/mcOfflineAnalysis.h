@@ -10,8 +10,11 @@
 #define analysisSkeleton_cxx
 #include "analysisSkeleton.C"
 
-#define digestTree_cxx
-#include "digestTree.C"
+#define muSkimD3PD_cxx
+#include "muSkimD3PD.C"
+
+#define muSkimMCD3PD_cxx
+#include "muSkimMCD3PD.C"
 
 #ifndef MCOFFLINEANALYSIS_H
 #define MCOFFLINEANALYSIS_H
@@ -22,7 +25,8 @@ public:
 	// pointers to classes
 	mcOfflinePhysics* m_mcOffPhys;
 	TFile*		      m_treeFile;
-	digestTree*       m_dgsTree;
+	muSkimD3PD*       m_muSkimD3PD;
+	muSkimMCD3PD*     m_muSkimMCD3PD;
 	
 	// local
 	string sMuonRecoAlgo;
@@ -36,7 +40,8 @@ public:
 	{
 		m_mcOffPhys = mcOffPhys;
 		m_treeFile = treeFile;
-		m_dgsTree = new digestTree( NULL, m_mcOffPhys, m_treeFile ); // the NULL arg is the [offlinePhysics* offPhys] variable
+		m_muSkimD3PD   = new muSkimD3PD( NULL, m_mcOffPhys, m_treeFile ); // the NULL arg is the [offlinePhysics* m_offPhys;] variable
+		m_muSkimMCD3PD = new muSkimMCD3PD( m_mcOffPhys, m_treeFile,  m_muSkimD3PD->getTree() );
 	}
 	~mcOfflineAnalysis();
 	

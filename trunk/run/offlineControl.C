@@ -41,8 +41,14 @@ void offlineControl::initialize(int runNumber)
 	m_GRL = new GRLinterface();
 	m_GRL->glrinitialize( (TString)str );
 	
-	str = checkANDsetFilepath("PWD", "/../conf/offline_dataset.list");
-	string strb = checkANDsetFilepath("PWD", "/offline_datasetdir/"); // ln -s  ~hod/data  datasetdir
+	//str = checkANDsetFilepath("PWD", "/../conf/offline_dataset.list");
+	//string strb = checkANDsetFilepath("PWD", "/offline_datasetdir/");
+	////////////////////////////////////////////////////////////////////////////////////////
+	// for TESTS only //////////////////////////////////////////////////////////////////////
+	string strb = checkANDsetFilepath("PWD", "/"); //////////////////////
+	str = checkANDsetFilepath("PWD", "/../conf/offline_dataset_WZphys_localTests.list"); ///
+	////////////////////////////////////////////////////////////////////////////////////////
+	
 	if(runNumber==0) makeChain(true, str, strb);
 	else             makeChain(true, str, strb, runNumber);
 
@@ -68,15 +74,15 @@ void offlineControl::initialize(int runNumber)
 
 void offlineControl::finalize()
 {
-	m_offlineAnalysis->m_dgsTree->m_tree->Print();
+	//m_offlineAnalysis->m_muSkimD3PD->m_tree->Print();
 	// tree
 	// the tree will split into multiple files
 	// since in digestTree class there is the
 	// following statement m_tree->SetMaxTreeSize(50000000);
 	// i.e., 50Mb per file
-	m_treefile = m_offlineAnalysis->m_dgsTree->m_tree->GetCurrentFile();
+	m_treefile = m_offlineAnalysis->m_muSkimD3PD->m_tree->GetCurrentFile();
 	m_treefile->cd();
-	m_offlineAnalysis->m_dgsTree->m_tree->Write();
+	m_offlineAnalysis->m_muSkimD3PD->m_tree->Write();
 	m_treefile->Write();
 	m_treefile->Close();
 	

@@ -22,7 +22,8 @@ mcOfflineControl::mcOfflineControl()
 	//////////////////////////////////////////
 	
 	str = checkANDsetFilepath("PWD", "/../conf/offline_mc_dataset_"+sMCsample+".list");
-	string strb = checkANDsetFilepath("PWD", "/offline_mc_datasetdir/"); // ln -s  ~hod/data  datasetdir
+	string strb = checkANDsetFilepath("PWD", "/offline_mc_datasetdir/");
+	if(sMCsample=="mcWZphys_localTests") strb = checkANDsetFilepath("PWD", "/");
 	makeChain(true, str, strb);
 
 	m_mcOffPhys = new mcOfflinePhysics( m_chain );
@@ -40,6 +41,8 @@ mcOfflineControl::mcOfflineControl()
 	m_mcOfflineAnalysis = new mcOfflineAnalysis( m_mcOffPhys, m_treefile, str1, str2, "" );
 	
 	book();
+	
+	m_treefile->cd();
 }
 
 mcOfflineControl::~mcOfflineControl()
@@ -70,9 +73,9 @@ void mcOfflineControl::finalize()
 	// since in digestTree class there is the
 	// following statement m_tree->SetMaxTreeSize(50000000);
 	// i.e., 50Mb per file
-	m_treefile = m_mcOfflineAnalysis->m_dgsTree->m_tree->GetCurrentFile();
+	m_treefile = m_mcOfflineAnalysis->m_muSkimD3PD->m_tree->GetCurrentFile();
 	m_treefile->cd();
-	m_mcOfflineAnalysis->m_dgsTree->m_tree->Write();
+	m_mcOfflineAnalysis->m_muSkimD3PD->m_tree->Write();
 	m_treefile->Write();
 	m_treefile->Close();
 
@@ -96,7 +99,9 @@ void mcOfflineControl::book()
 	m_mcOfflineAnalysis->bookHistosMap( m_mcOfflineAnalysis->getCutFlowOrderedMapPtr(), m_mcOfflineAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 	
 	m_dirCutProfile = m_histfile->mkdir("cutsProfile");
-	m_mcOfflineAnalysis->bookCutProfileHistosMap( m_mcOfflineAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );	
+	m_mcOfflineAnalysis->bookCutProfileHistosMap( m_mcOfflineAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );
+
+	m_dirPerformance = m_histfile->mkdir("performance");
 }
 
 void mcOfflineControl::draw()
@@ -107,6 +112,7 @@ void mcOfflineControl::draw()
 	m_mcOfflineAnalysis->drawFitHistos(m_dirFit, m_mcOfflineAnalysis->m_fitROOT->guess, m_mcOfflineAnalysis->m_fitROOT->fitFCN);
 	//m_mcOfflineAnalysis->drawFitHistos(m_dirFit, m_mcOfflineAnalysis->m_fitMinuit->guess, m_mcOfflineAnalysis->m_fitMinuit->fitFCN);
 	m_mcOfflineAnalysis->drawCutProfileHistosMap( m_dirCutProfile );
+	m_mcOfflineAnalysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
 
 	m_mcOfflineAnalysis->printCutFlowNumbers(l64t_nentries);
 }
@@ -153,6 +159,15 @@ void mcOfflineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		
 		if(l64t_jentry%100000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_mcOffPhys->RunNumber << "\tlumiblock=" << m_mcOffPhys->lbn << endl;
 		if(l64t_jentry%l64t_mod==0) m_mcOfflineAnalysis->printCutFlowNumbers(l64t_nentries);
+		
+		if(l64t_jentry%1000==0)
+		{
+			gSystem->GetProcInfo(&pi);
+			//cout << "RES Mem=" << pi.fMemResident << " VIRT Mem=" << pi.fMemVirtual << endl;
+			vResMemory.push_back((double)pi.fMemResident);
+			vVirMemory.push_back((double)pi.fMemVirtual);
+			vEntries.push_back((int)l64t_jentry);
+		}
 		
 		analyze();
 	}

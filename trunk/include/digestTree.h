@@ -21,12 +21,41 @@ public:
 	int counter;
 	
 	// event info branches
-	int RunNumber;
-	int lbn;
-	int EventNumber;
-	string period;
+	vector<string>* period;
 	vector<string>* triggers;
 	int isGRL;
+	
+	int RunNumber;
+	int EventNumber;
+	int timestamp;
+	int timestamp_ns;
+	int lbn;
+	int bcid;
+	int detmask0;
+	int detmask1;
+	int pixelFlags;
+	int sctFlags;
+	int trtFlags;
+	int larFlags;
+	int tileFlags;
+	int muonFlags;
+	int fwdFlags;
+	int coreFlags;
+	int pixelError;
+	int sctError;
+	int trtError;
+	int larError;
+	int tileError;
+	int muonError;
+	int fwdError;
+	int coreError;
+	int lar_ncellA;
+	int lar_ncellC;
+	float lar_energyA;
+	float lar_energyC;
+	float lar_timeA;
+	float lar_timeC;
+	float lar_timeDiff;
 	
 	
 	// L1 triggers

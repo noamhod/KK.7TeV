@@ -23,7 +23,7 @@ public:
 	digestPhysics* m_digestPhys;
 	GRLinterface*  m_digestAnalysis_grl;
 	
-	TFile* m_treeFile;
+	TFile*    m_treeFile;
 	ofstream* candidatesFile;
 	
 	// local

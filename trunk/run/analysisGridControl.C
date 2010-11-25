@@ -34,6 +34,8 @@ analysisGridControl::analysisGridControl( TChain* inchain, TFile* outfile )
 	m_analysis = new analysis( m_phys, m_GRL, m_rootfile, "cutFlow.cuts", "dataPeriods.data", "" );
 	
 	book();
+	
+	m_rootfile->cd();
 }
 
 analysisGridControl::~analysisGridControl()
@@ -64,9 +66,9 @@ void analysisGridControl::finalize()
 
 	// tree
 	// the tree will split into multiple files
-	m_rootfile = m_analysis->m_offTree->m_tree->GetCurrentFile();
+	m_rootfile = m_analysis->m_muD3PD->m_tree->GetCurrentFile();
 	m_rootfile->cd();
-	m_analysis->m_offTree->m_tree->Write();
+	m_analysis->m_muD3PD->m_tree->Write();
 	m_rootfile->Write();
 	m_rootfile->Close();
 }
@@ -87,7 +89,9 @@ void analysisGridControl::book()
 	
 	m_dirFit = m_rootfile->mkdir("fit");
 	
-	m_analysis->bookFitHistos(m_dirAllCuts);	
+	m_analysis->bookFitHistos(m_dirAllCuts);
+
+	m_dirPerformance = m_rootfile->mkdir("performance");
 }
 
 void analysisGridControl::draw()
@@ -96,6 +100,7 @@ void analysisGridControl::draw()
 	m_analysis->drawHistos(m_dirAllCuts);
 	m_analysis->drawHistosMap( m_analysis->getCutFlowOrderedMapPtr(), m_analysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 	m_analysis->drawCutProfileHistosMap( m_dirCutProfile );
+	m_analysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
 	
 	m_analysis->printCutFlowNumbers(l64t_nentries);
 }
@@ -140,6 +145,15 @@ void analysisGridControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		
 		if(l64t_jentry%1000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_phys->RunNumber << "\tlumiblock=" << m_phys->lbn << endl;
 		if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries);
+		
+		if(l64t_jentry%1000==0)
+		{
+			gSystem->GetProcInfo(&pi);
+			//cout << "RES Mem=" << pi.fMemResident << " VIRT Mem=" << pi.fMemVirtual << endl;
+			vResMemory.push_back((double)pi.fMemResident);
+			vVirMemory.push_back((double)pi.fMemVirtual);
+			vEntries.push_back((int)l64t_jentry);
+		}
 		
 		analyze();
 	}

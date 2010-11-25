@@ -94,18 +94,48 @@ void digestAnalysis::executeCutFlow()
 	////////////////////////////////////////////////////////
 	
 	
-	(*candidatesFile) << "Staco run " << analysisSkeleton::runnumber
-					  << " lb " 	  << analysisSkeleton::lumiblock
-					  << " event " 	  << analysisSkeleton::eventnumber
+	(*candidatesFile) << "Staco run " << analysisSkeleton::RunNumber
+					  << " lb " 	  << analysisSkeleton::lbn
+					  << " event " 	  << analysisSkeleton::EventNumber
 					  << endl;
 }
 
 void digestAnalysis::setEventVariables()
 {
 	// event level (for preselection)
-	analysisSkeleton::runnumber   = m_digestPhys->RunNumber;
-	analysisSkeleton::lumiblock   = m_digestPhys->lbn;
-	analysisSkeleton::eventnumber = m_digestPhys->EventNumber;
+	analysisSkeleton::RunNumber    = m_digestPhys->RunNumber;
+	analysisSkeleton::EventNumber  = m_digestPhys->EventNumber;
+	analysisSkeleton::timestamp    = m_digestPhys->timestamp;
+	analysisSkeleton::timestamp_ns = m_digestPhys->timestamp_ns;
+	analysisSkeleton::lbn          = m_digestPhys->lbn;
+	analysisSkeleton::bcid         = m_digestPhys->bcid;
+	analysisSkeleton::detmask0     = m_digestPhys->detmask0;
+	analysisSkeleton::detmask1     = m_digestPhys->detmask1;
+	analysisSkeleton::pixelFlags   = m_digestPhys->pixelFlags;
+	analysisSkeleton::sctFlags     = m_digestPhys->sctFlags;
+	analysisSkeleton::trtFlags     = m_digestPhys->trtFlags;
+	analysisSkeleton::larFlags     = m_digestPhys->larFlags;
+	analysisSkeleton::tileFlags    = m_digestPhys->tileFlags;
+	analysisSkeleton::muonFlags    = m_digestPhys->muonFlags;
+	analysisSkeleton::fwdFlags     = m_digestPhys->fwdFlags;
+	analysisSkeleton::coreFlags    = m_digestPhys->coreFlags;
+	analysisSkeleton::pixelError   = m_digestPhys->pixelError;
+	analysisSkeleton::sctError     = m_digestPhys->sctError;
+	analysisSkeleton::trtError     = m_digestPhys->trtError;
+	analysisSkeleton::larError     = m_digestPhys->larError;
+	analysisSkeleton::tileError    = m_digestPhys->tileError;
+	analysisSkeleton::muonError    = m_digestPhys->muonError;
+	analysisSkeleton::fwdError     = m_digestPhys->fwdError;
+	analysisSkeleton::coreError    = m_digestPhys->coreError;
+	analysisSkeleton::lar_ncellA   = m_digestPhys->lar_ncellA;
+	analysisSkeleton::lar_ncellC   = m_digestPhys->lar_ncellC;
+	analysisSkeleton::lar_energyA  = m_digestPhys->lar_energyA;
+	analysisSkeleton::lar_energyC  = m_digestPhys->lar_energyC;
+	analysisSkeleton::lar_timeA    = m_digestPhys->lar_timeA;
+	analysisSkeleton::lar_timeC    = m_digestPhys->lar_timeC;
+	analysisSkeleton::lar_timeDiff = m_digestPhys->lar_timeDiff;
+	
+	
 	analysisSkeleton::isGRL       = m_digestAnalysis_grl->m_grl.HasRunLumiBlock( analysisSkeleton::runnumber, analysisSkeleton::lumiblock );
 	//analysisSkeleton::isGRL     = m_digestPhys->isGRL;
 

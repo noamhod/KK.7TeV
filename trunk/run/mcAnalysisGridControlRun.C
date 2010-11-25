@@ -108,11 +108,11 @@ void mcAnalysisGridControlRun()
 	gROOT->ProcessLine(".include ../include/");
 	gROOT->ProcessLine(".include ../src/");
 	gROOT->ProcessLine(".include ./");
-	gROOT->ProcessLine(".include ../GoodRunsLists-00-00-84/");
-	gROOT->ProcessLine(".include ../GoodRunsLists-00-00-84/GoodRunsLists/");
+	gROOT->ProcessLine(".include ../GoodRunsLists-00-00-91/");
+	gROOT->ProcessLine(".include ../GoodRunsLists-00-00-91/GoodRunsLists/");
 	
-	exitIfNotExist("../GoodRunsLists-00-00-84/StandAlone/libGoodRunsLists.so");
-	gROOT->ProcessLine(".L ../GoodRunsLists-00-00-84/StandAlone/libGoodRunsLists.so");
+	exitIfNotExist("../GoodRunsLists-00-00-91/StandAlone/libGoodRunsLists.so");
+	gROOT->ProcessLine(".L ../GoodRunsLists-00-00-91/StandAlone/libGoodRunsLists.so");
 	
 	gSystem->Load( "libCintex.so" );
 	Cintex::Cintex::Enable();

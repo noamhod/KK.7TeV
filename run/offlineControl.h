@@ -31,7 +31,7 @@ class offlineControl : public offlineChains, public utilities
 		TDirectory* 	m_dirNoCuts;
 		TDirectory* 	m_dirCutFlow;
 		TDirectory* 	m_dirFit;
-		
+		TDirectory* 	m_dirPerformance;
 
 		// run control
 		Long64_t l64t_nentries;
@@ -43,6 +43,11 @@ class offlineControl : public offlineChains, public utilities
 		Long64_t l64t_mod;
 		Long64_t l64t_startEvent;
 		Long64_t l64t_stopEvent;
+
+		vector<int> vEntries;
+		vector<double> vResMemory;
+		vector<double> vVirMemory;
+		
 		
 		// for matching candidates
 		vector<double> runNumber;

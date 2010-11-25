@@ -86,6 +86,7 @@ class combinedGraphics : public analysisModules
 		TH1D* hccmu15X;
 		TH1D* hDYmumu;
 		TH1D* hDYtautau;
+		TH1D* hWW;
 		TH1D* hZprime_mumu_SSM1000;
 		TH1D* hZprime_mumu_SSM1250;
 		TH1D* hZprime_mumu_SSM1500;

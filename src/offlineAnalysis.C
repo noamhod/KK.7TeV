@@ -81,7 +81,8 @@ void offlineAnalysis::executeCutFlow()
 	//////////////////////////////////////////////////////////////
 	// write to the digest tree only the pairs that pass skim ////
 	bool passSkim = digestSkim(nMus); ////////////////////////////
-	if( passSkim ) m_dgsTree->fill(analysisSkeleton::isGRL); /////
+	//if( passSkim ) m_dgsTree->fill(analysisSkeleton::isGRL); /////
+	if( passSkim ) m_dgsTree->fill(analysisSkeleton::isGRL, true); /////
 	//////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////

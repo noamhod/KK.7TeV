@@ -18,6 +18,7 @@ public:
 	mcOfflinePhysics* m_mcOffPhys;
 	TFile*   m_treeFile;
 	TTree*   m_tree;
+	int counter;
 	
 	// event info branches
 	int RunNumber;
@@ -442,8 +443,10 @@ public:
 	~digestTree();
 	
 	TTree* getTree();
+	void setVectorPtrs();
 	void setBranches();
 	void fill(int GRL);
+	void fill(int GRL, bool loop);
 	void reset();
 	void write();
 

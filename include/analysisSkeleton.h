@@ -416,6 +416,7 @@ public:
 	
 	void buildMU4Vector(int nMus);
 	void buildMU4Vector(int nMus, string fromAngles = "");
+	void wipeMU4Vector();
 	
 	bool applyPreselection(string sSkipCut = "");
 	bool applySingleMuonSelection(string sSkipCut = "");

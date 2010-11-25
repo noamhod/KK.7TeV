@@ -64,6 +64,15 @@ class graphicObjects// : public utilities
 		TH1D*    h1_pTratio_muplus;
 		TH2D*    h2_pTmevspTid;
 		TH2D*    h2_pTmevspTid_muplus;
+		
+		// For the graphs
+		Int_t nentries;
+		TCanvas* cMemoryMonitor;
+		TGraph*  gResMemoryMonitor;
+		TGraph*  gVirMemoryMonitor;
+		Double_t* resMemoryArray;
+		Double_t* virMemoryArray;
+		Double_t* entryArray;
 
 		// canvases for cut flows
 		TCanvas* cnv_cutFlow_imass;
@@ -74,6 +83,7 @@ class graphicObjects// : public utilities
 		TLegend* leg_cutFlow_pT;
 		TLegend* leg_imassFit;
 		TLegend* leg_ipTdiff;
+		TLegend* leg_memory;
 
 		// map of histos
 		TMapSP2TH1D* h1map_cutProfile;
@@ -202,6 +212,8 @@ class graphicObjects// : public utilities
 		
 		void bookCutProfileHistosMap(TMapds* cutFlowOrdered, TDirectory* tdir);
 		void drawCutProfileHistosMap(TDirectory* tdir);
+		
+		void drawPerformance(vector<int>& vEntries, vector<double>& vResMemory, vector<double>& vVirMemory, TDirectory* tdir);
 
 	private:
 

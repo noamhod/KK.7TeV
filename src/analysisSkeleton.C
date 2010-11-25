@@ -90,7 +90,6 @@ bool analysisSkeleton::digestSkim(int muSize)
 	int skim  = 0;
 	for(int mu=0 ; mu<muSize ; mu++)
 	{
-		
 		if(mu_isCombinedMuon->at(mu)) skim++;
 		//if( fabs(mu_pt->at(mu))>=15*GeV2MeV )
 	}
@@ -475,7 +474,8 @@ void analysisSkeleton::imassSort()
 
 void analysisSkeleton::buildMU4Vector(int nMus)
 {
-	if(pmu.size()>0) pmu.clear();
+	//if(pmu.size()>0) pmu.clear();
+	wipeMU4Vector();
 	for(int n=0 ; n<nMus ; n++)
 	{
 		pmu.push_back( new TLorentzVector() );
@@ -494,12 +494,26 @@ void analysisSkeleton::buildMU4Vector(int nMus, string fromAngles)
 	}
 	else
 	{
-		if(pmu.size()>0) pmu.clear();
+		//if(pmu.size()>0) pmu.clear();
+		wipeMU4Vector();
 		for(int n=0 ; n<nMus ; n++)
 		{
 			pmu.push_back( new TLorentzVector() );
 			pmu[n]->SetPtEtaPhiM( mu_pt->at(n)*MeV2TeV, mu_eta->at(n), mu_phi->at(n), muonMass*GeV2TeV);
 		}
+	}
+}
+
+void analysisSkeleton::wipeMU4Vector()
+{
+	int nMus = (int)pmu.size();
+	if(nMus>0)
+	{
+		for(int n=0 ; n<nMus ; n++)
+		{
+			if(pmu[n]) delete pmu[n];
+		}
+		pmu.clear();
 	}
 }
 

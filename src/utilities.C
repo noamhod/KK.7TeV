@@ -98,12 +98,44 @@ string utilities::pickMCinputSampe()
 	mcSamplesMap.insert( make_pair( 202,"Wmunu" ) );
 	mcSamplesMap.insert( make_pair( 203,"bbmu15X" ) );
 	mcSamplesMap.insert( make_pair( 204,"ccmu15X" ) );
+	
+	mcSamplesMap.insert( make_pair( 300,"AlpgenJimmyWWlnulnuNp0" ) );
+	mcSamplesMap.insert( make_pair( 301,"AlpgenJimmyWWlnulnuNp1" ) );
+	mcSamplesMap.insert( make_pair( 302,"AlpgenJimmyWWlnulnuNp2" ) );
+	mcSamplesMap.insert( make_pair( 303,"AlpgenJimmyWWlnulnuNp3" ) );
+	
+	mcSamplesMap.insert( make_pair( 311,"gg2WW0240_JIMMY_WW_munumunu" ) );
+	mcSamplesMap.insert( make_pair( 312,"gg2WW0240_JIMMY_WW_munutaunu" ) );
+	mcSamplesMap.insert( make_pair( 313,"gg2WW0240_JIMMY_WW_taunumunu" ) );
+	mcSamplesMap.insert( make_pair( 314,"gg2WW0240_JIMMY_WW_taunutaunu" ) );
+	
+	mcSamplesMap.insert( make_pair( 321,"McAtNlo_JIMMY_WpWm_munumunu" ) );
+	mcSamplesMap.insert( make_pair( 322,"McAtNlo_JIMMY_WpWm_munutaunu" ) );
+	mcSamplesMap.insert( make_pair( 323,"McAtNlo_JIMMY_WpWm_taunutaunu" ) );
 
-	mcSamplesMap.insert( make_pair( 300,"Zprime_mumu_SSM1000" ) );
-	mcSamplesMap.insert( make_pair( 301,"Zprime_mumu_SSM1250" ) );
-	mcSamplesMap.insert( make_pair( 302,"Zprime_mumu_SSM1500" ) );
-	mcSamplesMap.insert( make_pair( 303,"Zprime_mumu_SSM1750" ) );
-	mcSamplesMap.insert( make_pair( 304,"Zprime_mumu_SSM2000" ) );
+	mcSamplesMap.insert( make_pair( 401,"PythiaH200zzllnunu" ) );
+	mcSamplesMap.insert( make_pair( 402,"PythiaH300zzllnunu" ) );
+	mcSamplesMap.insert( make_pair( 403,"PythiaH400zzllnunu" ) );
+	mcSamplesMap.insert( make_pair( 404,"PythiaH500zzllnunu" ) );
+	mcSamplesMap.insert( make_pair( 405,"PythiaH600zzllnunu" ) );
+	
+	mcSamplesMap.insert( make_pair( 410,"Pythiazz4l" ) );
+
+	mcSamplesMap.insert( make_pair( 420,"McAtNlo_JIMMY_ZZ_llll" ) );
+	mcSamplesMap.insert( make_pair( 421,"McAtNlo_JIMMY_ZZ_llnunu" ) );
+	mcSamplesMap.insert( make_pair( 422,"McAtNlo_JIMMY_ZZ_2l2tau" ) );
+	mcSamplesMap.insert( make_pair( 422,"McAtNlo_JIMMY_ZZ_llqq" ) );
+	
+	mcSamplesMap.insert( make_pair( 430,"AlpgenJimmyZZincllNp0" ) );
+	mcSamplesMap.insert( make_pair( 431,"AlpgenJimmyZZincllNp1" ) );
+	mcSamplesMap.insert( make_pair( 432,"AlpgenJimmyZZincllNp2" ) );
+	mcSamplesMap.insert( make_pair( 433,"AlpgenJimmyZZincllNp3" ) );
+	
+	mcSamplesMap.insert( make_pair( 500,"Zprime_mumu_SSM1000" ) );
+	mcSamplesMap.insert( make_pair( 501,"Zprime_mumu_SSM1250" ) );
+	mcSamplesMap.insert( make_pair( 502,"Zprime_mumu_SSM1500" ) );
+	mcSamplesMap.insert( make_pair( 503,"Zprime_mumu_SSM1750" ) );
+	mcSamplesMap.insert( make_pair( 504,"Zprime_mumu_SSM2000" ) );
 	
 	
 	cout << "PICK AN MC CHANNEL FORM THE LIST:" << endl;

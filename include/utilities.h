@@ -15,6 +15,7 @@ class utilities
 	public:
 		clock_t clockStart;
 		clock_t clockEnd;
+		ProcInfo_t pi;
 		
 	public:
 		utilities();

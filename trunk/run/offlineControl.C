@@ -41,12 +41,16 @@ void offlineControl::initialize(int runNumber)
 	m_GRL = new GRLinterface();
 	m_GRL->glrinitialize( (TString)str );
 	
-	//str = checkANDsetFilepath("PWD", "/../conf/offline_dataset.list");
-	//string strb = checkANDsetFilepath("PWD", "/offline_datasetdir/");
+	str = checkANDsetFilepath("PWD", "/../conf/offline_dataset.list");
+	string strb = checkANDsetFilepath("PWD", "/offline_datasetdir/");
+	
 	////////////////////////////////////////////////////////////////////////////////////////
 	// for TESTS only //////////////////////////////////////////////////////////////////////
-	string strb = checkANDsetFilepath("PWD", "/"); //////////////////////
-	str = checkANDsetFilepath("PWD", "/../conf/offline_dataset_WZphys_localTests.list"); ///
+	if(runNumber==-1)
+	{
+		strb = checkANDsetFilepath("PWD", "/");
+		str = checkANDsetFilepath("PWD", "/../conf/offline_dataset_WZphys_localTests.list");
+	}
 	////////////////////////////////////////////////////////////////////////////////////////
 	
 	if(runNumber==0) makeChain(true, str, strb);

@@ -269,6 +269,50 @@ void graphicObjects::bookHistos(TDirectory* tdir)
 	h2_pTmevspTid_muplus = new TH2D("pTmevspTid_mu+", "pTmevspTid_mu+", pTmevspTid_nbins,pTmevspTid_min,pTmevspTid_max, pTmevspTid_nbins,pTmevspTid_min,pTmevspTid_max);
 }
 
+void graphicObjects::drawPerformance(vector<int>& vEntries, vector<double>& vResMemory, vector<double>& vVirMemory, TDirectory* tdir)
+{
+	if(tdir!=NULL) tdir->cd();
+	
+	nentries = (Int_t)vEntries.size();
+	resMemoryArray = (Double_t*)malloc(nentries*sizeof(Double_t));
+	virMemoryArray = (Double_t*)malloc(nentries*sizeof(Double_t));
+	entryArray     = (Double_t*)malloc(nentries*sizeof(Double_t));
+	for(Int_t i=0 ; i<nentries ; i++)
+	{
+		resMemoryArray[i] = (Double_t)vResMemory[i];
+		virMemoryArray[i] = (Double_t)vVirMemory[i];
+		entryArray[i]     = (Double_t)vEntries[i];
+	}
+	
+	cMemoryMonitor = new TCanvas("memory","memory",canv_x,canv_y);
+	cMemoryMonitor->Draw();
+	cMemoryMonitor->cd();
+	
+	gVirMemoryMonitor = new TGraph (nentries, entryArray, virMemoryArray);
+	gVirMemoryMonitor->SetTitle("");
+	gVirMemoryMonitor->SetLineStyle(3);
+    gVirMemoryMonitor->SetLineColor(kBlue);
+	gVirMemoryMonitor->GetXaxis()->SetTitle("entry");
+    gVirMemoryMonitor->GetYaxis()->SetTitle("memory");
+    gVirMemoryMonitor->SetMinimum(0.);
+    gVirMemoryMonitor->Draw("AC");
+	
+	gResMemoryMonitor = new TGraph (nentries, entryArray, resMemoryArray);
+	gResMemoryMonitor->SetTitle("");
+	gResMemoryMonitor->SetLineStyle(1);
+    gResMemoryMonitor->SetLineColor(kRed); 
+    gResMemoryMonitor->Draw("C");
+	
+	leg_memory = new TLegend(leg_x1, leg_y1, leg_x2, leg_y2*2./3.);
+	leg_memory->AddEntry( gVirMemoryMonitor, "VIRT", "L");
+	leg_memory->AddEntry( gResMemoryMonitor, "RES", "L");
+	leg_memory->Draw("sames");
+	
+	cMemoryMonitor->Update();
+	cMemoryMonitor->SaveAs("memory.png");
+	cMemoryMonitor->Write();
+}
+
 void graphicObjects::drawBareHistos(TDirectory* tdir)
 {
 	if(tdir!=NULL) tdir->cd();

@@ -68,6 +68,7 @@ void offlineControl::initialize(int runNumber)
 
 void offlineControl::finalize()
 {
+	m_offlineAnalysis->m_dgsTree->m_tree->Print();
 	// tree
 	// the tree will split into multiple files
 	// since in digestTree class there is the
@@ -100,6 +101,8 @@ void offlineControl::book()
 	
 	m_dirCutProfile = m_histfile->mkdir("cutsProfile");
 	m_offlineAnalysis->bookCutProfileHistosMap( m_offlineAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );
+	
+	m_dirPerformance = m_histfile->mkdir("performance");
 }
 
 void offlineControl::draw()
@@ -110,6 +113,7 @@ void offlineControl::draw()
 	m_offlineAnalysis->drawFitHistos(m_dirFit, m_offlineAnalysis->m_fitROOT->guess, m_offlineAnalysis->m_fitROOT->fitFCN);
 	//m_offlineAnalysis->drawFitHistos(m_dirFit, m_offlineAnalysis->m_fitMinuit->guess, m_offlineAnalysis->m_fitMinuit->fitFCN);
 	m_offlineAnalysis->drawCutProfileHistosMap( m_dirCutProfile );
+	m_offlineAnalysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
 	
 	m_offlineAnalysis->printCutFlowNumbers(l64t_nentries);
 }
@@ -157,8 +161,17 @@ void offlineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		l64t_nbytes += l64t_nb;
 		// if (Cut(l64t_ientry) < 0) continue;
 		
-		if(l64t_jentry%100000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_offPhys->RunNumber << "\tlumiblock=" << m_offPhys->lbn << endl;
+		if(l64t_jentry%100000==0)   cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_offPhys->RunNumber << "\tlumiblock=" << m_offPhys->lbn << endl;
 		if(l64t_jentry%l64t_mod==0) m_offlineAnalysis->printCutFlowNumbers(l64t_nentries);
+		
+		if(l64t_jentry%1000==0)
+		{
+			gSystem->GetProcInfo(&pi);
+			//cout << "RES Mem=" << pi.fMemResident << " VIRT Mem=" << pi.fMemVirtual << endl;
+			vResMemory.push_back((double)pi.fMemResident);
+			vVirMemory.push_back((double)pi.fMemVirtual);
+			vEntries.push_back((int)l64t_jentry);
+		}
 		
 		///////////////////////////////////////////////////////////////////////////////////
 		//if( m_offlineAnalysis->getPeriodName(m_offPhys->RunNumber)=="I1" ) break; /////////
@@ -218,6 +231,8 @@ void offlineControl::loop(int runNumber)
 	}
 	
 	fits();
+	
+	
 	
 	draw();
 	

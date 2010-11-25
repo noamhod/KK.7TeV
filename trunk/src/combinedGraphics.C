@@ -1014,6 +1014,19 @@ void combinedGraphics::drawimass()
 	colorAccumulate+=colorOffset;
 	
 	
+	path = dir + m_mcAnalysisSelector + "Control_gg2WW0240_JIMMY_WW_munumunu.root";
+	channel = "WW #rightarrow #mu#nu#mu#nu";
+	TFile* fWW = new TFile( path.c_str(), "READ" );
+	hWW = getHisto(fWW, hdir, "imass");
+	setNormVals(0.01524, 0.98981, 9999, dataLumi_ipb);
+	NormToDataLumi( hWW, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	hWW->SetFillColor(colorAccumulate);
+	hWW->SetLineColor(colorAccumulate);
+	hWW->SetTitle("");
+	leg_imass->AddEntry( hWW, channel.c_str(), "f");
+	colorAccumulate+=colorOffset;
+	
+	
 	channel = "binned DY#tau#tau";
 	hDYtautau = getNormDYtautau("imass");
 	hDYtautau->SetFillColor(colorAccumulate);
@@ -1062,6 +1075,7 @@ void combinedGraphics::drawimass()
 	colorAccumulate+=colorOffset;
 	*/
 	
+	hMCimass->Add(hWW);
 	hMCimass->Add(hTTbar);
 	hMCimass->Add(hDYtautau);
 	//hMCimass->Add(hbbmu15X);
@@ -1084,6 +1098,7 @@ void combinedGraphics::drawimass()
 	hDYmumu->Draw("SAMES");
 	hTTbar->Draw("SAMES");
 	hDYtautau->Draw("SAMES");
+	hWW->Draw("SAMES");
 	//hbbmu15X->Draw("SAMES");
 	hWmunu->Draw("SAMES");
 	//hccmu15X->Draw("SAMES");
@@ -1235,6 +1250,18 @@ void combinedGraphics::drawpT()
 	leg_pT->AddEntry( hTTbar, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
 	
+	path = dir + m_mcAnalysisSelector + "Control_gg2WW0240_JIMMY_WW_munumunu.root";
+	channel = "WW #rightarrow #mu#nu#mu#nu";
+	TFile* fWW = new TFile( path.c_str(), "READ" );
+	hWW = getHisto(fWW, hdir, "imass");
+	setNormVals(0.01524, 1., 9999, dataLumi_ipb);
+	NormToDataLumi( hWW, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	hWW->SetFillColor(colorAccumulate);
+	hWW->SetLineColor(colorAccumulate);
+	hWW->SetTitle("");
+	leg_pT->AddEntry( hWW, channel.c_str(), "f");
+	colorAccumulate+=colorOffset;
+	
 	
 	channel = "binned DY#tau#tau";
 	hDYtautau = getNormDYtautau("pT");
@@ -1284,6 +1311,7 @@ void combinedGraphics::drawpT()
 	colorAccumulate+=colorOffset;
 	*/
 	
+	hMCpT->Add(hWW);
 	hMCpT->Add(hTTbar);
 	hMCpT->Add(hDYtautau);
 	//hMCpT->Add(hbbmu15X);
@@ -1306,6 +1334,7 @@ void combinedGraphics::drawpT()
 	hDYmumu->Draw("SAMES");
 	hTTbar->Draw("SAMES");
 	hDYtautau->Draw("SAMES");
+	hWW->Draw("SAMES");
 	//hbbmu15X->Draw("SAMES");
 	hWmunu->Draw("SAMES");
 	//hccmu15X->Draw("SAMES");

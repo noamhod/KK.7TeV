@@ -39,6 +39,15 @@ public:
 	// local
 	string sMuonRecoAlgo;
 	int nMus;
+	
+	// temp
+	int nAll;
+	int n0mu;
+	int n1mu;
+	int n2mu;
+	int n3mu;
+	int n4mu;
+	int nNmu;
 
 public:
 	analysis();

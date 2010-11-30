@@ -123,6 +123,10 @@ public:
 	vector<float>* mu_phi;
 	vector<float>* mu_pt;
 	vector<float>* mu_charge;
+	vector<unsigned short>* mu_allauthor;
+	vector<int>*   mu_author;
+	vector<float>* mu_matchchi2;
+	vector<int>*   mu_matchndof;
 	
 	// isolation
 	vector<float>* mu_ptcone20;

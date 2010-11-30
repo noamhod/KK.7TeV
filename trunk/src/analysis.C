@@ -9,7 +9,13 @@
 
 analysis::analysis()
 {
-
+	nAll = 0;
+	n0mu = 0;
+	n1mu = 0;
+	n2mu = 0;
+	n3mu = 0;
+	n4mu = 0;
+	nNmu = 0;
 }
 
 analysis::~analysis()
@@ -77,6 +83,35 @@ void analysis::executeCutFlow()
 	fillCutProfile1D(); ////////////////////
 	fillCutProfile2D(); ////////////////////
 	////////////////////////////////////////
+	
+	if(analysisSkeleton::mu_n>0)
+	{
+		cout << "mu_n = " << mu_n << endl;
+		cout << "mu_EF_dr->size() = " << analysisSkeleton::mu_EF_dr->size() << endl;
+		cout << "mu_EF_cb_eta->size() = " << analysisSkeleton::mu_EF_cb_eta->size() << endl;
+		cout << "mu_EF_cb_phi->size() = " << analysisSkeleton::mu_EF_cb_phi->size() << endl;
+		cout << "mu_EF_cb_pt->size() = " << analysisSkeleton::mu_EF_cb_pt->size() << endl;
+		cout << "mu_EF_ms_eta->size() = " << analysisSkeleton::mu_EF_ms_eta->size() << endl;
+		cout << "mu_EF_ms_phi->size() = " << analysisSkeleton::mu_EF_ms_phi->size() << endl;
+		cout << "mu_EF_ms_pt->size() = " << analysisSkeleton::mu_EF_ms_pt->size() << endl;
+		cout << "mu_EF_me_eta->size() = " << analysisSkeleton::mu_EF_me_eta->size() << endl;
+		cout << "mu_EF_me_phi->size() = " << analysisSkeleton::mu_EF_me_phi->size() << endl;
+		cout << "mu_EF_me_pt->size() = " << analysisSkeleton::mu_EF_me_pt->size() << endl;
+		cout << "mu_EF_matched->size() = " << analysisSkeleton::mu_EF_matched->size() << "\n" << endl;
+	}
+	int N=0;
+	for(int n=0 ; n<mu_n ; n++)
+	{
+		if( analysisSkeleton::mu_pt->at(n)*MeV2GeV >= 15. ) N++;
+	}
+	nAll++;
+	if(mu_n==0)        n0mu++;
+	if(mu_n==1 && N>0) n1mu++;
+	if(mu_n==2 && N>0) n2mu++;
+	if(mu_n==3 && N>0) n3mu++;
+	if(mu_n==4 && N>0) n4mu++;
+	if(mu_n>4  && N>0) nNmu++;
+	
 		
 	/////////////////////////////////////////////////////
 	// preform the entire preselection //////////////////
@@ -190,6 +225,10 @@ void analysis::setStacoVariables()
 	analysisSkeleton::mu_phi       = m_phys->mu_staco_phi;
 	analysisSkeleton::mu_pt        = m_phys->mu_staco_pt;
 	analysisSkeleton::mu_charge    = m_phys->mu_staco_charge;
+	analysisSkeleton::mu_allauthor = m_phys->mu_staco_allauthor;
+	analysisSkeleton::mu_author    = m_phys->mu_staco_author;
+	analysisSkeleton::mu_matchchi2 = m_phys->mu_staco_matchchi2;
+	analysisSkeleton::mu_matchndof = m_phys->mu_staco_matchndof;
 	
 	// isolation
 	analysisSkeleton::mu_ptcone20 = m_phys->mu_staco_ptcone20;
@@ -384,6 +423,10 @@ void analysis::setMuidVariables()
 	analysisSkeleton::mu_phi       = m_phys->mu_muid_phi;
 	analysisSkeleton::mu_pt        = m_phys->mu_muid_pt;
 	analysisSkeleton::mu_charge    = m_phys->mu_muid_charge;
+	analysisSkeleton::mu_allauthor = m_phys->mu_muid_allauthor;
+	analysisSkeleton::mu_author    = m_phys->mu_muid_author;
+	analysisSkeleton::mu_matchchi2 = m_phys->mu_muid_matchchi2;
+	analysisSkeleton::mu_matchndof = m_phys->mu_muid_matchndof;
 	
 	// isolation
 	analysisSkeleton::mu_ptcone20 = m_phys->mu_muid_ptcone20;

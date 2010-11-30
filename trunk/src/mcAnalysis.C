@@ -176,6 +176,10 @@ void mcAnalysis::setStacoVariables()
 	analysisSkeleton::mu_phi       = m_mcPhys->mu_staco_phi;
 	analysisSkeleton::mu_pt        = m_mcPhys->mu_staco_pt;
 	analysisSkeleton::mu_charge    = m_mcPhys->mu_staco_charge;
+	analysisSkeleton::mu_allauthor = m_mcPhys->mu_staco_allauthor;
+	analysisSkeleton::mu_author    = m_mcPhys->mu_staco_author;
+	analysisSkeleton::mu_matchchi2 = m_mcPhys->mu_staco_matchchi2;
+	analysisSkeleton::mu_matchndof = m_mcPhys->mu_staco_matchndof;
 	
 	// isolation
 	analysisSkeleton::mu_ptcone20 = m_mcPhys->mu_staco_ptcone20;
@@ -370,6 +374,10 @@ void mcAnalysis::setMuidVariables()
 	analysisSkeleton::mu_phi       = m_mcPhys->mu_muid_phi;
 	analysisSkeleton::mu_pt        = m_mcPhys->mu_muid_pt;
 	analysisSkeleton::mu_charge    = m_mcPhys->mu_muid_charge;
+	analysisSkeleton::mu_allauthor = m_mcPhys->mu_muid_allauthor;
+	analysisSkeleton::mu_author    = m_mcPhys->mu_muid_author;
+	analysisSkeleton::mu_matchchi2 = m_mcPhys->mu_muid_matchchi2;
+	analysisSkeleton::mu_matchndof = m_mcPhys->mu_muid_matchndof;
 	
 	// isolation
 	analysisSkeleton::mu_ptcone20 = m_mcPhys->mu_muid_ptcone20;

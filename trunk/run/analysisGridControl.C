@@ -165,11 +165,11 @@ void analysisGridControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	stopTimer(true);
 	
 	cout << "nAll = " << m_analysis->nAll << endl;
-	cout << "n0mu = " << m_analysis->n0mu << endl;
-	cout << "n1mu = " << m_analysis->n1mu << endl;
-	cout << "n2mu = " << m_analysis->n2mu << endl;
-	cout << "n3mu = " << m_analysis->n3mu << endl;
-	cout << "n4mu = " << m_analysis->n4mu << endl;
-	cout << "nNmu = " << m_analysis->nNmu << endl;
+	cout << "n0mu(pT>15GeV) = " << m_analysis->n0mu << endl;
+	cout << "n1mu(pT>15GeV) = " << m_analysis->n1mu << endl;
+	cout << "n2mu(pT>15GeV) = " << m_analysis->n2mu << endl;
+	cout << "n3mu(pT>15GeV) = " << m_analysis->n3mu << endl;
+	cout << "n4mu(pT>15GeV) = " << m_analysis->n4mu << endl;
+	cout << "nNmu(pT>15GeV) = " << m_analysis->nNmu << endl;
 }
 

@@ -88,16 +88,23 @@ void mcAnalysisGridControl::book()
 	m_mcAnalysis->bookFitHistos(m_dirAllCuts);	
 	
 	m_dirPerformance = m_rootfile->mkdir("performance");
+	
+	m_dirAfb = m_rootfile->mkdir("Afb");
 }
 
 void mcAnalysisGridControl::draw()
 {
 	m_mcAnalysis->drawBareHistos(m_dirNoCuts);
-	m_mcAnalysis->drawHistos(m_dirAllCuts);
-	m_mcAnalysis->drawHistosMap( m_mcAnalysis->getCutFlowOrderedMapPtr(), m_mcAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
-	m_mcAnalysis->drawCutProfileHistosMap( m_dirCutProfile );
-	m_mcAnalysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
 
+	m_mcAnalysis->calculateAfb(m_mcAnalysis->h1_Afb, m_dirAfb); // must come before drawHistos
+	m_mcAnalysis->drawHistos(m_dirAllCuts);
+	
+	m_mcAnalysis->drawHistosMap( m_mcAnalysis->getCutFlowOrderedMapPtr(), m_mcAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+	
+	m_mcAnalysis->drawCutProfileHistosMap( m_dirCutProfile );
+	
+	m_mcAnalysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
+	
 	m_mcAnalysis->printCutFlowNumbers(l64t_nentries);
 	cout << "nMultiMuonEvents = " << m_mcAnalysis->nMultiMuonEvents << endl;
 }

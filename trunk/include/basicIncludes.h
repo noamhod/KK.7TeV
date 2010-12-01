@@ -91,7 +91,8 @@ typedef map<string, vector<double>* > TMapsP2vd;
 typedef map<string, string> TMapss;
 typedef map<string, vector<string> > TMapsvs;
 typedef map<string, vector<string>* > TMapsP2vs;
-typedef map<int, vector<string>* >    TMapiP2vs; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+typedef map<int, vector<string>* >    TMapiP2vs;
+typedef multimap<float, float > TMultimapff;
 
 #define utilities_cxx
 #include "utilities.C"

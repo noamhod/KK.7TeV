@@ -28,6 +28,7 @@ class graphicObjects// : public utilities
 		TCanvas* cnv_pTdiff;
 		TCanvas* cnv_pTratio;
 		TCanvas* cnv_pTmevspTid;
+		TCanvas* cnv_Afb;
 		
 		// pads
 		TVirtualPad* pad_pT;
@@ -64,6 +65,7 @@ class graphicObjects// : public utilities
 		TH1D*    h1_pTratio_muplus;
 		TH2D*    h2_pTmevspTid;
 		TH2D*    h2_pTmevspTid_muplus;
+		TH1D*    h1_Afb;
 		
 		// For the graphs
 		Int_t nentries;
@@ -186,6 +188,10 @@ class graphicObjects// : public utilities
 		Int_t pTmevspTid_nbins;
 		Double_t pTmevspTid_min;
 		Double_t pTmevspTid_max;
+		
+		Int_t Afb_nbins;
+		Double_t Afb_min;
+		Double_t Afb_max;
 	
 	public:
 		graphicObjects();

@@ -220,6 +220,10 @@ void graphicObjects::ginitialize()
 	pTmevspTid_nbins = 100;
 	pTmevspTid_min   = 0.*GeV2TeV;
 	pTmevspTid_max   = 500.*GeV2TeV;
+	
+	Afb_nbins = 5;
+	Afb_min   = 450.*GeV2TeV;
+	Afb_max   = 550.*GeV2TeV;
 }
 
 void graphicObjects::setStyle()
@@ -267,6 +271,8 @@ void graphicObjects::bookHistos(TDirectory* tdir)
 	h1_pTdiff_muplus = new TH1D("pTdiff_mu+", "pTdiff_mu+", pTdiff_nbins, pTdiff_min, pTdiff_max);
 	h1_pTratio_muplus = new TH1D("pTratio_mu+", "pTratio_mu+", pTratio_nbins, pTratio_min, pTratio_max);
 	h2_pTmevspTid_muplus = new TH2D("pTmevspTid_mu+", "pTmevspTid_mu+", pTmevspTid_nbins,pTmevspTid_min,pTmevspTid_max, pTmevspTid_nbins,pTmevspTid_min,pTmevspTid_max);
+	
+	h1_Afb = new TH1D("Afb","Afb",Afb_nbins,Afb_min,Afb_max);
 }
 
 void graphicObjects::drawPerformance(vector<int>& vEntries, vector<double>& vResMemory, vector<double>& vVirMemory, TDirectory* tdir)
@@ -473,6 +479,14 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	h2_pTmevspTid_muplus->Draw("BOX");
 	cnv_pTmevspTid->Update();
     cnv_pTmevspTid->Write();
+	
+	
+	TCanvas* cnv_Afb = new TCanvas("Afb","Afb",canv_x,canv_y);
+	cnv_Afb->Draw();
+	cnv_Afb->cd();
+	h1_Afb->Draw("e1x0");
+	cnv_Afb->Update();
+	cnv_Afb->Write();
 }
 
 

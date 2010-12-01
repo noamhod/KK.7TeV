@@ -1252,6 +1252,7 @@ void muSkimD3PD::fill(int GRL)
 	{
 		// external
 		period->push_back( m_offPhys->period->at(0) );
+		//period->push_back( "NOAM" );  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		int nTriggers = (int)m_offPhys->triggers->size();
 		for(int i=0 ; i<nTriggers ; i++) triggers->push_back( m_offPhys->triggers->at(i) );
 	
@@ -1708,6 +1709,7 @@ void muSkimD3PD::fill(int GRL)
 	{
 		// external
 		period->push_back( m_mcOffPhys->period->at(0) );
+		//period->push_back( "NOAM" ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		int nTriggers = (int)m_mcOffPhys->triggers->size();
 		for(int i=0 ; i<nTriggers ; i++) triggers->push_back( m_mcOffPhys->triggers->at(i) );
 	

@@ -99,6 +99,25 @@ bool analysisSkeleton::digestSkim(int muSize)
 }
 ////////////////////////////////////////////////////
 
+/*
+bool analysisSkeleton::skimD3PD(physics* phys)
+{
+	if(phys->mu_staco_n<1  &&  phys->mu_muid_n<1) return false;
+	
+	for(int m=0 ; m<(int)phys->mu_staco_n ; m++)
+	{
+		if( fabs(pT(phys->mu_staco_me_qoverp->at(m), phys->mu_staco_me_theta->at(m)))*MeV2GeV >= 15. ) return true;
+	}
+
+	for(int m=0 ; m<(int)phys->mu_muid_n ; m++)
+	{
+		if( fabs(pT(phys->mu_muid_me_qoverp->at(m), phys->mu_muid_me_theta->at(m))*MeV2GeV) >= 15. ) return true;
+	}
+	
+	return false;
+}
+*/
+
 
 void analysisSkeleton::runEventDumper()
 {
@@ -402,8 +421,14 @@ void analysisSkeleton::fillCutFlow(string sorderedcutname, string sIsPreselectio
 		
 		if(values2fill.size()>0) values2fill.clear();
 		
-		current_imass = imass(pmu[muMinus],pmu[muPlus]);
-		current_mu_pT = pT(mu_me_qoverp->at(muMinus),mu_me_theta->at(muMinus))*MeV2TeV;
+		current_imass    = imass(pmu[muMinus],pmu[muPlus]);
+		current_mu_pT    = pT(mu_me_qoverp->at(muMinus),mu_me_theta->at(muMinus))*MeV2TeV;
+		current_cosTheta = cosThetaCollinsSoper( pmu[muMinus], -1, pmu[muPlus], +1 );
+		
+		//////////////////////////////////////////////////
+		// for the Afb calculation ///////////////////////
+		fillAfbMap(current_imass,current_cosTheta); //////
+		//////////////////////////////////////////////////
 		
 		///////////////////////////////////////////////////////////////////////
 		// these values go in the cutFlow histograms //////////////////////////

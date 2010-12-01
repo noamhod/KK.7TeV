@@ -10,6 +10,9 @@
 #define fit_cxx
 #include "fit.C"
 
+#define Afb_cxx
+#include "Afb.C"
+
 #define selection_cxx
 #include "selection.C"
 
@@ -33,7 +36,8 @@ class analysisModules : public cutFlowHandler,
 						public periodHandler,
 						public eventDumper,
 						public graphicObjects,
-						public fit
+						public fit,
+						public Afb
 {
 	public:
 

@@ -102,16 +102,24 @@ void mcOfflineControl::book()
 	m_mcOfflineAnalysis->bookCutProfileHistosMap( m_mcOfflineAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );
 
 	m_dirPerformance = m_histfile->mkdir("performance");
+	
+	m_dirAfb = m_histfile->mkdir("Afb");
 }
 
 void mcOfflineControl::draw()
 {
 	m_mcOfflineAnalysis->drawBareHistos(m_dirNoCuts);
+
+	m_mcOfflineAnalysis->calculateAfb(m_mcOfflineAnalysis->h1_Afb, m_dirAfb); // must come before drawHistos
 	m_mcOfflineAnalysis->drawHistos(m_dirAllCuts);
+
 	m_mcOfflineAnalysis->drawHistosMap( m_mcOfflineAnalysis->getCutFlowOrderedMapPtr(), m_mcOfflineAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+
 	m_mcOfflineAnalysis->drawFitHistos(m_dirFit, m_mcOfflineAnalysis->m_fitROOT->guess, m_mcOfflineAnalysis->m_fitROOT->fitFCN);
 	//m_mcOfflineAnalysis->drawFitHistos(m_dirFit, m_mcOfflineAnalysis->m_fitMinuit->guess, m_mcOfflineAnalysis->m_fitMinuit->fitFCN);
+
 	m_mcOfflineAnalysis->drawCutProfileHistosMap( m_dirCutProfile );
+
 	m_mcOfflineAnalysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
 
 	m_mcOfflineAnalysis->printCutFlowNumbers(l64t_nentries);

@@ -84,6 +84,7 @@ void analysis::executeCutFlow()
 	fillCutProfile2D(); ////////////////////
 	////////////////////////////////////////
 	
+	/*
 	if(analysisSkeleton::mu_n>0)
 	{
 		cout << "mu_n = " << mu_n << endl;
@@ -99,13 +100,14 @@ void analysis::executeCutFlow()
 		cout << "mu_EF_me_pt->size() = " << analysisSkeleton::mu_EF_me_pt->size() << endl;
 		cout << "mu_EF_matched->size() = " << analysisSkeleton::mu_EF_matched->size() << "\n" << endl;
 	}
+	*/
 	int N=0;
 	for(int n=0 ; n<mu_n ; n++)
 	{
-		if( analysisSkeleton::mu_pt->at(n)*MeV2GeV >= 15. ) N++;
+		if( fabs(analysisSkeleton::mu_pt->at(n)*MeV2GeV) > 15. ) N++;
 	}
 	nAll++;
-	if(mu_n==0)        n0mu++;
+	if(mu_n==0)        {cout << "n0mu=" << n0mu << endl; n0mu++;}
 	if(mu_n==1 && N>0) n1mu++;
 	if(mu_n==2 && N>0) n2mu++;
 	if(mu_n==3 && N>0) n3mu++;

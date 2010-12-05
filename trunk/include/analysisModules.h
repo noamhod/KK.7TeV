@@ -13,6 +13,9 @@
 #define Afb_cxx
 #include "Afb.C"
 
+#define tagNprobe_cxx
+#include "tagNprobe.C"
+
 #define selection_cxx
 #include "selection.C"
 
@@ -32,11 +35,13 @@
 #ifndef ANALYSISMUDULES_H
 #define ANALYSISMUDULES_H
 
-class analysisModules : public cutFlowHandler,
+class analysisModules : public selection,
+						public cutFlowHandler,
 						public periodHandler,
 						public eventDumper,
 						public graphicObjects,
 						public fit,
+						public tagNprobe,
 						public Afb
 {
 	public:

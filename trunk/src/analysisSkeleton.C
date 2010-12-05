@@ -99,7 +99,7 @@ bool analysisSkeleton::digestSkim(int muSize)
 }
 ////////////////////////////////////////////////////
 
-/*
+
 bool analysisSkeleton::skimD3PD(physics* phys)
 {
 	if(phys->mu_staco_n<1  &&  phys->mu_muid_n<1) return false;
@@ -116,7 +116,6 @@ bool analysisSkeleton::skimD3PD(physics* phys)
 	
 	return false;
 }
-*/
 
 
 void analysisSkeleton::runEventDumper()
@@ -652,10 +651,18 @@ void analysisSkeleton::fillCutProfile1D()
 			else if(sname=="etaTight_2")  (*h1map_cutProfile)[sname]->Fill( mu_eta->at(bi) );
 			else if(sname=="etaBarrel_1") (*h1map_cutProfile)[sname]->Fill( mu_eta->at(ai) );
 			else if(sname=="etaBarrel_2") (*h1map_cutProfile)[sname]->Fill( mu_eta->at(bi) );
-			else if(sname=="pTmatchingRatio_1") (*h1map_cutProfile)[sname]->Fill( pT(mu_me_qoverp->at(ai)/MeV2TeV, mu_me_theta->at(ai)) );
-			else if(sname=="pTmatchingRatio_2") (*h1map_cutProfile)[sname]->Fill( pT(mu_me_qoverp->at(bi)/MeV2TeV, mu_me_theta->at(bi)) );
-			else if(sname=="pTmatchingAbsDiff_1") (*h1map_cutProfile)[sname]->Fill( pT(mu_me_qoverp->at(ai)/MeV2TeV, mu_me_theta->at(ai)) );
-			else if(sname=="pTmatchingAbsDiff_2") (*h1map_cutProfile)[sname]->Fill( pT(mu_me_qoverp->at(bi)/MeV2TeV, mu_me_theta->at(bi)) );
+			else if(sname=="pTmatchingRatio_1")
+			{
+				float pTid = pT(mu_id_qoverp->at(ai), mu_id_theta->at(ai));
+				if(pTid!=0.) (*h1map_cutProfile)[sname]->Fill( pT(mu_me_qoverp->at(ai), mu_me_theta->at(ai)) / pTid );
+			}
+			else if(sname=="pTmatchingRatio_2")
+			{
+				float pTid = pT(mu_id_qoverp->at(bi), mu_id_theta->at(bi));
+				if(pTid!=0.) (*h1map_cutProfile)[sname]->Fill( pT(mu_me_qoverp->at(bi), mu_me_theta->at(bi)) / pTid );
+			}
+			else if(sname=="pTmatchingAbsDiff_1") (*h1map_cutProfile)[sname]->Fill( pT(mu_me_qoverp->at(ai)/MeV2TeV, mu_me_theta->at(ai)) - pT(mu_id_qoverp->at(ai), mu_id_theta->at(ai)) );
+			else if(sname=="pTmatchingAbsDiff_2") (*h1map_cutProfile)[sname]->Fill( pT(mu_me_qoverp->at(bi)/MeV2TeV, mu_me_theta->at(bi)) - pT(mu_id_qoverp->at(bi), mu_id_theta->at(bi)) );
 			else if(sname=="d0_1") (*h1map_cutProfile)[sname]->Fill( mu_d0_exPV->at(ai) );
 			else if(sname=="d0_2") (*h1map_cutProfile)[sname]->Fill( mu_d0_exPV->at(bi) );
 			else if(sname=="z0_1") (*h1map_cutProfile)[sname]->Fill( mu_z0_exPV->at(ai) );
@@ -721,6 +728,127 @@ void analysisSkeleton::fillCutProfile2D()
 			else if(sname=="impactParameter_2") (*h2map_cutProfile)[sname]->Fill( mu_d0_exPV->at(bi), mu_z0_exPV->at(bi) );
 		}
 	}
+}
+
+
+void analysisSkeleton::fillTagNProbe()
+{
+	// Tag&Probe mask:
+	// retrun 0: event was not triggered
+	// retrun 1: matched vector is NULL or empty
+	// retrun 2: event was not tagged
+	// retrun 3: event was tagged but with a problem
+	// retrun 4: event was tagged, found a probe candidate but not probed it and there's a problem with this cand
+	// retrun 5: event was tagged, found a probe candidate but not probed it
+	// retrun 6: event was tagged, found a probe candidate and probed it but the probe has a problem
+	// retrun 7: event was tagged and probed
+	// retrun 8: else
+	int itag   = -1;
+	int iprobe = -1;
+	int tNp_mask = tagNprobeMask(isL1_MU10, mu_L1_matched, mu_L1_dr, pmu, mu_charge, itag, iprobe);
+	switch(tNp_mask)
+	{
+		case 0: break;
+		case 1: break;
+		case 2: break;
+		case 3: break;
+		case 4: break;
+		case 5:
+			h1_tagNprobe_candidates_pT->Fill( fabs(pT(mu_me_qoverp->at(iprobe)/MeV2TeV, mu_me_theta->at(iprobe))) );
+			h1_tagNprobe_candidates_eta->Fill( mu_eta->at(iprobe) );
+			h1_tagNprobe_candidates_phi->Fill( mu_phi->at(iprobe) );
+			break;
+		case 6: break;
+		case 7:
+			h1_tagNprobe_candidates_pT->Fill( fabs(pT(mu_me_qoverp->at(iprobe)/MeV2TeV, mu_me_theta->at(iprobe))) );
+			h1_tagNprobe_candidates_eta->Fill( mu_eta->at(iprobe) );
+			h1_tagNprobe_candidates_phi->Fill( mu_phi->at(iprobe) );
+			h1_tagNprobe_succeeded_pT->Fill( fabs(pT(mu_me_qoverp->at(iprobe)/MeV2TeV, mu_me_theta->at(iprobe))) );
+			h1_tagNprobe_succeeded_eta->Fill( mu_eta->at(iprobe) );
+			h1_tagNprobe_succeeded_phi->Fill( mu_phi->at(iprobe) );
+			break;
+		case 8: break;
+		default: break;
+	}
+}
+
+/*
+void analysisSkeleton::fillTruthEfficiency()
+{
+	// Truth efficiency mask:
+	// retrun 0: truth pT vector is <=0
+	// retrun 1: didn't find truth muon with pT>0.
+	// retrun 2: found truth muon with pT>0 and event was not triggered
+	// retrun 3: found truth muon with pT>0, event was triggered but isMatched=0 or isMatched->size()=0
+	// retrun 4: found truth muon with pT>0, event was triggered but no reconstructed muon was matched to the trigger
+	// retrun 5: found truth muon with pT>0, event was triggered and reconstructed muon was matched to the trigger but didn't match to truth
+	// retrun 6: found truth muon with pT>0, event was triggered and reconstructed muon was matched to the trigger and to truth
+	// retrun 7: else
+	int irec = -1;
+	int itru = -1;
+	int truth_mask = truthMask(isL1_MU10, mu_L1_matched, mu_L1_dr,
+							   mu_eta, mu_phi,
+							   as_muonTruth_eta, as_muonTruth_phi, as_muonTruth_pt,
+							   irec, itru);
+	switch(truth_mask)
+	{
+		case 0: break;
+		case 1: break;
+		case 2:
+			h1_truth_candidates_pT->Fill( as_muonTruth_pt->at(itru)*MeV2TeV );
+			h1_truth_candidates_eta->Fill( as_muonTruth_eta->at(itru) );
+			h1_truth_candidates_phi->Fill( as_muonTruth_phi->at(itru) );
+			break;
+		case 3: break;
+		case 4: break;
+		case 5: break;
+		case 6:
+			h1_truth_candidates_pT->Fill( as_muonTruth_pt->at(irec)*MeV2TeV );
+			h1_truth_candidates_eta->Fill( as_muonTruth_eta->at(irec) );
+			h1_truth_candidates_phi->Fill( as_muonTruth_phi->at(irec) );
+			h1_truth_succeeded_pT->Fill( as_muonTruth_pt->at(irec)*MeV2TeV );
+			h1_truth_succeeded_eta->Fill( as_muonTruth_eta->at(irec) );
+			h1_truth_succeeded_phi->Fill( as_muonTruth_phi->at(irec) );
+			break;
+		case 7: break;
+		default: break;
+	}
+}
+*/
+
+void analysisSkeleton::fillTruthEfficiency()
+{
+	//mu_truth_matched = True if muon is matched to the truth
+	//mu_truth_status  : Status oMC status = 1 pfinal particle, status = 3 intermediate particle (documentary)
+	//mu_truth_mothertype : description: True mother PDG type
+	
+	
+	for(int t=0 ; t<(int)mu_truth_pt->size() ; t++)
+	{
+		//if(mu_n<2) continue; 
+	
+		//if(!mu_truth_matched->at(t)) continue; 
+		if(!mu_truth_status->at(t)) continue;
+		if(mu_truth_mothertype->at(t)!=PDTZ  &&  mu_truth_mothertype->at(t)!=PDTGAMMA) continue;
+		//if(as_mcevt_n==1)
+		//{
+		//	if(fabs(as_mcevt_pdf_scale->at(0)-mZ0)>10.) continue; // everything is in GeV
+		//}
+		
+		// fill the denominator histos
+		h1_truth_candidates_pT->Fill( fabs(pT(mu_me_qoverp->at(t)/MeV2TeV, mu_me_theta->at(t))) );
+		h1_truth_candidates_eta->Fill( mu_eta->at(t) );
+		h1_truth_candidates_phi->Fill( mu_phi->at(t) );
+		
+		if(!isL1_MU10) continue;
+		if(!mu_L1_matched->at(t)) continue;
+		if(mu_L1_dr->at(t)>dRthreshold  ||  mu_L1_dr->at(t)<0.) continue;
+
+		h1_truth_succeeded_pT->Fill( fabs(pT(mu_me_qoverp->at(t)/MeV2TeV, mu_me_theta->at(t))) );
+		h1_truth_succeeded_eta->Fill( mu_eta->at(t) );
+		h1_truth_succeeded_phi->Fill( mu_phi->at(t) );
+	}
+	cout << endl;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

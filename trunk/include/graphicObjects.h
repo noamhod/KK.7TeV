@@ -29,6 +29,9 @@ class graphicObjects// : public utilities
 		TCanvas* cnv_pTratio;
 		TCanvas* cnv_pTmevspTid;
 		TCanvas* cnv_Afb;
+		TCanvas* cnv_efficiency_pT;
+		TCanvas* cnv_efficiency_eta;
+		TCanvas* cnv_efficiency_phi;
 		
 		// pads
 		TVirtualPad* pad_pT;
@@ -43,29 +46,57 @@ class graphicObjects// : public utilities
 		TVirtualPad* pad_pTratio_muplus;
 		TVirtualPad* pad_pTmevspTid;
 		TVirtualPad* pad_pTmevspTid_muplus;
+		TVirtualPad* pad_candidates_pT;
+		TVirtualPad* pad_succeeded_pT;
+		TVirtualPad* pad_efficiency_pT;
+		TVirtualPad* pad_candidates_eta;
+		TVirtualPad* pad_succeeded_eta;
+		TVirtualPad* pad_efficiency_eta;
+		TVirtualPad* pad_candidates_phi;
+		TVirtualPad* pad_succeeded_phi;
+		TVirtualPad* pad_efficiency_phi;
 
 		// histos
-		TH1D*    h1_imass;
-		TH1D*    h1_pT;
-		TH1D*    h1_pT_muplus;
-		TH1D*    h1_eta;
-		TH1D*    h1_eta_muplus;
-		TH1D*    h1_costh;
-		TH1D*    h1_d0exPV;
-		TH1D*    h1_z0exPV;
-		TH1D*    h1_cosmicCosth;
-		TH1D*    h1_cosmicCosthAllCuts;
-		TH2D*    h2_xyVertex;
-		TH1D*    h1_imassFit;
-		TH1D*    h1_ipTdiff;
-		TH1D*    h1_etaSum;
-		TH1D*    h1_pTdiff;
-		TH1D*    h1_pTdiff_muplus;
-		TH1D*    h1_pTratio;
-		TH1D*    h1_pTratio_muplus;
-		TH2D*    h2_pTmevspTid;
-		TH2D*    h2_pTmevspTid_muplus;
-		TH1D*    h1_Afb;
+		TH1D* h1_imass;
+		TH1D* h1_pT;
+		TH1D* h1_pT_muplus;
+		TH1D* h1_eta;
+		TH1D* h1_eta_muplus;
+		TH1D* h1_costh;
+		TH1D* h1_d0exPV;
+		TH1D* h1_z0exPV;
+		TH1D* h1_cosmicCosth;
+		TH1D* h1_cosmicCosthAllCuts;
+		TH2D* h2_xyVertex;
+		TH1D* h1_imassFit;
+		TH1D* h1_ipTdiff;
+		TH1D* h1_etaSum;
+		TH1D* h1_pTdiff;
+		TH1D* h1_pTdiff_muplus;
+		TH1D* h1_pTratio;
+		TH1D* h1_pTratio_muplus;
+		TH2D* h2_pTmevspTid;
+		TH2D* h2_pTmevspTid_muplus;
+		TH1D* h1_Afb;
+		TH1D* h1_tagNprobe_candidates_pT;
+		TH1D* h1_tagNprobe_succeeded_pT;
+		TH1D* h1_tagNprobe_efficiency_pT;
+		TH1D* h1_tagNprobe_candidates_eta;
+		TH1D* h1_tagNprobe_succeeded_eta;
+		TH1D* h1_tagNprobe_efficiency_eta;
+		TH1D* h1_tagNprobe_candidates_phi;
+		TH1D* h1_tagNprobe_succeeded_phi;
+		TH1D* h1_tagNprobe_efficiency_phi;
+		TH1D* h1_truth_candidates_pT;
+		TH1D* h1_truth_succeeded_pT;
+		TH1D* h1_truth_efficiency_pT;
+		TH1D* h1_truth_candidates_eta;
+		TH1D* h1_truth_succeeded_eta;
+		TH1D* h1_truth_efficiency_eta;
+		TH1D* h1_truth_candidates_phi;
+		TH1D* h1_truth_succeeded_phi;
+		TH1D* h1_truth_efficiency_phi;
+	
 		
 		// For the graphs
 		Int_t nentries;
@@ -145,6 +176,10 @@ class graphicObjects// : public utilities
 		Double_t pT_bins[100+1]; //pT_bins[pT_nbins+1]; !!!!!!!!!!!!!!!
 		Double_t pT_bins_cut[100+1]; //pT_bins[pT_nbins+1]; !!!!!!!!!!!!!!!
 		
+		Int_t phi_nbins;
+		Double_t phi_min;
+		Double_t phi_max;
+		
 		Int_t eta_nbins;
 		Double_t eta_min;
 		Double_t eta_max;
@@ -192,6 +227,10 @@ class graphicObjects// : public utilities
 		Int_t Afb_nbins;
 		Double_t Afb_min;
 		Double_t Afb_max;
+		
+		Int_t tagNprobe_pT_nbins;
+		Double_t tagNprobe_pT_min;
+		Double_t tagNprobe_pT_max;
 	
 	public:
 		graphicObjects();

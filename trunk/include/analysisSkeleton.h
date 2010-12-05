@@ -13,7 +13,7 @@
 #ifndef ANALYSISSKELETON_H
 #define ANALYSISSKELETON_H
 
-class analysisSkeleton : public analysisModules, public selection
+class analysisSkeleton : public analysisModules//, public selection
 {
 public:
 	//////////////////////
@@ -37,6 +37,7 @@ public:
 	int nMusPassed;
 	TMapdi pTtoIndexMap;
 	TVectorP2VL	pmu;
+	TVectorP2VL pmuTruth;
 	TMapsd values2fill;
 	int nMultiMuonEvents;
 	
@@ -309,6 +310,50 @@ public:
 	vector<short>*   mu_L1_hemisphere;
 	vector<int>*     mu_L1_matched;
 	
+	
+	// * * * * * * * * * * * *  * * * * * * * * * * * * * * * * * * * * * * * *
+	// Monte Carlo truth
+	// staco/muid truth
+	vector<float>*   mu_truth_dr;
+	vector<float>*   mu_truth_E;
+	vector<float>*   mu_truth_pt;
+	vector<float>*   mu_truth_eta;
+	vector<float>*   mu_truth_phi;
+	vector<int>*     mu_truth_type;
+	vector<int>*     mu_truth_status;
+	vector<int>*     mu_truth_barcode;
+	vector<int>*     mu_truth_mothertype;
+	vector<int>*     mu_truth_motherbarcode;
+	vector<int>*     mu_truth_matched;
+	
+	// muonTruth
+	int              as_muonTruth_n;
+	vector<float>*   as_muonTruth_pt;
+	vector<float>*   as_muonTruth_m;
+	vector<float>*   as_muonTruth_eta;
+	vector<float>*   as_muonTruth_phi;
+	vector<float>*   as_muonTruth_charge;
+	vector<int>*     as_muonTruth_PDGID;
+	vector<int>*     as_muonTruth_barcode;
+	vector<int>*     as_muonTruth_type;
+	vector<int>*     as_muonTruth_origin;
+	
+	// MC event
+	int              as_mcevt_n;
+	vector<int>*     as_mcevt_signal_process_id;
+	vector<int>*     as_mcevt_event_number;
+	vector<double>*  as_mcevt_event_scale;
+	vector<double>*  as_mcevt_alphaQCD;
+	vector<double>*  as_mcevt_alphaQED;
+	vector<int>*     as_mcevt_pdf_id1;
+	vector<int>*     as_mcevt_pdf_id2;
+	vector<double>*  as_mcevt_pdf_x1;
+	vector<double>*  as_mcevt_pdf_x2;
+	vector<double>*  as_mcevt_pdf_scale;
+	vector<double>*  as_mcevt_pdf1;
+	vector<double>*  as_mcevt_pdf2;
+	vector<double>*  as_mcevt_weight;
+	
 	// * * * * * * * * * * * *  * * * * * * * * * * * * * * * * * * * * * * * *
 	// muon variables for selection
 	
@@ -323,104 +368,6 @@ public:
 	float current_cosmicCosth;
 	float current_ipTdiff;
 	float current_etaSum;
-	
-	// deprecated !!!
-	float d0exPVa;
-	float z0exPVa;
-	float d0exPVb;
-	float z0exPVb;
-	
-	// combined muon ?
-	int isMuaComb;
-	int isMubComb;
-	
-	// inner detector hits
-	int nSCThitsMua;
-	int nSCThitsMub;
-	int nPIXhitsMua;
-	int nPIXhitsMub;
-	int nIDhitsMua;
-	int nIDhitsMub;
-	
-	// MS hits
-	int nMDTBIHitsMua;
-	int nMDTBMHitsMua;
-	int nMDTBOHitsMua;
-	int nMDTBEEHitsMua;
-	int nMDTBIS78HitsMua;
-	int nMDTEIHitsMua;
-	int nMDTEMHitsMua;
-	int nMDTEOHitsMua;
-	int nMDTEEHitsMua;
-	int nRPCLayer1EtaHitsMua;
-	int nRPCLayer2EtaHitsMua;
-	int nRPCLayer3EtaHitsMua;
-	int nRPCLayer1PhiHitsMua;
-	int nRPCLayer2PhiHitsMua;
-	int nRPCLayer3PhiHitsMua;
-	int nTGCLayer1EtaHitsMua;
-	int nTGCLayer2EtaHitsMua;
-	int nTGCLayer3EtaHitsMua;
-	int nTGCLayer4EtaHitsMua;
-	int nTGCLayer1PhiHitsMua;
-	int nTGCLayer2PhiHitsMua;
-	int nTGCLayer3PhiHitsMua;
-	int nTGCLayer4PhiHitsMua;
-	
-	int nMDTBIHitsMub;
-	int nMDTBMHitsMub;
-	int nMDTBOHitsMub;
-	int nMDTBEEHitsMub;
-	int nMDTBIS78HitsMub;
-	int nMDTEIHitsMub;
-	int nMDTEMHitsMub;
-	int nMDTEOHitsMub;
-	int nMDTEEHitsMub;
-	int nRPCLayer1EtaHitsMub;
-	int nRPCLayer2EtaHitsMub;
-	int nRPCLayer3EtaHitsMub;
-	int nRPCLayer1PhiHitsMub;
-	int nRPCLayer2PhiHitsMub;
-	int nRPCLayer3PhiHitsMub;
-	int nTGCLayer1EtaHitsMub;
-	int nTGCLayer2EtaHitsMub;
-	int nTGCLayer3EtaHitsMub;
-	int nTGCLayer4EtaHitsMub;
-	int nTGCLayer1PhiHitsMub;
-	int nTGCLayer2PhiHitsMub;
-	int nTGCLayer3PhiHitsMub;
-	int nTGCLayer4PhiHitsMub;
-	
-	// ID - MS pT matching: pT=|p|*sin(theta), qOp=charge/|p|
-	float me_qOp_a;
-	float id_qOp_a;
-	float me_theta_a;
-	float id_theta_a;
-	float me_qOp_b;
-	float id_qOp_b;
-	float me_theta_b;
-	float id_theta_b;
-	
-	// impact parameter
-	float impPrmZ0;
-	float impPrmD0;
-	float phi_a;
-	float phi_b;
-	
-	// isolation
-	float mu_pTa;
-	float mu_pTb;
-	float pTcone20a;
-	float pTcone20b;
-	float pTcone30a;
-	float pTcone30b;
-	float pTcone40a;
-	float pTcone40b;
-	
-	// charge
-	float mu_charge_a;
-	float mu_charge_b;
-	////////////////////////
 
 public:
 	analysisSkeleton();
@@ -442,7 +389,7 @@ public:
 	string          getPeriodName(int run);
 	vector<string>* getPeriodTriggers();
 	int             isTrigger(string trigName);
-	//bool			skimD3PD(physics* phys);
+	bool			skimD3PD(physics* phys);
 	bool            digestSkim(int muSize);
 	void 			printAllProperties(int ai, int bi, int iv);
 	
@@ -456,6 +403,9 @@ public:
 	
 	void fillCutProfile1D();
 	void fillCutProfile2D();
+	
+	void fillTagNProbe();
+	void fillTruthEfficiency();
 
 private:
 	void runEventDumper();

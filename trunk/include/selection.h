@@ -7,16 +7,13 @@
 
 #include "basicIncludes.h"
 
-#define kinematics_cxx
-#include "kinematics.C"
-
 #ifndef SELECTION_H
 #define SELECTION_H
 
 class selection : public kinematics
 {
 public:
-	bool   b_print;
+	bool b_print;
 	
 public:
 	selection();

@@ -29,6 +29,7 @@
 #include <TAxis.h>
 #include <TLine.h>
 #include <TPaveText.h>
+#include <TThread.h>
 
 #include <RooFit.h>
 #include <RooRealVar.h>
@@ -70,6 +71,7 @@
 #include <map>
 #include <ctime>
 #include <time.h>
+#include <pthread.h>
 
 using namespace std;
 using namespace RooFit;
@@ -96,6 +98,9 @@ typedef multimap<float, float > TMultimapff;
 
 #define utilities_cxx
 #include "utilities.C"
+
+#define kinematics_cxx
+#include "kinematics.C"
 
 #include "units.h"
 

@@ -96,7 +96,17 @@ void mcAnalysisGridControl::draw()
 {
 	m_mcAnalysis->drawBareHistos(m_dirNoCuts);
 
-	m_mcAnalysis->calculateAfb(m_mcAnalysis->h1_Afb, m_dirAfb); // must come before drawHistos
+	// these calculations must come before drawHistos
+	bool isTruth = false;
+	m_mcAnalysis->calculateEfficiency(m_mcAnalysis->h1_tagNprobe_candidates_pT, m_mcAnalysis->h1_tagNprobe_succeeded_pT, m_mcAnalysis->h1_tagNprobe_efficiency_pT, isTruth);
+	m_mcAnalysis->calculateEfficiency(m_mcAnalysis->h1_tagNprobe_candidates_eta, m_mcAnalysis->h1_tagNprobe_succeeded_eta, m_mcAnalysis->h1_tagNprobe_efficiency_eta, isTruth);
+	m_mcAnalysis->calculateEfficiency(m_mcAnalysis->h1_tagNprobe_candidates_phi, m_mcAnalysis->h1_tagNprobe_succeeded_phi, m_mcAnalysis->h1_tagNprobe_efficiency_phi, isTruth);
+	isTruth = true;
+	m_mcAnalysis->calculateEfficiency(m_mcAnalysis->h1_truth_candidates_pT, m_mcAnalysis->h1_truth_succeeded_pT, m_mcAnalysis->h1_truth_efficiency_pT, isTruth);
+	m_mcAnalysis->calculateEfficiency(m_mcAnalysis->h1_truth_candidates_eta, m_mcAnalysis->h1_truth_succeeded_eta, m_mcAnalysis->h1_truth_efficiency_eta, isTruth);
+	m_mcAnalysis->calculateEfficiency(m_mcAnalysis->h1_truth_candidates_phi, m_mcAnalysis->h1_truth_succeeded_phi, m_mcAnalysis->h1_truth_efficiency_phi, isTruth);
+	
+	m_mcAnalysis->calculateAfb(m_mcAnalysis->h1_Afb, m_dirAfb);
 	m_mcAnalysis->drawHistos(m_dirAllCuts);
 	
 	m_mcAnalysis->drawHistosMap( m_mcAnalysis->getCutFlowOrderedMapPtr(), m_mcAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );

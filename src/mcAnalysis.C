@@ -7,14 +7,52 @@
 
 #include "mcAnalysis.h"
 
+/*
+void* handle1(void* p)
+{
+	//(static_cast<mcAnalysis*>(p)->mcAnalysis::fillCutProfile1D)();
+	TThread::Lock();
+	(static_cast<mcAnalysis*>(p)->mcAnalysis::fillCutProfile1D)();
+	TThread::UnLock();
+	return 0;
+}
+void* handle2(void* p)
+{
+	//(static_cast<mcAnalysis*>(p)->mcAnalysis::fillCutProfile2D)();
+	TThread::Lock();
+	(static_cast<mcAnalysis*>(p)->mcAnalysis::fillCutProfile2D)();
+	TThread::UnLock();
+	return 0;
+}
+void* handle3(void* p)
+{
+	//(static_cast<mcAnalysis*>(p)->mcAnalysis::fillCutProfile2D)();
+	TThread::Lock();
+	(static_cast<mcAnalysis*>(p)->mcAnalysis::fillTagNProbe)();
+	TThread::UnLock();
+	return 0;
+}
+void* handle4(void* p)
+{
+	//(static_cast<mcAnalysis*>(p)->mcAnalysis::fillCutProfile2D)();
+	TThread::Lock();
+	(static_cast<mcAnalysis*>(p)->mcAnalysis::fillTruthEfficiency)();
+	TThread::UnLock();
+	return 0;
+}
+*/
+/////////////////////////////////////////////////////
+
 mcAnalysis::mcAnalysis()
 {
-	
+	//thrd1 = new TThread("thrd1", handle1, (void*) 0);
+	//thrd2 = new TThread("thrd2", handle2, (void*) 0);
 }
 
 mcAnalysis::~mcAnalysis()
 {
-
+	//delete thrd1;
+	//delete thrd2;
 }
 
 void mcAnalysis::executeCutFlow()
@@ -58,9 +96,38 @@ void mcAnalysis::executeCutFlow()
 
 	////////////////////////////////////////
 	// execute the cut profile analysis ////
+	//pthread_create(&thrd1, NULL, wrap1, this);
+	//pthread_create(&thrd2, NULL, wrap2, this);
+	//pthread_join(thrd1, NULL);
+	//pthread_join(thrd2, NULL);
+	//TThread thrd1("thrd1", handle1, this);
+	//TThread thrd2("thrd2", handle2, this);
+	//thrd1.Run(); ///////////////////////////
+	//thrd2.Run(); ///////////////////////////
 	fillCutProfile1D(); ////////////////////
 	fillCutProfile2D(); ////////////////////
 	////////////////////////////////////////
+	
+	/////////////////////////
+	// Tag&Probe mask ///////
+	//TThread thrd3("thrd3", handle3, this);
+	//thrd3.Run(); ////////////
+	fillTagNProbe(); ////////
+	/////////////////////////
+	
+	////////////////////////////////
+	// Truth efficiency mask ///////
+	//TThread thrd4("thrd4", handle4, this);
+	//thrd4.Run(); ///////////////////
+	fillTruthEfficiency(); /////////
+	////////////////////////////////
+	
+	
+	//TThread::Ps();
+	//thrd1.Join();
+	//thrd2.Join();
+	//thrd3.Join();
+	//thrd4.Join();
 	
 	/////////////////////////////////////////////////////
 	// preform the entire preselection //////////////////
@@ -162,6 +229,34 @@ void mcAnalysis::setEventVariables()
 	analysisSkeleton::vxp_nTracks = m_mcPhys->vxp_nTracks;
 	analysisSkeleton::vxp_type    = m_mcPhys->vxp_type;
 	analysisSkeleton::vxp_z       = m_mcPhys->vxp_z;
+	
+	// muonTruth
+	analysisSkeleton::as_muonTruth_n = m_mcPhys->muonTruth_n;
+	analysisSkeleton::as_muonTruth_pt = m_mcPhys->muonTruth_pt;
+	analysisSkeleton::as_muonTruth_m = m_mcPhys->muonTruth_m;
+	analysisSkeleton::as_muonTruth_eta = m_mcPhys->muonTruth_eta;
+	analysisSkeleton::as_muonTruth_phi = m_mcPhys->muonTruth_phi;
+	analysisSkeleton::as_muonTruth_charge = m_mcPhys->muonTruth_charge;
+	analysisSkeleton::as_muonTruth_PDGID = m_mcPhys->muonTruth_PDGID;
+	analysisSkeleton::as_muonTruth_barcode = m_mcPhys->muonTruth_barcode;
+	analysisSkeleton::as_muonTruth_type = m_mcPhys->muonTruth_type;
+	analysisSkeleton::as_muonTruth_origin = m_mcPhys->muonTruth_origin;
+	
+	// MC event
+	analysisSkeleton::as_mcevt_n = m_mcPhys->mcevt_n;
+	analysisSkeleton::as_mcevt_signal_process_id = m_mcPhys->mcevt_signal_process_id;
+	analysisSkeleton::as_mcevt_event_number = m_mcPhys->mcevt_event_number;
+	analysisSkeleton::as_mcevt_event_scale = m_mcPhys->mcevt_event_scale;
+	analysisSkeleton::as_mcevt_alphaQCD = m_mcPhys->mcevt_alphaQCD;
+	analysisSkeleton::as_mcevt_alphaQED = m_mcPhys->mcevt_alphaQED;
+	analysisSkeleton::as_mcevt_pdf_id1 = m_mcPhys->mcevt_pdf_id1;
+	analysisSkeleton::as_mcevt_pdf_id2 = m_mcPhys->mcevt_pdf_id2;
+	analysisSkeleton::as_mcevt_pdf_x1 = m_mcPhys->mcevt_pdf_x1;
+	analysisSkeleton::as_mcevt_pdf_x2 = m_mcPhys->mcevt_pdf_x2;
+	analysisSkeleton::as_mcevt_pdf_scale = m_mcPhys->mcevt_pdf_scale;
+	analysisSkeleton::as_mcevt_pdf1 = m_mcPhys->mcevt_pdf1;
+	analysisSkeleton::as_mcevt_pdf2 = m_mcPhys->mcevt_pdf2;
+	analysisSkeleton::as_mcevt_weight = m_mcPhys->mcevt_weight;
 }
 
 void mcAnalysis::setStacoVariables()
@@ -360,6 +455,19 @@ void mcAnalysis::setStacoVariables()
 	analysisSkeleton::mu_L1_source = m_mcPhys->mu_staco_L1_source;
 	analysisSkeleton::mu_L1_hemisphere = m_mcPhys->mu_staco_L1_hemisphere;
 	analysisSkeleton::mu_L1_matched = m_mcPhys->mu_staco_L1_matched;
+	
+	// staco truth
+	analysisSkeleton::mu_truth_dr = m_mcPhys->mu_staco_truth_dr;
+	analysisSkeleton::mu_truth_E = m_mcPhys->mu_staco_truth_E;
+	analysisSkeleton::mu_truth_pt = m_mcPhys->mu_staco_truth_pt;
+	analysisSkeleton::mu_truth_eta = m_mcPhys->mu_staco_truth_eta;
+	analysisSkeleton::mu_truth_phi = m_mcPhys->mu_staco_truth_phi;
+	analysisSkeleton::mu_truth_type = m_mcPhys->mu_staco_truth_type;
+	analysisSkeleton::mu_truth_status = m_mcPhys->mu_staco_truth_status;
+	analysisSkeleton::mu_truth_barcode = m_mcPhys->mu_staco_truth_barcode;
+	analysisSkeleton::mu_truth_mothertype = m_mcPhys->mu_staco_truth_mothertype;
+	analysisSkeleton::mu_truth_motherbarcode = m_mcPhys->mu_staco_truth_motherbarcode;
+	analysisSkeleton::mu_truth_matched = m_mcPhys->mu_staco_truth_matched;
 }
 
 void mcAnalysis::setMuidVariables()
@@ -558,6 +666,19 @@ void mcAnalysis::setMuidVariables()
 	analysisSkeleton::mu_L1_source = m_mcPhys->mu_muid_L1_source;
 	analysisSkeleton::mu_L1_hemisphere = m_mcPhys->mu_muid_L1_hemisphere;
 	analysisSkeleton::mu_L1_matched = m_mcPhys->mu_muid_L1_matched;
+	
+	// muid truth
+	analysisSkeleton::mu_truth_dr = m_mcPhys->mu_muid_truth_dr;
+	analysisSkeleton::mu_truth_E = m_mcPhys->mu_muid_truth_E;
+	analysisSkeleton::mu_truth_pt = m_mcPhys->mu_muid_truth_pt;
+	analysisSkeleton::mu_truth_eta = m_mcPhys->mu_muid_truth_eta;
+	analysisSkeleton::mu_truth_phi = m_mcPhys->mu_muid_truth_phi;
+	analysisSkeleton::mu_truth_type = m_mcPhys->mu_muid_truth_type;
+	analysisSkeleton::mu_truth_status = m_mcPhys->mu_muid_truth_status;
+	analysisSkeleton::mu_truth_barcode = m_mcPhys->mu_muid_truth_barcode;
+	analysisSkeleton::mu_truth_mothertype = m_mcPhys->mu_muid_truth_mothertype;
+	analysisSkeleton::mu_truth_motherbarcode = m_mcPhys->mu_muid_truth_motherbarcode;
+	analysisSkeleton::mu_truth_matched = m_mcPhys->mu_muid_truth_matched;
 }
 
 void mcAnalysis::write()

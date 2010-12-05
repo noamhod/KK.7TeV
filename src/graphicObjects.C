@@ -24,81 +24,6 @@ void graphicObjects::setCutFlowMapSVDPtr(TMapsvd* cutFlowMapSVD)
 
 void graphicObjects::ginitialize()
 {
-	// canvases
-	cnv_imass        = NULL;
-	cnv_pT           = NULL;
-	cnv_eta          = NULL;
-	cnv_costh        = NULL;
-	cnv_d0exPV       = NULL;
-	cnv_z0exPV       = NULL;
-	cnv_cosmicCosth  = NULL;
-	cnv_xyVertex     = NULL;
-	cnv_imassFit     = NULL;
-	cnv_ipTdiff      = NULL;
-	cnv_etaSum       = NULL;
-	cnv_pTdiff       = NULL;
-	cnv_pTratio      = NULL;
-	cnv_pTmevspTid   = NULL;
-	
-	// pads
-	pad_pT                 = NULL;
-	pad_eta                = NULL;
-	pad_pT_muplus          = NULL;
-	pad_eta_muplus         = NULL;
-	pad_cosmicCosth        = NULL;
-	pad_cosmicCosthAllCuts = NULL;
-	pad_pTdiff             = NULL;
-	pad_pTratio            = NULL;
-	pad_pTmevspTid         = NULL;
-	pad_pTdiff_muplus      = NULL;
-	pad_pTratio_muplus     = NULL;
-	pad_pTmevspTid_muplus  = NULL;
-	
-	// histos
-	h1_imass              = NULL;
-	h1_pT                 = NULL;
-	h1_pT_muplus          = NULL;
-	h1_eta                = NULL;
-	h1_eta_muplus         = NULL;
-	h1_costh              = NULL;
-	h1_d0exPV             = NULL;
-	h1_z0exPV             = NULL;
-	h1_cosmicCosth        = NULL;
-	h1_cosmicCosthAllCuts = NULL;
-	h2_xyVertex           = NULL;
-	h1_imassFit           = NULL;
-	h1_ipTdiff            = NULL;
-	h1_etaSum             = NULL;
-	h1_pTdiff             = NULL;
-	h1_pTdiff_muplus      = NULL;
-	h1_pTratio            = NULL;
-	h1_pTratio_muplus     = NULL;
-	h2_pTmevspTid         = NULL;
-	h2_pTmevspTid_muplus  = NULL;
-
-	// cut flow canvases
-	cnv_cutFlow_imass  = NULL;
-	cnv_cutFlow_pT     = NULL;
-	
-	// cut flow legends
-	leg_cutFlow_imass  = NULL;
-	leg_cutFlow_pT     = NULL;
-	
-	// fit legends
-	leg_imassFit = NULL;
-	leg_ipTdiff  = NULL;
-	
-	// cut flow histos maps
-	hmap_cutFlow_imass = NULL;
-	hmap_cutFlow_pT    = NULL;
-
-	// cut profile histos map
-	h1map_cutProfile = NULL;
-	h2map_cutProfile = NULL;
-	
-	// cut profile cnavases
-	cmap_cutProfile = NULL;
-	
 	// canvas size
 	canv_x = 602;
 	canv_y = 400;
@@ -175,9 +100,12 @@ void graphicObjects::ginitialize()
 		pT_bins[i] = TMath::Power( 10,(logpTmin + i*pT_binwidth) );
 		pT_bins_cut[i] = TMath::Power( 10,(logpTmin_cut + i*pT_binwidth_cut) );
 	}
-
 	
-	eta_nbins   = 42;
+	phi_nbins   = 15;
+	phi_min     = -pi;
+	phi_max     = +pi;
+	
+	eta_nbins   = 150;
 	eta_min     = -3.;
 	eta_max     = 3.;
 
@@ -221,9 +149,13 @@ void graphicObjects::ginitialize()
 	pTmevspTid_min   = 0.*GeV2TeV;
 	pTmevspTid_max   = 500.*GeV2TeV;
 	
-	Afb_nbins = 5;
-	Afb_min   = 450.*GeV2TeV;
-	Afb_max   = 550.*GeV2TeV;
+	Afb_nbins = 10;
+	Afb_min   = 850.*GeV2TeV;
+	Afb_max   = 1000.*GeV2TeV;
+	
+	tagNprobe_pT_nbins = 30;
+	tagNprobe_pT_min   = 0.*MeV2GeV;
+	tagNprobe_pT_max   = 300.*MeV2GeV;
 }
 
 void graphicObjects::setStyle()
@@ -273,6 +205,26 @@ void graphicObjects::bookHistos(TDirectory* tdir)
 	h2_pTmevspTid_muplus = new TH2D("pTmevspTid_mu+", "pTmevspTid_mu+", pTmevspTid_nbins,pTmevspTid_min,pTmevspTid_max, pTmevspTid_nbins,pTmevspTid_min,pTmevspTid_max);
 	
 	h1_Afb = new TH1D("Afb","Afb",Afb_nbins,Afb_min,Afb_max);
+	
+	h1_tagNprobe_candidates_pT     = new TH1D("tagNprobe_candidates_pT","tagNprobe_candidates_pT",tagNprobe_pT_nbins,tagNprobe_pT_min,tagNprobe_pT_max);
+	h1_tagNprobe_succeeded_pT     = new TH1D("tagNprobe_succeeded_pT","tagNprobe_succeeded_pT",tagNprobe_pT_nbins,tagNprobe_pT_min,tagNprobe_pT_max);
+	h1_tagNprobe_efficiency_pT = new TH1D("tagNprobe_efficiency_pT","tagNprobe_efficiency_pT",tagNprobe_pT_nbins,tagNprobe_pT_min,tagNprobe_pT_max);
+	h1_tagNprobe_candidates_eta     = new TH1D("tagNprobe_candidates_eta","tagNprobe_candidates_eta",eta_nbins,eta_min,eta_max);
+	h1_tagNprobe_succeeded_eta     = new TH1D("tagNprobe_succeeded_eta","tagNprobe_succeeded_eta",eta_nbins,eta_min,eta_max);
+	h1_tagNprobe_efficiency_eta = new TH1D("tagNprobe_efficiency_eta","tagNprobe_efficiency_eta",eta_nbins,eta_min,eta_max);
+	h1_tagNprobe_candidates_phi     = new TH1D("tagNprobe_candidates_phi","tagNprobe_candidates_phi",phi_nbins,phi_min,phi_max);
+	h1_tagNprobe_succeeded_phi     = new TH1D("tagNprobe_succeeded_phi","tagNprobe_succeeded_phi",phi_nbins,phi_min,phi_max);
+	h1_tagNprobe_efficiency_phi = new TH1D("tagNprobe_efficiency_phi","tagNprobe_efficiency_phi",phi_nbins,phi_min,phi_max);
+	
+	h1_truth_candidates_pT = new TH1D("truth_candidates_pT","truth_candidates_pT",tagNprobe_pT_nbins,tagNprobe_pT_min,tagNprobe_pT_max);
+	h1_truth_succeeded_pT  = new TH1D("truth_succeeded_pT","truth_succeeded_pT",tagNprobe_pT_nbins,tagNprobe_pT_min,tagNprobe_pT_max);
+	h1_truth_efficiency_pT = new TH1D("truth_efficiency_pT","truth_efficiency_pT",tagNprobe_pT_nbins,tagNprobe_pT_min,tagNprobe_pT_max);
+	h1_truth_candidates_eta = new TH1D("truth_candidates_eta","truth_candidates_eta",eta_nbins,eta_min,eta_max);
+	h1_truth_succeeded_eta  = new TH1D("truth_succeeded_eta","truth_succeeded_eta",eta_nbins,eta_min,eta_max);
+	h1_truth_efficiency_eta = new TH1D("truth_efficiency_eta","truth_efficiency_eta",eta_nbins,eta_min,eta_max);
+	h1_truth_candidates_phi = new TH1D("truth_candidates_phi","truth_candidates_phi",phi_nbins,phi_min,phi_max);
+	h1_truth_succeeded_phi  = new TH1D("truth_succeeded_phi","truth_succeeded_phi",phi_nbins,phi_min,phi_max);
+	h1_truth_efficiency_phi = new TH1D("truth_efficiency_phi","truth_efficiency_phi",phi_nbins,phi_min,phi_max);
 }
 
 void graphicObjects::drawPerformance(vector<int>& vEntries, vector<double>& vResMemory, vector<double>& vVirMemory, TDirectory* tdir)
@@ -443,7 +395,6 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	cnv_etaSum->Update();
     cnv_etaSum->Write();
 	
-	
 	cnv_pTdiff = new TCanvas("pTdiff","pTdiff",canv_x,canv_y);
 	cnv_pTdiff->Divide(1,2);
 	pad_pTdiff = cnv_pTdiff->cd(1);
@@ -480,13 +431,144 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	cnv_pTmevspTid->Update();
     cnv_pTmevspTid->Write();
 	
-	
-	TCanvas* cnv_Afb = new TCanvas("Afb","Afb",canv_x,canv_y);
+	cnv_Afb = new TCanvas("Afb","Afb",canv_x,canv_y);
 	cnv_Afb->Draw();
 	cnv_Afb->cd();
+	h1_Afb->SetTitle("");
+	h1_Afb->SetMinimum(-1.1);
+	h1_Afb->SetMaximum(+1.1);
+	h1_Afb->SetXTitle("#hat{m}_{#mu#mu} TeV");
+	h1_Afb->SetYTitle("A_{FB}");
 	h1_Afb->Draw("e1x0");
 	cnv_Afb->Update();
 	cnv_Afb->Write();
+	
+	
+	cnv_efficiency_pT = new TCanvas("efficiency_pT","efficiency_pT",canv_x,canv_y);
+	cnv_efficiency_pT->Divide(1,3);
+	pad_candidates_pT    = cnv_efficiency_pT->cd(1);
+	pad_succeeded_pT  = cnv_efficiency_pT->cd(2);
+	pad_efficiency_pT = cnv_efficiency_pT->cd(3);
+	cnv_efficiency_pT->Draw();
+	pad_candidates_pT->cd();
+	h1_tagNprobe_candidates_pT->SetTitle("");
+	h1_tagNprobe_candidates_pT->SetXTitle("p_{T} TeV");
+	h1_tagNprobe_candidates_pT->SetYTitle("Candidate probe muons");
+	h1_truth_candidates_pT->SetTitle("");
+	h1_truth_candidates_pT->SetXTitle("p_{T} TeV");
+	h1_truth_candidates_pT->SetYTitle("Candidate probe muons");
+	h1_truth_candidates_pT->SetLineColor(kRed);
+	h1_truth_candidates_pT->SetLineStyle(2);
+	h1_truth_candidates_pT->Draw();
+	h1_tagNprobe_candidates_pT->Draw("sames");
+	pad_succeeded_pT->cd();
+	h1_tagNprobe_succeeded_pT->SetTitle("");
+	h1_tagNprobe_succeeded_pT->SetXTitle("p_{T} TeV");
+	h1_tagNprobe_succeeded_pT->SetYTitle("Probe muons");
+	h1_truth_succeeded_pT->SetTitle("");
+	h1_truth_succeeded_pT->SetXTitle("p_{T} TeV");
+	h1_truth_succeeded_pT->SetYTitle("Candidate probe muons");
+	h1_truth_succeeded_pT->SetLineColor(kRed);
+	h1_truth_succeeded_pT->SetLineStyle(2);
+	h1_truth_succeeded_pT->Draw();
+	h1_tagNprobe_succeeded_pT->Draw("sames");
+	pad_efficiency_pT->cd();
+	pad_efficiency_pT->SetGrid();
+	h1_tagNprobe_efficiency_pT->SetTitle("");
+	h1_tagNprobe_efficiency_pT->SetXTitle("p_{T} TeV");
+	h1_tagNprobe_efficiency_pT->SetYTitle("#epsilon = #frac{N_{probes}}{N_{probe}^{candidates}}");
+	h1_truth_efficiency_pT->SetTitle("");
+	h1_truth_efficiency_pT->SetXTitle("p_{T} TeV");
+	h1_truth_efficiency_pT->SetYTitle("#epsilon = #frac{N_{probes}}{N_{probe}^{candidates}}");
+	h1_truth_efficiency_pT->SetLineColor(kRed);
+	h1_truth_efficiency_pT->Draw();
+	h1_tagNprobe_efficiency_pT->Draw("e1x0sames");
+	cnv_efficiency_pT->Update();
+	cnv_efficiency_pT->Write();
+	
+	cnv_efficiency_eta = new TCanvas("efficiency_eta","efficiency_eta",canv_x,canv_y);
+	cnv_efficiency_eta->Divide(1,3);
+	pad_candidates_eta    = cnv_efficiency_eta->cd(1);
+	pad_succeeded_eta  = cnv_efficiency_eta->cd(2);
+	pad_efficiency_eta = cnv_efficiency_eta->cd(3);
+	cnv_efficiency_eta->Draw();
+	pad_candidates_eta->cd();
+	h1_tagNprobe_candidates_eta->SetTitle("");
+	h1_tagNprobe_candidates_eta->SetXTitle("#eta");
+	h1_tagNprobe_candidates_eta->SetYTitle("Candidate probe muons");
+	h1_truth_candidates_eta->SetTitle("");
+	h1_truth_candidates_eta->SetXTitle("#eta");
+	h1_truth_candidates_eta->SetYTitle("Candidate probe muons");
+	h1_truth_candidates_eta->SetLineColor(kRed);
+	h1_truth_candidates_eta->SetLineStyle(2);
+	h1_truth_candidates_eta->Draw();
+	h1_tagNprobe_candidates_eta->Draw("sames");
+	pad_succeeded_eta->cd();
+	h1_tagNprobe_succeeded_eta->SetTitle("");
+	h1_tagNprobe_succeeded_eta->SetXTitle("#eta");
+	h1_tagNprobe_succeeded_eta->SetYTitle("Probe muons");
+	h1_truth_succeeded_eta->SetTitle("");
+	h1_truth_succeeded_eta->SetXTitle("#eta");
+	h1_truth_succeeded_eta->SetYTitle("Candidate probe muons");
+	h1_truth_succeeded_eta->SetLineColor(kRed);
+	h1_truth_succeeded_eta->SetLineStyle(2);
+	h1_truth_succeeded_eta->Draw();
+	h1_tagNprobe_succeeded_eta->Draw("sames");
+	pad_efficiency_eta->cd();
+	pad_efficiency_eta->SetGrid();
+	h1_tagNprobe_efficiency_eta->SetTitle("");
+	h1_tagNprobe_efficiency_eta->SetXTitle("#eta");
+	h1_tagNprobe_efficiency_eta->SetYTitle("#epsilon = #frac{N_{probes}}{N_{probe}^{candidates}}");
+	h1_truth_efficiency_eta->SetTitle("");
+	h1_truth_efficiency_eta->SetXTitle("#eta");
+	h1_truth_efficiency_eta->SetYTitle("#epsilon = #frac{N_{probes}}{N_{probe}^{candidates}}");
+	h1_truth_efficiency_eta->SetLineColor(kRed);
+	h1_truth_efficiency_eta->Draw();
+	h1_tagNprobe_efficiency_eta->Draw("e1x0sames");
+	cnv_efficiency_eta->Update();
+	cnv_efficiency_eta->Write();
+	
+	cnv_efficiency_phi = new TCanvas("efficiency_phi","efficiency_phi",canv_x,canv_y);
+	cnv_efficiency_phi->Divide(1,3);
+	pad_candidates_phi    = cnv_efficiency_phi->cd(1);
+	pad_succeeded_phi  = cnv_efficiency_phi->cd(2);
+	pad_efficiency_phi = cnv_efficiency_phi->cd(3);
+	cnv_efficiency_phi->Draw();
+	pad_candidates_phi->cd();
+	h1_tagNprobe_candidates_phi->SetTitle("");
+	h1_tagNprobe_candidates_phi->SetXTitle("#phi");
+	h1_tagNprobe_candidates_phi->SetYTitle("Candidate probe muons");
+	h1_truth_candidates_phi->SetTitle("");
+	h1_truth_candidates_phi->SetXTitle("#phi");
+	h1_truth_candidates_phi->SetYTitle("Candidate probe muons");
+	h1_truth_candidates_phi->SetLineColor(kRed);
+	h1_truth_candidates_phi->SetLineStyle(2);
+	h1_truth_candidates_phi->Draw();
+	h1_tagNprobe_candidates_phi->Draw("sames");
+	pad_succeeded_phi->cd();
+	h1_tagNprobe_succeeded_phi->SetTitle("");
+	h1_tagNprobe_succeeded_phi->SetXTitle("#phi");
+	h1_tagNprobe_succeeded_phi->SetYTitle("Probe muons");
+	h1_truth_succeeded_phi->SetTitle("");
+	h1_truth_succeeded_phi->SetXTitle("#phi");
+	h1_truth_succeeded_phi->SetYTitle("Candidate probe muons");
+	h1_truth_succeeded_phi->SetLineColor(kRed);
+	h1_truth_succeeded_phi->SetLineStyle(2);
+	h1_truth_succeeded_phi->Draw();
+	h1_tagNprobe_succeeded_phi->Draw("sames");
+	pad_efficiency_phi->cd();
+	pad_efficiency_phi->SetGrid();
+	h1_tagNprobe_efficiency_phi->SetTitle("");
+	h1_tagNprobe_efficiency_phi->SetXTitle("#phi");
+	h1_tagNprobe_efficiency_phi->SetYTitle("#epsilon = #frac{N_{probes}}{N_{probe}^{candidates}}");
+	h1_truth_efficiency_phi->SetTitle("");
+	h1_truth_efficiency_phi->SetXTitle("#phi");
+	h1_truth_efficiency_phi->SetYTitle("#epsilon = #frac{N_{probes}}{N_{probe}^{candidates}}");
+	h1_truth_efficiency_phi->SetLineColor(kRed);
+	h1_truth_efficiency_phi->Draw();
+	h1_tagNprobe_efficiency_phi->Draw("e1x0sames");
+	cnv_efficiency_phi->Update();
+	cnv_efficiency_phi->Write();
 }
 
 

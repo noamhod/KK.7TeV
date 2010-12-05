@@ -8,13 +8,16 @@
 #ifndef UNITS_H
 #define UNITS_H
 
-double MeV2TeV = 1.e-6;
-double MeV2GeV = 1.e-3;
-double GeV2TeV = 1.e-3;
-double GeV2MeV = 1.e+3;
+float MeV2TeV = 1.e-6;
+float MeV2GeV = 1.e-3;
+float GeV2TeV = 1.e-3;
+float GeV2MeV = 1.e+3;
 
-double muonMass = 0.105658367; // GeV
+float muonMass = 0.105658367; // GeV
 
+float pi = 3.14159265;
+
+float mZ0 = 91.1876; // GeV
 
 #endif
 

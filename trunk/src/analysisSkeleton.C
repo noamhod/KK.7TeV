@@ -730,7 +730,7 @@ void analysisSkeleton::fillCutProfile2D()
 	}
 }
 
-
+/*
 void analysisSkeleton::fillTagNProbe()
 {
 	// Tag&Probe mask:
@@ -771,50 +771,50 @@ void analysisSkeleton::fillTagNProbe()
 		default: break;
 	}
 }
+*/
 
-/*
-void analysisSkeleton::fillTruthEfficiency()
+void analysisSkeleton::fillTagNProbe()
 {
-	// Truth efficiency mask:
-	// retrun 0: truth pT vector is <=0
-	// retrun 1: didn't find truth muon with pT>0.
-	// retrun 2: found truth muon with pT>0 and event was not triggered
-	// retrun 3: found truth muon with pT>0, event was triggered but isMatched=0 or isMatched->size()=0
-	// retrun 4: found truth muon with pT>0, event was triggered but no reconstructed muon was matched to the trigger
-	// retrun 5: found truth muon with pT>0, event was triggered and reconstructed muon was matched to the trigger but didn't match to truth
-	// retrun 6: found truth muon with pT>0, event was triggered and reconstructed muon was matched to the trigger and to truth
-	// retrun 7: else
-	int irec = -1;
-	int itru = -1;
-	int truth_mask = truthMask(isL1_MU10, mu_L1_matched, mu_L1_dr,
-							   mu_eta, mu_phi,
-							   as_muonTruth_eta, as_muonTruth_phi, as_muonTruth_pt,
-							   irec, itru);
-	switch(truth_mask)
+	// Tag&Probe mask:
+	// retrun 0: matched vector is null or empty (no fill)
+	// retrun 1: event CANNOT be tagged (no fill)
+	// retrun 2: event was tagged, probe candidate found but not probed
+	// retrun 3: event was tagged, probe candidate found and probed
+	// retrun 4: else
+	
+	int itag;
+	int iprobe;
+	int tNp_mask;
+	for(int i=1 ; i<=2 ; i++)
 	{
-		case 0: break;
-		case 1: break;
-		case 2:
-			h1_truth_candidates_pT->Fill( as_muonTruth_pt->at(itru)*MeV2TeV );
-			h1_truth_candidates_eta->Fill( as_muonTruth_eta->at(itru) );
-			h1_truth_candidates_phi->Fill( as_muonTruth_phi->at(itru) );
-			break;
-		case 3: break;
-		case 4: break;
-		case 5: break;
-		case 6:
-			h1_truth_candidates_pT->Fill( as_muonTruth_pt->at(irec)*MeV2TeV );
-			h1_truth_candidates_eta->Fill( as_muonTruth_eta->at(irec) );
-			h1_truth_candidates_phi->Fill( as_muonTruth_phi->at(irec) );
-			h1_truth_succeeded_pT->Fill( as_muonTruth_pt->at(irec)*MeV2TeV );
-			h1_truth_succeeded_eta->Fill( as_muonTruth_eta->at(irec) );
-			h1_truth_succeeded_phi->Fill( as_muonTruth_phi->at(irec) );
-			break;
-		case 7: break;
-		default: break;
+		if(i==1)
+		{
+			itag   = -1;
+			iprobe = -1;
+		}
+		tNp_mask = tagNprobeMask(mu_L1_matched, pmu, mu_charge, itag, iprobe);
+		switch(tNp_mask)
+		{
+			case 0: break;
+			case 1: break;
+			case 2:
+				h1_tagNprobe_candidates_pT->Fill( fabs(pT(mu_me_qoverp->at(iprobe)/MeV2TeV, mu_me_theta->at(iprobe))) );
+				h1_tagNprobe_candidates_eta->Fill( mu_eta->at(iprobe) );
+				h1_tagNprobe_candidates_phi->Fill( mu_phi->at(iprobe) );
+				break;
+			case 3:
+				h1_tagNprobe_candidates_pT->Fill( fabs(pT(mu_me_qoverp->at(iprobe)/MeV2TeV, mu_me_theta->at(iprobe))) );
+				h1_tagNprobe_candidates_eta->Fill( mu_eta->at(iprobe) );
+				h1_tagNprobe_candidates_phi->Fill( mu_phi->at(iprobe) );
+				h1_tagNprobe_succeeded_pT->Fill( fabs(pT(mu_me_qoverp->at(iprobe)/MeV2TeV, mu_me_theta->at(iprobe))) );
+				h1_tagNprobe_succeeded_eta->Fill( mu_eta->at(iprobe) );
+				h1_tagNprobe_succeeded_phi->Fill( mu_phi->at(iprobe) );
+				break;
+			case 4: break;
+			default: break;
+		}
 	}
 }
-*/
 
 void analysisSkeleton::fillTruthEfficiency()
 {
@@ -822,12 +822,12 @@ void analysisSkeleton::fillTruthEfficiency()
 	//mu_truth_status  : Status oMC status = 1 pfinal particle, status = 3 intermediate particle (documentary)
 	//mu_truth_mothertype : description: True mother PDG type
 	
-	
+	cout << "\nmu_truth_pt->size() = " << mu_truth_pt->size() << ",  mu_pt->size() = " << mu_pt->size() << endl;
 	for(int t=0 ; t<(int)mu_truth_pt->size() ; t++)
 	{
 		//if(mu_n<2) continue; 
 	
-		//if(!mu_truth_matched->at(t)) continue; 
+		//if(!mu_truth_matched->at(t)) continue;
 		if(!mu_truth_status->at(t)) continue;
 		if(mu_truth_mothertype->at(t)!=PDTZ  &&  mu_truth_mothertype->at(t)!=PDTGAMMA) continue;
 		//if(as_mcevt_n==1)
@@ -835,20 +835,28 @@ void analysisSkeleton::fillTruthEfficiency()
 		//	if(fabs(as_mcevt_pdf_scale->at(0)-mZ0)>10.) continue; // everything is in GeV
 		//}
 		
+		float dphi = mu_truth_phi->at(t) - mu_phi->at(t);
+		float deta = mu_truth_eta->at(t) - mu_eta->at(t);
+		float drMatch = sqrt(dphi*dphi + deta*deta);
+		cout << "truth-reco matching : mu_truth_matched->at(" << t << ") = " << mu_truth_matched->at(t) << endl;
+		cout <<	"truth-reco dR       : mu_truth_dr->at(" << t << ") = " << mu_truth_dr->at(t) << ",  dRcalculatedManually->at(" << t << ") = " << drMatch << endl;
+		cout << "truth-reco pT       : mu_truth_pt->at(" << t << ") = " << mu_truth_pt->at(t) << ",  mu_pt->at(" << t << ") = " << mu_pt->at(t) << endl;
+		cout << "reco-trig matching  : mu_L1_matched->at(" << t << ") = " << mu_L1_matched->at(t) << endl;
+		
 		// fill the denominator histos
 		h1_truth_candidates_pT->Fill( fabs(pT(mu_me_qoverp->at(t)/MeV2TeV, mu_me_theta->at(t))) );
 		h1_truth_candidates_eta->Fill( mu_eta->at(t) );
 		h1_truth_candidates_phi->Fill( mu_phi->at(t) );
 		
-		if(!isL1_MU10) continue;
+		//if(!isL1_MU10) continue;
 		if(!mu_L1_matched->at(t)) continue;
-		if(mu_L1_dr->at(t)>dRthreshold  ||  mu_L1_dr->at(t)<0.) continue;
+		if(mu_L1_dr->at(t)<0.)    continue;
+		//if(mu_L1_dr->at(t)>dRthreshold  ||  mu_L1_dr->at(t)<0.) continue;
 
 		h1_truth_succeeded_pT->Fill( fabs(pT(mu_me_qoverp->at(t)/MeV2TeV, mu_me_theta->at(t))) );
 		h1_truth_succeeded_eta->Fill( mu_eta->at(t) );
 		h1_truth_succeeded_phi->Fill( mu_phi->at(t) );
 	}
-	cout << endl;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

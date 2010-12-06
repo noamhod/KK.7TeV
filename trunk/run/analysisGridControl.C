@@ -92,14 +92,28 @@ void analysisGridControl::book()
 	m_analysis->bookFitHistos(m_dirAllCuts);
 
 	m_dirPerformance = m_rootfile->mkdir("performance");
+	
+	m_dirAfb = m_rootfile->mkdir("Afb");
 }
 
 void analysisGridControl::draw()
 {
 	m_analysis->drawBareHistos(m_dirNoCuts);
+	
+	// these calculations must come before drawHistos
+	bool isTruth = false;
+	m_analysis->calculateEfficiency(m_analysis->h1_tagNprobe_candidates_pT, m_analysis->h1_tagNprobe_succeeded_pT, m_analysis->h1_tagNprobe_efficiency_pT, isTruth);
+	m_analysis->calculateEfficiency(m_analysis->h1_tagNprobe_candidates_eta, m_analysis->h1_tagNprobe_succeeded_eta, m_analysis->h1_tagNprobe_efficiency_eta, isTruth);
+	m_analysis->calculateEfficiency(m_analysis->h1_tagNprobe_candidates_phi, m_analysis->h1_tagNprobe_succeeded_phi, m_analysis->h1_tagNprobe_efficiency_phi, isTruth);
+	
+	m_analysis->calculateAfb(m_analysis->h1_Afb, m_dirAfb);
+	
 	m_analysis->drawHistos(m_dirAllCuts);
+	
 	m_analysis->drawHistosMap( m_analysis->getCutFlowOrderedMapPtr(), m_analysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+	
 	m_analysis->drawCutProfileHistosMap( m_dirCutProfile );
+	
 	m_analysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
 	
 	m_analysis->printCutFlowNumbers(l64t_nentries);

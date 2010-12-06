@@ -113,16 +113,35 @@ void offlineControl::book()
 	m_offlineAnalysis->bookCutProfileHistosMap( m_offlineAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );
 	
 	m_dirPerformance = m_histfile->mkdir("performance");
+	
+	m_dirAfb = m_histfile->mkdir("Afb");
 }
 
 void offlineControl::draw()
 {
 	m_offlineAnalysis->drawBareHistos(m_dirNoCuts);
+	
+	// these calculations must come before drawHistos
+	bool isTruth = false;
+	m_offlineAnalysis->calculateEfficiency(m_offlineAnalysis->h1_tagNprobe_candidates_pT, m_offlineAnalysis->h1_tagNprobe_succeeded_pT, m_offlineAnalysis->h1_tagNprobe_efficiency_pT, isTruth);
+	m_offlineAnalysis->calculateEfficiency(m_offlineAnalysis->h1_tagNprobe_candidates_eta, m_offlineAnalysis->h1_tagNprobe_succeeded_eta, m_offlineAnalysis->h1_tagNprobe_efficiency_eta, isTruth);
+	m_offlineAnalysis->calculateEfficiency(m_offlineAnalysis->h1_tagNprobe_candidates_phi, m_offlineAnalysis->h1_tagNprobe_succeeded_phi, m_offlineAnalysis->h1_tagNprobe_efficiency_phi, isTruth);
+	isTruth = true;
+	m_offlineAnalysis->calculateEfficiency(m_offlineAnalysis->h1_truth_candidates_pT, m_offlineAnalysis->h1_truth_succeeded_pT, m_offlineAnalysis->h1_truth_efficiency_pT, isTruth);
+	m_offlineAnalysis->calculateEfficiency(m_offlineAnalysis->h1_truth_candidates_eta, m_offlineAnalysis->h1_truth_succeeded_eta, m_offlineAnalysis->h1_truth_efficiency_eta, isTruth);
+	m_offlineAnalysis->calculateEfficiency(m_offlineAnalysis->h1_truth_candidates_phi, m_offlineAnalysis->h1_truth_succeeded_phi, m_offlineAnalysis->h1_truth_efficiency_phi, isTruth);
+	
+	m_offlineAnalysis->calculateAfb(m_offlineAnalysis->h1_Afb, m_dirAfb);
+	
 	m_offlineAnalysis->drawHistos(m_dirAllCuts);
+	
 	m_offlineAnalysis->drawHistosMap( m_offlineAnalysis->getCutFlowOrderedMapPtr(), m_offlineAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+	
 	m_offlineAnalysis->drawFitHistos(m_dirFit, m_offlineAnalysis->m_fitROOT->guess, m_offlineAnalysis->m_fitROOT->fitFCN);
 	//m_offlineAnalysis->drawFitHistos(m_dirFit, m_offlineAnalysis->m_fitMinuit->guess, m_offlineAnalysis->m_fitMinuit->fitFCN);
+	
 	m_offlineAnalysis->drawCutProfileHistosMap( m_dirCutProfile );
+	
 	m_offlineAnalysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
 	
 	m_offlineAnalysis->printCutFlowNumbers(l64t_nentries);

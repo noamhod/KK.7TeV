@@ -84,23 +84,12 @@ void analysis::executeCutFlow()
 	fillCutProfile2D(); ////////////////////
 	////////////////////////////////////////
 	
-	/*
-	if(analysisSkeleton::mu_n>0)
-	{
-		cout << "mu_n = " << mu_n << endl;
-		cout << "mu_EF_dr->size() = " << analysisSkeleton::mu_EF_dr->size() << endl;
-		cout << "mu_EF_cb_eta->size() = " << analysisSkeleton::mu_EF_cb_eta->size() << endl;
-		cout << "mu_EF_cb_phi->size() = " << analysisSkeleton::mu_EF_cb_phi->size() << endl;
-		cout << "mu_EF_cb_pt->size() = " << analysisSkeleton::mu_EF_cb_pt->size() << endl;
-		cout << "mu_EF_ms_eta->size() = " << analysisSkeleton::mu_EF_ms_eta->size() << endl;
-		cout << "mu_EF_ms_phi->size() = " << analysisSkeleton::mu_EF_ms_phi->size() << endl;
-		cout << "mu_EF_ms_pt->size() = " << analysisSkeleton::mu_EF_ms_pt->size() << endl;
-		cout << "mu_EF_me_eta->size() = " << analysisSkeleton::mu_EF_me_eta->size() << endl;
-		cout << "mu_EF_me_phi->size() = " << analysisSkeleton::mu_EF_me_phi->size() << endl;
-		cout << "mu_EF_me_pt->size() = " << analysisSkeleton::mu_EF_me_pt->size() << endl;
-		cout << "mu_EF_matched->size() = " << analysisSkeleton::mu_EF_matched->size() << "\n" << endl;
-	}
-	*/
+	/////////////////////////
+	// Tag&Probe mask ///////
+	fillTagNProbe(); ////////
+	/////////////////////////
+	
+	
 	int N=0;
 	for(int n=0 ; n<mu_n ; n++)
 	{

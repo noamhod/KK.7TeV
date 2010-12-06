@@ -77,6 +77,16 @@ void mcDigestAnalysis::executeCutFlow()
 	fillCutProfile2D(); ////////////////////
 	////////////////////////////////////////
 	
+	/////////////////////////
+	// Tag&Probe mask ///////
+	fillTagNProbe(); ////////
+	/////////////////////////
+	
+	////////////////////////////////
+	// Truth efficiency mask ///////
+	fillTruthEfficiency(); /////////
+	////////////////////////////////
+	
 	/////////////////////////////////////////////////////
 	// preform the entire preselection //////////////////
 	bool passPreselection = applyPreselection(); ////////
@@ -174,6 +184,34 @@ void mcDigestAnalysis::setEventVariables()
 	analysisSkeleton::vxp_nTracks = m_mcDigestPhys->vxp_nTracks;
 	analysisSkeleton::vxp_type    = m_mcDigestPhys->vxp_type;
 	analysisSkeleton::vxp_z       = m_mcDigestPhys->vxp_z;
+	
+	// muonTruth
+	analysisSkeleton::as_muonTruth_n = m_mcDigestPhys->muonTruth_n;
+	analysisSkeleton::as_muonTruth_pt = m_mcDigestPhys->muonTruth_pt;
+	analysisSkeleton::as_muonTruth_m = m_mcDigestPhys->muonTruth_m;
+	analysisSkeleton::as_muonTruth_eta = m_mcDigestPhys->muonTruth_eta;
+	analysisSkeleton::as_muonTruth_phi = m_mcDigestPhys->muonTruth_phi;
+	analysisSkeleton::as_muonTruth_charge = m_mcDigestPhys->muonTruth_charge;
+	analysisSkeleton::as_muonTruth_PDGID = m_mcDigestPhys->muonTruth_PDGID;
+	analysisSkeleton::as_muonTruth_barcode = m_mcDigestPhys->muonTruth_barcode;
+	analysisSkeleton::as_muonTruth_type = m_mcDigestPhys->muonTruth_type;
+	analysisSkeleton::as_muonTruth_origin = m_mcDigestPhys->muonTruth_origin;
+	
+	// MC event
+	analysisSkeleton::as_mcevt_n = m_mcDigestPhys->mcevt_n;
+	analysisSkeleton::as_mcevt_signal_process_id = m_mcDigestPhys->mcevt_signal_process_id;
+	analysisSkeleton::as_mcevt_event_number = m_mcDigestPhys->mcevt_event_number;
+	analysisSkeleton::as_mcevt_event_scale = m_mcDigestPhys->mcevt_event_scale;
+	analysisSkeleton::as_mcevt_alphaQCD = m_mcDigestPhys->mcevt_alphaQCD;
+	analysisSkeleton::as_mcevt_alphaQED = m_mcDigestPhys->mcevt_alphaQED;
+	analysisSkeleton::as_mcevt_pdf_id1 = m_mcDigestPhys->mcevt_pdf_id1;
+	analysisSkeleton::as_mcevt_pdf_id2 = m_mcDigestPhys->mcevt_pdf_id2;
+	analysisSkeleton::as_mcevt_pdf_x1 = m_mcDigestPhys->mcevt_pdf_x1;
+	analysisSkeleton::as_mcevt_pdf_x2 = m_mcDigestPhys->mcevt_pdf_x2;
+	analysisSkeleton::as_mcevt_pdf_scale = m_mcDigestPhys->mcevt_pdf_scale;
+	analysisSkeleton::as_mcevt_pdf1 = m_mcDigestPhys->mcevt_pdf1;
+	analysisSkeleton::as_mcevt_pdf2 = m_mcDigestPhys->mcevt_pdf2;
+	analysisSkeleton::as_mcevt_weight = m_mcDigestPhys->mcevt_weight;
 }
 
 void mcDigestAnalysis::setStacoVariables()
@@ -374,6 +412,19 @@ void mcDigestAnalysis::setStacoVariables()
 	analysisSkeleton::mu_L1_source = m_mcDigestPhys->mu_staco_L1_source;
 	analysisSkeleton::mu_L1_hemisphere = m_mcDigestPhys->mu_staco_L1_hemisphere;
 	analysisSkeleton::mu_L1_matched = m_mcDigestPhys->mu_staco_L1_matched;
+	
+	// staco truth
+	analysisSkeleton::mu_truth_dr = m_mcDigestPhys->mu_staco_truth_dr;
+	analysisSkeleton::mu_truth_E = m_mcDigestPhys->mu_staco_truth_E;
+	analysisSkeleton::mu_truth_pt = m_mcDigestPhys->mu_staco_truth_pt;
+	analysisSkeleton::mu_truth_eta = m_mcDigestPhys->mu_staco_truth_eta;
+	analysisSkeleton::mu_truth_phi = m_mcDigestPhys->mu_staco_truth_phi;
+	analysisSkeleton::mu_truth_type = m_mcDigestPhys->mu_staco_truth_type;
+	analysisSkeleton::mu_truth_status = m_mcDigestPhys->mu_staco_truth_status;
+	analysisSkeleton::mu_truth_barcode = m_mcDigestPhys->mu_staco_truth_barcode;
+	analysisSkeleton::mu_truth_mothertype = m_mcDigestPhys->mu_staco_truth_mothertype;
+	analysisSkeleton::mu_truth_motherbarcode = m_mcDigestPhys->mu_staco_truth_motherbarcode;
+	analysisSkeleton::mu_truth_matched = m_mcDigestPhys->mu_staco_truth_matched;
 }
 
 void mcDigestAnalysis::setMuidVariables()
@@ -574,6 +625,19 @@ void mcDigestAnalysis::setMuidVariables()
 	analysisSkeleton::mu_L1_source = m_mcDigestPhys->mu_muid_L1_source;
 	analysisSkeleton::mu_L1_hemisphere = m_mcDigestPhys->mu_muid_L1_hemisphere;
 	analysisSkeleton::mu_L1_matched = m_mcDigestPhys->mu_muid_L1_matched;
+	
+	// muid truth
+	analysisSkeleton::mu_truth_dr = m_mcDigestPhys->mu_muid_truth_dr;
+	analysisSkeleton::mu_truth_E = m_mcDigestPhys->mu_muid_truth_E;
+	analysisSkeleton::mu_truth_pt = m_mcDigestPhys->mu_muid_truth_pt;
+	analysisSkeleton::mu_truth_eta = m_mcDigestPhys->mu_muid_truth_eta;
+	analysisSkeleton::mu_truth_phi = m_mcDigestPhys->mu_muid_truth_phi;
+	analysisSkeleton::mu_truth_type = m_mcDigestPhys->mu_muid_truth_type;
+	analysisSkeleton::mu_truth_status = m_mcDigestPhys->mu_muid_truth_status;
+	analysisSkeleton::mu_truth_barcode = m_mcDigestPhys->mu_muid_truth_barcode;
+	analysisSkeleton::mu_truth_mothertype = m_mcDigestPhys->mu_muid_truth_mothertype;
+	analysisSkeleton::mu_truth_motherbarcode = m_mcDigestPhys->mu_muid_truth_motherbarcode;
+	analysisSkeleton::mu_truth_matched = m_mcDigestPhys->mu_muid_truth_matched;
 }
 
 void mcDigestAnalysis::write()

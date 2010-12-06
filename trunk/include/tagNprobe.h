@@ -38,10 +38,7 @@ class tagNprobe
 		int  findProbe(vector<int>* isMatched, TVectorP2VL& pmu, vector<float>* charge, int itag);
 		int  tagNprobeMask(int wasEventTriggered, vector<int>* isMatched, vector<float>* dR,
 						   TVectorP2VL& pmu, vector<float>* charge, int& itag, int& iprobe);
-		int  truthMask(int wasEventTriggered, vector<int>* isMatched, vector<float>* dR,
-					   vector<float>* eta, vector<float>* phi,
-					   vector<float>* etaTruth, vector<float>* phiTruth, vector<float>* pTtruth,
-					   int& irec, int& itru);
+		int  tagNprobeMask(vector<int>* isMatched, TVectorP2VL& pmu, vector<float>* charge, int& itag, int& iprobe);
 		void calculateEfficiency(TH1D* hCandidates, TH1D* hSucceeded, TH1D* hEfficiency, bool isTruth);
 		
 	private:

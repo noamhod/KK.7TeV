@@ -153,9 +153,9 @@ void graphicObjects::ginitialize()
 	Afb_min   = 850.*GeV2TeV;
 	Afb_max   = 1000.*GeV2TeV;
 	
-	tagNprobe_pT_nbins = 30;
+	tagNprobe_pT_nbins = 50;
 	tagNprobe_pT_min   = 0.*MeV2GeV;
-	tagNprobe_pT_max   = 300.*MeV2GeV;
+	tagNprobe_pT_max   = 150.*MeV2GeV;
 }
 
 void graphicObjects::setStyle()
@@ -467,7 +467,7 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	h1_tagNprobe_succeeded_pT->SetYTitle("Probe muons");
 	h1_truth_succeeded_pT->SetTitle("");
 	h1_truth_succeeded_pT->SetXTitle("p_{T} TeV");
-	h1_truth_succeeded_pT->SetYTitle("Candidate probe muons");
+	h1_truth_succeeded_pT->SetYTitle("Probe muons");
 	h1_truth_succeeded_pT->SetLineColor(kRed);
 	h1_truth_succeeded_pT->SetLineStyle(2);
 	h1_truth_succeeded_pT->Draw();
@@ -509,7 +509,7 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	h1_tagNprobe_succeeded_eta->SetYTitle("Probe muons");
 	h1_truth_succeeded_eta->SetTitle("");
 	h1_truth_succeeded_eta->SetXTitle("#eta");
-	h1_truth_succeeded_eta->SetYTitle("Candidate probe muons");
+	h1_truth_succeeded_eta->SetYTitle("Probe muons");
 	h1_truth_succeeded_eta->SetLineColor(kRed);
 	h1_truth_succeeded_eta->SetLineStyle(2);
 	h1_truth_succeeded_eta->Draw();
@@ -551,7 +551,7 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	h1_tagNprobe_succeeded_phi->SetYTitle("Probe muons");
 	h1_truth_succeeded_phi->SetTitle("");
 	h1_truth_succeeded_phi->SetXTitle("#phi");
-	h1_truth_succeeded_phi->SetYTitle("Candidate probe muons");
+	h1_truth_succeeded_phi->SetYTitle("Probe muons");
 	h1_truth_succeeded_phi->SetLineColor(kRed);
 	h1_truth_succeeded_phi->SetLineStyle(2);
 	h1_truth_succeeded_phi->Draw();

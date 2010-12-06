@@ -43,7 +43,7 @@ void offlineAnalysis::executeAdvanced()
 
 void offlineAnalysis::executeCutFlow()
 {
-	sMuonRecoAlgo = "muid";
+	sMuonRecoAlgo = "staco";
 	
 	///////////////////////////////////
 	// set all the event-level vars ///
@@ -71,12 +71,17 @@ void offlineAnalysis::executeCutFlow()
 	buildMU4Vector(nMus, "angles"); /////////////////////
 	//buildMU4Vector(nMus); /////////////////////////////
 	/////////////////////////////////////////////////////
-
+	
 	////////////////////////////////////////
 	// execute the cut profile analysis ////
 	fillCutProfile1D(); ////////////////////
 	fillCutProfile2D(); ////////////////////
 	////////////////////////////////////////
+	
+	/////////////////////////
+	// Tag&Probe mask ///////
+	fillTagNProbe(); ////////
+	/////////////////////////
 	
 	//////////////////////////////////////////////////////////////
 	// write to the digest tree only the pairs that pass skim ////
@@ -213,7 +218,7 @@ void offlineAnalysis::setStacoVariables()
 	analysisSkeleton::mu_id_qoverp = m_offPhys->mu_staco_id_qoverp;
 	analysisSkeleton::mu_me_theta  = m_offPhys->mu_staco_me_theta;
 	analysisSkeleton::mu_id_theta  = m_offPhys->mu_staco_id_theta;
-	
+
 	// for impact parameter
 	analysisSkeleton::mu_d0_exPV = m_offPhys->mu_staco_d0_exPV;
 	analysisSkeleton::mu_z0_exPV = m_offPhys->mu_staco_z0_exPV;
@@ -249,7 +254,7 @@ void offlineAnalysis::setStacoVariables()
 	analysisSkeleton::mu_nTGCLayer2PhiHits = m_offPhys->mu_staco_nTGCLayer2PhiHits;
 	analysisSkeleton::mu_nTGCLayer3PhiHits = m_offPhys->mu_staco_nTGCLayer3PhiHits;
 	analysisSkeleton::mu_nTGCLayer4PhiHits = m_offPhys->mu_staco_nTGCLayer4PhiHits;
-	
+
 	analysisSkeleton::mu_etcone20 = m_offPhys->mu_staco_etcone20;
 	analysisSkeleton::mu_etcone30 = m_offPhys->mu_staco_etcone30;
 	analysisSkeleton::mu_etcone40 = m_offPhys->mu_staco_etcone40;

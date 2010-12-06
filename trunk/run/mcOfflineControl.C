@@ -110,7 +110,18 @@ void mcOfflineControl::draw()
 {
 	m_mcOfflineAnalysis->drawBareHistos(m_dirNoCuts);
 
-	m_mcOfflineAnalysis->calculateAfb(m_mcOfflineAnalysis->h1_Afb, m_dirAfb); // must come before drawHistos
+	// these calculations must come before drawHistos
+	bool isTruth = false;
+	m_mcOfflineAnalysis->calculateEfficiency(m_mcOfflineAnalysis->h1_tagNprobe_candidates_pT, m_mcOfflineAnalysis->h1_tagNprobe_succeeded_pT, m_mcOfflineAnalysis->h1_tagNprobe_efficiency_pT, isTruth);
+	m_mcOfflineAnalysis->calculateEfficiency(m_mcOfflineAnalysis->h1_tagNprobe_candidates_eta, m_mcOfflineAnalysis->h1_tagNprobe_succeeded_eta, m_mcOfflineAnalysis->h1_tagNprobe_efficiency_eta, isTruth);
+	m_mcOfflineAnalysis->calculateEfficiency(m_mcOfflineAnalysis->h1_tagNprobe_candidates_phi, m_mcOfflineAnalysis->h1_tagNprobe_succeeded_phi, m_mcOfflineAnalysis->h1_tagNprobe_efficiency_phi, isTruth);
+	isTruth = true;
+	m_mcOfflineAnalysis->calculateEfficiency(m_mcOfflineAnalysis->h1_truth_candidates_pT, m_mcOfflineAnalysis->h1_truth_succeeded_pT, m_mcOfflineAnalysis->h1_truth_efficiency_pT, isTruth);
+	m_mcOfflineAnalysis->calculateEfficiency(m_mcOfflineAnalysis->h1_truth_candidates_eta, m_mcOfflineAnalysis->h1_truth_succeeded_eta, m_mcOfflineAnalysis->h1_truth_efficiency_eta, isTruth);
+	m_mcOfflineAnalysis->calculateEfficiency(m_mcOfflineAnalysis->h1_truth_candidates_phi, m_mcOfflineAnalysis->h1_truth_succeeded_phi, m_mcOfflineAnalysis->h1_truth_efficiency_phi, isTruth);
+	
+	m_mcOfflineAnalysis->calculateAfb(m_mcOfflineAnalysis->h1_Afb, m_dirAfb);
+	
 	m_mcOfflineAnalysis->drawHistos(m_dirAllCuts);
 
 	m_mcOfflineAnalysis->drawHistosMap( m_mcOfflineAnalysis->getCutFlowOrderedMapPtr(), m_mcOfflineAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );

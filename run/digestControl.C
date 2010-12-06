@@ -96,16 +96,30 @@ void digestControl::book()
 	m_digestAnalysis->bookCutProfileHistosMap( m_digestAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );
 	
 	m_dirPerformance = m_histfile->mkdir("performance");
+	
+	m_dirAfb = m_histfile->mkdir("Afb");
 }
 
 void digestControl::draw()
 {
 	m_digestAnalysis->drawBareHistos(m_dirNoCuts);
+	
+	bool isTruth = false;
+	m_digestAnalysis->calculateEfficiency(m_digestAnalysis->h1_tagNprobe_candidates_pT, m_digestAnalysis->h1_tagNprobe_succeeded_pT, m_digestAnalysis->h1_tagNprobe_efficiency_pT, isTruth);
+	m_digestAnalysis->calculateEfficiency(m_digestAnalysis->h1_tagNprobe_candidates_eta, m_digestAnalysis->h1_tagNprobe_succeeded_eta, m_digestAnalysis->h1_tagNprobe_efficiency_eta, isTruth);
+	m_digestAnalysis->calculateEfficiency(m_digestAnalysis->h1_tagNprobe_candidates_phi, m_digestAnalysis->h1_tagNprobe_succeeded_phi, m_digestAnalysis->h1_tagNprobe_efficiency_phi, isTruth);
+	
+	m_digestAnalysis->calculateAfb(m_digestAnalysis->h1_Afb, m_dirAfb);
+	
 	m_digestAnalysis->drawHistos(m_dirAllCuts);
+	
 	m_digestAnalysis->drawHistosMap( m_digestAnalysis->getCutFlowOrderedMapPtr(), m_digestAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
+	
 	m_digestAnalysis->drawFitHistos(m_dirFit, m_digestAnalysis->m_fitROOT->guess, m_digestAnalysis->m_fitROOT->fitFCN);
 	//m_digestAnalysis->drawFitHistos(m_dirFit, m_digestAnalysis->m_fitMinuit->guess, m_digestAnalysis->m_fitMinuit->fitFCN);
+	
 	m_digestAnalysis->drawCutProfileHistosMap( m_dirCutProfile );
+	
 	m_digestAnalysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
 	
 	m_digestAnalysis->printCutFlowNumbers(l64t_nentries);

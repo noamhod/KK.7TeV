@@ -1506,6 +1506,14 @@ void muD3PD::fill(int GRL, string sPeriod, vector<string>* vsTriggers)
 		
 		// muid
 		mu_muid_n = (int)m_phys->mu_muid_n;
+		
+		int nMuidTmp = (int)m_phys->mu_muid_matchchi2->size();
+		for(int i=0 ; i<nMuidTmp ; i++)
+		{
+			mu_muid_matchchi2->push_back( m_phys->mu_muid_matchchi2->at(i) );  // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+			mu_muid_matchndof->push_back( m_phys->mu_muid_matchndof->at(i) );  // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+		}
+		
 		int nMuid = (int)m_phys->mu_muid_pt->size();
 		for(int i=0 ; i<nMuid ; i++)
 		{
@@ -1525,8 +1533,8 @@ void muD3PD::fill(int GRL, string sPeriod, vector<string>* vsTriggers)
 			mu_muid_z0_exPV->push_back( m_phys->mu_muid_z0_exPV->at(i) );
 			mu_muid_allauthor->push_back( m_phys->mu_muid_allauthor->at(i) );
 			mu_muid_author->push_back( m_phys->mu_muid_author->at(i) );
-			mu_muid_matchchi2->push_back( m_phys->mu_muid_matchchi2->at(i) ); //////////// !!!
-			mu_muid_matchndof->push_back( m_phys->mu_muid_matchndof->at(i) ); //////////// !!!
+			//mu_muid_matchchi2->push_back( m_phys->mu_muid_matchchi2->at(i) );  // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+			//mu_muid_matchndof->push_back( m_phys->mu_muid_matchndof->at(i) );  // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 			mu_muid_me_qoverp->push_back( m_phys->mu_muid_me_qoverp->at(i) );
 			mu_muid_id_qoverp->push_back( m_phys->mu_muid_id_qoverp->at(i) );
 			mu_muid_me_theta->push_back( m_phys->mu_muid_me_theta->at(i) );

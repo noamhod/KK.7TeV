@@ -107,6 +107,7 @@ void mcAnalysisGridControl::draw()
 	m_mcAnalysis->calculateEfficiency(m_mcAnalysis->h1_truth_candidates_phi, m_mcAnalysis->h1_truth_succeeded_phi, m_mcAnalysis->h1_truth_efficiency_phi, isTruth);
 	
 	m_mcAnalysis->calculateAfb(m_mcAnalysis->h1_Afb, m_dirAfb);
+	
 	m_mcAnalysis->drawHistos(m_dirAllCuts);
 	
 	m_mcAnalysis->drawHistosMap( m_mcAnalysis->getCutFlowOrderedMapPtr(), m_mcAnalysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );

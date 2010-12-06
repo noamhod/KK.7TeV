@@ -30,6 +30,7 @@ class analysisGridControl : public utilities
 		TDirectory* 	m_dirNoCuts;
 		TDirectory* 	m_dirCutFlow;
 		TDirectory* 	m_dirPerformance;
+		TDirectory* 	m_dirAfb;
 		
 
 		// run control

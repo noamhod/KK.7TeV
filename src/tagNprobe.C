@@ -151,82 +151,49 @@ int tagNprobe::tagNprobeMask(int wasEventTriggered, vector<int>* isMatched, vect
 	return 8;
 }
 
-int tagNprobe::truthMask(int wasEventTriggered, vector<int>* isMatched, vector<float>* dR,
-						 vector<float>* eta, vector<float>* phi,
-						 vector<float>* etaTruth, vector<float>* phiTruth, vector<float>* pTtruth,
-						 int& irec, int& itru)
+int tagNprobe::tagNprobeMask(vector<int>* isMatched, TVectorP2VL& pmu, vector<float>* charge, int& itag, int& iprobe)
 {
-	// Truth efficiency mask:
-	// retrun 0: truth pT vector is <=0
-	// retrun 1: didn't find truth muon with pT>0.
-	// retrun 2: found truth muon with pT>0 and event was not triggered
-	// retrun 3: found truth muon with pT>0, event was triggered but isMatched=0 or isMatched->size()=0
-	// retrun 4: found truth muon with pT>0, event was triggered but no reconstructed muon was matched to the trigger
-	// retrun 4: found truth muon with pT>0, event was triggered but no reconstructed muon was matched to the trigger
-	// retrun 5: found truth muon with pT>0, event was triggered and reconstructed muon was matched to the trigger but didn't match to truth
-	// retrun 6: found truth muon with pT>0, event was triggered and reconstructed muon was matched to the trigger and to truth
-	// retrun 7: else
+	// Tag&Probe mask:
+	// retrun 0: matched vector is null or empty (no fill)
+	// retrun 1: event CANNOT be tagged (no fill)
+	// retrun 2: event was tagged, probe candidate found but not probed
+	// retrun 3: event was tagged, probe candidate found and probed
+	// retrun 4: else
 
-	if(pTtruth->size()<=0) return 0;
+	if(isMatched->size()<1) return 0;
 	
-	float pTmax = 0.;
-	truth_pTmaxIndex = 0;
-	recon_pTmaxIndex = 0;
-	triggerIndex = 0;
-	bool  pTmaxFound = false;
-	bool  reconFound  = false;
-	bool  trigFound   = false;
-	dRbest = 1000.;
-	
-	
-	// find the truth candidate
-	for(int i=0 ; i<(int)pTtruth->size() ; i++)
-	{
-		if(pTtruth->at(i) > pTmax)
-		{
-			pTmax = pTtruth->at(i);
-			truth_pTmaxIndex = i;
-			pTmaxFound = true;
-		}
-	}
-	itru = truth_pTmaxIndex;
-	if(!pTmaxFound) return 1;
-	if(!wasEventTriggered) return 2;
-	if(isMatched==0  ||  isMatched->size()==0) return 3;
-	
-	// find the main reconstructed trigger muon
+	bool tag1  = false;
+	int  itag1 = 0;
 	for(int t=0 ; t<(int)isMatched->size() ; t++)
 	{
-		if(!isMatched->at(t)) continue;
-		float dr = dR->at(t);
-		if(dr<dRbest  &&  dr>0.)
-		{
-			dRbest = dr;
-			triggerIndex = t;
-			trigFound = true;
-		}
+		if(t==itag)           continue; // in the second call of this function, don't count it as tag
+		if(!isMatched->at(t)) continue; // have to trigger...
+		itag1 = t;
+		tag1  = true;
+		break;
 	}
-	if(!trigFound) return 4;
-	if(dRbest>dRthreshold) return 5;
+	if(!tag1) return 1; // cannot be tagged
 	
-	// match the reconstructed triggered muon to the truth muon
-	dRbest = 1000.;
-	for(int tt=0 ; tt<(int)pTtruth->size() ; tt++)
+	
+	for(int t=0 ; t<(int)isMatched->size() ; t++)
 	{
-		float deta = eta->at(triggerIndex)-etaTruth->at(tt);
-		float dphi = phi->at(triggerIndex)-phiTruth->at(tt);
-		float dr = sqrt( deta*deta + dphi*dphi );
-		if(dr<dRbest  &&  dr>0.)
-		{
-			dRbest = dr;
-			recon_pTmaxIndex = tt;
-			reconFound = true;
-		}
+		if(t==itag1)  continue; // skip the tag (the probe cannot be the tag...)
+		if(t==iprobe) continue; // in the second call of this function, don't count it as probe
+		
+		mHat  = kin.imass(pmu[itag1],pmu[t]);
+		Q1xQ2 = charge->at(itag1)*charge->at(t);
+		
+		if(fabs(mHat-mZ0*GeV2TeV)>mHatDiffThreshold) continue; // have to be on Z mass
+		if(Q1xQ2>=0.)                                continue; // require opposite charge
+		
+		itag   = itag1;
+		iprobe = t;
+		
+		if(!isMatched->at(t)) return 2; // tagged but not probed
+		else                  return 3; // tagged and probed 
 	}
-	irec = recon_pTmaxIndex;
-	if(!reconFound) return 5;
-	if(dRbest<=dRthreshold) return 6;
-	return 7;
+	
+	return 4;
 }
 
 void tagNprobe::calculateEfficiency(TH1D* hCandidates, TH1D* hSucceeded, TH1D* hEfficiency, bool isTruth)

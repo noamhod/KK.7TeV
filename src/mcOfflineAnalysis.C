@@ -77,6 +77,16 @@ void mcOfflineAnalysis::executeCutFlow()
 	fillCutProfile2D(); ////////////////////
 	////////////////////////////////////////
 	
+	/////////////////////////
+	// Tag&Probe mask ///////
+	fillTagNProbe(); ////////
+	/////////////////////////
+	
+	////////////////////////////////
+	// Truth efficiency mask ///////
+	fillTruthEfficiency(); /////////
+	////////////////////////////////
+	
 	////////////////////////////////////////////////////////////
 	// write to the digest tree only the pairs that pass skim //
 	bool passSkim = digestSkim(nMus); //////////////////////////
@@ -191,6 +201,34 @@ void mcOfflineAnalysis::setEventVariables()
 	analysisSkeleton::vxp_nTracks = m_mcOffPhys->vxp_nTracks;
 	analysisSkeleton::vxp_type    = m_mcOffPhys->vxp_type;
 	analysisSkeleton::vxp_z       = m_mcOffPhys->vxp_z;
+	
+	// muonTruth
+	analysisSkeleton::as_muonTruth_n = m_mcOffPhys->muonTruth_n;
+	analysisSkeleton::as_muonTruth_pt = m_mcOffPhys->muonTruth_pt;
+	analysisSkeleton::as_muonTruth_m = m_mcOffPhys->muonTruth_m;
+	analysisSkeleton::as_muonTruth_eta = m_mcOffPhys->muonTruth_eta;
+	analysisSkeleton::as_muonTruth_phi = m_mcOffPhys->muonTruth_phi;
+	analysisSkeleton::as_muonTruth_charge = m_mcOffPhys->muonTruth_charge;
+	analysisSkeleton::as_muonTruth_PDGID = m_mcOffPhys->muonTruth_PDGID;
+	analysisSkeleton::as_muonTruth_barcode = m_mcOffPhys->muonTruth_barcode;
+	analysisSkeleton::as_muonTruth_type = m_mcOffPhys->muonTruth_type;
+	analysisSkeleton::as_muonTruth_origin = m_mcOffPhys->muonTruth_origin;
+	
+	// MC event
+	analysisSkeleton::as_mcevt_n = m_mcOffPhys->mcevt_n;
+	analysisSkeleton::as_mcevt_signal_process_id = m_mcOffPhys->mcevt_signal_process_id;
+	analysisSkeleton::as_mcevt_event_number = m_mcOffPhys->mcevt_event_number;
+	analysisSkeleton::as_mcevt_event_scale = m_mcOffPhys->mcevt_event_scale;
+	analysisSkeleton::as_mcevt_alphaQCD = m_mcOffPhys->mcevt_alphaQCD;
+	analysisSkeleton::as_mcevt_alphaQED = m_mcOffPhys->mcevt_alphaQED;
+	analysisSkeleton::as_mcevt_pdf_id1 = m_mcOffPhys->mcevt_pdf_id1;
+	analysisSkeleton::as_mcevt_pdf_id2 = m_mcOffPhys->mcevt_pdf_id2;
+	analysisSkeleton::as_mcevt_pdf_x1 = m_mcOffPhys->mcevt_pdf_x1;
+	analysisSkeleton::as_mcevt_pdf_x2 = m_mcOffPhys->mcevt_pdf_x2;
+	analysisSkeleton::as_mcevt_pdf_scale = m_mcOffPhys->mcevt_pdf_scale;
+	analysisSkeleton::as_mcevt_pdf1 = m_mcOffPhys->mcevt_pdf1;
+	analysisSkeleton::as_mcevt_pdf2 = m_mcOffPhys->mcevt_pdf2;
+	analysisSkeleton::as_mcevt_weight = m_mcOffPhys->mcevt_weight;
 }
 
 void mcOfflineAnalysis::setStacoVariables()
@@ -391,6 +429,19 @@ void mcOfflineAnalysis::setStacoVariables()
 	analysisSkeleton::mu_L1_source = m_mcOffPhys->mu_staco_L1_source;
 	analysisSkeleton::mu_L1_hemisphere = m_mcOffPhys->mu_staco_L1_hemisphere;
 	analysisSkeleton::mu_L1_matched = m_mcOffPhys->mu_staco_L1_matched;
+	
+	// staco truth
+	analysisSkeleton::mu_truth_dr = m_mcOffPhys->mu_staco_truth_dr;
+	analysisSkeleton::mu_truth_E = m_mcOffPhys->mu_staco_truth_E;
+	analysisSkeleton::mu_truth_pt = m_mcOffPhys->mu_staco_truth_pt;
+	analysisSkeleton::mu_truth_eta = m_mcOffPhys->mu_staco_truth_eta;
+	analysisSkeleton::mu_truth_phi = m_mcOffPhys->mu_staco_truth_phi;
+	analysisSkeleton::mu_truth_type = m_mcOffPhys->mu_staco_truth_type;
+	analysisSkeleton::mu_truth_status = m_mcOffPhys->mu_staco_truth_status;
+	analysisSkeleton::mu_truth_barcode = m_mcOffPhys->mu_staco_truth_barcode;
+	analysisSkeleton::mu_truth_mothertype = m_mcOffPhys->mu_staco_truth_mothertype;
+	analysisSkeleton::mu_truth_motherbarcode = m_mcOffPhys->mu_staco_truth_motherbarcode;
+	analysisSkeleton::mu_truth_matched = m_mcOffPhys->mu_staco_truth_matched;
 }
 
 void mcOfflineAnalysis::setMuidVariables()
@@ -591,6 +642,19 @@ void mcOfflineAnalysis::setMuidVariables()
 	analysisSkeleton::mu_L1_source = m_mcOffPhys->mu_muid_L1_source;
 	analysisSkeleton::mu_L1_hemisphere = m_mcOffPhys->mu_muid_L1_hemisphere;
 	analysisSkeleton::mu_L1_matched = m_mcOffPhys->mu_muid_L1_matched;
+	
+	// muid truth
+	analysisSkeleton::mu_truth_dr = m_mcOffPhys->mu_muid_truth_dr;
+	analysisSkeleton::mu_truth_E = m_mcOffPhys->mu_muid_truth_E;
+	analysisSkeleton::mu_truth_pt = m_mcOffPhys->mu_muid_truth_pt;
+	analysisSkeleton::mu_truth_eta = m_mcOffPhys->mu_muid_truth_eta;
+	analysisSkeleton::mu_truth_phi = m_mcOffPhys->mu_muid_truth_phi;
+	analysisSkeleton::mu_truth_type = m_mcOffPhys->mu_muid_truth_type;
+	analysisSkeleton::mu_truth_status = m_mcOffPhys->mu_muid_truth_status;
+	analysisSkeleton::mu_truth_barcode = m_mcOffPhys->mu_muid_truth_barcode;
+	analysisSkeleton::mu_truth_mothertype = m_mcOffPhys->mu_muid_truth_mothertype;
+	analysisSkeleton::mu_truth_motherbarcode = m_mcOffPhys->mu_muid_truth_motherbarcode;
+	analysisSkeleton::mu_truth_matched = m_mcOffPhys->mu_muid_truth_matched;
 }
 
 void mcOfflineAnalysis::write()

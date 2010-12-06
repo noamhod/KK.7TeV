@@ -389,7 +389,8 @@ public:
 	string          getPeriodName(int run);
 	vector<string>* getPeriodTriggers();
 	int             isTrigger(string trigName);
-	bool			skimD3PD(physics* phys);
+	//bool			skimD3PD(physics* phys);
+	bool 			skimD3PD(physics* phys, mcPhysics* mcPhys, float pTthreshold);
 	bool            digestSkim(int muSize);
 	void 			printAllProperties(int ai, int bi, int iv);
 	

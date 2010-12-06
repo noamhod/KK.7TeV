@@ -42,7 +42,7 @@ void mcDigestAnalysis::executeAdvanced()
 
 void mcDigestAnalysis::executeCutFlow()
 {
-	sMuonRecoAlgo = "muid";
+	sMuonRecoAlgo = "staco";
 
 	///////////////////////////////////
 	// set all the event-level vars ///

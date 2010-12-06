@@ -84,7 +84,6 @@ int analysisSkeleton::isTrigger(string trigName)
 
 ////////////////////////////////////////////////////
 // use this method only in the offline analysis. ///
-// it should be called after the preselection //////
 bool analysisSkeleton::digestSkim(int muSize)
 {
 	int skim  = 0;
@@ -97,21 +96,34 @@ bool analysisSkeleton::digestSkim(int muSize)
 	
 	return false;
 }
-////////////////////////////////////////////////////
 
-
-bool analysisSkeleton::skimD3PD(physics* phys)
+/////////////////////////////////////////////////////////
+// use this method only in the analysis / mcAnalysis. ///
+bool analysisSkeleton::skimD3PD(physics* phys, mcPhysics* mcPhys, float pTthreshold) // at least one mu(staco/muid) with pT>pTthreshold
 {
-	if(phys->mu_staco_n<1  &&  phys->mu_muid_n<1) return false;
-	
-	for(int m=0 ; m<(int)phys->mu_staco_n ; m++)
+	if(phys!=NULL  &&  mcPhys==NULL)
 	{
-		if( fabs(pT(phys->mu_staco_me_qoverp->at(m), phys->mu_staco_me_theta->at(m)))*MeV2GeV >= 15. ) return true;
+		if(phys->mu_staco_n<1  &&  phys->mu_muid_n<1) return false;
+		for(int m=0 ; m<(int)phys->mu_staco_n ; m++)
+		{
+			if( fabs(pT(phys->mu_staco_me_qoverp->at(m), phys->mu_staco_me_theta->at(m)))*MeV2GeV >= pTthreshold ) return true;
+		}
+		for(int m=0 ; m<(int)phys->mu_muid_n ; m++)
+		{
+			if( fabs(pT(phys->mu_muid_me_qoverp->at(m), phys->mu_muid_me_theta->at(m))*MeV2GeV) >= pTthreshold ) return true;
+		}
 	}
-
-	for(int m=0 ; m<(int)phys->mu_muid_n ; m++)
+	else
 	{
-		if( fabs(pT(phys->mu_muid_me_qoverp->at(m), phys->mu_muid_me_theta->at(m))*MeV2GeV) >= 15. ) return true;
+		if(mcPhys->mu_staco_n<1  &&  mcPhys->mu_muid_n<1) return false;
+		for(int m=0 ; m<(int)mcPhys->mu_staco_n ; m++)
+		{
+			if( fabs(pT(mcPhys->mu_staco_me_qoverp->at(m), mcPhys->mu_staco_me_theta->at(m)))*MeV2GeV >= pTthreshold ) return true;
+		}
+		for(int m=0 ; m<(int)mcPhys->mu_muid_n ; m++)
+		{
+			if( fabs(pT(mcPhys->mu_muid_me_qoverp->at(m), mcPhys->mu_muid_me_theta->at(m))*MeV2GeV) >= pTthreshold ) return true;
+		}
 	}
 	
 	return false;
@@ -835,6 +847,7 @@ void analysisSkeleton::fillTruthEfficiency()
 		//	if(fabs(as_mcevt_pdf_scale->at(0)-mZ0)>10.) continue; // everything is in GeV
 		//}
 		
+		/*
 		float dphi = mu_truth_phi->at(t) - mu_phi->at(t);
 		float deta = mu_truth_eta->at(t) - mu_eta->at(t);
 		float drMatch = sqrt(dphi*dphi + deta*deta);
@@ -842,6 +855,7 @@ void analysisSkeleton::fillTruthEfficiency()
 		cout <<	"truth-reco dR       : mu_truth_dr->at(" << t << ") = " << mu_truth_dr->at(t) << ",  dRcalculatedManually->at(" << t << ") = " << drMatch << endl;
 		cout << "truth-reco pT       : mu_truth_pt->at(" << t << ") = " << mu_truth_pt->at(t) << ",  mu_pt->at(" << t << ") = " << mu_pt->at(t) << endl;
 		cout << "reco-trig matching  : mu_L1_matched->at(" << t << ") = " << mu_L1_matched->at(t) << endl;
+		*/
 		
 		// fill the denominator histos
 		h1_truth_candidates_pT->Fill( fabs(pT(mu_me_qoverp->at(t)/MeV2TeV, mu_me_theta->at(t))) );

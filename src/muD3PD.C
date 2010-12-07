@@ -36,6 +36,61 @@ muD3PD::muD3PD(physics* phys, mcPhysics* mcPhys, TFile* treeFile)
 	counter = 0;
 }
 
+void muD3PD::doSkimD3PD(float pTthreshold) // at least one mu(staco/muid) with pT>pTthreshold
+{
+	doSkim = false;
+
+	if(m_phys!=NULL  &&  m_mcPhys==NULL)
+	{
+		if(m_phys->mu_staco_n<1  &&  m_phys->mu_muid_n<1)
+		{
+			doSkim = false;
+			return;
+		}
+		for(int m=0 ; m<(int)m_phys->mu_staco_n ; m++)
+		{
+			if( fabs(kin.pT(m_phys->mu_staco_me_qoverp->at(m), m_phys->mu_staco_me_theta->at(m)))*MeV2GeV >= pTthreshold )
+			{
+				doSkim = true;
+				return;
+			}
+		}
+		for(int m=0 ; m<(int)m_phys->mu_muid_n ; m++)
+		{
+			if( fabs(kin.pT(m_phys->mu_muid_me_qoverp->at(m), m_phys->mu_muid_me_theta->at(m))*MeV2GeV) >= pTthreshold ) 
+			{
+				doSkim = true;
+				return;
+			}
+		}
+	}
+	else
+	{
+		if(m_mcPhys->mu_staco_n<1  &&  m_mcPhys->mu_muid_n<1)
+		{
+			doSkim = false;
+			return;
+		}
+		for(int m=0 ; m<(int)m_mcPhys->mu_staco_n ; m++)
+		{
+			if( fabs(kin.pT(m_mcPhys->mu_staco_me_qoverp->at(m), m_mcPhys->mu_staco_me_theta->at(m)))*MeV2GeV >= pTthreshold )
+			{
+				doSkim = true;
+				return;
+			}
+		}
+		for(int m=0 ; m<(int)m_mcPhys->mu_muid_n ; m++)
+		{
+			if( fabs(kin.pT(m_mcPhys->mu_muid_me_qoverp->at(m), m_mcPhys->mu_muid_me_theta->at(m))*MeV2GeV) >= pTthreshold )
+			{
+				doSkim = true;
+				return;
+			}
+		}
+	}
+}
+
+
 TTree* muD3PD::getTree()
 {
 	return m_tree;
@@ -1245,7 +1300,9 @@ void muD3PD::setBranches()
 }
 
 void muD3PD::fill(int GRL, string sPeriod, vector<string>* vsTriggers)
-{	
+{
+	if(!doSkim) return;
+
 	// external
 	isGRL = GRL;
 	period->push_back( sPeriod );

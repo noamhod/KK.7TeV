@@ -149,11 +149,11 @@ void graphicObjects::ginitialize()
 	pTmevspTid_min   = 0.*GeV2TeV;
 	pTmevspTid_max   = 500.*GeV2TeV;
 	
-	Afb_nbins = 10;
-	Afb_min   = 850.*GeV2TeV;
-	Afb_max   = 1000.*GeV2TeV;
+	Afb_nbins = 40;
+	Afb_min   = 60.*GeV2TeV;
+	Afb_max   = 460.*GeV2TeV;
 	
-	tagNprobe_pT_nbins = 50;
+	tagNprobe_pT_nbins = 150;
 	tagNprobe_pT_min   = 0.*MeV2GeV;
 	tagNprobe_pT_max   = 150.*MeV2GeV;
 }
@@ -443,7 +443,6 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	cnv_Afb->Update();
 	cnv_Afb->Write();
 	
-	
 	cnv_efficiency_pT = new TCanvas("efficiency_pT","efficiency_pT",canv_x,canv_y);
 	cnv_efficiency_pT->Divide(1,3);
 	pad_candidates_pT    = cnv_efficiency_pT->cd(1);
@@ -459,6 +458,8 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	h1_truth_candidates_pT->SetYTitle("Candidate probe muons");
 	h1_truth_candidates_pT->SetLineColor(kRed);
 	h1_truth_candidates_pT->SetLineStyle(2);
+	if(h1_tagNprobe_candidates_pT->GetMaximum() > h1_truth_candidates_pT->GetMaximum()) h1_truth_candidates_pT->SetMaximum(1.05*h1_tagNprobe_candidates_pT->GetMaximum());
+	h1_truth_candidates_pT->SetMinimum(0.);
 	h1_truth_candidates_pT->Draw();
 	h1_tagNprobe_candidates_pT->Draw("sames");
 	pad_succeeded_pT->cd();
@@ -470,6 +471,8 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	h1_truth_succeeded_pT->SetYTitle("Probe muons");
 	h1_truth_succeeded_pT->SetLineColor(kRed);
 	h1_truth_succeeded_pT->SetLineStyle(2);
+	if(h1_tagNprobe_succeeded_pT->GetMaximum() > h1_truth_succeeded_pT->GetMaximum()) h1_truth_succeeded_pT->SetMaximum(1.05*h1_tagNprobe_succeeded_pT->GetMaximum());
+	h1_truth_succeeded_pT->SetMinimum(0.);
 	h1_truth_succeeded_pT->Draw();
 	h1_tagNprobe_succeeded_pT->Draw("sames");
 	pad_efficiency_pT->cd();
@@ -481,6 +484,8 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	h1_truth_efficiency_pT->SetXTitle("p_{T} TeV");
 	h1_truth_efficiency_pT->SetYTitle("#epsilon = #frac{N_{probes}}{N_{probe}^{candidates}}");
 	h1_truth_efficiency_pT->SetLineColor(kRed);
+	h1_truth_efficiency_pT->SetMinimum(0.);
+	h1_truth_efficiency_pT->SetMaximum(1.05);
 	h1_truth_efficiency_pT->Draw();
 	h1_tagNprobe_efficiency_pT->Draw("e1x0sames");
 	cnv_efficiency_pT->Update();
@@ -501,6 +506,8 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	h1_truth_candidates_eta->SetYTitle("Candidate probe muons");
 	h1_truth_candidates_eta->SetLineColor(kRed);
 	h1_truth_candidates_eta->SetLineStyle(2);
+	if(h1_tagNprobe_candidates_eta->GetMaximum() > h1_truth_candidates_eta->GetMaximum()) h1_truth_candidates_eta->SetMaximum(1.05*h1_tagNprobe_candidates_eta->GetMaximum());
+	h1_truth_candidates_eta->SetMinimum(0.);
 	h1_truth_candidates_eta->Draw();
 	h1_tagNprobe_candidates_eta->Draw("sames");
 	pad_succeeded_eta->cd();
@@ -512,6 +519,8 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	h1_truth_succeeded_eta->SetYTitle("Probe muons");
 	h1_truth_succeeded_eta->SetLineColor(kRed);
 	h1_truth_succeeded_eta->SetLineStyle(2);
+	if(h1_tagNprobe_succeeded_eta->GetMaximum() > h1_truth_succeeded_eta->GetMaximum()) h1_truth_succeeded_eta->SetMaximum(1.05*h1_tagNprobe_succeeded_eta->GetMaximum());
+	h1_truth_succeeded_eta->SetMinimum(0.);
 	h1_truth_succeeded_eta->Draw();
 	h1_tagNprobe_succeeded_eta->Draw("sames");
 	pad_efficiency_eta->cd();
@@ -523,6 +532,8 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	h1_truth_efficiency_eta->SetXTitle("#eta");
 	h1_truth_efficiency_eta->SetYTitle("#epsilon = #frac{N_{probes}}{N_{probe}^{candidates}}");
 	h1_truth_efficiency_eta->SetLineColor(kRed);
+	h1_truth_efficiency_eta->SetMinimum(0.);
+	h1_truth_efficiency_eta->SetMaximum(1.05);
 	h1_truth_efficiency_eta->Draw();
 	h1_tagNprobe_efficiency_eta->Draw("e1x0sames");
 	cnv_efficiency_eta->Update();
@@ -543,6 +554,8 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	h1_truth_candidates_phi->SetYTitle("Candidate probe muons");
 	h1_truth_candidates_phi->SetLineColor(kRed);
 	h1_truth_candidates_phi->SetLineStyle(2);
+	if(h1_tagNprobe_candidates_phi->GetMaximum() > h1_truth_candidates_phi->GetMaximum()) h1_truth_candidates_phi->SetMaximum(1.05*h1_tagNprobe_candidates_phi->GetMaximum());
+	h1_truth_candidates_phi->SetMinimum(0.);
 	h1_truth_candidates_phi->Draw();
 	h1_tagNprobe_candidates_phi->Draw("sames");
 	pad_succeeded_phi->cd();
@@ -554,6 +567,8 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	h1_truth_succeeded_phi->SetYTitle("Probe muons");
 	h1_truth_succeeded_phi->SetLineColor(kRed);
 	h1_truth_succeeded_phi->SetLineStyle(2);
+	if(h1_tagNprobe_succeeded_phi->GetMaximum() > h1_truth_succeeded_phi->GetMaximum()) h1_truth_succeeded_phi->SetMaximum(1.05*h1_tagNprobe_succeeded_phi->GetMaximum());
+	h1_truth_succeeded_phi->SetMinimum(0.);
 	h1_truth_succeeded_phi->Draw();
 	h1_tagNprobe_succeeded_phi->Draw("sames");
 	pad_efficiency_phi->cd();
@@ -565,6 +580,8 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	h1_truth_efficiency_phi->SetXTitle("#phi");
 	h1_truth_efficiency_phi->SetYTitle("#epsilon = #frac{N_{probes}}{N_{probe}^{candidates}}");
 	h1_truth_efficiency_phi->SetLineColor(kRed);
+	h1_truth_efficiency_phi->SetMinimum(0.);
+	h1_truth_efficiency_phi->SetMaximum(1.05);
 	h1_truth_efficiency_phi->Draw();
 	h1_tagNprobe_efficiency_phi->Draw("e1x0sames");
 	cnv_efficiency_phi->Update();

@@ -13,6 +13,8 @@
 class muD3PD
 {
 public:
+	kinematics kin;
+
 	// pointers
 	physics*   m_phys;
 	mcPhysics* m_mcPhys;
@@ -20,6 +22,7 @@ public:
 	TTree*     m_tree;
 	
 	// locals
+	bool doSkim;
 	int counter;
 	
 	// event info branches
@@ -467,6 +470,8 @@ public:
 	muD3PD();
 	muD3PD(physics* phys, mcPhysics* mcPhys, TFile* treeFile);
 	~muD3PD();
+	
+	void doSkimD3PD(float pTthreshold);
 	
 	TTree* getTree();
 	void setVectorPtrs();

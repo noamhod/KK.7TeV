@@ -26,16 +26,16 @@ void tagNprobe::reset()
 	probeIndex = -1;
 }
 
-bool tagNprobe::findTag(vector<int>* isMatched, vector<float>* dR)
+bool tagNprobe::findTag(vector<int>* trigger_match, vector<float>* dR)
 {
-	if(isMatched==0)         return false;
-	if(isMatched->size()==0) return false;
+	if(trigger_match==0)         return false;
+	if(trigger_match->size()==0) return false;
 
 	bool tagged = false;
 	dRbest = 1000.;
-	for(int t=0 ; t<(int)isMatched->size() ; t++)
+	for(int t=0 ; t<(int)trigger_match->size() ; t++)
 	{
-		if(!isMatched->at(t)) continue;
+		if(!trigger_match->at(t)) continue;
 		float dr = dR->at(t);
 		if(dr<dRbest  &&  dr>0.)
 		{
@@ -55,7 +55,7 @@ bool tagNprobe::findTag(vector<int>* isMatched, vector<float>* dR)
 	return false;
 }
 
-int tagNprobe::findProbe(vector<int>* isMatched, TVectorP2VL& pmu, vector<float>* charge, int itag)
+int tagNprobe::findProbe(vector<int>* trigger_match, TVectorP2VL& pmu, vector<float>* charge, int itag)
 {
 	// Probe mask:
 	// retrun 0: matched vector is NULL or empty
@@ -63,12 +63,12 @@ int tagNprobe::findProbe(vector<int>* isMatched, TVectorP2VL& pmu, vector<float>
 	// retrun 2: found probe candidate and probed it
 	// retrun 3: else
 
-	if(isMatched==0)         return 0;
-	if(isMatched->size()==0) return 0;
+	if(trigger_match==0)         return 0;
+	if(trigger_match->size()==0) return 0;
 	
 	bool probeCandidate = false;
 	
-	for(int t=0 ; (t<(int)isMatched->size() && t!=itag) ; t++)
+	for(int t=0 ; (t<(int)trigger_match->size() && t!=itag) ; t++)
 	{
 		mHat  = kin.imass(pmu[itag],pmu[t]);
 		Q1xQ2 = charge->at(itag)*charge->at(t);
@@ -76,7 +76,7 @@ int tagNprobe::findProbe(vector<int>* isMatched, TVectorP2VL& pmu, vector<float>
 		{
 			probeIndex = t;
 			probeCandidate = true;
-			if( isMatched->at(t) ) return 2;
+			if( trigger_match->at(t) ) return 2;
 		}
 	}
 	
@@ -85,7 +85,7 @@ int tagNprobe::findProbe(vector<int>* isMatched, TVectorP2VL& pmu, vector<float>
 	return 3;
 }
 
-int tagNprobe::tagNprobeMask(int wasEventTriggered, vector<int>* isMatched, vector<float>* dR,
+int tagNprobe::tagNprobeMask(int wasEventTriggered, vector<int>* trigger_match, vector<float>* dR,
 							 TVectorP2VL& pmu, vector<float>* charge, int& itag, int& iprobe)
 {
 	// Tag&Probe mask:
@@ -106,10 +106,10 @@ int tagNprobe::tagNprobeMask(int wasEventTriggered, vector<int>* isMatched, vect
 	bool tagged = false;
 	
 	if(!wasEventTriggered)  return 0;
-	if(isMatched->size()<1) return 1;
+	if(trigger_match->size()<1) return 1;
 	
 	// Tag first
-	isTag = findTag(isMatched,dR);
+	isTag = findTag(trigger_match,dR);
 	if(!isTag) return 2;
 	if(tagIndex<0  ||  tagIndex>=(int)pmu.size())
 	{
@@ -124,7 +124,7 @@ int tagNprobe::tagNprobeMask(int wasEventTriggered, vector<int>* isMatched, vect
 	// retrun 1: found probe candidate but didn't probed it
 	// retrun 2: found probe candidate and probed it
 	// retrun 3: else
-	int probMask = findProbe(isMatched, pmu, charge, tagIndex);
+	int probMask = findProbe(trigger_match, pmu, charge, tagIndex);
 	if(probMask==0) return 1;
 	if(probMask==1)
 	{
@@ -151,49 +151,66 @@ int tagNprobe::tagNprobeMask(int wasEventTriggered, vector<int>* isMatched, vect
 	return 8;
 }
 
-int tagNprobe::tagNprobeMask(vector<int>* isMatched, TVectorP2VL& pmu, vector<float>* charge, int& itag, int& iprobe)
+int tagNprobe::tagNprobeMask(float trigger_min, float trigger_threshold, vector<float>* trigger_pT, vector<int>* trigger_match,
+							 TVectorP2VL& pmu, vector<float>* qOp, vector<float>* theta, vector<float>* charge,
+							 int& itag, int& iprobe)
 {
 	// Tag&Probe mask:
 	// retrun 0: matched vector is null or empty (no fill)
 	// retrun 1: event CANNOT be tagged (no fill)
-	// retrun 2: event was tagged, probe candidate found but not probed
-	// retrun 3: event was tagged, probe candidate found and probed
-	// retrun 4: else
+	// retrun 2: event was tagged but not probed
+	// retrun 3: event was tagged and probed but probe candidate has pT < trigger_threshold ???
+	// retrun 4: event was tagged and probed but probe candidate has pT problem
+	// retrun 5: event was tagged and probed
+	// retrun 6: else
 
-	if(isMatched->size()<1) return 0;
+	if(trigger_match->size()<1) return 0;
 	
-	bool tag1  = false;
-	int  itag1 = 0;
-	for(int t=0 ; t<(int)isMatched->size() ; t++)
+	bool btag = false;
+	int  itag_current = 0;
+	for(int t=0 ; t<(int)trigger_match->size() ; t++)
 	{
-		if(t==itag)           continue; // in the second call of this function, don't count it as tag
-		if(!isMatched->at(t)) continue; // have to trigger...
-		itag1 = t;
-		tag1  = true;
+		pTtag = fabs(kin.pT(qOp->at(t)/MeV2GeV,theta->at(t)));
+	
+		if(t==itag)                                     continue; // in the second call of this function, don't count it as tag
+		if(!trigger_match->at(t))                       continue; // have to trigger...
+		if(trigger_pT->at(t)*MeV2GeV<trigger_threshold) continue; // muon has to pass the relevant trigger pT threshold
+		if(pTtag<=trigger_min)                          continue; // muon cannot have pT < pT threshold
+		if(trigger_pT->at(t)*MeV2TeV>20.)               continue; // muon trigger pT threshold is not valid
+		itag_current = t;
+		btag  = true;
 		break;
 	}
-	if(!tag1) return 1; // cannot be tagged
+	if(!btag) return 1; // cannot be tagged
 	
+	if(pTtag<=1.) cout << "after tag: pTtag=" << pTtag << endl;
 	
-	for(int t=0 ; t<(int)isMatched->size() ; t++)
+	for(int t=0 ; t<(int)trigger_match->size() ; t++)
 	{
-		if(t==itag1)  continue; // skip the tag (the probe cannot be the tag...)
-		if(t==iprobe) continue; // in the second call of this function, don't count it as probe
+		if(t==itag_current) continue; // skip the current tag (the probe cannot be the tag...)
+		if(t==iprobe)       continue; // in the second call of this function, don't count it as probe
 		
-		mHat  = kin.imass(pmu[itag1],pmu[t]);
-		Q1xQ2 = charge->at(itag1)*charge->at(t);
+		mHat    = kin.imass(pmu[itag_current],pmu[t]);
+		Q1xQ2   = charge->at(itag_current)*charge->at(t);
+		pTprobe = fabs(kin.pT(qOp->at(t)/MeV2GeV,theta->at(t)));
 		
 		if(fabs(mHat-mZ0*GeV2TeV)>mHatDiffThreshold) continue; // have to be on Z mass
 		if(Q1xQ2>=0.)                                continue; // require opposite charge
+		if(pTprobe<=trigger_min)                     continue; // require minimum probe pT=1 GeV
 		
-		itag   = itag1;
+		itag   = itag_current;
 		iprobe = t;
 		
-		if(!isMatched->at(t)) return 2; // tagged but not probed
-		else                  return 3; // tagged and probed 
+		if(!trigger_match->at(t)) return 2; // tagged but not probed
+		else
+		{
+			if(trigger_pT->at(t)*MeV2GeV<trigger_threshold) return 3; // tagged and probed but probe candidate has pT < trigger_threshold ???
+			if(trigger_pT->at(t)*MeV2TeV>20.)               return 4; // tagged and probed but probe candidate has pT problem
+			return 5;                                                 // tagged and probed
+		}
 	}
 	
-	return 4;
+	return 6;
 }
 
 void tagNprobe::calculateEfficiency(TH1D* hCandidates, TH1D* hSucceeded, TH1D* hEfficiency, bool isTruth)
@@ -202,7 +219,8 @@ void tagNprobe::calculateEfficiency(TH1D* hCandidates, TH1D* hSucceeded, TH1D* h
 	Double_t prob;
 	Double_t eff;
 	Double_t deff;
-	for(Int_t b=0 ; b<=hEfficiency->GetNbinsX() ; b++) // include overflow/underflow
+	//for(Int_t b=0 ; b<=hEfficiency->GetNbinsX() ; b++) // include overflow/underflow
+	for(Int_t b=1 ; b<=hEfficiency->GetNbinsX() ; b++)
 	{
 		cand = hCandidates->GetBinContent(b);
 		prob = hSucceeded->GetBinContent(b);

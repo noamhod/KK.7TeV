@@ -40,6 +40,7 @@ public:
 	TVectorP2VL pmuTruth;
 	TMapsd values2fill;
 	int nMultiMuonEvents;
+	TMapsb cutsToSkipMap;
 	
 
 
@@ -376,6 +377,8 @@ public:
 	{
 		currentRun = 0;
 		sCurrentPeriod = "";
+		cutsToSkipForTagNProbe();
+		nMultiMuonEvents = 0;
 	}
 	~analysisSkeleton();
 	
@@ -390,25 +393,32 @@ public:
 	vector<string>* getPeriodTriggers();
 	int             isTrigger(string trigName);
 	//bool 			skimD3PD(physics* phys, mcPhysics* mcPhys, float pTthreshold);
-	bool            digestSkim(int muSize);
+	//bool            digestSkim(int muSize);
 	void 			printAllProperties(int ai, int bi, int iv);
 	
 	void buildMU4Vector(int nMus);
 	void buildMU4Vector(int nMus, string fromAngles = "");
 	void wipeMU4Vector();
 	
-	bool applyPreselection(string sSkipCut = "");
-	bool applySingleMuonSelection(string sSkipCut = "");
-	bool applyDoubleMuonSelection(string sSkipCut = "");
+	bool applyPreselection();
+	bool applySingleMuonSelection();
+	bool applyDoubleMuonSelection();
 	
 	void fillCutProfile1D();
 	void fillCutProfile2D();
 	
 	void fillTagNProbe();
 	void fillTruthEfficiency();
+	
+	void cutsToSkipForTagNProbe();
+	void applyTagNProbe(TMapsb& cutsToSkip, bool isMC);
 
 private:
 	void runEventDumper();
+	
+	bool preselection(TMapsb& cutsToSkip);
+	bool singleSelection(TMapsb& cutsToSkip);
+	bool doubleSelection(TMapsb& cutsToSkip);
 	
 	bool preselection(string sSkipCut);
 	bool singleSelection(string sSkipCut);

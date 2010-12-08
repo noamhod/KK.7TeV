@@ -81,55 +81,6 @@ int analysisSkeleton::isTrigger(string trigName)
 	return isTrig;
 }
 
-
-////////////////////////////////////////////////////
-// use this method only in the offline analysis. ///
-bool analysisSkeleton::digestSkim(int muSize)
-{
-	int skim  = 0;
-	for(int mu=0 ; mu<muSize ; mu++)
-	{
-		if(mu_isCombinedMuon->at(mu)) skim++;
-		//if( fabs(mu_pt->at(mu))>=15*GeV2MeV )
-	}
-	if( skim>1 ) return true;
-	
-	return false;
-}
-
-/*
-/////////////////////////////////////////////////////////
-// use this method only in the analysis / mcAnalysis. ///
-bool analysisSkeleton::skimD3PD(physics* phys, mcPhysics* mcPhys, float pTthreshold) // at least one mu(staco/muid) with pT>pTthreshold
-{
-	if(phys!=NULL  &&  mcPhys==NULL)
-	{
-		if(phys->mu_staco_n<1  &&  phys->mu_muid_n<1) return false;
-		for(int m=0 ; m<(int)phys->mu_staco_n ; m++)
-		{
-			if( fabs(pT(phys->mu_staco_me_qoverp->at(m), phys->mu_staco_me_theta->at(m)))*MeV2GeV >= pTthreshold ) return true;
-		}
-		for(int m=0 ; m<(int)phys->mu_muid_n ; m++)
-		{
-			if( fabs(pT(phys->mu_muid_me_qoverp->at(m), phys->mu_muid_me_theta->at(m))*MeV2GeV) >= pTthreshold ) return true;
-		}
-	}
-	else
-	{
-		if(mcPhys->mu_staco_n<1  &&  mcPhys->mu_muid_n<1) return false;
-		for(int m=0 ; m<(int)mcPhys->mu_staco_n ; m++)
-		{
-			if( fabs(pT(mcPhys->mu_staco_me_qoverp->at(m), mcPhys->mu_staco_me_theta->at(m)))*MeV2GeV >= pTthreshold ) return true;
-		}
-		for(int m=0 ; m<(int)mcPhys->mu_muid_n ; m++)
-		{
-			if( fabs(pT(mcPhys->mu_muid_me_qoverp->at(m), mcPhys->mu_muid_me_theta->at(m))*MeV2GeV) >= pTthreshold ) return true;
-		}
-	}
-	return false;
-}
-*/
-
 void analysisSkeleton::runEventDumper()
 {
 	//////////////////////////////////////////////////////////////////////////////////////////////
@@ -581,39 +532,42 @@ bool analysisSkeleton::assignPairIndices()
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 
-bool analysisSkeleton::applyPreselection(string sSkipCut)
+bool analysisSkeleton::applyPreselection()
 {
-	bool isSkippedCut = (sSkipCut!="") ? true : false;
+	TMapsb cutsToSkip;
+	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;
 
 	///////////////////////////////////////////
 	// do not skip this for correct counting //
 	if(!isSkippedCut) incrementNallEvents(); //
 	///////////////////////////////////////////
 
-	passCutFlow = preselection(sSkipCut);
+	passCutFlow = preselection(cutsToSkip);
 	
 	return passCutFlow;
 }
 
-bool analysisSkeleton::applySingleMuonSelection(string sSkipCut)
+bool analysisSkeleton::applySingleMuonSelection()
 {
-	bool isSkippedCut = (sSkipCut=="") ? false : true;
+	TMapsb cutsToSkip;
+	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;
 
 	////////////////////////////////////////
 	// fill the NO CUTS items //////////////
 	if(!isSkippedCut) fillBeforeCuts(); ////
 	////////////////////////////////////////
 	
-	passCutFlow = singleSelection(sSkipCut);
+	passCutFlow = singleSelection(cutsToSkip);
 	
 	return passCutFlow;
 }
 
-bool analysisSkeleton::applyDoubleMuonSelection(string sSkipCut)
+bool analysisSkeleton::applyDoubleMuonSelection()
 {
-	bool isSkippedCut = (sSkipCut=="") ? false : true;
+	TMapsb cutsToSkip;
+	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;
 	
-	passCutFlow = doubleSelection(sSkipCut);
+	passCutFlow = doubleSelection(cutsToSkip);
 	
 	if(passCutFlow  &&  !isSkippedCut)
 	{
@@ -642,10 +596,14 @@ void analysisSkeleton::fillCutProfile1D()
 	{
 		string sname = it->first;
 		
+		string snameNoSuffix = sname;
+		string suffix = sname.substr(sname.length()-2,sname.length()-1);
+		if(suffix=="_1"  ||  suffix=="_2") snameNoSuffix = sname.substr(0,sname.length()-2);
+		
 		pass = true;
-		pass = (pass && preselection(sname))    ? true : false;
-		pass = (pass && singleSelection(sname)) ? true : false;
-		pass = (pass && doubleSelection(sname)) ? true : false;
+		pass = (pass && preselection(snameNoSuffix))    ? true : false;
+		pass = (pass && singleSelection(snameNoSuffix)) ? true : false;
+		pass = (pass && doubleSelection(snameNoSuffix)) ? true : false;
 		
 		if(pass)
 		{
@@ -712,10 +670,14 @@ void analysisSkeleton::fillCutProfile2D()
 	{
 		string sname = it->first;
 		
+		string snameNoSuffix = "";
+		string suffix = sname.substr(sname.length()-2,sname.length()-1);
+		if(suffix=="_1"  ||  suffix=="_2") snameNoSuffix = sname.substr(0,sname.length()-2);
+		
 		pass = true;
-		pass = (pass && preselection(sname))    ? true : false;
-		pass = (pass  & singleSelection(sname)) ? true : false;
-		pass = (pass && doubleSelection(sname)) ? true : false;
+		pass = (pass && preselection(snameNoSuffix))    ? true : false;
+		pass = (pass && singleSelection(snameNoSuffix)) ? true : false;
+		pass = (pass && doubleSelection(snameNoSuffix)) ? true : false;
 		
 		if(pass)
 		{
@@ -755,7 +717,7 @@ void analysisSkeleton::fillTagNProbe()
 	int itag;
 	int iprobe;
 	int tNp_mask;
-	for(int i=1 ; i<=2 ; i++)
+	for(int i=1 ; i<=2 ; i++) // one tag, one probe but also the other way around...
 	{
 		if(i==1)
 		{
@@ -764,7 +726,6 @@ void analysisSkeleton::fillTagNProbe()
 		}
 		tNp_mask = tagNprobeMask(1., 10., mu_L1_pt, mu_L1_matched, pmu, mu_me_qoverp, mu_me_theta, mu_charge, itag, iprobe);
 		//tNp_mask = tagNprobeMask(1., 13., mu_EF_me_pt, mu_EF_matched, pmu, mu_charge, itag, iprobe);
-		//cout << "tNp_mask = " << tNp_mask << endl;
 		switch(tNp_mask)
 		{
 			case 0: break;
@@ -792,34 +753,26 @@ void analysisSkeleton::fillTagNProbe()
 
 void analysisSkeleton::fillTruthEfficiency()
 {
-	//mu_truth_matched = True if muon is matched to the truth
-	//mu_truth_status  : Status oMC status = 1 pfinal particle, status = 3 intermediate particle (documentary)
+	//mu_truth_matched    : True if muon is matched to the truth
+	//mu_truth_status     : Status oMC status = 1 pfinal particle, status = 3 intermediate particle (documentary)
 	//mu_truth_mothertype : description: True mother PDG type
-	
-	//cout << "mu_truth_pt->size() = " << mu_truth_pt->size() << ",  mu_pt->size() = " << mu_pt->size() << endl;
 	
 	float truthEfficiency_pTmin = 1.; // in GeV
 	float pTreconstructed = 0.;
+	
+	//////////////////////////////////////
+	if(mu_truth_pt->size()!=2) return; ///
+	//////////////////////////////////////
 	for(int t=0 ; t<(int)mu_truth_pt->size() ; t++)
 	{
 		pTreconstructed = fabs(pT(mu_me_qoverp->at(t), mu_me_theta->at(t)));
 		
-		/*
-		float dphi = mu_truth_phi->at(t) - mu_phi->at(t);
-		float deta = mu_truth_eta->at(t) - mu_eta->at(t);
-		float drMatch = sqrt(dphi*dphi + deta*deta);
-		cout << "truth-reco matching : mu_truth_matched->at(" << t << ") = " << mu_truth_matched->at(t) << endl;
-		cout <<	"truth-reco dR       : mu_truth_dr->at(" << t << ") = " << mu_truth_dr->at(t) << ",  dRcalculatedManually->at(" << t << ") = " << drMatch << endl;
-		cout << "truth-reco pT       : pTreconstructed = " << pTreconstructed << ",  mu_truth_pt->at(" << t << ") = " << mu_truth_pt->at(t) << ",  mu_pt->at(" << t << ") = " << mu_pt->at(t) << endl;
-		cout << "reco-trig matching  : mu_L1_matched->at(" << t << ") = " << mu_L1_matched->at(t) << endl;
-		cout << "trig pT threshold   : mu_L1_pt->at(" << t << ") = " << mu_L1_pt->at(t) << endl;
-		*/
+		if(!mu_truth_status->at(t))                        continue; // has to be final particle
+		if(mu_truth_mothertype->at(t)!=PDTZ)               continue; // has to come out of gamma/Z^0
+		if(pTreconstructed*MeV2GeV<=truthEfficiency_pTmin) continue; // has to be above pT min
 		
-		if(!mu_truth_status->at(t)) continue;
-		if(mu_truth_mothertype->at(t)!=PDTZ  &&  mu_truth_mothertype->at(t)!=PDTGAMMA) continue;
-		if(pTreconstructed*MeV2GeV<=truthEfficiency_pTmin) continue;
 		
-		// fill the denominator histos
+		// fill the probe candidate histos
 		h1_truth_candidates_pT->Fill( pTreconstructed*MeV2TeV );
 		h1_truth_candidates_eta->Fill( mu_eta->at(t) );
 		h1_truth_candidates_phi->Fill( mu_phi->at(t) );
@@ -833,18 +786,76 @@ void analysisSkeleton::fillTruthEfficiency()
 		if(mu_EF_dr->at(t)<0.)              continue;
 		*/
 	
+		// fill the probe histoe
 		h1_truth_succeeded_pT->Fill( pTreconstructed*MeV2TeV );
 		h1_truth_succeeded_eta->Fill( mu_eta->at(t) );
 		h1_truth_succeeded_phi->Fill( mu_phi->at(t) );
 	}
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+void analysisSkeleton::cutsToSkipForTagNProbe()
+{
+	if(cutsToSkipMap.size()>0) cutsToSkipMap.clear();
+	
+	cutsToSkipMap.insert(make_pair("pTandEta",true));
+	cutsToSkipMap.insert(make_pair("pTandEtaTight",true));
+	cutsToSkipMap.insert(make_pair("pTandEtaBarrel",true));
+	cutsToSkipMap.insert(make_pair("pT",true));
+	cutsToSkipMap.insert(make_pair("pT_use_qOp_and_theta",true));
+	cutsToSkipMap.insert(make_pair("eta",true));
+	cutsToSkipMap.insert(make_pair("etaTight",true));
+	cutsToSkipMap.insert(make_pair("etaBarrel",true));
+	cutsToSkipMap.insert(make_pair("msHits",true));
+}
 
+void analysisSkeleton::applyTagNProbe(TMapsb& cutsToSkip, bool isMC)
+{
+	bool pass;
+	
+	pass = true;
+	pass = (pass && preselection(cutsToSkip))    ? true : false;
+	pass = (pass && singleSelection(cutsToSkip)) ? true : false;
+	if(pass)
+	{
+		/////////////////////////
+		// Tag&Probe mask ///////
+		fillTagNProbe(); ////////
+		/////////////////////////
+		/////////////////////////////////////////
+		// Truth efficiency mask ////////////////
+		if(isMC) fillTruthEfficiency(); /////////
+		/////////////////////////////////////////
+	}
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 bool analysisSkeleton::preselection(string sSkipCut)
 {
-	bool isSkippedCut = (sSkipCut=="") ? false : true;
+	TMapsb cutsToSkip;
+	cutsToSkip.insert(make_pair(sSkipCut,true));
+	return preselection(cutsToSkip);
+}
+
+bool analysisSkeleton::singleSelection(string sSkipCut)
+{
+	TMapsb cutsToSkip;
+	cutsToSkip.insert(make_pair(sSkipCut,true));
+	return singleSelection(cutsToSkip);
+}
+
+bool analysisSkeleton::doubleSelection(string sSkipCut)
+{
+	TMapsb cutsToSkip;
+	cutsToSkip.insert(make_pair(sSkipCut,true));
+	return doubleSelection(cutsToSkip);
+}
+
+bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
+{
+	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;
+	TMapsb::iterator itrEnd = cutsToSkip.end();
+	TMapsb::iterator itr;
 
 	int nMus = (int)mu_pt->size();
 	resetMuQAflags(nMus);
@@ -860,18 +871,23 @@ bool analysisSkeleton::preselection(string sSkipCut)
 		///////////////////////////////////////////////////////////////////////////
 		
 		string sorderedcutname = ii->second;
+		
+		itr = cutsToSkip.find(sorderedcutname);
+		bool bSkipCut;
+		if(itr!=itrEnd) bSkipCut = itr->second;
+		else bSkipCut = false;
 
-		if(sorderedcutname=="GRL"  &&  sorderedcutname!=sSkipCut)
+		if(sorderedcutname=="GRL"  &&  !bSkipCut)
 		{
 			passCurrentCut = ( isGRLCut((*m_cutFlowMapSVD)[sorderedcutname][0], isGRL) ) ? true : false;
 		}
 
-		else if(sorderedcutname=="L1_MU6"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="L1_MU6"  &&  !bSkipCut)
 		{
 			passCurrentCut = ( isL1_MU6Cut((*m_cutFlowMapSVD)[sorderedcutname][0], isL1_MU6) ) ? true : false;
 		}
 		
-		else if(sorderedcutname=="Trigger"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="Trigger"  &&  !bSkipCut)
 		{
 			//string trigName = vTriggers->at(0);
 			//int trigVal = isTrigger(trigName);
@@ -889,12 +905,12 @@ bool analysisSkeleton::preselection(string sSkipCut)
 			passCurrentCut = pass1Trig;
 		}
 		
-		else if(sorderedcutname=="EF_mu13"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="EF_mu13"  &&  !bSkipCut)
 		{
 			passCurrentCut = ( isEF_muXCut((*m_cutFlowMapSVD)[sorderedcutname][0], isEF_mu13) ) ? true : false;
 		}
 		
-		else if(sorderedcutname=="hipTmuon"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="hipTmuon"  &&  !bSkipCut)
 		{
 			float cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 			float cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
@@ -902,7 +918,7 @@ bool analysisSkeleton::preselection(string sSkipCut)
 			(int)mu_pt->size(), mu_pt, mu_me_qoverp, mu_me_theta) ) ? true : false;
 		}
 		
-		else if(sorderedcutname=="PV"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="PV"  &&  !bSkipCut)
 		{
 			float cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 			float cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
@@ -925,26 +941,34 @@ bool analysisSkeleton::preselection(string sSkipCut)
 	return passCutFlow;
 }
 
-bool analysisSkeleton::singleSelection(string sSkipCut)
+bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 {
-	bool isSkippedCut = (sSkipCut=="") ? false : true;
+	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;
+	TMapsb::iterator itrEnd = cutsToSkip.end();
+	TMapsb::iterator itr;
 	
 	int muSize  = (int)mu_charge->size();
 
 	passCutFlow = true;
 	
 	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
-	{
-		string sorderedcutname = ii->second;
-		nMusPassed = 0;
-		
+	{	
 		///////////////////////////////////////////////////////////////////////////
 		// ignore preselection: ///////////////////////////////////////////////////
 		float num = ii->first; ///////////////////////////////////////////////////
 		if(m_cutFlowTypeOrdered->operator[](num)=="preselection") continue; ///////
 		///////////////////////////////////////////////////////////////////////////
 		
-		if(sorderedcutname=="pT"  &&  sorderedcutname!=sSkipCut)
+		string sorderedcutname = ii->second;
+		nMusPassed = 0;
+		
+		itr = cutsToSkip.find(sorderedcutname);
+		bool bSkipCut;
+		if(itr!=itrEnd) bSkipCut = itr->second;
+		else bSkipCut = false;
+		
+		
+		if(sorderedcutname=="pT"  &&  !bSkipCut)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
@@ -954,7 +978,7 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 			}
 		}
 		
-		else if(sorderedcutname=="pT_use_qOp_and_theta"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="pT_use_qOp_and_theta"  &&  !bSkipCut)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
@@ -964,7 +988,7 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 			}
 		}
 		
-		else if(sorderedcutname=="eta"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="eta"  &&  !bSkipCut)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
@@ -974,7 +998,7 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 			}
 		}
 		
-		else if(sorderedcutname=="etaTight"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="etaTight"  &&  !bSkipCut)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
@@ -984,7 +1008,7 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 			}
 		}
 		
-		else if(sorderedcutname=="etaBarrel"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="etaBarrel"  &&  !bSkipCut)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
@@ -994,7 +1018,7 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 			}
 		}
 		
-		else if(sorderedcutname=="pTandEta"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="pTandEta"  &&  !bSkipCut)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
@@ -1008,7 +1032,7 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 			}
 		}
 		
-		else if(sorderedcutname=="pTandEtaTight"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="pTandEtaTight"  &&  !bSkipCut)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
@@ -1022,7 +1046,7 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 			}
 		}
 		
-		else if(sorderedcutname=="pTandEtaBarrel"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="pTandEtaBarrel"  &&  !bSkipCut)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
@@ -1036,7 +1060,7 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 			}
 		}
 		
-		else if(sorderedcutname=="d0"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="d0"  &&  !bSkipCut)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
@@ -1046,7 +1070,7 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 			}
 		}
 		
-		else if(sorderedcutname=="z0"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="z0"  &&  !bSkipCut)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
@@ -1056,7 +1080,7 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 			}
 		}
 		
-		else if(sorderedcutname=="impactParameter"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="impactParameter"  &&  !bSkipCut)
 		{
 			float cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 			float cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
@@ -1068,7 +1092,7 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 			}
 		}
 		
-		else if(sorderedcutname=="isCombMu"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="isCombMu"  &&  !bSkipCut)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
@@ -1078,7 +1102,7 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 			}
 		}
 		
-		else if(sorderedcutname=="idHits"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="idHits"  &&  !bSkipCut)
 		{
 			float cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 			float cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
@@ -1091,7 +1115,7 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 			}
 		}
 		
-		else if(sorderedcutname=="ms3stationsMDThits"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="ms3stationsMDThits"  &&  !bSkipCut)
 		{
 			float cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 			float cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
@@ -1110,7 +1134,7 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 			}
 		}
 		
-		else if(sorderedcutname=="msHits"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="msHits"  &&  !bSkipCut)
 		{
 			float cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 			float cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
@@ -1130,7 +1154,7 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 			}
 		}
 		
-		else if(sorderedcutname=="isolation30"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="isolation30"  &&  !bSkipCut)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
@@ -1143,7 +1167,7 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 			}
 		}
 		
-		else if(sorderedcutname=="pTmatchingRatio"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="pTmatchingRatio"  &&  !bSkipCut)
 		{
 			float cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 			float cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
@@ -1156,7 +1180,7 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 			}
 		}
 		
-		else if(sorderedcutname=="pTmatchingAbsDiff"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="pTmatchingAbsDiff"  &&  !bSkipCut)
 		{
 			float cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 			for(int mu=0 ; mu<muSize ; mu++)
@@ -1185,9 +1209,11 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 	return passCutFlow;
 }
 
-bool analysisSkeleton::doubleSelection(string sSkipCut)
+bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
 {
-	bool isSkippedCut = (sSkipCut=="") ? false : true;
+	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;
+	TMapsb::iterator itrEnd = cutsToSkip.end();
+	TMapsb::iterator itr;
 	
 	//////////////////////////////////////////
 	// need at least 2 muons...///////////////
@@ -1220,25 +1246,30 @@ bool analysisSkeleton::doubleSelection(string sSkipCut)
 		///////////////////////////////////////////////////////////////////////////
 		
 		string sorderedcutname = ii->second;
+		
+		itr = cutsToSkip.find(sorderedcutname);
+		bool bSkipCut;
+		if(itr!=itrEnd) bSkipCut = itr->second;
+		else bSkipCut = false;
 
-		if(sorderedcutname=="oppositeCharge"  &&  sorderedcutname!=sSkipCut)
+		if(sorderedcutname=="oppositeCharge"  &&  !bSkipCut)
 		{
 			//passCurrentCut = ( oppositeChargeCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_me_qoverp->at(ai), mu_me_qoverp->at(bi)) ) ? true : false;
 			//passCurrentCut = ( oppositeChargeCut(mu_me_qoverp->at(ai), mu_me_qoverp->at(bi)) ) ? true : false;
 			passCurrentCut = ( oppositeChargeCut(mu_charge->at(ai), mu_charge->at(bi)) ) ? true : false;
 		}
 
-		else if(sorderedcutname=="imass"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="imass"  &&  !bSkipCut)
 		{
 			passCurrentCut = ( imassCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
 		}
 
-		else if(sorderedcutname=="cosThetaDimu"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="cosThetaDimu"  &&  !bSkipCut)
 		{
 			passCurrentCut = ( cosThetaDimuCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
 		}
 		
-		else if(sorderedcutname=="etaSum"  &&  sorderedcutname!=sSkipCut)
+		else if(sorderedcutname=="etaSum"  &&  !bSkipCut)
 		{
 			passCurrentCut = ( etaSumCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
 		}

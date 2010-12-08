@@ -36,6 +36,58 @@ muSkimD3PD::muSkimD3PD(offlinePhysics* offPhys, mcOfflinePhysics* mcOffPhys, TFi
 	counter = 0;
 }
 
+void muSkimD3PD::doSkimD3PD()
+{
+	doSkim = false;
+	
+	int skimStaco = 0;
+	int skimMuid  = 0;
+	
+	if(m_offPhys!=NULL  &&  m_mcOffPhys==NULL)
+	{
+		for(int mu=0 ; mu<(int)m_offPhys->mu_staco_isCombinedMuon->size() ; mu++)
+		{
+			if(m_offPhys->mu_staco_isCombinedMuon->at(mu)) skimStaco++;
+			if( skimStaco>1 )
+			{
+				doSkim = true;
+				return;
+			}
+		}
+		for(int mu=0 ; mu<(int)m_offPhys->mu_muid_isCombinedMuon->size() ; mu++)
+		{
+			if(m_offPhys->mu_muid_isCombinedMuon->at(mu)) skimMuid++;
+			if( skimMuid>1 )
+			{
+				doSkim = true;
+				return;
+			}
+		}
+	}
+	else
+	{
+		for(int mu=0 ; mu<(int)m_mcOffPhys->mu_staco_isCombinedMuon->size() ; mu++)
+		{
+			if(m_mcOffPhys->mu_staco_isCombinedMuon->at(mu)) skimStaco++;
+			if( skimStaco>1 )
+			{
+				doSkim = true;
+				return;
+			}
+		}
+		for(int mu=0 ; mu<(int)m_mcOffPhys->mu_muid_isCombinedMuon->size() ; mu++)
+		{
+			if(m_mcOffPhys->mu_muid_isCombinedMuon->at(mu)) skimMuid++;
+			if( skimMuid>1 )
+			{
+				doSkim = true;
+				return;
+			}
+		}
+	}
+}
+
+
 TTree* muSkimD3PD::getTree()
 {
 	return m_tree;
@@ -1245,7 +1297,9 @@ void muSkimD3PD::setBranches()
 }
 
 void muSkimD3PD::fill(int GRL)
-{	
+{
+	if(!doSkim) return;
+
 	isGRL = GRL;
 	
 	if(m_mcOffPhys==NULL  &&  m_offPhys!=NULL)

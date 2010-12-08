@@ -183,7 +183,6 @@ int tagNprobe::tagNprobeMask(float trigger_min, float trigger_threshold, vector<
 	}
 	if(!btag) return 1; // cannot be tagged
 	
-	if(pTtag<=1.) cout << "after tag: pTtag=" << pTtag << endl;
 	
 	for(int t=0 ; t<(int)trigger_match->size() ; t++)
 	{
@@ -219,8 +218,7 @@ void tagNprobe::calculateEfficiency(TH1D* hCandidates, TH1D* hSucceeded, TH1D* h
 	Double_t prob;
 	Double_t eff;
 	Double_t deff;
-	//for(Int_t b=0 ; b<=hEfficiency->GetNbinsX() ; b++) // include overflow/underflow
-	for(Int_t b=1 ; b<=hEfficiency->GetNbinsX() ; b++)
+	for(Int_t b=0 ; b<=hEfficiency->GetNbinsX()+1 ; b++) // include overflow/underflow
 	{
 		cand = hCandidates->GetBinContent(b);
 		prob = hSucceeded->GetBinContent(b);

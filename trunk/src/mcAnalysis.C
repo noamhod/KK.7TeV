@@ -7,52 +7,14 @@
 
 #include "mcAnalysis.h"
 
-/*
-void* handle1(void* p)
-{
-	//(static_cast<mcAnalysis*>(p)->mcAnalysis::fillCutProfile1D)();
-	TThread::Lock();
-	(static_cast<mcAnalysis*>(p)->mcAnalysis::fillCutProfile1D)();
-	TThread::UnLock();
-	return 0;
-}
-void* handle2(void* p)
-{
-	//(static_cast<mcAnalysis*>(p)->mcAnalysis::fillCutProfile2D)();
-	TThread::Lock();
-	(static_cast<mcAnalysis*>(p)->mcAnalysis::fillCutProfile2D)();
-	TThread::UnLock();
-	return 0;
-}
-void* handle3(void* p)
-{
-	//(static_cast<mcAnalysis*>(p)->mcAnalysis::fillCutProfile2D)();
-	TThread::Lock();
-	(static_cast<mcAnalysis*>(p)->mcAnalysis::fillTagNProbe)();
-	TThread::UnLock();
-	return 0;
-}
-void* handle4(void* p)
-{
-	//(static_cast<mcAnalysis*>(p)->mcAnalysis::fillCutProfile2D)();
-	TThread::Lock();
-	(static_cast<mcAnalysis*>(p)->mcAnalysis::fillTruthEfficiency)();
-	TThread::UnLock();
-	return 0;
-}
-*/
-/////////////////////////////////////////////////////
-
 mcAnalysis::mcAnalysis()
 {
-	//thrd1 = new TThread("thrd1", handle1, (void*) 0);
-	//thrd2 = new TThread("thrd2", handle2, (void*) 0);
+
 }
 
 mcAnalysis::~mcAnalysis()
 {
-	//delete thrd1;
-	//delete thrd2;
+
 }
 
 void mcAnalysis::executeCutFlow()
@@ -64,24 +26,10 @@ void mcAnalysis::executeCutFlow()
 	setEventVariables(); //////////////
 	///////////////////////////////////
 	
-	/*
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// skim the "offline" tree //////////////////////////////////////////////////////////////////////////////////////
-	float pTthreshold = 15.; // in GeV //////////////////////////////////////////////////////////////////////////////
-	bool  passSkim    = skimD3PD(NULL, m_mcPhys, pTthreshold); //////////////////////////////////////////////////////
-	if(passSkim)
-	{
-		m_muMCD3PD->fillMC(); // this does *not* call TTree::Fill()
-		m_muD3PD->fill(analysisSkeleton::isGRL, analysisSkeleton::sPeriod, analysisSkeleton::vTriggers);
-		m_muMCD3PD->resetVectorPtrsMC(); // in muD3PD this is done internally but in muMCD3PD this has to be
-										 // done externally, i.e. here since the tree is being filled in the
-										 // muD3PD class.
-	}
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	*/
-	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// fill the "offline" tree with *all* the events /////////////////////////////////////////////////////////
+	//float pTthreshold = 15.; // in GeV /////////////////////////////////////////////////////////////////////// NO NEED TO SKIM ON MC
+	//m_muD3PD->doSkimD3PD(pTthreshold); // will set a flag in muD3PD class if pass the skim /////////////////// NO NEED TO SKIM ON MC
 	m_muMCD3PD->fillMC(); // this does *not* call TTree::Fill() //////////////////////////////////////////////
 	m_muD3PD->fill(analysisSkeleton::isGRL, analysisSkeleton::sPeriod, analysisSkeleton::vTriggers); /////////
 	m_muMCD3PD->resetVectorPtrsMC(); // in muD3PD this is done internally but in muMCD3PD this has to be /////
@@ -110,40 +58,17 @@ void mcAnalysis::executeCutFlow()
 	//buildMU4Vector(nMus); /////////////////////////////
 	/////////////////////////////////////////////////////
 
+	/////////////////////////////////////////////
+	// Do the Tag&Probe analysis ////////////////
+	bool isMC = true; ///////////////////////////
+	applyTagNProbe(cutsToSkipMap, isMC); ////////
+	/////////////////////////////////////////////
+	
 	////////////////////////////////////////
 	// execute the cut profile analysis ////
-	//pthread_create(&thrd1, NULL, wrap1, this);
-	//pthread_create(&thrd2, NULL, wrap2, this);
-	//pthread_join(thrd1, NULL);
-	//pthread_join(thrd2, NULL);
-	//TThread thrd1("thrd1", handle1, this);
-	//TThread thrd2("thrd2", handle2, this);
-	//thrd1.Run(); ///////////////////////////
-	//thrd2.Run(); ///////////////////////////
 	fillCutProfile1D(); ////////////////////
 	fillCutProfile2D(); ////////////////////
 	////////////////////////////////////////
-	
-	/////////////////////////
-	// Tag&Probe mask ///////
-	//TThread thrd3("thrd3", handle3, this);
-	//thrd3.Run(); ////////////
-	fillTagNProbe(); ////////
-	/////////////////////////
-	
-	////////////////////////////////
-	// Truth efficiency mask ///////
-	//TThread thrd4("thrd4", handle4, this);
-	//thrd4.Run(); ///////////////////
-	fillTruthEfficiency(); /////////
-	////////////////////////////////
-	
-	
-	//TThread::Ps();
-	//thrd1.Join();
-	//thrd2.Join();
-	//thrd3.Join();
-	//thrd4.Join();
 	
 	/////////////////////////////////////////////////////
 	// preform the entire preselection //////////////////

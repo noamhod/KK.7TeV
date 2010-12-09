@@ -70,15 +70,71 @@ int analysisSkeleton::isTrigger(string trigName)
 	}
 	
 	int isTrig = 0;
-	if     (trigName=="L1_MU10") isTrig = isL1_MU10;
-	else if(trigName=="EF_mu10") isTrig = isEF_mu10;
-	else if(trigName=="EF_mu10_MG") isTrig = isEF_mu10_MG;
-	else if(trigName=="EF_mu13") isTrig = isEF_mu13;
-	else if(trigName=="EF_mu13_MG") isTrig = isEF_mu13_MG;
-	else if(trigName=="EF_mu13_tight") isTrig = isEF_mu13_tight;
+	if     (trigName=="L1_MU10")          isTrig = isL1_MU10;
+	else if(trigName=="EF_mu10")          isTrig = isEF_mu10;
+	else if(trigName=="EF_mu10_MG")       isTrig = isEF_mu10_MG;
+	else if(trigName=="EF_mu13")          isTrig = isEF_mu13;
+	else if(trigName=="EF_mu13_MG")       isTrig = isEF_mu13_MG;
+	else if(trigName=="EF_mu13_tight")    isTrig = isEF_mu13_tight;
 	else if(trigName=="EF_mu13_MG_tight") isTrig = isEF_mu13_MG_tight;
 	else cout << "WARNING:  in analysisSkeleton::isTrigger -> the trigger " << trigName << " was not found and the event is regected by default" << endl;
 	return isTrig;
+}
+
+void analysisSkeleton::matchTrigger(string speriod)
+{
+	if(speriod=="")
+	{
+		cout << "ERROR: in analysisSkeleton::matchTrigger -> (speriod==""), exitting now" << endl;
+		exit(-1);
+	}
+	
+	if(speriod=="MC")
+	{
+		trigger_match = mu_L1_matched;
+		trigger_pt    = mu_L1_pt;
+	}
+	else if(speriod=="A" || speriod=="B1-B2" || speriod=="C1" || speriod=="C2" || speriod=="D1-D6")
+	{
+		trigger_match = mu_L1_matched;
+		trigger_pt    = mu_L1_pt;
+	}
+	else if(speriod=="E1" || speriod=="E2" || speriod=="E3")
+	{
+		trigger_match = mu_L1_matched;
+		trigger_pt    = mu_L1_pt;
+	}
+	else if(speriod=="E4" || speriod=="E5" || speriod=="E6" || speriod=="E7")
+	{
+		trigger_match = mu_EF_matched;
+		trigger_pt    = mu_EF_me_pt;
+	}
+	else if(speriod=="F1" || speriod=="F2")
+	{
+		trigger_match = mu_EF_matched;
+		trigger_pt    = mu_EF_me_pt;
+	}
+	else if(speriod=="G1" || speriod=="G2" || speriod=="G3" || speriod=="G4")
+	{
+		trigger_match = mu_EF_matched;
+		trigger_pt    = mu_EF_me_pt;
+	}
+	else if(speriod=="G5" || speriod=="G6")
+	{
+		trigger_match = mu_EF_matched;
+		trigger_pt    = mu_EF_me_pt;
+	}
+	else if(speriod=="H1" || speriod=="H2")
+	{
+		trigger_match = mu_EF_matched;
+		trigger_pt    = mu_EF_me_pt;
+	}
+	else if(speriod=="I1" || speriod=="I2")
+	{
+		trigger_match = mu_EF_matched;
+		trigger_pt    = mu_EF_me_pt;
+	}
+	else cout << "WARNING:  in analysisSkeleton::matchTrigger -> the period name " << speriod << " was not found" << endl;
 }
 
 void analysisSkeleton::runEventDumper()
@@ -608,7 +664,19 @@ void analysisSkeleton::fillCutProfile1D()
 		if(pass)
 		{
 			if     (sname=="GRL")     (*h1map_cutProfile)[sname]->Fill( isGRL );
-			else if(sname=="Trigger") (*h1map_cutProfile)[sname]->Fill( isTrigger(vTriggers->at(0)) );
+			else if(sname=="Trigger")
+			{
+				int trigDecision = 0;
+				for(int t=0 ; t<(int)vTriggers->size() ; t++)
+				{
+					if( isTrigger(vTriggers->at(t)) )
+					{
+						trigDecision = 1;
+						break;
+					}
+				}
+				(*h1map_cutProfile)[sname]->Fill( trigDecision );
+			}
 			
 			else if(sname=="pT_1")      (*h1map_cutProfile)[sname]->Fill( mu_pt->at(ai)*MeV2TeV );
 			else if(sname=="pT_2")      (*h1map_cutProfile)[sname]->Fill( mu_pt->at(bi)*MeV2TeV );
@@ -717,6 +785,13 @@ void analysisSkeleton::fillTagNProbe()
 	int itag;
 	int iprobe;
 	int tNp_mask;
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	matchTrigger(sPeriod); ///////////////////////////////////////////////////////////
+	float trig_pTmin       = (float)m_period2pTminMap->operator[](sPeriod); //////////
+	float trig_pTthreshold = (float)m_period2pTthresholdMap->operator[](sPeriod); ////
+	//////////////////////////////////////////////////////////////////////////////////
+	
 	for(int i=1 ; i<=2 ; i++) // one tag, one probe but also the other way around...
 	{
 		if(i==1)
@@ -724,8 +799,10 @@ void analysisSkeleton::fillTagNProbe()
 			itag   = -1;
 			iprobe = -1;
 		}
-		tNp_mask = tagNprobeMask(1., 10., mu_L1_pt, mu_L1_matched, pmu, mu_me_qoverp, mu_me_theta, mu_charge, itag, iprobe);
-		//tNp_mask = tagNprobeMask(1., 13., mu_EF_me_pt, mu_EF_matched, pmu, mu_charge, itag, iprobe);
+		////////////////////////////////////////////////////////////////////////////////////////////////
+		tNp_mask = tagNprobeMask(trig_pTmin, trig_pTthreshold, trigger_pt, trigger_match, //////////
+								 pmu, mu_me_qoverp, mu_me_theta, mu_charge, itag, iprobe); /////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////
 		switch(tNp_mask)
 		{
 			case 0: break;
@@ -791,21 +868,6 @@ void analysisSkeleton::fillTruthEfficiency()
 		h1_truth_succeeded_eta->Fill( mu_eta->at(t) );
 		h1_truth_succeeded_phi->Fill( mu_phi->at(t) );
 	}
-}
-
-void analysisSkeleton::cutsToSkipForTagNProbe()
-{
-	if(cutsToSkipMap.size()>0) cutsToSkipMap.clear();
-	
-	cutsToSkipMap.insert(make_pair("pTandEta",true));
-	cutsToSkipMap.insert(make_pair("pTandEtaTight",true));
-	cutsToSkipMap.insert(make_pair("pTandEtaBarrel",true));
-	cutsToSkipMap.insert(make_pair("pT",true));
-	cutsToSkipMap.insert(make_pair("pT_use_qOp_and_theta",true));
-	cutsToSkipMap.insert(make_pair("eta",true));
-	cutsToSkipMap.insert(make_pair("etaTight",true));
-	cutsToSkipMap.insert(make_pair("etaBarrel",true));
-	cutsToSkipMap.insert(make_pair("msHits",true));
 }
 
 void analysisSkeleton::applyTagNProbe(TMapsb& cutsToSkip, bool isMC)
@@ -889,9 +951,6 @@ bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 		
 		else if(sorderedcutname=="Trigger"  &&  !bSkipCut)
 		{
-			//string trigName = vTriggers->at(0);
-			//int trigVal = isTrigger(trigName);
-			//passCurrentCut = ( triggerCut((*m_cutFlowMapSVD)[sorderedcutname][0], trigVal, trigName) ) ? true : false;
 			string trigName;
 			int trigVal;
 			bool pass1Trig = false;

@@ -19,15 +19,17 @@ class cutFlowHandler : public utilities
 		// variables
 		string          m_skey;
 		string          m_stype;
+		int				m_iskip;
 		int             m_inum;
 		int             m_nvals;
 		vector<double>  m_dval;
 		
-		TMapds*         m_cutFlowOrdered; // the map between the order of the cut and its name
+		TMapds*         m_cutFlowOrdered;     // the map between the order of the cut and its name
 		TMapds*         m_cutFlowTypeOrdered; // the map between the order of the cut and its type
-		TMapsi*         m_cutFlowNumbers; // the map between the name of the cut and the events surviving it
-		TMapsvd*		m_cutFlowMapSVD;  // the actual cut flow map between the cut's name and the vector of its values
-
+		TMapsi*         m_cutFlowNumbers;     // the map between the name of the cut and the events surviving it
+		TMapsvd*		m_cutFlowMapSVD;      // the actual cut flow map between the cut's name and the vector of its values
+		TMapsb*			m_cutsFlowSkipMap;    // cuts to skip in tag&probe analysis
+		
 	public:
 		cutFlowHandler();
 		cutFlowHandler(string sCutFlowFilePath);
@@ -37,6 +39,7 @@ class cutFlowHandler : public utilities
 		int    getNVals();
         string getType();
         string getKey();
+		int    getSkip();
 		int    getNum();
         double getVal(int valNum);
 		void getVal(vector<double>& dvalVec);
@@ -48,6 +51,7 @@ class cutFlowHandler : public utilities
 		TMapds*  getCutFlowTypeOrderedMapPtr();
 		TMapsi*  getCutFlowNumbersMapPtr();
 		TMapsvd* getCutFlowMapSVDPtr();
+		TMapsb*	 getCutFlowToSkipMapPtr();
 
 	private:
 		int    nAllEvents;

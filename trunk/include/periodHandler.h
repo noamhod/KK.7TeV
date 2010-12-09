@@ -19,12 +19,16 @@ class periodHandler
 		string  m_speriod;
 		int    	m_firstrun;
 		int    	m_lastrun;
+		double  m_trig_pTmin;
+		double  m_trig_pTthreshold;
 		int     m_ntrigs;
 		vector<string>* m_trigs;
 		
-		TMapis*  m_firstrun2periodMap;
-		TMapis*  m_lastrun2periodMap;
+		TMapis*    m_firstrun2periodMap;
+		TMapis*    m_lastrun2periodMap;
 		TMapsP2vs* m_period2triggerMap;
+		TMapsd*    m_period2pTthresholdMap;
+		TMapsd*    m_period2pTminMap;
 
 	public:
 		periodHandler();
@@ -37,13 +41,17 @@ class periodHandler
 		string          getPeriod(int runNumber, TMapis* firstrun2periodMap, TMapis* lastrun2periodMap);
 		vector<string>* getTrigs(string sPeriod, TMapsP2vs* period2triggerMap);
 		
-		TMapis*  getFirstRun2PeriodMapPtr();
-		TMapis*  getLastRun2PeriodMapPtr();
+		TMapis*    getFirstRun2PeriodMapPtr();
+		TMapis*    getLastRun2PeriodMapPtr();
 		TMapsP2vs* getPeriod2TriggerMapPtr();
+		TMapsd*    getPeriod2pTthresholdMapPtr();
+		TMapsd*    getPeriod2pTminMapPtr();
 
 		string getPeriod();
 		int getFirstRun();
 		int getLastRun();
+		double getTrig_pTmin();
+		double getTrig_pTthreshold();
 		int getNtrigs();
 		vector<string>* getTriggers();
 		int getTrigsSize();

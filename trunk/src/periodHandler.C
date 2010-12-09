@@ -19,7 +19,8 @@ periodHandler::periodHandler(string sPeriodFilePath)
 	m_lastrun2periodMap  = new TMapis();
 	m_period2triggerMap  = new TMapsP2vs();
 	
-	//m_trigs = new vector<string>;
+	m_period2pTthresholdMap = new TMapsd();
+	m_period2pTminMap = new TMapsd();
 	
 	readPeriods(sPeriodFilePath);
 }
@@ -36,18 +37,18 @@ periodHandler::~periodHandler()
 void periodHandler::parseKeyValLine(string sLine)
 {
 	/* * * * * * * * * * EXAMPLE * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	#PERIODRANGE		#RUNNUMBERSTART			#RUNNUMBEREND			#NTRIGS		#TRIGGERS
-	A					152166					153200					1			L1_MU10
-	B1-B2				153565					155160					1			L1_MU10 
-	C1					155228					155697					1			L1_MU10
-	C2					156682					156682					1			L1_MU10
-	D1-D6				158045					159224					1			L1_MU10
-	E1					160387					160479					1			L1_MU10
-	E2					160530					160530					1			L1_MU10
-	E3					160613					160879					1			L1_MU10
-	E4					160899					160980					2			EF_mu10		EF_mu10_MG
-	E5					161118					161379					2			EF_mu10		EF_mu10_MG
-	E6					161407					161520					2			EF_mu10		EF_mu10_MG
+	#PERIODRANGE		#RUNNUMBERSTART		#RUNNUMBEREND	#PTMIN	#PTTHREHS	#NTRIGS		#TRIGGERS
+	#--- monte carlo
+	MC					100000				110000			1		10			1			L1_MU10
+	#--- data
+	A					152166				153200			1		10			1			L1_MU10
+	B1-B2				153565				155160			1		10			1			L1_MU10
+	E4					160899				160980			1		10			2			EF_mu10			EF_mu10_MG
+	E5					161118				161379			1		10			2			EF_mu10			EF_mu10_MG
+	G5					165821				166143			1		13			2			EF_mu13			EF_mu13_MG
+	G6					166198				166383			1		13			2			EF_mu13			EF_mu13_MG
+	I1					167575				167680			1		13			2			EF_mu13_tight	EF_mu13_MG_tight
+	I2					167776				167844			1		13			2			EF_mu13_tight	EF_mu13_MG_tight
 	* * * * * * * * ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 	//if(m_trigs->size()>0) m_trigs->clear();
@@ -64,6 +65,12 @@ void periodHandler::parseKeyValLine(string sLine)
 	
 	// get the end range of runs:
 	strm >> m_lastrun;
+	
+	// get the trigger pT min
+	strm >> m_trig_pTmin;
+	
+	// get the trigger pT threshold
+	strm >> m_trig_pTthreshold;
 	
 	// get the number of triggers:
 	strm >> m_ntrigs;
@@ -90,6 +97,8 @@ void periodHandler::readPeriods(string sPeriodFilePath)
 	string speriod;
 	int    firstrun;
 	int    lastrun;
+	double pTmin;
+	double pTthreshold;
 	int    ntrigs;
 	vector<string>* vtrigs;
 
@@ -121,6 +130,12 @@ void periodHandler::readPeriods(string sPeriodFilePath)
 		// get the end run:
 		lastrun = getLastRun();
 		
+		// get the trigger pT min
+		pTmin = getTrig_pTmin();
+		
+		// get the trigger pT threshold
+		pTthreshold = getTrig_pTthreshold();
+		
 		// get the number of possible triggers
 		ntrigs = getNtrigs();
 		
@@ -131,7 +146,9 @@ void periodHandler::readPeriods(string sPeriodFilePath)
 
 		if(b_print)
 		{
-			cout << "period=" << speriod << "\trange=" << firstrun << "-" << lastrun << "\ttriggers=" << ntrigs;
+			cout << "period=" << speriod
+				 << "\trange=" << firstrun << "-" << lastrun
+				 << "\ttriggers(pTmin=" << pTmin << " GeV, pTthreshold=" << pTthreshold << " GeV) = " << ntrigs;
 			for(int i=0 ; i<(int)getNtrigs() ; i++)
 			{
 				cout << "\ttrig[" << i << "]=" << vtrigs->at(i);
@@ -143,6 +160,8 @@ void periodHandler::readPeriods(string sPeriodFilePath)
 		m_firstrun2periodMap->insert( make_pair(firstrun,speriod) );
 		m_lastrun2periodMap->insert( make_pair(lastrun,speriod) );
 		m_period2triggerMap->insert( make_pair(speriod,vtrigs) );
+		m_period2pTminMap->insert( make_pair(speriod,pTmin) );
+		m_period2pTthresholdMap->insert( make_pair(speriod,pTthreshold) );
 	}
 	cout << "\nread " << nLinesRead << " lines from " << sPeriodFilePath << "\n" << endl;
 	
@@ -166,6 +185,16 @@ int periodHandler::getFirstRun()
 int periodHandler::getLastRun()
 {
 	return m_lastrun;
+}
+
+double periodHandler::getTrig_pTmin()
+{
+	return m_trig_pTmin;
+}
+
+double periodHandler::getTrig_pTthreshold()
+{
+	return m_trig_pTthreshold;
 }
 
 int periodHandler::getNtrigs()
@@ -202,6 +231,15 @@ TMapsP2vs* periodHandler::getPeriod2TriggerMapPtr()
 	return m_period2triggerMap;
 }
 
+TMapsd* periodHandler::getPeriod2pTthresholdMapPtr()
+{
+	return m_period2pTthresholdMap;
+}
+
+TMapsd* periodHandler::getPeriod2pTminMapPtr()
+{
+	return m_period2pTminMap;
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 

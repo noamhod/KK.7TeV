@@ -108,10 +108,6 @@ void mcAnalysisGridControl::draw()
 	
 	m_mcAnalysis->drawCutProfileHistosMap( m_dirCutProfile );
 	
-	m_mcAnalysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
-	
-	m_mcAnalysis->printCutFlowNumbers(l64t_nentries);
-	
 	bool isTruth = false;
 	m_mcAnalysis->calculateEfficiency(m_mcAnalysis->h1map_tagNprobe_candidates_pT,
 									  m_mcAnalysis->h1map_tagNprobe_succeeded_pT,
@@ -133,6 +129,10 @@ void mcAnalysisGridControl::draw()
 									  m_mcAnalysis->h1map_truth_succeeded_phi,
 									  m_mcAnalysis->h1map_truth_trigEff_phi, isTruth);
 	m_mcAnalysis->drawEfficiencyHistosMap(m_dirEff);
+	
+	m_mcAnalysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
+	
+	m_mcAnalysis->printCutFlowNumbers(l64t_nentries);
 	
 	cout << "nMultiMuonEvents = " << m_mcAnalysis->nMultiMuonEvents << endl;
 }

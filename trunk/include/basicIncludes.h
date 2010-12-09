@@ -95,6 +95,7 @@ typedef map<string, vector<string> > TMapsvs;
 typedef map<string, vector<string>* > TMapsP2vs;
 typedef map<int, vector<string>* >    TMapiP2vs;
 typedef multimap<float, float > TMultimapff;
+typedef vector<TCanvas*> TVecCanvas;
 
 #define utilities_cxx
 #include "utilities.C"

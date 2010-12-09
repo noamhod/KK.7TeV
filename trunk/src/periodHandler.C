@@ -18,7 +18,7 @@ periodHandler::periodHandler(string sPeriodFilePath)
 	m_firstrun2periodMap = new TMapis();
 	m_lastrun2periodMap  = new TMapis();
 	m_period2triggerMap  = new TMapsP2vs();
-	
+	m_period2triggerperiodMap = new TMapss();
 	m_period2pTthresholdMap = new TMapsd();
 	m_period2pTminMap = new TMapsd();
 	
@@ -144,22 +144,27 @@ void periodHandler::readPeriods(string sPeriodFilePath)
 
 		nLinesRead++;
 
-		if(b_print)
+		cout << "period=" << speriod
+			 << "\trange=" << firstrun << "-" << lastrun
+			 << "\ttriggers(pTmin=" << pTmin << " GeV, pTthreshold=" << pTthreshold << " GeV) = " << ntrigs;
+		for(int i=0 ; i<(int)getNtrigs() ; i++)
 		{
-			cout << "period=" << speriod
-				 << "\trange=" << firstrun << "-" << lastrun
-				 << "\ttriggers(pTmin=" << pTmin << " GeV, pTthreshold=" << pTthreshold << " GeV) = " << ntrigs;
-			for(int i=0 ; i<(int)getNtrigs() ; i++)
-			{
-				cout << "\ttrig[" << i << "]=" << vtrigs->at(i);
-			}
+			cout << "\ttrig[" << i << "]=" << vtrigs->at(i);
 		}
 		cout << endl;
+		
+		string sTriggerPeriod = "";
+		for(int i=0 ; i<(int)getNtrigs() ; i++)
+		{
+			if(i==0) sTriggerPeriod += vtrigs->at(i);
+			if(i>0)  sTriggerPeriod += "||" + vtrigs->at(i);
+		}
 		
 		// pair the maps:
 		m_firstrun2periodMap->insert( make_pair(firstrun,speriod) );
 		m_lastrun2periodMap->insert( make_pair(lastrun,speriod) );
 		m_period2triggerMap->insert( make_pair(speriod,vtrigs) );
+		m_period2triggerperiodMap->insert( make_pair(speriod,sTriggerPeriod) );
 		m_period2pTminMap->insert( make_pair(speriod,pTmin) );
 		m_period2pTthresholdMap->insert( make_pair(speriod,pTthreshold) );
 	}
@@ -239,6 +244,11 @@ TMapsd* periodHandler::getPeriod2pTthresholdMapPtr()
 TMapsd* periodHandler::getPeriod2pTminMapPtr()
 {
 	return m_period2pTminMap;
+}
+
+TMapss* periodHandler::getPeriod2triggerperiodMapPtr()
+{
+	return m_period2triggerperiodMap;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

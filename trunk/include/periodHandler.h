@@ -27,6 +27,7 @@ class periodHandler
 		TMapis*    m_firstrun2periodMap;
 		TMapis*    m_lastrun2periodMap;
 		TMapsP2vs* m_period2triggerMap;
+		TMapss*    m_period2triggerperiodMap;
 		TMapsd*    m_period2pTthresholdMap;
 		TMapsd*    m_period2pTminMap;
 
@@ -46,6 +47,7 @@ class periodHandler
 		TMapsP2vs* getPeriod2TriggerMapPtr();
 		TMapsd*    getPeriod2pTthresholdMapPtr();
 		TMapsd*    getPeriod2pTminMapPtr();
+		TMapss*    getPeriod2triggerperiodMapPtr();
 
 		string getPeriod();
 		int getFirstRun();

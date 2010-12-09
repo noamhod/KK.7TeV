@@ -40,8 +40,9 @@ public:
 	TVectorP2VL pmuTruth;
 	TMapsd values2fill;
 	int nMultiMuonEvents;
-	vector<int>* trigger_match;
+	vector<int>*   trigger_match;
 	vector<float>* trigger_pt;
+	vector<float>* trigger_dr;
 	
 
 

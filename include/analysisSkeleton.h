@@ -40,7 +40,8 @@ public:
 	TVectorP2VL pmuTruth;
 	TMapsd values2fill;
 	int nMultiMuonEvents;
-	TMapsb cutsToSkipMap;
+	vector<int>* trigger_match;
+	vector<float>* trigger_pt;
 	
 
 
@@ -377,7 +378,6 @@ public:
 	{
 		currentRun = 0;
 		sCurrentPeriod = "";
-		cutsToSkipForTagNProbe();
 		nMultiMuonEvents = 0;
 	}
 	~analysisSkeleton();
@@ -392,8 +392,7 @@ public:
 	string          getPeriodName(int run);
 	vector<string>* getPeriodTriggers();
 	int             isTrigger(string trigName);
-	//bool 			skimD3PD(physics* phys, mcPhysics* mcPhys, float pTthreshold);
-	//bool            digestSkim(int muSize);
+	void            matchTrigger(string speriod);
 	void 			printAllProperties(int ai, int bi, int iv);
 	
 	void buildMU4Vector(int nMus);
@@ -410,7 +409,6 @@ public:
 	void fillTagNProbe();
 	void fillTruthEfficiency();
 	
-	void cutsToSkipForTagNProbe();
 	void applyTagNProbe(TMapsb& cutsToSkip, bool isMC);
 
 private:

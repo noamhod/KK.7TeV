@@ -16,10 +16,11 @@ cutFlowHandler::cutFlowHandler(string sCutFlowFilePath)
 {
 	b_print = false;
 
-	m_cutFlowOrdered = new TMapds();
+	m_cutFlowOrdered     = new TMapds();
 	m_cutFlowTypeOrdered = new TMapds();
-	m_cutFlowNumbers = new TMapsi();
-	m_cutFlowMapSVD  = new TMapsvd();
+	m_cutsFlowSkipMap    = new TMapsb();
+	m_cutFlowNumbers     = new TMapsi();
+	m_cutFlowMapSVD      = new TMapsvd();
 	
 	nAllEvents = 0;
 	
@@ -47,13 +48,16 @@ void cutFlowHandler::incrementNallEvents()
 void cutFlowHandler::parseKeyValLine(string sLine)
 {
 	/* * * * * * * * * * EXAMPLE * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	#TYPE			##ORDER#			#NAME#					#NVALUES#		#VALUE(S)#
-	selection		0					oppositeCharge			1				0.
-	selection		1					pT						1				20.
-	selection		2					eta						1				2.4
-	selection		3					cosThetaDimu			1				-0.99
-	preselection	0					PV						3				2.				1.			150.
-	* * * * * * * * ** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	#TYPE#			#ORDER#		#SKIPFORT&P		#NAME#					#NVALUES#		#VALUE(S)
+	#																					[1]		[2]		[3]#
+	################
+	# PRESELECTION #
+	################
+	preselection	0			0				GRL						1				 1.
+	preselection	1			0				Trigger					1				 1.
+	preselection	2			0				PV						3				 2.		 	1.		 200.
+	#preselection	3			0				hipTmuon				2				 0.015	 	0.010
+	* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 	
 	double tmpVal = 0.;
 
@@ -67,6 +71,9 @@ void cutFlowHandler::parseKeyValLine(string sLine)
 	
 	// get the oreder of the cut:
 	strm >> m_inum;
+	
+	// get the skip flag (0/1):
+	strm >> m_iskip;
 	
 	// get the name of the cut:
 	strm >> m_skey;
@@ -95,6 +102,11 @@ string cutFlowHandler::getKey()
 int cutFlowHandler::getNum()
 {
 	return m_inum;
+}
+
+int cutFlowHandler::getSkip()
+{
+	return m_iskip;
 }
 
 double cutFlowHandler::getVal(int valNum)
@@ -128,6 +140,8 @@ void cutFlowHandler::readCutFlow(string sCutFlowFilePath)
 	string sLine = "";
 	
 	double dnum   = 0.;
+	double dskip  = 0.;
+	bool skipflag = false;
 	string stype  = "";
 	string skey   = "";
 	double nvals  = 0.;
@@ -160,6 +174,10 @@ void cutFlowHandler::readCutFlow(string sCutFlowFilePath)
 		// get the cut number:
 		dnum = getNum();
 		
+		// get the cut skip flag (0/1):
+		dskip    = getSkip();
+		skipflag = (dskip==1.) ? true : false;
+		
 		// get the key = cut name (ownership utilitis):
 		skey = getKey();
 		
@@ -172,19 +190,17 @@ void cutFlowHandler::readCutFlow(string sCutFlowFilePath)
 
 		nLinesRead++;
 
-		//if(b_print)
-		//{
-			cout << "type=" << stype << "\tnum=" << dnum << "\tkey=" << skey << "\tnvals=" << nvals << "\t";
-			for(int i=0 ; i<(int)getNVals() ; i++)
-			{
-				cout << "   val[" << i << "]=" << dval[i];
-			}
-			cout << endl;
-		//}
+		cout << "type=" << stype << "\tnum=" << dnum << "\tkey=" << skey << "\tnvals=" << nvals << "\t";
+		for(int i=0 ; i<(int)getNVals() ; i++)
+		{
+			cout << "   val[" << i << "]=" << dval[i];
+		}
+		cout << endl;
 
 		// pair the maps:
 		m_cutFlowMapSVD->insert( make_pair(skey,dval) );
 		m_cutFlowTypeOrdered->insert( make_pair(dnum,stype) );
+		m_cutsFlowSkipMap->insert( make_pair(skey,skipflag) );
 		m_cutFlowOrdered->insert( make_pair(dnum,skey) );
 		m_cutFlowNumbers->insert( make_pair(skey,0) );
 	}
@@ -248,3 +264,9 @@ TMapsvd* cutFlowHandler::getCutFlowMapSVDPtr()
 {
 	return m_cutFlowMapSVD;
 }
+
+TMapsb*	cutFlowHandler::getCutFlowToSkipMapPtr()
+{
+	return m_cutsFlowSkipMap;
+}
+

@@ -93,46 +93,55 @@ void analysisSkeleton::matchTrigger(string speriod)
 	{
 		trigger_match = mu_L1_matched;
 		trigger_pt    = mu_L1_pt;
+		trigger_dr    = mu_L1_dr;
 	}
 	else if(speriod=="A" || speriod=="B1-B2" || speriod=="C1" || speriod=="C2" || speriod=="D1-D6")
 	{
 		trigger_match = mu_L1_matched;
 		trigger_pt    = mu_L1_pt;
+		trigger_dr    = mu_L1_dr;
 	}
 	else if(speriod=="E1" || speriod=="E2" || speriod=="E3")
 	{
 		trigger_match = mu_L1_matched;
 		trigger_pt    = mu_L1_pt;
+		trigger_dr    = mu_L1_dr;
 	}
 	else if(speriod=="E4" || speriod=="E5" || speriod=="E6" || speriod=="E7")
 	{
 		trigger_match = mu_EF_matched;
 		trigger_pt    = mu_EF_me_pt;
+		trigger_dr    = mu_EF_dr;
 	}
 	else if(speriod=="F1" || speriod=="F2")
 	{
 		trigger_match = mu_EF_matched;
 		trigger_pt    = mu_EF_me_pt;
+		trigger_dr    = mu_EF_dr;
 	}
 	else if(speriod=="G1" || speriod=="G2" || speriod=="G3" || speriod=="G4")
 	{
 		trigger_match = mu_EF_matched;
 		trigger_pt    = mu_EF_me_pt;
+		trigger_dr    = mu_EF_dr;
 	}
 	else if(speriod=="G5" || speriod=="G6")
 	{
 		trigger_match = mu_EF_matched;
 		trigger_pt    = mu_EF_me_pt;
+		trigger_dr    = mu_EF_dr;
 	}
 	else if(speriod=="H1" || speriod=="H2")
 	{
 		trigger_match = mu_EF_matched;
 		trigger_pt    = mu_EF_me_pt;
+		trigger_dr    = mu_EF_dr;
 	}
 	else if(speriod=="I1" || speriod=="I2")
 	{
 		trigger_match = mu_EF_matched;
 		trigger_pt    = mu_EF_me_pt;
+		trigger_dr    = mu_EF_dr;
 	}
 	else cout << "WARNING:  in analysisSkeleton::matchTrigger -> the period name " << speriod << " was not found" << endl;
 }
@@ -790,6 +799,7 @@ void analysisSkeleton::fillTagNProbe()
 	matchTrigger(sPeriod); ///////////////////////////////////////////////////////////
 	float trig_pTmin       = (float)m_period2pTminMap->operator[](sPeriod); //////////
 	float trig_pTthreshold = (float)m_period2pTthresholdMap->operator[](sPeriod); ////
+	string sTrigPeriod     = (*m_period2triggerperiodMap)[sPeriod]; //////////////////
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	for(int i=1 ; i<=2 ; i++) // one tag, one probe but also the other way around...
@@ -808,19 +818,19 @@ void analysisSkeleton::fillTagNProbe()
 			case 0: break;
 			case 1: break;
 			case 2:
-				h1_tagNprobe_candidates_pT->Fill( fabs(pT(mu_me_qoverp->at(iprobe)/MeV2TeV, mu_me_theta->at(iprobe))) );
-				h1_tagNprobe_candidates_eta->Fill( mu_eta->at(iprobe) );
-				h1_tagNprobe_candidates_phi->Fill( mu_phi->at(iprobe) );
+				(*h1map_tagNprobe_candidates_pT)[sTrigPeriod]->Fill( fabs(pT(mu_me_qoverp->at(iprobe)/MeV2TeV, mu_me_theta->at(iprobe))) );
+				(*h1map_tagNprobe_candidates_eta)[sTrigPeriod]->Fill( mu_eta->at(iprobe) );
+				(*h1map_tagNprobe_candidates_phi)[sTrigPeriod]->Fill( mu_phi->at(iprobe) );
 				break;
 			case 3: break;
 			case 4: break;
 			case 5:
-				h1_tagNprobe_candidates_pT->Fill( fabs(pT(mu_me_qoverp->at(iprobe)/MeV2TeV, mu_me_theta->at(iprobe))) );
-				h1_tagNprobe_candidates_eta->Fill( mu_eta->at(iprobe) );
-				h1_tagNprobe_candidates_phi->Fill( mu_phi->at(iprobe) );
-				h1_tagNprobe_succeeded_pT->Fill( fabs(pT(mu_me_qoverp->at(iprobe)/MeV2TeV, mu_me_theta->at(iprobe))) );
-				h1_tagNprobe_succeeded_eta->Fill( mu_eta->at(iprobe) );
-				h1_tagNprobe_succeeded_phi->Fill( mu_phi->at(iprobe) );
+				(*h1map_tagNprobe_candidates_pT)[sTrigPeriod]->Fill( fabs(pT(mu_me_qoverp->at(iprobe)/MeV2TeV, mu_me_theta->at(iprobe))) );
+				(*h1map_tagNprobe_candidates_eta)[sTrigPeriod]->Fill( mu_eta->at(iprobe) );
+				(*h1map_tagNprobe_candidates_phi)[sTrigPeriod]->Fill( mu_phi->at(iprobe) );
+				(*h1map_tagNprobe_succeeded_pT)[sTrigPeriod]->Fill( fabs(pT(mu_me_qoverp->at(iprobe)/MeV2TeV, mu_me_theta->at(iprobe))) );
+				(*h1map_tagNprobe_succeeded_eta)[sTrigPeriod]->Fill( mu_eta->at(iprobe) );
+				(*h1map_tagNprobe_succeeded_phi)[sTrigPeriod]->Fill( mu_phi->at(iprobe) );
 				break;
 			case 6: break;
 			default: break;
@@ -834,39 +844,39 @@ void analysisSkeleton::fillTruthEfficiency()
 	//mu_truth_status     : Status oMC status = 1 pfinal particle, status = 3 intermediate particle (documentary)
 	//mu_truth_mothertype : description: True mother PDG type
 	
-	float truthEfficiency_pTmin = 1.; // in GeV
-	float pTreconstructed = 0.;
+	//////////////////////////////////////////////////////////////////////////////////
+	matchTrigger(sPeriod); ///////////////////////////////////////////////////////////
+	float trig_pTmin       = (float)m_period2pTminMap->operator[](sPeriod); //////////
+	float trig_pTthreshold = (float)m_period2pTthresholdMap->operator[](sPeriod); ////
+	string sTrigPeriod     = (*m_period2triggerperiodMap)[sPeriod]; //////////////////
+	//////////////////////////////////////////////////////////////////////////////////
 	
 	//////////////////////////////////////
 	if(mu_truth_pt->size()!=2) return; ///
 	//////////////////////////////////////
+	
+	float pTreconstructed = 0.;
 	for(int t=0 ; t<(int)mu_truth_pt->size() ; t++)
 	{
 		pTreconstructed = fabs(pT(mu_me_qoverp->at(t), mu_me_theta->at(t)));
 		
-		if(!mu_truth_status->at(t))                        continue; // has to be final particle
-		if(mu_truth_mothertype->at(t)!=PDTZ)               continue; // has to come out of gamma/Z^0
-		if(pTreconstructed*MeV2GeV<=truthEfficiency_pTmin) continue; // has to be above pT min
-		
+		if(!mu_truth_status->at(t))             continue; // has to be final particle
+		if(mu_truth_mothertype->at(t)!=PDTZ)    continue; // has to come out of gamma/Z^0
+		if(pTreconstructed*MeV2GeV<=trig_pTmin) continue; // has to be above pT min
 		
 		// fill the probe candidate histos
-		h1_truth_candidates_pT->Fill( pTreconstructed*MeV2TeV );
-		h1_truth_candidates_eta->Fill( mu_eta->at(t) );
-		h1_truth_candidates_phi->Fill( mu_phi->at(t) );
+		(*h1map_truth_candidates_pT)[sTrigPeriod]->Fill( pTreconstructed*MeV2TeV );
+		(*h1map_truth_candidates_eta)[sTrigPeriod]->Fill( mu_eta->at(t) );
+		(*h1map_truth_candidates_phi)[sTrigPeriod]->Fill( mu_phi->at(t) );
 		
-		if(mu_L1_pt->at(t)*MeV2GeV<10.)  continue;
-		if(!mu_L1_matched->at(t))        continue;
-		if(mu_L1_dr->at(t)<0.)           continue;
-		/*
-		if(!mu_EF_me_pt->at(t)*MeV2GeV<13.) continue;
-		if(!mu_EF_matched->at(t))           continue;
-		if(mu_EF_dr->at(t)<0.)              continue;
-		*/
+		if(trigger_pt->at(t)*MeV2GeV<trig_pTthreshold) continue;
+		if(!trigger_match->at(t))                      continue;
+		if(trigger_dr->at(t)<0.)                       continue;
 	
-		// fill the probe histoe
-		h1_truth_succeeded_pT->Fill( pTreconstructed*MeV2TeV );
-		h1_truth_succeeded_eta->Fill( mu_eta->at(t) );
-		h1_truth_succeeded_phi->Fill( mu_phi->at(t) );
+		// fill the probe histos
+		(*h1map_truth_succeeded_pT)[sTrigPeriod]->Fill( pTreconstructed*MeV2TeV );
+		(*h1map_truth_succeeded_eta)[sTrigPeriod]->Fill( mu_eta->at(t) );
+		(*h1map_truth_succeeded_phi)[sTrigPeriod]->Fill( mu_phi->at(t) );
 	}
 }
 

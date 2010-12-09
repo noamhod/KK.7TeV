@@ -228,6 +228,29 @@ void tagNprobe::calculateEfficiency(TH1D* hCandidates, TH1D* hSucceeded, TH1D* h
 		if(!isTruth) hEfficiency->SetBinError(b,deff);
 	}
 }
+
+void tagNprobe::calculateEfficiency(TMapSP2TH1D* hMapCandidates, TMapSP2TH1D* hMapSucceeded, TMapSP2TH1D* hMapEfficiency, bool isTruth)
+{
+	for(TMapSP2TH1D::iterator it=hMapCandidates->begin() ; it!=hMapCandidates->end() ; it++)
+	{
+		Double_t cand;
+		Double_t prob;
+		Double_t eff;
+		Double_t deff;
+		
+		string trigper = it->first;
+		
+		for(Int_t b=0 ; b<=(*hMapEfficiency)[trigper]->GetNbinsX()+1 ; b++) // include overflow/underflow
+		{
+			cand = (*hMapCandidates)[trigper]->GetBinContent(b);
+			prob = (*hMapSucceeded)[trigper]->GetBinContent(b);
+			eff  = (cand!=0) ? prob/cand : 0.;
+			deff = (cand!=0) ? sqrt(eff*(1.-eff)/cand) : 0.;
+			(*hMapEfficiency)[trigper]->SetBinContent(b,eff);
+			if(!isTruth) (*hMapEfficiency)[trigper]->SetBinError(b,deff);
+		}
+	}
+}
 #endif
 
 

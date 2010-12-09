@@ -90,6 +90,9 @@ void mcAnalysisGridControl::book()
 	m_dirPerformance = m_rootfile->mkdir("performance");
 	
 	m_dirAfb = m_rootfile->mkdir("Afb");
+	
+	m_dirEff = m_rootfile->mkdir("efficiency");
+	m_mcAnalysis->bookEfficiencyHistos(m_mcAnalysis->m_period2triggerperiodMap, m_dirEff);
 }
 
 void mcAnalysisGridControl::draw()
@@ -97,15 +100,6 @@ void mcAnalysisGridControl::draw()
 	m_mcAnalysis->drawBareHistos(m_dirNoCuts);
 
 	// these calculations must come before drawHistos
-	bool isTruth = false;
-	m_mcAnalysis->calculateEfficiency(m_mcAnalysis->h1_tagNprobe_candidates_pT, m_mcAnalysis->h1_tagNprobe_succeeded_pT, m_mcAnalysis->h1_tagNprobe_efficiency_pT, isTruth);
-	m_mcAnalysis->calculateEfficiency(m_mcAnalysis->h1_tagNprobe_candidates_eta, m_mcAnalysis->h1_tagNprobe_succeeded_eta, m_mcAnalysis->h1_tagNprobe_efficiency_eta, isTruth);
-	m_mcAnalysis->calculateEfficiency(m_mcAnalysis->h1_tagNprobe_candidates_phi, m_mcAnalysis->h1_tagNprobe_succeeded_phi, m_mcAnalysis->h1_tagNprobe_efficiency_phi, isTruth);
-	isTruth = true;
-	m_mcAnalysis->calculateEfficiency(m_mcAnalysis->h1_truth_candidates_pT, m_mcAnalysis->h1_truth_succeeded_pT, m_mcAnalysis->h1_truth_efficiency_pT, isTruth);
-	m_mcAnalysis->calculateEfficiency(m_mcAnalysis->h1_truth_candidates_eta, m_mcAnalysis->h1_truth_succeeded_eta, m_mcAnalysis->h1_truth_efficiency_eta, isTruth);
-	m_mcAnalysis->calculateEfficiency(m_mcAnalysis->h1_truth_candidates_phi, m_mcAnalysis->h1_truth_succeeded_phi, m_mcAnalysis->h1_truth_efficiency_phi, isTruth);
-	
 	m_mcAnalysis->calculateAfb(m_mcAnalysis->h1_Afb, m_dirAfb);
 	
 	m_mcAnalysis->drawHistos(m_dirAllCuts);
@@ -117,6 +111,29 @@ void mcAnalysisGridControl::draw()
 	m_mcAnalysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
 	
 	m_mcAnalysis->printCutFlowNumbers(l64t_nentries);
+	
+	bool isTruth = false;
+	m_mcAnalysis->calculateEfficiency(m_mcAnalysis->h1map_tagNprobe_candidates_pT,
+									  m_mcAnalysis->h1map_tagNprobe_succeeded_pT,
+									  m_mcAnalysis->h1map_tagNprobe_trigEff_pT, isTruth);
+	m_mcAnalysis->calculateEfficiency(m_mcAnalysis->h1map_tagNprobe_candidates_eta,
+									  m_mcAnalysis->h1map_tagNprobe_succeeded_eta,
+									  m_mcAnalysis->h1map_tagNprobe_trigEff_eta, isTruth);
+	m_mcAnalysis->calculateEfficiency(m_mcAnalysis->h1map_tagNprobe_candidates_phi,
+									  m_mcAnalysis->h1map_tagNprobe_succeeded_phi,
+									  m_mcAnalysis->h1map_tagNprobe_trigEff_phi, isTruth);
+	isTruth = true;
+	m_mcAnalysis->calculateEfficiency(m_mcAnalysis->h1map_truth_candidates_pT,
+									  m_mcAnalysis->h1map_truth_succeeded_pT,
+									  m_mcAnalysis->h1map_truth_trigEff_pT, isTruth);
+	m_mcAnalysis->calculateEfficiency(m_mcAnalysis->h1map_truth_candidates_eta,
+									  m_mcAnalysis->h1map_truth_succeeded_eta,
+									  m_mcAnalysis->h1map_truth_trigEff_eta, isTruth);
+	m_mcAnalysis->calculateEfficiency(m_mcAnalysis->h1map_truth_candidates_phi,
+									  m_mcAnalysis->h1map_truth_succeeded_phi,
+									  m_mcAnalysis->h1map_truth_trigEff_phi, isTruth);
+	m_mcAnalysis->drawEfficiencyHistosMap(m_dirEff);
+	
 	cout << "nMultiMuonEvents = " << m_mcAnalysis->nMultiMuonEvents << endl;
 }
 

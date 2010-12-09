@@ -78,25 +78,6 @@ class graphicObjects// : public utilities
 		TH2D* h2_pTmevspTid;
 		TH2D* h2_pTmevspTid_muplus;
 		TH1D* h1_Afb;
-		TH1D* h1_tagNprobe_candidates_pT;
-		TH1D* h1_tagNprobe_succeeded_pT;
-		TH1D* h1_tagNprobe_efficiency_pT;
-		TH1D* h1_tagNprobe_candidates_eta;
-		TH1D* h1_tagNprobe_succeeded_eta;
-		TH1D* h1_tagNprobe_efficiency_eta;
-		TH1D* h1_tagNprobe_candidates_phi;
-		TH1D* h1_tagNprobe_succeeded_phi;
-		TH1D* h1_tagNprobe_efficiency_phi;
-		TH1D* h1_truth_candidates_pT;
-		TH1D* h1_truth_succeeded_pT;
-		TH1D* h1_truth_efficiency_pT;
-		TH1D* h1_truth_candidates_eta;
-		TH1D* h1_truth_succeeded_eta;
-		TH1D* h1_truth_efficiency_eta;
-		TH1D* h1_truth_candidates_phi;
-		TH1D* h1_truth_succeeded_phi;
-		TH1D* h1_truth_efficiency_phi;
-	
 		
 		// For the graphs
 		Int_t nentries;
@@ -124,12 +105,32 @@ class graphicObjects// : public utilities
 		TMapSP2TH1D* hmap_cutFlow_imass;
 		TMapSP2TH1D* hmap_cutFlow_pT;
 		
+		TMapSP2TH1D* h1map_tagNprobe_candidates_pT;
+		TMapSP2TH1D* h1map_tagNprobe_succeeded_pT;
+		TMapSP2TH1D* h1map_tagNprobe_trigEff_pT;
+		TMapSP2TH1D* h1map_tagNprobe_candidates_eta;
+		TMapSP2TH1D* h1map_tagNprobe_succeeded_eta;
+		TMapSP2TH1D* h1map_tagNprobe_trigEff_eta;
+		TMapSP2TH1D* h1map_tagNprobe_candidates_phi;
+		TMapSP2TH1D* h1map_tagNprobe_succeeded_phi;
+		TMapSP2TH1D* h1map_tagNprobe_trigEff_phi;
+		
+		TMapSP2TH1D* h1map_truth_candidates_pT;
+		TMapSP2TH1D* h1map_truth_succeeded_pT;
+		TMapSP2TH1D* h1map_truth_trigEff_pT;
+		TMapSP2TH1D* h1map_truth_candidates_eta;
+		TMapSP2TH1D* h1map_truth_succeeded_eta;
+		TMapSP2TH1D* h1map_truth_trigEff_eta;
+		TMapSP2TH1D* h1map_truth_candidates_phi;
+		TMapSP2TH1D* h1map_truth_succeeded_phi;
+		TMapSP2TH1D* h1map_truth_trigEff_phi;
+		
 		// map of canvases
 		TMapSP2TCNV* cmap_cutProfile;
 		
 		// map of cutFlow
 		TMapsvd* cut_cutFlowMapSVD;
-
+		
 		// for the canvases
 		Int_t    canv_x;
 		Int_t    canv_y;
@@ -245,6 +246,9 @@ class graphicObjects// : public utilities
 
 		void bookBareHistos(TDirectory* tdir);
 		void drawBareHistos(TDirectory* tdir);
+		
+		void bookEfficiencyHistos(TMapss* period2triggerperiodMap, TDirectory* tdir);
+		void drawEfficiencyHistosMap(TDirectory* tdir);
 
 		void bookHistos(TDirectory* tdir);
 		void drawHistos(TDirectory* tdir);

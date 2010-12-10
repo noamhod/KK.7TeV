@@ -212,7 +212,6 @@ void offlineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		if(l64t_jentry%1000==0)
 		{
 			gSystem->GetProcInfo(&pi);
-			//cout << "RES Mem=" << pi.fMemResident << " VIRT Mem=" << pi.fMemVirtual << endl;
 			vResMemory.push_back((double)pi.fMemResident);
 			vVirMemory.push_back((double)pi.fMemVirtual);
 			vEntries.push_back((int)l64t_jentry);
@@ -267,17 +266,25 @@ void offlineControl::loop(int runNumber)
 		
 		if(l64t_jentry%100000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_offPhys->RunNumber << "\tlumiblock=" << m_offPhys->lbn << endl;
 		
-		if(m_offPhys->RunNumber < runNumber) continue;
-		if(m_offPhys->RunNumber > runNumber) break;
+		//////////////////////////////////////////////////////
+		if(m_offPhys->RunNumber < runNumber) continue; ///////
+		if(m_offPhys->RunNumber > runNumber) break; //////////
+		//////////////////////////////////////////////////////
 		
 		if(l64t_jentry%l64t_mod==0) m_offlineAnalysis->printCutFlowNumbers(l64t_nentries);
+		
+		if(l64t_jentry%1000==0)
+		{
+			gSystem->GetProcInfo(&pi);
+			vResMemory.push_back((double)pi.fMemResident);
+			vVirMemory.push_back((double)pi.fMemVirtual);
+			vEntries.push_back((int)l64t_jentry);
+		}
 		
 		analyze();
 	}
 	
 	fits();
-	
-	
 	
 	draw();
 	
@@ -287,7 +294,79 @@ void offlineControl::loop(int runNumber)
 }
 
 
+void offlineControl::loop(string sPeriodStart, string sPeriodEnd)
+{
+	if (m_offPhys->fChain == 0)  return;
 
+	l64t_nentries = m_offPhys->fChain->GetEntriesFast();
+	l64t_nbytes = 0;
+	l64t_nb = 0;
+
+	l64t_mod = 100000;
+
+	int firstRunInRange = 0;
+	int lastRunInRange  = 0;
+	for(TMapis::iterator it=m_offlineAnalysis->m_firstrun2periodMap->begin() ; it!=m_offlineAnalysis->m_firstrun2periodMap->end() ; it++)
+	{
+		if(it->second==sPeriodStart)
+		{
+			firstRunInRange = it->first;
+			cout << "start loop in run# = " << firstRunInRange << endl;
+			break;
+		}
+	}
+	for(TMapis::iterator it=m_offlineAnalysis->m_lastrun2periodMap->begin() ; it!=m_offlineAnalysis->m_lastrun2periodMap->end() ; it++)
+	{
+		if(it->second==sPeriodEnd)
+		{
+			lastRunInRange = it->first;
+			cout << "end loop in run# = " << lastRunInRange << endl;
+			break;
+		}
+	}
+	if(lastRunInRange==0 || firstRunInRange==0)
+	{
+		cout << "ERROR in offlineControl::loop(string sPeriodName): didn't find period with name = " << lastRunInRange << " or " << firstRunInRange << endl;
+		cout << "exitting now" << endl;
+		exit(-1);
+	}
+	
+	for (l64t_jentry=0 ; l64t_jentry<l64t_nentries ; l64t_jentry++)
+	{
+		l64t_ientry = m_offPhys->LoadTree(l64t_jentry);
+		if (l64t_ientry < 0) break;
+		l64t_nb = m_offPhys->fChain->GetEntry(l64t_jentry);
+		l64t_nbytes += l64t_nb;
+		// if (Cut(l64t_ientry) < 0) continue;
+		
+		if(l64t_jentry%100000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_offPhys->RunNumber << "\tlumiblock=" << m_offPhys->lbn << endl;
+		
+		////////////////////////////////////////////////////////////
+		if(m_offPhys->RunNumber < firstRunInRange) continue; ///////
+		if(m_offPhys->RunNumber > lastRunInRange)  break; //////////
+		////////////////////////////////////////////////////////////
+		
+		if(l64t_jentry%l64t_mod==0) m_offlineAnalysis->printCutFlowNumbers(l64t_nentries);
+		
+		if(l64t_jentry%1000==0)
+		{
+			gSystem->GetProcInfo(&pi);
+			vResMemory.push_back((double)pi.fMemResident);
+			vVirMemory.push_back((double)pi.fMemVirtual);
+			vEntries.push_back((int)l64t_jentry);
+		}
+		
+		analyze();
+	}
+	
+	fits();
+	
+	draw();
+	
+	//finalize();
+	
+	stopTimer(true);
+}
 
 
 

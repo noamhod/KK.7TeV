@@ -394,13 +394,18 @@ void analysisSkeleton::fillAfterCuts()
 	h2_pTmevspTid->Fill( pT(mu_me_qoverp->at(muMinus),mu_me_theta->at(muMinus))*MeV2TeV, pT(mu_id_qoverp->at(muMinus),mu_id_theta->at(muMinus))*MeV2TeV );
 	h2_pTmevspTid_muplus->Fill( pT(mu_me_qoverp->at(muPlus),mu_me_theta->at(muPlus))*MeV2TeV, pT(mu_id_qoverp->at(muPlus),mu_id_theta->at(muPlus))*MeV2TeV );
 	
+	//////////////////////////////////////////////////
+	// for the Afb calculation ///////////////////////
+	fillAfbMap(current_imass,current_cosTheta); //////
+	//////////////////////////////////////////////////
+	
+	// fill the xVector for the ML fit:
+	fillXvec( current_imass );
+	
 	//cout << "\n$$$$$$$$$ dimuon $$$$$$$$$" << endl;
 	//cout << "\t im=" << current_imass << endl;
 	//cout << "\t pTmu=" << current_mu_pT  << endl;
 	//cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << endl;
-	
-	// fill the xVector for the ML fit:
-	fillXvec( current_imass );
 }
 
 void analysisSkeleton::fillBeforeCuts()
@@ -451,11 +456,6 @@ void analysisSkeleton::fillCutFlow(string sorderedcutname, string sIsPreselectio
 		current_imass    = imass(pmu[muMinus],pmu[muPlus]);
 		current_mu_pT    = pT(mu_me_qoverp->at(muMinus),mu_me_theta->at(muMinus))*MeV2TeV;
 		current_cosTheta = cosThetaCollinsSoper( pmu[muMinus], -1, pmu[muPlus], +1 );
-		
-		//////////////////////////////////////////////////
-		// for the Afb calculation ///////////////////////
-		fillAfbMap(current_imass,current_cosTheta); //////
-		//////////////////////////////////////////////////
 		
 		///////////////////////////////////////////////////////////////////////
 		// these values go in the cutFlow histograms //////////////////////////

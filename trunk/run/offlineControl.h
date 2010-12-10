@@ -73,7 +73,7 @@ class offlineControl : public offlineChains, public utilities
 		void analyze();
 		void loop(Long64_t startEvent = 0, Long64_t stopAfterNevents = kMaxLong64);
 		void loop(int runNumber);
-		void loop(string sPeriodStart, string sPeriodEnd);
+		void loop(string sPeriodStart, string sPeriodEnd, Long64_t l64t_initialGuess);
 		
 		void getCandidates(string sFilePath);
 		bool matchCandidates();

@@ -294,7 +294,7 @@ void offlineControl::loop(int runNumber)
 }
 
 
-void offlineControl::loop(string sPeriodStart, string sPeriodEnd)
+void offlineControl::loop(string sPeriodStart, string sPeriodEnd, Long64_t l64t_initialGuess)
 {
 	if (m_offPhys->fChain == 0)  return;
 
@@ -331,7 +331,44 @@ void offlineControl::loop(string sPeriodStart, string sPeriodEnd)
 		exit(-1);
 	}
 	
-	for (l64t_jentry=0 ; l64t_jentry<l64t_nentries ; l64t_jentry++)
+	// bisection
+	Long64_t l64t_a = 0;
+	//Long64_t l64t_b = l64t_nentries;
+	Long64_t l64t_b = l64t_initialGuess; //190000000 initial guess (should be bigger than firstRunInRange)
+	Long64_t l64t_jmid = 0;
+	Long64_t l64t_imid = 0;
+	int run = 0;
+	int iterations = 0;
+	cout << "iteration[" << iterations << "] : run=" << run << ", a=" << l64t_a << ", b=" << l64t_b << ", mid=" << l64t_jmid << endl;
+	while(run!=firstRunInRange)
+	{
+		iterations++;
+		l64t_jmid = l64t_a + (Long64_t)((long double)(l64t_b-l64t_a)/2.);
+		l64t_imid = m_offPhys->LoadTree(l64t_jmid);
+		m_offPhys->fChain->GetEntry(l64t_jmid);
+		run = m_offPhys->RunNumber;
+		cout << "iteration[" << iterations << "] : run=" << run << ", a=" << l64t_a << ", b=" << l64t_b << ", mid=" << l64t_jmid << endl;
+		if(run<firstRunInRange) l64t_a = l64t_jmid;
+		if(run>firstRunInRange) l64t_b = l64t_jmid;
+		if(run==firstRunInRange) {cout << "found first run in range=" << firstRunInRange << endl; break;}
+		if(l64t_a==l64t_b || (l64t_b-l64t_a)==1) {cout << "l64t_a==l64t_b || (l64t_b-l64t_a)==1, exitting now" << endl; exit(-1);}
+	}
+	// now go back to the first file in the firstRunInRange
+	cout << "looking for first event in run " << firstRunInRange << endl;
+	while(run==firstRunInRange)
+	{
+		l64t_imid = m_offPhys->LoadTree(l64t_jmid);
+		m_offPhys->fChain->GetEntry(l64t_jmid);
+		run = m_offPhys->RunNumber;
+		if(run!=firstRunInRange)
+		{
+			l64t_jmid++;
+			break;
+		}
+		l64t_jmid--;
+	}
+	
+	for (l64t_jentry=l64t_jmid ; l64t_jentry<l64t_nentries ; l64t_jentry++)
 	{
 		l64t_ientry = m_offPhys->LoadTree(l64t_jentry);
 		if (l64t_ientry < 0) break;

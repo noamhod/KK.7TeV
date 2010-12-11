@@ -43,7 +43,7 @@ void offlineAnalysis::executeAdvanced()
 
 void offlineAnalysis::executeCutFlow()
 {
-	sMuonRecoAlgo = "staco";
+	sMuonRecoAlgo = "muid";
 	
 	///////////////////////////////////
 	// set all the event-level vars ///

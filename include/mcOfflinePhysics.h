@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Thu Nov 25 17:45:55 2010 by ROOT version 5.26/00
+// Sun Dec 12 14:12:45 2010 by ROOT version 5.27/06
 // from TTree offline/offline
-// found on file: mcWZphys.root
+// found on file: user.hod.003311._00001.mcWZphys.root
 //////////////////////////////////////////////////////////
 
 #ifndef mcOfflinePhysics_h
@@ -986,9 +986,9 @@ mcOfflinePhysics::mcOfflinePhysics(TTree *tree)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("mcWZphys.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("user.hod.003311._00001.mcWZphys.root");
       if (!f) {
-         f = new TFile("mcWZphys.root");
+         f = new TFile("user.hod.003311._00001.mcWZphys.root");
       }
       tree = (TTree*)gDirectory->Get("offline");
 

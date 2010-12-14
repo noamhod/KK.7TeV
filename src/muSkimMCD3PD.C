@@ -180,6 +180,7 @@ void muSkimMCD3PD::setBranchesMC()
 	m_tree->Branch( "muonTruth_phi",    &muonTruth_phi );
 	m_tree->Branch( "muonTruth_charge", &muonTruth_charge );
 	m_tree->Branch( "muonTruth_PDGID",  &muonTruth_PDGID );
+	m_tree->Branch( "muonTruth_barcode",&muonTruth_barcode );
 	m_tree->Branch( "muonTruth_type",   &muonTruth_type );
 	m_tree->Branch( "muonTruth_origin", &muonTruth_origin );
 	
@@ -254,6 +255,7 @@ void muSkimMCD3PD::fillMC()
 		muonTruth_phi->push_back( m_mcOffPhys->muonTruth_phi->at(i) );
 		muonTruth_charge->push_back( m_mcOffPhys->muonTruth_charge->at(i) );
 		muonTruth_PDGID->push_back( m_mcOffPhys->muonTruth_PDGID->at(i) );
+		//muonTruth_barcode->push_back( m_mcOffPhys->muonTruth_barcode->at(i) );
 		muonTruth_type->push_back( m_mcOffPhys->muonTruth_type->at(i) );
 		muonTruth_origin->push_back( m_mcOffPhys->muonTruth_origin->at(i) );
 	}

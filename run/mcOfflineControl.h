@@ -32,6 +32,7 @@ class mcOfflineControl : public offlineChains, public utilities
 		TDirectory* 	m_dirFit;
 		TDirectory* 	m_dirPerformance;
 		TDirectory* 	m_dirAfb;
+		TDirectory* 	m_dirEff;
 
 		// run control
 		Long64_t l64t_nentries;

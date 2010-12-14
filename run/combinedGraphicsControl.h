@@ -23,7 +23,7 @@ class combinedGraphicsControl : public utilities
 	public:
 		combinedGraphicsControl();
 		~combinedGraphicsControl();
-		void initialize(string sAnalysisSelector);
+		void initialize(string sAnalysisSelector, string muonSelector);
 		void finalize();
 		void execute();
 

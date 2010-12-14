@@ -20,18 +20,18 @@ class combinedGraphics : public analysisModules
 	
 		// integrated luminosity of the data in 1/pb
 		TMapsd period2lumiMap;
+		
+		TMapsd mcProc2sigma;
+		TMapsd mcProc2br;
+		TMapsd mcProc2kfactor;
+		TMapsd mcProc2geneff;
+		TMapsi mcProc2nevents;
+		
 		double dataLumi_ipb;
+		string m_muonSelector;
 		string m_dataAnalysisSelector;
 		string m_mcAnalysisSelector;
 	
-	/*
-		// cutFlowHandler
-		cutFlowHandler* m_cutFlowHandler;
-		TMapsvd* m_cutFlowMapSVD;
-		TMapds*  m_cutFlowOrdered;
-		TMapds*  m_cutFlowTypeOrdered;
-		TMapsi*  m_cutFlowNumbers;
-	*/	
 		// map of histos
 		TMapSP2TH1D* hmap_cutFlow_imass;
 		TMapSP2TH1D* hmap_cutFlow_pT;
@@ -72,6 +72,8 @@ class combinedGraphics : public analysisModules
 		double m_crossSection_pb;
 		double m_branchingRatio;
 		double m_nMCevents;
+		double m_kFactor;
+		double m_genEff;
 		double m_dataLumi_pb;
 		
 		// histos
@@ -87,6 +89,8 @@ class combinedGraphics : public analysisModules
 		TH1D* hDYmumu;
 		TH1D* hDYtautau;
 		TH1D* hWW;
+		TH1D* hWZ;
+		TH1D* hZZ;
 		TH1D* hZprime_mumu_SSM1000;
 		TH1D* hZprime_mumu_SSM1250;
 		TH1D* hZprime_mumu_SSM1500;
@@ -106,14 +110,19 @@ class combinedGraphics : public analysisModules
 	
 	public:
 		combinedGraphics();
-		combinedGraphics( string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath, string sAnalysisSelector, TFile* hfile) :
+		combinedGraphics(string sCutFlowFilePath,
+						 string sPeriodsFilePath,
+						 string sEventDumpFilePath,
+						 string sAnalysisSelector,
+						 string muonSelector,
+						 TFile* hfile) :
 		analysisModules(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
 		{
 			hFile = hfile;
-			initialize(sAnalysisSelector);
+			initialize(sAnalysisSelector, muonSelector);
 		}
 		~combinedGraphics();
-		void initialize(string analysisSelector);
+		void initialize(string analysisSelector, string muonSelector);
 		
 		TCanvas* getCanvas(TFile* f, string dir, string cname);
 		TH1D*    getHisto(TFile* f, string dir, string hname);
@@ -123,22 +132,28 @@ class combinedGraphics : public analysisModules
 		double IntegralOverFlow(TH1D* h);
 		void Scale(TH1D* h, double d);
 		void Norm(TH1D* h);
-		void NormToDataLumi(TH1D* h, double crossSection_pb, double branchingRatio, double nMCevents, double dataLumi_pb);
-		void setNormVals(double crossSection_pb, double branchingRatio, double nMCevents, double dataLumi_pb);
+		void NormToDataLumi(TH1D* h,
+							double crossSection_pb,
+							double branchingRatio,
+							double nMCevents,
+							double kFactor,
+							double genEff,
+							double dataLumi_pb);
+		void setNormVals(double crossSection_pb,
+						 double branchingRatio,
+						 double nMCevents,
+						 double kFactor,
+						 double genEff,
+						 double dataLumi_pb);
 		
 		void relDiff(TH1D* hInp, TH1D* hRef, TH1D* hRelDiffPos, TH1D* hRelDiffNeg);
 		void ratio(double xmin, double xmax, TH1D* hInp, TH1D* hRef, TH1D* hRat, TH1D* hRatUp, TH1D* hRatDwn);
 		void drawRatio(double xmin, double xmax, TH1D* hRat);
 		void drawRatioWithBand(double xmin, double xmax, TH1D* hRat, TH1D* hRatUp, TH1D* hRatDwn);
 		
-		void getHistosMap(TFile* f, string dir, TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered);
-		void drawNormHistosMap(string channel, TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered);
-		
 		TH1D* getNormDYmumu(string sHistName);
 		TH1D* getNormDYtautau(string sHistName);
 		
-		void drawMCcutFlow();
-		void drawDataCutFlow();
 		void drawimass();
 		void drawpT();
 	

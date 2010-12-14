@@ -9,8 +9,10 @@
 #   run type
 mcordata=$1
 if [ "$mcordata" = "mc" ] ; then
+   echo ""
    echo "MC run"
 elif [ "$mcordata" = "data" ] ; then
+   echo ""
    echo "DATA run"
 else
    exit

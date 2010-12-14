@@ -65,7 +65,7 @@ atlasStyle->SetTitleSize(tsize,"z");
 
 //use bold lines and markers
 atlasStyle->SetMarkerStyle(20);
-atlasStyle->SetMarkerSize(1); //1.2
+atlasStyle->SetMarkerSize(0.9); //1 //1.2
 atlasStyle->SetHistLineWidth(1.5);
 atlasStyle->SetLineStyleString(2,"[12 12]"); // postscript dashes
 

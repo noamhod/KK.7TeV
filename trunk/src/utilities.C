@@ -139,6 +139,17 @@ string utilities::pickMCinputSampe()
 	mcSamplesMap.insert( make_pair( 503,"Zprime_mumu_SSM1750" ) );
 	mcSamplesMap.insert( make_pair( 504,"Zprime_mumu_SSM2000" ) );
 	
+	mcSamplesMap.insert( make_pair( 600,"WW_Herwig" ) );
+	mcSamplesMap.insert( make_pair( 601,"WZ_Herwig" ) );
+	mcSamplesMap.insert( make_pair( 602,"ZZ_Herwig" ) );
+	
+	mcSamplesMap.insert( make_pair( 700,"T1_McAtNlo_Jimmy" ) );
+	
+	mcSamplesMap.insert( make_pair( 800,"TTbar_McAtNlo_Jimmy_2mu15_30M150" ) );
+	mcSamplesMap.insert( make_pair( 801,"TTbar_McAtNlo_Jimmy_2mu15_150M300" ) );
+	mcSamplesMap.insert( make_pair( 802,"TTbar_McAtNlo_Jimmy_2mu15_300M450" ) );
+	mcSamplesMap.insert( make_pair( 803,"TTbar_McAtNlo_Jimmy_2mu15_M450" ) );
+	
 	
 	cout << "PICK AN MC CHANNEL FORM THE LIST:" << endl;
 	for(TMapis::iterator it=mcSamplesMap.begin() ; it!=mcSamplesMap.end() ; it++)

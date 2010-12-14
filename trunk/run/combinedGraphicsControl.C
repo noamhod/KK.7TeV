@@ -18,7 +18,7 @@ combinedGraphicsControl::~combinedGraphicsControl()
 	
 }
 
-void combinedGraphicsControl::initialize(string sAnalysisSelector)
+void combinedGraphicsControl::initialize(string sAnalysisSelector, string muonSelector)
 {
 	string str = "";
 	
@@ -30,7 +30,7 @@ void combinedGraphicsControl::initialize(string sAnalysisSelector)
 	string sCutFlowFilePath  = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
 	string sPeriodsFilePath  = checkANDsetFilepath("PWD", "/../conf/dataPeriods.data");
 	
-	m_combinedGraphics = new combinedGraphics(sCutFlowFilePath, sPeriodsFilePath, "", sAnalysisSelector, m_histfile);
+	m_combinedGraphics = new combinedGraphics(sCutFlowFilePath, sPeriodsFilePath, "", sAnalysisSelector, muonSelector, m_histfile);
 }
 
 void  combinedGraphicsControl::finalize()
@@ -43,6 +43,4 @@ void combinedGraphicsControl::execute()
 {
 	m_combinedGraphics->drawimass();
 	m_combinedGraphics->drawpT();
-	m_combinedGraphics->drawMCcutFlow();
-	m_combinedGraphics->drawDataCutFlow();
 }

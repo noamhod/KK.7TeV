@@ -50,7 +50,7 @@
  source panda_run.sh   mc   105349   group10.phys-sm.mc09_7TeV.105349.Pythia_Zprime_mumu_SSM2000.merge.AOD.e524_s765_s767_r1302_r1306.WZphys.100612.01.D3PD
 
  
-# di-boson WW / ZZ / WZ
+# di-boson WW / ZZ / WZ FROM WZ PAGE
  source panda_run.sh   mc   107100   group10.phys-sm.mc09_7TeV.107100.AlpgenJimmyWWlnulnuNp0.merge.AOD.e536_s765_s767_r1302_r1306.WZphys.100612.02.D3PD
  source panda_run.sh   mc   107101   group10.phys-sm.mc09_7TeV.107101.AlpgenJimmyWWlnulnuNp1.merge.AOD.e536_s765_s767_r1302_r1306.WZphys.100612.02.D3PD
  source panda_run.sh   mc   107102   group10.phys-sm.mc09_7TeV.107102.AlpgenJimmyWWlnulnuNp2.merge.AOD.e536_s765_s767_r1302_r1306.WZphys.100612.02.D3PD
@@ -80,3 +80,20 @@
  source panda_run.sh   mc   107109   group10.phys-sm.mc09_7TeV.107109.AlpgenJimmyZZincllNp1.merge.AOD.e536_s765_s767_r1302_r1306.WZphys.100612.06.D3PD
  source panda_run.sh   mc   107110   group10.phys-sm.mc09_7TeV.107110.AlpgenJimmyZZincllNp2.merge.AOD.e536_s765_s767_r1302_r1306.WZphys.100612.06.D3PD
  source panda_run.sh   mc   107111   group10.phys-sm.mc09_7TeV.107111.AlpgenJimmyZZincllNp3.merge.AOD.e536_s765_s767_r1302_r1306.WZphys.100612.06.D3PD
+
+
+# di-boson WW / ZZ / WZ FROM EXOTICS PAGE 
+ source panda_run.sh   mc   105985   group09.phys-exotics.mc09_7TeV.105985.WW_Herwig.merge.AOD.e521_s765_s767_r1430_r1429.100612.01.101123_D3PD
+ source panda_run.sh   mc   105986   group09.phys-exotics.mc09_7TeV.105986.ZZ_Herwig.merge.AOD.e521_s765_s767_r1430_r1429.100612.01.101123_D3PD
+ source panda_run.sh   mc   105987   group09.phys-exotics.mc09_7TeV.105987.WZ_Herwig.merge.AOD.e521_s765_s767_r1430_r1429.100612.01.101123_D3PD
+
+
+# TTbar->mumu 15GeV FROM EXOTICS PAGE
+ source panda_run.sh   mc   115374   group09.phys-exotics.mc09_7TeV.115374.TTbar_McAtNlo_Jimmy_2mu15_30M150.merge.AOD.e637_s765_s767_r1302_r1306.WZphys.100612.01.101119_D3PD
+ source panda_run.sh   mc   115375   group09.phys-exotics.mc09_7TeV.115375.TTbar_McAtNlo_Jimmy_2mu15_150M300.merge.AOD.e637_s765_s767_r1302_r1306.WZphys.100612.01.101119_D3PD
+ source panda_run.sh   mc   115376   group09.phys-exotics.mc09_7TeV.115376.TTbar_McAtNlo_Jimmy_2mu15_300M450.merge.AOD.e637_s765_s767_r1302_r1306.WZphys.100612.01.101119_D3PD
+ source panda_run.sh   mc   115377   group09.phys-exotics.mc09_7TeV.115377.TTbar_McAtNlo_Jimmy_2mu15_M450.merge.AOD.e637_s765_s767_r1302_r1306.WZphys.100612.01.101119_D3PD
+
+
+# TTbar with pileup
+ source panda_run.sh   mc   105200   group10.phys-sm.mc09_7TeV.105200.T1_McAtNlo_Jimmy.merge.AOD.e510_s765_s767_r1430_r1429.WZphys.100612.23.D3PD/

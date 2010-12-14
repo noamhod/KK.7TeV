@@ -58,12 +58,6 @@ void mcOfflineControl::initialize()
 	l64t_nb       = 0;
 	l64t_jentry   = 0;
 	l64t_ientry   = 0;
-
-	// pointers
-	m_mcOffPhys     = NULL;
-	m_mcOfflineAnalysis = NULL;
-	m_histfile = NULL;
-	m_treefile = NULL;
 }
 
 void mcOfflineControl::finalize()
@@ -104,6 +98,9 @@ void mcOfflineControl::book()
 	m_dirPerformance = m_histfile->mkdir("performance");
 	
 	m_dirAfb = m_histfile->mkdir("Afb");
+	
+	m_dirEff = m_histfile->mkdir("efficiency");
+	m_mcOfflineAnalysis->bookEfficiencyHistos(m_mcOfflineAnalysis->m_period2triggerperiodMap, m_dirEff);
 }
 
 void mcOfflineControl::draw()
@@ -111,15 +108,6 @@ void mcOfflineControl::draw()
 	m_mcOfflineAnalysis->drawBareHistos(m_dirNoCuts);
 
 	// these calculations must come before drawHistos
-	bool isTruth = false;
-	m_mcOfflineAnalysis->calculateEfficiency(m_mcOfflineAnalysis->h1_tagNprobe_candidates_pT, m_mcOfflineAnalysis->h1_tagNprobe_succeeded_pT, m_mcOfflineAnalysis->h1_tagNprobe_efficiency_pT, isTruth);
-	m_mcOfflineAnalysis->calculateEfficiency(m_mcOfflineAnalysis->h1_tagNprobe_candidates_eta, m_mcOfflineAnalysis->h1_tagNprobe_succeeded_eta, m_mcOfflineAnalysis->h1_tagNprobe_efficiency_eta, isTruth);
-	m_mcOfflineAnalysis->calculateEfficiency(m_mcOfflineAnalysis->h1_tagNprobe_candidates_phi, m_mcOfflineAnalysis->h1_tagNprobe_succeeded_phi, m_mcOfflineAnalysis->h1_tagNprobe_efficiency_phi, isTruth);
-	isTruth = true;
-	m_mcOfflineAnalysis->calculateEfficiency(m_mcOfflineAnalysis->h1_truth_candidates_pT, m_mcOfflineAnalysis->h1_truth_succeeded_pT, m_mcOfflineAnalysis->h1_truth_efficiency_pT, isTruth);
-	m_mcOfflineAnalysis->calculateEfficiency(m_mcOfflineAnalysis->h1_truth_candidates_eta, m_mcOfflineAnalysis->h1_truth_succeeded_eta, m_mcOfflineAnalysis->h1_truth_efficiency_eta, isTruth);
-	m_mcOfflineAnalysis->calculateEfficiency(m_mcOfflineAnalysis->h1_truth_candidates_phi, m_mcOfflineAnalysis->h1_truth_succeeded_phi, m_mcOfflineAnalysis->h1_truth_efficiency_phi, isTruth);
-	
 	m_mcOfflineAnalysis->calculateAfb(m_mcOfflineAnalysis->h1_Afb, m_dirAfb);
 	
 	m_mcOfflineAnalysis->drawHistos(m_dirAllCuts);
@@ -131,6 +119,28 @@ void mcOfflineControl::draw()
 
 	m_mcOfflineAnalysis->drawCutProfileHistosMap( m_dirCutProfile );
 
+	bool isTruth = false;
+	m_mcOfflineAnalysis->calculateEfficiency(m_mcOfflineAnalysis->h1map_tagNprobe_candidates_pT,
+											 m_mcOfflineAnalysis->h1map_tagNprobe_succeeded_pT,
+											 m_mcOfflineAnalysis->h1map_tagNprobe_trigEff_pT, isTruth);
+	m_mcOfflineAnalysis->calculateEfficiency(m_mcOfflineAnalysis->h1map_tagNprobe_candidates_eta,
+											 m_mcOfflineAnalysis->h1map_tagNprobe_succeeded_eta,
+											 m_mcOfflineAnalysis->h1map_tagNprobe_trigEff_eta, isTruth);
+	m_mcOfflineAnalysis->calculateEfficiency(m_mcOfflineAnalysis->h1map_tagNprobe_candidates_phi,
+											 m_mcOfflineAnalysis->h1map_tagNprobe_succeeded_phi,
+											 m_mcOfflineAnalysis->h1map_tagNprobe_trigEff_phi, isTruth);
+	isTruth = true;
+	m_mcOfflineAnalysis->calculateEfficiency(m_mcOfflineAnalysis->h1map_truth_candidates_pT,
+											 m_mcOfflineAnalysis->h1map_truth_succeeded_pT,
+											 m_mcOfflineAnalysis->h1map_truth_trigEff_pT, isTruth);
+	m_mcOfflineAnalysis->calculateEfficiency(m_mcOfflineAnalysis->h1map_truth_candidates_eta,
+											 m_mcOfflineAnalysis->h1map_truth_succeeded_eta,
+											 m_mcOfflineAnalysis->h1map_truth_trigEff_eta, isTruth);
+	m_mcOfflineAnalysis->calculateEfficiency(m_mcOfflineAnalysis->h1map_truth_candidates_phi,
+											 m_mcOfflineAnalysis->h1map_truth_succeeded_phi,
+											 m_mcOfflineAnalysis->h1map_truth_trigEff_phi, isTruth);
+	m_mcOfflineAnalysis->drawEfficiencyHistosMap(m_dirEff);
+	
 	m_mcOfflineAnalysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
 
 	m_mcOfflineAnalysis->printCutFlowNumbers(l64t_nentries);
@@ -195,7 +205,7 @@ void mcOfflineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	
 	draw();
 	
-	//finalize();
+	finalize();
 	
 	stopTimer(true);
 }

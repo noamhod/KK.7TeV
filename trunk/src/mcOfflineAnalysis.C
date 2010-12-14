@@ -42,7 +42,7 @@ void mcOfflineAnalysis::executeAdvanced()
 
 void mcOfflineAnalysis::executeCutFlow()
 {
-	sMuonRecoAlgo = "staco";
+	sMuonRecoAlgo = "muid";
 
 	///////////////////////////////////
 	// set all the event-level vars ///
@@ -86,6 +86,7 @@ void mcOfflineAnalysis::executeCutFlow()
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// write to the digest tree only the pairs that pass skim ///////////////////////////////
 	//m_muSkimD3PD->doSkimD3PD(); // will set a flag in muSkimD3PD class if pass the skim /// NO NEED TO SKIM ON MC
+	m_muSkimD3PD->doSkim = true; // EVERYTHING PASSES /////////////////////////////////////// NO NEED TO SKIM ON MC
 	m_muSkimMCD3PD->fillMC();   // this does *not* call TTree::Fill() ///////////////////////
 	m_muSkimD3PD->fill(analysisSkeleton::isGRL); ////////////////////////////////////////////
 	m_muSkimMCD3PD->resetVectorPtrsMC(); // in muSkimD3PD this is done internally ///////////
@@ -203,7 +204,7 @@ void mcOfflineAnalysis::setEventVariables()
 	analysisSkeleton::as_muonTruth_phi = m_mcOffPhys->muonTruth_phi;
 	analysisSkeleton::as_muonTruth_charge = m_mcOffPhys->muonTruth_charge;
 	analysisSkeleton::as_muonTruth_PDGID = m_mcOffPhys->muonTruth_PDGID;
-	analysisSkeleton::as_muonTruth_barcode = m_mcOffPhys->muonTruth_barcode;
+	//analysisSkeleton::as_muonTruth_barcode = m_mcOffPhys->muonTruth_barcode;
 	analysisSkeleton::as_muonTruth_type = m_mcOffPhys->muonTruth_type;
 	analysisSkeleton::as_muonTruth_origin = m_mcOffPhys->muonTruth_origin;
 	

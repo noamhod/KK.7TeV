@@ -239,7 +239,7 @@ void offlineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	
 	draw();
 	
-	//finalize();
+	finalize();
 	
 	stopTimer(true);
 	
@@ -288,7 +288,7 @@ void offlineControl::loop(int runNumber)
 	
 	draw();
 	
-	//finalize();
+	finalize();
 	
 	stopTimer(true);
 }
@@ -400,7 +400,7 @@ void offlineControl::loop(string sPeriodStart, string sPeriodEnd, Long64_t l64t_
 	
 	draw();
 	
-	//finalize();
+	finalize();
 	
 	stopTimer(true);
 }

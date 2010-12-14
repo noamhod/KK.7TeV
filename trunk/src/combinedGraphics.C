@@ -17,8 +17,10 @@ combinedGraphics::~combinedGraphics()
 
 }
 
-void combinedGraphics::initialize(string analysisSelector)
+void combinedGraphics::initialize(string analysisSelector, string muonSelector)
 {
+	m_muonSelector = muonSelector + "/";
+
 	m_mcAnalysisSelector   = (analysisSelector=="digest") ? "mcDigest" : "mcOffline";
 	m_dataAnalysisSelector = (analysisSelector=="digest") ? "digest"   : "offline";
 
@@ -36,8 +38,23 @@ void combinedGraphics::initialize(string analysisSelector)
 	leg_y1 = 0.376;
 	leg_y2 = 0.922;
 	
-	//vcolors = new vector<Color_t>;
-	//vcolors->push_back();
+	
+	// see: http://www-cdf.fnal.gov/~bernd/rootcolors.png
+	vcolors = new vector<Color_t>;
+	vcolors->push_back(61);
+	vcolors->push_back(46);
+	vcolors->push_back(8);
+	vcolors->push_back(98);
+	vcolors->push_back(28);
+	vcolors->push_back(51);
+	vcolors->push_back(94);
+	vcolors->push_back(226);
+	vcolors->push_back(150);
+	vcolors->push_back(49);
+	vcolors->push_back(14);
+	vcolors->push_back(109);
+	vcolors->push_back(199);
+	vcolors->push_back(207);
 	
 	/////////////////////////////////////////////////
 	// integrated luminosity of the data in 1/pb ////
@@ -69,6 +86,168 @@ void combinedGraphics::initialize(string analysisSelector)
 		//if(it->first == "I") continue; // skip period I for now !!!
 		dataLumi_ipb += it->second;
 	}
+	
+	//--- mc processes cross section values in pb
+	mcProc2sigma.insert(   make_pair("DYmumu_75M120",819.93));
+	mcProc2br.insert(      make_pair("DYmumu_75M120",1.));
+	mcProc2nevents.insert( make_pair("DYmumu_75M120",19994));
+	mcProc2geneff.insert(  make_pair("DYmumu_75M120",1.));
+	mcProc2kfactor.insert( make_pair("DYmumu_75M120",1.));
+	mcProc2sigma.insert(   make_pair("DYmumu_120M250",8.7158));
+	mcProc2br.insert(      make_pair("DYmumu_120M250",1.));
+	mcProc2nevents.insert( make_pair("DYmumu_120M250",19996));
+	mcProc2geneff.insert(  make_pair("DYmumu_120M250",1.));
+	mcProc2kfactor.insert( make_pair("DYmumu_120M250",1.));
+	mcProc2sigma.insert(   make_pair("DYmumu_250M400",0.41571));
+	mcProc2br.insert(      make_pair("DYmumu_250M400",1.));
+	mcProc2nevents.insert( make_pair("DYmumu_250M400",19997));
+	mcProc2geneff.insert(  make_pair("DYmumu_250M400",1.));
+	mcProc2kfactor.insert( make_pair("DYmumu_250M400",1.));
+	mcProc2sigma.insert(   make_pair("DYmumu_400M600",0.06724));
+	mcProc2br.insert(      make_pair("DYmumu_400M600",1.));
+	mcProc2nevents.insert( make_pair("DYmumu_400M600",19996));
+	mcProc2geneff.insert(  make_pair("DYmumu_400M600",1.));
+	mcProc2kfactor.insert( make_pair("DYmumu_400M600",1.));
+	mcProc2sigma.insert(   make_pair("DYmumu_600M800",0.01116));
+	mcProc2br.insert(      make_pair("DYmumu_600M800",1.));
+	mcProc2nevents.insert( make_pair("DYmumu_600M800",19993));
+	mcProc2geneff.insert(  make_pair("DYmumu_600M800",1.));
+	mcProc2kfactor.insert( make_pair("DYmumu_600M800",1.));
+	mcProc2sigma.insert(   make_pair("DYmumu_800M1000",0.0027437));
+	mcProc2br.insert(      make_pair("DYmumu_800M1000",1.));
+	mcProc2nevents.insert( make_pair("DYmumu_800M1000",19946));
+	mcProc2geneff.insert(  make_pair("DYmumu_800M1000",1.));
+	mcProc2kfactor.insert( make_pair("DYmumu_800M1000",1.));
+	mcProc2sigma.insert(   make_pair("DYmumu_1000M1250",0.00091775));
+	mcProc2br.insert(      make_pair("DYmumu_1000M1250",1.));
+	mcProc2nevents.insert( make_pair("DYmumu_1000M1250",19992));
+	mcProc2geneff.insert(  make_pair("DYmumu_1000M1250",1.));
+	mcProc2kfactor.insert( make_pair("DYmumu_1000M1250",1.));
+	mcProc2sigma.insert(   make_pair("DYmumu_1250M1500",0.00024866));
+	mcProc2br.insert(      make_pair("DYmumu_1250M1500",1.));
+	mcProc2nevents.insert( make_pair("DYmumu_1250M1500",19995));
+	mcProc2geneff.insert(  make_pair("DYmumu_1250M1500",1.));
+	mcProc2kfactor.insert( make_pair("DYmumu_1250M1500",1.));
+	mcProc2sigma.insert(   make_pair("DYmumu_1500M1750",0.00007659));
+	mcProc2br.insert(      make_pair("DYmumu_1500M1750",1.));
+	mcProc2nevents.insert( make_pair("DYmumu_1500M1750",19987));
+	mcProc2geneff.insert(  make_pair("DYmumu_1500M1750",1.));
+	mcProc2kfactor.insert( make_pair("DYmumu_1500M1750",1.));
+	mcProc2sigma.insert(   make_pair("DYmumu_1750M2000",0.000026361));
+	mcProc2br.insert(      make_pair("DYmumu_1750M2000",1.));
+	mcProc2nevents.insert( make_pair("DYmumu_1750M2000",19991));
+	mcProc2geneff.insert(  make_pair("DYmumu_1750M2000",1.));
+	mcProc2kfactor.insert( make_pair("DYmumu_1750M2000",1.));
+	mcProc2sigma.insert(   make_pair("DYmumu_M2000",0.000015325));
+	mcProc2br.insert(      make_pair("DYmumu_M2000",1.));
+	mcProc2nevents.insert( make_pair("DYmumu_M2000",19990));
+	mcProc2geneff.insert(  make_pair("DYmumu_M2000",1.));
+	mcProc2kfactor.insert( make_pair("DYmumu_M2000",1.));
+	
+	mcProc2sigma.insert(   make_pair("DYtautau_75M120",817.8));
+	mcProc2br.insert(      make_pair("DYtautau_75M120",1.));
+	mcProc2nevents.insert( make_pair("DYtautau_75M120",19998));
+	mcProc2geneff.insert(  make_pair("DYtautau_75M120",1.));
+	mcProc2kfactor.insert( make_pair("DYtautau_75M120",1.));
+	mcProc2sigma.insert(   make_pair("DYtautau_120M250",8.6608));
+	mcProc2br.insert(      make_pair("DYtautau_120M250",1.));
+	mcProc2nevents.insert( make_pair("DYtautau_120M250",19996));
+	mcProc2geneff.insert(  make_pair("DYtautau_120M250",1.));
+	mcProc2kfactor.insert( make_pair("DYtautau_120M250",1.));
+	mcProc2sigma.insert(   make_pair("DYtautau_250M400",0.41613));
+	mcProc2br.insert(      make_pair("DYtautau_250M400",1.));
+	mcProc2nevents.insert( make_pair("DYtautau_250M400",19994));
+	mcProc2geneff.insert(  make_pair("DYtautau_250M400",1.));
+	mcProc2kfactor.insert( make_pair("DYtautau_250M400",1.));
+	mcProc2sigma.insert(   make_pair("DYtautau_400M600",0.067269));
+	mcProc2br.insert(      make_pair("DYtautau_400M600",1.));
+	mcProc2nevents.insert( make_pair("DYtautau_400M600",19992));
+	mcProc2geneff.insert(  make_pair("DYtautau_400M600",1.));
+	mcProc2kfactor.insert( make_pair("DYtautau_400M600",1.));
+	mcProc2sigma.insert(   make_pair("DYtautau_600M800",0.01116));
+	mcProc2br.insert(      make_pair("DYtautau_600M800",1.));
+	mcProc2nevents.insert( make_pair("DYtautau_600M800",19986));
+	mcProc2geneff.insert(  make_pair("DYtautau_600M800",1.));
+	mcProc2kfactor.insert( make_pair("DYtautau_600M800",1.));
+	mcProc2sigma.insert(   make_pair("DYtautau_800M1000",0.0027437));
+	mcProc2br.insert(      make_pair("DYtautau_800M1000",1.));
+	mcProc2nevents.insert( make_pair("DYtautau_800M1000",19984));
+	mcProc2geneff.insert(  make_pair("DYtautau_800M1000",1.));
+	mcProc2kfactor.insert( make_pair("DYtautau_800M1000",1.));
+	mcProc2sigma.insert(   make_pair("DYtautau_1000M1250",0.00091775));
+	mcProc2br.insert(      make_pair("DYtautau_1000M1250",1.));
+	mcProc2nevents.insert( make_pair("DYtautau_1000M1250",19980));
+	mcProc2geneff.insert(  make_pair("DYtautau_1000M1250",1.));
+	mcProc2kfactor.insert( make_pair("DYtautau_1000M1250",1.));
+	mcProc2sigma.insert(   make_pair("DYtautau_1250M1500",0.00024897));
+	mcProc2br.insert(      make_pair("DYtautau_1250M1500",1.));
+	mcProc2nevents.insert( make_pair("DYtautau_1250M1500",19973));
+	mcProc2geneff.insert(  make_pair("DYtautau_1250M1500",1.));
+	mcProc2kfactor.insert( make_pair("DYtautau_1250M1500",1.));
+	mcProc2sigma.insert(   make_pair("DYtautau_1500M1750",0.000076551));
+	mcProc2br.insert(      make_pair("DYtautau_1500M1750",1.));
+	mcProc2nevents.insert( make_pair("DYtautau_1500M1750",19974));
+	mcProc2geneff.insert(  make_pair("DYtautau_1500M1750",1.));
+	mcProc2kfactor.insert( make_pair("DYtautau_1500M1750",1.));
+	mcProc2sigma.insert(   make_pair("DYtautau_1750M2000",0.000026356));
+	mcProc2br.insert(      make_pair("DYtautau_1750M2000",1.));
+	mcProc2nevents.insert( make_pair("DYtautau_1750M2000",19968));
+	mcProc2geneff.insert(  make_pair("DYtautau_1750M2000",1.));
+	mcProc2kfactor.insert( make_pair("DYtautau_1750M2000",1.));
+	mcProc2sigma.insert(   make_pair("DYtautau_M2000",0.000015323));
+	mcProc2br.insert(      make_pair("DYtautau_M2000",1.));
+	mcProc2nevents.insert( make_pair("DYtautau_M2000",18966));
+	mcProc2geneff.insert(  make_pair("DYtautau_M2000",1.));
+	mcProc2kfactor.insert( make_pair("DYtautau_M2000",1.));
+	
+	mcProc2sigma.insert(   make_pair("Zprime_mumu_SSM1000",0.12881));
+	mcProc2br.insert(      make_pair("Zprime_mumu_SSM1000",1.));
+	mcProc2nevents.insert( make_pair("Zprime_mumu_SSM1000",19996));
+	mcProc2geneff.insert(  make_pair("Zprime_mumu_SSM1000",1.));
+	mcProc2kfactor.insert( make_pair("Zprime_mumu_SSM1000",1.));
+	mcProc2sigma.insert(   make_pair("Zprime_mumu_SSM1250",0.041544));
+	mcProc2br.insert(      make_pair("Zprime_mumu_SSM1250",1.));
+	mcProc2nevents.insert( make_pair("Zprime_mumu_SSM1250",19995));
+	mcProc2geneff.insert(  make_pair("Zprime_mumu_SSM1250",1.));
+	mcProc2kfactor.insert( make_pair("Zprime_mumu_SSM1250",1.));
+	mcProc2sigma.insert(   make_pair("Zprime_mumu_SSM1500",0.015215));
+	mcProc2br.insert(      make_pair("Zprime_mumu_SSM1500",1.));
+	mcProc2nevents.insert( make_pair("Zprime_mumu_SSM1500",19995));
+	mcProc2geneff.insert(  make_pair("Zprime_mumu_SSM1500",1.));
+	mcProc2kfactor.insert( make_pair("Zprime_mumu_SSM1500",1.));
+	mcProc2sigma.insert(   make_pair("Zprime_mumu_SSM1750",0.0060546));
+	mcProc2br.insert(      make_pair("Zprime_mumu_SSM1750",1.));
+	mcProc2nevents.insert( make_pair("Zprime_mumu_SSM1750",19995));
+	mcProc2geneff.insert(  make_pair("Zprime_mumu_SSM1750",1.));
+	mcProc2kfactor.insert( make_pair("Zprime_mumu_SSM1750",1.));
+	mcProc2sigma.insert(   make_pair("Zprime_mumu_SSM2000",0.0025803));
+	mcProc2br.insert(      make_pair("Zprime_mumu_SSM2000",1.));
+	mcProc2nevents.insert( make_pair("Zprime_mumu_SSM2000",19998));
+	mcProc2geneff.insert(  make_pair("Zprime_mumu_SSM2000",1.));
+	mcProc2kfactor.insert( make_pair("Zprime_mumu_SSM2000",1.));
+
+	mcProc2sigma.insert(   make_pair("T1_McAtNlo_Jimmy",80.201));
+	mcProc2br.insert(      make_pair("T1_McAtNlo_Jimmy",1.));
+	mcProc2nevents.insert( make_pair("T1_McAtNlo_Jimmy",984390));
+	mcProc2kfactor.insert( make_pair("T1_McAtNlo_Jimmy",1.09));
+	mcProc2geneff.insert(  make_pair("T1_McAtNlo_Jimmy",1.));
+	
+	mcProc2sigma.insert(   make_pair("WW_Herwig",29.592));
+	mcProc2br.insert(      make_pair("WW_Herwig",1.));
+	mcProc2nevents.insert( make_pair("WW_Herwig",249837));
+	mcProc2kfactor.insert( make_pair("WW_Herwig",1.));
+	mcProc2geneff.insert(  make_pair("WW_Herwig",0.38863));
+	mcProc2sigma.insert(   make_pair("WZ_Herwig",11.23));
+	mcProc2br.insert(      make_pair("WZ_Herwig",1.));
+	mcProc2nevents.insert( make_pair("WZ_Herwig",244833));
+	mcProc2kfactor.insert( make_pair("WZ_Herwig",1.));
+	mcProc2geneff.insert(  make_pair("WZ_Herwig",0.30847));
+	mcProc2sigma.insert(   make_pair("ZZ_Herwig",4.5964));
+	mcProc2br.insert(      make_pair("ZZ_Herwig",1.));
+	mcProc2nevents.insert( make_pair("ZZ_Herwig",249725));
+	mcProc2kfactor.insert( make_pair("ZZ_Herwig",1.));
+	mcProc2geneff.insert(  make_pair("ZZ_Herwig",0.21152));
+	
 }
 
 TCanvas* combinedGraphics::getCanvas(TFile* f, string dir, string cname)
@@ -138,18 +317,31 @@ void combinedGraphics::Norm(TH1D* h)
 	N = Integral(h);
 }
 
-void combinedGraphics::NormToDataLumi(TH1D* h, double crossSection_pb, double branchingRatio, double nMCevents, double dataLumi_pb)
+void combinedGraphics::NormToDataLumi(TH1D* h,
+									  double crossSection_pb,
+									  double branchingRatio,
+									  double nMCevents,
+									  double kFactor,
+									  double genEff,
+									  double dataLumi_pb)
 { 
 	double mcLumi = nMCevents/(crossSection_pb*branchingRatio);
 	if ( mcLumi>0 ) Scale(h, dataLumi_pb/mcLumi);
 }
 
-void combinedGraphics::setNormVals(double crossSection_pb, double branchingRatio, double nMCevents, double dataLumi_pb)
+void combinedGraphics::setNormVals(double crossSection_pb,
+								   double branchingRatio,
+								   double nMCevents,
+								   double kFactor,
+								   double genEff,
+								   double dataLumi_pb)
 {
 	m_crossSection_pb = crossSection_pb;
-	m_branchingRatio = branchingRatio;
-	m_nMCevents = nMCevents;
-	m_dataLumi_pb = dataLumi_pb;
+	m_branchingRatio  = branchingRatio;
+	m_nMCevents       = nMCevents;
+	m_kFactor         = kFactor;
+	m_genEff          = genEff;
+	m_dataLumi_pb     = dataLumi_pb;
 }
 
 void combinedGraphics::relDiff(TH1D* hInp, TH1D* hRef, TH1D* hRelDiffPos, TH1D* hRelDiffNeg)
@@ -316,7 +508,6 @@ void combinedGraphics::drawRatio(double xmin, double xmax, TH1D* hRat)
 	*/
 }
 
-
 void combinedGraphics::drawRatioWithBand(double xmin, double xmax, TH1D* hRat, TH1D* hRatUp, TH1D* hRatDwn)
 {
 	hFile->cd();
@@ -367,419 +558,92 @@ void combinedGraphics::drawRatioWithBand(double xmin, double xmax, TH1D* hRat, T
 	*/
 }
 
-
-void combinedGraphics::getHistosMap(TFile* f, string dir, TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered)
-{
-	hFile->cd();
-
-	hmap_cutFlow_imass = new TMapSP2TH1D();
-	hmap_cutFlow_pT    = new TMapSP2TH1D();
-
-	for(TMapds::iterator it=cutFlowOrdered->begin() ; it!=cutFlowOrdered->end() ; ++it)
-	{
-		double snumber = it->first;
-		
-		///////////////////////////////////////////////////////////////////////////
-		// ignore preselection: ///////////////////////////////////////////////////
-		if(cutFlowTypeOrdered->operator[](snumber)=="preselection") continue; /////
-		///////////////////////////////////////////////////////////////////////////
-
-		string sname = "";
-
-		// invariant mass cut flow histos
-		sname = "imass." + it->second;
-		hmap_cutFlow_imass->insert( make_pair( sname, getHisto(f, dir, sname) ) );
-		cout << "(" << snumber << ") obtained " << sname << endl;
-
-		// pT cut flow histos
-		sname = "pT." + it->second;
-		hmap_cutFlow_pT->insert( make_pair( sname, getHisto(f, dir, sname) ) );
-		cout << "(" << snumber << ") obtained " << sname << endl;
-	}
-}
-
-void combinedGraphics::drawNormHistosMap(string channel, TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered)
-{
-	hFile->cd();
-
-	gStyle->SetOptStat(0);
-
-	bool bfirst;
-	
-	Color_t colorStart  = 100;//kOrange; //40;
-	Color_t colorOffset = -10;//1;
-	Color_t colorAccumulate = colorStart;
-	TMapSP2TH1D::iterator it;
-	TMapds::iterator ii;
-	string sname = "";
-	
-	leg_cutFlow_imass = new TLegend(0.8039215,0.4808014,0.9232736,0.9298832,NULL,"brNDC");
-	leg_cutFlow_imass->SetFillColor(kWhite);
-	leg_cutFlow_pT    = new TLegend(0.8039215,0.4808014,0.9232736,0.9298832,NULL,"brNDC");
-	leg_cutFlow_pT->SetFillColor(kWhite);
-	
-	TPaveText* pvtxt = new TPaveText(0.6379599,0.8069948,0.8035117,0.9274611,"brNDC");
-	pvtxt->SetFillColor(kWhite);
-	TText* txt = pvtxt->AddText( channel.c_str() );
-	
-	stringstream strm;
-	string L;
-	string lumilabel = "";
-	strm << setprecision(2);
-	strm << dataLumi_ipb;
-	strm >> L;
-	lumilabel = "#intLdt~" + L + " pb^{-1}";
-	TPaveText* pvtxt1 = new TPaveText(0.546462,0.6944909,0.7118499,0.8146912,"brNDC");
-	pvtxt1->SetFillColor(kWhite);
-	TText* txt1 = pvtxt1->AddText( lumilabel.c_str() );
-	
-	cnv_cutFlow_imass = new TCanvas("imass.cutFlow","imass.cutFlow",canv_x,canv_y);
-	cnv_cutFlow_imass->SetFillColor(kWhite);
-	cnv_cutFlow_imass->SetLogy();
-	cnv_cutFlow_imass->SetLogx();
-	cnv_cutFlow_imass->Draw();
-	cnv_cutFlow_imass->cd();
-	colorAccumulate = colorStart;
-	
-	bfirst = true;
-	for(TMapds::iterator ii=cutFlowOrdered->begin() ; ii!=cutFlowOrdered->end() ; ++ii)
-	{
-		double num = ii->first;
-		///////////////////////////////////////////////////////////////////////////
-		// ignore preselection: ///////////////////////////////////////////////////
-		if(cutFlowTypeOrdered->operator[](num)=="preselection") continue; /////////
-		///////////////////////////////////////////////////////////////////////////
-		
-		string str = ii->second;
-		it=hmap_cutFlow_imass->find("imass."+str);
-		string sname = it->first;
-		stringstream strm;
-		string s1, s2;
-		strm << setprecision(2);
-		strm << (*hmap_cutFlow_imass)[sname]->GetBinWidth(1);
-		strm >> s1;
-		strm.clear();
-		strm << setprecision(2);
-		strm << (*hmap_cutFlow_imass)[sname]->GetBinWidth( (*hmap_cutFlow_imass)[sname]->GetNbinsX() );
-		strm >> s2;
-		string ytitle = "#frac{dN}{d#hat{m}} (" + s1 + "#rightarrow" + s2 + " TeV)^{-1}";
-		/*
-		double norm = (*hmap_cutFlow_imass)[sname]->GetEntries() * (*hmap_cutFlow_imass)[sname]->GetBinWidth(1);
-		if(norm<=0)
-		{
-			cout << "ERROR: norm(" << sname << ") = 0" << endl;
-			exit(-1);
-		}
-		(*hmap_cutFlow_imass)[sname]->Scale(1./norm);
-		*/
-		
-		NormToDataLumi( (*hmap_cutFlow_imass)[sname], m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-		//NormToBinWidth( (*hmap_cutFlow_imass)[sname] );
-		//Norm( (*hmap_cutFlow_imass)[sname] );
-		(*hmap_cutFlow_imass)[sname]->SetTitle("");
-		(*hmap_cutFlow_imass)[sname]->SetXTitle("#hat{m}_{#mu#mu} (TeV)");
-		(*hmap_cutFlow_imass)[sname]->SetYTitle( ytitle.c_str() );
-		(*hmap_cutFlow_imass)[sname]->SetFillColor(colorAccumulate);
-		(*hmap_cutFlow_imass)[sname]->SetLineColor(colorAccumulate);
-		leg_cutFlow_imass->AddEntry( (*hmap_cutFlow_imass)[sname], str.c_str(), "f");
-		if(bfirst)
-		{
-			if(channel!="2010 Data") (*hmap_cutFlow_imass)[sname]->SetMinimum(1.e-2);
-			//else                     (*hmap_cutFlow_imass)[sname]->SetMinimum(1.e-2);
-			(*hmap_cutFlow_imass)[sname]->SetMaximum(1.e+4);
-			(*hmap_cutFlow_imass)[sname]->Draw();
-		}
-		else (*hmap_cutFlow_imass)[sname]->Draw("SAMES");
-		
-		colorAccumulate += colorOffset;
-		cout << "drawn " << sname << endl;
-		
-		bfirst = false;
-	}
-	cnv_cutFlow_imass->RedrawAxis();
-	pvtxt->Draw("SMAES");
-	pvtxt1->Draw("SMAES");
-	leg_cutFlow_imass->Draw("SAMES");
-	cnv_cutFlow_imass->Update();
-	//cnv_cutFlow_imass->Write();
-	
-	//--------------
-	
-	cnv_cutFlow_pT = new TCanvas("pT.cutFlow","pT.cutFlow",canv_x,canv_y);
-	cnv_cutFlow_pT->SetLogy();
-	cnv_cutFlow_pT->SetLogx();
-	cnv_cutFlow_pT->Draw();
-	cnv_cutFlow_pT->cd();
-	colorAccumulate = colorStart;
-	
-	bfirst = true;
-	for(TMapds::iterator ii=cutFlowOrdered->begin() ; ii!=cutFlowOrdered->end() ; ++ii)
-	{
-		double num = ii->first;
-		///////////////////////////////////////////////////////////////////////////
-		// ignore preselection: ///////////////////////////////////////////////////
-		if(cutFlowTypeOrdered->operator[](num)=="preselection") continue; /////////
-		///////////////////////////////////////////////////////////////////////////
-		
-		string str = ii->second;
-		it=hmap_cutFlow_pT->find("pT."+str);
-		string sname = it->first;
-		stringstream strm;
-		string s1, s2;
-		strm << setprecision(2);
-		strm << (*hmap_cutFlow_pT)[sname]->GetBinWidth(1);
-		strm >> s1;
-		strm.clear();
-		strm << setprecision(2);
-		strm << (*hmap_cutFlow_pT)[sname]->GetBinWidth( (*hmap_cutFlow_pT)[sname]->GetNbinsX() );
-		strm >> s2;
-		string ytitle = "#frac{dN}{dp_{T}^{#mu}} (" + s1 + "#rightarrow" + s2 + " TeV)^{-1}";
-		/*
-		double norm = (*hmap_cutFlow_pT)[sname]->GetEntries() * (*hmap_cutFlow_pT)[sname]->GetBinWidth(1);
-		if(norm<=0)
-		{
-			cout << "ERROR: norm(" << sname << ") = 0" << endl;
-			exit(-1);
-		}
-		(*hmap_cutFlow_pT)[sname]->Scale(1./norm);
-		*/
-		
-		NormToDataLumi( (*hmap_cutFlow_pT)[sname], m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-		//NormToBinWidth( (*hmap_cutFlow_pT)[sname] );
-		//Norm( (*hmap_cutFlow_pT)[sname] );
-		(*hmap_cutFlow_pT)[sname]->SetTitle("");
-		(*hmap_cutFlow_pT)[sname]->SetXTitle("p_{T}^{#mu} (TeV)");
-		(*hmap_cutFlow_pT)[sname]->SetYTitle( ytitle.c_str() );
-		(*hmap_cutFlow_pT)[sname]->SetFillColor(colorAccumulate);
-		(*hmap_cutFlow_pT)[sname]->SetLineColor(colorAccumulate);
-		leg_cutFlow_pT->AddEntry( (*hmap_cutFlow_pT)[sname], str.c_str(), "f");
-		if(bfirst)
-		{
-			if(channel!="2010 Data") (*hmap_cutFlow_pT)[sname]->SetMinimum(1.e-2);
-			//else                     (*hmap_cutFlow_pT)[sname]->SetMinimum(1.e-2);
-			(*hmap_cutFlow_pT)[sname]->SetMaximum(1.e+4);
-			(*hmap_cutFlow_pT)[sname]->Draw();
-		}
-		else (*hmap_cutFlow_pT)[sname]->Draw("SAMES");
-		colorAccumulate += colorOffset;
-		cout << "drawn " << sname << endl;
-		
-		bfirst = false;
-	}
-	cnv_cutFlow_pT->RedrawAxis();
-	pvtxt->Draw("SMAES");
-	pvtxt1->Draw("SMAES");
-	leg_cutFlow_pT->Draw("SAMES");
-	cnv_cutFlow_pT->Update();
-	//cnv_cutFlow_pT->Write();
-}
-
-void combinedGraphics::drawMCcutFlow()
-{
-	hFile->cd();
-
-	string dir = "/srv01/tau/hod/";
-	dir += (m_dataAnalysisSelector=="digest") ? "digestControl/" : "offlineControl/";
-	string path = "";
-	string channel = "";
-	string hdir = "cutFlow";
-	
-	// main canvases
-	cnv_MC_cutFlow_imass = new TCanvas("cnv_MC_cutFlow_imass", "cnv_MC_cutFlow_imass", 1200, 800);
-	cnv_MC_cutFlow_imass->Divide(2,3);
-	cnv_MC_cutFlow_imass->SetFillColor(kWhite);
-	cnv_MC_cutFlow_imass->Draw();
-	cnv_MC_cutFlow_imass->cd();
-	cnv_MC_cutFlow_imass->Update();
-	
-	cnv_MC_cutFlow_pT = new TCanvas("cnv_MC_cutFlow_pT", "cnv_MC_cutFlow_pT", 1200, 800);
-	cnv_MC_cutFlow_pT->Divide(2,3);
-	cnv_MC_cutFlow_pT->SetFillColor(kWhite);
-	cnv_MC_cutFlow_pT->Draw();
-	cnv_MC_cutFlow_pT->cd();
-	cnv_MC_cutFlow_pT->Update();
-	
-	
-	// pads
-	path = dir + m_mcAnalysisSelector + "Control_Zmumu.root";
-	channel = "Z #rightarrow #mu^{+}#mu^{-}";
-	setNormVals(989., 1., 299811, dataLumi_ipb);
-	TFile* fZmumu = new TFile( path.c_str(), "READ" );
-	getHistosMap(fZmumu, hdir, m_cutFlowOrdered, m_cutFlowTypeOrdered);
-	drawNormHistosMap(channel, m_cutFlowOrdered, m_cutFlowTypeOrdered);
-	cnv_MC_cutFlow_imass->cd(1);
-	cnv_cutFlow_imass->DrawClonePad();
-	cnv_MC_cutFlow_pT->cd(1);
-	cnv_cutFlow_pT->DrawClonePad();
-	
-	path = dir + m_mcAnalysisSelector + "Control_Wmunu.root";
-	channel = "W #rightarrow #mu#nuX";
-	setNormVals(10454., 1., 989886, dataLumi_ipb);
-	TFile* fWmunu = new TFile( path.c_str(), "READ" );
-	getHistosMap(fWmunu, hdir, m_cutFlowOrdered, m_cutFlowTypeOrdered);
-	drawNormHistosMap(channel, m_cutFlowOrdered, m_cutFlowTypeOrdered);
-	cnv_MC_cutFlow_imass->cd(2);
-	cnv_cutFlow_imass->DrawClonePad();
-	cnv_MC_cutFlow_pT->cd(2);
-	cnv_cutFlow_pT->DrawClonePad();
-	
-	path = dir + m_mcAnalysisSelector + "Control_Ztautau.root";
-	channel = "Z #rightarrow #tau^{+}#tau^{-}";
-	setNormVals(989., 1., 1998598, dataLumi_ipb);
-	TFile* fZtautau = new TFile( path.c_str(), "READ" );
-	getHistosMap(fZtautau, hdir, m_cutFlowOrdered, m_cutFlowTypeOrdered);
-	drawNormHistosMap(channel, m_cutFlowOrdered, m_cutFlowTypeOrdered);
-	cnv_MC_cutFlow_imass->cd(3);
-	cnv_cutFlow_imass->DrawClonePad();
-	cnv_MC_cutFlow_pT->cd(3);
-	cnv_cutFlow_pT->DrawClonePad();
-	
-	path = dir + m_mcAnalysisSelector + "Control_TTbar.root";
-	channel = "t #bar{t} #rightarrow #mu^{+}#mu^{-}X";
-	setNormVals(161., 1., 199838, dataLumi_ipb);
-	TFile* fTTbar = new TFile( path.c_str(), "READ" );
-	getHistosMap(fTTbar, hdir, m_cutFlowOrdered, m_cutFlowTypeOrdered);
-	drawNormHistosMap(channel, m_cutFlowOrdered, m_cutFlowTypeOrdered);
-	cnv_MC_cutFlow_imass->cd(4);
-	cnv_cutFlow_imass->DrawClonePad();
-	cnv_MC_cutFlow_pT->cd(4);
-	cnv_cutFlow_pT->DrawClonePad();
-	
-	path = dir + m_mcAnalysisSelector + "Control_bbmu15X.root";
-	channel = "b #bar{b} #rightarrow #mu^{+}#mu^{-}X";
-	setNormVals(7.39e+4, 1., 4388911, dataLumi_ipb);
-	TFile* fbbmu15X = new TFile( path.c_str(), "READ" );
-	getHistosMap(fbbmu15X, hdir, m_cutFlowOrdered, m_cutFlowTypeOrdered);
-	drawNormHistosMap(channel, m_cutFlowOrdered, m_cutFlowTypeOrdered);
-	cnv_MC_cutFlow_imass->cd(5);
-	cnv_cutFlow_imass->DrawClonePad();
-	cnv_MC_cutFlow_pT->cd(5);
-	cnv_cutFlow_pT->DrawClonePad();
-	
-	path = dir + m_mcAnalysisSelector + "Control_ccmu15X.root";
-	channel = "c #bar{c} #rightarrow #mu^{+}#mu^{-}X";
-	setNormVals(2.84e+4, 1., 1499257, dataLumi_ipb);
-	TFile* fccmu15X = new TFile( path.c_str(), "READ" );
-	getHistosMap(fccmu15X, hdir, m_cutFlowOrdered, m_cutFlowTypeOrdered);
-	drawNormHistosMap(channel, m_cutFlowOrdered, m_cutFlowTypeOrdered);
-	cnv_MC_cutFlow_imass->cd(6);
-	cnv_cutFlow_imass->DrawClonePad();
-	cnv_MC_cutFlow_pT->cd(6);
-	cnv_cutFlow_pT->DrawClonePad();
-}
-
-
-void combinedGraphics::drawDataCutFlow()
-{
-	hFile->cd();
-
-	string dir = "/srv01/tau/hod/";
-	dir += (m_dataAnalysisSelector=="digest") ? "digestControl/" : "offlineControl/";
-	string path = "";
-	string channel = "";
-	string hdir = "cutFlow";
-	
-	// main canvases
-	cnv_data_cutFlow_imass = new TCanvas("cnv_data_cutFlow_imass", "cnv_data_cutFlow_imass", 1200, 800);
-	cnv_data_cutFlow_imass->SetFillColor(kWhite);
-	cnv_data_cutFlow_imass->Draw();
-	cnv_data_cutFlow_imass->cd();
-	cnv_data_cutFlow_imass->Update();
-	
-	cnv_data_cutFlow_pT = new TCanvas("cnv_data_cutFlow_pT", "cnv_data_cutFlow_pT", 1200, 800);
-	cnv_data_cutFlow_pT->SetFillColor(kWhite);
-	cnv_data_cutFlow_pT->Draw();
-	cnv_data_cutFlow_pT->cd();
-	cnv_data_cutFlow_pT->Update();
-	
-	
-	path = dir + m_dataAnalysisSelector + "Control.root";
-	channel = "2010 Data";
-	setNormVals(1., 1., 1, 1.);
-	TFile* fZmumu = new TFile( path.c_str(), "READ" );
-	getHistosMap(fZmumu, hdir, m_cutFlowOrdered, m_cutFlowTypeOrdered);
-	drawNormHistosMap(channel, m_cutFlowOrdered, m_cutFlowTypeOrdered);
-	cnv_data_cutFlow_imass->cd();
-	cnv_cutFlow_imass->DrawClonePad();
-	cnv_data_cutFlow_pT->cd();
-	cnv_cutFlow_pT->DrawClonePad();
-}
-
 TH1D* combinedGraphics::getNormDYmumu(string sHistName)
 {
 	hFile->cd();
 
-	string dir = "/srv01/tau/hod/";
-	dir += (m_dataAnalysisSelector=="digest") ? "digestControl/" : "offlineControl/";
-	string path = "";
+	string dir = "/data/hod/D3PDdigest/rel15_barrel_selection/DYmumu/" + m_muonSelector;
+	string path  = "";
+	string sProc = "";
 	string hdir = "allCuts";
-	string tmp = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
+	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
 	
-	path = dir + tmp + "DYmumu_75M120.root";
+	sProc = "DYmumu_75M120";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumu75M120 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYmumu75M120 = getHisto(fDYmumu75M120, hdir, sHistName.c_str());
-	setNormVals(819.93, 1., 19994, dataLumi_ipb);
-	NormToDataLumi( hDYmumu75M120, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYmumu75M120, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
-	path = dir + tmp + "DYmumu_120M250.root";
+	sProc = "DYmumu_120M250";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumu120M250 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYmumu120M250 = getHisto(fDYmumu120M250, hdir, sHistName.c_str());
-	setNormVals(8.7158, 1., 19996, dataLumi_ipb);
-	NormToDataLumi( hDYmumu120M250, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYmumu120M250, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
-	path = dir + tmp + "DYmumu_250M400.root";
+	sProc = "DYmumu_250M400";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumu250M400 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYmumu250M400 = getHisto(fDYmumu250M400, hdir, sHistName.c_str());
-	setNormVals(0.41571, 1., 19997, dataLumi_ipb);
-	NormToDataLumi( hDYmumu250M400, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYmumu250M400, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
-	path = dir + tmp + "DYmumu_400M600.root";
+	sProc = "DYmumu_400M600";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumu400M600 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYmumu400M600 = getHisto(fDYmumu400M600, hdir, sHistName.c_str());
-	setNormVals(0.06724, 1., 19996, dataLumi_ipb);
-	NormToDataLumi( hDYmumu400M600, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYmumu400M600, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
-	path = dir + tmp + "DYmumu_600M800.root";
+	sProc = "DYmumu_600M800";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumu600M800 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYmumu600M800 = getHisto(fDYmumu600M800, hdir, sHistName.c_str());
-	setNormVals(0.01116, 1., 19993, dataLumi_ipb);
-	NormToDataLumi( hDYmumu600M800, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYmumu600M800, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
-	path = dir + tmp + "DYmumu_800M1000.root";
+	sProc = "DYmumu_800M1000";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumu800M1000 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYmumu800M1000 = getHisto(fDYmumu800M1000, hdir, sHistName.c_str());
-	setNormVals(0.0027437, 1., 19946, dataLumi_ipb);
-	NormToDataLumi( hDYmumu800M1000, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYmumu800M1000, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
-	path = dir + tmp + "DYmumu_1000M1250.root";
+	sProc = "DYmumu_1000M1250";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumu1000M1250 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYmumu1000M1250 = getHisto(fDYmumu1000M1250, hdir, sHistName.c_str());
-	setNormVals(0.00091775, 1., 19992, dataLumi_ipb);
-	NormToDataLumi( hDYmumu1000M1250, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYmumu1000M1250, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
-	path = dir + tmp + "DYmumu_1250M1500.root";
+	sProc = "DYmumu_1250M1500";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumu1250M1500 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYmumu1250M1500 = getHisto(fDYmumu1250M1500, hdir, sHistName.c_str());
-	setNormVals(0.00024866, 1., 19995, dataLumi_ipb);
-	NormToDataLumi( hDYmumu1250M1500, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYmumu1250M1500, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
-	path = dir + tmp + "DYmumu_1500M1750.root";
+	sProc = "DYmumu_1500M1750";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumu1500M1750 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYmumu1500M1750 = getHisto(fDYmumu1500M1750, hdir, sHistName.c_str());
-	setNormVals(0.00007659, 1., 19987, dataLumi_ipb);
-	NormToDataLumi( hDYmumu1500M1750, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYmumu1500M1750, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
-	path = dir + tmp + "DYmumu_1750M2000.root";
+	sProc = "DYmumu_1750M2000";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumu1750M2000 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYmumu1750M2000 = getHisto(fDYmumu1750M2000, hdir, sHistName.c_str());
-	setNormVals(0.000026361, 1., 19991, dataLumi_ipb);
-	NormToDataLumi( hDYmumu1750M2000, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYmumu1750M2000, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
-	path = dir + tmp + "DYmumu_M2000.root";
+	sProc = "DYmumu_M2000";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumuM2000 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYmumuM2000 = getHisto(fDYmumuM2000, hdir, sHistName.c_str());
-	setNormVals(0.000015325, 1., 19990, dataLumi_ipb);
-	NormToDataLumi( hDYmumuM2000, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYmumuM2000, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	hDYmumu75M120->Add(hDYmumu120M250);
 	hDYmumu75M120->Add(hDYmumu250M400);
@@ -799,78 +663,88 @@ TH1D* combinedGraphics::getNormDYtautau(string sHistName)
 {
 	hFile->cd();
 
-	string dir = "/srv01/tau/hod/";
-	dir += (m_dataAnalysisSelector=="digest") ? "digestControl/" : "offlineControl/";
-	string path = "";
+	string dir = "/data/hod/D3PDdigest/rel15_barrel_selection/DYtautau/" + m_muonSelector;
+	string path  = "";
+	string sProc = "";
 	string hdir = "allCuts";
-	string tmp = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";	
-
+	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
 	
-	path = dir + tmp + "DYtautau_75M120.root";
+	sProc = "DYtautau_75M120";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautau75M120 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYtautau75M120 = getHisto(fDYtautau75M120, hdir, sHistName.c_str());
-	setNormVals(817.8, 1., 19998, dataLumi_ipb);
-	NormToDataLumi( hDYtautau75M120, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYtautau75M120, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
-	path = dir + tmp + "DYtautau_120M250.root";
+	sProc = "DYtautau_120M250";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautau120M250 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYtautau120M250 = getHisto(fDYtautau120M250, hdir, sHistName.c_str());
-	setNormVals(8.6608, 1., 19996, dataLumi_ipb);
-	NormToDataLumi( hDYtautau120M250, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYtautau120M250, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
-	path = dir + tmp + "DYtautau_250M400.root";
+	sProc = "DYtautau_250M400";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautau250M400 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYtautau250M400 = getHisto(fDYtautau250M400, hdir, sHistName.c_str());
-	setNormVals(0.41613, 1., 19994, dataLumi_ipb);
-	NormToDataLumi( hDYtautau250M400, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYtautau250M400, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
-	path = dir + tmp + "DYtautau_400M600.root";
+	sProc = "DYtautau_400M600";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautau400M600 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYtautau400M600 = getHisto(fDYtautau400M600, hdir, sHistName.c_str());
-	setNormVals(0.067269, 1., 19992, dataLumi_ipb);
-	NormToDataLumi( hDYtautau400M600, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYtautau400M600, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
-	path = dir + tmp + "DYtautau_600M800.root";
+	sProc = "DYtautau_600M800";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautau600M800 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYtautau600M800 = getHisto(fDYtautau600M800, hdir, sHistName.c_str());
-	setNormVals(0.01116, 1., 19986, dataLumi_ipb);
-	NormToDataLumi( hDYtautau600M800, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYtautau600M800, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
-	path = dir + tmp + "DYtautau_800M1000.root";
+	sProc = "DYtautau_800M1000";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautau800M1000 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYtautau800M1000 = getHisto(fDYtautau800M1000, hdir, sHistName.c_str());
-	setNormVals(0.0027437, 1., 19984, dataLumi_ipb);
-	NormToDataLumi( hDYtautau800M1000, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYtautau800M1000, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
-	path = dir + tmp + "DYtautau_1000M1250.root";
+	sProc = "DYtautau_1000M1250";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautau1000M1250 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYtautau1000M1250 = getHisto(fDYtautau1000M1250, hdir, sHistName.c_str());
-	setNormVals(0.00091775, 1., 19980, dataLumi_ipb);
-	NormToDataLumi( hDYtautau1000M1250, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYtautau1000M1250, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
-	path = dir + tmp + "DYtautau_1250M1500.root";
+	sProc = "DYtautau_1250M1500";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautau1250M1500 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYtautau1250M1500 = getHisto(fDYtautau1250M1500, hdir, sHistName.c_str());
-	setNormVals(0.00024897, 1., 19973, dataLumi_ipb);
-	NormToDataLumi( hDYtautau1250M1500, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYtautau1250M1500, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
-	path = dir + tmp + "DYtautau_1500M1750.root";
+	sProc = "DYtautau_1500M1750";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautau1500M1750 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYtautau1500M1750 = getHisto(fDYtautau1500M1750, hdir, sHistName.c_str());
-	setNormVals(0.000076551, 1., 19974, dataLumi_ipb);
-	NormToDataLumi( hDYtautau1500M1750, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYtautau1500M1750, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
-	path = dir + tmp + "DYtautau_1750M2000.root";
+	sProc = "DYtautau_1750M2000";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautau1750M2000 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYtautau1750M2000 = getHisto(fDYtautau1750M2000, hdir, sHistName.c_str());
-	setNormVals(0.000026356, 1., 19968, dataLumi_ipb);
-	NormToDataLumi( hDYtautau1750M2000, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYtautau1750M2000, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
-	path = dir + tmp + "DYtautau_M2000.root";
+	sProc = "DYtautau_M2000";
+	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautauM2000 = new TFile( path.c_str(), "READ" );
 	TH1D* hDYtautauM2000 = getHisto(fDYtautauM2000, hdir, sHistName.c_str());
-	setNormVals(0.000015323, 1., 18966, dataLumi_ipb);
-	NormToDataLumi( hDYtautauM2000, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hDYtautauM2000, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	hDYtautau75M120->Add(hDYtautau120M250);
 	hDYtautau75M120->Add(hDYtautau250M400);
@@ -891,16 +765,7 @@ void combinedGraphics::drawimass()
 {
 	hFile->cd();
 	
-	string dir = "/srv01/tau/hod/";
-	dir += (m_dataAnalysisSelector=="digest") ? "digestControl/" : "offlineControl/";
-	string path = "";
-	string channel = "";
-	string hdir = "allCuts";
-	string tmp = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
-	
-	
 	gStyle->SetOptStat(0);
-	
 	
 	leg_imass = new TLegend(0.8039215,0.4808014,0.9232736,0.9298832,NULL,"brNDC");
 	leg_imass->SetFillColor(kWhite);
@@ -917,6 +782,11 @@ void combinedGraphics::drawimass()
 	TPaveText* pvtxt = new TPaveText(0.546462,0.6944909,0.7118499,0.8146912,"brNDC");
 	pvtxt->SetFillColor(kWhite);
 	TText* txt = pvtxt->AddText( lumilabel.c_str() );
+	
+	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
+	TPaveText* pvtxt1 = new TPaveText(0.5747393,0.6552055,0.6850104,0.7388414,"brNDC");
+	pvtxt1->SetFillColor(kWhite);
+	TText* txt1 = pvtxt1->AddText( muonLabel.c_str() );
 	
 	
 	// main canvases
@@ -944,22 +814,28 @@ void combinedGraphics::drawimass()
 	Color_t colorAccumulate = colorStart;
 	
 	string s1, s2;
-
-	//path = dir + m_dataAnalysisSelector + "Control.root";
-	//path = dir + "offlineControl_13102010_A-I2_ZprimeGRL_etaBarrel.root";
-	path = dir + "offlineControl_16112010_A-I2_ZprimeGRL_barrel.root";
+	
+	string dir = "/data/hod/D3PDdigest/rel15_barrel_selection/";
+	string path = "";
+	string sProc = "";
+	string channel = "";
+	string hdir = "allCuts";
+	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
+	
+	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
+	path = dir + "A-I2_ZprimeGRL/" + m_muonSelector + sData + ".root";
 	TFile* fdata = new TFile( path.c_str(), "READ" );
 	hData = getHisto(fdata, hdir, "imass");
-	leg_imass->AddEntry( hData, "Data", "lep");
+	leg_imass->AddEntry(hData, "Data", "lep");
 	
 	
-	
-	path = dir + m_mcAnalysisSelector + "Control_Zprime_mumu_SSM1000.root";
+	sProc = "Zprime_mumu_SSM1000";
+	path = dir + "Zprime_mumu/" + m_muonSelector + analysisType + sProc + ".root";
 	channel = "1 TeV Z' #rightarrow #mu^{+}#mu^{-}";
 	TFile* fZprime_mumu_SSM1000 = new TFile( path.c_str(), "READ" );
 	hZprime_mumu_SSM1000 = getHisto(fZprime_mumu_SSM1000, hdir, "imass");
-	setNormVals(0.12881, 1., 19996, dataLumi_ipb);
-	NormToDataLumi( hZprime_mumu_SSM1000, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hZprime_mumu_SSM1000, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	//////////////////////////////////////////////////////
 	// Z' interfere with the SM (DYmumu) /////////////////
 	//hZprime_mumu_SSM1000->Add( getNormDYmumu() ); ////////
@@ -982,105 +858,121 @@ void combinedGraphics::drawimass()
 	hZprime_mumu_SSM1000->SetYTitle( ytitle.c_str() );
 	leg_imass->AddEntry( hZprime_mumu_SSM1000, channel.c_str(), "f");
 	
+	unsigned int c = 0;
+	Color_t color = 0;
 	
+	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
 	channel = "SM(sig+bkg)";
 	hMCimass = getNormDYmumu("imass");
-	hMCimass->SetFillColor(colorAccumulate);
-	hMCimass->SetLineColor(colorAccumulate);
+	hMCimass->SetFillColor(color);
+	hMCimass->SetLineColor(color);
 	hMCimass->SetTitle("");
 	leg_imass->AddEntry( hMCimass, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
+	c++;
 	
-	
+	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
 	channel = "binned DY#mu#mu";
 	hDYmumu = getNormDYmumu("imass");
-	hDYmumu->SetFillColor(colorAccumulate);
-	hDYmumu->SetLineColor(colorAccumulate);
+	hDYmumu->SetFillColor(color);
+	hDYmumu->SetLineColor(color);
 	hDYmumu->SetTitle("");
 	leg_imass->AddEntry( hDYmumu, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
+	c++;
 	
-	
-	path = dir + m_mcAnalysisSelector + "Control_TTbar.root";
-	channel = "t #bar{t} #rightarrow #mu^{+}#mu^{-}X";
-	TFile* fTTbar = new TFile( path.c_str(), "READ" );
-	hTTbar = getHisto(fTTbar, hdir, "imass");
-	setNormVals(161., 1., 199838, dataLumi_ipb);
-	NormToDataLumi( hTTbar, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-	hTTbar->SetFillColor(colorAccumulate);
-	hTTbar->SetLineColor(colorAccumulate);
-	hTTbar->SetTitle("");
-	leg_imass->AddEntry( hTTbar, channel.c_str(), "f");
+	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
+	sProc = "ZZ_Herwig";
+	path = dir + "ZZ_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
+	channel = "ZZ";
+	TFile* fZZ = new TFile( path.c_str(), "READ" );
+	hZZ = getHisto(fZZ, hdir, "imass");
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hZZ, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	hZZ->SetFillColor(color);
+	hZZ->SetLineColor(color);
+	hZZ->SetTitle("");
+	leg_imass->AddEntry( hZZ, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
+	c++;
 	
+	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
+	sProc = "WZ_Herwig";
+	path = dir + "WZ_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
+	channel = "WZ";
+	TFile* fWZ = new TFile( path.c_str(), "READ" );
+	hWZ = getHisto(fWZ, hdir, "imass");
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hWZ, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	hWZ->SetFillColor(color);
+	hWZ->SetLineColor(color);
+	hWZ->SetTitle("");
+	leg_imass->AddEntry( hWZ, channel.c_str(), "f");
+	colorAccumulate+=colorOffset;
+	c++;
 	
-	path = dir + m_mcAnalysisSelector + "Control_gg2WW0240_JIMMY_WW_munumunu.root";
-	channel = "WW #rightarrow #mu#nu#mu#nu";
+	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
+	sProc = "WW_Herwig";
+	path = dir + "WW_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
+	channel = "WW";
 	TFile* fWW = new TFile( path.c_str(), "READ" );
 	hWW = getHisto(fWW, hdir, "imass");
-	setNormVals(0.01524, 0.98981, 9999, dataLumi_ipb);
-	NormToDataLumi( hWW, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-	hWW->SetFillColor(colorAccumulate);
-	hWW->SetLineColor(colorAccumulate);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hWW, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	hWW->SetFillColor(color);
+	hWW->SetLineColor(color);
 	hWW->SetTitle("");
 	leg_imass->AddEntry( hWW, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
+	c++;
 	
+	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
+	sProc = "T1_McAtNlo_Jimmy";
+	path = dir + "T1_McAtNlo_Jimmy/" + m_muonSelector + analysisType + sProc + ".root";
+	channel = "t #bar{t} #rightarrow #mu^{+}#mu^{-}X";
+	TFile* fTTbar = new TFile( path.c_str(), "READ" );
+	hTTbar = getHisto(fTTbar, hdir, "imass");
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hTTbar, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	hTTbar->SetFillColor(color);
+	hTTbar->SetLineColor(color);
+	hTTbar->SetTitle("");
+	leg_imass->AddEntry( hTTbar, channel.c_str(), "f");
+	colorAccumulate+=colorOffset;
+	c++;
 	
+	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
 	channel = "binned DY#tau#tau";
 	hDYtautau = getNormDYtautau("imass");
-	hDYtautau->SetFillColor(colorAccumulate);
-	hDYtautau->SetLineColor(colorAccumulate);
+	hDYtautau->SetFillColor(color);
+	hDYtautau->SetLineColor(color);
 	hDYtautau->SetTitle("");
 	leg_imass->AddEntry( hDYtautau, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
+	c++;
 	
 	/*
-	path = dir + m_mcAnalysisSelector + "Control_bbmu15X.root";
-	channel = "b #bar{b} #rightarrow #mu^{+}#mu^{-}X";
-	TFile* fbbmu15X = new TFile( path.c_str(), "READ" );
-	hbbmu15X = getHisto(fbbmu15X, hdir, "imass");
-	setNormVals(7.39e+4, 1., 4388911, dataLumi_ipb);
-	NormToDataLumi( hbbmu15X, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-	hbbmu15X->SetFillColor(colorAccumulate);
-	hbbmu15X->SetLineColor(colorAccumulate);
-	hbbmu15X->SetTitle("");
-	leg_imass->AddEntry( hbbmu15X, channel.c_str(), "f");
-	colorAccumulate+=colorOffset;
-	*/
-	
+	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
 	path = dir + m_mcAnalysisSelector + "Control_Wmunu.root";
 	channel = "W #rightarrow #mu#nuX";
 	TFile* fWmunu = new TFile( path.c_str(), "READ" );
 	hWmunu = getHisto(fWmunu, hdir, "imass");
 	setNormVals(10454., 1., 989886, dataLumi_ipb);
 	NormToDataLumi( hWmunu, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-	hWmunu->SetFillColor(colorAccumulate);
-	hWmunu->SetLineColor(colorAccumulate);
+	hWmunu->SetFillColor(color);
+	hWmunu->SetLineColor(color);
 	hWmunu->SetTitle("");
 	leg_imass->AddEntry( hWmunu, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
-	
-	/*
-	path = dir + m_mcAnalysisSelector + "Control_ccmu15X.root";
-	channel = "c #bar{c} #rightarrow #mu^{+}#mu^{-}X";
-	TFile* fccmu15X = new TFile( path.c_str(), "READ" );
-	hccmu15X = getHisto(fccmu15X, hdir, "imass");
-	setNormVals(2.84e+4, 1., 1499257, dataLumi_ipb);
-	NormToDataLumi( hccmu15X, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-	hccmu15X->SetFillColor(colorAccumulate);
-	hccmu15X->SetLineColor(colorAccumulate);
-	hccmu15X->SetTitle("");
-	leg_imass->AddEntry( hccmu15X, channel.c_str(), "f");
-	colorAccumulate+=colorOffset;
+	c++;
 	*/
 	
+	hMCimass->Add(hZZ);
+	hMCimass->Add(hWZ);
 	hMCimass->Add(hWW);
 	hMCimass->Add(hTTbar);
 	hMCimass->Add(hDYtautau);
-	//hMCimass->Add(hbbmu15X);
-	hMCimass->Add(hWmunu);
-	//hMCimass->Add(hccmu15X);
+	//hMCimass->Add(hWmunu);
 	
 	//////////////////////////////////////
 	double mHatMin = 0.075; // TeV ///////
@@ -1096,14 +988,15 @@ void combinedGraphics::drawimass()
 	hZprime_mumu_SSM1000->Draw();
 	hMCimass->Draw("SAMES");
 	hDYmumu->Draw("SAMES");
+	hZZ->Draw("SAMES");
+	hWZ->Draw("SAMES");
+	hWW->Draw("SAMES");
 	hTTbar->Draw("SAMES");
 	hDYtautau->Draw("SAMES");
-	hWW->Draw("SAMES");
-	//hbbmu15X->Draw("SAMES");
-	hWmunu->Draw("SAMES");
-	//hccmu15X->Draw("SAMES");
+	//hWmunu->Draw("SAMES");
 	hData->Draw("e1x0SAMES");
 	pvtxt->Draw("SAMES");
+	pvtxt1->Draw("SAMES");
 	leg_imass->Draw("SAMES");
 	//lLowBound->Draw("SMAES");
 	pad_imass->RedrawAxis();
@@ -1121,6 +1014,12 @@ void combinedGraphics::drawimass()
 	drawRatio(mHatMin, hRat->GetXaxis()->GetXmax(), hRat);
 	pad_imass_ratio->RedrawAxis();
 	
+	TString fName = "imass_" + (TString)muonLabel;
+	cnv_imass->SaveAs(fName+".eps");
+	cnv_imass->SaveAs(fName+".C");
+	cnv_imass->SaveAs(fName+".root");
+	cnv_imass->SaveAs(fName+".png");
+	
 }
 
 
@@ -1128,16 +1027,7 @@ void combinedGraphics::drawpT()
 {
 	hFile->cd();
 
-	string dir = "/srv01/tau/hod/";
-	dir += (m_dataAnalysisSelector=="digest") ? "digestControl/" : "offlineControl/";
-	string path = "";
-	string channel = "";
-	string hdir = "allCuts";
-	string tmp = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
-	
-	
 	gStyle->SetOptStat(0);
-	
 	
 	leg_pT = new TLegend(0.8039215,0.4808014,0.9232736,0.9298832,NULL,"brNDC");
 	leg_pT->SetFillColor(kWhite);
@@ -1155,6 +1045,10 @@ void combinedGraphics::drawpT()
 	pvtxt->SetFillColor(kWhite);
 	TText* txt = pvtxt->AddText( lumilabel.c_str() );
 	
+	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
+	TPaveText* pvtxt1 = new TPaveText(0.5747393,0.6552055,0.6850104,0.7388414,"brNDC");
+	pvtxt1->SetFillColor(kWhite);
+	TText* txt1 = pvtxt1->AddText( muonLabel.c_str() );
 	
 	// main canvases
 	cnv_pT = new TCanvas("cnv_pT", "cnv_pT", 0,0,1200,800);
@@ -1181,22 +1075,27 @@ void combinedGraphics::drawpT()
 	Color_t colorAccumulate = colorStart;
 	
 	string s1, s2;
-
-	//path = dir + m_dataAnalysisSelector + "Control.root";
-	//path = dir + "offlineControl_13102010_A-I2_ZprimeGRL_etaBarrel.root";
-	path = dir + "offlineControl_16112010_A-I2_ZprimeGRL_barrel.root";
+	
+	string dir = "/data/hod/D3PDdigest/rel15_barrel_selection/";
+	string path = "";
+	string sProc = "";
+	string channel = "";
+	string hdir = "allCuts";
+	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
+	
+	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
+	path = dir + "A-I2_ZprimeGRL/" + m_muonSelector + sData + ".root";
 	TFile* fdata = new TFile( path.c_str(), "READ" );
 	hData = getHisto(fdata, hdir, "pT");
 	leg_pT->AddEntry( hData, "Data", "lep");
 	
-	
-	
-	path = dir + m_mcAnalysisSelector + "Control_Zprime_mumu_SSM1000.root";
+	sProc = "Zprime_mumu_SSM1000";
+	path = dir + "Zprime_mumu/" + m_muonSelector + analysisType + sProc + ".root";
 	channel = "1 TeV Z' #rightarrow #mu^{+}#mu^{-}";
 	TFile* fZprime_mumu_SSM1000 = new TFile( path.c_str(), "READ" );
 	hZprime_mumu_SSM1000 = getHisto(fZprime_mumu_SSM1000, hdir, "pT");
-	setNormVals(0.12881, 1., 19996, dataLumi_ipb);
-	NormToDataLumi( hZprime_mumu_SSM1000, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hZprime_mumu_SSM1000, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	//////////////////////////////////////////////////////
 	// Z' interfere with the SM (DYmumu) /////////////////
 	//hZprime_mumu_SSM1000->Add( getNormDYmumu() ); ////////
@@ -1219,104 +1118,121 @@ void combinedGraphics::drawpT()
 	hZprime_mumu_SSM1000->SetYTitle( ytitle.c_str() );
 	leg_pT->AddEntry( hZprime_mumu_SSM1000, channel.c_str(), "f");
 	
+	unsigned int c = 0;
+	Color_t color = 0;
 	
+	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
 	channel = "SM(sig+bkg)";
 	hMCpT = getNormDYmumu("pT");
-	hMCpT->SetFillColor(colorAccumulate);
-	hMCpT->SetLineColor(colorAccumulate);
+	hMCpT->SetFillColor(color);
+	hMCpT->SetLineColor(color);
 	hMCpT->SetTitle("");
 	leg_pT->AddEntry( hMCpT, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
+	c++;
 	
-	
+	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
 	channel = "binned DY#mu#mu";
 	hDYmumu = getNormDYmumu("pT");
-	hDYmumu->SetFillColor(colorAccumulate);
-	hDYmumu->SetLineColor(colorAccumulate);
+	hDYmumu->SetFillColor(color);
+	hDYmumu->SetLineColor(color);
 	hDYmumu->SetTitle("");
 	leg_pT->AddEntry( hDYmumu, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
+	c++;
 	
-	
-	path = dir + m_mcAnalysisSelector + "Control_TTbar.root";
-	channel = "t #bar{t} #rightarrow #mu^{+}#mu^{-}X";
-	TFile* fTTbar = new TFile( path.c_str(), "READ" );
-	hTTbar = getHisto(fTTbar, hdir, "pT");
-	setNormVals(161., 1., 199838, dataLumi_ipb);
-	NormToDataLumi( hTTbar, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-	hTTbar->SetFillColor(colorAccumulate);
-	hTTbar->SetLineColor(colorAccumulate);
-	hTTbar->SetTitle("");
-	leg_pT->AddEntry( hTTbar, channel.c_str(), "f");
+	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
+	sProc = "ZZ_Herwig";
+	path = dir + "ZZ_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
+	channel = "ZZ";
+	TFile* fZZ = new TFile( path.c_str(), "READ" );
+	hZZ = getHisto(fZZ, hdir, "pT");
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hZZ, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	hZZ->SetFillColor(color);
+	hZZ->SetLineColor(color);
+	hZZ->SetTitle("");
+	leg_pT->AddEntry( hZZ, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
+	c++;
 	
-	path = dir + m_mcAnalysisSelector + "Control_gg2WW0240_JIMMY_WW_munumunu.root";
-	channel = "WW #rightarrow #mu#nu#mu#nu";
+	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
+	sProc = "WZ_Herwig";
+	path = dir + "WZ_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
+	channel = "WZ";
+	TFile* fWZ = new TFile( path.c_str(), "READ" );
+	hWZ = getHisto(fWZ, hdir, "pT");
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hWZ, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	hWZ->SetFillColor(color);
+	hWZ->SetLineColor(color);
+	hWZ->SetTitle("");
+	leg_pT->AddEntry( hWZ, channel.c_str(), "f");
+	colorAccumulate+=colorOffset;
+	c++;
+	
+	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
+	sProc = "WW_Herwig";
+	path = dir + "WW_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
+	channel = "WW";
 	TFile* fWW = new TFile( path.c_str(), "READ" );
-	hWW = getHisto(fWW, hdir, "imass");
-	setNormVals(0.01524, 1., 9999, dataLumi_ipb);
-	NormToDataLumi( hWW, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-	hWW->SetFillColor(colorAccumulate);
-	hWW->SetLineColor(colorAccumulate);
+	hWW = getHisto(fWW, hdir, "pT");
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hWW, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	hWW->SetFillColor(color);
+	hWW->SetLineColor(color);
 	hWW->SetTitle("");
 	leg_pT->AddEntry( hWW, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
+	c++;
 	
+	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
+	sProc = "T1_McAtNlo_Jimmy";
+	path = dir + "T1_McAtNlo_Jimmy/" + m_muonSelector + analysisType + sProc + ".root";
+	channel = "t #bar{t} #rightarrow #mu^{+}#mu^{-}X";
+	TFile* fTTbar = new TFile( path.c_str(), "READ" );
+	hTTbar = getHisto(fTTbar, hdir, "pT");
+	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	NormToDataLumi(hTTbar, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	hTTbar->SetFillColor(color);
+	hTTbar->SetLineColor(color);
+	hTTbar->SetTitle("");
+	leg_pT->AddEntry( hTTbar, channel.c_str(), "f");
+	colorAccumulate+=colorOffset;
+	c++;
 	
+	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
 	channel = "binned DY#tau#tau";
 	hDYtautau = getNormDYtautau("pT");
-	hDYtautau->SetFillColor(colorAccumulate);
-	hDYtautau->SetLineColor(colorAccumulate);
+	hDYtautau->SetFillColor(color);
+	hDYtautau->SetLineColor(color);
 	hDYtautau->SetTitle("");
 	leg_pT->AddEntry( hDYtautau, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
+	c++;
 	
 	/*
-	path = dir + m_mcAnalysisSelector + "Control_bbmu15X.root";
-	channel = "b #bar{b} #rightarrow #mu^{+}#mu^{-}X";
-	TFile* fbbmu15X = new TFile( path.c_str(), "READ" );
-	hbbmu15X = getHisto(fbbmu15X, hdir, "pT");
-	setNormVals(7.39e+4, 1., 4388911, dataLumi_ipb);
-	NormToDataLumi( hbbmu15X, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-	hbbmu15X->SetFillColor(colorAccumulate);
-	hbbmu15X->SetLineColor(colorAccumulate);
-	hbbmu15X->SetTitle("");
-	leg_pT->AddEntry( hbbmu15X, channel.c_str(), "f");
-	colorAccumulate+=colorOffset;
-	*/
-	
+	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
 	path = dir + m_mcAnalysisSelector + "Control_Wmunu.root";
 	channel = "W #rightarrow #mu#nuX";
 	TFile* fWmunu = new TFile( path.c_str(), "READ" );
 	hWmunu = getHisto(fWmunu, hdir, "pT");
 	setNormVals(10454., 1., 989886, dataLumi_ipb);
 	NormToDataLumi( hWmunu, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-	hWmunu->SetFillColor(colorAccumulate);
-	hWmunu->SetLineColor(colorAccumulate);
+	hWmunu->SetFillColor(color);
+	hWmunu->SetLineColor(color);
 	hWmunu->SetTitle("");
 	leg_pT->AddEntry( hWmunu, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
-	
-	/*
-	path = dir + m_mcAnalysisSelector + "Control_ccmu15X.root";
-	channel = "c #bar{c} #rightarrow #mu^{+}#mu^{-}X";
-	TFile* fccmu15X = new TFile( path.c_str(), "READ" );
-	hccmu15X = getHisto(fccmu15X, hdir, "pT");
-	setNormVals(2.84e+4, 1., 1499257, dataLumi_ipb);
-	NormToDataLumi( hccmu15X, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-	hccmu15X->SetFillColor(colorAccumulate);
-	hccmu15X->SetLineColor(colorAccumulate);
-	hccmu15X->SetTitle("");
-	leg_pT->AddEntry( hccmu15X, channel.c_str(), "f");
-	colorAccumulate+=colorOffset;
+	c++;
 	*/
-	
+
+	hMCpT->Add(hZZ);
+	hMCpT->Add(hWZ);
 	hMCpT->Add(hWW);
 	hMCpT->Add(hTTbar);
 	hMCpT->Add(hDYtautau);
-	//hMCpT->Add(hbbmu15X);
-	hMCpT->Add(hWmunu);
-	//hMCpT->Add(hccmu15X);
+	//hMCpT->Add(hWmunu);
 	
 	//////////////////////////////////////
 	double mHatMin = 0.075; // TeV ///////
@@ -1332,18 +1248,18 @@ void combinedGraphics::drawpT()
 	hZprime_mumu_SSM1000->Draw();
 	hMCpT->Draw("SAMES");
 	hDYmumu->Draw("SAMES");
+	hZZ->Draw("SAMES");
+	hWZ->Draw("SAMES");
+	hWW->Draw("SAMES");
 	hTTbar->Draw("SAMES");
 	hDYtautau->Draw("SAMES");
-	hWW->Draw("SAMES");
-	//hbbmu15X->Draw("SAMES");
-	hWmunu->Draw("SAMES");
-	//hccmu15X->Draw("SAMES");
+	//hWmunu->Draw("SAMES");
 	hData->Draw("e1x0SAMES");
 	pvtxt->Draw("SAMES");
+	pvtxt1->Draw("SAMES");
 	leg_pT->Draw("SAMES");
 	//lLowBound->Draw("SMAES");
 	pad_pT->RedrawAxis();
-	
 	
 	hRat = (TH1D*)hData->Clone("ratio");
 	hRat->Reset();
@@ -1359,9 +1275,13 @@ void combinedGraphics::drawpT()
 	drawRatio(hRat->GetXaxis()->GetXmin(), hRat->GetXaxis()->GetXmax(), hRat);
 	pad_pT_ratio->RedrawAxis();
 	
+	//cnv_pT->Print( hFile->GetName() );
+	//cnv_pT->SaveAs("pT.DATA.vs.MC.eps");
+	//cnv_pT->SaveAs("pT.DATA.vs.MC.C");
 	
-	cnv_pT->Print( hFile->GetName() );
-	cnv_pT->SaveAs("pT.DATA.vs.MC.eps");
-	cnv_pT->SaveAs("pT.DATA.vs.MC.C");
-	
+	TString fName = "pT_" + (TString)muonLabel;
+	cnv_pT->SaveAs(fName+".eps");
+	cnv_pT->SaveAs(fName+".C");
+	cnv_pT->SaveAs(fName+".root");
+	cnv_pT->SaveAs(fName+".png");
 }

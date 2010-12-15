@@ -17,6 +17,9 @@ class combinedGraphics : public analysisModules
 {
 	public:
 		TFile* hFile;
+		
+		// colors
+		vector<Color_t>* vcolors;
 	
 		// integrated luminosity of the data in 1/pb
 		TMapsd period2lumiMap;
@@ -31,32 +34,6 @@ class combinedGraphics : public analysisModules
 		string m_muonSelector;
 		string m_dataAnalysisSelector;
 		string m_mcAnalysisSelector;
-	
-		// map of histos
-		TMapSP2TH1D* hmap_cutFlow_imass;
-		TMapSP2TH1D* hmap_cutFlow_pT;
-		
-		// legends for the cut flow histod
-		TLegend* leg_cutFlow_imass;
-		TLegend* leg_imass;
-		TLegend* leg_cutFlow_pT;
-		TLegend* leg_pT;
-		
-		// canvases for cut flows
-		TCanvas* cnv_cutFlow_imass;
-		TCanvas* cnv_MC_cutFlow_imass;
-		TCanvas* cnv_data_cutFlow_imass;
-		TCanvas* cnv_imass;
-		TCanvas* cnv_cutFlow_pT;
-		TCanvas* cnv_MC_cutFlow_pT;
-		TCanvas* cnv_data_cutFlow_pT;
-		TCanvas* cnv_pT;
-		
-		// pads
-		TVirtualPad* pad_imass;
-		TVirtualPad* pad_imass_ratio;
-		TVirtualPad* pad_pT;
-		TVirtualPad* pad_pT_ratio;
 		
 		// for the canvases
 		Int_t    canv_x;
@@ -76,37 +53,12 @@ class combinedGraphics : public analysisModules
 		double m_genEff;
 		double m_dataLumi_pb;
 		
-		// histos
-		TH1D* hData;
-		TH1D* hMCimass;
-		TH1D* hMCpT;
-		TH1D* hZmumu;
-		TH1D* hWmunu;
-		TH1D* hZtautau;
-		TH1D* hTTbar;
-		TH1D* hbbmu15X;
-		TH1D* hccmu15X;
-		TH1D* hDYmumu;
-		TH1D* hDYtautau;
-		TH1D* hWW;
-		TH1D* hWZ;
-		TH1D* hZZ;
-		TH1D* hZprime_mumu_SSM1000;
-		TH1D* hZprime_mumu_SSM1250;
-		TH1D* hZprime_mumu_SSM1500;
-		TH1D* hZprime_mumu_SSM1750;
-		TH1D* hZprime_mumu_SSM2000;
-		
-		TH1D* hRat;
-		TH1D* hRatUp;
-		TH1D* hRatDwn;
-		
-		// TLines
-		TLine* lUnit;
-		TLine* lLowBound;
-	
-		// colors
-		vector<Color_t>* vcolors;
+		// canvas properties
+		Double_t m_miny;
+		Double_t m_maxy;
+		Double_t m_minratiox;
+		bool     m_logx;
+		bool     m_logy;
 	
 	public:
 		combinedGraphics();
@@ -154,8 +106,10 @@ class combinedGraphics : public analysisModules
 		TH1D* getNormDYmumu(string sHistName);
 		TH1D* getNormDYtautau(string sHistName);
 		
-		void drawimass();
-		void drawpT();
+		TH1D* setRegularMChisto(string sProc, string channel, string path, string hdir, string hName, Color_t color);
+		
+		void set_MCvsData(bool logx = false, bool logx = false, Double_t min = 0., Double_t max = 0., Double_t minratiox = 0.);
+		void draw_MCvsData(string dir, string hDir, string hName, string xTitle, string yTitle);
 	
 	private:
 };

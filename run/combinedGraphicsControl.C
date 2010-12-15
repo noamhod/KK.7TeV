@@ -41,6 +41,18 @@ void  combinedGraphicsControl::finalize()
 
 void combinedGraphicsControl::execute()
 {
-	m_combinedGraphics->drawimass();
-	m_combinedGraphics->drawpT();
+	string dir  = "/data/hod/D3PDdigest/rel15_barrel_selection/";
+	string hDir = "allCuts";
+	
+	m_combinedGraphics->set_MCvsData(true, true, 5.e-5, 3.e+3, 0.075);
+	m_combinedGraphics->draw_MCvsData(dir, hDir, "imass", "#hat{m}_{#mu#mu} (TeV)", "#frac{dN}{d#hat{m}}");
+
+	m_combinedGraphics->set_MCvsData(true, true, 5.e-5, 3.e+3, 0.025);
+	m_combinedGraphics->draw_MCvsData(dir, hDir, "pT", "p_{T}^{#mu} (TeV)", "#frac{dN}{dp_{T}}");
+	
+	m_combinedGraphics->set_MCvsData(false, true, 5.e-5, 1.e+3, 0.);
+	m_combinedGraphics->draw_MCvsData(dir, hDir, "eta", "#eta", "#frac{dN}{d#eta}");
+	
+	m_combinedGraphics->set_MCvsData(false, true, 5.e-5, 1.e+3, 0.);
+	m_combinedGraphics->draw_MCvsData(dir, hDir, "phi", "#phi", "#frac{dN}{d#phi}");
 }

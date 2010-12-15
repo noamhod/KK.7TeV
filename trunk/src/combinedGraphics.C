@@ -493,15 +493,15 @@ void combinedGraphics::drawRatio(double xmin, double xmax, TH1D* hRat)
 	leg_ratio->AddEntry( hRat, "R=#frac{Data}{MC}", "lep");
 	leg_ratio->Draw("SAMES");
 	
-	lUnit = new TLine(0,1,hData->GetXaxis()->GetXmax(),1);
+	TLine* lUnit = new TLine(hRatFrame->GetXaxis()->GetXmin(),1,hRatFrame->GetXaxis()->GetXmax(),1);
 	lUnit->SetLineColor(kBlack);
 	lUnit->Draw("SAMES");
 	
 	/*
-	lLowBound = new TLine(xmin,hmin,xmin,hmax);
+	TLine* lLowBound = new TLine(xmin,hmin,xmin,hmax);
 	lLowBound->SetLineColor(kBlack);
 	lLowBound->SetLineWidth(3);
-	if(xmin!=hData->GetXaxis()->GetXmin())
+	if(xmin!=hRatFrame->GetXaxis()->GetXmin())
 	{
 		lLowBound->Draw("SAMES");
 	}
@@ -543,15 +543,15 @@ void combinedGraphics::drawRatioWithBand(double xmin, double xmax, TH1D* hRat, T
 	leg_ratio->AddEntry( hRatUp, "Singed quadrature", "f");
 	leg_ratio->Draw("SAMES");
 	
-	lUnit = new TLine(0,1,hData->GetXaxis()->GetXmax(),1);
+	TLine* lUnit = new TLine(0,1,hRat->GetXaxis()->GetXmax(),1);
 	lUnit->SetLineColor(kBlack);
 	lUnit->Draw("SAMES");
 	
 	/*
-	lLowBound = new TLine(xmin,1.5*hmin,xmin,0.5*hmax);
+	TLine* lLowBound = new TLine(xmin,1.5*hmin,xmin,0.5*hmax);
 	lLowBound->SetLineColor(kBlack);
 	lLowBound->SetLineWidth(3);
-	if(xmin!=hData->GetXaxis()->GetXmin())
+	if(xmin!=hRat->GetXaxis()->GetXmin())
 	{
 		lLowBound->Draw("SAMES");
 	}
@@ -760,277 +760,35 @@ TH1D* combinedGraphics::getNormDYtautau(string sHistName)
 	return (TH1D*)hDYtautau75M120->Clone();
 }
 
-
-void combinedGraphics::drawimass()
+TH1D* combinedGraphics::setRegularMChisto(string sProc, string channel, string path, string hdir, string hName, Color_t color)
 {
-	hFile->cd();
-	
-	gStyle->SetOptStat(0);
-	
-	leg_imass = new TLegend(0.8039215,0.4808014,0.9232736,0.9298832,NULL,"brNDC");
-	leg_imass->SetFillColor(kWhite);
-	
-	m_dataLumi_pb = dataLumi_ipb;
-	
-	stringstream strm;
-	string L;
-	string lumilabel = "";
-	strm << setprecision(2);
-	strm << dataLumi_ipb;
-	strm >> L;
-	lumilabel = "#intLdt~" + L + " pb^{-1}";
-	TPaveText* pvtxt = new TPaveText(0.546462,0.6944909,0.7118499,0.8146912,"brNDC");
-	pvtxt->SetFillColor(kWhite);
-	TText* txt = pvtxt->AddText( lumilabel.c_str() );
-	
-	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
-	TPaveText* pvtxt1 = new TPaveText(0.5747393,0.6552055,0.6850104,0.7388414,"brNDC");
-	pvtxt1->SetFillColor(kWhite);
-	TText* txt1 = pvtxt1->AddText( muonLabel.c_str() );
-	
-	
-	// main canvases
-	cnv_imass = new TCanvas("cnv_imass", "cnv_imass", 0,0,1200,800);
-	cnv_imass->Divide(1,2);
-	
-	pad_imass = cnv_imass->cd(1);
-	pad_imass->SetPad(0.009197324,0.2150259,0.9899666,0.9909326);
-	pad_imass->SetFillColor(kWhite);
-	pad_imass->SetLogx();
-	pad_imass->SetLogy();
-	
-	pad_imass_ratio = cnv_imass->cd(2);
-	pad_imass_ratio->SetPad(0.009197324,0.01036269,0.9899666,0.253886);
-	pad_imass_ratio->SetFillColor(kWhite);
-	pad_imass_ratio->SetLogx();
-	pad_imass_ratio->SetLogy();
-	
-	cnv_imass->Draw();
-	cnv_imass->cd();
-	cnv_imass->Update();
-	
-	Color_t colorStart  = 100;//kOrange; //40;
-	Color_t colorOffset = -10;//1;
-	Color_t colorAccumulate = colorStart;
-	
-	string s1, s2;
-	
-	string dir = "/data/hod/D3PDdigest/rel15_barrel_selection/";
-	string path = "";
-	string sProc = "";
-	string channel = "";
-	string hdir = "allCuts";
-	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
-	
-	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
-	path = dir + "A-I2_ZprimeGRL/" + m_muonSelector + sData + ".root";
-	TFile* fdata = new TFile( path.c_str(), "READ" );
-	hData = getHisto(fdata, hdir, "imass");
-	leg_imass->AddEntry(hData, "Data", "lep");
-	
-	
-	sProc = "Zprime_mumu_SSM1000";
-	path = dir + "Zprime_mumu/" + m_muonSelector + analysisType + sProc + ".root";
-	channel = "1 TeV Z' #rightarrow #mu^{+}#mu^{-}";
-	TFile* fZprime_mumu_SSM1000 = new TFile( path.c_str(), "READ" );
-	hZprime_mumu_SSM1000 = getHisto(fZprime_mumu_SSM1000, hdir, "imass");
+	TFile* f = new TFile( path.c_str(), "READ" );
+	TH1D*  h = getHisto(f, hdir, hName);
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
-	NormToDataLumi(hZprime_mumu_SSM1000, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
-	//////////////////////////////////////////////////////
-	// Z' interfere with the SM (DYmumu) /////////////////
-	//hZprime_mumu_SSM1000->Add( getNormDYmumu() ); ////////
-	//////////////////////////////////////////////////////
-	hZprime_mumu_SSM1000->SetLineColor(kBlue);
-	hZprime_mumu_SSM1000->SetLineWidth(2);
-	hZprime_mumu_SSM1000->SetMinimum(5.e-5);
-	hZprime_mumu_SSM1000->SetMaximum(3.e+3);
-	strm.clear();
-	strm << setprecision(2);
-	strm << hZprime_mumu_SSM1000->GetBinWidth(1);
-	strm >> s1;
-	strm.clear();
-	strm << setprecision(2);
-	strm << hZprime_mumu_SSM1000->GetBinWidth( hZprime_mumu_SSM1000->GetNbinsX() );
-	strm >> s2;
-	string ytitle = "#frac{dN}{d#hat{m}} (" + s1 + "#rightarrow" + s2 + " TeV)^{-1}";
-	hZprime_mumu_SSM1000->SetTitle("");
-	hZprime_mumu_SSM1000->SetXTitle("#hat{m}_{#mu#mu} (TeV)");
-	hZprime_mumu_SSM1000->SetYTitle( ytitle.c_str() );
-	leg_imass->AddEntry( hZprime_mumu_SSM1000, channel.c_str(), "f");
-	
-	unsigned int c = 0;
-	Color_t color = 0;
-	
-	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
-	channel = "SM(sig+bkg)";
-	hMCimass = getNormDYmumu("imass");
-	hMCimass->SetFillColor(color);
-	hMCimass->SetLineColor(color);
-	hMCimass->SetTitle("");
-	leg_imass->AddEntry( hMCimass, channel.c_str(), "f");
-	colorAccumulate+=colorOffset;
-	c++;
-	
-	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
-	channel = "binned DY#mu#mu";
-	hDYmumu = getNormDYmumu("imass");
-	hDYmumu->SetFillColor(color);
-	hDYmumu->SetLineColor(color);
-	hDYmumu->SetTitle("");
-	leg_imass->AddEntry( hDYmumu, channel.c_str(), "f");
-	colorAccumulate+=colorOffset;
-	c++;
-	
-	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
-	sProc = "ZZ_Herwig";
-	path = dir + "ZZ_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
-	channel = "ZZ";
-	TFile* fZZ = new TFile( path.c_str(), "READ" );
-	hZZ = getHisto(fZZ, hdir, "imass");
-	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
-	NormToDataLumi(hZZ, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
-	hZZ->SetFillColor(color);
-	hZZ->SetLineColor(color);
-	hZZ->SetTitle("");
-	leg_imass->AddEntry( hZZ, channel.c_str(), "f");
-	colorAccumulate+=colorOffset;
-	c++;
-	
-	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
-	sProc = "WZ_Herwig";
-	path = dir + "WZ_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
-	channel = "WZ";
-	TFile* fWZ = new TFile( path.c_str(), "READ" );
-	hWZ = getHisto(fWZ, hdir, "imass");
-	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
-	NormToDataLumi(hWZ, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
-	hWZ->SetFillColor(color);
-	hWZ->SetLineColor(color);
-	hWZ->SetTitle("");
-	leg_imass->AddEntry( hWZ, channel.c_str(), "f");
-	colorAccumulate+=colorOffset;
-	c++;
-	
-	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
-	sProc = "WW_Herwig";
-	path = dir + "WW_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
-	channel = "WW";
-	TFile* fWW = new TFile( path.c_str(), "READ" );
-	hWW = getHisto(fWW, hdir, "imass");
-	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
-	NormToDataLumi(hWW, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
-	hWW->SetFillColor(color);
-	hWW->SetLineColor(color);
-	hWW->SetTitle("");
-	leg_imass->AddEntry( hWW, channel.c_str(), "f");
-	colorAccumulate+=colorOffset;
-	c++;
-	
-	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
-	sProc = "T1_McAtNlo_Jimmy";
-	path = dir + "T1_McAtNlo_Jimmy/" + m_muonSelector + analysisType + sProc + ".root";
-	channel = "t #bar{t} #rightarrow #mu^{+}#mu^{-}X";
-	TFile* fTTbar = new TFile( path.c_str(), "READ" );
-	hTTbar = getHisto(fTTbar, hdir, "imass");
-	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
-	NormToDataLumi(hTTbar, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
-	hTTbar->SetFillColor(color);
-	hTTbar->SetLineColor(color);
-	hTTbar->SetTitle("");
-	leg_imass->AddEntry( hTTbar, channel.c_str(), "f");
-	colorAccumulate+=colorOffset;
-	c++;
-	
-	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
-	channel = "binned DY#tau#tau";
-	hDYtautau = getNormDYtautau("imass");
-	hDYtautau->SetFillColor(color);
-	hDYtautau->SetLineColor(color);
-	hDYtautau->SetTitle("");
-	leg_imass->AddEntry( hDYtautau, channel.c_str(), "f");
-	colorAccumulate+=colorOffset;
-	c++;
-	
-	/*
-	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
-	path = dir + m_mcAnalysisSelector + "Control_Wmunu.root";
-	channel = "W #rightarrow #mu#nuX";
-	TFile* fWmunu = new TFile( path.c_str(), "READ" );
-	hWmunu = getHisto(fWmunu, hdir, "imass");
-	setNormVals(10454., 1., 989886, dataLumi_ipb);
-	NormToDataLumi( hWmunu, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-	hWmunu->SetFillColor(color);
-	hWmunu->SetLineColor(color);
-	hWmunu->SetTitle("");
-	leg_imass->AddEntry( hWmunu, channel.c_str(), "f");
-	colorAccumulate+=colorOffset;
-	c++;
-	*/
-	
-	hMCimass->Add(hZZ);
-	hMCimass->Add(hWZ);
-	hMCimass->Add(hWW);
-	hMCimass->Add(hTTbar);
-	hMCimass->Add(hDYtautau);
-	//hMCimass->Add(hWmunu);
-	
-	//////////////////////////////////////
-	double mHatMin = 0.075; // TeV ///////
-	//////////////////////////////////////
-	
-	/*
-	lLowBound = new TLine(mHatMin,hMCimass->GetMinimum(),mHatMin,hMCimass->GetMaximum());
-	lLowBound->SetLineColor(kBlack);
-	lLowBound->SetLineWidth(3);
-	*/
-	
-	pad_imass->cd();
-	hZprime_mumu_SSM1000->Draw();
-	hMCimass->Draw("SAMES");
-	hDYmumu->Draw("SAMES");
-	hZZ->Draw("SAMES");
-	hWZ->Draw("SAMES");
-	hWW->Draw("SAMES");
-	hTTbar->Draw("SAMES");
-	hDYtautau->Draw("SAMES");
-	//hWmunu->Draw("SAMES");
-	hData->Draw("e1x0SAMES");
-	pvtxt->Draw("SAMES");
-	pvtxt1->Draw("SAMES");
-	leg_imass->Draw("SAMES");
-	//lLowBound->Draw("SMAES");
-	pad_imass->RedrawAxis();
-	
-	
-	hRat = (TH1D*)hData->Clone("ratio");
-	hRat->Reset();
-	hRatUp = (TH1D*)hData->Clone("ratUp");
-	hRatUp->Reset();
-	hRatDwn = (TH1D*)hData->Clone("ratDwn");
-	hRatDwn->Reset();
-	
-	ratio(mHatMin, hRat->GetXaxis()->GetXmax(), hData, hMCimass, hRat, hRatUp, hRatDwn);
-	pad_imass_ratio->cd();
-	drawRatio(mHatMin, hRat->GetXaxis()->GetXmax(), hRat);
-	pad_imass_ratio->RedrawAxis();
-	
-	TString fName = "imass_" + (TString)muonLabel;
-	cnv_imass->SaveAs(fName+".eps");
-	cnv_imass->SaveAs(fName+".C");
-	cnv_imass->SaveAs(fName+".root");
-	cnv_imass->SaveAs(fName+".png");
-	
+	NormToDataLumi(h, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
+	h->SetFillColor(color);
+	h->SetLineColor(color);
+	h->SetTitle("");
+	return h;
 }
 
+void combinedGraphics::set_MCvsData(bool logx, bool logy, Double_t min, Double_t max, Double_t minratiox)
+{
+	m_logx = logx;
+	m_logy = logy;
+	m_miny  = min;
+	m_maxy  = max;
+	m_minratiox = minratiox;
+}
 
-void combinedGraphics::drawpT()
+void combinedGraphics::draw_MCvsData(string dir, string hDir, string hName, string xTitle, string yTitle)
 {
 	hFile->cd();
 
 	gStyle->SetOptStat(0);
 	
-	leg_pT = new TLegend(0.8039215,0.4808014,0.9232736,0.9298832,NULL,"brNDC");
-	leg_pT->SetFillColor(kWhite);
+	TLegend* leg = new TLegend(0.8039215,0.4808014,0.9232736,0.9298832,NULL,"brNDC");
+	leg->SetFillColor(kWhite);
 	
 	m_dataLumi_pb = dataLumi_ipb;
 	
@@ -1051,24 +809,25 @@ void combinedGraphics::drawpT()
 	TText* txt1 = pvtxt1->AddText( muonLabel.c_str() );
 	
 	// main canvases
-	cnv_pT = new TCanvas("cnv_pT", "cnv_pT", 0,0,1200,800);
-	cnv_pT->Divide(1,2);
+	string cName = "cnv_" + hName;
+	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);
+	cnv->Divide(1,2);
 	
-	pad_pT = cnv_pT->cd(1);
-	pad_pT->SetPad(0.009197324,0.2150259,0.9899666,0.9909326);
-	pad_pT->SetFillColor(kWhite);
-	pad_pT->SetLogx();
-	pad_pT->SetLogy();
+	TVirtualPad* pad = cnv->cd(1);
+	pad->SetPad(0.009197324,0.2150259,0.9899666,0.9909326);
+	pad->SetFillColor(kWhite);
+	if(m_logx) pad->SetLogx();
+	if(m_logy) pad->SetLogy();
 	
-	pad_pT_ratio = cnv_pT->cd(2);
-	pad_pT_ratio->SetPad(0.009197324,0.01036269,0.9899666,0.253886);
-	pad_pT_ratio->SetFillColor(kWhite);
-	pad_pT_ratio->SetLogx();
-	pad_pT_ratio->SetLogy();
+	TVirtualPad* pad_ratio = cnv->cd(2);
+	pad_ratio->SetPad(0.009197324,0.01036269,0.9899666,0.253886);
+	pad_ratio->SetFillColor(kWhite);
+	if(m_logx) pad_ratio->SetLogx();
+	pad_ratio->SetLogy();
 	
-	cnv_pT->Draw();
-	cnv_pT->cd();
-	cnv_pT->Update();
+	cnv->Draw();
+	cnv->cd();
+	cnv->Update();
 	
 	Color_t colorStart  = 100;//kOrange; //40;
 	Color_t colorOffset = -10;//1;
@@ -1076,24 +835,25 @@ void combinedGraphics::drawpT()
 	
 	string s1, s2;
 	
-	string dir = "/data/hod/D3PDdigest/rel15_barrel_selection/";
 	string path = "";
 	string sProc = "";
 	string channel = "";
-	string hdir = "allCuts";
 	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
+	
+	double ymin = 1.e10;
+	double ymax = 0.;
 	
 	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
 	path = dir + "A-I2_ZprimeGRL/" + m_muonSelector + sData + ".root";
 	TFile* fdata = new TFile( path.c_str(), "READ" );
-	hData = getHisto(fdata, hdir, "pT");
-	leg_pT->AddEntry( hData, "Data", "lep");
+	TH1D* hData = getHisto(fdata, hDir, hName);
+	leg->AddEntry( hData, "Data", "lep");
 	
 	sProc = "Zprime_mumu_SSM1000";
 	path = dir + "Zprime_mumu/" + m_muonSelector + analysisType + sProc + ".root";
-	channel = "1 TeV Z' #rightarrow #mu^{+}#mu^{-}";
+	channel = "1 TeV Z'";
 	TFile* fZprime_mumu_SSM1000 = new TFile( path.c_str(), "READ" );
-	hZprime_mumu_SSM1000 = getHisto(fZprime_mumu_SSM1000, hdir, "pT");
+	TH1D* hZprime_mumu_SSM1000 = getHisto(fZprime_mumu_SSM1000, hDir, hName);
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hZprime_mumu_SSM1000, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	//////////////////////////////////////////////////////
@@ -1102,8 +862,8 @@ void combinedGraphics::drawpT()
 	//////////////////////////////////////////////////////
 	hZprime_mumu_SSM1000->SetLineColor(kBlue);
 	hZprime_mumu_SSM1000->SetLineWidth(2);
-	hZprime_mumu_SSM1000->SetMinimum(5.e-5);
-	hZprime_mumu_SSM1000->SetMaximum(3.e+3);
+	if(m_miny!=m_maxy) hZprime_mumu_SSM1000->SetMinimum(m_miny);
+	if(m_miny!=m_maxy) hZprime_mumu_SSM1000->SetMaximum(m_maxy);
 	strm.clear();
 	strm << setprecision(2);
 	strm << hZprime_mumu_SSM1000->GetBinWidth(1);
@@ -1112,32 +872,36 @@ void combinedGraphics::drawpT()
 	strm << setprecision(2);
 	strm << hZprime_mumu_SSM1000->GetBinWidth( hZprime_mumu_SSM1000->GetNbinsX() );
 	strm >> s2;
-	string ytitle = "#frac{dN}{dp_{T}} (" + s1 + "#rightarrow" + s2 + " TeV)^{-1}";
+	string ytitle = (s1==s2) ? yTitle : yTitle + "(" + s1 + "#rightarrow" + s2 + " TeV)^{-1}";
 	hZprime_mumu_SSM1000->SetTitle("");
-	hZprime_mumu_SSM1000->SetXTitle("p_{T}^{#mu} (TeV)");
+	hZprime_mumu_SSM1000->SetXTitle( xTitle.c_str() );
 	hZprime_mumu_SSM1000->SetYTitle( ytitle.c_str() );
-	leg_pT->AddEntry( hZprime_mumu_SSM1000, channel.c_str(), "f");
+	if(hZprime_mumu_SSM1000->GetMinimum()<ymin) ymin=hZprime_mumu_SSM1000->GetMinimum();
+	if(hZprime_mumu_SSM1000->GetMaximum()>ymax) ymax=hZprime_mumu_SSM1000->GetMaximum();
+	leg->AddEntry( hZprime_mumu_SSM1000, channel.c_str(), "f");
 	
 	unsigned int c = 0;
 	Color_t color = 0;
 	
 	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
 	channel = "SM(sig+bkg)";
-	hMCpT = getNormDYmumu("pT");
-	hMCpT->SetFillColor(color);
-	hMCpT->SetLineColor(color);
-	hMCpT->SetTitle("");
-	leg_pT->AddEntry( hMCpT, channel.c_str(), "f");
+	TH1D* hMC = getNormDYmumu(hName);
+	hMC->SetFillColor(color);
+	hMC->SetLineColor(color);
+	hMC->SetTitle("");
+	leg->AddEntry( hMC, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
 	c++;
 	
 	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
-	channel = "binned DY#mu#mu";
-	hDYmumu = getNormDYmumu("pT");
+	channel = "Binned DY#mu#mu";
+	TH1D* hDYmumu = getNormDYmumu(hName);
 	hDYmumu->SetFillColor(color);
 	hDYmumu->SetLineColor(color);
 	hDYmumu->SetTitle("");
-	leg_pT->AddEntry( hDYmumu, channel.c_str(), "f");
+	if(hDYmumu->GetMinimum()<ymin) ymin=hDYmumu->GetMinimum();
+	if(hDYmumu->GetMaximum()>ymax) ymax=hDYmumu->GetMaximum();
+	leg->AddEntry( hDYmumu, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
 	c++;
 	
@@ -1145,14 +909,10 @@ void combinedGraphics::drawpT()
 	sProc = "ZZ_Herwig";
 	path = dir + "ZZ_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
 	channel = "ZZ";
-	TFile* fZZ = new TFile( path.c_str(), "READ" );
-	hZZ = getHisto(fZZ, hdir, "pT");
-	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
-	NormToDataLumi(hZZ, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
-	hZZ->SetFillColor(color);
-	hZZ->SetLineColor(color);
-	hZZ->SetTitle("");
-	leg_pT->AddEntry( hZZ, channel.c_str(), "f");
+	TH1D* hZZ = setRegularMChisto(sProc, channel, path, hDir, hName, color);
+	if(hZZ->GetMinimum()<ymin) ymin=hZZ->GetMinimum();
+	if(hZZ->GetMaximum()>ymax) ymax=hZZ->GetMaximum();
+	leg->AddEntry( hZZ, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
 	c++;
 	
@@ -1160,14 +920,10 @@ void combinedGraphics::drawpT()
 	sProc = "WZ_Herwig";
 	path = dir + "WZ_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
 	channel = "WZ";
-	TFile* fWZ = new TFile( path.c_str(), "READ" );
-	hWZ = getHisto(fWZ, hdir, "pT");
-	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
-	NormToDataLumi(hWZ, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
-	hWZ->SetFillColor(color);
-	hWZ->SetLineColor(color);
-	hWZ->SetTitle("");
-	leg_pT->AddEntry( hWZ, channel.c_str(), "f");
+	TH1D* hWZ = setRegularMChisto(sProc, channel, path, hDir, hName, color);
+	if(hWZ->GetMinimum()<ymin) ymin=hWZ->GetMinimum();
+	if(hWZ->GetMaximum()>ymax) ymax=hWZ->GetMaximum();
+	leg->AddEntry( hWZ, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
 	c++;
 	
@@ -1175,113 +931,78 @@ void combinedGraphics::drawpT()
 	sProc = "WW_Herwig";
 	path = dir + "WW_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
 	channel = "WW";
-	TFile* fWW = new TFile( path.c_str(), "READ" );
-	hWW = getHisto(fWW, hdir, "pT");
-	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
-	NormToDataLumi(hWW, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
-	hWW->SetFillColor(color);
-	hWW->SetLineColor(color);
-	hWW->SetTitle("");
-	leg_pT->AddEntry( hWW, channel.c_str(), "f");
+	TH1D* hWW = setRegularMChisto(sProc, channel, path, hDir, hName, color);
+	if(hWW->GetMinimum()<ymin) ymin=hWW->GetMinimum();
+	if(hWW->GetMaximum()>ymax) ymax=hWW->GetMaximum();
+	leg->AddEntry( hWW, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
 	c++;
 	
 	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
 	sProc = "T1_McAtNlo_Jimmy";
 	path = dir + "T1_McAtNlo_Jimmy/" + m_muonSelector + analysisType + sProc + ".root";
-	channel = "t #bar{t} #rightarrow #mu^{+}#mu^{-}X";
-	TFile* fTTbar = new TFile( path.c_str(), "READ" );
-	hTTbar = getHisto(fTTbar, hdir, "pT");
-	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
-	NormToDataLumi(hTTbar, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
-	hTTbar->SetFillColor(color);
-	hTTbar->SetLineColor(color);
-	hTTbar->SetTitle("");
-	leg_pT->AddEntry( hTTbar, channel.c_str(), "f");
+	channel = "t #bar{t}";
+	TH1D* hTTbar = setRegularMChisto(sProc, channel, path, hDir, hName, color);
+	if(hTTbar->GetMinimum()<ymin) ymin=hTTbar->GetMinimum();
+	if(hTTbar->GetMaximum()>ymax) ymax=hTTbar->GetMaximum();
+	leg->AddEntry( hTTbar, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
 	c++;
 	
 	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
-	channel = "binned DY#tau#tau";
-	hDYtautau = getNormDYtautau("pT");
+	channel = "Binned DY#tau#tau";
+	TH1D* hDYtautau = getNormDYtautau(hName);
 	hDYtautau->SetFillColor(color);
 	hDYtautau->SetLineColor(color);
 	hDYtautau->SetTitle("");
-	leg_pT->AddEntry( hDYtautau, channel.c_str(), "f");
+	if(hDYtautau->GetMinimum()<ymin) ymin=hDYtautau->GetMinimum();
+	if(hDYtautau->GetMaximum()>ymax) ymax=hDYtautau->GetMaximum();
+	leg->AddEntry( hDYtautau, channel.c_str(), "f");
 	colorAccumulate+=colorOffset;
 	c++;
-	
-	/*
-	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
-	path = dir + m_mcAnalysisSelector + "Control_Wmunu.root";
-	channel = "W #rightarrow #mu#nuX";
-	TFile* fWmunu = new TFile( path.c_str(), "READ" );
-	hWmunu = getHisto(fWmunu, hdir, "pT");
-	setNormVals(10454., 1., 989886, dataLumi_ipb);
-	NormToDataLumi( hWmunu, m_crossSection_pb, m_branchingRatio, m_nMCevents, m_dataLumi_pb);
-	hWmunu->SetFillColor(color);
-	hWmunu->SetLineColor(color);
-	hWmunu->SetTitle("");
-	leg_pT->AddEntry( hWmunu, channel.c_str(), "f");
-	colorAccumulate+=colorOffset;
-	c++;
-	*/
 
-	hMCpT->Add(hZZ);
-	hMCpT->Add(hWZ);
-	hMCpT->Add(hWW);
-	hMCpT->Add(hTTbar);
-	hMCpT->Add(hDYtautau);
-	//hMCpT->Add(hWmunu);
+	hMC->Add(hZZ);
+	hMC->Add(hWZ);
+	hMC->Add(hWW);
+	hMC->Add(hTTbar);
+	hMC->Add(hDYtautau);
+	if(hMC->GetMinimum()<ymin) ymin=hMC->GetMinimum();
+	if(hMC->GetMaximum()>ymax) ymax=hMC->GetMaximum();
 	
-	//////////////////////////////////////
-	double mHatMin = 0.075; // TeV ///////
-	//////////////////////////////////////
-	
-	/*
-	lLowBound = new TLine(mHatMin,hMCpT->GetMinimum(),mHatMin,hMCpT->GetMaximum());
-	lLowBound->SetLineColor(kBlack);
-	lLowBound->SetLineWidth(3);
-	*/
-	
-	pad_pT->cd();
+	pad->cd();
 	hZprime_mumu_SSM1000->Draw();
-	hMCpT->Draw("SAMES");
+	hMC->Draw("SAMES");
 	hDYmumu->Draw("SAMES");
 	hZZ->Draw("SAMES");
 	hWZ->Draw("SAMES");
 	hWW->Draw("SAMES");
 	hTTbar->Draw("SAMES");
 	hDYtautau->Draw("SAMES");
-	//hWmunu->Draw("SAMES");
 	hData->Draw("e1x0SAMES");
 	pvtxt->Draw("SAMES");
 	pvtxt1->Draw("SAMES");
-	leg_pT->Draw("SAMES");
-	//lLowBound->Draw("SMAES");
-	pad_pT->RedrawAxis();
+	leg->Draw("SAMES");
+	pad->RedrawAxis();
 	
-	hRat = (TH1D*)hData->Clone("ratio");
+	TH1D* hRat = (TH1D*)hData->Clone("ratio");
 	hRat->Reset();
-	hRatUp = (TH1D*)hData->Clone("ratUp");
+	TH1D* hRatUp = (TH1D*)hData->Clone("ratUp");
 	hRatUp->Reset();
-	hRatDwn = (TH1D*)hData->Clone("ratDwn");
+	TH1D* hRatDwn = (TH1D*)hData->Clone("ratDwn");
 	hRatDwn->Reset();
 	
-	double hpTmin = 0.025;
+	double minrat = (m_minratiox==0.) ? hData->GetXaxis()->GetXmin() : m_minratiox;
+	ratio(minrat/*hRat->GetXaxis()->GetXmin()*/, hRat->GetXaxis()->GetXmax(), hData, hMC, hRat, hRatUp, hRatDwn);
+	pad_ratio->cd();
+	drawRatio(minrat/*hRat->GetXaxis()->GetXmin()*/, hRat->GetXaxis()->GetXmax(), hRat);
+	pad_ratio->RedrawAxis();
 	
-	ratio(hpTmin/*hRat->GetXaxis()->GetXmin()*/, hRat->GetXaxis()->GetXmax(), hData, hMCpT, hRat, hRatUp, hRatDwn);
-	pad_pT_ratio->cd();
-	drawRatio(hRat->GetXaxis()->GetXmin(), hRat->GetXaxis()->GetXmax(), hRat);
-	pad_pT_ratio->RedrawAxis();
+	cout << "hName=" << hName << ": xminratio=" << minrat << ", ymin=" << ymin << ", ymax=" << ymax << endl;
 	
-	//cnv_pT->Print( hFile->GetName() );
-	//cnv_pT->SaveAs("pT.DATA.vs.MC.eps");
-	//cnv_pT->SaveAs("pT.DATA.vs.MC.C");
-	
-	TString fName = "pT_" + (TString)muonLabel;
-	cnv_pT->SaveAs(fName+".eps");
-	cnv_pT->SaveAs(fName+".C");
-	cnv_pT->SaveAs(fName+".root");
-	cnv_pT->SaveAs(fName+".png");
+	//cnv->Print( hFile->GetName() );
+	TString fName = (TString)hName + "_" + (TString)muonLabel;
+	cnv->SaveAs(fName+".eps");
+	cnv->SaveAs(fName+".C");
+	cnv->SaveAs(fName+".root");
+	cnv->SaveAs(fName+".png");
 }

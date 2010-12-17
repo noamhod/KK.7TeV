@@ -558,90 +558,90 @@ void combinedGraphics::drawRatioWithBand(double xmin, double xmax, TH1D* hRat, T
 	*/
 }
 
-TH1D* combinedGraphics::getNormDYmumu(string sHistName)
+TH1D* combinedGraphics::getNormDYmumu(string dir, string hDir, string hName)
 {
 	hFile->cd();
 
-	string dir = "/data/hod/D3PDdigest/rel15_barrel_selection/DYmumu/" + m_muonSelector;
+	//string dir = "/data/hod/D3PDdigest/rel15_barrel_selection/DYmumu/" + m_muonSelector;
 	string path  = "";
 	string sProc = "";
-	string hdir = "allCuts";
+	//string hDir = "allCuts";
 	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
 	
 	sProc = "DYmumu_75M120";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumu75M120 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu75M120 = getHisto(fDYmumu75M120, hdir, sHistName.c_str());
+	TH1D* hDYmumu75M120 = getHisto(fDYmumu75M120, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYmumu75M120, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	sProc = "DYmumu_120M250";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumu120M250 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu120M250 = getHisto(fDYmumu120M250, hdir, sHistName.c_str());
+	TH1D* hDYmumu120M250 = getHisto(fDYmumu120M250, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYmumu120M250, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	sProc = "DYmumu_250M400";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumu250M400 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu250M400 = getHisto(fDYmumu250M400, hdir, sHistName.c_str());
+	TH1D* hDYmumu250M400 = getHisto(fDYmumu250M400, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYmumu250M400, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	sProc = "DYmumu_400M600";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumu400M600 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu400M600 = getHisto(fDYmumu400M600, hdir, sHistName.c_str());
+	TH1D* hDYmumu400M600 = getHisto(fDYmumu400M600, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYmumu400M600, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	sProc = "DYmumu_600M800";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumu600M800 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu600M800 = getHisto(fDYmumu600M800, hdir, sHistName.c_str());
+	TH1D* hDYmumu600M800 = getHisto(fDYmumu600M800, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYmumu600M800, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	sProc = "DYmumu_800M1000";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumu800M1000 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu800M1000 = getHisto(fDYmumu800M1000, hdir, sHistName.c_str());
+	TH1D* hDYmumu800M1000 = getHisto(fDYmumu800M1000, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYmumu800M1000, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	sProc = "DYmumu_1000M1250";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumu1000M1250 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu1000M1250 = getHisto(fDYmumu1000M1250, hdir, sHistName.c_str());
+	TH1D* hDYmumu1000M1250 = getHisto(fDYmumu1000M1250, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYmumu1000M1250, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	sProc = "DYmumu_1250M1500";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumu1250M1500 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu1250M1500 = getHisto(fDYmumu1250M1500, hdir, sHistName.c_str());
+	TH1D* hDYmumu1250M1500 = getHisto(fDYmumu1250M1500, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYmumu1250M1500, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	sProc = "DYmumu_1500M1750";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumu1500M1750 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu1500M1750 = getHisto(fDYmumu1500M1750, hdir, sHistName.c_str());
+	TH1D* hDYmumu1500M1750 = getHisto(fDYmumu1500M1750, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYmumu1500M1750, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	sProc = "DYmumu_1750M2000";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumu1750M2000 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu1750M2000 = getHisto(fDYmumu1750M2000, hdir, sHistName.c_str());
+	TH1D* hDYmumu1750M2000 = getHisto(fDYmumu1750M2000, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYmumu1750M2000, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	sProc = "DYmumu_M2000";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYmumuM2000 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumuM2000 = getHisto(fDYmumuM2000, hdir, sHistName.c_str());
+	TH1D* hDYmumuM2000 = getHisto(fDYmumuM2000, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYmumuM2000, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
@@ -659,90 +659,90 @@ TH1D* combinedGraphics::getNormDYmumu(string sHistName)
 	return (TH1D*)hDYmumu75M120->Clone();
 }
 
-TH1D* combinedGraphics::getNormDYtautau(string sHistName)
+TH1D* combinedGraphics::getNormDYtautau(string dir, string hDir, string hName)
 {
 	hFile->cd();
 
-	string dir = "/data/hod/D3PDdigest/rel15_barrel_selection/DYtautau/" + m_muonSelector;
+	//string dir = "/data/hod/D3PDdigest/rel15_barrel_selection/DYtautau/" + m_muonSelector;
 	string path  = "";
 	string sProc = "";
-	string hdir = "allCuts";
+	//string hDir = "allCuts";
 	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
 	
 	sProc = "DYtautau_75M120";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautau75M120 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYtautau75M120 = getHisto(fDYtautau75M120, hdir, sHistName.c_str());
+	TH1D* hDYtautau75M120 = getHisto(fDYtautau75M120, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYtautau75M120, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	sProc = "DYtautau_120M250";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautau120M250 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYtautau120M250 = getHisto(fDYtautau120M250, hdir, sHistName.c_str());
+	TH1D* hDYtautau120M250 = getHisto(fDYtautau120M250, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYtautau120M250, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	sProc = "DYtautau_250M400";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautau250M400 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYtautau250M400 = getHisto(fDYtautau250M400, hdir, sHistName.c_str());
+	TH1D* hDYtautau250M400 = getHisto(fDYtautau250M400, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYtautau250M400, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	sProc = "DYtautau_400M600";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautau400M600 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYtautau400M600 = getHisto(fDYtautau400M600, hdir, sHistName.c_str());
+	TH1D* hDYtautau400M600 = getHisto(fDYtautau400M600, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYtautau400M600, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	sProc = "DYtautau_600M800";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautau600M800 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYtautau600M800 = getHisto(fDYtautau600M800, hdir, sHistName.c_str());
+	TH1D* hDYtautau600M800 = getHisto(fDYtautau600M800, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYtautau600M800, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	sProc = "DYtautau_800M1000";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautau800M1000 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYtautau800M1000 = getHisto(fDYtautau800M1000, hdir, sHistName.c_str());
+	TH1D* hDYtautau800M1000 = getHisto(fDYtautau800M1000, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYtautau800M1000, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	sProc = "DYtautau_1000M1250";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautau1000M1250 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYtautau1000M1250 = getHisto(fDYtautau1000M1250, hdir, sHistName.c_str());
+	TH1D* hDYtautau1000M1250 = getHisto(fDYtautau1000M1250, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYtautau1000M1250, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	sProc = "DYtautau_1250M1500";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautau1250M1500 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYtautau1250M1500 = getHisto(fDYtautau1250M1500, hdir, sHistName.c_str());
+	TH1D* hDYtautau1250M1500 = getHisto(fDYtautau1250M1500, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYtautau1250M1500, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	sProc = "DYtautau_1500M1750";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautau1500M1750 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYtautau1500M1750 = getHisto(fDYtautau1500M1750, hdir, sHistName.c_str());
+	TH1D* hDYtautau1500M1750 = getHisto(fDYtautau1500M1750, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYtautau1500M1750, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	sProc = "DYtautau_1750M2000";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautau1750M2000 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYtautau1750M2000 = getHisto(fDYtautau1750M2000, hdir, sHistName.c_str());
+	TH1D* hDYtautau1750M2000 = getHisto(fDYtautau1750M2000, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYtautau1750M2000, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
 	sProc = "DYtautau_M2000";
 	path = dir + analysisType + sProc + ".root";
 	TFile* fDYtautauM2000 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYtautauM2000 = getHisto(fDYtautauM2000, hdir, sHistName.c_str());
+	TH1D* hDYtautauM2000 = getHisto(fDYtautauM2000, hDir, hName.c_str());
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(hDYtautauM2000, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	
@@ -760,10 +760,10 @@ TH1D* combinedGraphics::getNormDYtautau(string sHistName)
 	return (TH1D*)hDYtautau75M120->Clone();
 }
 
-TH1D* combinedGraphics::setRegularMChisto(string sProc, string channel, string path, string hdir, string hName, Color_t color)
+TH1D* combinedGraphics::setRegularMChisto(string sProc, string channel, string path, string hDir, string hName, Color_t color)
 {
 	TFile* f = new TFile( path.c_str(), "READ" );
-	TH1D*  h = getHisto(f, hdir, hName);
+	TH1D*  h = getHisto(f, hDir, hName);
 	setNormVals(mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	NormToDataLumi(h, mcProc2sigma[sProc], mcProc2br[sProc], mcProc2nevents[sProc], mcProc2kfactor[sProc], mcProc2geneff[sProc], dataLumi_ipb);
 	h->SetFillColor(color);
@@ -783,6 +783,25 @@ void combinedGraphics::set_MCvsData(bool logx, bool logy, Double_t min, Double_t
 
 void combinedGraphics::draw_MCvsData(string dir, string hDir, string hName, string xTitle, string yTitle)
 {
+	cout << "getting " << dir+" : " + hDir + " : " + hName << endl;
+
+	string hNameFixed = hName;
+	
+	/*
+	size_t found;
+	int ipos;
+	found = hNameFixed.find(" ");
+	if(found!=string::npos) { ipos=(int)found;  hNameFixed = hNameFixed.substr(0,ipos-1)+hNameFixed.substr(ipos+1,hNameFixed.length()); }
+	found = hNameFixed.find("#");
+	if(found!=string::npos) { ipos=(int)found;  hNameFixed = hNameFixed.substr(0,ipos-1)+hNameFixed.substr(ipos+1,hNameFixed.length()); }
+	found = hNameFixed.find("^");
+	if(found!=string::npos) { ipos=(int)found;  hNameFixed = hNameFixed.substr(0,ipos-1)+hNameFixed.substr(ipos+1,hNameFixed.length()); }
+	found = hNameFixed.find("{");
+	if(found!=string::npos) { ipos=(int)found;  hNameFixed = hNameFixed.substr(0,ipos-1)+hNameFixed.substr(ipos+1,hNameFixed.length()); }
+	found = hNameFixed.find("}");
+	if(found!=string::npos) { ipos=(int)found;  hNameFixed = hNameFixed.substr(0,ipos-1)+hNameFixed.substr(ipos+1,hNameFixed.length()); }
+	*/
+	
 	hFile->cd();
 
 	gStyle->SetOptStat(0);
@@ -808,8 +827,7 @@ void combinedGraphics::draw_MCvsData(string dir, string hDir, string hName, stri
 	pvtxt1->SetFillColor(kWhite);
 	TText* txt1 = pvtxt1->AddText( muonLabel.c_str() );
 	
-	// main canvases
-	string cName = "cnv_" + hName;
+	string cName = "cnv_" + hNameFixed;
 	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);
 	cnv->Divide(1,2);
 	
@@ -844,9 +862,15 @@ void combinedGraphics::draw_MCvsData(string dir, string hDir, string hName, stri
 	double ymax = 0.;
 	
 	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
-	path = dir + "A-I2_ZprimeGRL/" + m_muonSelector + sData + ".root";
+	path = dir + "AtoI2_ZprimeGRL/" + m_muonSelector + sData + ".root";
 	TFile* fdata = new TFile( path.c_str(), "READ" );
 	TH1D* hData = getHisto(fdata, hDir, hName);
+	if(hData==NULL)
+	{
+		cout << "ERROR: cannot find histogram with name = " << hName << " in the file." << endl;
+		cout << "returning now." << endl;
+		return;
+	}
 	leg->AddEntry( hData, "Data", "lep");
 	
 	sProc = "Zprime_mumu_SSM1000";
@@ -885,7 +909,7 @@ void combinedGraphics::draw_MCvsData(string dir, string hDir, string hName, stri
 	
 	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
 	channel = "SM(sig+bkg)";
-	TH1D* hMC = getNormDYmumu(hName);
+	TH1D* hMC = getNormDYmumu(dir+"DYmumu/"+m_muonSelector, hDir, hName);
 	hMC->SetFillColor(color);
 	hMC->SetLineColor(color);
 	hMC->SetTitle("");
@@ -895,7 +919,7 @@ void combinedGraphics::draw_MCvsData(string dir, string hDir, string hName, stri
 	
 	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
 	channel = "Binned DY#mu#mu";
-	TH1D* hDYmumu = getNormDYmumu(hName);
+	TH1D* hDYmumu = getNormDYmumu(dir+"DYmumu/"+m_muonSelector, hDir, hName);
 	hDYmumu->SetFillColor(color);
 	hDYmumu->SetLineColor(color);
 	hDYmumu->SetTitle("");
@@ -951,7 +975,7 @@ void combinedGraphics::draw_MCvsData(string dir, string hDir, string hName, stri
 	
 	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
 	channel = "Binned DY#tau#tau";
-	TH1D* hDYtautau = getNormDYtautau(hName);
+	TH1D* hDYtautau = getNormDYtautau(dir+"DYtautau/"+m_muonSelector, hDir, hName);
 	hDYtautau->SetFillColor(color);
 	hDYtautau->SetLineColor(color);
 	hDYtautau->SetTitle("");
@@ -1000,7 +1024,9 @@ void combinedGraphics::draw_MCvsData(string dir, string hDir, string hName, stri
 	cout << "hName=" << hName << ": xminratio=" << minrat << ", ymin=" << ymin << ", ymax=" << ymax << endl;
 	
 	//cnv->Print( hFile->GetName() );
-	TString fName = (TString)hName + "_" + (TString)muonLabel;
+	
+	
+	TString fName = "figures/" + (TString)hNameFixed + "_" + (TString)muonLabel;
 	cnv->SaveAs(fName+".eps");
 	cnv->SaveAs(fName+".C");
 	cnv->SaveAs(fName+".root");

@@ -71,17 +71,17 @@ void mcDigestAnalysis::executeCutFlow()
 	//buildMU4Vector(nMus); /////////////////////////////
 	/////////////////////////////////////////////////////
 
-	////////////////////////////////////////
-	// execute the cut profile analysis ////
-	fillCutProfile1D(); ////////////////////
-	fillCutProfile2D(); ////////////////////
-	////////////////////////////////////////
-	
 	////////////////////////////////////////////////
 	// Do the Tag&Probe analysis ///////////////////
 	bool isMC = true; //////////////////////////////
 	applyTagNProbe( (*m_cutsFlowSkipMap),isMC ); ///
 	////////////////////////////////////////////////
+	
+	////////////////////////////////////////
+	// execute the cut profile analysis ////
+	fillCutProfile1D(); ////////////////////
+	fillCutProfile2D(); ////////////////////
+	////////////////////////////////////////
 	
 	/////////////////////////////////////////////////////
 	// preform the entire preselection //////////////////
@@ -189,7 +189,7 @@ void mcDigestAnalysis::setEventVariables()
 	analysisSkeleton::as_muonTruth_phi = m_mcDigestPhys->muonTruth_phi;
 	analysisSkeleton::as_muonTruth_charge = m_mcDigestPhys->muonTruth_charge;
 	analysisSkeleton::as_muonTruth_PDGID = m_mcDigestPhys->muonTruth_PDGID;
-	analysisSkeleton::as_muonTruth_barcode = m_mcDigestPhys->muonTruth_barcode;
+	//analysisSkeleton::as_muonTruth_barcode = m_mcDigestPhys->muonTruth_barcode;
 	analysisSkeleton::as_muonTruth_type = m_mcDigestPhys->muonTruth_type;
 	analysisSkeleton::as_muonTruth_origin = m_mcDigestPhys->muonTruth_origin;
 	

@@ -42,7 +42,7 @@ void digestControl::initialize()
 	m_GRL = new GRLinterface();
 	m_GRL->glrinitialize( (TString)str );
 	
-	str = checkANDsetFilepath("PWD", "/../conf/digest_dataset.list");
+	str = checkANDsetFilepath("PWD", "/../conf/digest_dataset_AtoI2_ZprimeGRL.list");
 	string strb = checkANDsetFilepath("PWD", "/digest_datasetdir/"); // ln -s  ~hod/data  datasetdir
 	makeChain(true, str, strb);
 
@@ -98,16 +98,14 @@ void digestControl::book()
 	m_dirPerformance = m_histfile->mkdir("performance");
 	
 	m_dirAfb = m_histfile->mkdir("Afb");
+	
+	m_dirEff = m_histfile->mkdir("efficiency");
+	m_digestAnalysis->bookEfficiencyHistos(m_digestAnalysis->m_period2triggerperiodMap, m_dirEff);
 }
 
 void digestControl::draw()
 {
 	m_digestAnalysis->drawBareHistos(m_dirNoCuts);
-	
-	bool isTruth = false;
-	m_digestAnalysis->calculateEfficiency(m_digestAnalysis->h1_tagNprobe_candidates_pT, m_digestAnalysis->h1_tagNprobe_succeeded_pT, m_digestAnalysis->h1_tagNprobe_efficiency_pT, isTruth);
-	m_digestAnalysis->calculateEfficiency(m_digestAnalysis->h1_tagNprobe_candidates_eta, m_digestAnalysis->h1_tagNprobe_succeeded_eta, m_digestAnalysis->h1_tagNprobe_efficiency_eta, isTruth);
-	m_digestAnalysis->calculateEfficiency(m_digestAnalysis->h1_tagNprobe_candidates_phi, m_digestAnalysis->h1_tagNprobe_succeeded_phi, m_digestAnalysis->h1_tagNprobe_efficiency_phi, isTruth);
 	
 	m_digestAnalysis->calculateAfb(m_digestAnalysis->h1_Afb, m_dirAfb);
 	
@@ -119,6 +117,28 @@ void digestControl::draw()
 	//m_digestAnalysis->drawFitHistos(m_dirFit, m_digestAnalysis->m_fitMinuit->guess, m_digestAnalysis->m_fitMinuit->fitFCN);
 	
 	m_digestAnalysis->drawCutProfileHistosMap( m_dirCutProfile );
+	
+	bool isTruth = false;
+	m_digestAnalysis->calculateEfficiency(m_digestAnalysis->h1map_tagNprobe_candidates_pT,
+										  m_digestAnalysis->h1map_tagNprobe_succeeded_pT,
+										  m_digestAnalysis->h1map_tagNprobe_trigEff_pT, isTruth);
+	m_digestAnalysis->calculateEfficiency(m_digestAnalysis->h1map_tagNprobe_candidates_eta,
+										  m_digestAnalysis->h1map_tagNprobe_succeeded_eta,
+										  m_digestAnalysis->h1map_tagNprobe_trigEff_eta, isTruth);
+	m_digestAnalysis->calculateEfficiency(m_digestAnalysis->h1map_tagNprobe_candidates_phi,
+										  m_digestAnalysis->h1map_tagNprobe_succeeded_phi,
+										  m_digestAnalysis->h1map_tagNprobe_trigEff_phi, isTruth);
+	isTruth = true;
+	m_digestAnalysis->calculateEfficiency(m_digestAnalysis->h1map_truth_candidates_pT,
+										  m_digestAnalysis->h1map_truth_succeeded_pT,
+										  m_digestAnalysis->h1map_truth_trigEff_pT, isTruth);
+	m_digestAnalysis->calculateEfficiency(m_digestAnalysis->h1map_truth_candidates_eta,
+										  m_digestAnalysis->h1map_truth_succeeded_eta,
+										  m_digestAnalysis->h1map_truth_trigEff_eta, isTruth);
+	m_digestAnalysis->calculateEfficiency(m_digestAnalysis->h1map_truth_candidates_phi,
+										  m_digestAnalysis->h1map_truth_succeeded_phi,
+										  m_digestAnalysis->h1map_truth_trigEff_phi, isTruth);
+	m_digestAnalysis->drawEfficiencyHistosMap(m_dirEff);
 	
 	m_digestAnalysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
 	
@@ -202,7 +222,7 @@ void digestControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	
 	draw();
 	
-	//finalize();
+	finalize();
 	
 	stopTimer(true);
 	

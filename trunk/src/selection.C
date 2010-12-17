@@ -746,7 +746,7 @@ bool selection::pTandEtaTightCut( float pTCutVal, float etaTightCutVal, float me
 
 bool selection::pTandEtaBarrelCut( float pTCutVal, float etaBarrelCutVal, float me_qOp, float me_theta, float eta )
 {
-	if( !etaTightCut( etaBarrelCutVal, eta ) )  return false;
+	if( !etaBarrelCut( etaBarrelCutVal, eta ) )  return false;
 	if( !pTCut( pTCutVal, me_qOp, me_theta ) ) return false;
 	
 	return true;
@@ -770,7 +770,7 @@ bool selection::pTandEtaTightCut( float pTCutVal, float etaTightCutVal, float pT
 
 bool selection::pTandEtaBarrelCut( float pTCutVal, float etaBarrelCutVal, float pT, float eta )
 {
-	if( !etaTightCut( etaBarrelCutVal, eta ) )  return false;
+	if( !etaBarrelCut( etaBarrelCutVal, eta ) )  return false;
 	if( !pTCut( pTCutVal, pT ) )               return false;
 	
 	return true;

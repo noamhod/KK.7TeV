@@ -103,8 +103,8 @@ class combinedGraphics : public analysisModules
 		void drawRatio(double xmin, double xmax, TH1D* hRat);
 		void drawRatioWithBand(double xmin, double xmax, TH1D* hRat, TH1D* hRatUp, TH1D* hRatDwn);
 		
-		TH1D* getNormDYmumu(string sHistName);
-		TH1D* getNormDYtautau(string sHistName);
+		TH1D* getNormDYmumu(string dir, string hDir, string hName);
+		TH1D* getNormDYtautau(string dir, string hDir, string hName);
 		
 		TH1D* setRegularMChisto(string sProc, string channel, string path, string hdir, string hName, Color_t color);
 		

@@ -97,6 +97,9 @@ void mcDigestControl::book()
 	m_dirPerformance = m_histfile->mkdir("performance");
 	
 	m_dirAfb = m_histfile->mkdir("Afb");
+	
+	m_dirEff = m_histfile->mkdir("efficiency");
+	m_mcDigestAnalysis->bookEfficiencyHistos(m_mcDigestAnalysis->m_period2triggerperiodMap, m_dirEff);
 }
 
 void mcDigestControl::draw()
@@ -104,15 +107,6 @@ void mcDigestControl::draw()
 	m_mcDigestAnalysis->drawBareHistos(m_dirNoCuts);
 	
 	// these calculations must come before drawHistos
-	bool isTruth = false;
-	m_mcDigestAnalysis->calculateEfficiency(m_mcDigestAnalysis->h1_tagNprobe_candidates_pT, m_mcDigestAnalysis->h1_tagNprobe_succeeded_pT, m_mcDigestAnalysis->h1_tagNprobe_efficiency_pT, isTruth);
-	m_mcDigestAnalysis->calculateEfficiency(m_mcDigestAnalysis->h1_tagNprobe_candidates_eta, m_mcDigestAnalysis->h1_tagNprobe_succeeded_eta, m_mcDigestAnalysis->h1_tagNprobe_efficiency_eta, isTruth);
-	m_mcDigestAnalysis->calculateEfficiency(m_mcDigestAnalysis->h1_tagNprobe_candidates_phi, m_mcDigestAnalysis->h1_tagNprobe_succeeded_phi, m_mcDigestAnalysis->h1_tagNprobe_efficiency_phi, isTruth);
-	isTruth = true;
-	m_mcDigestAnalysis->calculateEfficiency(m_mcDigestAnalysis->h1_truth_candidates_pT, m_mcDigestAnalysis->h1_truth_succeeded_pT, m_mcDigestAnalysis->h1_truth_efficiency_pT, isTruth);
-	m_mcDigestAnalysis->calculateEfficiency(m_mcDigestAnalysis->h1_truth_candidates_eta, m_mcDigestAnalysis->h1_truth_succeeded_eta, m_mcDigestAnalysis->h1_truth_efficiency_eta, isTruth);
-	m_mcDigestAnalysis->calculateEfficiency(m_mcDigestAnalysis->h1_truth_candidates_phi, m_mcDigestAnalysis->h1_truth_succeeded_phi, m_mcDigestAnalysis->h1_truth_efficiency_phi, isTruth);
-	
 	m_mcDigestAnalysis->calculateAfb(m_mcDigestAnalysis->h1_Afb, m_dirAfb);
 	
 	m_mcDigestAnalysis->drawHistos(m_dirAllCuts);
@@ -123,6 +117,28 @@ void mcDigestControl::draw()
 	//m_mcDigestAnalysis->drawFitHistos(m_dirFit, m_mcDigestAnalysis->m_fitMinuit->guess, m_mcDigestAnalysis->m_fitMinuit->fitFCN);
 	
 	m_mcDigestAnalysis->drawCutProfileHistosMap( m_dirCutProfile );
+	
+	bool isTruth = false;
+	m_mcDigestAnalysis->calculateEfficiency(m_mcDigestAnalysis->h1map_tagNprobe_candidates_pT,
+											m_mcDigestAnalysis->h1map_tagNprobe_succeeded_pT,
+											m_mcDigestAnalysis->h1map_tagNprobe_trigEff_pT, isTruth);
+	m_mcDigestAnalysis->calculateEfficiency(m_mcDigestAnalysis->h1map_tagNprobe_candidates_eta,
+											m_mcDigestAnalysis->h1map_tagNprobe_succeeded_eta,
+											m_mcDigestAnalysis->h1map_tagNprobe_trigEff_eta, isTruth);
+	m_mcDigestAnalysis->calculateEfficiency(m_mcDigestAnalysis->h1map_tagNprobe_candidates_phi,
+											m_mcDigestAnalysis->h1map_tagNprobe_succeeded_phi,
+											m_mcDigestAnalysis->h1map_tagNprobe_trigEff_phi, isTruth);
+	isTruth = true;
+	m_mcDigestAnalysis->calculateEfficiency(m_mcDigestAnalysis->h1map_truth_candidates_pT,
+											m_mcDigestAnalysis->h1map_truth_succeeded_pT,
+											m_mcDigestAnalysis->h1map_truth_trigEff_pT, isTruth);
+	m_mcDigestAnalysis->calculateEfficiency(m_mcDigestAnalysis->h1map_truth_candidates_eta,
+											m_mcDigestAnalysis->h1map_truth_succeeded_eta,
+											m_mcDigestAnalysis->h1map_truth_trigEff_eta, isTruth);
+	m_mcDigestAnalysis->calculateEfficiency(m_mcDigestAnalysis->h1map_truth_candidates_phi,
+											m_mcDigestAnalysis->h1map_truth_succeeded_phi,
+											m_mcDigestAnalysis->h1map_truth_trigEff_phi, isTruth);
+	m_mcDigestAnalysis->drawEfficiencyHistosMap(m_dirEff);
 	
 	m_mcDigestAnalysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
 	
@@ -187,6 +203,8 @@ void mcDigestControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	fits();
 	
 	draw();
+	
+	finalize();
 	
 	stopTimer(true);
 }

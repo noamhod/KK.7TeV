@@ -291,8 +291,6 @@ void analysisSkeleton::printAllProperties(int ai, int bi, int iv)
 	printProperty("mu_1_nTGCLayer2PhiHits", mu_nTGCLayer2PhiHits->at(ai));
 	printProperty("mu_1_nTGCLayer3PhiHits", mu_nTGCLayer3PhiHits->at(ai));
 	printProperty("mu_1_nTGCLayer4PhiHits", mu_nTGCLayer4PhiHits->at(ai));
-	
-
 
 	printProperty("mu_2_m", mu_m->at(bi));
 	printProperty("mu_2_px", mu_px->at(bi));
@@ -494,10 +492,22 @@ int analysisSkeleton::countQAflags()
 
 void analysisSkeleton::pTSort()
 {
-	// the map is already sorted, no need to convert values
-	TMapdi::reverse_iterator rit = pTtoIndexMap.rbegin();
+	// build a reduced pT to index map of the good QA muons only
+	TMapdi pTtoIndexMapReduced;
+	for(TMapdi::iterator it=pTtoIndexMap.begin() ; it!=pTtoIndexMap.end() ; it++)
+	{
+		if(muQAflags[it->second]) pTtoIndexMapReduced.insert( make_pair(it->first,it->second) );
+	}
+
+	// the map is already sorted by the pT size but,
+	// from the lowest to the highest, so there's
+	// no need to convert values.
+	// the following line defines the reversed iterator
+	// so the "rbegin()" points the iterator to the entry
+	// with the largest pT and so on.
+	TMapdi::reverse_iterator rit=pTtoIndexMapReduced.rbegin();
 	ai = rit->second;
-	++rit;
+	rit++;
 	bi = rit->second;
 }
 
@@ -588,6 +598,9 @@ bool analysisSkeleton::assignPairIndices()
 		cout << "WARNING: in analysisSkeleton::assignPairIndices, but there are <2 good single-muons" << endl;
 		return false;
 	}
+	
+	if(!muQAflags[ai] || !muQAflags[bi]) return false;
+	
 	return true;
 }
 
@@ -599,14 +612,12 @@ bool analysisSkeleton::assignPairIndices()
 
 bool analysisSkeleton::applyPreselection()
 {
-	TMapsb cutsToSkip;
-	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;
-
 	///////////////////////////////////////////
 	// do not skip this for correct counting //
-	if(!isSkippedCut) incrementNallEvents(); //
+	incrementNallEvents(); ////////////////////
 	///////////////////////////////////////////
 
+	TMapsb cutsToSkip; // dummy (empty)
 	passCutFlow = preselection(cutsToSkip);
 	
 	return passCutFlow;
@@ -614,14 +625,12 @@ bool analysisSkeleton::applyPreselection()
 
 bool analysisSkeleton::applySingleMuonSelection()
 {
-	TMapsb cutsToSkip;
-	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;
-
 	////////////////////////////////////////
 	// fill the NO CUTS items //////////////
-	if(!isSkippedCut) fillBeforeCuts(); ////
+	fillBeforeCuts(); //////////////////////
 	////////////////////////////////////////
-	
+
+	TMapsb cutsToSkip; // dummy (empty)
 	passCutFlow = singleSelection(cutsToSkip);
 	
 	return passCutFlow;
@@ -629,12 +638,10 @@ bool analysisSkeleton::applySingleMuonSelection()
 
 bool analysisSkeleton::applyDoubleMuonSelection()
 {
-	TMapsb cutsToSkip;
-	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;
-	
+	TMapsb cutsToSkip; // dummy (empty)
 	passCutFlow = doubleSelection(cutsToSkip);
 	
-	if(passCutFlow  &&  !isSkippedCut)
+	if(passCutFlow)
 	{
 		///////////////////////////////////////////////
 		// fill the cutFlow and the allCuts items /////
@@ -944,10 +951,12 @@ bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 		
 		string sorderedcutname = ii->second;
 		
-		itr = cutsToSkip.find(sorderedcutname);
-		bool bSkipCut;
-		if(itr!=itrEnd) bSkipCut = itr->second;
-		else bSkipCut = false;
+		bool bSkipCut = false;
+		if(isSkippedCut)
+		{
+			itr = cutsToSkip.find(sorderedcutname);
+			if(itr!=itrEnd) bSkipCut = itr->second;
+		}
 
 		if(sorderedcutname=="GRL"  &&  !bSkipCut)
 		{
@@ -1031,10 +1040,12 @@ bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 		string sorderedcutname = ii->second;
 		nMusPassed = 0;
 		
-		itr = cutsToSkip.find(sorderedcutname);
-		bool bSkipCut;
-		if(itr!=itrEnd) bSkipCut = itr->second;
-		else bSkipCut = false;
+		bool bSkipCut = false;
+		if(isSkippedCut)
+		{
+			itr = cutsToSkip.find(sorderedcutname);
+			if(itr!=itrEnd) bSkipCut = itr->second;
+		}
 		
 		
 		if(sorderedcutname=="pT"  &&  !bSkipCut)
@@ -1121,8 +1132,7 @@ bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 			{
 				float cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 				float cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
-				thisMuPass = ( pTandEtaBarrelCut(cutval1, cutval2,
-				mu_me_qoverp->at(mu), mu_me_theta->at(mu), mu_eta->at(mu)) ) ? true : false;
+				thisMuPass = (pTandEtaBarrelCut(cutval1,cutval2,mu_me_qoverp->at(mu),mu_me_theta->at(mu),mu_eta->at(mu))) ? true : false;
 				//thisMuPass = ( pTandEtaBarrelCut(cutval1, cutval2, mu_pt->at(mu), mu_eta->at(mu)) ) ? true : false;
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
@@ -1302,7 +1312,6 @@ bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
 	bool isPair = assignPairIndices(); //////////////////
 	if(!isPair) return false; ///////////////////////////
 	/////////////////////////////////////////////////////
-	
 
 	passCutFlow    = true;
 	passCurrentCut = true;
@@ -1316,10 +1325,12 @@ bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
 		
 		string sorderedcutname = ii->second;
 		
-		itr = cutsToSkip.find(sorderedcutname);
-		bool bSkipCut;
-		if(itr!=itrEnd) bSkipCut = itr->second;
-		else bSkipCut = false;
+		bool bSkipCut = false;
+		if(isSkippedCut)
+		{
+			itr = cutsToSkip.find(sorderedcutname);
+			if(itr!=itrEnd) bSkipCut = itr->second;
+		}
 
 		if(sorderedcutname=="oppositeCharge"  &&  !bSkipCut)
 		{

@@ -57,8 +57,10 @@ class combinedGraphics : public analysisModules
 		Double_t m_miny;
 		Double_t m_maxy;
 		Double_t m_minratiox;
+		Double_t m_minRelDiffx;
 		bool     m_logx;
 		bool     m_logy;
+		bool     m_doRatio;
 	
 	public:
 		combinedGraphics();
@@ -99,7 +101,9 @@ class combinedGraphics : public analysisModules
 						 double dataLumi_pb);
 		
 		void relDiff(TH1D* hInp, TH1D* hRef, TH1D* hRelDiffPos, TH1D* hRelDiffNeg);
+		void relDiff(TH1D* hInp, TH1D* hRef, TH1D* hRelDiff);
 		void ratio(double xmin, double xmax, TH1D* hInp, TH1D* hRef, TH1D* hRat, TH1D* hRatUp, TH1D* hRatDwn);
+		void drawRelDiff(double xmin, double xmax, TH1D* hRelDiff);
 		void drawRatio(double xmin, double xmax, TH1D* hRat);
 		void drawRatioWithBand(double xmin, double xmax, TH1D* hRat, TH1D* hRatUp, TH1D* hRatDwn);
 		
@@ -108,8 +112,14 @@ class combinedGraphics : public analysisModules
 		
 		TH1D* setRegularMChisto(string sProc, string channel, string path, string hdir, string hName, Color_t color);
 		
-		void set_MCvsData(bool logx = false, bool logx = false, Double_t min = 0., Double_t max = 0., Double_t minratiox = 0.);
-		void draw_MCvsData(string dir, string hDir, string hName, string xTitle, string yTitle);
+		void set_allMCvsData(bool logx = false, bool logx = false, Double_t min = 0., Double_t max = 0., Double_t minratiox = 0.);
+		void draw_allMCvsData(string dir, string hDir, string hName, string xTitle, string yTitle);
+		
+		void set_sumMCvsData(bool logx = false, bool logx = false, Double_t min = 0., Double_t max = 0., Double_t minratiox = 0., bool doRatio = true);
+		void draw_sumMCvsData(string dir, string hDir, string hName, string xTitle, string yTitle);
+		
+		void set_AfbMCvsData(bool logx = false, bool logx = false, Double_t min = 0., Double_t max = 0., Double_t minratiox = 0.);
+		void draw_AfbMCvsData(string dir, string hDir, string hName, string xTitle, string yTitle);
 	
 	private:
 };

@@ -33,6 +33,7 @@ atlasStyle->SetStatColor(icol);
 atlasStyle->SetFrameFillColor(icol);
 atlasStyle->SetTitleFillColor(icol);
 
+
 // set the paper & margin sizes
 atlasStyle->SetPaperSize(20,26);
 atlasStyle->SetPadTopMargin(0.05);

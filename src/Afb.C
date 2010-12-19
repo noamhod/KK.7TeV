@@ -70,7 +70,7 @@ void Afb::calculateAfb(TH1D* h, TDirectory* tdir)
 		float N = Nf[b-1]+Nb[b-1];
 		
 		// the Forward-Backward Asymmetry:
-		float afb = (N>0.) ? (Nf[b-1]-Nb[b-1])/N : 0.;
+		float afb = (N>0.) ? (Nf[b-1]-Nb[b-1])/N : -999.;
 		
 		// the Forward-Backward Asymmetry error: 
 		// if N=Nf+Nb, p=Nf/N, q=1-p=Nb/N, then A=p-q=2*p-1.

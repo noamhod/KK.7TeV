@@ -26,7 +26,7 @@ void combinedGraphics::initialize(string analysisSelector, string muonSelector)
 
 	hFile->cd();
 	
-	setStyle();
+	//setStyle();
 	
 	// canvas size
 	canv_x = 602;
@@ -370,6 +370,32 @@ void combinedGraphics::relDiff(TH1D* hInp, TH1D* hRef, TH1D* hRelDiffPos, TH1D* 
 	}
 }
 
+void combinedGraphics::relDiff(TH1D* hInp, TH1D* hRef, TH1D* hRelDiff)
+{
+	Int_t nBins = hInp->GetNbinsX();
+	Double_t reldiff = 0.;
+	Double_t nRef = 0.;
+	Double_t nInp = 0.;
+	Double_t eRef = 0.;
+	Double_t eInp = 0.;
+
+	for (Int_t n=1 ; n<=nBins ; n++) {
+		nRef = hRef->GetBinContent(n);
+		nInp = hInp->GetBinContent(n);
+		eRef = hRef->GetBinError(n);
+		eInp = hInp->GetBinError(n);
+		if (eRef!=0.  &&  eInp!=0.)// for not dividing by zero...
+		{
+			reldiff = (nRef-nInp) / sqrt(eRef*eRef + eInp*eInp);
+			hRelDiff->SetBinContent(n,reldiff);
+		}
+		else
+		{
+			hRelDiff->SetBinContent(n,-999.);
+		}
+	}
+}
+
 void combinedGraphics::ratio(double xmin, double xmax, TH1D* hInp, TH1D* hRef, TH1D* hRat, TH1D* hRatUp, TH1D* hRatDwn)
 {
 	Int_t nBins = hInp->GetNbinsX();
@@ -446,6 +472,55 @@ void combinedGraphics::ratio(double xmin, double xmax, TH1D* hInp, TH1D* hRef, T
 			*/
 		}
 	}
+}
+
+void combinedGraphics::drawRelDiff(double xmin, double xmax, TH1D* hRelDiff)
+{
+	hFile->cd();
+
+	double hmin = -1;
+	double hmax = +1;
+
+	TH1D* hRelDiffFrame = (TH1D*)hRelDiff->Clone("");
+	hRelDiffFrame->Reset();
+	hRelDiffFrame->SetMaximum(hmax);
+	hRelDiffFrame->SetMinimum(hmin);
+	hRelDiffFrame->SetTitle("");
+	hRelDiffFrame->Draw();
+	
+	Int_t nfullbins = 0;
+	for(Int_t i=1 ; i<=hRelDiff->GetNbinsX() ; i++) { if(hRelDiff->GetBinContent(i)>0) nfullbins++; }
+	Double_t *xArray       = (Double_t *)malloc(nfullbins*sizeof(Double_t));
+	Double_t *RelDiffArray = (Double_t *)malloc(nfullbins*sizeof(Double_t));
+	TAxis *xaxis = hRelDiff->GetXaxis();
+	int index = 0;
+	for(Int_t i=1 ; i<=hRelDiff->GetNbinsX() ; i++)
+	{
+		if(hRelDiff->GetBinContent(i)>0)
+		{
+			xArray[index]       = xaxis->GetBinCenter(i);
+			RelDiffArray[index] = hRelDiff->GetBinContent(i);
+			index++;
+		}
+	}
+	TGraph *gRelDiff = new TGraph(nfullbins, xArray, RelDiffArray);
+	gRelDiff->SetLineStyle(1);
+	gRelDiff->SetLineWidth(2);
+	gRelDiff->SetLineColor(kRed);
+	gRelDiff->SetTitle("");
+	gRelDiff->Draw("PSAMES");
+	
+	//hRelDiff->SetTitle("");
+	//hRelDiff->Draw("elx0SAMES");
+	
+	TLegend* leg_RelDiff = new TLegend(0.8008749,0.6868085,0.8951647,0.8289424,NULL,"brNDC");
+	leg_RelDiff->SetFillColor(kWhite);
+	leg_RelDiff->AddEntry( gRelDiff, "R=#frac{Data}{MC}", "lep");
+	leg_RelDiff->Draw("SAMES");
+	
+	TLine* lUnit = new TLine(hRelDiffFrame->GetXaxis()->GetXmin(),0,hRelDiffFrame->GetXaxis()->GetXmax(),0);
+	lUnit->SetLineColor(kBlack);
+	lUnit->Draw("SAMES");
 }
 
 void combinedGraphics::drawRatio(double xmin, double xmax, TH1D* hRat)
@@ -772,8 +847,10 @@ TH1D* combinedGraphics::setRegularMChisto(string sProc, string channel, string p
 	return h;
 }
 
-void combinedGraphics::set_MCvsData(bool logx, bool logy, Double_t min, Double_t max, Double_t minratiox)
+void combinedGraphics::set_allMCvsData(bool logx, bool logy, Double_t min, Double_t max, Double_t minratiox)
 {
+	setStyle();
+
 	m_logx = logx;
 	m_logy = logy;
 	m_miny  = min;
@@ -781,26 +858,11 @@ void combinedGraphics::set_MCvsData(bool logx, bool logy, Double_t min, Double_t
 	m_minratiox = minratiox;
 }
 
-void combinedGraphics::draw_MCvsData(string dir, string hDir, string hName, string xTitle, string yTitle)
+void combinedGraphics::draw_allMCvsData(string dir, string hDir, string hName, string xTitle, string yTitle)
 {
 	cout << "getting " << dir+" : " + hDir + " : " + hName << endl;
 
 	string hNameFixed = hName;
-	
-	/*
-	size_t found;
-	int ipos;
-	found = hNameFixed.find(" ");
-	if(found!=string::npos) { ipos=(int)found;  hNameFixed = hNameFixed.substr(0,ipos-1)+hNameFixed.substr(ipos+1,hNameFixed.length()); }
-	found = hNameFixed.find("#");
-	if(found!=string::npos) { ipos=(int)found;  hNameFixed = hNameFixed.substr(0,ipos-1)+hNameFixed.substr(ipos+1,hNameFixed.length()); }
-	found = hNameFixed.find("^");
-	if(found!=string::npos) { ipos=(int)found;  hNameFixed = hNameFixed.substr(0,ipos-1)+hNameFixed.substr(ipos+1,hNameFixed.length()); }
-	found = hNameFixed.find("{");
-	if(found!=string::npos) { ipos=(int)found;  hNameFixed = hNameFixed.substr(0,ipos-1)+hNameFixed.substr(ipos+1,hNameFixed.length()); }
-	found = hNameFixed.find("}");
-	if(found!=string::npos) { ipos=(int)found;  hNameFixed = hNameFixed.substr(0,ipos-1)+hNameFixed.substr(ipos+1,hNameFixed.length()); }
-	*/
 	
 	hFile->cd();
 
@@ -1032,3 +1094,497 @@ void combinedGraphics::draw_MCvsData(string dir, string hDir, string hName, stri
 	cnv->SaveAs(fName+".root");
 	cnv->SaveAs(fName+".png");
 }
+
+void combinedGraphics::set_sumMCvsData(bool logx, bool logy, Double_t min, Double_t max, Double_t minratiox, bool doRatio)
+{
+	setStyle();
+
+	m_logx = logx;
+	m_logy = logy;
+	m_miny  = min;
+	m_maxy  = max;
+	m_doRatio  = doRatio;
+	m_minratiox = minratiox;
+	m_minRelDiffx = minratiox;
+}
+
+void combinedGraphics::draw_sumMCvsData(string dir, string hDir, string hName, string xTitle, string yTitle)
+{
+	cout << "getting " << dir + " : " + hDir + " : " + hName << endl;
+
+	TStyle* plotstyle = (TStyle*)gROOT->GetStyle("Plain");
+	plotstyle->cd();
+	
+	string hNameFixed = hName;
+	
+	hFile->cd();
+
+	gStyle->SetOptStat(0);
+	
+	TLegend* leg = new TLegend(0.7393469,0.8156218,0.9335198,0.9321636,NULL,"brNDC");
+	leg->SetFillColor(kWhite);
+	
+	m_dataLumi_pb = dataLumi_ipb;
+	
+	stringstream strm;
+	string L;
+	string lumilabel = "";
+	strm << setprecision(2);
+	strm << dataLumi_ipb;
+	strm >> L;
+	lumilabel = "#intLdt~" + L + " pb^{-1}";
+	TPaveText* pvtxt = new TPaveText(0.1424448,0.784087,0.3078514,0.9033709,"brNDC");
+	pvtxt->SetFillColor(kWhite);
+	TText* txt = pvtxt->AddText( lumilabel.c_str() );
+	
+	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
+	TPaveText* pvtxt1 = new TPaveText(0.1640196,0.74981,0.2607065,0.8279615,"brNDC");
+	pvtxt1->SetFillColor(kWhite);
+	TText* txt1 = pvtxt1->AddText( muonLabel.c_str() );
+	
+	string cName = "cnv_" + hNameFixed;
+	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);
+	cnv->Divide(1,2);
+	
+	TVirtualPad* pad = cnv->cd(1);
+	pad->SetPad(0.009197324,0.2150259,0.9899666,0.9909326);
+	pad->SetFillColor(kWhite);
+	if(m_logx) pad->SetLogx();
+	if(m_logy) pad->SetLogy();
+	
+	TVirtualPad* pad_ratio = cnv->cd(2);
+	pad_ratio->SetPad(0.009197324,0.01036269,0.9899666,0.253886);
+	pad_ratio->SetFillColor(kWhite);
+	if(m_logx) pad_ratio->SetLogx();
+	if(m_doRatio) pad_ratio->SetLogy();
+	
+	cnv->Draw();
+	cnv->cd();
+	cnv->Update();
+	
+	
+	string s1, s2;
+	
+	string path = "";
+	string sProc = "";
+	string channel = "";
+	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
+	
+	double ymin = 1.e10;
+	double ymax = 0.;
+	
+	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
+	path = dir + "AtoI2_ZprimeGRL/" + m_muonSelector + sData + ".root";
+	TFile* fdata = new TFile( path.c_str(), "READ" );
+	TH1D* hData = getHisto(fdata, hDir, hName);
+	if(hData==NULL)
+	{
+		cout << "ERROR: cannot find histogram with name = " << hName << " in the file." << endl;
+		cout << "returning now." << endl;
+		return;
+	}
+	leg->AddEntry( hData, "Data", "lep");
+	
+	channel = "SM(sig+bkg)";
+	TH1D* hBGsum = getNormDYmumu(dir+"DYmumu/"+m_muonSelector, hDir, hName);
+	hBGsum->SetLineColor(kRed);
+	//hBGsum->SetFillColor(kRed);
+	hBGsum->SetLineWidth(2);
+	//hBGsum->SetMarkerStyle(21);
+	//hBGsum->SetMarkerColor(kBlue);
+	strm.clear();
+	strm << setprecision(2);
+	strm << hBGsum->GetBinWidth(1);
+	strm >> s1;
+	strm.clear();
+	strm << setprecision(2);
+	strm << hBGsum->GetBinWidth( hBGsum->GetNbinsX() );
+	strm >> s2;
+	string ytitle = (s1==s2) ? yTitle : yTitle + "(" + s1 + "#rightarrow" + s2 + " TeV)^{-1}";
+	hBGsum->SetTitle("");
+	hBGsum->SetXTitle( xTitle.c_str() );
+	hBGsum->SetYTitle( ytitle.c_str() );
+	leg->AddEntry( hBGsum, channel.c_str(), "l");
+	
+	sProc = "ZZ_Herwig";
+	path = dir + "ZZ_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
+	channel = "ZZ";
+	TH1D* hZZ = setRegularMChisto(sProc, channel, path, hDir, hName, kBlue);
+
+	sProc = "WZ_Herwig";
+	path = dir + "WZ_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
+	channel = "WZ";
+	TH1D* hWZ = setRegularMChisto(sProc, channel, path, hDir, hName, kBlue);
+	
+	sProc = "WW_Herwig";
+	path = dir + "WW_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
+	channel = "WW";
+	TH1D* hWW = setRegularMChisto(sProc, channel, path, hDir, hName, kBlue);
+	
+	sProc = "T1_McAtNlo_Jimmy";
+	path = dir + "T1_McAtNlo_Jimmy/" + m_muonSelector + analysisType + sProc + ".root";
+	channel = "t #bar{t}";
+	TH1D* hTTbar = setRegularMChisto(sProc, channel, path, hDir, hName, kBlue);
+	
+	channel = "Binned DY#tau#tau";
+	TH1D* hDYtautau = getNormDYtautau(dir+"DYtautau/"+m_muonSelector, hDir, hName);
+	
+	hBGsum->Add(hZZ);
+	hBGsum->Add(hWZ);
+	hBGsum->Add(hWW);
+	hBGsum->Add(hTTbar);
+	hBGsum->Add(hDYtautau);
+	
+	pad->cd();
+	hBGsum->SetMinimum(m_miny);
+	hBGsum->SetMaximum(m_maxy);
+	//hBGsum->Draw("E4");
+	hBGsum->Draw();
+	hData->Draw("e1x0SAMES");
+	pvtxt->Draw("SAMES");
+	pvtxt1->Draw("SAMES");
+	leg->Draw("SAMES");
+	pad->RedrawAxis();
+
+	
+	if(m_doRatio)
+	{
+		TH1D* hRat = (TH1D*)hData->Clone("ratio");
+		hRat->Reset();
+		TH1D* hRatUp = (TH1D*)hData->Clone("ratUp");
+		hRatUp->Reset();
+		TH1D* hRatDwn = (TH1D*)hData->Clone("ratDwn");
+		hRatDwn->Reset();
+	
+		double minrat = (m_minratiox==0.) ? hData->GetXaxis()->GetXmin() : m_minratiox;
+		ratio(minrat, hRat->GetXaxis()->GetXmax(), hData, hBGsum, hRat, hRatUp, hRatDwn);
+		pad_ratio->cd();
+		drawRatio(minrat, hRat->GetXaxis()->GetXmax(), hRat);
+		pad_ratio->RedrawAxis();
+	}
+	else
+	{
+		TH1D* hRelDiff = (TH1D*)hData->Clone("RelDiffio");
+		hRelDiff->Reset();
+	
+		double minRelDiff = (m_minRelDiffx==0.) ? hData->GetXaxis()->GetXmin() : m_minRelDiffx;
+		relDiff(hData, hBGsum, hRelDiff);
+		pad_ratio->cd();
+		drawRelDiff(minRelDiff, hRelDiff->GetXaxis()->GetXmax(), hRelDiff);
+		pad_ratio->RedrawAxis();
+	}
+	
+	
+	TString fName = "figures/" + (TString)hNameFixed + "_" + (TString)muonLabel;
+	cnv->SaveAs(fName+".eps");
+	cnv->SaveAs(fName+".C");
+	cnv->SaveAs(fName+".root");
+	cnv->SaveAs(fName+".png");
+}
+
+void combinedGraphics::set_AfbMCvsData(bool logx, bool logy, Double_t min, Double_t max, Double_t minratiox)
+{
+	m_logx = logx;
+	m_logy = logy;
+	m_miny  = min;
+	m_maxy  = max;
+	m_minratiox = minratiox;
+	m_minRelDiffx = minratiox;
+}
+
+void combinedGraphics::draw_AfbMCvsData(string dir, string hDir, string hName, string xTitle, string yTitle)
+{
+	cout << "getting " << dir + " : " + hDir + " : " + hName << endl;
+
+	string hNameFixed = hName;
+	
+	hFile->cd();
+
+	gStyle->SetOptStat(0);
+	
+	TLegend* leg = new TLegend(0.7123746,0.7292746,0.8695652,0.8821244,NULL,"brNDC");
+	leg->SetFillColor(kWhite);
+	
+	m_dataLumi_pb = dataLumi_ipb;
+	
+	stringstream strm;
+	string L;
+	string lumilabel = "";
+	strm << setprecision(2);
+	strm << dataLumi_ipb;
+	strm >> L;
+	lumilabel = "#intLdt~" + L + " pb^{-1}";
+	TPaveText* pvtxt = new TPaveText(0.1195652,0.1334197,0.2458194,0.2318653,"brNDC");
+	pvtxt->SetFillColor(kWhite);
+	TText* txt = pvtxt->AddText( lumilabel.c_str() );
+	
+	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
+	TPaveText* pvtxt1 = new TPaveText(0.1421405,0.126943,0.2165552,0.1683938,"brNDC");
+	pvtxt1->SetFillColor(kWhite);
+	TText* txt1 = pvtxt1->AddText( muonLabel.c_str() );
+	
+	string cName = "cnv_" + hNameFixed;
+	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);
+	
+	TPad *pad_mHat = new TPad("pad_mHat","",0,0,1,1);
+	pad_mHat->SetFillColor(kWhite);
+	pad_mHat->SetTicky(0);
+	pad_mHat->SetLogy();
+
+	TPad *pad_Afb  = new TPad("pad_Afb", "",0,0,1,1);
+	pad_Afb->SetTicky(0);
+	pad_Afb->SetTickx(1);
+	pad_Afb->SetFillStyle(0);
+	pad_Afb->SetFrameFillStyle(4000); //will be transparent
+	pad_Afb->SetFrameFillColor(0);
+	
+	
+	string s1, s2;
+	
+	string path = "";
+	string sProc = "";
+	string channel = "";
+	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
+	
+	Float_t mHat;
+	Float_t cosTh;
+	
+	
+	// Data
+	TH1D* hDataM  = new TH1D("mHat_data","mHat_data", Afb_nbins, Afb_min, Afb_max );
+	hDataM->SetTitle("");
+	hDataM->SetYTitle("#frac{dN}{d#hat{m}_{#mu#mu}} #left(TeV#right)^{-1}");
+	hDataM->SetLineColor(kBlack);
+	hDataM->SetLineWidth(2);
+	TH1D* hData   = new TH1D("Afb_data","Afb_data",   Afb_nbins, Afb_min, Afb_max );
+	hData->SetMarkerStyle(20);
+	hData->SetMarkerColor(kBlack);
+	hData->SetMarkerSize(1.2);
+	TH1D* hDataNf = new TH1D("dataNf","dataNf",       Afb_nbins, Afb_min, Afb_max );
+	TH1D* hDataNb = new TH1D("dataNb","dataNb",       Afb_nbins, Afb_min, Afb_max );
+	leg->AddEntry( hData, "Data: A_{FB}#left(#hat{m}_{#mu#mu}#right)", "lep");
+	leg->AddEntry( hData, "Data: #frac{dN}{d#hat{m}_{#mu#mu}}", "l");
+	
+	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
+	
+	path = dir + "AtoI2_ZprimeGRL/" + m_muonSelector + sData + ".root";
+	TFile* fData = new TFile( path.c_str(), "READ" );
+	TTree* Afb_data_tree = (TTree*)fData->Get("Afb/Afb_tree");
+	Afb_data_tree->SetBranchAddress( "mHat",  &mHat );
+	Afb_data_tree->SetBranchAddress( "cosTh", &cosTh );
+	
+	
+	if (Afb_data_tree==0) return;
+	for (Long64_t l64t_jentry=0 ; l64t_jentry<Afb_data_tree->GetEntries() ; l64t_jentry++)
+	{
+		Afb_data_tree->GetEntry(l64t_jentry);
+		
+		if(cosTh>=0) hDataNf->Fill(mHat);
+		else         hDataNb->Fill(mHat);
+		
+		hDataM->Fill(mHat);
+	}
+	for(Int_t b=1 ; b<=hData->GetNbinsX() ; b++)
+	{
+		Double_t Nf = hDataNf->GetBinContent(b);
+		Double_t Nb = hDataNb->GetBinContent(b);
+		Double_t N = Nf+Nb;
+		
+		if(N<2)
+		{
+			//hData->SetBinContent(b,0);
+			//hData->SetBinError(b,0);
+			continue;
+		}
+		
+		//float afb = (N>0.) ? (Nf-Nb)/N : -999.;
+		float afb = (Nf-Nb)/N;
+		
+		// the Forward-Backward Asymmetry error: 
+		// if N=Nf+Nb, p=Nf/N, q=1-p=Nb/N, then A=p-q=2*p-1.
+		// The statistical error on p is sqrt(p*q/N) (binomial distribution),
+		// and from this, the statistical error on A is sqrt((1-A*A)/N)
+		//float dafb = (N>0.) ? sqrt( (1.-afb*afb)/N ) : 0.;
+		float dafb = sqrt( (1.-afb*afb)/N );
+		
+		hData->SetBinContent(b,afb);
+		hData->SetBinError(b,dafb);
+	}
+	
+	
+	
+	// Backgrounds
+	channel = "DYmumu: A_{FB}#left(#hat{m}_{#mu#mu}#right)";
+	TH1D* hBGsum = new TH1D("Afb_sumBG","Afb_sumBG", Afb_nbins, Afb_min, Afb_max );
+	TH1D* hNf    = new TH1D("bgNf","bgNf",           Afb_nbins, Afb_min, Afb_max );
+	TH1D* hNb    = new TH1D("bgNb","bgNb",           Afb_nbins, Afb_min, Afb_max );
+	hBGsum->SetLineColor(kAzure-5);
+	hBGsum->SetFillColor(kAzure-5);
+	hBGsum->SetLineWidth(1);
+	hBGsum->SetMarkerSize(0);
+	hBGsum->SetMarkerColor(0);
+	//hBGsum->SetMarkerStyle(kAzure-5);
+	//hBGsum->SetMarkerColor(kAzure-5);
+	strm.clear();
+	strm << setprecision(2);
+	strm << hBGsum->GetBinWidth(1);
+	strm >> s1;
+	strm.clear();
+	strm << setprecision(2);
+	strm << hBGsum->GetBinWidth( hBGsum->GetNbinsX() );
+	strm >> s2;
+	string ytitle = (s1==s2) ? yTitle : yTitle + "(" + s1 + "#rightarrow" + s2 + " TeV)^{-1}";
+	hBGsum->SetTitle("");
+	hBGsum->SetXTitle( xTitle.c_str() );
+	hBGsum->SetYTitle( ytitle.c_str() );
+	leg->AddEntry( hBGsum, channel.c_str(), "f");
+	
+	
+	TList* Afb_sumBG_list = new TList();
+	
+	sProc = "DYmumu_75M120";
+	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fDYmumu_75M120 = new TFile( path.c_str(), "READ" );
+	Afb_sumBG_list->Add( (TTree*)fDYmumu_75M120->Get("Afb/Afb_tree") );
+	
+	sProc = "DYmumu_120M250";
+	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fDYmumu_120M250 = new TFile( path.c_str(), "READ" );
+	Afb_sumBG_list->Add( (TTree*)fDYmumu_120M250->Get("Afb/Afb_tree") );
+	
+	sProc = "DYmumu_250M400";
+	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fDYmumu_250M400 = new TFile( path.c_str(), "READ" );
+	Afb_sumBG_list->Add( (TTree*)fDYmumu_250M400->Get("Afb/Afb_tree") );
+	
+	sProc = "DYmumu_400M600";
+	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fDYmumu_400M600 = new TFile( path.c_str(), "READ" );
+	Afb_sumBG_list->Add( (TTree*)fDYmumu_400M600->Get("Afb/Afb_tree") );
+	
+	/*
+	sProc = "ZZ_Herwig";
+	path = dir + "ZZ_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fZZ = new TFile( path.c_str(), "READ" );
+	Afb_sumBG_list->Add( (TTree*)fZZ->Get("Afb/Afb_tree") );
+	
+	sProc = "WZ_Herwig";
+	path = dir + "WZ_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fWZ = new TFile( path.c_str(), "READ" );
+	Afb_sumBG_list->Add( (TTree*)fWZ->Get("Afb/Afb_tree") );
+	
+	sProc = "WW_Herwig";
+	path = dir + "WW_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fWW = new TFile( path.c_str(), "READ" );
+	Afb_sumBG_list->Add( (TTree*)fWW->Get("Afb/Afb_tree") );
+	
+	sProc = "T1_McAtNlo_Jimmy";
+	path = dir + "T1_McAtNlo_Jimmy/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fT1 = new TFile( path.c_str(), "READ" );
+	Afb_sumBG_list->Add( (TTree*)fT1->Get("Afb/Afb_tree") );
+	
+	
+	sProc = "DYtautau_75M120";
+	path = dir + "DYtautau/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fDYtautau_75M120 = new TFile( path.c_str(), "READ" );
+	Afb_sumBG_list->Add( (TTree*)fDYtautau_75M120->Get("Afb/Afb_tree") );
+	
+	sProc = "DYtautau_120M250";
+	path = dir + "DYtautau/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fDYtautau_120M250 = new TFile( path.c_str(), "READ" );
+	Afb_sumBG_list->Add( (TTree*)fDYtautau_120M250->Get("Afb/Afb_tree") );
+	
+	sProc = "DYtautau_250M400";
+	path = dir + "DYtautau/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fDYtautau_250M400 = new TFile( path.c_str(), "READ" );
+	Afb_sumBG_list->Add( (TTree*)fDYtautau_250M400->Get("Afb/Afb_tree") );
+	*/
+	
+	
+	TFile* mergedFile = new TFile("Afb_sumBG_merged.root", "RECREATE");
+	cout << "Merging trees...patience..." << endl;
+    TTree::MergeTrees(Afb_sumBG_list);
+    mergedFile->Write();
+    mergedFile->Close();
+	
+	TFile* fBG = new TFile("Afb_sumBG_merged.root", "READ");
+	TTree* Afb_sumBG_tree = (TTree*)fBG->Get("Afb_tree");
+	Afb_sumBG_tree->SetBranchAddress( "mHat",  &mHat );
+	Afb_sumBG_tree->SetBranchAddress( "cosTh", &cosTh );
+
+	if (Afb_sumBG_tree==0) return;
+	for (Long64_t l64t_jentry=0 ; l64t_jentry<Afb_sumBG_tree->GetEntriesFast() ; l64t_jentry++)
+	{
+		Afb_sumBG_tree->GetEntry(l64t_jentry);
+		
+		if(cosTh>=0) hNf->Fill(mHat);
+		else         hNb->Fill(mHat);
+	}
+	for(Int_t b=1 ; b<=hBGsum->GetNbinsX() ; b++)
+	{
+		Double_t Nf = hNf->GetBinContent(b);
+		Double_t Nb = hNb->GetBinContent(b);
+		Double_t N = Nf+Nb;
+		
+		if(N<2)
+		{
+			//hBGsum->SetBinContent(b,0);
+			//hBGsum->SetBinError(b,0);
+			continue;
+		}
+		
+		//float afb = (N>0.) ? (Nf-Nb)/N : -999.;
+		float afb = (Nf-Nb)/N;
+		
+		// the Forward-Backward Asymmetry error: 
+		// if N=Nf+Nb, p=Nf/N, q=1-p=Nb/N, then A=p-q=2*p-1.
+		// The statistical error on p is sqrt(p*q/N) (binomial distribution),
+		// and from this, the statistical error on A is sqrt((1-A*A)/N)
+		//float dafb = (N>0.) ? sqrt( (1.-afb*afb)/N ) : 0.;
+		float dafb = sqrt( (1.-afb*afb)/N );
+		
+		hBGsum->SetBinContent(b,afb);
+		hBGsum->SetBinError(b,dafb);
+	}
+
+	pad_mHat->Draw();
+	pad_mHat->cd();
+	hDataM->GetYaxis()->SetRangeUser(5.e-1,1.1*hDataM->GetMaximum());
+	hDataM->Draw();
+
+	cnv->cd();
+
+	pad_Afb->Draw();
+	pad_Afb->cd();
+	hBGsum->GetYaxis()->SetRangeUser(m_miny,m_maxy);
+	hBGsum->Draw("E6 Y+");
+	TH1D* hBGsumTmp = (TH1D*)hBGsum->Clone("");
+	hBGsumTmp->Reset();
+	for(Int_t b=0 ; b<hBGsumTmp->GetNbinsX() ; b++) hBGsumTmp->SetBinContent(b,hBGsum->GetBinContent(b));
+	hBGsumTmp->SetLineColor(kAzure+8);
+	hBGsumTmp->Draw("CSAMES");
+	hData->Draw("e1x0SAMES");
+	pvtxt->Draw("SAMES");
+	pvtxt1->Draw("SAMES");
+	leg->Draw("SAMES");
+	TLine* lUnit = new TLine(Afb_min,0.,Afb_max,0.);
+	lUnit->SetLineColor(kBlack);
+	lUnit->SetLineStyle(2);
+	lUnit->Draw("SAMES");
+	//pad_Afb->RedrawAxis();
+	
+	cnv->cd();
+	
+	pad_mHat->cd();
+	pad_mHat->RedrawAxis();
+	pad_mHat->Update();
+
+	cnv->Update();
+	
+	TString fName = "figures/" + (TString)hNameFixed + "_" + (TString)muonLabel;
+	cnv->SaveAs(fName+".eps");
+	cnv->SaveAs(fName+".C");
+	cnv->SaveAs(fName+".root");
+	cnv->SaveAs(fName+".png");
+}
+

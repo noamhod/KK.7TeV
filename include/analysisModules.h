@@ -61,7 +61,7 @@ class analysisModules : public selection,
 			
 			setCutFlowMapSVDPtr( cutFlowHandler::m_cutFlowMapSVD );
 			ginitialize();
-			setStyle();
+			//setStyle();
 		}
 		~analysisModules();
 		

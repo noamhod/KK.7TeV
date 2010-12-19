@@ -380,6 +380,7 @@ public:
 		currentRun = 0;
 		sCurrentPeriod = "";
 		nMultiMuonEvents = 0;
+		setStyle();
 	}
 	~analysisSkeleton();
 	

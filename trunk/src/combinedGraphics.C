@@ -26,8 +26,6 @@ void combinedGraphics::initialize(string analysisSelector, string muonSelector)
 
 	hFile->cd();
 	
-	//setStyle();
-	
 	// canvas size
 	canv_x = 602;
 	canv_y = 400;
@@ -849,8 +847,6 @@ TH1D* combinedGraphics::setRegularMChisto(string sProc, string channel, string p
 
 void combinedGraphics::set_allMCvsData(bool logx, bool logy, Double_t min, Double_t max, Double_t minratiox)
 {
-	setStyle();
-
 	m_logx = logx;
 	m_logy = logy;
 	m_miny  = min;
@@ -1097,8 +1093,6 @@ void combinedGraphics::draw_allMCvsData(string dir, string hDir, string hName, s
 
 void combinedGraphics::set_sumMCvsData(bool logx, bool logy, Double_t min, Double_t max, Double_t minratiox, bool doRatio)
 {
-	setStyle();
-
 	m_logx = logx;
 	m_logy = logy;
 	m_miny  = min;
@@ -1111,9 +1105,6 @@ void combinedGraphics::set_sumMCvsData(bool logx, bool logy, Double_t min, Doubl
 void combinedGraphics::draw_sumMCvsData(string dir, string hDir, string hName, string xTitle, string yTitle)
 {
 	cout << "getting " << dir + " : " + hDir + " : " + hName << endl;
-
-	TStyle* plotstyle = (TStyle*)gROOT->GetStyle("Plain");
-	plotstyle->cd();
 	
 	string hNameFixed = hName;
 	
@@ -1359,7 +1350,7 @@ void combinedGraphics::draw_AfbMCvsData(string dir, string hDir, string hName, s
 	TH1D* hData   = new TH1D("Afb_data","Afb_data",   Afb_nbins, Afb_min, Afb_max );
 	hData->SetMarkerStyle(20);
 	hData->SetMarkerColor(kBlack);
-	hData->SetMarkerSize(1.2);
+	hData->SetMarkerSize(0.9);
 	TH1D* hDataNf = new TH1D("dataNf","dataNf",       Afb_nbins, Afb_min, Afb_max );
 	TH1D* hDataNb = new TH1D("dataNb","dataNb",       Afb_nbins, Afb_min, Afb_max );
 	leg->AddEntry( hData, "Data: A_{FB}#left(#hat{m}_{#mu#mu}#right)", "lep");
@@ -1410,8 +1401,6 @@ void combinedGraphics::draw_AfbMCvsData(string dir, string hDir, string hName, s
 		hData->SetBinContent(b,afb);
 		hData->SetBinError(b,dafb);
 	}
-	
-	
 	
 	// Backgrounds
 	channel = "DYmumu: A_{FB}#left(#hat{m}_{#mu#mu}#right)";

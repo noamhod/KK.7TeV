@@ -26,6 +26,7 @@ class combinedGraphicsControl : public utilities
 		void initialize(string sAnalysisSelector, string muonSelector);
 		void finalize();
 		void execute();
+		void executeAfb();
 
 	private:
 };

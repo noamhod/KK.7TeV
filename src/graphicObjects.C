@@ -35,22 +35,6 @@ void graphicObjects::clearTreeVars()
 	imass_profile          = -9999;
 	cosThetaDimu_profile   = -9999;
 	etaSum_profile         = -9999;
-	
-	// eff - floats and strings
-	tNp_triggerName  = "";
-	tNp_cand_pT  = -9999;
-	tNp_succ_pT  = -9999;
-	tNp_cand_eta = -9999;
-	tNp_succ_eta = -9999;
-	tNp_cand_phi = -9999;
-	tNp_succ_phi = -9999;
-	tru_triggerName  = "";
-	tru_cand_pT  = -9999;
-	tru_succ_pT  = -9999;
-	tru_cand_eta = -9999;
-	tru_succ_eta = -9999;
-	tru_cand_phi = -9999;
-	tru_succ_phi = -9999;
 
 	// all cuts - vectors
 	charge->clear();
@@ -95,6 +79,23 @@ void graphicObjects::clearTreeVars()
 	nPixHits_profile->clear();
 	vxp_z_profile->clear();
 	vxp_nTracks_profile->clear();
+	
+	// eff - vectors
+	tNp_triggerName->clear();
+	tNp_cand_pT->clear();
+	tNp_succ_pT->clear();
+	tNp_cand_eta->clear();
+	tNp_succ_eta->clear();
+	tNp_cand_phi->clear();
+	tNp_succ_phi->clear();
+	tru_triggerName->clear();
+	tru_cand_pT->clear();
+	tru_succ_pT->clear();
+	tru_cand_eta->clear();
+	tru_succ_eta->clear();
+	tru_cand_phi->clear();
+	tru_succ_phi->clear();
+	
 }
 
 void graphicObjects::writeTrees(TDirectory* tDir_allCuts,
@@ -156,6 +157,21 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	nPixHits_profile = new vector<int>;
 	vxp_z_profile = new vector<float>;
 	vxp_nTracks_profile = new vector<int>;
+	// eff vectors
+	tNp_triggerName = new vector<string>; // only one entry but easier to access...
+	tNp_cand_pT = new vector<float>;
+	tNp_succ_pT = new vector<float>;
+	tNp_cand_eta = new vector<float>;
+	tNp_succ_eta = new vector<float>;
+	tNp_cand_phi = new vector<float>;
+	tNp_succ_phi = new vector<float>;
+	tru_triggerName = new vector<string>; // only one entry but easier to access...
+	tru_cand_pT = new vector<float>;
+	tru_succ_pT = new vector<float>;
+	tru_cand_eta = new vector<float>;
+	tru_succ_eta = new vector<float>;
+	tru_cand_phi = new vector<float>;
+	tru_succ_phi = new vector<float>;
 	
 	
 	if(tDir_allCuts!=NULL) tDir_allCuts->cd();

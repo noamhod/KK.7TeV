@@ -295,21 +295,21 @@ class graphicObjects// : public utilities
 		float imass_profile;
 		float cosThetaDimu_profile;
 		float etaSum_profile;
-		// eff - floats and strings
-		string tNp_triggerName;
-		float tNp_cand_pT;
-		float tNp_succ_pT;
-		float tNp_cand_eta;
-		float tNp_succ_eta;
-		float tNp_cand_phi;
-		float tNp_succ_phi;
-		string tru_triggerName;
-		float tru_cand_pT;
-		float tru_succ_pT;
-		float tru_cand_eta;
-		float tru_succ_eta;
-		float tru_cand_phi;
-		float tru_succ_phi;
+		// eff - vectors
+		vector<string>* tNp_triggerName; // only one entry but easier to access...
+		vector<float>* tNp_cand_pT;
+		vector<float>* tNp_succ_pT;
+		vector<float>* tNp_cand_eta;
+		vector<float>* tNp_succ_eta;
+		vector<float>* tNp_cand_phi;
+		vector<float>* tNp_succ_phi;
+		vector<string>* tru_triggerName; // only one entry but easier to access...
+		vector<float>* tru_cand_pT;
+		vector<float>* tru_succ_pT;
+		vector<float>* tru_cand_eta;
+		vector<float>* tru_succ_eta;
+		vector<float>* tru_cand_phi;
+		vector<float>* tru_succ_phi;
 		//--------------------------------
 	
 	public:

@@ -30,7 +30,7 @@ class analysisGridControl : public utilities
 		TDirectory* 	m_dirNoCuts;
 		TDirectory* 	m_dirCutFlow;
 		TDirectory* 	m_dirPerformance;
-		TDirectory* 	m_dirAfb;
+		TDirectory* 	m_dirEff;
 		
 
 		// run control
@@ -48,10 +48,13 @@ class analysisGridControl : public utilities
 		vector<double> vResMemory;
 		vector<double> vVirMemory;
 	
+		string m_muRecAlgo;
+	
 	public:
 		analysisGridControl();
 		analysisGridControl( TChain* inchain, TFile* outfile );
 		~analysisGridControl();
+		void   setRecAlgo(string muRecAlgo);
 		void   initialize();
 		void   finalize();
 		void   book();

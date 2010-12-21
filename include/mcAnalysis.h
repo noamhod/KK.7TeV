@@ -42,6 +42,7 @@ public:
 	mcAnalysis(mcPhysics* mcPhys, TFile* treeFile, string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath ) :
 	analysisSkeleton(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
 	{
+		sMuonRecoAlgo = "staco";
 		m_mcPhys = mcPhys;
 		m_treeFile = treeFile;
 		m_muD3PD = new muD3PD( NULL, m_mcPhys, m_treeFile ); // the NULL arg is the [physics* m_phys;] variable
@@ -53,7 +54,7 @@ public:
 	void setStacoVariables();
 	void setMuidVariables();
 	
-	void executeCutFlow();
+	void execute( string mualgo = "staco" );
 	
 	void write();
 

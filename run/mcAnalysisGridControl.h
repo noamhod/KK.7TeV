@@ -44,11 +44,14 @@ class mcAnalysisGridControl : public utilities
 		vector<int> vEntries;
 		vector<double> vResMemory;
 		vector<double> vVirMemory;
+		
+		string m_muRecAlgo;
 	
 	public:
 		mcAnalysisGridControl();
 		mcAnalysisGridControl( TChain* inchain, TFile* outfile );
 		~mcAnalysisGridControl();
+		void   setRecAlgo(string muRecAlgo);
 		void   initialize();
 		void   finalize();
 		void   book();

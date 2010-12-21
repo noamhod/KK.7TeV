@@ -31,7 +31,6 @@ class mcOfflineControl : public offlineChains, public utilities
 		TDirectory* 	m_dirCutFlow;
 		TDirectory* 	m_dirFit;
 		TDirectory* 	m_dirPerformance;
-		TDirectory* 	m_dirAfb;
 		TDirectory* 	m_dirEff;
 
 		// run control
@@ -49,6 +48,8 @@ class mcOfflineControl : public offlineChains, public utilities
 		vector<double> vResMemory;
 		vector<double> vVirMemory;
 		
+		string m_muRecAlgo;
+		
 		// for matching candidates
 		vector<double> runNumber;
 		vector<double> lumiBlock;
@@ -63,6 +64,7 @@ class mcOfflineControl : public offlineChains, public utilities
 		mcOfflineControl();
 		~mcOfflineControl();
 		
+		void   setRecAlgo(string muRecAlgo);
 		void   initialize();
 		void   finalize();
 		

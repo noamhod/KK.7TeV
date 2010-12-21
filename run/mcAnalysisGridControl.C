@@ -16,6 +16,8 @@ mcAnalysisGridControl::mcAnalysisGridControl( TChain* inchain, TFile* outfile )
 {
 	startTimer();
 
+	m_muRecAlgo = "staco";
+	
 	string str = "";
 	
 	initialize();
@@ -36,7 +38,17 @@ mcAnalysisGridControl::mcAnalysisGridControl( TChain* inchain, TFile* outfile )
 
 mcAnalysisGridControl::~mcAnalysisGridControl()
 {
-	//finalize();
+	
+}
+
+void mcAnalysisGridControl::setRecAlgo(string muRecAlgo)
+{
+	if(muRecAlgo!="staco"  &&  muRecAlgo!="muid")
+	{
+		cout << "WARNING: muRecAlgo=" << muRecAlgo << " is not supported, setting to default (staco)" << endl;
+		muRecAlgo = "staco";
+	}
+	m_muRecAlgo = muRecAlgo;
 }
 
 void mcAnalysisGridControl::initialize()
@@ -47,19 +59,10 @@ void mcAnalysisGridControl::initialize()
 	l64t_nb       = 0;
 	l64t_jentry   = 0;
 	l64t_ientry   = 0;
-
-	// pointers
-	m_mcPhys     = NULL;
-	m_mcAnalysis = NULL;
-	m_rootfile = NULL;
-	m_rootfile = NULL;
 }
 
 void mcAnalysisGridControl::finalize()
 {
-	// write the tree
-	//m_mcAnalysis->write();
-
 	// tree
 	// the tree will split into multiple files
 	m_rootfile = m_mcAnalysis->m_muD3PD->m_tree->GetCurrentFile();
@@ -84,15 +87,14 @@ void mcAnalysisGridControl::book()
 	m_mcAnalysis->bookCutProfileHistosMap( m_mcAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );
 	
 	m_dirFit = m_rootfile->mkdir("fit");
-	
-	m_mcAnalysis->bookFitHistos(m_dirAllCuts);	
-	
-	m_dirPerformance = m_rootfile->mkdir("performance");
+	m_mcAnalysis->bookFitHistos(m_dirFit);	
 	
 	m_dirEff = m_rootfile->mkdir("efficiency");
 	m_mcAnalysis->bookEfficiencyHistos(m_mcAnalysis->m_period2triggerperiodMap, m_dirEff);
 	
 	m_mcAnalysis->setTrees(m_dirAllCuts, m_dirCutProfile, m_dirEff);
+	
+	m_dirPerformance = m_rootfile->mkdir("performance");
 }
 
 void mcAnalysisGridControl::draw()
@@ -149,7 +151,7 @@ void mcAnalysisGridControl::fits()
 
 void mcAnalysisGridControl::analyze()
 {
-	m_mcAnalysis->executeCutFlow();
+	m_mcAnalysis->execute( m_muRecAlgo );
 }
 
 void mcAnalysisGridControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)

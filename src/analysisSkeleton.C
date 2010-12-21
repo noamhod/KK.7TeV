@@ -1136,10 +1136,10 @@ void analysisSkeleton::fillTagNProbe()
 				(*h1map_tagNprobe_candidates_pT)[sTrigPeriod]->Fill( tmp );
 				(*h1map_tagNprobe_candidates_eta)[sTrigPeriod]->Fill( mu_eta->at(iprobe) );
 				(*h1map_tagNprobe_candidates_phi)[sTrigPeriod]->Fill( mu_phi->at(iprobe) );
-				tNp_triggerName = sTrigPeriod;
-				tNp_cand_pT  = tmp;
-				tNp_cand_eta = mu_eta->at(iprobe);
-				tNp_cand_phi = mu_phi->at(iprobe);
+				tNp_triggerName->push_back(sTrigPeriod);
+				tNp_cand_pT->push_back( tmp );
+				tNp_cand_eta->push_back( mu_eta->at(iprobe) );
+				tNp_cand_phi->push_back( mu_phi->at(iprobe) );
 				break;
 			case 3: break;
 			case 4: break;
@@ -1151,13 +1151,13 @@ void analysisSkeleton::fillTagNProbe()
 				(*h1map_tagNprobe_succeeded_pT)[sTrigPeriod]->Fill( tmp );
 				(*h1map_tagNprobe_succeeded_eta)[sTrigPeriod]->Fill( mu_eta->at(iprobe) );
 				(*h1map_tagNprobe_succeeded_phi)[sTrigPeriod]->Fill( mu_phi->at(iprobe) );
-				tNp_triggerName = sTrigPeriod;
-				tNp_cand_pT  = tmp;
-				tNp_cand_eta = mu_eta->at(iprobe);
-				tNp_cand_phi = mu_phi->at(iprobe);
-				tNp_succ_pT  = tmp;
-				tNp_succ_eta = mu_eta->at(iprobe);
-				tNp_succ_phi = mu_phi->at(iprobe);
+				tNp_triggerName->push_back( sTrigPeriod );
+				tNp_cand_pT->push_back( tmp );
+				tNp_cand_eta->push_back( mu_eta->at(iprobe) );
+				tNp_cand_phi->push_back( mu_phi->at(iprobe) );
+				tNp_succ_pT->push_back( tmp );
+				tNp_succ_eta->push_back( mu_eta->at(iprobe) );
+				tNp_succ_phi->push_back( mu_phi->at(iprobe) );
 				break;
 			case 6: break;
 			default: break;
@@ -1195,10 +1195,10 @@ void analysisSkeleton::fillTruthEfficiency()
 		(*h1map_truth_candidates_pT)[sTrigPeriod]->Fill( pTreconstructed*MeV2TeV );
 		(*h1map_truth_candidates_eta)[sTrigPeriod]->Fill( mu_eta->at(t) );
 		(*h1map_truth_candidates_phi)[sTrigPeriod]->Fill( mu_phi->at(t) );
-		tru_triggerName = sTrigPeriod;
-		tru_cand_pT  = pTreconstructed*MeV2TeV;
-		tru_cand_eta = mu_eta->at(t);
-		tru_cand_phi = mu_phi->at(t);
+		tru_triggerName->push_back( sTrigPeriod );
+		tru_cand_pT->push_back( pTreconstructed*MeV2TeV );
+		tru_cand_eta->push_back( mu_eta->at(t) );
+		tru_cand_phi->push_back( mu_phi->at(t) );
 		
 		if(trigger_pt->at(t)*MeV2GeV<trig_pTthreshold) continue;
 		if(!trigger_match->at(t))                      continue;
@@ -1208,9 +1208,9 @@ void analysisSkeleton::fillTruthEfficiency()
 		(*h1map_truth_succeeded_pT)[sTrigPeriod]->Fill( pTreconstructed*MeV2TeV );
 		(*h1map_truth_succeeded_eta)[sTrigPeriod]->Fill( mu_eta->at(t) );
 		(*h1map_truth_succeeded_phi)[sTrigPeriod]->Fill( mu_phi->at(t) );
-		tru_succ_pT  = pTreconstructed*MeV2TeV;
-		tru_succ_eta = mu_eta->at(t);
-		tru_succ_phi = mu_phi->at(t);
+		tru_succ_pT->push_back( pTreconstructed*MeV2TeV );
+		tru_succ_eta->push_back( mu_eta->at(t) );
+		tru_succ_phi->push_back( mu_phi->at(t) );
 	}
 }
 

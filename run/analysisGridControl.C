@@ -43,6 +43,16 @@ analysisGridControl::~analysisGridControl()
 	
 }
 
+void analysisGridControl::setRecAlgo(string muRecAlgo)
+{
+	if(muRecAlgo!="staco"  &&  muRecAlgo!="muid")
+	{
+		cout << "WARNING: muRecAlgo=" << muRecAlgo << " is not supported, setting to default (staco)" << endl;
+		muRecAlgo = "staco";
+	}
+	m_muRecAlgo = muRecAlgo;
+}
+
 void analysisGridControl::initialize()
 {
 	// run control
@@ -51,12 +61,6 @@ void analysisGridControl::initialize()
 	l64t_nb       = 0;
 	l64t_jentry   = 0;
 	l64t_ientry   = 0;
-
-	// pointers
-	m_phys     = NULL;
-	m_analysis = NULL;
-	m_rootfile = NULL;
-	m_rootfile = NULL;
 }
 
 void analysisGridControl::finalize()
@@ -88,12 +92,14 @@ void analysisGridControl::book()
 	m_analysis->bookCutProfileHistosMap( m_analysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );
 	
 	m_dirFit = m_rootfile->mkdir("fit");
+	m_analysis->bookFitHistos(m_dirFit);
 	
-	m_analysis->bookFitHistos(m_dirAllCuts);
+	m_dirEff = m_rootfile->mkdir("efficiency");
+	m_analysis->bookEfficiencyHistos(m_analysis->m_period2triggerperiodMap, m_dirEff);
+	
+	m_analysis->setTrees(m_dirAllCuts, m_dirCutProfile, m_dirEff);
 
 	m_dirPerformance = m_rootfile->mkdir("performance");
-	
-	m_dirAfb = m_rootfile->mkdir("Afb");
 }
 
 void analysisGridControl::draw()
@@ -101,18 +107,35 @@ void analysisGridControl::draw()
 	m_analysis->drawBareHistos(m_dirNoCuts);
 	
 	// these calculations must come before drawHistos
-	bool isTruth = false;
-	m_analysis->calculateEfficiency(m_analysis->h1_tagNprobe_candidates_pT, m_analysis->h1_tagNprobe_succeeded_pT, m_analysis->h1_tagNprobe_efficiency_pT, isTruth);
-	m_analysis->calculateEfficiency(m_analysis->h1_tagNprobe_candidates_eta, m_analysis->h1_tagNprobe_succeeded_eta, m_analysis->h1_tagNprobe_efficiency_eta, isTruth);
-	m_analysis->calculateEfficiency(m_analysis->h1_tagNprobe_candidates_phi, m_analysis->h1_tagNprobe_succeeded_phi, m_analysis->h1_tagNprobe_efficiency_phi, isTruth);
-	
-	m_analysis->calculateAfb(m_analysis->h1_Afb, m_dirAfb);
+	m_analysis->calculateAfb(m_analysis->h1_Afb);
 	
 	m_analysis->drawHistos(m_dirAllCuts);
 	
 	m_analysis->drawHistosMap( m_analysis->getCutFlowOrderedMapPtr(), m_analysis->getCutFlowTypeOrderedMapPtr(), m_dirCutFlow );
 	
 	m_analysis->drawCutProfileHistosMap( m_dirCutProfile );
+	
+	bool isTruth = false;
+	m_analysis->calculateEfficiency(m_analysis->h1map_tagNprobe_candidates_pT,
+									m_analysis->h1map_tagNprobe_succeeded_pT,
+									m_analysis->h1map_tagNprobe_trigEff_pT, isTruth);
+	m_analysis->calculateEfficiency(m_analysis->h1map_tagNprobe_candidates_eta,
+									m_analysis->h1map_tagNprobe_succeeded_eta,
+									m_analysis->h1map_tagNprobe_trigEff_eta, isTruth);
+	m_analysis->calculateEfficiency(m_analysis->h1map_tagNprobe_candidates_phi,
+									m_analysis->h1map_tagNprobe_succeeded_phi,
+									m_analysis->h1map_tagNprobe_trigEff_phi, isTruth);
+	isTruth = true;
+	m_analysis->calculateEfficiency(m_analysis->h1map_truth_candidates_pT,
+									m_analysis->h1map_truth_succeeded_pT,
+									m_analysis->h1map_truth_trigEff_pT, isTruth);
+	m_analysis->calculateEfficiency(m_analysis->h1map_truth_candidates_eta,
+									m_analysis->h1map_truth_succeeded_eta,
+									m_analysis->h1map_truth_trigEff_eta, isTruth);
+	m_analysis->calculateEfficiency(m_analysis->h1map_truth_candidates_phi,
+									m_analysis->h1map_truth_succeeded_phi,
+									m_analysis->h1map_truth_trigEff_phi, isTruth);
+	m_analysis->drawEfficiencyHistosMap(m_dirEff);
 	
 	m_analysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
 	
@@ -129,7 +152,7 @@ void analysisGridControl::fits()
 
 void analysisGridControl::analyze()
 {
-	m_analysis->executeCutFlow();
+	m_analysis->execute(m_muRecAlgo);
 }
 
 void analysisGridControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)

@@ -47,7 +47,17 @@ mcOfflineControl::mcOfflineControl()
 
 mcOfflineControl::~mcOfflineControl()
 {
-	//finalize();
+	
+}
+
+void mcOfflineControl::setRecAlgo(string muRecAlgo)
+{
+	if(muRecAlgo!="staco"  &&  muRecAlgo!="muid")
+	{
+		cout << "WARNING: muRecAlgo=" << muRecAlgo << " is not supported, setting to default (staco)" << endl;
+		muRecAlgo = "staco";
+	}
+	m_muRecAlgo = muRecAlgo;
 }
 
 void mcOfflineControl::initialize()
@@ -94,13 +104,13 @@ void mcOfflineControl::book()
 	
 	m_dirCutProfile = m_histfile->mkdir("cutsProfile");
 	m_mcOfflineAnalysis->bookCutProfileHistosMap( m_mcOfflineAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );
-
-	m_dirPerformance = m_histfile->mkdir("performance");
-	
-	m_dirAfb = m_histfile->mkdir("Afb");
 	
 	m_dirEff = m_histfile->mkdir("efficiency");
 	m_mcOfflineAnalysis->bookEfficiencyHistos(m_mcOfflineAnalysis->m_period2triggerperiodMap, m_dirEff);
+	
+	m_mcOfflineAnalysis->setTrees(m_dirAllCuts, m_dirCutProfile, m_dirEff);
+	
+	m_dirPerformance = m_histfile->mkdir("performance");
 }
 
 void mcOfflineControl::draw()
@@ -108,7 +118,7 @@ void mcOfflineControl::draw()
 	m_mcOfflineAnalysis->drawBareHistos(m_dirNoCuts);
 
 	// these calculations must come before drawHistos
-	m_mcOfflineAnalysis->calculateAfb(m_mcOfflineAnalysis->h1_Afb, m_dirAfb);
+	m_mcOfflineAnalysis->calculateAfb(m_mcOfflineAnalysis->h1_Afb);
 	
 	m_mcOfflineAnalysis->drawHistos(m_dirAllCuts);
 
@@ -158,7 +168,7 @@ void mcOfflineControl::fits()
 
 void mcOfflineControl::analyze()
 {
-	m_mcOfflineAnalysis->executeCutFlow();
+	m_mcOfflineAnalysis->execute(m_muRecAlgo);
 }
 
 void mcOfflineControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)

@@ -38,6 +38,7 @@ public:
 					  string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath ) :
 	analysisSkeleton(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
 	{
+		sMuonRecoAlgo = "staco";
 		m_mcOffPhys = mcOffPhys;
 		m_treeFile = treeFile;
 		m_muSkimD3PD   = new muSkimD3PD( NULL, m_mcOffPhys, m_treeFile ); // the NULL arg is the [offlinePhysics* m_offPhys;] variable
@@ -50,7 +51,7 @@ public:
 	void setMuidVariables();
 	
 	void executeAdvanced();
-	void executeCutFlow();
+	void execute( string mualgo = "staco" );
 	
 	void write();
 

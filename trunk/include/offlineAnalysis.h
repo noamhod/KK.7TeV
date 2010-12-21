@@ -38,6 +38,7 @@ public:
 					string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath ) :
 	analysisSkeleton(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
 	{
+		sMuonRecoAlgo = "staco";
 		m_offPhys = offPhys;
 		m_offAnalysis_grl = grl;
 		m_treeFile = treeFile;
@@ -50,7 +51,7 @@ public:
 	void setMuidVariables();
 	
 	void executeAdvanced();
-	void executeCutFlow();
+	void execute( string mualgo = "staco" );
 	
 	void write();
 

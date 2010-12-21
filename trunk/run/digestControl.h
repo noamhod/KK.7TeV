@@ -32,7 +32,6 @@ public:
 	TDirectory* 	m_dirCutFlow;
 	TDirectory* 	m_dirFit;
 	TDirectory* 	m_dirPerformance;
-	TDirectory* 	m_dirAfb;
 	TDirectory* 	m_dirEff;
 
 	// run control
@@ -50,6 +49,8 @@ public:
 	vector<double> vResMemory;
 	vector<double> vVirMemory;
 	
+	string m_muRecAlgo;
+	
 	// for matching candidates
 	vector<double> runNumber;
 	vector<double> lumiBlock;
@@ -64,6 +65,8 @@ public:
 public:
 	digestControl();
 	~digestControl();
+	
+	void   setRecAlgo(string muRecAlgo);
 	void   initialize();
 	void   finalize();
 	

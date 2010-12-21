@@ -40,6 +40,7 @@ public:
 		string sTime = "digestCandidates_" + getDateHour() + ".cuts";
 		candidatesFile->open( sTime.c_str() );
 		
+		sMuonRecoAlgo = "staco";
 		m_digestPhys = digestPhys;
 		m_digestAnalysis_grl = grl;	
 		m_treeFile   = treeFile;
@@ -51,7 +52,7 @@ public:
 	void setMuidVariables();
 	
 	void executeAdvanced();
-	void executeCutFlow();
+	void execute( string mualgo = "staco" );
 	
 	void write();
 

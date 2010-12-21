@@ -17,9 +17,9 @@ mcAnalysis::~mcAnalysis()
 
 }
 
-void mcAnalysis::executeCutFlow()
+void mcAnalysis::execute( string mualgo )
 {
-	sMuonRecoAlgo = "staco";
+	sMuonRecoAlgo = mualgo;
 
 	///////////////////////////////////
 	// set all the event-level vars ///

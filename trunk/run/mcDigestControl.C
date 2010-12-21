@@ -48,6 +48,16 @@ mcDigestControl::~mcDigestControl()
 
 }
 
+void mcDigestControl::setRecAlgo(string muRecAlgo)
+{
+	if(muRecAlgo!="staco"  &&  muRecAlgo!="muid")
+	{
+		cout << "WARNING: muRecAlgo=" << muRecAlgo << " is not supported, setting to default (staco)" << endl;
+		muRecAlgo = "staco";
+	}
+	m_muRecAlgo = muRecAlgo;
+}
+
 void mcDigestControl::initialize()
 {
 	// run control
@@ -56,12 +66,6 @@ void mcDigestControl::initialize()
 	l64t_nb       = 0;
 	l64t_jentry   = 0;
 	l64t_ientry   = 0;
-
-	// pointers
-	m_mcDigestPhys     = NULL;
-	m_mcDigestAnalysis = NULL;
-	m_histfile = NULL;
-	m_treefile = NULL;
 }
 
 void mcDigestControl::finalize()
@@ -94,12 +98,12 @@ void mcDigestControl::book()
 	m_dirCutProfile = m_histfile->mkdir("cutsProfile");
 	m_mcDigestAnalysis->bookCutProfileHistosMap( m_mcDigestAnalysis->getCutFlowOrderedMapPtr(), m_dirCutProfile );
 	
-	m_dirPerformance = m_histfile->mkdir("performance");
-	
-	m_dirAfb = m_histfile->mkdir("Afb");
-	
 	m_dirEff = m_histfile->mkdir("efficiency");
 	m_mcDigestAnalysis->bookEfficiencyHistos(m_mcDigestAnalysis->m_period2triggerperiodMap, m_dirEff);
+	
+	m_mcDigestAnalysis->setTrees(m_dirAllCuts, m_dirCutProfile, m_dirEff);
+	
+	m_dirPerformance = m_histfile->mkdir("performance");
 }
 
 void mcDigestControl::draw()
@@ -107,7 +111,7 @@ void mcDigestControl::draw()
 	m_mcDigestAnalysis->drawBareHistos(m_dirNoCuts);
 	
 	// these calculations must come before drawHistos
-	m_mcDigestAnalysis->calculateAfb(m_mcDigestAnalysis->h1_Afb, m_dirAfb);
+	m_mcDigestAnalysis->calculateAfb(m_mcDigestAnalysis->h1_Afb);
 	
 	m_mcDigestAnalysis->drawHistos(m_dirAllCuts);
 	
@@ -157,7 +161,7 @@ void mcDigestControl::fits()
 
 void mcDigestControl::analyze()
 {
-	m_mcDigestAnalysis->executeCutFlow();
+	m_mcDigestAnalysis->execute(m_muRecAlgo);
 }
 
 void mcDigestControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)

@@ -11,30 +11,24 @@
 
 Afb::Afb()
 {
-	m_mmap_Afb = new TMultimapff();
-	//file = new ofstream();
-	//file->open( "Afb.raw" );
+	m_mmap_Afb_CS = new TMultimapff();
+	m_mmap_Afb_HE = new TMultimapff();
 }
 
 Afb::~Afb()
 {
-	//file->close();
-}
-
-
-void Afb::fillAfbMap(float mHat, float cosTh)
-{
-	m_mmap_Afb->insert( make_pair(mHat,cosTh) ); 
-}
-
-void Afb::calculateAfb(TH1D* h, TDirectory* tdir)
-{
-	if(tdir!=NULL) tdir->cd();
-	m_Afb_tree = new TTree("Afb_tree","Afb_tree");
-	m_Afb_tree->SetDirectory(tdir);
-	m_Afb_tree->Branch( "mHat",  &mHat );
-	m_Afb_tree->Branch( "cosTh", &cosTh );
 	
+}
+
+
+void Afb::fillAfbMap(float mhat, float cosThCS, float cosThHE)
+{
+	m_mmap_Afb_CS->insert( make_pair(mhat,cosThCS) ); 
+	m_mmap_Afb_HE->insert( make_pair(mHat,cosThHE) );
+}
+
+void Afb::calculateAfb(TH1D* h)
+{	
 	TAxis* xaxis   = h->GetXaxis();
 	float mHatmin  = (float)xaxis->GetXmin();
 	float mHatmax  = (float)xaxis->GetXmax();
@@ -48,22 +42,18 @@ void Afb::calculateAfb(TH1D* h, TDirectory* tdir)
 		Nb.push_back(0.);
 	}
 	
-	for(TMultimapff::iterator it=m_mmap_Afb->begin() ; it!=m_mmap_Afb->end() ; ++it)
+	for(TMultimapff::iterator itCS=m_mmap_Afb_CS->begin() ; itCS!=m_mmap_Afb_CS->end() ; ++itCS)
 	{
-		mHat  = it->first;
-		cosTh = it->second;
-		m_Afb_tree->Fill();
-		//(*file) << mHat << "\t" << cosTh << endl;
+		mHat              = itCS->first;
+		cosThCollinsSoper = itCS->second;
+	
 		if(mHat>=mHatmin  &&  mHat<=mHatmax)
 		{
 			int bin = 1 + (int)floor((mHat-mHatmin)/binWidth);
-			if(cosTh>=0) Nf[bin-1]++;
+			if(cosThCollinsSoper>=0) Nf[bin-1]++;
 			else         Nb[bin-1]++;
-			//cout << "Nf[" << bin-1 << "]=" << Nf[bin-1] << ",  Nf[" << bin-1 << "]=" << Nb[bin-1] << endl;
 		}
 	}
-	tdir->cd();
-	//m_Afb_tree->Write();
 	
 	for(Int_t b=1 ; b<=h->GetNbinsX() ; b++)
 	{

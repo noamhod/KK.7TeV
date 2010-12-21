@@ -28,7 +28,6 @@ class mcAnalysisGridControl : public utilities
 		TDirectory* 	m_dirNoCuts;
 		TDirectory* 	m_dirCutFlow;
 		TDirectory* 	m_dirPerformance;
-		TDirectory* 	m_dirAfb;
 		TDirectory* 	m_dirEff;
 	
 		// run control

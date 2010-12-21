@@ -89,10 +89,10 @@ void mcAnalysisGridControl::book()
 	
 	m_dirPerformance = m_rootfile->mkdir("performance");
 	
-	m_dirAfb = m_rootfile->mkdir("Afb");
-	
 	m_dirEff = m_rootfile->mkdir("efficiency");
 	m_mcAnalysis->bookEfficiencyHistos(m_mcAnalysis->m_period2triggerperiodMap, m_dirEff);
+	
+	m_mcAnalysis->setTrees(m_dirAllCuts, m_dirCutProfile, m_dirEff);
 }
 
 void mcAnalysisGridControl::draw()
@@ -100,7 +100,7 @@ void mcAnalysisGridControl::draw()
 	m_mcAnalysis->drawBareHistos(m_dirNoCuts);
 
 	// these calculations must come before drawHistos
-	m_mcAnalysis->calculateAfb(m_mcAnalysis->h1_Afb, m_dirAfb);
+	m_mcAnalysis->calculateAfb(m_mcAnalysis->h1_Afb);
 	
 	m_mcAnalysis->drawHistos(m_dirAllCuts);
 	

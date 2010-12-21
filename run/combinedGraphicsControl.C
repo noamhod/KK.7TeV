@@ -101,3 +101,38 @@ void combinedGraphicsControl::executeAfb()
 	m_combinedGraphics->set_AfbMCvsData(false, false, -1.05, +1.05, 0.);
 	m_combinedGraphics->draw_AfbMCvsData(dir, "allCuts", "Afb", "#hat{m}_{#mu#mu} TeV", "A_{FB}#left(#hat{m}_{#mu#mu}#right)");
 }
+
+void combinedGraphicsControl::executeTrig()
+{
+	m_combinedGraphics->setStyle();
+
+	string dir  = "/data/hod/D3PDdigest/rel15_barrel_selection/";
+	
+	m_combinedGraphics->set_allMCvsData(0., 1.2);
+	
+	m_combinedGraphics->draw_trigData(dir, "efficiency", "tNp_effi_pT.L1_MU10");
+	m_combinedGraphics->draw_trigData(dir, "efficiency", "tNp_effi_pT.EF_mu10||EF_mu10_MG");
+	m_combinedGraphics->draw_trigData(dir, "efficiency", "tNp_effi_pT.EF_mu13||EF_mu13_MG");
+	m_combinedGraphics->draw_trigData(dir, "efficiency", "tNp_effi_pT.EF_mu13_tight||EF_mu13_MG_tight");
+	
+	m_combinedGraphics->draw_trigData(dir, "efficiency", "tNp_effi_eta.L1_MU10");
+	m_combinedGraphics->draw_trigData(dir, "efficiency", "tNp_effi_eta.EF_mu10||EF_mu10_MG");
+	m_combinedGraphics->draw_trigData(dir, "efficiency", "tNp_effi_eta.EF_mu13||EF_mu13_MG");
+	m_combinedGraphics->draw_trigData(dir, "efficiency", "tNp_effi_eta.EF_mu13_tight||EF_mu13_MG_tight");
+	
+	m_combinedGraphics->draw_trigData(dir, "efficiency", "tNp_effi_phi.L1_MU10");
+	m_combinedGraphics->draw_trigData(dir, "efficiency", "tNp_effi_phi.EF_mu10||EF_mu10_MG");
+	m_combinedGraphics->draw_trigData(dir, "efficiency", "tNp_effi_phi.EF_mu13||EF_mu13_MG");
+	m_combinedGraphics->draw_trigData(dir, "efficiency", "tNp_effi_phi.EF_mu13_tight||EF_mu13_MG_tight");
+}
+
+void combinedGraphicsControl::executeTrigTRUvsTnP()
+{
+	m_combinedGraphics->setStyle();
+
+	string dir  = "/data/hod/D3PDdigest/rel15_barrel_selection/";
+	
+	m_combinedGraphics->draw_trigTRUvsTnP(dir, "efficiency", "tNp_effi_pT.L1_MU10");
+	m_combinedGraphics->draw_trigTRUvsTnP(dir, "efficiency", "tNp_effi_eta.L1_MU10");
+	m_combinedGraphics->draw_trigTRUvsTnP(dir, "efficiency", "tNp_effi_phi.L1_MU10");
+}

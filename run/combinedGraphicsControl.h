@@ -25,8 +25,11 @@ class combinedGraphicsControl : public utilities
 		~combinedGraphicsControl();
 		void initialize(string sAnalysisSelector, string muonSelector);
 		void finalize();
+		
 		void execute();
 		void executeAfb();
+		void executeTrig();
+		void executeTrigTRUvsTnP();
 
 	private:
 };

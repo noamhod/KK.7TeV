@@ -17,6 +17,232 @@ graphicObjects::~graphicObjects()
 
 }
 
+
+void graphicObjects::clearTreeVars()
+{
+	// all cuts - floats
+	Mhat         = -9999;
+	CosThetaCS   = -9999;
+	CosThetaHE   = -9999;
+	Ysystem      = -9999;
+	Q_T          = -9999;
+	CosThetaDimu = -9999;
+	ipTDiff      = -9999;
+	EtaSum       = -9999;
+	
+	// cut profile - floats
+	oppositeCharge_profile = -9999;
+	imass_profile          = -9999;
+	cosThetaDimu_profile   = -9999;
+	etaSum_profile         = -9999;
+	
+	// eff - floats and strings
+	tNp_triggerName  = "";
+	tNp_cand_pT  = -9999;
+	tNp_succ_pT  = -9999;
+	tNp_cand_eta = -9999;
+	tNp_succ_eta = -9999;
+	tNp_cand_phi = -9999;
+	tNp_succ_phi = -9999;
+	tru_triggerName  = "";
+	tru_cand_pT  = -9999;
+	tru_succ_pT  = -9999;
+	tru_cand_eta = -9999;
+	tru_succ_eta = -9999;
+	tru_cand_phi = -9999;
+	tru_succ_phi = -9999;
+
+	// all cuts - vectors
+	charge->clear();
+	m->clear();
+	e->clear();
+	px->clear();
+	py->clear();
+	pz->clear();
+	pt->clear();
+	qoverp_me->clear();
+	theta_me->clear();
+	qoverp_id->clear();
+	theta_id->clear();
+	eta->clear();
+	phi->clear();
+	d0_exPV->clear();
+	z0_exPV->clear();
+	
+	// cut profile vectors
+	pT_profile->clear();
+	pT_qOp_and_theta_profile->clear();
+	eta_profile->clear();
+	etaTight_profile->clear();
+	etaBarrel_profile->clear();
+	pTmatchingRatio_profile->clear();
+	pTmatchingAbsDiff_profile->clear();
+	pTmatchingAbsDiff_profile->clear();
+	d0_profile->clear();
+	z0_profile->clear();
+	ip_d0_profile->clear();
+	ip_z0_profile->clear();
+	isolation20_profile->clear();
+	isolation30_profile->clear();
+	isolation40_profile->clear();
+	nMDTBI_profile->clear();
+	nMDTBM_profile->clear();
+	nMDTBO_profile->clear();
+	nRPCPhi1_profile->clear();
+	nRPCPhi2_profile->clear();
+	nRPCPhi3_profile->clear();
+	nSCTHits_profile->clear();
+	nPixHits_profile->clear();
+	vxp_z_profile->clear();
+	vxp_nTracks_profile->clear();
+}
+
+void graphicObjects::writeTrees(TDirectory* tDir_allCuts,
+								TDirectory* tDir_cutsProfile,
+								TDirectory* tDir_efficiency)
+{
+	tDir_allCuts->cd();
+	tree_allCuts->Write();
+
+	tDir_cutsProfile->cd();
+	tree_cutsProfile->Write();
+	
+	tDir_efficiency->cd();
+	tree_efficiency->Write();
+}
+
+void graphicObjects::setTrees(TDirectory* tDir_allCuts,
+							  TDirectory* tDir_cutsProfile,
+							  TDirectory* tDir_efficiency)
+{
+	// all cuts - vectors
+	charge = new vector<float>;
+	m = new vector<float>;
+	e = new vector<float>;
+	px = new vector<float>;
+	py = new vector<float>;
+	pz = new vector<float>;
+	pt = new vector<float>;
+	qoverp_me = new vector<float>;
+	theta_me = new vector<float>;
+	qoverp_id = new vector<float>;
+	theta_id = new vector<float>;
+	eta = new vector<float>;
+	phi = new vector<float>;
+	d0_exPV = new vector<float>;
+	z0_exPV = new vector<float>;
+	// cut profile vectors
+	pT_profile = new vector<float>;
+	pT_qOp_and_theta_profile = new vector<float>;
+	eta_profile = new vector<float>;
+	etaTight_profile = new vector<float>;
+	etaBarrel_profile = new vector<float>;
+	pTmatchingRatio_profile = new vector<float>;
+	pTmatchingAbsDiff_profile = new vector<float>;
+	d0_profile = new vector<float>;
+	z0_profile = new vector<float>;
+	ip_d0_profile = new vector<float>;
+	ip_z0_profile = new vector<float>;
+	isolation20_profile = new vector<float>;
+	isolation30_profile = new vector<float>;
+	isolation40_profile = new vector<float>;
+	nMDTBI_profile = new vector<int>;
+	nMDTBM_profile = new vector<int>;
+	nMDTBO_profile = new vector<int>;
+	nRPCPhi1_profile = new vector<int>;
+	nRPCPhi2_profile = new vector<int>;
+	nRPCPhi3_profile = new vector<int>;
+	nSCTHits_profile = new vector<int>;
+	nPixHits_profile = new vector<int>;
+	vxp_z_profile = new vector<float>;
+	vxp_nTracks_profile = new vector<int>;
+	
+	
+	if(tDir_allCuts!=NULL) tDir_allCuts->cd();
+	tree_allCuts = new TTree("allCuts_tree","allCuts_tree");
+	tree_allCuts->SetDirectory(tDir_allCuts);
+	// 2 muons (floats)
+	tree_allCuts->Branch( "Mhat",         &Mhat );
+	tree_allCuts->Branch( "CosThetaCS",   &CosThetaCS );
+	tree_allCuts->Branch( "CosThetaHE",   &CosThetaHE );
+	tree_allCuts->Branch( "Ysystem",      &Ysystem );
+	tree_allCuts->Branch( "Q_T",           &Q_T );
+	tree_allCuts->Branch( "CosThetaDimu", &CosThetaDimu );
+	tree_allCuts->Branch( "ipTDiff",      &ipTDiff );
+	tree_allCuts->Branch( "EtaSum",       &EtaSum );
+	// 1 muon (vectors)
+	tree_allCuts->Branch( "charge", &charge );
+	tree_allCuts->Branch( "m",  &m );
+	tree_allCuts->Branch( "e",  &e );
+	tree_allCuts->Branch( "px", &px );
+	tree_allCuts->Branch( "py", &py );
+	tree_allCuts->Branch( "pz", &pz );
+	tree_allCuts->Branch( "pt", &pt );
+	tree_allCuts->Branch( "qoverp_me", &qoverp_me );
+	tree_allCuts->Branch( "theta_me",  &theta_me );
+	tree_allCuts->Branch( "qoverp_id", &qoverp_id );
+	tree_allCuts->Branch( "theta_id",  &theta_id );
+	tree_allCuts->Branch( "eta", &eta );
+	tree_allCuts->Branch( "phi", &phi );
+	tree_allCuts->Branch( "d0_exPV",  &d0_exPV );
+	tree_allCuts->Branch( "z0_exPV",  &z0_exPV );
+	
+	
+	if(tDir_cutsProfile!=NULL) tDir_cutsProfile->cd();
+	tree_cutsProfile = new TTree("cutsProfile_tree","cutsProfile_tree");
+	tree_cutsProfile->SetDirectory(tDir_cutsProfile);
+	// vectors
+	tree_cutsProfile->Branch( "pT_profile", &pT_profile );
+	tree_cutsProfile->Branch( "pT_qOp_and_theta_profile", &pT_qOp_and_theta_profile );
+	tree_cutsProfile->Branch( "eta_profile", &eta_profile );
+	tree_cutsProfile->Branch( "etaTight_profile", &etaTight_profile );
+	tree_cutsProfile->Branch( "etaBarrel_profile", &etaBarrel_profile );
+	tree_cutsProfile->Branch( "pTmatchingRatio_profile", &pTmatchingRatio_profile );
+	tree_cutsProfile->Branch( "pTmatchingAbsDiff_profile", &pTmatchingAbsDiff_profile );
+	tree_cutsProfile->Branch( "pTmatchingAbsDiff_profile", &pTmatchingAbsDiff_profile );
+	tree_cutsProfile->Branch( "d0_profile", &d0_profile );
+	tree_cutsProfile->Branch( "z0_profile", &z0_profile );
+	tree_cutsProfile->Branch( "isolation20_profile", &isolation20_profile );
+	tree_cutsProfile->Branch( "isolation30_profile", &isolation30_profile );
+	tree_cutsProfile->Branch( "isolation40_profile", &isolation40_profile );
+	tree_cutsProfile->Branch( "nMDTBI_profile", &nMDTBI_profile );
+	tree_cutsProfile->Branch( "nMDTBM_profile", &nMDTBM_profile );
+	tree_cutsProfile->Branch( "nMDTBO_profile", &nMDTBO_profile );
+	tree_cutsProfile->Branch( "nRPCPhi1_profile", &nRPCPhi1_profile );
+	tree_cutsProfile->Branch( "nRPCPhi2_profile", &nRPCPhi2_profile );
+	tree_cutsProfile->Branch( "nRPCPhi3_profile", &nRPCPhi3_profile );
+	tree_cutsProfile->Branch( "nSCTHits_profile", &nSCTHits_profile );
+	tree_cutsProfile->Branch( "nPixHits_profile", &nPixHits_profile );
+	tree_cutsProfile->Branch( "ip_d0_profile", &ip_d0_profile );
+	tree_cutsProfile->Branch( "ip_z0_profile", &ip_z0_profile );
+	// floats
+	tree_cutsProfile->Branch( "oppositeCharge_profile", &oppositeCharge_profile );
+	tree_cutsProfile->Branch( "imass_profile", &imass_profile );
+	tree_cutsProfile->Branch( "cosThetaDimu_profile", &cosThetaDimu_profile );
+	tree_cutsProfile->Branch( "etaSum_profile", &etaSum_profile );
+	tree_cutsProfile->Branch( "vxp_z_profile", &vxp_z_profile );
+	tree_cutsProfile->Branch( "vxp_nTracks_profile", &vxp_nTracks_profile );
+	
+	
+	if(tDir_efficiency!=NULL) tDir_efficiency->cd();
+	tree_efficiency = new TTree("eff_tree","eff_tree");
+	tree_efficiency->SetDirectory(tDir_efficiency);
+	tree_efficiency->Branch( "tNp_triggerName",  &tNp_triggerName );
+	tree_efficiency->Branch( "tru_triggerName",  &tru_triggerName );
+	tree_efficiency->Branch( "tNp_cand_pT",  &tNp_cand_pT );
+	tree_efficiency->Branch( "tNp_succ_pT",  &tNp_succ_pT );
+	tree_efficiency->Branch( "tNp_cand_eta", &tNp_cand_eta );
+	tree_efficiency->Branch( "tNp_succ_eta", &tNp_succ_eta );
+	tree_efficiency->Branch( "tNp_cand_phi", &tNp_cand_phi );
+	tree_efficiency->Branch( "tNp_succ_phi", &tNp_succ_phi );
+	tree_efficiency->Branch( "tru_cand_pT",  &tru_cand_pT );
+	tree_efficiency->Branch( "tru_succ_pT",  &tru_succ_pT );
+	tree_efficiency->Branch( "tru_cand_eta", &tru_cand_eta );
+	tree_efficiency->Branch( "tru_succ_eta", &tru_succ_eta );
+	tree_efficiency->Branch( "tru_cand_phi", &tru_cand_phi );
+	tree_efficiency->Branch( "tru_succ_phi", &tru_succ_phi );
+}
+
 void graphicObjects::setCutFlowMapSVDPtr(TMapsvd* cutFlowMapSVD)
 {
 	cut_cutFlowMapSVD = cutFlowMapSVD;
@@ -47,7 +273,7 @@ void graphicObjects::ginitialize()
 	else if( it3 != itEnd ) pTcutNmae = "pTandEtaTight";
 	else if( it4 != itEnd ) pTcutNmae = "pTandEtaBarrel";
 	else if( it5 != itEnd ) pTcutNmae = "pTandEta";
-	else 
+	else
 	{
 		cout << "ERROR: in graphicObjects::ginitialize(): pT cut value was not found, exitting now" << endl;
 		exit(-1);
@@ -640,6 +866,10 @@ void graphicObjects::drawEfficiencyHistosMap(TDirectory* tdir)
 		(*h1map_truth_trigEff_pT)[strigperiod]->SetXTitle("p_{T} TeV");
 		(*h1map_truth_trigEff_pT)[strigperiod]->SetYTitle("#epsilon = #frac{N_{probes}}{N_{probe}^{candidates}}");
 		(*h1map_truth_trigEff_pT)[strigperiod]->SetLineColor(kRed);
+		(*h1map_truth_trigEff_pT)[strigperiod]->SetLineWidth(2);
+		(*h1map_truth_trigEff_pT)[strigperiod]->SetMarkerStyle(7);
+		(*h1map_truth_trigEff_pT)[strigperiod]->SetMarkerColor(kRed);
+		(*h1map_truth_trigEff_pT)[strigperiod]->SetMarkerSize(0.5);
 		(*h1map_truth_trigEff_pT)[strigperiod]->SetMinimum(0.);
 		(*h1map_truth_trigEff_pT)[strigperiod]->SetMaximum(1.05);
 		(*h1map_truth_trigEff_pT)[strigperiod]->Draw();
@@ -697,6 +927,10 @@ void graphicObjects::drawEfficiencyHistosMap(TDirectory* tdir)
 		(*h1map_truth_trigEff_eta)[strigperiod]->SetXTitle("#eta");
 		(*h1map_truth_trigEff_eta)[strigperiod]->SetYTitle("#epsilon = #frac{N_{probes}}{N_{probe}^{candidates}}");
 		(*h1map_truth_trigEff_eta)[strigperiod]->SetLineColor(kRed);
+		(*h1map_truth_trigEff_eta)[strigperiod]->SetLineWidth(2);
+		(*h1map_truth_trigEff_eta)[strigperiod]->SetMarkerStyle(7);
+		(*h1map_truth_trigEff_eta)[strigperiod]->SetMarkerColor(kRed);
+		(*h1map_truth_trigEff_eta)[strigperiod]->SetMarkerSize(0.5);
 		(*h1map_truth_trigEff_eta)[strigperiod]->SetMinimum(0.);
 		(*h1map_truth_trigEff_eta)[strigperiod]->SetMaximum(1.05);
 		(*h1map_truth_trigEff_eta)[strigperiod]->Draw();
@@ -755,6 +989,10 @@ void graphicObjects::drawEfficiencyHistosMap(TDirectory* tdir)
 		(*h1map_truth_trigEff_phi)[strigperiod]->SetXTitle("#phi");
 		(*h1map_truth_trigEff_phi)[strigperiod]->SetYTitle("#epsilon = #frac{N_{probes}}{N_{probe}^{candidates}}");
 		(*h1map_truth_trigEff_phi)[strigperiod]->SetLineColor(kRed);
+		(*h1map_truth_trigEff_phi)[strigperiod]->SetLineWidth(2);
+		(*h1map_truth_trigEff_phi)[strigperiod]->SetMarkerStyle(7);
+		(*h1map_truth_trigEff_phi)[strigperiod]->SetMarkerColor(kRed);
+		(*h1map_truth_trigEff_phi)[strigperiod]->SetMarkerSize(0.5);
 		(*h1map_truth_trigEff_phi)[strigperiod]->SetMinimum(0.);
 		(*h1map_truth_trigEff_phi)[strigperiod]->SetMaximum(1.05);
 		(*h1map_truth_trigEff_phi)[strigperiod]->Draw();

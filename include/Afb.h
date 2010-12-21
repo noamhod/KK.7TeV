@@ -13,18 +13,18 @@
 class Afb
 {
 	public:
-		TMultimapff* m_mmap_Afb; // holds: mHat=key, cos(theta)_CS=val
-		ofstream*    file;
-		TTree*       m_Afb_tree;
+		TMultimapff* m_mmap_Afb_CS; // holds: mHat=key, cos(theta)_CS=val
+		TMultimapff* m_mmap_Afb_HE; // holds: mHat=key, cos(theta)_HE=val
 		float mHat;
-		float cosTh;
+		float cosThCollinsSoper;
+		float cosThBoost;
 	
 	public:
 		Afb();
 		~Afb();
 
-		void fillAfbMap(float mHat, float cosTh);
-		void calculateAfb(TH1D* h, TDirectory* tdir);
+		void fillAfbMap(float mhat, float cosThCS, float cosThHE);
+		void calculateAfb(TH1D* h);
 		
 	private:
 };

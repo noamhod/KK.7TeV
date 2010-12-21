@@ -71,8 +71,31 @@ float kinematics::ySystem( TLorentzVector* pa, TLorentzVector* pb )
 	return m_pTmp.Rapidity();
 }
 
+
+float kinematics::cosThetaBoost( TLorentzVector* pa, float ca,
+								 TLorentzVector* pb, float cb )
+{
+	// http://xrootd.slac.stanford.edu/BFROOT/www/doc/workbook_backup_010108/analysis/analysis.html
+	// A useful quantity in many analyses is the helicity angle.
+	// In the reaction Y -> X -> a + b, the helicity angle of 
+	// particle a is the angle measured in the rest frame of the
+	//decaying parent particle, X, between the direction of the
+	// decay daughter a and the direction of the grandparent particle Y.
+
+	m_pTmp = (*pa)+(*pb); // this is the mumu system (Z) 4vector
+	TVector3 ZboostVector = m_pTmp.BoostVector(); // this is the 3vector of the Z
+	TLorentzVector p; // this is the muon 4vector
+	
+	if(ca<0)      p.SetPxPyPzE(pa->Px(),pa->Py(),pa->Pz(),pa->E());
+	else if(cb<0) p.SetPxPyPzE(pb->Px(),pb->Py(),pb->Pz(),pb->E());
+	p.Boost( -ZboostVector ); // boost p to the dimuon CM (rest) frame
+	float cosThetaB = p.Vect()*m_pTmp.Vect()/(p.P()*m_pTmp.P());
+	//if (ySystem(pa,pb) < 0) cosThetaB *= -1.; // reclassify ???
+	return cosThetaB;
+}
+
 float kinematics::cosThetaCollinsSoper( TLorentzVector* pa, float ca,
-										 TLorentzVector* pb, float cb )
+										TLorentzVector* pb, float cb )
 {
 	// this will work only for leptons e, mu and tau
 	// by default it is assumed that pa is the lepton

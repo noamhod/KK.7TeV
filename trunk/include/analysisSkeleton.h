@@ -364,13 +364,33 @@ public:
 	// more variables
 	float current_imass;
 	float current_cosTheta;
-	float current_mu_pT;
-	float current_muplus_pT;
-	float current_mu_eta;
-	float current_muplus_eta;
+	float current_cosThetaHE;
+	float current_cosThetaCS;
+	float current_ySystem;
+	float current_QT;
 	float current_cosmicCosth;
 	float current_ipTdiff;
 	float current_etaSum;
+	float current_pTdiff;
+	float current_pTdiff_muplus;
+	float current_pTratio;
+	float current_pTratio_muplus;
+	float current_mu_pT;
+	float current_muplus_pT;
+	float current_mu_me_pT;
+	float current_muplus_me_pT;
+	float current_mu_id_pT;
+	float current_muplus_id_pT;
+	float current_mu_eta;
+	float current_muplus_eta;
+	float current_mu_me_qop;
+	float current_muplus_me_qop;
+	float current_mu_id_qop;
+	float current_muplus_id_qop;
+	float current_mu_me_theta;
+	float current_muplus_me_theta;
+	float current_mu_id_theta;
+	float current_muplus_id_theta;
 
 public:
 	analysisSkeleton();
@@ -407,6 +427,7 @@ public:
 	
 	void fillCutProfile1D();
 	void fillCutProfile2D();
+	void fillCutProfile();
 	
 	void fillTagNProbe();
 	void fillTruthEfficiency();

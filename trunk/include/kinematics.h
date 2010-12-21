@@ -32,7 +32,9 @@ class kinematics
 		float QT(                   TLorentzVector* pa, TLorentzVector* pb );
 		float ySystem(              TLorentzVector* pa, TLorentzVector* pb );
 		float cosThetaCollinsSoper( TLorentzVector* pa, float ca,
-		TLorentzVector* pb, float cb );
+									TLorentzVector* pb, float cb );
+		float cosThetaBoost( 		TLorentzVector* pa, float ca,
+									TLorentzVector* pb, float cb );
 
 	private:
 		

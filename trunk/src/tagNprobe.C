@@ -225,7 +225,8 @@ void tagNprobe::calculateEfficiency(TH1D* hCandidates, TH1D* hSucceeded, TH1D* h
 		eff  = (cand!=0) ? prob/cand : 0.;
 		deff = (cand!=0) ? sqrt(eff*(1.-eff)/cand) : 0.;
 		hEfficiency->SetBinContent(b,eff);
-		if(!isTruth) hEfficiency->SetBinError(b,deff);
+		hEfficiency->SetBinError(b,deff);
+		//if(!isTruth) hEfficiency->SetBinError(b,deff);
 	}
 }
 
@@ -247,7 +248,8 @@ void tagNprobe::calculateEfficiency(TMapSP2TH1D* hMapCandidates, TMapSP2TH1D* hM
 			eff  = (cand!=0) ? prob/cand : 0.;
 			deff = (cand!=0) ? sqrt(eff*(1.-eff)/cand) : 0.;
 			(*hMapEfficiency)[trigper]->SetBinContent(b,eff);
-			if(!isTruth) (*hMapEfficiency)[trigper]->SetBinError(b,deff);
+			(*hMapEfficiency)[trigper]->SetBinError(b,deff);
+			//if(!isTruth) (*hMapEfficiency)[trigper]->SetBinError(b,deff);
 		}
 	}
 }

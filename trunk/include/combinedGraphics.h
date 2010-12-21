@@ -23,6 +23,7 @@ class combinedGraphics : public analysisModules
 	
 		// integrated luminosity of the data in 1/pb
 		TMapsd period2lumiMap;
+		TMapsd period2trigMap;
 		
 		TMapsd mcProc2sigma;
 		TMapsd mcProc2br;
@@ -80,6 +81,7 @@ class combinedGraphics : public analysisModules
 		
 		TCanvas* getCanvas(TFile* f, string dir, string cname);
 		TH1D*    getHisto(TFile* f, string dir, string hname);
+		TH1D*    cloneHisto(TFile* f, string dir, string hname);
 		void fixHisto(TH1D* h);
 		void NormToBinWidth(TH1D* h);
 		double Integral(TH1D* h);
@@ -120,6 +122,10 @@ class combinedGraphics : public analysisModules
 		
 		void set_AfbMCvsData(bool logx = false, bool logx = false, Double_t min = 0., Double_t max = 0., Double_t minratiox = 0.);
 		void draw_AfbMCvsData(string dir, string hDir, string hName, string xTitle, string yTitle);
+		
+		void draw_trigData(string dir, string hDir, string hName);
+		void draw_trigTRUvsTnP(string dir, string hDir, string hName);
+		void draw_trigMCvsData(string dir, string hDir, string hName);
 	
 	private:
 };

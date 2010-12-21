@@ -5,9 +5,19 @@
 
 	float GeV2TeV = 1.e-3;
 
-	int Afb_nbins = 40;
-	double Afb_min   = 60.*GeV2TeV;
-	double Afb_max   = 460.*GeV2TeV;
+	int    imass_nbins = 60;
+	double imass_min   = 75.*GeV2TeV;
+	double imass_max   = 375.*GeV2TeV;
+	
+	// logarithmic boundries and bins of histograms
+	Double_t logMmin     = log10(imass_min);
+	Double_t logMmax     = log10(imass_max);
+	Double_t M_bins[100+1];
+	
+	Double_t M_binwidth = (Double_t)( (logMmax-logMmin)/(Double_t)imass_nbins );
+	M_bins[0] = imass_min;
+	for(Int_t i=1 ; i<=imass_nbins ; i++) M_bins[i] = TMath::Power( 10,(logMmin + i*M_binwidth) );
+	
 
 	string dir   = "/data/hod/D3PDdigest/rel15_barrel_selection/";
 	string hDir  = "allCuts";
@@ -51,14 +61,16 @@
 	TPad *pad_mHat = new TPad("pad_mHat","",0,0,1,1);
 	pad_mHat->SetFillColor(kWhite);
 	pad_mHat->SetTicky(0);
-        pad_mHat->SetLogy();
+	pad_mHat->SetLogy();
+	//pad_mHat->SetLogx();
 
 	TPad *pad_Afb  = new TPad("pad_Afb", "",0,0,1,1);
-        pad_Afb->SetTicky(0);
-        pad_Afb->SetTickx(1);
+	pad_Afb->SetTicky(0);
+	pad_Afb->SetTickx(1);
 	pad_Afb->SetFillStyle(0);
 	pad_Afb->SetFrameFillStyle(4000); //will be transparent
 	pad_Afb->SetFrameFillColor(0);
+	//pad_Afb->SetLogx();
 	
 	
 	string s1, s2;
@@ -73,17 +85,17 @@
 	
 	
 	// Data
-	TH1D* hDataM  = new TH1D("mHat_data","mHat_data", Afb_nbins, Afb_min, Afb_max );
+	TH1D* hDataM  = new TH1D("mHat_data","mHat_data", /*imass_nbins, imass_min, imass_max*/imass_nbins, M_bins );
 	hDataM->SetTitle("");
 	hDataM->SetYTitle("#frac{dN}{d#hat{m}_{#mu#mu}} 1/TeV");
 	hDataM->SetLineColor(kBlack);
 	hDataM->SetLineWidth(2);
-	TH1D* hData   = new TH1D("Afb_data","Afb_data",   Afb_nbins, Afb_min, Afb_max );
+	TH1D* hData   = new TH1D("Afb_data","Afb_data",   /*imass_nbins, imass_min, imass_max*/imass_nbins, M_bins );
 	hData->SetMarkerStyle(20);
 	hData->SetMarkerColor(kBlack);
 	hData->SetMarkerSize(1.2);
-	TH1D* hDataNf = new TH1D("dataNf","dataNf",       Afb_nbins, Afb_min, Afb_max );
-	TH1D* hDataNb = new TH1D("dataNb","dataNb",       Afb_nbins, Afb_min, Afb_max );
+	TH1D* hDataNf = new TH1D("dataNf","dataNf",       /*imass_nbins, imass_min, imass_max*/imass_nbins, M_bins );
+	TH1D* hDataNb = new TH1D("dataNb","dataNb",       /*imass_nbins, imass_min, imass_max*/imass_nbins, M_bins );
 	leg->AddEntry( hData, "Data: A_{FB}#left(#hat{m}_{#mu#mu}#right)", "lep");
 	leg->AddEntry( hData, "Data: #frac{dN}{d#hat{m}_{#mu#mu}}", "l");
 	
@@ -138,9 +150,9 @@
 	
 	// Backgrounds
 	channel = "DYmumu: A_{FB}#left(#hat{m}_{#mum#mu}#right)";
-	TH1D* hBGsum = new TH1D("Afb_sumBG","Afb_sumBG", Afb_nbins, Afb_min, Afb_max );
-	TH1D* hNf    = new TH1D("bgNf","bgNf",           Afb_nbins, Afb_min, Afb_max );
-	TH1D* hNb    = new TH1D("bgNb","bgNb",           Afb_nbins, Afb_min, Afb_max );
+	TH1D* hBGsum = new TH1D("Afb_sumBG","Afb_sumBG", imass_nbins, imass_min, imass_max );
+	TH1D* hNf    = new TH1D("bgNf","bgNf",           imass_nbins, imass_min, imass_max );
+	TH1D* hNb    = new TH1D("bgNb","bgNb",           imass_nbins, imass_min, imass_max );
 	hBGsum->SetLineColor(kAzure-5);
 	hBGsum->SetFillColor(kAzure-5);
 	hBGsum->SetLineWidth(1);
@@ -157,6 +169,12 @@
 	TList* Afb_sumBG_list = new TList();
 	
 	sProc = "DYmumu_75M120";
+	path = "/srv01/tau/hod/z0analysis-tests/z0analysis-dev/run/mcWZphys.root";
+	TFile* fDYmumu_75M120 = new TFile( path.c_str(), "READ" );
+	Afb_sumBG_list->Add( (TTree*)fDYmumu_75M120->Get("allCuts/allCuts_tree") );
+	
+	/*
+	sProc = "DYmumu_75M120";
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
 	TFile* fDYmumu_75M120 = new TFile( path.c_str(), "READ" );
 	Afb_sumBG_list->Add( (TTree*)fDYmumu_75M120->Get("Afb/Afb_tree") );
@@ -172,10 +190,10 @@
 	Afb_sumBG_list->Add( (TTree*)fDYmumu_250M400->Get("Afb/Afb_tree") );
 
 	sProc = "DYmumu_400M600";
-        path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-        TFile* fDYmumu_400M600 = new TFile( path.c_str(), "READ" );
-        Afb_sumBG_list->Add( (TTree*)fDYmumu_400M600->Get("Afb/Afb_tree") );
-	
+	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fDYmumu_400M600 = new TFile( path.c_str(), "READ" );
+	Afb_sumBG_list->Add( (TTree*)fDYmumu_400M600->Get("Afb/Afb_tree") );
+	*/
 
 /*	
 	sProc = "ZZ_Herwig";
@@ -223,9 +241,13 @@
 	mergedFile->Close();
 	
 	TFile* fBG = new TFile("Afb_sumBG_merged.root", "READ");
-	TTree* Afb_sumBG_tree = (TTree*)fBG->Get("Afb_tree");
-	Afb_sumBG_tree->SetBranchAddress( "mHat",  &mHat );
-	Afb_sumBG_tree->SetBranchAddress( "cosTh", &cosTh );
+	//TTree* Afb_sumBG_tree = (TTree*)fBG->Get("Afb_tree");
+	//Afb_sumBG_tree->SetBranchAddress( "mHat",  &mHat );
+	//Afb_sumBG_tree->SetBranchAddress( "cosTh", &cosTh );
+	
+	TTree* Afb_sumBG_tree = (TTree*)fBG->Get("allCuts_tree");
+	Afb_sumBG_tree->SetBranchAddress( "Mhat",  &mHat );
+	Afb_sumBG_tree->SetBranchAddress( "CosThetaHE", &cosTh );
 
 	if (Afb_sumBG_tree==0) return;
 	for (Long64_t l64t_jentry=0 ; l64t_jentry<Afb_sumBG_tree->GetEntriesFast() ; l64t_jentry++)
@@ -283,7 +305,7 @@
 	pvtxt->Draw("SAMES");
 	pvtxt1->Draw("SAMES");
 	leg->Draw("SAMES");
-	TLine* lUnit = new TLine(Afb_min,0.,Afb_max,0.);
+	TLine* lUnit = new TLine(imass_min,0.,imass_max,0.);
 	lUnit->SetLineColor(kBlack);
 	lUnit->SetLineStyle(2);
 	lUnit->Draw("SAMES");

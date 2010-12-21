@@ -13,6 +13,11 @@
 class graphicObjects// : public utilities
 {
 	public:
+		TTree* tree_allCuts;
+		TTree* tree_cutsProfile;
+		TTree* tree_efficiency;
+	
+	
 		// canvases
 		TCanvas* cnv_imass;
 		TCanvas* cnv_pT;
@@ -232,6 +237,80 @@ class graphicObjects// : public utilities
 		Int_t tagNprobe_pT_nbins;
 		Double_t tagNprobe_pT_min;
 		Double_t tagNprobe_pT_max;
+		
+		//--------------------------------
+		//--- for the trees
+		// all cuts - floats
+		float Mhat;
+		float CosThetaCS;
+		float CosThetaHE;
+		float Ysystem;
+		float Q_T;
+		float CosThetaDimu;
+		float ipTDiff;
+		float EtaSum;
+		// all cuts - vectors
+		vector<float>* charge;
+		vector<float>* m;
+		vector<float>* e;
+		vector<float>* px;
+		vector<float>* py;
+		vector<float>* pz;
+		vector<float>* pt;
+		vector<float>* qoverp_me;
+		vector<float>* theta_me;
+		vector<float>* qoverp_id;
+		vector<float>* theta_id;
+		vector<float>* eta;
+		vector<float>* phi;
+		vector<float>* d0_exPV;
+		vector<float>* z0_exPV;
+		// cut profile vectors
+		vector<float>* pT_profile;
+		vector<float>* pT_qOp_and_theta_profile;
+		vector<float>* eta_profile;
+		vector<float>* etaTight_profile;
+		vector<float>* etaBarrel_profile;
+		vector<float>* pTmatchingRatio_profile;
+		vector<float>* pTmatchingAbsDiff_profile;
+		vector<float>* d0_profile;
+		vector<float>* z0_profile;
+		vector<float>* ip_d0_profile;
+		vector<float>* ip_z0_profile;
+		vector<float>* isolation20_profile;
+		vector<float>* isolation30_profile;
+		vector<float>* isolation40_profile;
+		vector<int>* nMDTBI_profile;
+		vector<int>* nMDTBM_profile;
+		vector<int>* nMDTBO_profile;
+		vector<int>* nRPCPhi1_profile;
+		vector<int>* nRPCPhi2_profile;
+		vector<int>* nRPCPhi3_profile;
+		vector<int>* nSCTHits_profile;
+		vector<int>* nPixHits_profile;
+		vector<float>* vxp_z_profile;
+		vector<int>*   vxp_nTracks_profile;
+		// cut profile - floats
+		float oppositeCharge_profile;
+		float imass_profile;
+		float cosThetaDimu_profile;
+		float etaSum_profile;
+		// eff - floats and strings
+		string tNp_triggerName;
+		float tNp_cand_pT;
+		float tNp_succ_pT;
+		float tNp_cand_eta;
+		float tNp_succ_eta;
+		float tNp_cand_phi;
+		float tNp_succ_phi;
+		string tru_triggerName;
+		float tru_cand_pT;
+		float tru_succ_pT;
+		float tru_cand_eta;
+		float tru_succ_eta;
+		float tru_cand_phi;
+		float tru_succ_phi;
+		//--------------------------------
 	
 	public:
 		graphicObjects();
@@ -241,6 +320,14 @@ class graphicObjects// : public utilities
 		void gfinalize();
 
 		void setStyle();
+		
+		void setTrees(TDirectory* tDir_allCuts,
+					  TDirectory* tDir_cutsProfile,
+					  TDirectory* tDir_efficiency);
+		void writeTrees(TDirectory* tDir_allCuts,
+						TDirectory* tDir_cutsProfile,
+						TDirectory* tDir_efficiency);
+		void clearTreeVars();
 		
 		void setCutFlowMapSVDPtr(TMapsvd* cutFlowMapSVD);
 

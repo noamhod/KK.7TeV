@@ -368,11 +368,11 @@ void analysisSkeleton::fillAfterCuts()
 	current_muplus_me_pT = pT(mu_me_qoverp->at(muPlus),mu_me_theta->at(muPlus))*MeV2TeV;
 	current_mu_id_pT     = pT(mu_id_qoverp->at(muMinus),mu_id_theta->at(muMinus))*MeV2TeV;
 	current_muplus_id_pT = pT(mu_id_qoverp->at(muPlus),mu_id_theta->at(muPlus))*MeV2TeV;
-	current_mu_pT       = mu_pt->at(muMinus);
-	current_muplus_pT   = mu_pt->at(muPlus);
-	current_mu_eta      = mu_eta->at(muMinus);
-	current_muplus_eta  = mu_eta->at(muPlus);
-	current_mu_me_qop   = mu_me_qoverp->at(muMinus)*MeV2TeV;
+	current_mu_pT        = mu_pt->at(muMinus);
+	current_muplus_pT    = mu_pt->at(muPlus);
+	current_mu_eta       = mu_eta->at(muMinus);
+	current_muplus_eta   = mu_eta->at(muPlus);
+	current_mu_me_qop    = mu_me_qoverp->at(muMinus)*MeV2TeV;
 	current_muplus_me_qop = mu_me_qoverp->at(muPlus)*MeV2TeV;
 	current_mu_id_qop     = mu_id_qoverp->at(muMinus)*MeV2TeV;
 	current_muplus_id_qop = mu_me_qoverp->at(muPlus)*MeV2TeV;
@@ -599,7 +599,6 @@ void analysisSkeleton::imassSort()
 
 void analysisSkeleton::buildMU4Vector(int nMus)
 {
-	//if(pmu.size()>0) pmu.clear();
 	wipeMU4Vector();
 	for(int n=0 ; n<nMus ; n++)
 	{
@@ -613,20 +612,24 @@ void analysisSkeleton::buildMU4Vector(int nMus)
 
 void analysisSkeleton::buildMU4Vector(int nMus, string fromAngles)
 {
+	cout << "\nbefore: RunNumber=" << RunNumber << ", EventNumber=" << EventNumber << ", nMus=" << nMus << ", size=" << mu_pt->size() << endl;
 	if(fromAngles=="")
 	{
-		cout << "you shhould call buildMU4Vector(int nMus) instead" << endl;
+		cout << "you should call buildMU4Vector(int nMus) instead" << endl;
 	}
 	else
 	{
-		//if(pmu.size()>0) pmu.clear();
+		cout << "before wipe" << endl;
 		wipeMU4Vector();
+		cout << "after wipe" << endl;
 		for(int n=0 ; n<nMus ; n++)
 		{
 			pmu.push_back( new TLorentzVector() );
 			pmu[n]->SetPtEtaPhiM( mu_pt->at(n)*MeV2TeV, mu_eta->at(n), mu_phi->at(n), muonMass*GeV2TeV);
+			cout << "after[" << n << "]" << endl;
 		}
 	}
+	cout << "after all" << endl;
 }
 
 void analysisSkeleton::wipeMU4Vector()
@@ -958,27 +961,29 @@ void analysisSkeleton::fillCutProfile1D()
 				(*h1map_cutProfile)[sname]->Fill( mu_nRPCLayer3PhiHits->at(bi) );
 				nRPCPhi3_profile->push_back( mu_nRPCLayer3PhiHits->at(bi) );
 			}
+			//-------------------------------------
+			// cuts on the 2-muon system
 			else if(sname=="oppositeCharge")
 			{
 				(*h1map_cutProfile)[sname]->Fill( mu_charge->at(ai)*mu_charge->at(bi) );
-				oppositeCharge_profile = mu_charge->at(ai)*mu_charge->at(bi);
+				oppositeCharge_profile->push_back( mu_charge->at(ai)*mu_charge->at(bi) );
 			}
 			else if(sname=="imass")
 			{
 				float tmp = imass(pmu[ai],pmu[bi]);
 				(*h1map_cutProfile)[sname]->Fill( tmp );
-				imass_profile = tmp;
+				imass_profile->push_back( tmp );
 			}
 			else if(sname=="cosThetaDimu")
 			{
 				float tmp = cosThetaDimu(pmu[ai],pmu[bi]);
 				(*h1map_cutProfile)[sname]->Fill( tmp );
-				cosThetaDimu_profile = tmp;
+				cosThetaDimu_profile->push_back( tmp );
 			}
 			else if(sname=="etaSum")
 			{
 				(*h1map_cutProfile)[sname]->Fill( mu_eta->at(ai)+mu_eta->at(bi) );
-				etaSum_profile = mu_eta->at(ai)+mu_eta->at(bi);
+				etaSum_profile->push_back( mu_eta->at(ai)+mu_eta->at(bi) );
 			}
 		}
 	}

@@ -15,6 +15,8 @@ analysisGridControl::analysisGridControl()
 analysisGridControl::analysisGridControl( TChain* inchain, TFile* outfile )
 {
 	startTimer();
+	
+	m_muRecAlgo = "staco";
 
 	string str = "";
 	

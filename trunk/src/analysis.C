@@ -60,9 +60,9 @@ void analysis::execute( string mualgo )
 	// skim the "offline" tree //////////////////////////////////////////////////////////////////////////////////////
 	float pTthreshold = 15.; // in GeV //////////////////////////////////////////////////////////////////////////////
 	m_muD3PD->doSkimD3PD(pTthreshold); // will set a flag in muD3PD class if pass the skim ////////////////////////// 
-	m_muD3PD->fill(analysisSkeleton::isGRL, analysisSkeleton::sPeriod, analysisSkeleton::vTriggers); ///
-	//bool  passSkim    = skimD3PD(m_phys, NULL, pTthreshold); ////////////////////////////////////////////////////////
-	//if(passSkim) m_muD3PD->fill(analysisSkeleton::isGRL, analysisSkeleton::sPeriod, analysisSkeleton::vTriggers); ///
+	m_muD3PD->fill(analysisSkeleton::isGRL, analysisSkeleton::sPeriod, analysisSkeleton::vTriggers); ////////////////
+	//bool  passSkim    = skimD3PD(m_phys, NULL, pTthreshold); //////////////////////////////////////////////////////
+	//if(passSkim) m_muD3PD->fill(analysisSkeleton::isGRL, analysisSkeleton::sPeriod, analysisSkeleton::vTriggers); /
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/////////////////////////////////////////////////////
@@ -77,6 +77,11 @@ void analysis::execute( string mualgo )
 		setMuidVariables();
 		nMus = (int)m_phys->mu_muid_pt->size();
 	}
+	cout << "algo=" << sMuonRecoAlgo << ", nMus=" << nMus
+									 << ", m_phys->mu_staco_pt->size()=" << m_phys->mu_staco_pt->size()
+									 << ", m_phys->mu_muid_pt->size()=" << m_phys->mu_muid_pt->size()
+									 << ", as::mu_pt->size()=" << analysisSkeleton::mu_pt->size()
+									 << endl;
 	/////////////////////////////////////////////////////
 	
 	/////////////////////////////////////////////////////

@@ -291,10 +291,10 @@ class graphicObjects// : public utilities
 		vector<float>* vxp_z_profile;
 		vector<int>*   vxp_nTracks_profile;
 		// cut profile - floats
-		float oppositeCharge_profile;
-		float imass_profile;
-		float cosThetaDimu_profile;
-		float etaSum_profile;
+		vector<float>* oppositeCharge_profile;
+		vector<float>* imass_profile;
+		vector<float>* cosThetaDimu_profile;
+		vector<float>* etaSum_profile;
 		// eff - vectors
 		vector<string>* tNp_triggerName; // only one entry but easier to access...
 		vector<float>* tNp_cand_pT;

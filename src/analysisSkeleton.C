@@ -612,24 +612,19 @@ void analysisSkeleton::buildMU4Vector(int nMus)
 
 void analysisSkeleton::buildMU4Vector(int nMus, string fromAngles)
 {
-	cout << "\nbefore: RunNumber=" << RunNumber << ", EventNumber=" << EventNumber << ", nMus=" << nMus << ", size=" << mu_pt->size() << endl;
 	if(fromAngles=="")
 	{
 		cout << "you should call buildMU4Vector(int nMus) instead" << endl;
 	}
 	else
 	{
-		cout << "before wipe" << endl;
 		wipeMU4Vector();
-		cout << "after wipe" << endl;
 		for(int n=0 ; n<nMus ; n++)
 		{
 			pmu.push_back( new TLorentzVector() );
 			pmu[n]->SetPtEtaPhiM( mu_pt->at(n)*MeV2TeV, mu_eta->at(n), mu_phi->at(n), muonMass*GeV2TeV);
-			cout << "after[" << n << "]" << endl;
 		}
 	}
-	cout << "after all" << endl;
 }
 
 void analysisSkeleton::wipeMU4Vector()

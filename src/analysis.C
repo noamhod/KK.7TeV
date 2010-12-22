@@ -77,11 +77,6 @@ void analysis::execute( string mualgo )
 		setMuidVariables();
 		nMus = (int)m_phys->mu_muid_pt->size();
 	}
-	cout << "algo=" << sMuonRecoAlgo << ", nMus=" << nMus
-									 << ", m_phys->mu_staco_pt->size()=" << m_phys->mu_staco_pt->size()
-									 << ", m_phys->mu_muid_pt->size()=" << m_phys->mu_muid_pt->size()
-									 << ", as::mu_pt->size()=" << analysisSkeleton::mu_pt->size()
-									 << endl;
 	/////////////////////////////////////////////////////
 	
 	/////////////////////////////////////////////////////

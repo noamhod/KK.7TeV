@@ -51,19 +51,18 @@ public:
 
 public:
 	analysis();
-	analysis(physics* phys, GRLinterface* grl, TFile* treeFile,
-			 string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath ) :
-			 analysisSkeleton(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
-			 {
-				sMuonRecoAlgo = "staco";
-				m_phys = phys;
-				m_analysis_grl = grl;	
-				m_treeFile = treeFile;
-				//m_offTree = new offTree( m_phys, NULL, m_treeFile ); // the NULL arg is the [mcPhysics* m_mcPhys;] variable
-				m_muD3PD  = new muD3PD( m_phys, NULL, m_treeFile ); // the NULL arg is the [mcPhysics* m_mcPhys;] variable
-				m_muid    = new muon_muid(  m_phys ); // this will also "turn on" the desired branches (virtual in the base)
-				m_mustaco = new muon_staco( m_phys ); // this will also  "turn on" the desired branches (virtual in the base)
-			}
+	analysis(physics* phys, GRLinterface* grl, TFile* treeFile, string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath ) :
+	analysisSkeleton(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
+	{
+		sMuonRecoAlgo = "staco";
+		m_phys = phys;
+		m_analysis_grl = grl;	
+		m_treeFile = treeFile;
+		//m_offTree = new offTree( m_phys, NULL, m_treeFile ); // the NULL arg is the [mcPhysics* m_mcPhys;] variable
+		m_muD3PD  = new muD3PD( m_phys, NULL, m_treeFile ); // the NULL arg is the [mcPhysics* m_mcPhys;] variable
+		m_muid    = new muon_muid(  m_phys ); // this will also "turn on" the desired branches (virtual in the base)
+		m_mustaco = new muon_staco( m_phys ); // this will also  "turn on" the desired branches (virtual in the base)
+	}
 	~analysis();
 
 

@@ -31,10 +31,10 @@ void graphicObjects::clearTreeVars()
 	EtaSum       = -9999;
 	
 	// cut profile - floats
-	oppositeCharge_profile = -9999;
-	imass_profile          = -9999;
-	cosThetaDimu_profile   = -9999;
-	etaSum_profile         = -9999;
+	//oppositeCharge_profile = -9999;
+	//imass_profile          = -9999;
+	//cosThetaDimu_profile   = -9999;
+	//etaSum_profile         = -9999;
 
 	// all cuts - vectors
 	charge->clear();
@@ -54,6 +54,8 @@ void graphicObjects::clearTreeVars()
 	z0_exPV->clear();
 	
 	// cut profile vectors
+	vxp_z_profile->clear();
+	vxp_nTracks_profile->clear();
 	pT_profile->clear();
 	pT_qOp_and_theta_profile->clear();
 	eta_profile->clear();
@@ -77,8 +79,10 @@ void graphicObjects::clearTreeVars()
 	nRPCPhi3_profile->clear();
 	nSCTHits_profile->clear();
 	nPixHits_profile->clear();
-	vxp_z_profile->clear();
-	vxp_nTracks_profile->clear();
+	oppositeCharge_profile->clear();
+	imass_profile->clear();
+	cosThetaDimu_profile->clear();
+	etaSum_profile->clear();
 	
 	// eff - vectors
 	tNp_triggerName->clear();
@@ -117,6 +121,8 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 							  TDirectory* tDir_efficiency)
 {
 	// all cuts - vectors
+	vxp_z_profile = new vector<float>;
+	vxp_nTracks_profile = new vector<int>;
 	charge = new vector<float>;
 	m = new vector<float>;
 	e = new vector<float>;
@@ -155,8 +161,10 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	nRPCPhi3_profile = new vector<int>;
 	nSCTHits_profile = new vector<int>;
 	nPixHits_profile = new vector<int>;
-	vxp_z_profile = new vector<float>;
-	vxp_nTracks_profile = new vector<int>;
+	oppositeCharge_profile = new vector<float>;
+	imass_profile          = new vector<float>;
+	cosThetaDimu_profile   = new vector<float>;
+	etaSum_profile         = new vector<float>;
 	// eff vectors
 	tNp_triggerName = new vector<string>; // only one entry but easier to access...
 	tNp_cand_pT = new vector<float>;
@@ -208,6 +216,8 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_cutsProfile = new TTree("cutsProfile_tree","cutsProfile_tree");
 	tree_cutsProfile->SetDirectory(tDir_cutsProfile);
 	// vectors
+	tree_cutsProfile->Branch( "vxp_z_profile", &vxp_z_profile );
+	tree_cutsProfile->Branch( "vxp_nTracks_profile", &vxp_nTracks_profile );
 	tree_cutsProfile->Branch( "pT_profile", &pT_profile );
 	tree_cutsProfile->Branch( "pT_qOp_and_theta_profile", &pT_qOp_and_theta_profile );
 	tree_cutsProfile->Branch( "eta_profile", &eta_profile );
@@ -231,13 +241,10 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_cutsProfile->Branch( "nPixHits_profile", &nPixHits_profile );
 	tree_cutsProfile->Branch( "ip_d0_profile", &ip_d0_profile );
 	tree_cutsProfile->Branch( "ip_z0_profile", &ip_z0_profile );
-	// floats
 	tree_cutsProfile->Branch( "oppositeCharge_profile", &oppositeCharge_profile );
 	tree_cutsProfile->Branch( "imass_profile", &imass_profile );
 	tree_cutsProfile->Branch( "cosThetaDimu_profile", &cosThetaDimu_profile );
 	tree_cutsProfile->Branch( "etaSum_profile", &etaSum_profile );
-	tree_cutsProfile->Branch( "vxp_z_profile", &vxp_z_profile );
-	tree_cutsProfile->Branch( "vxp_nTracks_profile", &vxp_nTracks_profile );
 	
 	
 	if(tDir_efficiency!=NULL) tDir_efficiency->cd();

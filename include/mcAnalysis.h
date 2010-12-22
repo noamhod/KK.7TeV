@@ -28,11 +28,6 @@ public:
 	muMCD3PD*  m_muMCD3PD;
 	TFile*     m_treeFile;
 	
-	//pthread_t thrd1;
-	//pthread_t thrd2;
-	//TThread* thrd1;
-	//TThread* thrd2;
-	
 	// local
 	string sMuonRecoAlgo;
 	int nMus;

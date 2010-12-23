@@ -54,4 +54,4 @@ chmod 777 Z_GRL_CURRENT.xml
 
 
 # submit the local run
-echo $datasetfiles > input.txt; root.exe $controller;
+echo $datasetfiles > input.txt; root.exe -b $controller;

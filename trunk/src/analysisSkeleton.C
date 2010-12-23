@@ -764,17 +764,40 @@ void analysisSkeleton::fillCutProfile1D()
 				(*h1map_cutProfile)[sname]->Fill( mu_pt->at(bi)*MeV2TeV );
 				pT_profile->push_back( mu_pt->at(bi)*MeV2TeV );
 			}
-			else if(sname=="pT_use_qOp_and_theta_1")
+			
+			else if(sname=="pT_loose_1")
+			{ 
+				(*h1map_cutProfile)[sname]->Fill( mu_pt->at(ai)*MeV2TeV );
+				pT_loose_profile->push_back( mu_pt->at(ai)*MeV2TeV );
+			}
+			else if(sname=="pT_loose_2")
+			{
+				(*h1map_cutProfile)[sname]->Fill( mu_pt->at(bi)*MeV2TeV );
+				pT_loose_profile->push_back( mu_pt->at(bi)*MeV2TeV );
+			}
+			else if(sname=="pT_qOp+theta_1")
 			{
 				float tmp = pT(mu_me_qoverp->at(ai)/MeV2TeV, mu_me_theta->at(ai));
 				(*h1map_cutProfile)[sname]->Fill( tmp );
 				pT_qOp_and_theta_profile->push_back( tmp );
 			}
-			else if(sname=="pT_use_qOp_and_theta_2")
+			else if(sname=="pT_qOp+theta_2")
 			{
 				float tmp = pT(mu_me_qoverp->at(bi)/MeV2TeV, mu_me_theta->at(bi));
 				(*h1map_cutProfile)[sname]->Fill( tmp );
 				pT_qOp_and_theta_profile->push_back( tmp );
+			}
+			else if(sname=="pT_qOp+theta_loose_1")
+			{
+				float tmp = pT(mu_me_qoverp->at(ai)/MeV2TeV, mu_me_theta->at(ai));
+				(*h1map_cutProfile)[sname]->Fill( tmp );
+				pT_qOp_and_theta_loose_profile->push_back( tmp );
+			}
+			else if(sname=="pT_qOp+theta_loose_2")
+			{
+				float tmp = pT(mu_me_qoverp->at(bi)/MeV2TeV, mu_me_theta->at(bi));
+				(*h1map_cutProfile)[sname]->Fill( tmp );
+				pT_qOp_and_theta_loose_profile->push_back( tmp );
 			}
 			else if(sname=="eta_1")
 			{
@@ -805,6 +828,26 @@ void analysisSkeleton::fillCutProfile1D()
 			{
 				(*h1map_cutProfile)[sname]->Fill( mu_eta->at(bi) );
 				etaBarrel_profile->push_back( mu_eta->at(bi) );
+			}
+			else if(sname=="etaFwd_1")
+			{
+				(*h1map_cutProfile)[sname]->Fill( mu_eta->at(ai) );
+				etaFwd_profile->push_back( mu_eta->at(ai) );
+			}
+			else if(sname=="etaFwd_2")
+			{
+				(*h1map_cutProfile)[sname]->Fill( mu_eta->at(bi) );
+				etaFwd_profile->push_back( mu_eta->at(bi) );
+			}
+			else if(sname=="etaFull_1")
+			{
+				(*h1map_cutProfile)[sname]->Fill( mu_eta->at(ai) );
+				etaFull_profile->push_back( mu_eta->at(ai) );
+			}
+			else if(sname=="etaFull_2")
+			{
+				(*h1map_cutProfile)[sname]->Fill( mu_eta->at(bi) );
+				etaFull_profile->push_back( mu_eta->at(bi) );
 			}
 			else if(sname=="pTmatchingRatio_1")
 			{
@@ -1391,7 +1434,27 @@ bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 			}
 		}
 		
-		else if(sorderedcutname=="pT_use_qOp_and_theta"  &&  !bSkipCut)
+		if(sorderedcutname=="pT_loose"  &&  !bSkipCut)
+		{
+			for(int mu=0 ; mu<muSize ; mu++)
+			{
+				thisMuPass = ( pTCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_pt->at(mu)) ) ? true : false;
+				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
+				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
+			}
+		}
+		
+		else if(sorderedcutname=="pT_qOp+theta"  &&  !bSkipCut)
+		{
+			for(int mu=0 ; mu<muSize ; mu++)
+			{
+				thisMuPass = ( pTCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_me_qoverp->at(mu), mu_me_theta->at(mu)) ) ? true : false;
+				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
+				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
+			}
+		}
+		
+		else if(sorderedcutname=="pT_qOp+theta_loose"  &&  !bSkipCut)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
@@ -1426,6 +1489,26 @@ bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
 				thisMuPass = ( etaBarrelCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_eta->at(mu)) ) ? true : false;
+				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
+				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
+			}
+		}
+		
+		else if(sorderedcutname=="etaFwd"  &&  !bSkipCut)
+		{
+			for(int mu=0 ; mu<muSize ; mu++)
+			{
+				thisMuPass = ( etaCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_eta->at(mu)) ) ? true : false;
+				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
+				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
+			}
+		}
+		
+		else if(sorderedcutname=="etaFull"  &&  !bSkipCut)
+		{
+			for(int mu=0 ; mu<muSize ; mu++)
+			{
+				thisMuPass = ( etaCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_eta->at(mu)) ) ? true : false;
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
 			}
@@ -1527,6 +1610,24 @@ bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 			}
 		}
 		
+		else if(sorderedcutname=="idHitsMCPrel15"  &&  !bSkipCut)
+		{
+			float cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
+			float cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
+			float cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
+			float cutval4 = (*m_cutFlowMapSVD)[sorderedcutname][3];
+			float cutval5 = (*m_cutFlowMapSVD)[sorderedcutname][4];
+			for(int mu=0 ; mu<muSize ; mu++)
+			{
+				thisMuPass = ( nIDhitsMCPrel15Cut(cutval1,cutval2,cutval3,cutval4,cutval5,
+												  mu_nSCTHits->at(mu),mu_nPixHits->at(mu),
+												  mu_nTRTHits->at(mu),mu_nTRTOutliers->at(mu),
+												  mu_eta->at(mu)) ) ? true : false;
+				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
+				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
+			}
+		}
+		
 		else if(sorderedcutname=="ms3stationsMDThits"  &&  !bSkipCut)
 		{
 			float cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
@@ -1561,6 +1662,84 @@ bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 				mu_nRPCLayer1PhiHits->at(mu), mu_nRPCLayer2PhiHits->at(mu), mu_nRPCLayer3PhiHits->at(mu)
 				)
 				) ? true : false;
+				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
+				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
+			}
+		}
+		
+		else if(sorderedcutname=="msHits1"  &&  !bSkipCut)
+		{
+			float cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
+			float cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
+			float cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
+			float cutval4 = (*m_cutFlowMapSVD)[sorderedcutname][3];
+			float cutval5 = (*m_cutFlowMapSVD)[sorderedcutname][4];
+			float cutval6 = (*m_cutFlowMapSVD)[sorderedcutname][5];
+			float cutval7 = (*m_cutFlowMapSVD)[sorderedcutname][6];
+			for(int mu=0 ; mu<muSize ; mu++)
+			{
+				thisMuPass = ( nMShits1( cutval1,cutval2,cutval3,cutval4,cutval5,cutval6,cutval7,
+										 mu_nMDTBIHits->at(mu), mu_nMDTBMHits->at(mu), mu_nMDTBOHits->at(mu),
+										 mu_nMDTEIHits->at(mu), mu_nMDTEMHits->at(mu), mu_nMDTEEHits->at(mu), mu_nMDTEOHits->at(mu),
+										 mu_nMDTBIS78Hits->at(mu), mu_nMDTBEEHits->at(mu),
+										 mu_nRPCLayer1PhiHits->at(mu), mu_nRPCLayer2PhiHits->at(mu), mu_nRPCLayer3PhiHits->at(mu),
+										 mu_nTGCLayer1PhiHits->at(mu), mu_nTGCLayer2PhiHits->at(mu), mu_nTGCLayer3PhiHits->at(mu), mu_nTGCLayer4PhiHits->at(mu),
+										 mu_nCSCEtaHits->at(mu), mu_nCSCPhiHits->at(mu)
+										)
+							 ) ? true : false;
+				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
+				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
+			}
+		}
+		
+		else if(sorderedcutname=="msHits2"  &&  !bSkipCut)
+		{
+			float cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
+			float cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
+			float cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
+			float cutval4 = (*m_cutFlowMapSVD)[sorderedcutname][3];
+			float cutval5 = (*m_cutFlowMapSVD)[sorderedcutname][4];
+			float cutval6 = (*m_cutFlowMapSVD)[sorderedcutname][5];
+			float cutval7 = (*m_cutFlowMapSVD)[sorderedcutname][6];
+			float cutval8 = (*m_cutFlowMapSVD)[sorderedcutname][8];
+			float cutval9 = (*m_cutFlowMapSVD)[sorderedcutname][9];
+			for(int mu=0 ; mu<muSize ; mu++)
+			{
+				thisMuPass = ( nMShits2( cutval1,cutval2,cutval3,cutval4,cutval5,cutval6,cutval7,cutval8,cutval9,
+										 mu_nMDTBIHits->at(mu), mu_nMDTBMHits->at(mu), mu_nMDTBOHits->at(mu),
+										 mu_nMDTEIHits->at(mu), mu_nMDTEMHits->at(mu), mu_nMDTEEHits->at(mu), mu_nMDTEOHits->at(mu),
+										 mu_nMDTBIS78Hits->at(mu), mu_nMDTBEEHits->at(mu),
+										 mu_nRPCLayer1PhiHits->at(mu), mu_nRPCLayer2PhiHits->at(mu), mu_nRPCLayer3PhiHits->at(mu),
+										 mu_nTGCLayer1PhiHits->at(mu), mu_nTGCLayer2PhiHits->at(mu), mu_nTGCLayer3PhiHits->at(mu), mu_nTGCLayer4PhiHits->at(mu),
+										 mu_nCSCEtaHits->at(mu)
+										)
+							 ) ? true : false;
+				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
+				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
+			}
+		}
+		
+		else if(sorderedcutname=="msHits3"  &&  !bSkipCut)
+		{
+			float cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
+			float cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
+			float cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
+			float cutval4 = (*m_cutFlowMapSVD)[sorderedcutname][3];
+			float cutval5 = (*m_cutFlowMapSVD)[sorderedcutname][4];
+			float cutval6 = (*m_cutFlowMapSVD)[sorderedcutname][5];
+			float cutval7 = (*m_cutFlowMapSVD)[sorderedcutname][6];
+			for(int mu=0 ; mu<muSize ; mu++)
+			{
+				// msHits3 has identical functionality to msHits1 but with different 6th parameter (nMDTCSCsumCutVal)
+				thisMuPass = ( nMShits1( cutval1,cutval2,cutval3,cutval4,cutval5,cutval6,cutval7,
+										 mu_nMDTBIHits->at(mu), mu_nMDTBMHits->at(mu), mu_nMDTBOHits->at(mu),
+										 mu_nMDTEIHits->at(mu), mu_nMDTEMHits->at(mu), mu_nMDTEEHits->at(mu), mu_nMDTEOHits->at(mu),
+										 mu_nMDTBIS78Hits->at(mu), mu_nMDTBEEHits->at(mu),
+										 mu_nRPCLayer1PhiHits->at(mu), mu_nRPCLayer2PhiHits->at(mu), mu_nRPCLayer3PhiHits->at(mu),
+										 mu_nTGCLayer1PhiHits->at(mu), mu_nTGCLayer2PhiHits->at(mu), mu_nTGCLayer3PhiHits->at(mu), mu_nTGCLayer4PhiHits->at(mu),
+										 mu_nCSCEtaHits->at(mu), mu_nCSCPhiHits->at(mu)
+										)
+							 ) ? true : false;
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
 			}

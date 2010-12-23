@@ -11,6 +11,8 @@
 mcOfflineControl::mcOfflineControl()
 {
 	startTimer();
+	
+	m_muRecAlgo = "staco";
 
 	initialize();
 	

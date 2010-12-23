@@ -12,6 +12,8 @@ mcDigestControl::mcDigestControl()
 {
 	startTimer();
 
+	m_muRecAlgo = "staco";
+	
 	initialize();
 	
 	string str = "";

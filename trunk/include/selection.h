@@ -103,7 +103,13 @@ public:
 						   vector<float>* pvfPVz0,
 						   vector<float>* pvfPVz0err,
 						   int& bestVtxIndex );
+						   
 	bool nIDhitsCut( float nSCThitsCutVal, float nPIXhitsCutVal, float nIDhitsCutVal, int nSCThits, int nPIXhits );
+	bool nIDhitsMCPrel15Cut(float nSCThitsCutVal, float nPIXhitsCutVal, float nTRThitsCutVal,
+							float etaAbsThreshold, float nTRTratioThreshold,
+							int nSCThits, int nPIXhits, int nTRTHits, int nTRTOutliers,
+							float eta);
+	
 	bool nMS3stationsMDThits(float nMDTIHitsCutVal, float nMDTMHitsCutVal, float nMDTOHitsCutVal, float nMDTBEEHitsCutVal, float nMDTBIS78HitsCutVal,
 							 int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,
 							 int nMDTEIHits, int nMDTEMHits, int nMDTEOHits,
@@ -113,6 +119,30 @@ public:
 				 int nMDTBIHits, int nMDTBMHits, int nMDTBOHits, int nMDTBIS78Hits, int nMDTBEEHits,
 				 int nRPCLayer1PhiHits, int nRPCLayer2PhiHits, int nRPCLayer3PhiHits
 				 );
+	bool nMShits1(float nMDTB_IMO_HitsCutVal, float nMDTE_IMEO_HitsCutVal,
+				  float nMDTBIS78HitsCutVal, float nMDTBEEHitsCutVal,
+				  float nCSCEtaHitsCutVal,
+				  float nMDTCSCsumCutVal, float nRPCTGCCSCsumsCutVal,
+				  int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,
+				  int nMDTEIHits, int nMDTEMHits, int nMDTEEHits, int nMDTEOHits,
+				  int nMDTBIS78Hits, int nMDTBEEHits,
+				  int nRPCLayer1PhiHits, int nRPCLayer2PhiHits, int nRPCLayer3PhiHits,
+				  int nTGCLayer1PhiHits, int nTGCLayer2PhiHits, int nTGCLayer3PhiHits, int nTGCLayer4PhiHits,
+				  int nCSCEtaHits, int nCSCPhiHits
+				  );
+	bool nMShits2(float nMDTB_IMO_HitsCutVal, float nMDTE_IMEO_HitsCutVal,
+				  float nMDTBIS78HitsCutVal, float nMDTBEEHitsCutVal,
+				  float nCSCEtaHitsCutVal,
+				  float nRPCPhiHitsCutVal, float nTGCPhiHitsCutVal,
+				  float nMDTCSCsumCutVal, float nRPCTGCsumsCutVal,
+				  int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,
+				  int nMDTEIHits, int nMDTEMHits, int nMDTEEHits, int nMDTEOHits,
+				  int nMDTBIS78Hits, int nMDTBEEHits,
+				  int nRPCLayer1PhiHits, int nRPCLayer2PhiHits, int nRPCLayer3PhiHits,
+				  int nTGCLayer1PhiHits, int nTGCLayer2PhiHits, int nTGCLayer3PhiHits, int nTGCLayer4PhiHits,
+				  int nCSCEtaHits
+				 );
+				 
 	bool pTmatchingRatioCut( float pTmatchHighRatioCutVal,
 							 float pTmatchLowRatioCutVal,
 							 float me_qOp_a, float me_theta_a,

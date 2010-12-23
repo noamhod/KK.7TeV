@@ -592,6 +592,42 @@ bool selection::nIDhitsCut( float nSCThitsCutVal, float nPIXhitsCutVal, float nI
 	return true;
 }
 
+bool selection::nIDhitsMCPrel15Cut(float nSCThitsCutVal, float nPIXhitsCutVal, float nTRThitsCutVal,
+								   float etaAbsThreshold, float nTRTratioThreshold,
+								   int nSCThits, int nPIXhits, int nTRTHits, int nTRTOutliers,
+								   float eta
+								   )
+{
+	// number of pixel hits >=1, number of SCT hits >=6,
+	// TRT hits > 5 for eta<1.9, outlier fraction < 0.9. 
+	// If TRT hits >5 for eta>=1.9, outlier fraction < 0.9 
+
+	bool passedPIX = (nPIXhits >= nPIXhitsCutVal) ? true : false;
+	if(!passedPIX) return false;
+
+	bool passedSCT = (nSCThits >= nSCThitsCutVal) ? true : false;
+	if(!passedSCT) return false;
+	
+	int nTRT = nTRTHits+nTRTOutliers;
+	if(fabs(eta)<etaAbsThreshold)
+	{
+		bool passedTRTsum = (nTRT > nTRThitsCutVal) ? true : false;
+		bool passedTRTrat = (nTRTOutliers < nTRTratioThreshold*nTRT) ? true : false;
+		bool passedTRT = (passedTRTsum && passedTRTrat) ? true : false;
+		if(!passedTRT) return false;
+	}
+	else if(fabs(eta)>=etaAbsThreshold)
+	{
+		if(nTRT>nTRThitsCutVal)
+		{
+			bool passedTRTrat = (nTRTOutliers < nTRTratioThreshold*nTRT) ? true : false;
+			if(!passedTRTrat) return false;
+		}
+	}
+	
+	return true;
+}
+
 bool selection::nMS3stationsMDThits(float nMDTIHitsCutVal, float nMDTMHitsCutVal, float nMDTOHitsCutVal, float nMDTBEEHitsCutVal, float nMDTBIS78HitsCutVal,
 									int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,
 									int nMDTEIHits, int nMDTEMHits, int nMDTEOHits,
@@ -644,6 +680,82 @@ bool selection::nMShits(float nMDTIHitsCutVal, float nMDTMHitsCutVal, float nMDT
 	passed = (passed  &&  passedMDT  &&  passedRPC) ? true : false;
 	
 	return passed;
+}
+
+bool selection::nMShits1(float nMDTB_IMO_HitsCutVal, float nMDTE_IMEO_HitsCutVal,
+						 float nMDTBIS78HitsCutVal, float nMDTBEEHitsCutVal,
+						 float nCSCEtaHitsCutVal,
+						 float nMDTCSCsumCutVal, float nRPCTGCCSCsumsCutVal,
+						 int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,
+						 int nMDTEIHits, int nMDTEMHits, int nMDTEEHits, int nMDTEOHits,
+						 int nMDTBIS78Hits, int nMDTBEEHits,
+						 int nRPCLayer1PhiHits, int nRPCLayer2PhiHits, int nRPCLayer3PhiHits,
+						 int nTGCLayer1PhiHits, int nTGCLayer2PhiHits, int nTGCLayer3PhiHits, int nTGCLayer4PhiHits,
+						 int nCSCEtaHits, int nCSCPhiHits
+						)
+{
+	//(\ Sum_$=IMO nMDTB$Hits>=3 + \Sum_$=IMEO nMDTE$Hits>=3 + nCSCEtaHits>=3 ) >=2 (>=3 for nMShits3 cut)
+	// && mu_staco_nMDTBEEHits==0
+	// && mu_staco_nMDTBIS78Hits==0
+	// && (\Sum_K=1^3 nRPCLayerKPhiHits + \Sum_K=1^4 nTGCLayerKPhiHits + nCSCPhiHits )>=1
+	
+	bool passedMDTB   = ((nMDTBIHits+nMDTBMHits+nMDTBOHits)            >= nMDTB_IMO_HitsCutVal)  ? true : false;
+	bool passedMDTE   = ((nMDTEIHits+nMDTEMHits+nMDTEEHits+nMDTEOHits) >= nMDTE_IMEO_HitsCutVal) ? true : false;
+	bool passedCSCEta = (nCSCEtaHits                                   >= nCSCEtaHitsCutVal)     ? true : false;
+	bool passedMDTCSC = (((int)passedMDTB+(int)passedMDTE+(int)passedCSCEta) >= nMDTCSCsumCutVal) ? true : false;
+	if(!passedMDTCSC) return false;
+	 
+	bool passedMDTBIS78 = (nMDTBIS78Hits==nMDTBIS78HitsCutVal) ? true : false;
+	if(!passedMDTBIS78) return false;
+	
+	bool passedMDTBEE   = (nMDTBEEHits==nMDTBEEHitsCutVal) ? true : false;
+	if(!passedMDTBEE) return false;
+	
+	int nRPCTGCCSCsum = nRPCLayer1PhiHits+nRPCLayer2PhiHits+nRPCLayer3PhiHits + 
+						nTGCLayer1PhiHits+nTGCLayer2PhiHits+nTGCLayer3PhiHits+nTGCLayer4PhiHits +
+						nCSCPhiHits;
+	bool passedRPCTGCCSC = (nRPCTGCCSCsum >= nRPCTGCCSCsumsCutVal) ? true : false;
+	if(!passedRPCTGCCSC) return false;
+	
+	return true;
+}
+
+bool selection::nMShits2(float nMDTB_IMO_HitsCutVal, float nMDTE_IMEO_HitsCutVal,
+						 float nMDTBIS78HitsCutVal, float nMDTBEEHitsCutVal,
+						 float nCSCEtaHitsCutVal,
+						 float nRPCPhiHitsCutVal, float nTGCPhiHitsCutVal,
+						 float nMDTCSCsumCutVal, float nRPCTGCsumsCutVal,
+						 int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,
+						 int nMDTEIHits, int nMDTEMHits, int nMDTEEHits, int nMDTEOHits,
+						 int nMDTBIS78Hits, int nMDTBEEHits,
+						 int nRPCLayer1PhiHits, int nRPCLayer2PhiHits, int nRPCLayer3PhiHits,
+						 int nTGCLayer1PhiHits, int nTGCLayer2PhiHits, int nTGCLayer3PhiHits, int nTGCLayer4PhiHits,
+						 int nCSCEtaHits
+						)
+{
+	//(\ Sum_$=IMO nMDTB$Hits>=3 + \Sum_$=IMEO nMDTE$Hits>=3 + nCSCEtaHits>=3 ) >=2
+	// && mu_staco_nMDTBEEHits==0
+	// && mu_staco_nMDTBIS78Hits==0
+	// && (\Sum_K=1^3 nRPCLayerKPhiHits>=1 + \Sum_K=1^4 nTGCLayerKPhiHits>=1 )>=1
+	
+	bool passedMDTB   = ((nMDTBIHits+nMDTBMHits+nMDTBOHits)            >= nMDTB_IMO_HitsCutVal)  ? true : false;
+	bool passedMDTE   = ((nMDTEIHits+nMDTEMHits+nMDTEEHits+nMDTEOHits) >= nMDTE_IMEO_HitsCutVal) ? true : false;
+	bool passedCSCEta = (nCSCEtaHits                                   >= nCSCEtaHitsCutVal)     ? true : false;
+	bool passedMDTCSC = (((int)passedMDTB+(int)passedMDTE+(int)passedCSCEta) >= nMDTCSCsumCutVal) ? true : false;
+	if(!passedMDTCSC) return false;
+	 
+	bool passedMDTBIS78 = (nMDTBIS78Hits==nMDTBIS78HitsCutVal) ? true : false;
+	if(!passedMDTBIS78) return false;
+	
+	bool passedMDTBEE   = (nMDTBEEHits==nMDTBEEHitsCutVal) ? true : false;
+	if(!passedMDTBEE) return false;
+	
+	bool passedRPC = ((nRPCLayer1PhiHits+nRPCLayer2PhiHits+nRPCLayer3PhiHits)                   >= nRPCPhiHitsCutVal) ? true : false;
+	bool passedTGC = ((nTGCLayer1PhiHits+nTGCLayer2PhiHits+nTGCLayer3PhiHits+nTGCLayer4PhiHits) >= nTGCPhiHitsCutVal) ? true : false;
+	bool passedRPCTGC = (((int)passedRPC+(int)passedTGC) >= nRPCTGCsumsCutVal) ? true : false;
+	if(!passedRPCTGC) return false;
+	
+	return true;
 }
 
 bool selection::pTmatchingRatioCut( float pTmatchHighRatioCutVal,

@@ -228,6 +228,7 @@ public:
 	vector<float>*   mu_ie_theta;
 	vector<float>*   mu_ie_qoverp;
 	vector<int>*     mu_nBLHits;
+	vector<int>*     mu_nTRTHits;
 	vector<int>*     mu_nTRTHighTHits;
 	vector<int>*     mu_nBLSharedHits;
 	vector<int>*     mu_nPixSharedHits;

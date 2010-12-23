@@ -343,6 +343,7 @@ void mcOfflineAnalysis::setStacoVariables()
 	analysisSkeleton::mu_ie_theta = m_mcOffPhys->mu_staco_ie_theta;
 	analysisSkeleton::mu_ie_qoverp = m_mcOffPhys->mu_staco_ie_qoverp;
 	analysisSkeleton::mu_nBLHits = m_mcOffPhys->mu_staco_nBLHits;
+	analysisSkeleton::mu_nTRTHits = m_mcOffPhys->mu_staco_nTRTHits;
 	analysisSkeleton::mu_nTRTHighTHits = m_mcOffPhys->mu_staco_nTRTHighTHits;
 	analysisSkeleton::mu_nBLSharedHits = m_mcOffPhys->mu_staco_nBLSharedHits;
 	analysisSkeleton::mu_nPixSharedHits = m_mcOffPhys->mu_staco_nPixSharedHits;
@@ -556,6 +557,7 @@ void mcOfflineAnalysis::setMuidVariables()
 	analysisSkeleton::mu_ie_theta = m_mcOffPhys->mu_muid_ie_theta;
 	analysisSkeleton::mu_ie_qoverp = m_mcOffPhys->mu_muid_ie_qoverp;
 	analysisSkeleton::mu_nBLHits = m_mcOffPhys->mu_muid_nBLHits;
+	analysisSkeleton::mu_nTRTHits = m_mcOffPhys->mu_muid_nTRTHits;
 	analysisSkeleton::mu_nTRTHighTHits = m_mcOffPhys->mu_muid_nTRTHighTHits;
 	analysisSkeleton::mu_nBLSharedHits = m_mcOffPhys->mu_muid_nBLSharedHits;
 	analysisSkeleton::mu_nPixSharedHits = m_mcOffPhys->mu_muid_nPixSharedHits;

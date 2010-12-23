@@ -188,6 +188,7 @@ public:
 	vector<float>*   mu_staco_ie_theta;
 	vector<float>*   mu_staco_ie_qoverp;
 	vector<int>*     mu_staco_nBLHits;
+	vector<int>*     mu_staco_nTRTHits;
 	vector<int>*     mu_staco_nTRTHighTHits;
 	vector<int>*     mu_staco_nBLSharedHits;
 	vector<int>*     mu_staco_nPixSharedHits;
@@ -372,6 +373,7 @@ public:
 	vector<float>*   mu_muid_ie_theta;
 	vector<float>*   mu_muid_ie_qoverp;
 	vector<int>*     mu_muid_nBLHits;
+	vector<int>*     mu_muid_nTRTHits;
 	vector<int>*     mu_muid_nTRTHighTHits;
 	vector<int>*     mu_muid_nBLSharedHits;
 	vector<int>*     mu_muid_nPixSharedHits;

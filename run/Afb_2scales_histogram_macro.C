@@ -1,13 +1,167 @@
+#include <iostream>
+#include <stdlib.h>
+#include <stdio.h>      // for the sprintf call
+#include <string>
+#include <sstream>      // for the int to string operation (stringstream call)
+#include <cstring>      // for the string functions
+#include <math.h>
+#include <cmath>
+#include <complex>
+#include <fstream>
+#include <vector>
+#include <map>
+#include <ctime>
+#include <time.h>
+
+#include <TROOT.h>
+#include <TSystem.h>
+#include <TMatrix.h>
+#include <TVector.h>
+#include <TLorentzVector.h>
+#include <TVector3.h>
+#include <TCut.h>
+#include <TChain.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <TStyle.h>
+#include <TCanvas.h>
+#include <TFile.h>
+#include <TDirectory.h>
+#include <TLegend.h>
+#include <TMinuit.h>
+#include <TApplication.h>
+#include <TF1.h>
+#include <TAxis.h>
+#include <TLine.h>
+#include <TPaveText.h>
+#include <TThread.h>
+#include <TList.h>
+
+using namespace std;
+
+// Declare pointer to data as global (not elegant but TMinuit needs this).
+vector<double> *VCOSTH = new vector<double>();
+Float_t IMASS;
+Float_t COSTH;
+
+// The pdf to be fitted
+// First argument needs to be a pointer in order to plot with the TF1 class.
+double cosThetaPdf(double* xPtr, double par[])
 {
-	//gROOT->ProcessLine(".x ../src/rootlogon_atlas.C");
-	//gROOT->SetStyle("ATLAS");
-	//gROOT->ForceStyle();
+	double x   = *xPtr;
+	double pdf = 1.;
+	double Afb  = par[0];
 
+	if (fabs(x)<=1.)
+	{
+		// see: http://arxiv.org/PS_cache/arxiv/pdf/1004/1004.1649v1.pdf
+		// pdf_CollinsSoper = (1/N)*dN/dcosThetaCS = (3/8)*((1+0.5*A0) + A4*cosThetaCS + (1-3/2*A0)*cosTetaCS^2)
+		// pdf_Helicity     = (1/N)*dN/dcosThetaHE = (3/8)*(1+cosTetaHE^2) + Afb*cosThetaHE
+		// if A0=~0 then pdf_CollinsSoper = pdf_Helicity (in the Z/Z'/Z* cases, it is approximately true)
+		pdf  = (3./8.)*(1. + x*x + Afb*x);
+		if (pdf > 0) { return pdf; }
+		else { cout << "warning:  pdf<=0, pdf=" << pdf << endl; return 1e-30; }
+	}
+	else { cout << "warning:  x<-1 || x>+1, x=" << x << endl; return 1e-30; }
+}
+
+// fcn passes back f = - 2*ln(L), the function to be minimized.
+void fcn(int& npar, double* deriv, double& f, double par[], int flag)
+{
+	vector<double> xVec = *VCOSTH; // VCOSTH is global
+	int n = xVec.size();
+	double lnL = 0.;
+	double x   = 0.;
+	double pdf = 0.;
+	for (int i=0; i<n; i++){
+		x = xVec[i];
+		pdf = cosThetaPdf(&x, par);
+		if (pdf > 0.) {
+			lnL += log(pdf); // need positive f
+		}
+		else { cout << "WARNING -- pdf is negative!!!" << endl; }
+	}
+	f = -2.0 * lnL; // factor of -2 so minuit gets the errors right
+}
+
+
+void fillVec(TTree* t, TH1D* h, Int_t b)
+{
+	VCOSTH->clear();
+	if (t==0) return;
+	
+	Double_t bmin = h->GetBinLowEdge(b);
+	Double_t bwid = h->GetBinWidth(b);
+	Double_t bmax = bmin+bwid;
+	
+	for (Long64_t l64t_jentry=0 ; l64t_jentry<t->GetEntries() ; l64t_jentry++)
+	{
+		t->GetEntry(l64t_jentry);
+		if( IMASS>=(Float_t)bmin  &&  IMASS<(Float_t)bmax ) VCOSTH->push_back(COSTH);
+	}
+}
+
+void minimize(double& Afb, double& dAfb)
+{
+	int npar = 1;      // the number of parameters
+	TMinuit minuit(npar);
+	minuit.SetFCN(fcn);
+
+	double par[npar];        // the start values
+	double stepSize[npar];   // step sizes
+	double minVal[npar];     // minimum bound on parameter
+	double maxVal[npar];     // maximum bound on parameter
+	string parName[npar];
+
+	par[0]      = 0.1; 
+	stepSize[0] = 1e-6;
+	minVal[0]   = -1.;
+	maxVal[0]   = +1.;
+	parName[0]  = "Afb";
+
+	for (int i=0; i<npar; i++)
+	{
+		minuit.DefineParameter(i, parName[i].c_str(), par[i], stepSize[i], minVal[i], maxVal[i]);
+	}
+
+	// Do the minimization!
+	minuit.Migrad(); // Minuit's best minimization algorithm
+	double outpar[npar], err[npar];
+	for (int i=0; i<npar; i++)
+	{
+		minuit.GetParameter(i,outpar[i],err[i]);
+	}
+	
+	/*
+	TF1* func = new TF1("pdf", cosThetaPdf, -1., 1., npar);
+	func->SetParameters(outpar);
+	func->SetLineStyle(1);
+	func->SetLineColor(1);
+	func->SetLineWidth(1);
+	func->GetXaxis()->SetTitle("cos#left(#theta^{*}#right)");
+	func->GetYaxis()->SetTitle("pdf");
+	*/
+	
+	Afb  = 0.;
+	dAfb = 0.;
+	minuit.GetParameter(0,Afb,dAfb);
+}
+
+
+void execute()
+{
+	int minEntriesDATA = 10;
+	int minEntriesMC   = 10;
+	string refframe = "CosThetaCS";
+	//string refframe = "CosThetaHE";
+	bool doLogM = true;
+	
 	float GeV2TeV = 1.e-3;
-
-	int    imass_nbins = 60;
+	int    imass_nbins = 10;
 	double imass_min   = 75.*GeV2TeV;
 	double imass_max   = 375.*GeV2TeV;
+	//double imass_min   = 60.*GeV2TeV;
+	//double imass_max   = 360.*GeV2TeV;
 	
 	// logarithmic boundries and bins of histograms
 	Double_t logMmin     = log10(imass_min);
@@ -17,7 +171,6 @@
 	Double_t M_binwidth = (Double_t)( (logMmax-logMmin)/(Double_t)imass_nbins );
 	M_bins[0] = imass_min;
 	for(Int_t i=1 ; i<=imass_nbins ; i++) M_bins[i] = TMath::Power( 10,(logMmin + i*M_binwidth) );
-	
 
 	string dir   = "/data/hod/D3PDdigest/rel15_barrel_selection/";
 	string hDir  = "allCuts";
@@ -25,16 +178,13 @@
 	string xTitle = "#hat{m}_{#mu#mu} TeV";
 	string yTitle= "A_{FB}#left(#hat{m}_{#mu#mu}#right)";
 
-	string m_dataAnalysisSelector = "diget";	
+	string m_dataAnalysisSelector = "digest";	
 	string m_muonSelector = "staco/";
 
 	double m_miny = -1.05;
 	double m_maxy = +1.05;
 
-
-
 	string hNameFixed = hName;
-	
 
 	gStyle->SetOptStat(0);
 	
@@ -55,9 +205,6 @@
 	string cName = "cnv_" + hNameFixed;
 	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);
 	
-	
-	
-	
 	TPad *pad_mHat = new TPad("pad_mHat","",0,0,1,1);
 	pad_mHat->SetFillColor(kWhite);
 	pad_mHat->SetTicky(0);
@@ -72,94 +219,67 @@
 	pad_Afb->SetFrameFillColor(0);
 	//pad_Afb->SetLogx();
 	
-	
-	string s1, s2;
-	
 	string path = "";
 	string sProc = "";
 	string channel = "";
 	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
 	
-	Float_t mHat;
-	Float_t cosTh;
-	
-	
 	// Data
-	TH1D* hDataM  = new TH1D("mHat_data","mHat_data", /*imass_nbins, imass_min, imass_max*/imass_nbins, M_bins );
+	TH1D* hDataM;
+	if(doLogM) hDataM  = new TH1D("mHat_data","mHat_data", imass_nbins, M_bins );
+	else       hDataM  = new TH1D("mHat_data","mHat_data", imass_nbins, imass_min, imass_max );
 	hDataM->SetTitle("");
 	hDataM->SetYTitle("#frac{dN}{d#hat{m}_{#mu#mu}} 1/TeV");
 	hDataM->SetLineColor(kBlack);
 	hDataM->SetLineWidth(2);
-	TH1D* hData   = new TH1D("Afb_data","Afb_data",   /*imass_nbins, imass_min, imass_max*/imass_nbins, M_bins );
+	TH1D* hData;
+	if(doLogM) hData   = new TH1D("Afb_data","Afb_data", imass_nbins, M_bins );
+	else       hData   = new TH1D("Afb_data","Afb_data", imass_nbins, imass_min, imass_max );
 	hData->SetMarkerStyle(20);
 	hData->SetMarkerColor(kBlack);
 	hData->SetMarkerSize(1.2);
-	TH1D* hDataNf = new TH1D("dataNf","dataNf",       /*imass_nbins, imass_min, imass_max*/imass_nbins, M_bins );
-	TH1D* hDataNb = new TH1D("dataNb","dataNb",       /*imass_nbins, imass_min, imass_max*/imass_nbins, M_bins );
 	leg->AddEntry( hData, "Data: A_{FB}#left(#hat{m}_{#mu#mu}#right)", "lep");
 	leg->AddEntry( hData, "Data: #frac{dN}{d#hat{m}_{#mu#mu}}", "l");
 	
 	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
 	
 	path = dir + "AtoI2_ZprimeGRL/" + m_muonSelector + sData + ".root";
+	cout << "path=" << path << endl;
 	TFile* fData = new TFile( path.c_str(), "READ" );
-	TTree* Afb_data_tree = (TTree*)fData->Get("Afb/Afb_tree");
-	Afb_data_tree->SetBranchAddress( "mHat",  &mHat );
-	Afb_data_tree->SetBranchAddress( "cosTh", &cosTh );
+	TTree* Afb_data_tree = (TTree*)fData->Get("allCuts/allCuts_tree");
+	Afb_data_tree->SetBranchAddress( "Mhat",       &IMASS );
+	Afb_data_tree->SetBranchAddress( refframe.c_str(), &COSTH );
 	
-	
+	// fill the imass histo
 	if (Afb_data_tree==0) return;
 	for (Long64_t l64t_jentry=0 ; l64t_jentry<Afb_data_tree->GetEntries() ; l64t_jentry++)
 	{
 		Afb_data_tree->GetEntry(l64t_jentry);
-		
-		if(cosTh>=0) hDataNf->Fill(mHat);
-		else         hDataNb->Fill(mHat);
-		
-		hDataM->Fill(mHat);
+		hDataM->Fill(IMASS);
 	}
+	
+	double afb  = 0.;
+	double dafb = 0.;
 	for(Int_t b=1 ; b<=hData->GetNbinsX() ; b++)
 	{
-		Double_t Nf = hDataNf->GetBinContent(b);
-		Double_t Nb = hDataNb->GetBinContent(b);
-		Double_t N = Nf+Nb;
-		
-		//if(Nf<1  ||  Nb<1)
-		if(N<1)
-		{
-			//hData->SetBinContent(b,0);
-			//hData->SetBinError(b,0);
-			continue;
-		}
-		
-		//float afb = (N>0.) ? (Nf-Nb)/N : -999.;
-		float afb = (Nf-Nb)/N;
-		
-		// the Forward-Backward Asymmetry error: 
-		// if N=Nf+Nb, p=Nf/N, q=1-p=Nb/N, then A=p-q=2*p-1.
-		// The statistical error on p is sqrt(p*q/N) (binomial distribution),
-		// and from this, the statistical error on A is sqrt((1-A*A)/N)
-		//float dafb = (N>0.) ? sqrt( (1.-afb*afb)/N ) : 0.;
-		float dafb = sqrt( (1.-afb*afb)/N );
-		
+		fillVec(Afb_data_tree, hData, b); // the VCOSTH vector is full
+		if((int)VCOSTH->size()<minEntriesDATA) continue;
+		minimize(afb, dafb);
 		hData->SetBinContent(b,afb);
 		hData->SetBinError(b,dafb);
 	}
 	
 	
-	
 	// Backgrounds
 	channel = "DYmumu: A_{FB}#left(#hat{m}_{#mum#mu}#right)";
-	TH1D* hBGsum = new TH1D("Afb_sumBG","Afb_sumBG", imass_nbins, imass_min, imass_max );
-	TH1D* hNf    = new TH1D("bgNf","bgNf",           imass_nbins, imass_min, imass_max );
-	TH1D* hNb    = new TH1D("bgNb","bgNb",           imass_nbins, imass_min, imass_max );
+	TH1D* hBGsum;
+	if(doLogM) hBGsum = new TH1D("Afb_sumBG","Afb_sumBG", imass_nbins, M_bins );
+	else       hBGsum = new TH1D("Afb_sumBG","Afb_sumBG", imass_nbins, imass_min, imass_max );
 	hBGsum->SetLineColor(kAzure-5);
 	hBGsum->SetFillColor(kAzure-5);
 	hBGsum->SetLineWidth(1);
 	hBGsum->SetMarkerSize(0);
 	hBGsum->SetMarkerColor(0);
-	//hBGsum->SetMarkerStyle(kAzure-5);
-	//hBGsum->SetMarkerColor(kAzure-5);
 	hBGsum->SetTitle("");
 	hBGsum->SetXTitle( xTitle.c_str() );
 	hBGsum->SetYTitle( yTitle.c_str() );
@@ -168,69 +288,83 @@
 	
 	TList* Afb_sumBG_list = new TList();
 	
+	/*
+	sProc = "Zmumu";
+	path = dir + "Zmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	cout << "path=" << path << endl;
+	TFile* fZmumu = new TFile( path.c_str(), "READ" );
+	Afb_sumBG_list->Add( (TTree*)fZmumu->Get("allCuts/allCuts_tree") );
+	*/
+	
+	/*
 	sProc = "DYmumu_75M120";
 	path = "/srv01/tau/hod/z0analysis-tests/z0analysis-dev/run/mcWZphys.root";
 	TFile* fDYmumu_75M120 = new TFile( path.c_str(), "READ" );
 	Afb_sumBG_list->Add( (TTree*)fDYmumu_75M120->Get("allCuts/allCuts_tree") );
+	*/
 	
-	/*
+	
 	sProc = "DYmumu_75M120";
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	cout << "path=" << path << endl;
 	TFile* fDYmumu_75M120 = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fDYmumu_75M120->Get("Afb/Afb_tree") );
+	Afb_sumBG_list->Add( (TTree*)fDYmumu_75M120->Get("allCuts/allCuts_tree") );
 	
 	sProc = "DYmumu_120M250";
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	cout << "path=" << path << endl;
 	TFile* fDYmumu_120M250 = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fDYmumu_120M250->Get("Afb/Afb_tree") );
+	Afb_sumBG_list->Add( (TTree*)fDYmumu_120M250->Get("allCuts/allCuts_tree") );
 	
 	sProc = "DYmumu_250M400";
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	cout << "path=" << path << endl;
 	TFile* fDYmumu_250M400 = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fDYmumu_250M400->Get("Afb/Afb_tree") );
+	Afb_sumBG_list->Add( (TTree*)fDYmumu_250M400->Get("allCuts/allCuts_tree") );
 
 	sProc = "DYmumu_400M600";
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	cout << "path=" << path << endl;
 	TFile* fDYmumu_400M600 = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fDYmumu_400M600->Get("Afb/Afb_tree") );
-	*/
-
-/*	
+	Afb_sumBG_list->Add( (TTree*)fDYmumu_400M600->Get("allCuts/allCuts_tree") );
+	
+	
+	/*	
 	sProc = "ZZ_Herwig";
 	path = dir + "ZZ_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
 	TFile* fZZ = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fZZ->Get("Afb/Afb_tree") );
+	Afb_sumBG_list->Add( (TTree*)fZZ->Get("allCuts/allCuts_tree") );
 	
 	sProc = "WZ_Herwig";
 	path = dir + "WZ_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
 	TFile* fWZ = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fWZ->Get("Afb/Afb_tree") );
+	Afb_sumBG_list->Add( (TTree*)fWZ->Get("allCuts/allCuts_tree") );
 	
 	sProc = "WW_Herwig";
 	path = dir + "WW_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
 	TFile* fWW = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fWW->Get("Afb/Afb_tree") );
+	Afb_sumBG_list->Add( (TTree*)fWW->Get("allCuts/allCuts_tree") );
 	
 	sProc = "T1_McAtNlo_Jimmy";
 	path = dir + "T1_McAtNlo_Jimmy/" + m_muonSelector + analysisType + sProc + ".root";
 	TFile* fT1 = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fT1->Get("Afb/Afb_tree") );
+	Afb_sumBG_list->Add( (TTree*)fT1->Get("allCuts/allCuts_tree") );
 	
 	
 	sProc = "DYtautau_75M120";
 	path = dir + "DYtautau/" + m_muonSelector + analysisType + sProc + ".root";
 	TFile* fDYtautau_75M120 = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fDYtautau_75M120->Get("Afb/Afb_tree") );
+	Afb_sumBG_list->Add( (TTree*)fDYtautau_75M120->Get("allCuts/allCuts_tree") );
 	
 	sProc = "DYtautau_120M250";
 	path = dir + "DYtautau/" + m_muonSelector + analysisType + sProc + ".root";
 	TFile* fDYtautau_120M250 = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fDYtautau_120M250->Get("Afb/Afb_tree") );
+	Afb_sumBG_list->Add( (TTree*)fDYtautau_120M250->Get("allCuts/allCuts_tree") );
 	
 	sProc = "DYtautau_250M400";
 	path = dir + "DYtautau/" + m_muonSelector + analysisType + sProc + ".root";
 	TFile* fDYtautau_250M400 = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fDYtautau_250M400->Get("Afb/Afb_tree") );
+	Afb_sumBG_list->Add( (TTree*)fDYtautau_250M400->Get("allCuts/allCuts_tree") );
 
 */	
 	
@@ -242,45 +376,20 @@
 	
 	TFile* fBG = new TFile("Afb_sumBG_merged.root", "READ");
 	//TTree* Afb_sumBG_tree = (TTree*)fBG->Get("Afb_tree");
-	//Afb_sumBG_tree->SetBranchAddress( "mHat",  &mHat );
-	//Afb_sumBG_tree->SetBranchAddress( "cosTh", &cosTh );
+	//Afb_sumBG_tree->SetBranchAddress( "mHat",  &IMASS );
+	//Afb_sumBG_tree->SetBranchAddress( "cosTh", &COSTH );
 	
 	TTree* Afb_sumBG_tree = (TTree*)fBG->Get("allCuts_tree");
-	Afb_sumBG_tree->SetBranchAddress( "Mhat",  &mHat );
-	Afb_sumBG_tree->SetBranchAddress( "CosThetaHE", &cosTh );
+	Afb_sumBG_tree->SetBranchAddress( "Mhat",       &IMASS );
+	Afb_sumBG_tree->SetBranchAddress( refframe.c_str(), &COSTH );
 
-	if (Afb_sumBG_tree==0) return;
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<Afb_sumBG_tree->GetEntriesFast() ; l64t_jentry++)
-	{
-		Afb_sumBG_tree->GetEntry(l64t_jentry);
-		
-		if(cosTh>=0) hNf->Fill(mHat);
-		else         hNb->Fill(mHat);
-	}
+	afb  = 0.;
+	dafb = 0.;
 	for(Int_t b=1 ; b<=hBGsum->GetNbinsX() ; b++)
 	{
-		Double_t Nf = hNf->GetBinContent(b);
-		Double_t Nb = hNb->GetBinContent(b);
-		Double_t N = Nf+Nb;
-		
-		//if(Nf<1  ||  Nb<1)
-		if(N<1)
-		{
-			//hBGsum->SetBinContent(b,0);
-			//hBGsum->SetBinError(b,0);
-			continue;
-		}
-		
-		//float afb = (N>0.) ? (Nf-Nb)/N : -999.;
-		float afb = (Nf-Nb)/N;
-		
-		// the Forward-Backward Asymmetry error: 
-		// if N=Nf+Nb, p=Nf/N, q=1-p=Nb/N, then A=p-q=2*p-1.
-		// The statistical error on p is sqrt(p*q/N) (binomial distribution),
-		// and from this, the statistical error on A is sqrt((1-A*A)/N)
-		//float dafb = (N>0.) ? sqrt( (1.-afb*afb)/N ) : 0.;
-		float dafb = sqrt( (1.-afb*afb)/N );
-		
+		fillVec(Afb_sumBG_tree, hBGsum, b); // the VCOSTH vector is full
+		if((int)VCOSTH->size()<minEntriesMC) continue;
+		minimize(afb, dafb);
 		hBGsum->SetBinContent(b,afb);
 		hBGsum->SetBinError(b,dafb);
 	}
@@ -319,7 +428,7 @@
 
 	cnv->Update();
 
-/*	
+	/*	
 	TString fName = "figures/" + (TString)hNameFixed + "_" + (TString)muonLabel;
 	cnv->SaveAs(fName+".eps");
 	cnv->SaveAs(fName+".C");

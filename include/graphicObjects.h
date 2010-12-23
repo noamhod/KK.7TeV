@@ -267,10 +267,14 @@ class graphicObjects// : public utilities
 		vector<float>* z0_exPV;
 		// cut profile vectors
 		vector<float>* pT_profile;
+		vector<float>* pT_loose_profile;
 		vector<float>* pT_qOp_and_theta_profile;
+		vector<float>* pT_qOp_and_theta_loose_profile;
 		vector<float>* eta_profile;
 		vector<float>* etaTight_profile;
 		vector<float>* etaBarrel_profile;
+		vector<float>* etaFwd_profile;
+		vector<float>* etaFull_profile;
 		vector<float>* pTmatchingRatio_profile;
 		vector<float>* pTmatchingAbsDiff_profile;
 		vector<float>* d0_profile;

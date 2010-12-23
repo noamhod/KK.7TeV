@@ -31,6 +31,8 @@ void offlineControl::setRecAlgo(string muRecAlgo)
 void offlineControl::initialize(int runNumber)
 {
 	startTimer();
+	
+	m_muRecAlgo = "staco";
 
 	// run control
 	l64t_nentries = 0;

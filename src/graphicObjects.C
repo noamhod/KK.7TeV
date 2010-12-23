@@ -57,10 +57,13 @@ void graphicObjects::clearTreeVars()
 	vxp_z_profile->clear();
 	vxp_nTracks_profile->clear();
 	pT_profile->clear();
-	pT_qOp_and_theta_profile->clear();
+	pT_loose_profile->clear();
+	pT_qOp_and_theta_loose_profile->clear();
 	eta_profile->clear();
 	etaTight_profile->clear();
 	etaBarrel_profile->clear();
+	etaFwd_profile->clear();
+	etaFull_profile->clear();
 	pTmatchingRatio_profile->clear();
 	pTmatchingAbsDiff_profile->clear();
 	pTmatchingAbsDiff_profile->clear();
@@ -140,10 +143,14 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	z0_exPV = new vector<float>;
 	// cut profile vectors
 	pT_profile = new vector<float>;
+	pT_loose_profile = new vector<float>;
 	pT_qOp_and_theta_profile = new vector<float>;
+	pT_qOp_and_theta_loose_profile = new vector<float>;
 	eta_profile = new vector<float>;
 	etaTight_profile = new vector<float>;
 	etaBarrel_profile = new vector<float>;
+	etaFwd_profile = new vector<float>;
+	etaFull_profile = new vector<float>;
 	pTmatchingRatio_profile = new vector<float>;
 	pTmatchingAbsDiff_profile = new vector<float>;
 	d0_profile = new vector<float>;
@@ -219,10 +226,14 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_cutsProfile->Branch( "vxp_z_profile", &vxp_z_profile );
 	tree_cutsProfile->Branch( "vxp_nTracks_profile", &vxp_nTracks_profile );
 	tree_cutsProfile->Branch( "pT_profile", &pT_profile );
+	tree_cutsProfile->Branch( "pT_loose_profile", &pT_loose_profile );
 	tree_cutsProfile->Branch( "pT_qOp_and_theta_profile", &pT_qOp_and_theta_profile );
+	tree_cutsProfile->Branch( "pT_qOp_and_theta_loose_profile", &pT_qOp_and_theta_loose_profile );
 	tree_cutsProfile->Branch( "eta_profile", &eta_profile );
 	tree_cutsProfile->Branch( "etaTight_profile", &etaTight_profile );
 	tree_cutsProfile->Branch( "etaBarrel_profile", &etaBarrel_profile );
+	tree_cutsProfile->Branch( "etaFwd_profile", &etaFwd_profile );
+	tree_cutsProfile->Branch( "etaFull_profile", &etaFull_profile );
 	tree_cutsProfile->Branch( "pTmatchingRatio_profile", &pTmatchingRatio_profile );
 	tree_cutsProfile->Branch( "pTmatchingAbsDiff_profile", &pTmatchingAbsDiff_profile );
 	tree_cutsProfile->Branch( "pTmatchingAbsDiff_profile", &pTmatchingAbsDiff_profile );
@@ -286,16 +297,20 @@ void graphicObjects::ginitialize()
 	// get the cut value from the cutFlow map
 	string pTcutNmae;
 	TMapsvd::iterator it1=cut_cutFlowMapSVD->find("pT");
-	TMapsvd::iterator it2=cut_cutFlowMapSVD->find("pT_use_qOp_and_theta");
-	TMapsvd::iterator it3=cut_cutFlowMapSVD->find("pTandEtaTight");
-	TMapsvd::iterator it4=cut_cutFlowMapSVD->find("pTandEtaBarrel");
-	TMapsvd::iterator it5=cut_cutFlowMapSVD->find("pTandEta");
+	TMapsvd::iterator it2=cut_cutFlowMapSVD->find("pT_loose");
+	TMapsvd::iterator it3=cut_cutFlowMapSVD->find("pT_qOp+theta");
+	TMapsvd::iterator it4=cut_cutFlowMapSVD->find("pT_qOp+theta_loose");
+	TMapsvd::iterator it5=cut_cutFlowMapSVD->find("pTandEtaTight");
+	TMapsvd::iterator it6=cut_cutFlowMapSVD->find("pTandEtaBarrel");
+	TMapsvd::iterator it7=cut_cutFlowMapSVD->find("pTandEta");
 	TMapsvd::iterator itEnd=cut_cutFlowMapSVD->end();
 	if     ( it1 != itEnd ) pTcutNmae = "pT";
-	else if( it2 != itEnd ) pTcutNmae = "pT_use_qOp_and_theta";
-	else if( it3 != itEnd ) pTcutNmae = "pTandEtaTight";
-	else if( it4 != itEnd ) pTcutNmae = "pTandEtaBarrel";
-	else if( it5 != itEnd ) pTcutNmae = "pTandEta";
+	if     ( it2 != itEnd ) pTcutNmae = "pT_loose";
+	else if( it3 != itEnd ) pTcutNmae = "pT_qOp+theta";
+	else if( it4 != itEnd ) pTcutNmae = "pT_qOp+theta_loose";
+	else if( it5 != itEnd ) pTcutNmae = "pTandEtaTight";
+	else if( it6 != itEnd ) pTcutNmae = "pTandEtaBarrel";
+	else if( it7 != itEnd ) pTcutNmae = "pTandEta";
 	else
 	{
 		cout << "ERROR: in graphicObjects::ginitialize(): pT cut value was not found, exitting now" << endl;
@@ -1229,7 +1244,7 @@ void graphicObjects::bookCutProfileHistosMap(TMapds* cutFlowOrdered, TDirectory*
 			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 		}
 		
-		else if(sname=="pT_use_qOp_and_theta")
+		else if(sname=="pT_qOp+theta")
 		{
 			string stmp = sname;
 			sname = stmp+"_1";

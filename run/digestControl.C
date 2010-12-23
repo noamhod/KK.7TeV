@@ -31,6 +31,8 @@ void digestControl::setRecAlgo(string muRecAlgo)
 void digestControl::initialize()
 {
 	startTimer();
+	
+	m_muRecAlgo = "staco";
 
 	// run control
 	l64t_nentries = 0;

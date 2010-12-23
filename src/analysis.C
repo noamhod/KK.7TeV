@@ -104,7 +104,7 @@ void analysis::execute( string mualgo )
 		if( fabs(analysisSkeleton::mu_pt->at(n)*MeV2GeV) > 15. ) N++;
 	}
 	nAll++;
-	if(mu_n==0)        {cout << "n0mu=" << n0mu << endl; n0mu++;}
+	if(mu_n==0)        n0mu++;
 	if(mu_n==1 && N>0) n1mu++;
 	if(mu_n==2 && N>0) n2mu++;
 	if(mu_n==3 && N>0) n3mu++;
@@ -324,6 +324,7 @@ void analysis::setStacoVariables()
 	analysisSkeleton::mu_ie_theta = m_phys->mu_staco_ie_theta;
 	analysisSkeleton::mu_ie_qoverp = m_phys->mu_staco_ie_qoverp;
 	analysisSkeleton::mu_nBLHits = m_phys->mu_staco_nBLHits;
+	analysisSkeleton::mu_nTRTHits = m_phys->mu_staco_nTRTHits;
 	analysisSkeleton::mu_nTRTHighTHits = m_phys->mu_staco_nTRTHighTHits;
 	analysisSkeleton::mu_nBLSharedHits = m_phys->mu_staco_nBLSharedHits;
 	analysisSkeleton::mu_nPixSharedHits = m_phys->mu_staco_nPixSharedHits;
@@ -522,6 +523,7 @@ void analysis::setMuidVariables()
 	analysisSkeleton::mu_ie_theta = m_phys->mu_muid_ie_theta;
 	analysisSkeleton::mu_ie_qoverp = m_phys->mu_muid_ie_qoverp;
 	analysisSkeleton::mu_nBLHits = m_phys->mu_muid_nBLHits;
+	analysisSkeleton::mu_nTRTHits = m_phys->mu_muid_nTRTHits;
 	analysisSkeleton::mu_nTRTHighTHits = m_phys->mu_muid_nTRTHighTHits;
 	analysisSkeleton::mu_nBLSharedHits = m_phys->mu_muid_nBLSharedHits;
 	analysisSkeleton::mu_nPixSharedHits = m_phys->mu_muid_nPixSharedHits;

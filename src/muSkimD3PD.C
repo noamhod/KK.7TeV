@@ -197,6 +197,7 @@ void muSkimD3PD::setVectorPtrs()
 	mu_staco_ie_theta = new vector<float>;
 	mu_staco_ie_qoverp = new vector<float>;
 	mu_staco_nBLHits = new vector<int>;
+	mu_staco_nTRTHits = new vector<int>;
 	mu_staco_nTRTHighTHits = new vector<int>;
 	mu_staco_nBLSharedHits = new vector<int>;
 	mu_staco_nPixSharedHits = new vector<int>;
@@ -380,6 +381,7 @@ void muSkimD3PD::setVectorPtrs()
 	mu_muid_ie_theta = new vector<float>;
 	mu_muid_ie_qoverp = new vector<float>;
 	mu_muid_nBLHits = new vector<int>;
+	mu_muid_nTRTHits = new vector<int>;
 	mu_muid_nTRTHighTHits = new vector<int>;
 	mu_muid_nBLSharedHits = new vector<int>;
 	mu_muid_nPixSharedHits = new vector<int>;
@@ -576,6 +578,7 @@ void muSkimD3PD::resetVectorPtrs()
 	mu_staco_ie_theta->clear();
 	mu_staco_ie_qoverp->clear();
 	mu_staco_nBLHits->clear();
+	mu_staco_nTRTHits->clear();
 	mu_staco_nTRTHighTHits->clear();
 	mu_staco_nBLSharedHits->clear();
 	mu_staco_nPixSharedHits->clear();
@@ -759,6 +762,7 @@ void muSkimD3PD::resetVectorPtrs()
 	mu_muid_ie_theta->clear();
 	mu_muid_ie_qoverp->clear();
 	mu_muid_nBLHits->clear();
+	mu_muid_nTRTHits->clear();
 	mu_muid_nTRTHighTHits->clear();
 	mu_muid_nBLSharedHits->clear();
 	mu_muid_nPixSharedHits->clear();
@@ -1019,6 +1023,7 @@ void muSkimD3PD::setBranches()
 	m_tree->Branch( "mu_staco_ie_theta", &mu_staco_ie_theta );
 	m_tree->Branch( "mu_staco_ie_qoverp", &mu_staco_ie_qoverp );
 	m_tree->Branch( "mu_staco_nBLHits", &mu_staco_nBLHits );
+	m_tree->Branch( "mu_staco_nTRTHits", &mu_staco_nTRTHits );
 	m_tree->Branch( "mu_staco_nTRTHighTHits", &mu_staco_nTRTHighTHits );
 	m_tree->Branch( "mu_staco_nBLSharedHits", &mu_staco_nBLSharedHits );
 	m_tree->Branch( "mu_staco_nPixSharedHits", &mu_staco_nPixSharedHits );
@@ -1203,6 +1208,7 @@ void muSkimD3PD::setBranches()
 	m_tree->Branch( "mu_muid_ie_theta", &mu_muid_ie_theta );
 	m_tree->Branch( "mu_muid_ie_qoverp", &mu_muid_ie_qoverp );
 	m_tree->Branch( "mu_muid_nBLHits", &mu_muid_nBLHits );
+	m_tree->Branch( "mu_muid_nTRTHits", &mu_muid_nTRTHits );
 	m_tree->Branch( "mu_muid_nTRTHighTHits", &mu_muid_nTRTHighTHits );
 	m_tree->Branch( "mu_muid_nBLSharedHits", &mu_muid_nBLSharedHits );
 	m_tree->Branch( "mu_muid_nPixSharedHits", &mu_muid_nPixSharedHits );
@@ -1474,6 +1480,7 @@ void muSkimD3PD::fill(int GRL)
 			mu_staco_ie_theta->push_back( m_offPhys->mu_staco_ie_theta->at(i) );
 			mu_staco_ie_qoverp->push_back( m_offPhys->mu_staco_ie_qoverp->at(i) );
 			mu_staco_nBLHits->push_back( m_offPhys->mu_staco_nBLHits->at(i) );
+			mu_staco_nTRTHits->push_back( m_offPhys->mu_staco_nTRTHits->at(i) );
 			mu_staco_nTRTHighTHits->push_back( m_offPhys->mu_staco_nTRTHighTHits->at(i) );
 			mu_staco_nBLSharedHits->push_back( m_offPhys->mu_staco_nBLSharedHits->at(i) );
 			mu_staco_nPixSharedHits->push_back( m_offPhys->mu_staco_nPixSharedHits->at(i) );
@@ -1670,6 +1677,7 @@ void muSkimD3PD::fill(int GRL)
 			mu_muid_ie_theta->push_back( m_offPhys->mu_muid_ie_theta->at(i) );
 			mu_muid_ie_qoverp->push_back( m_offPhys->mu_muid_ie_qoverp->at(i) );
 			mu_muid_nBLHits->push_back( m_offPhys->mu_muid_nBLHits->at(i) );
+			mu_muid_nTRTHits->push_back( m_offPhys->mu_muid_nTRTHits->at(i) );
 			mu_muid_nTRTHighTHits->push_back( m_offPhys->mu_muid_nTRTHighTHits->at(i) );
 			mu_muid_nBLSharedHits->push_back( m_offPhys->mu_muid_nBLSharedHits->at(i) );
 			mu_muid_nPixSharedHits->push_back( m_offPhys->mu_muid_nPixSharedHits->at(i) );
@@ -1964,6 +1972,7 @@ void muSkimD3PD::fill(int GRL)
 			mu_staco_ie_theta->push_back(m_mcOffPhys->mu_staco_ie_theta->at(i) );
 			mu_staco_ie_qoverp->push_back(m_mcOffPhys->mu_staco_ie_qoverp->at(i) );
 			mu_staco_nBLHits->push_back(m_mcOffPhys->mu_staco_nBLHits->at(i) );
+			mu_staco_nTRTHits->push_back(m_mcOffPhys->mu_staco_nTRTHits->at(i) );
 			mu_staco_nTRTHighTHits->push_back(m_mcOffPhys->mu_staco_nTRTHighTHits->at(i) );
 			mu_staco_nBLSharedHits->push_back(m_mcOffPhys->mu_staco_nBLSharedHits->at(i) );
 			mu_staco_nPixSharedHits->push_back(m_mcOffPhys->mu_staco_nPixSharedHits->at(i) );
@@ -2152,6 +2161,7 @@ void muSkimD3PD::fill(int GRL)
 			mu_muid_ie_theta->push_back(m_mcOffPhys->mu_muid_ie_theta->at(i) );
 			mu_muid_ie_qoverp->push_back(m_mcOffPhys->mu_muid_ie_qoverp->at(i) );
 			mu_muid_nBLHits->push_back(m_mcOffPhys->mu_muid_nBLHits->at(i) );
+			mu_muid_nTRTHits->push_back(m_mcOffPhys->mu_muid_nTRTHits->at(i) );
 			mu_muid_nTRTHighTHits->push_back(m_mcOffPhys->mu_muid_nTRTHighTHits->at(i) );
 			mu_muid_nBLSharedHits->push_back(m_mcOffPhys->mu_muid_nBLSharedHits->at(i) );
 			mu_muid_nPixSharedHits->push_back(m_mcOffPhys->mu_muid_nPixSharedHits->at(i) );

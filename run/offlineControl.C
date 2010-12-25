@@ -59,12 +59,11 @@ void offlineControl::initialize(int runNumber)
 	}
 	////////////////////////////////////////////////////////////////////////////////////////
 	
-	if(runNumber==0) makeChain(true, str, strb);
-	else             makeChain(true, str, strb, runNumber);
+	if(runNumber==-1) makeChain(true, str, strb);
+	else              makeChain(true, str, strb, runNumber);
 
 	m_offPhys = new offlinePhysics( m_chain );
 
-	//str = checkANDsetFilepath("PWD", "/../data/offlineTreeDigest.root");
 	str = checkANDsetFilepath("PWD", "/../data/digestTree.root");
 	m_treefile = new TFile( str.c_str(), "RECREATE");
 	

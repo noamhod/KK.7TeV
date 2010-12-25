@@ -22,7 +22,6 @@ public:
 	TTree*     m_tree;
 	
 	// locals
-	bool doSkim;
 	int counter;
 	
 	// event info branches
@@ -473,7 +472,7 @@ public:
 	muD3PD(physics* phys, mcPhysics* mcPhys, TFile* treeFile);
 	~muD3PD();
 	
-	void doSkimD3PD(float pTthreshold);
+	bool doSkimD3PD(float pTthreshold);
 	
 	TTree* getTree();
 	void setVectorPtrs();

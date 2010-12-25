@@ -45,12 +45,14 @@ selection		15			1				eta						1				2.4
 
 #selection		101			1				msHits					6				3.		 3.		 3.		0.		0.		1.
 #selection		102			0				msHits1					7				3.		 3.		 0.		0.		3.		2.		1.
-selection		103			0				msHits2					9				3.		 3.		 0.		0.		3.		1.		1.		2.		1.
-#selection		104			0				msHits3					7				3.		 3.		 0.		0.		3.		3.		1.
-#selection		105			0				idHits					3				4.		 1.		 6.
-selection		106			0				idHitsMCPrel15			5				6.		 1.		 5.		1.9		0.9
-#selection		107			0				pTmatchingRatio			2				2.		 0.5
-#selection		108			0				pTmatchingAbsDiff		1				0.015
+#selection		103			0				msHits2					10				3.		 3.		 0.		0.		3.		1.		1.		1.		2.		1.
+#selection		104			0				msHits2noCSCphi			9				3.		 3.		 0.		0.		3.		1.		1.		2.		1.
+#selection		105			0				msHits3					7				3.		 3.		 0.		0.		3.		3.		1.
+selection		103			0				msHits4					10				3.		 3.		 0.		0.		0.		1.		1.		1.		2.		1.
+selection		106			0				idHits					3				4.		 1.		 6.
+#selection		107			0				idHitsMCPrel15			5				6.		 1.		 5.		1.9		0.9
+#selection		108			0				pTmatchingRatio			2				2.		 0.5
+#selection		109			0				pTmatchingAbsDiff		1				0.015
 
 #selection		201			0				d0						1				0.2
 #selection		202			0				z0						1				1.

@@ -36,58 +36,33 @@ muD3PD::muD3PD(physics* phys, mcPhysics* mcPhys, TFile* treeFile)
 	counter = 0;
 }
 
-void muD3PD::doSkimD3PD(float pTthreshold) // at least one mu(staco/muid) with pT>pTthreshold
+bool muD3PD::doSkimD3PD(float pTthreshold) // at least one mu(staco/muid) with pT>pTthreshold
 {
-	doSkim = false;
-
-	if(m_phys!=NULL  &&  m_mcPhys==NULL)
+	// less than 1 mu staco and muid
+	if(m_phys->mu_staco_n<1  &&  m_phys->mu_muid_n<1) return false;
+	
+	// if at least one mu_staco pT>=pTthreshold
+	for(int m=0 ; m<(int)m_phys->mu_staco_n ; m++)
 	{
-		if(m_phys->mu_staco_n<1  &&  m_phys->mu_muid_n<1)
-		{
-			doSkim = false;
-			return;
-		}
-		for(int m=0 ; m<(int)m_phys->mu_staco_n ; m++)
-		{
-			if( fabs(kin.pT(m_phys->mu_staco_me_qoverp->at(m), m_phys->mu_staco_me_theta->at(m)))*MeV2GeV >= pTthreshold )
-			{
-				doSkim = true;
-				return;
-			}
-		}
-		for(int m=0 ; m<(int)m_phys->mu_muid_n ; m++)
-		{
-			if( fabs(kin.pT(m_phys->mu_muid_me_qoverp->at(m), m_phys->mu_muid_me_theta->at(m))*MeV2GeV) >= pTthreshold ) 
-			{
-				doSkim = true;
-				return;
-			}
-		}
+		float pt = fabs(kin.pT(m_phys->mu_staco_me_qoverp->at(m), m_phys->mu_staco_me_theta->at(m)))*MeV2GeV;
+		//float pt = fabs(m_phys->mu_staco_pt->at(m))*MeV2GeV;
+		if( pt >= pTthreshold ) return true;
 	}
-	else
+	
+	// if at least one mu_muid pT>=pTthreshold
+	for(int m=0 ; m<(int)m_phys->mu_muid_n ; m++)
 	{
-		if(m_mcPhys->mu_staco_n<1  &&  m_mcPhys->mu_muid_n<1)
-		{
-			doSkim = false;
-			return;
-		}
-		for(int m=0 ; m<(int)m_mcPhys->mu_staco_n ; m++)
-		{
-			if( fabs(kin.pT(m_mcPhys->mu_staco_me_qoverp->at(m), m_mcPhys->mu_staco_me_theta->at(m)))*MeV2GeV >= pTthreshold )
-			{
-				doSkim = true;
-				return;
-			}
-		}
-		for(int m=0 ; m<(int)m_mcPhys->mu_muid_n ; m++)
-		{
-			if( fabs(kin.pT(m_mcPhys->mu_muid_me_qoverp->at(m), m_mcPhys->mu_muid_me_theta->at(m))*MeV2GeV) >= pTthreshold )
-			{
-				doSkim = true;
-				return;
-			}
-		}
+		float pt = fabs(kin.pT(m_phys->mu_muid_me_qoverp->at(m), m_phys->mu_muid_me_theta->at(m)))*MeV2GeV;
+		//float pt = fabs(m_phys->mu_muid_pt->at(m))*MeV2GeV;
+		if( pt >= pTthreshold ) return true;
 	}
+	
+	// no mu with pT>=pTthreshold
+	////////////////////////////
+	return false; //////////////
+	////////////////////////////
+	
+	return false;
 }
 
 
@@ -1307,8 +1282,6 @@ void muD3PD::setBranches()
 
 void muD3PD::fill(int GRL, string sPeriod, vector<string>* vsTriggers)
 {
-	if(!doSkim) return;
-
 	// external
 	isGRL = GRL;
 	period->push_back( sPeriod );

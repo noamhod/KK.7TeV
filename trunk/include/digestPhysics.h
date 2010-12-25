@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Thu Nov 25 18:01:59 2010 by ROOT version 5.26/00
+// Sat Dec 25 21:56:01 2010 by ROOT version 5.26/00
 // from TTree digest/digest
 // found on file: digestTree.root
 //////////////////////////////////////////////////////////
@@ -175,6 +175,7 @@ public :
    vector<float>   *mu_staco_ie_theta;
    vector<float>   *mu_staco_ie_qoverp;
    vector<int>     *mu_staco_nBLHits;
+   vector<int>     *mu_staco_nTRTHits;
    vector<int>     *mu_staco_nTRTHighTHits;
    vector<int>     *mu_staco_nBLSharedHits;
    vector<int>     *mu_staco_nPixSharedHits;
@@ -357,6 +358,7 @@ public :
    vector<float>   *mu_muid_ie_theta;
    vector<float>   *mu_muid_ie_qoverp;
    vector<int>     *mu_muid_nBLHits;
+   vector<int>     *mu_muid_nTRTHits;
    vector<int>     *mu_muid_nTRTHighTHits;
    vector<int>     *mu_muid_nBLSharedHits;
    vector<int>     *mu_muid_nPixSharedHits;
@@ -605,6 +607,7 @@ public :
    TBranch        *b_mu_staco_ie_theta;   //!
    TBranch        *b_mu_staco_ie_qoverp;   //!
    TBranch        *b_mu_staco_nBLHits;   //!
+   TBranch        *b_mu_staco_nTRTHits;   //!
    TBranch        *b_mu_staco_nTRTHighTHits;   //!
    TBranch        *b_mu_staco_nBLSharedHits;   //!
    TBranch        *b_mu_staco_nPixSharedHits;   //!
@@ -787,6 +790,7 @@ public :
    TBranch        *b_mu_muid_ie_theta;   //!
    TBranch        *b_mu_muid_ie_qoverp;   //!
    TBranch        *b_mu_muid_nBLHits;   //!
+   TBranch        *b_mu_muid_nTRTHits;   //!
    TBranch        *b_mu_muid_nTRTHighTHits;   //!
    TBranch        *b_mu_muid_nBLSharedHits;   //!
    TBranch        *b_mu_muid_nPixSharedHits;   //!
@@ -1043,6 +1047,7 @@ void digestPhysics::Init(TTree *tree)
    mu_staco_ie_theta = 0;
    mu_staco_ie_qoverp = 0;
    mu_staco_nBLHits = 0;
+   mu_staco_nTRTHits = 0;
    mu_staco_nTRTHighTHits = 0;
    mu_staco_nBLSharedHits = 0;
    mu_staco_nPixSharedHits = 0;
@@ -1224,6 +1229,7 @@ void digestPhysics::Init(TTree *tree)
    mu_muid_ie_theta = 0;
    mu_muid_ie_qoverp = 0;
    mu_muid_nBLHits = 0;
+   mu_muid_nTRTHits = 0;
    mu_muid_nTRTHighTHits = 0;
    mu_muid_nBLSharedHits = 0;
    mu_muid_nPixSharedHits = 0;
@@ -1475,6 +1481,7 @@ void digestPhysics::Init(TTree *tree)
    fChain->SetBranchAddress("mu_staco_ie_theta", &mu_staco_ie_theta, &b_mu_staco_ie_theta);
    fChain->SetBranchAddress("mu_staco_ie_qoverp", &mu_staco_ie_qoverp, &b_mu_staco_ie_qoverp);
    fChain->SetBranchAddress("mu_staco_nBLHits", &mu_staco_nBLHits, &b_mu_staco_nBLHits);
+   fChain->SetBranchAddress("mu_staco_nTRTHits", &mu_staco_nTRTHits, &b_mu_staco_nTRTHits);
    fChain->SetBranchAddress("mu_staco_nTRTHighTHits", &mu_staco_nTRTHighTHits, &b_mu_staco_nTRTHighTHits);
    fChain->SetBranchAddress("mu_staco_nBLSharedHits", &mu_staco_nBLSharedHits, &b_mu_staco_nBLSharedHits);
    fChain->SetBranchAddress("mu_staco_nPixSharedHits", &mu_staco_nPixSharedHits, &b_mu_staco_nPixSharedHits);
@@ -1657,6 +1664,7 @@ void digestPhysics::Init(TTree *tree)
    fChain->SetBranchAddress("mu_muid_ie_theta", &mu_muid_ie_theta, &b_mu_muid_ie_theta);
    fChain->SetBranchAddress("mu_muid_ie_qoverp", &mu_muid_ie_qoverp, &b_mu_muid_ie_qoverp);
    fChain->SetBranchAddress("mu_muid_nBLHits", &mu_muid_nBLHits, &b_mu_muid_nBLHits);
+   fChain->SetBranchAddress("mu_muid_nTRTHits", &mu_muid_nTRTHits, &b_mu_muid_nTRTHits);
    fChain->SetBranchAddress("mu_muid_nTRTHighTHits", &mu_muid_nTRTHighTHits, &b_mu_muid_nTRTHighTHits);
    fChain->SetBranchAddress("mu_muid_nBLSharedHits", &mu_muid_nBLSharedHits, &b_mu_muid_nBLSharedHits);
    fChain->SetBranchAddress("mu_muid_nPixSharedHits", &mu_muid_nPixSharedHits, &b_mu_muid_nPixSharedHits);

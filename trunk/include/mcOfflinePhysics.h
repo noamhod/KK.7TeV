@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Sun Dec 12 14:12:45 2010 by ROOT version 5.27/06
+// Sat Dec 25 14:12:20 2010 by ROOT version 5.26/00
 // from TTree offline/offline
-// found on file: user.hod.003311._00001.mcWZphys.root
+// found on file: mcWZphys.root
 //////////////////////////////////////////////////////////
 
 #ifndef mcOfflinePhysics_h
@@ -175,6 +175,7 @@ public :
    vector<float>   *mu_staco_ie_theta;
    vector<float>   *mu_staco_ie_qoverp;
    vector<int>     *mu_staco_nBLHits;
+   vector<int>     *mu_staco_nTRTHits;
    vector<int>     *mu_staco_nTRTHighTHits;
    vector<int>     *mu_staco_nBLSharedHits;
    vector<int>     *mu_staco_nPixSharedHits;
@@ -357,6 +358,7 @@ public :
    vector<float>   *mu_muid_ie_theta;
    vector<float>   *mu_muid_ie_qoverp;
    vector<int>     *mu_muid_nBLHits;
+   vector<int>     *mu_muid_nTRTHits;
    vector<int>     *mu_muid_nTRTHighTHits;
    vector<int>     *mu_muid_nBLSharedHits;
    vector<int>     *mu_muid_nPixSharedHits;
@@ -475,6 +477,7 @@ public :
    vector<float>   *muonTruth_phi;
    vector<float>   *muonTruth_charge;
    vector<int>     *muonTruth_PDGID;
+   vector<int>     *muonTruth_barcode;
    vector<int>     *muonTruth_type;
    vector<int>     *muonTruth_origin;
    Int_t           mcevt_n;
@@ -650,6 +653,7 @@ public :
    TBranch        *b_mu_staco_ie_theta;   //!
    TBranch        *b_mu_staco_ie_qoverp;   //!
    TBranch        *b_mu_staco_nBLHits;   //!
+   TBranch        *b_mu_staco_nTRTHits;   //!
    TBranch        *b_mu_staco_nTRTHighTHits;   //!
    TBranch        *b_mu_staco_nBLSharedHits;   //!
    TBranch        *b_mu_staco_nPixSharedHits;   //!
@@ -832,6 +836,7 @@ public :
    TBranch        *b_mu_muid_ie_theta;   //!
    TBranch        *b_mu_muid_ie_qoverp;   //!
    TBranch        *b_mu_muid_nBLHits;   //!
+   TBranch        *b_mu_muid_nTRTHits;   //!
    TBranch        *b_mu_muid_nTRTHighTHits;   //!
    TBranch        *b_mu_muid_nBLSharedHits;   //!
    TBranch        *b_mu_muid_nPixSharedHits;   //!
@@ -950,6 +955,7 @@ public :
    TBranch        *b_muonTruth_phi;   //!
    TBranch        *b_muonTruth_charge;   //!
    TBranch        *b_muonTruth_PDGID;   //!
+   TBranch        *b_muonTruth_barcode;   //!
    TBranch        *b_muonTruth_type;   //!
    TBranch        *b_muonTruth_origin;   //!
    TBranch        *b_mcevt_n;   //!
@@ -986,9 +992,9 @@ mcOfflinePhysics::mcOfflinePhysics(TTree *tree)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("user.hod.003311._00001.mcWZphys.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("mcWZphys.root");
       if (!f) {
-         f = new TFile("user.hod.003311._00001.mcWZphys.root");
+         f = new TFile("mcWZphys.root");
       }
       tree = (TTree*)gDirectory->Get("offline");
 
@@ -1133,6 +1139,7 @@ void mcOfflinePhysics::Init(TTree *tree)
    mu_staco_ie_theta = 0;
    mu_staco_ie_qoverp = 0;
    mu_staco_nBLHits = 0;
+   mu_staco_nTRTHits = 0;
    mu_staco_nTRTHighTHits = 0;
    mu_staco_nBLSharedHits = 0;
    mu_staco_nPixSharedHits = 0;
@@ -1314,6 +1321,7 @@ void mcOfflinePhysics::Init(TTree *tree)
    mu_muid_ie_theta = 0;
    mu_muid_ie_qoverp = 0;
    mu_muid_nBLHits = 0;
+   mu_muid_nTRTHits = 0;
    mu_muid_nTRTHighTHits = 0;
    mu_muid_nBLSharedHits = 0;
    mu_muid_nPixSharedHits = 0;
@@ -1430,6 +1438,7 @@ void mcOfflinePhysics::Init(TTree *tree)
    muonTruth_phi = 0;
    muonTruth_charge = 0;
    muonTruth_PDGID = 0;
+   muonTruth_barcode = 0;
    muonTruth_type = 0;
    muonTruth_origin = 0;
    mcevt_signal_process_id = 0;
@@ -1608,6 +1617,7 @@ void mcOfflinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("mu_staco_ie_theta", &mu_staco_ie_theta, &b_mu_staco_ie_theta);
    fChain->SetBranchAddress("mu_staco_ie_qoverp", &mu_staco_ie_qoverp, &b_mu_staco_ie_qoverp);
    fChain->SetBranchAddress("mu_staco_nBLHits", &mu_staco_nBLHits, &b_mu_staco_nBLHits);
+   fChain->SetBranchAddress("mu_staco_nTRTHits", &mu_staco_nTRTHits, &b_mu_staco_nTRTHits);
    fChain->SetBranchAddress("mu_staco_nTRTHighTHits", &mu_staco_nTRTHighTHits, &b_mu_staco_nTRTHighTHits);
    fChain->SetBranchAddress("mu_staco_nBLSharedHits", &mu_staco_nBLSharedHits, &b_mu_staco_nBLSharedHits);
    fChain->SetBranchAddress("mu_staco_nPixSharedHits", &mu_staco_nPixSharedHits, &b_mu_staco_nPixSharedHits);
@@ -1790,6 +1800,7 @@ void mcOfflinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("mu_muid_ie_theta", &mu_muid_ie_theta, &b_mu_muid_ie_theta);
    fChain->SetBranchAddress("mu_muid_ie_qoverp", &mu_muid_ie_qoverp, &b_mu_muid_ie_qoverp);
    fChain->SetBranchAddress("mu_muid_nBLHits", &mu_muid_nBLHits, &b_mu_muid_nBLHits);
+   fChain->SetBranchAddress("mu_muid_nTRTHits", &mu_muid_nTRTHits, &b_mu_muid_nTRTHits);
    fChain->SetBranchAddress("mu_muid_nTRTHighTHits", &mu_muid_nTRTHighTHits, &b_mu_muid_nTRTHighTHits);
    fChain->SetBranchAddress("mu_muid_nBLSharedHits", &mu_muid_nBLSharedHits, &b_mu_muid_nBLSharedHits);
    fChain->SetBranchAddress("mu_muid_nPixSharedHits", &mu_muid_nPixSharedHits, &b_mu_muid_nPixSharedHits);
@@ -1908,6 +1919,7 @@ void mcOfflinePhysics::Init(TTree *tree)
    fChain->SetBranchAddress("muonTruth_phi", &muonTruth_phi, &b_muonTruth_phi);
    fChain->SetBranchAddress("muonTruth_charge", &muonTruth_charge, &b_muonTruth_charge);
    fChain->SetBranchAddress("muonTruth_PDGID", &muonTruth_PDGID, &b_muonTruth_PDGID);
+   fChain->SetBranchAddress("muonTruth_barcode", &muonTruth_barcode, &b_muonTruth_barcode);
    fChain->SetBranchAddress("muonTruth_type", &muonTruth_type, &b_muonTruth_type);
    fChain->SetBranchAddress("muonTruth_origin", &muonTruth_origin, &b_muonTruth_origin);
    fChain->SetBranchAddress("mcevt_n", &mcevt_n, &b_mcevt_n);

@@ -133,6 +133,19 @@ public:
 	bool nMShits2(float nMDTB_IMO_HitsCutVal, float nMDTE_IMEO_HitsCutVal,
 				  float nMDTBIS78HitsCutVal, float nMDTBEEHitsCutVal,
 				  float nCSCEtaHitsCutVal,
+				  float nRPCPhiHitsCutVal, float nTGCPhiHitsCutVal, float nCSCPhiHitsCutVal,
+				  float nMDTCSCsumCutVal, float nRPCTGCsumsCutVal,
+				  int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,
+				  int nMDTEIHits, int nMDTEMHits, int nMDTEEHits, int nMDTEOHits,
+				  int nMDTBIS78Hits, int nMDTBEEHits,
+				  int nRPCLayer1PhiHits, int nRPCLayer2PhiHits, int nRPCLayer3PhiHits,
+				  int nTGCLayer1PhiHits, int nTGCLayer2PhiHits, int nTGCLayer3PhiHits, int nTGCLayer4PhiHits,
+				  int nCSCEtaHits, int nCSCPhiHits
+				 );
+	bool nMShits2noCSCphi(
+				  float nMDTB_IMO_HitsCutVal, float nMDTE_IMEO_HitsCutVal,
+				  float nMDTBIS78HitsCutVal, float nMDTBEEHitsCutVal,
+				  float nCSCEtaHitsCutVal,
 				  float nRPCPhiHitsCutVal, float nTGCPhiHitsCutVal,
 				  float nMDTCSCsumCutVal, float nRPCTGCsumsCutVal,
 				  int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,

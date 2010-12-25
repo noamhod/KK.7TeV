@@ -50,15 +50,15 @@ double cosThetaPdf(double* xPtr, double par[])
 {
 	double x   = *xPtr;
 	double pdf = 1.;
-	double Afb  = par[0];
+	double A4  = par[0];
 
 	if (fabs(x)<=1.)
 	{
 		// see: http://arxiv.org/PS_cache/arxiv/pdf/1004/1004.1649v1.pdf
 		// pdf_CollinsSoper = (1/N)*dN/dcosThetaCS = (3/8)*((1+0.5*A0) + A4*cosThetaCS + (1-3/2*A0)*cosTetaCS^2)
-		// pdf_Helicity     = (1/N)*dN/dcosThetaHE = (3/8)*(1+cosTetaHE^2) + Afb*cosThetaHE
+		// pdf_Helicity     = (1/N)*dN/dcosThetaHE = (3/8)*(1+cosTetaHE^2 + Afb*cosThetaHE)
 		// if A0=~0 then pdf_CollinsSoper = pdf_Helicity (in the Z/Z'/Z* cases, it is approximately true)
-		pdf  = (3./8.)*(1. + x*x + Afb*x);
+		pdf  = (3./8.)*(1. + x*x + A4*x);
 		if (pdf > 0) { return pdf; }
 		else { cout << "warning:  pdf<=0, pdf=" << pdf << endl; return 1e-30; }
 	}
@@ -101,7 +101,7 @@ void fillVec(TTree* t, TH1D* h, Int_t b)
 	}
 }
 
-void minimize(double& Afb, double& dAfb)
+void minimize(double& A4, double& dA4)
 {
 	int npar = 1;      // the number of parameters
 	TMinuit minuit(npar);
@@ -113,11 +113,11 @@ void minimize(double& Afb, double& dAfb)
 	double maxVal[npar];     // maximum bound on parameter
 	string parName[npar];
 
-	par[0]      = 0.1; 
+	par[0]      = 0.01; 
 	stepSize[0] = 1e-6;
 	minVal[0]   = -1.;
 	maxVal[0]   = +1.;
-	parName[0]  = "Afb";
+	parName[0]  = "A4";
 
 	for (int i=0; i<npar; i++)
 	{
@@ -142,9 +142,9 @@ void minimize(double& Afb, double& dAfb)
 	func->GetYaxis()->SetTitle("pdf");
 	*/
 	
-	Afb  = 0.;
-	dAfb = 0.;
-	minuit.GetParameter(0,Afb,dAfb);
+	A4  = 0.;
+	dA4 = 0.;
+	minuit.GetParameter(0,A4,dA4);
 }
 
 
@@ -157,9 +157,9 @@ void execute()
 	bool doLogM = true;
 	
 	float GeV2TeV = 1.e-3;
-	int    imass_nbins = 10;
-	double imass_min   = 75.*GeV2TeV;
-	double imass_max   = 375.*GeV2TeV;
+	int    imass_nbins = 16;
+	double imass_min   = 80.*GeV2TeV;
+	double imass_max   = 400.*GeV2TeV;
 	//double imass_min   = 60.*GeV2TeV;
 	//double imass_max   = 360.*GeV2TeV;
 	
@@ -172,7 +172,8 @@ void execute()
 	M_bins[0] = imass_min;
 	for(Int_t i=1 ; i<=imass_nbins ; i++) M_bins[i] = TMath::Power( 10,(logMmin + i*M_binwidth) );
 
-	string dir   = "/data/hod/D3PDdigest/rel15_barrel_selection/";
+	//string dir   = "/data/hod/D3PDdigest/rel15_barrel_selection/";
+	string dir   = "/data/hod/D3PDdigest/rel15_fwd_selection/";
 	string hDir  = "allCuts";
 	string hName = "Afb";
 	string xTitle = "#hat{m}_{#mu#mu} TeV";
@@ -188,7 +189,7 @@ void execute()
 
 	gStyle->SetOptStat(0);
 	
-	TLegend* leg = new TLegend(0.7123746,0.7292746,0.8695652,0.8821244,NULL,"brNDC");
+	TLegend* leg = new TLegend(0.7107023,0.7098446,0.867893,0.8626943,NULL,"brNDC");
 	leg->SetFillColor(kWhite);
 	
 	string L = "43";
@@ -212,6 +213,7 @@ void execute()
 	//pad_mHat->SetLogx();
 
 	TPad *pad_Afb  = new TPad("pad_Afb", "",0,0,1,1);
+	pad_Afb->SetGridy();
 	pad_Afb->SetTicky(0);
 	pad_Afb->SetTickx(1);
 	pad_Afb->SetFillStyle(0);
@@ -258,13 +260,17 @@ void execute()
 		hDataM->Fill(IMASS);
 	}
 	
+	double a4  = 0.;
+	double da4 = 0.;
 	double afb  = 0.;
 	double dafb = 0.;
 	for(Int_t b=1 ; b<=hData->GetNbinsX() ; b++)
 	{
 		fillVec(Afb_data_tree, hData, b); // the VCOSTH vector is full
 		if((int)VCOSTH->size()<minEntriesDATA) continue;
-		minimize(afb, dafb);
+		minimize(a4, da4);
+		afb = (3./8.)*a4;
+		dafb = (3./8.)*da4;
 		hData->SetBinContent(b,afb);
 		hData->SetBinError(b,dafb);
 	}
@@ -383,17 +389,26 @@ void execute()
 	Afb_sumBG_tree->SetBranchAddress( "Mhat",       &IMASS );
 	Afb_sumBG_tree->SetBranchAddress( refframe.c_str(), &COSTH );
 
+	a4   = 0.;
+	da4  = 0.;
 	afb  = 0.;
 	dafb = 0.;
 	for(Int_t b=1 ; b<=hBGsum->GetNbinsX() ; b++)
 	{
 		fillVec(Afb_sumBG_tree, hBGsum, b); // the VCOSTH vector is full
 		if((int)VCOSTH->size()<minEntriesMC) continue;
-		minimize(afb, dafb);
+		minimize(a4, da4);
+		afb = (3./8.)*a4;
+		dafb = (3./8.)*da4;
 		hBGsum->SetBinContent(b,afb);
 		hBGsum->SetBinError(b,dafb);
 	}
-
+	TH1D* hBGsumTmp = (TH1D*)hBGsum->Clone("");
+	hBGsumTmp->Reset();
+	for(Int_t b=1 ; b<hBGsumTmp->GetNbinsX() ; b++) hBGsumTmp->SetBinContent(b,hBGsum->GetBinContent(b));
+	hBGsumTmp->SetLineColor(kAzure+8);
+	
+	
 	pad_mHat->Draw();
 	pad_mHat->cd();
 	hDataM->GetYaxis()->SetRangeUser(5.e-1,1.1*hDataM->GetMaximum());
@@ -404,12 +419,8 @@ void execute()
 	pad_Afb->Draw();
 	pad_Afb->cd();
 	hBGsum->GetYaxis()->SetRangeUser(m_miny,m_maxy);
-	hBGsum->Draw("E6 Y+");
-	TH1D* hBGsumTmp = (TH1D*)hBGsum->Clone("");
-	hBGsumTmp->Reset();
-	for(Int_t b=0 ; b<hBGsumTmp->GetNbinsX() ; b++) hBGsumTmp->SetBinContent(b,hBGsum->GetBinContent(b));
-	hBGsumTmp->SetLineColor(kAzure+8);
-	hBGsumTmp->Draw("CSAMES");
+	hBGsum->Draw("E5 Y+");
+	//hBGsumTmp->Draw("CSAMES");
 	hData->Draw("e1x0SAMES");
 	pvtxt->Draw("SAMES");
 	pvtxt1->Draw("SAMES");
@@ -417,7 +428,7 @@ void execute()
 	TLine* lUnit = new TLine(imass_min,0.,imass_max,0.);
 	lUnit->SetLineColor(kBlack);
 	lUnit->SetLineStyle(2);
-	lUnit->Draw("SAMES");
+	//lUnit->Draw("SAMES");
 	//pad_Afb->RedrawAxis();
 	
 	cnv->cd();
@@ -428,11 +439,10 @@ void execute()
 
 	cnv->Update();
 
-	/*	
+	
 	TString fName = "figures/" + (TString)hNameFixed + "_" + (TString)muonLabel;
 	cnv->SaveAs(fName+".eps");
 	cnv->SaveAs(fName+".C");
 	cnv->SaveAs(fName+".root");
 	cnv->SaveAs(fName+".png");
-*/
 }

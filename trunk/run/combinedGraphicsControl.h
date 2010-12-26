@@ -30,6 +30,7 @@ class combinedGraphicsControl : public utilities
 		void executeAfb();
 		void executeTrig();
 		void executeTrigTRUvsTnP();
+		void executeTrigMCvsData();
 
 	private:
 };

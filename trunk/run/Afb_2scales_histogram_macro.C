@@ -155,9 +155,10 @@ void execute()
 	string refframe = "CosThetaCS";
 	//string refframe = "CosThetaHE";
 	bool doLogM = true;
+	bool doLogx = false;
 	
 	float GeV2TeV = 1.e-3;
-	int    imass_nbins = 16;
+	int    imass_nbins = 20;
 	double imass_min   = 80.*GeV2TeV;
 	double imass_max   = 400.*GeV2TeV;
 	//double imass_min   = 60.*GeV2TeV;
@@ -173,7 +174,7 @@ void execute()
 	for(Int_t i=1 ; i<=imass_nbins ; i++) M_bins[i] = TMath::Power( 10,(logMmin + i*M_binwidth) );
 
 	//string dir   = "/data/hod/D3PDdigest/rel15_barrel_selection/";
-	string dir   = "/data/hod/D3PDdigest/rel15_fwd_selection/";
+	string dir   = "/data/hod/D3PDdigest/rel15_eta24_selection/";
 	string hDir  = "allCuts";
 	string hName = "Afb";
 	string xTitle = "#hat{m}_{#mu#mu} TeV";
@@ -210,7 +211,7 @@ void execute()
 	pad_mHat->SetFillColor(kWhite);
 	pad_mHat->SetTicky(0);
 	pad_mHat->SetLogy();
-	//pad_mHat->SetLogx();
+	if(doLogx) pad_mHat->SetLogx();
 
 	TPad *pad_Afb  = new TPad("pad_Afb", "",0,0,1,1);
 	pad_Afb->SetGridy();
@@ -219,7 +220,7 @@ void execute()
 	pad_Afb->SetFillStyle(0);
 	pad_Afb->SetFrameFillStyle(4000); //will be transparent
 	pad_Afb->SetFrameFillColor(0);
-	//pad_Afb->SetLogx();
+	if(doLogx) pad_Afb->SetLogx();
 	
 	string path = "";
 	string sProc = "";
@@ -277,7 +278,7 @@ void execute()
 	
 	
 	// Backgrounds
-	channel = "DYmumu: A_{FB}#left(#hat{m}_{#mum#mu}#right)";
+	channel = "DYmumu: A_{FB}#left(#hat{m}_{#mu#mu}#right)";
 	TH1D* hBGsum;
 	if(doLogM) hBGsum = new TH1D("Afb_sumBG","Afb_sumBG", imass_nbins, M_bins );
 	else       hBGsum = new TH1D("Afb_sumBG","Afb_sumBG", imass_nbins, imass_min, imass_max );
@@ -411,7 +412,7 @@ void execute()
 	
 	pad_mHat->Draw();
 	pad_mHat->cd();
-	hDataM->GetYaxis()->SetRangeUser(5.e-1,1.1*hDataM->GetMaximum());
+	hDataM->GetYaxis()->SetRangeUser(5.e-1,1.5*hDataM->GetMaximum());
 	hDataM->Draw();
 
 	cnv->cd();

@@ -87,7 +87,14 @@ class combinedGraphics : public analysisModules
 		double Integral(TH1D* h);
 		double IntegralOverFlow(TH1D* h);
 		void Scale(TH1D* h, double d);
+		void ScaleWerrors(TH1D* h, double d);
+		void addNscale(TH1D* h1, double d1, TH1D* h2, double d2);
 		void Norm(TH1D* h);
+		double getMCLumi(double crossSection_pb,
+						 double branchingRatio,
+						 double nMCevents,
+						 double kFactor,
+						 double genEff);
 		void NormToDataLumi(TH1D* h,
 							double crossSection_pb,
 							double branchingRatio,
@@ -125,7 +132,7 @@ class combinedGraphics : public analysisModules
 		
 		void draw_trigData(string dir, string hDir, string hName);
 		void draw_trigTRUvsTnP(string dir, string hDir, string hName);
-		void draw_trigMCvsData(string dir, string hDir, string hName);
+		void draw_trigMCvsData(string dir, string hDir, string sVar);
 	
 	private:
 };

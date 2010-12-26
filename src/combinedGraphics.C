@@ -69,15 +69,21 @@ void combinedGraphics::initialize(string analysisSelector, string muonSelector)
 		I		 EF_mu13_tight	22953.0
 				 total			43400.33
 	*/
-	period2trigMap.insert( make_pair( "L1_MU10",0.157183/1000 ) );
-	period2trigMap.insert( make_pair( "L1_MU10",8.83395/1000  ) );
-	period2trigMap.insert( make_pair( "L1_MU10",8.71722/1000  ) );
-	period2trigMap.insert( make_pair( "L1_MU10",255.204/1000  ) );
-	period2trigMap.insert( make_pair( "EF_mu10",1081.62/1000  ) );
-	period2trigMap.insert( make_pair( "EF_mu10",1958.16/1000  ) );
-	period2trigMap.insert( make_pair( "EF_mu13",8540.39/1000  ) );
-	period2trigMap.insert( make_pair( "EF_mu13_tight",8520.76/1000  ) );
-	period2trigMap.insert( make_pair( "EF_mu13_tight",22952.4/1000  ) );
+	//=======>
+	/*
+		Period	 Trigger	 	Lumi[1/pb]
+		A-D		 L1_MU10		0.315107831
+		E-F		 EF_mu10		3.04011
+		G		 EF_mu13		8.57007
+		H-I		 EF_mu13_tight	31.47504
+				 total			43.40033
+	*/
+	
+	
+	period2trigMap.insert( make_pair( "L1_MU10",0.315107831 ) );
+	period2trigMap.insert( make_pair( "EF_mu10",3.04011  ) );
+	period2trigMap.insert( make_pair( "EF_mu13",8.57007  ) );
+	period2trigMap.insert( make_pair( "EF_mu13_tight",31.47504  ) );
 	
 	period2lumiMap.insert( make_pair( "A",0.157183/1000 ) );
 	period2lumiMap.insert( make_pair( "B",8.83395/1000  ) );
@@ -319,10 +325,34 @@ double combinedGraphics::IntegralOverFlow(TH1D* h)
 void combinedGraphics::Scale(TH1D* h, double d)
 { 
 	/// scale including over/underflow
+	for(int i=0 ; i<=h->GetNbinsX()+1 ; i++)
+	{ 
+		h->SetBinContent(i,h->GetBinContent(i)*d);
+	}
+}
+
+void combinedGraphics::ScaleWerrors(TH1D* h, double d)
+{ 
+	/// scale including over/underflow
 	for ( int i=0 ; i<=h->GetNbinsX()+1 ; i++ )
 	{ 
-		//h->SetBinError(i,h->GetBinError(i)*d);
 		h->SetBinContent(i,h->GetBinContent(i)*d);
+		h->SetBinError(i,h->GetBinError(i)*d);
+	}
+}
+
+void combinedGraphics::addNscale(TH1D* h1, double d1, TH1D* h2, double d2)
+{ 
+	/// scale including over/underflow
+	for (int i=0 ; i<=h1->GetNbinsX()+1 ; i++)
+	{
+		Double_t binContent = h1->GetBinContent(i)*d1 + h2->GetBinContent(i)*d2;
+		Double_t binError   = sqrt(
+								(h1->GetBinError(i)*d1)*(h1->GetBinError(i)*d1) +
+								(h2->GetBinError(i)*d2)*(h2->GetBinError(i)*d2)
+								  ); // quadrature
+		h1->SetBinContent(i,binContent);
+		h1->SetBinError(i,binError);
 	}
 }
 
@@ -343,6 +373,16 @@ void combinedGraphics::NormToDataLumi(TH1D* h,
 { 
 	double mcLumi = nMCevents/(crossSection_pb*branchingRatio);
 	if ( mcLumi>0 ) Scale(h, dataLumi_pb/mcLumi);
+}
+
+double combinedGraphics::getMCLumi(double crossSection_pb,
+								   double branchingRatio,
+								   double nMCevents,
+								   double kFactor,
+								   double genEff)
+{ 
+	double mcLumi = (nMCevents*kFactor)/(crossSection_pb*branchingRatio*genEff);
+	return mcLumi;
 }
 
 void combinedGraphics::setNormVals(double crossSection_pb,
@@ -897,11 +937,13 @@ void combinedGraphics::draw_allMCvsData(string dir, string hDir, string hName, s
 	TPaveText* pvtxt = new TPaveText(0.546462,0.6944909,0.7118499,0.8146912,"brNDC");
 	pvtxt->SetFillColor(kWhite);
 	TText* txt = pvtxt->AddText( lumilabel.c_str() );
+	if(!txt) cout << "dummy" << endl;
 	
 	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
 	TPaveText* pvtxt1 = new TPaveText(0.5747393,0.6552055,0.6850104,0.7388414,"brNDC");
 	pvtxt1->SetFillColor(kWhite);
 	TText* txt1 = pvtxt1->AddText( muonLabel.c_str() );
+	if(!txt1) cout << "dummy" << endl;
 	
 	string cName = "cnv_" + hNameFixed;
 	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);
@@ -1145,11 +1187,13 @@ void combinedGraphics::draw_sumMCvsData(string dir, string hDir, string hName, s
 	TPaveText* pvtxt = new TPaveText(0.1424448,0.784087,0.3078514,0.9033709,"brNDC");
 	pvtxt->SetFillColor(kWhite);
 	TText* txt = pvtxt->AddText( lumilabel.c_str() );
+	if(!txt) cout << "dummy" << endl;
 	
 	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
 	TPaveText* pvtxt1 = new TPaveText(0.1640196,0.74981,0.2607065,0.8279615,"brNDC");
 	pvtxt1->SetFillColor(kWhite);
 	TText* txt1 = pvtxt1->AddText( muonLabel.c_str() );
+	if(!txt1) cout << "dummy" << endl;
 	
 	string cName = "cnv_" + hNameFixed;
 	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);
@@ -1325,11 +1369,13 @@ void combinedGraphics::draw_AfbMCvsData(string dir, string hDir, string hName, s
 	TPaveText* pvtxt = new TPaveText(0.1195652,0.1334197,0.2458194,0.2318653,"brNDC");
 	pvtxt->SetFillColor(kWhite);
 	TText* txt = pvtxt->AddText( lumilabel.c_str() );
+	if(!txt) cout << "dummy" << endl;
 	
 	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
 	TPaveText* pvtxt1 = new TPaveText(0.1421405,0.126943,0.2165552,0.1683938,"brNDC");
 	pvtxt1->SetFillColor(kWhite);
 	TText* txt1 = pvtxt1->AddText( muonLabel.c_str() );
+	if(!txt1) cout << "dummy" << endl;
 	
 	string cName = "cnv_" + hNameFixed;
 	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);
@@ -1601,7 +1647,7 @@ void combinedGraphics::draw_trigData(string dir, string hDir, string hName)
 	string hNameFixed = hName;
 	
 	hFile->cd();
-
+	
 	gStyle->SetOptStat(0);
 	
 	double trig_dataLumi_ipb = 0.;
@@ -1611,8 +1657,7 @@ void combinedGraphics::draw_trigData(string dir, string hDir, string hName)
 		if(pos!=string::npos) trig_dataLumi_ipb = it->second;
 	}
 	
-	
-	TLegend* leg = new TLegend(0.4572864,0.2132867,0.6243719,0.3496503,NULL,"brNDC");
+	TLegend* leg = new TLegend(0.2801003,0.3095855,0.3846154,0.3937824,NULL,"brNDC");
 	leg->SetFillColor(kWhite);
 	
 	stringstream strm;
@@ -1625,11 +1670,13 @@ void combinedGraphics::draw_trigData(string dir, string hDir, string hName)
 	TPaveText* pvtxt = new TPaveText(0.2550251,0.2237762,0.4208543,0.3426573,"brNDC");
 	pvtxt->SetFillColor(kWhite);
 	TText* txt = pvtxt->AddText( lumilabel.c_str() );
+	if(!txt) cout << "dummy" << endl;
 	
 	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
 	TPaveText* pvtxt1 = new TPaveText(0.281407,0.201049,0.3781407,0.2674825,"brNDC");
 	pvtxt1->SetFillColor(kWhite);
 	TText* txt1 = pvtxt1->AddText( muonLabel.c_str() );
+	if(!txt1) cout << "dummy" << endl;
 	
 	string cName = "cnv_" + hNameFixed;
 	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);
@@ -1700,11 +1747,13 @@ void combinedGraphics::draw_trigTRUvsTnP(string dir, string hDir, string hName)
 	TPaveText* pvtxt = new TPaveText(0.2550251,0.2237762,0.4208543,0.3426573,"brNDC");
 	pvtxt->SetFillColor(kWhite);
 	TText* txt = pvtxt->AddText( lumilabel.c_str() );
+	if(!txt) cout << "dummy" << endl;
 	
 	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
 	TPaveText* pvtxt1 = new TPaveText(0.281407,0.201049,0.3781407,0.2674825,"brNDC");
 	pvtxt1->SetFillColor(kWhite);
 	TText* txt1 = pvtxt1->AddText( muonLabel.c_str() );
+	if(!txt1) cout << "dummy" << endl;
 	
 	string cName = "cnv_" + hNameFixed;
 	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);
@@ -1729,8 +1778,9 @@ void combinedGraphics::draw_trigTRUvsTnP(string dir, string hDir, string hName)
 	hDirect->SetTitle(hName.c_str());
 	hDirect->SetLineColor(kRed);
 	hDirect->SetLineWidth(2);
+	hDirect->SetMarkerStyle(2);
 	hDirect->SetMarkerColor(kRed);
-	hDirect->SetMarkerSize(0.05);
+	hDirect->SetMarkerSize(1);
 	if(hTnP==NULL || hDirect==NULL)
 	{
 		cout << "ERROR: cannot find histogram with name = " << hName << " in the file." << endl;
@@ -1759,11 +1809,9 @@ void combinedGraphics::draw_trigTRUvsTnP(string dir, string hDir, string hName)
 	cnv->SaveAs(fName+".png");
 }
 
-void combinedGraphics::draw_trigMCvsData(string dir, string hDir, string hName)
+void combinedGraphics::draw_trigMCvsData(string dir, string hDir, string sVar)
 {
-	cout << "getting " << dir + " : " + hDir + " : " + hName << endl;
-	
-	string hNameFixed = hName;
+	cout << "getting " << dir + " : " + hDir + " : " + sVar << endl;
 	
 	hFile->cd();
 
@@ -1784,138 +1832,195 @@ void combinedGraphics::draw_trigMCvsData(string dir, string hDir, string hName)
 	TPaveText* pvtxt = new TPaveText(0.2550251,0.2237762,0.4208543,0.3426573,"brNDC");
 	pvtxt->SetFillColor(kWhite);
 	TText* txt = pvtxt->AddText( lumilabel.c_str() );
+	if(!txt) cout << "dummy" << endl;
 	
 	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
 	TPaveText* pvtxt1 = new TPaveText(0.281407,0.201049,0.3781407,0.2674825,"brNDC");
 	pvtxt1->SetFillColor(kWhite);
 	TText* txt1 = pvtxt1->AddText( muonLabel.c_str() );
+	if(!txt1) cout << "dummy" << endl;
 	
-	string cName = "cnv_" + hNameFixed;
-	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);
-	cnv->Divide(1,2);
-	
-	TVirtualPad* pad = cnv->cd(1);
-	pad->SetPad(0.009197324,0.2150259,0.9899666,0.9909326);
-	pad->SetFillColor(kWhite);
-	if(m_logx) pad->SetLogx();
-	if(m_logy) pad->SetLogy();
-	
-	TVirtualPad* pad_ratio = cnv->cd(2);
-	pad_ratio->SetPad(0.009197324,0.01036269,0.9899666,0.253886);
-	pad_ratio->SetFillColor(kWhite);
-	if(m_logx) pad_ratio->SetLogx();
-	if(m_doRatio) pad_ratio->SetLogy();
-	
+	string cName = "cnv_trigMCvsData_" + sVar;
+	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);	
 	cnv->Draw();
 	cnv->cd();
-	cnv->Update();
-	
-	
-	string s1, s2;
+
 	
 	string path = "";
 	string sProc = "";
 	string channel = "";
 	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
 	
-	double ymin = 1.e10;
-	double ymax = 0.;
+	string sNameMC;
+	if(sVar=="pT") sNameMC = "tNp_effi_pT.L1_MU10";
+	if(sVar=="eta") sNameMC = "tNp_effi_eta.L1_MU10";
+	if(sVar=="phi") sNameMC = "tNp_effi_phi.L1_MU10";
 	
+	
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+	// Data
 	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
 	path = dir + "AtoI2_ZprimeGRL/" + m_muonSelector + sData + ".root";
 	TFile* fdata = new TFile( path.c_str(), "READ" );
-	TH1D* hData = getHisto(fdata, hDir, hName);
-	hData->SetTitle(hName.c_str());
-	if(hData==NULL)
-	{
-		cout << "ERROR: cannot find histogram with name = " << hName << " in the file." << endl;
-		cout << "returning now." << endl;
-		return;
-	}
+	TH1D* hData = cloneHisto(fdata, hDir, "tNp_effi_"+sVar+".L1_MU10");
+	hData->Reset();
+	hData->SetTitle("");
 	leg->AddEntry( hData, "Data", "lep");
 	
-	channel = "SM(sig+bkg)";
-	TH1D* hBGsum = getNormDYmumu(dir+"DYmumu/"+m_muonSelector, hDir, hName);
+	string sEffPrefix = "tNp_effi_"+sVar+".";
+	string sPrimTrig = "";
+	string sTrig = "";
+	
+	sPrimTrig = "L1_MU10";
+	sTrig     = "L1_MU10";
+	addNscale(hData, 1., cloneHisto(fdata, hDir, sEffPrefix+sTrig), period2trigMap[sPrimTrig]/m_dataLumi_pb);
+	sPrimTrig = "EF_mu10";
+	sTrig     = "EF_mu10||EF_mu10_MG";
+	addNscale(hData, 1., cloneHisto(fdata, hDir, sEffPrefix+sTrig), period2trigMap[sPrimTrig]/m_dataLumi_pb);
+	sPrimTrig = "EF_mu13";
+	sTrig     = "EF_mu13||EF_mu13_MG";
+	addNscale(hData, 1., cloneHisto(fdata, hDir, sEffPrefix+sTrig), period2trigMap[sPrimTrig]/m_dataLumi_pb);
+	sPrimTrig = "EF_mu13_tight";
+	sTrig     = "EF_mu13_tight||EF_mu13_MG_tight";
+	addNscale(hData, 1., cloneHisto(fdata, hDir, sEffPrefix+sTrig), period2trigMap[sPrimTrig]/m_dataLumi_pb);
+	
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+	// MC
+	
+	double mcInversedLumiSum = 0.;
+	
+	sProc = "DYmumu_75M120";
+	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fDYmumu_75M120 = new TFile( path.c_str(), "READ" );
+	TH1D* hDYmumu_75M120  = cloneHisto(fDYmumu_75M120, hDir, sNameMC);
+	double lDYmumu_75M120 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
+	mcInversedLumiSum += 1./lDYmumu_75M120;
+	
+	sProc = "DYmumu_120M250";
+	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fDYmumu_120M250 = new TFile( path.c_str(), "READ" );
+	TH1D* hDYmumu_120M250  = cloneHisto(fDYmumu_120M250, hDir, sNameMC);
+	double lDYmumu_120M250 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
+	mcInversedLumiSum += 1./lDYmumu_120M250;
+	
+	sProc = "DYmumu_250M400";
+	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fDYmumu_250M400 = new TFile( path.c_str(), "READ" );
+	TH1D* hDYmumu_250M400  = cloneHisto(fDYmumu_250M400, hDir, sNameMC);
+	double lDYmumu_250M400 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
+	mcInversedLumiSum += 1./lDYmumu_250M400;
+	
+	sProc = "DYmumu_400M600";
+	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fDYmumu_400M600 = new TFile( path.c_str(), "READ" );
+	TH1D* hDYmumu_400M600  = cloneHisto(fDYmumu_400M600, hDir, sNameMC);
+	double lDYmumu_400M600 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
+	mcInversedLumiSum += 1./lDYmumu_400M600;
+	
+	/*
+	sProc = "DYmumu_600M800";
+	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fDYmumu_600M800 = new TFile( path.c_str(), "READ" );
+	TH1D* hDYmumu_600M800  = cloneHisto(fDYmumu_600M800, hDir, sNameMC);
+	double lDYmumu_600M800 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
+	mcInversedLumiSum += 1./lDYmumu_600M800;
+	
+	sProc = "DYmumu_800M1000";
+	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fDYmumu_800M1000 = new TFile( path.c_str(), "READ" );
+	TH1D* hDYmumu_800M1000  = cloneHisto(fDYmumu_800M1000, hDir, sNameMC);
+	double lDYmumu_800M1000 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
+	mcInversedLumiSum += 1./lDYmumu_800M1000;
+	
+	sProc = "DYmumu_1000M1250";
+	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fDYmumu_1000M1250 = new TFile( path.c_str(), "READ" );
+	TH1D* hDYmumu_1000M1250  = cloneHisto(fDYmumu_1000M1250, hDir, sNameMC);
+	double lDYmumu_1000M1250 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
+	mcInversedLumiSum += 1./lDYmumu_1000M1250;
+	
+	sProc = "DYmumu_1250M1500";
+	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fDYmumu_1250M1500 = new TFile( path.c_str(), "READ" );
+	TH1D* hDYmumu_1250M1500  = cloneHisto(fDYmumu_1250M1500, hDir, sNameMC);
+	double lDYmumu_1250M1500 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
+	mcInversedLumiSum += 1./lDYmumu_1250M1500;
+	
+	sProc = "DYmumu_1500M1750";
+	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fDYmumu_1500M1750 = new TFile( path.c_str(), "READ" );
+	TH1D* hDYmumu_1500M1750  = cloneHisto(fDYmumu_1500M1750, hDir, sNameMC);
+	double lDYmumu_1500M1750 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
+	mcInversedLumiSum += 1./lDYmumu_1500M1750;
+	
+	sProc = "DYmumu_1750M2000";
+	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fDYmumu_1750M2000 = new TFile( path.c_str(), "READ" );
+	TH1D* hDYmumu_1750M2000  = cloneHisto(fDYmumu_1750M2000, hDir, sNameMC);
+	double lDYmumu_1750M2000 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
+	mcInversedLumiSum += 1./lDYmumu_1750M2000;
+	
+	sProc = "DYmumu_M2000";
+	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fDYmumu_M2000 = new TFile( path.c_str(), "READ" );
+	TH1D* hDYmumu_M2000  = cloneHisto(fDYmumu_M2000, hDir, sNameMC);
+	double lDYmumu_M2000 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
+	mcInversedLumiSum += 1./lDYmumu_M2000;
+	*/
+	
+	
+	channel = "DYmumu";
+	TH1D* hBGsum  = (TH1D*)hDYmumu_75M120->Clone("");
+	hBGsum->Reset();
 	hBGsum->SetLineColor(kRed);
-	//hBGsum->SetFillColor(kRed);
 	hBGsum->SetLineWidth(2);
-	//hBGsum->SetMarkerStyle(21);
-	//hBGsum->SetMarkerColor(kBlue);
+	hBGsum->SetMarkerStyle(2);
+	hBGsum->SetMarkerSize(1);
+	hBGsum->SetMarkerColor(kRed);
 	hBGsum->SetTitle("");
 	leg->AddEntry( hBGsum, channel.c_str(), "l");
 	
-	sProc = "ZZ_Herwig";
-	path = dir + "ZZ_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
-	channel = "ZZ";
-	TH1D* hZZ = setRegularMChisto(sProc, channel, path, hDir, hName, kBlue);
-
-	sProc = "WZ_Herwig";
-	path = dir + "WZ_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
-	channel = "WZ";
-	TH1D* hWZ = setRegularMChisto(sProc, channel, path, hDir, hName, kBlue);
 	
-	sProc = "WW_Herwig";
-	path = dir + "WW_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
-	channel = "WW";
-	TH1D* hWW = setRegularMChisto(sProc, channel, path, hDir, hName, kBlue);
+	// epsilonAverage = SUM{h(i)*w(i)}/SUM{w(i)}
+	// w(i) = L(data)/L(i)
+	// epsilonAverage = SUM{h(i)*(L(data)/L(i))}/SUM{L(data)/L(i)}
+	//                = SUM{h(i)/L(i)}/SUM{1/L(i)}
 	
-	sProc = "T1_McAtNlo_Jimmy";
-	path = dir + "T1_McAtNlo_Jimmy/" + m_muonSelector + analysisType + sProc + ".root";
-	channel = "t #bar{t}";
-	TH1D* hTTbar = setRegularMChisto(sProc, channel, path, hDir, hName, kBlue);
+	ScaleWerrors(hDYmumu_75M120,    1./lDYmumu_75M120);
+	ScaleWerrors(hDYmumu_120M250,   1./lDYmumu_120M250);
+	ScaleWerrors(hDYmumu_250M400,   1./lDYmumu_250M400);
+	ScaleWerrors(hDYmumu_400M600,   1./lDYmumu_400M600);
+	//ScaleWerrors(hDYmumu_600M800,   1./lDYmumu_600M800);
+	//ScaleWerrors(hDYmumu_800M1000,  1./lDYmumu_800M1000);
+	//ScaleWerrors(hDYmumu_1000M1250, 1./lDYmumu_1000M1250);
+	//ScaleWerrors(hDYmumu_1250M1500, 1./lDYmumu_1250M1500);
+	//ScaleWerrors(hDYmumu_1500M1750, 1./lDYmumu_1500M1750);
+	//ScaleWerrors(hDYmumu_1750M2000, 1./lDYmumu_1750M2000);
+	//ScaleWerrors(hDYmumu_M2000,     1./lDYmumu_M2000);
 	
-	channel = "Binned DY#tau#tau";
-	TH1D* hDYtautau = getNormDYtautau(dir+"DYtautau/"+m_muonSelector, hDir, hName);
+	addNscale(hBGsum,1., hDYmumu_75M120,  1./mcInversedLumiSum);
+	addNscale(hBGsum,1., hDYmumu_120M250, 1./mcInversedLumiSum);
+	addNscale(hBGsum,1., hDYmumu_250M400, 1./mcInversedLumiSum);
+	addNscale(hBGsum,1., hDYmumu_400M600, 1./mcInversedLumiSum);
 	
-	hBGsum->Add(hZZ);
-	hBGsum->Add(hWZ);
-	hBGsum->Add(hWW);
-	hBGsum->Add(hTTbar);
-	hBGsum->Add(hDYtautau);
 	
-	pad->cd();
-	hBGsum->SetMinimum(m_miny);
-	hBGsum->SetMaximum(m_maxy);
-	//hBGsum->Draw("E4");
+	
+	cnv->cd();
+	hBGsum->SetMinimum(0.);
+	hBGsum->SetMaximum(1.1);
 	hBGsum->Draw();
 	hData->Draw("e1x0SAMES");
 	pvtxt->Draw("SAMES");
 	pvtxt1->Draw("SAMES");
 	leg->Draw("SAMES");
-	pad->RedrawAxis();
+	cnv->RedrawAxis();
 
 	
-	if(m_doRatio)
-	{
-		TH1D* hRat = (TH1D*)hData->Clone("ratio");
-		hRat->Reset();
-		TH1D* hRatUp = (TH1D*)hData->Clone("ratUp");
-		hRatUp->Reset();
-		TH1D* hRatDwn = (TH1D*)hData->Clone("ratDwn");
-		hRatDwn->Reset();
+	//size_t pos = hNameFixed.find("||");
+	//if(pos!=string::npos) hNameFixed = hNameFixed.substr(0,pos-1) + "_OR_" + hNameFixed.substr(pos+2);
+	//TString fName = "figures/trigMCvsData_" + (TString)hNameFixed + "." + (TString)muonLabel;
 	
-		double minrat = (m_minratiox==0.) ? hData->GetXaxis()->GetXmin() : m_minratiox;
-		ratio(minrat, hRat->GetXaxis()->GetXmax(), hData, hBGsum, hRat, hRatUp, hRatDwn);
-		pad_ratio->cd();
-		drawRatio(minrat, hRat->GetXaxis()->GetXmax(), hRat);
-		pad_ratio->RedrawAxis();
-	}
-	else
-	{
-		TH1D* hRelDiff = (TH1D*)hData->Clone("RelDiffio");
-		hRelDiff->Reset();
-	
-		double minRelDiff = (m_minRelDiffx==0.) ? hData->GetXaxis()->GetXmin() : m_minRelDiffx;
-		relDiff(hData, hBGsum, hRelDiff);
-		pad_ratio->cd();
-		drawRelDiff(minRelDiff, hRelDiff->GetXaxis()->GetXmax(), hRelDiff);
-		pad_ratio->RedrawAxis();
-	}
-	
-	size_t pos = hNameFixed.find("||");
-	if(pos!=string::npos) hNameFixed = hNameFixed.substr(0,pos-1) + "_OR_" + hNameFixed.substr(pos+2);
-	
-	TString fName = "figures/" + (TString)hNameFixed + "." + (TString)muonLabel;
+	TString fName = "figures/trigMCvsData_" + (TString)sVar + "." + (TString)muonLabel;
 	cnv->SaveAs(fName+".eps");
 	cnv->SaveAs(fName+".C");
 	cnv->SaveAs(fName+".root");

@@ -155,7 +155,7 @@ void execute()
 	string refframe = "CosThetaCS";
 	//string refframe = "CosThetaHE";
 	bool doLogM = true;
-	bool doLogx = false;
+	bool doLogx = true;
 	
 	float GeV2TeV = 1.e-3;
 	int    imass_nbins = 20;
@@ -190,19 +190,16 @@ void execute()
 
 	gStyle->SetOptStat(0);
 	
-	TLegend* leg = new TLegend(0.7107023,0.7098446,0.867893,0.8626943,NULL,"brNDC");
+	TLegend* leg = new TLegend(0.6262542,0.7098446,0.867893,0.8717617,NULL,"brNDC");
 	leg->SetFillColor(kWhite);
 	
+	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
 	string L = "43";
 	string lumilabel = "#intLdt~" + L + " pb^{-1}";
 	TPaveText* pvtxt = new TPaveText(0.1195652,0.1334197,0.2458194,0.2318653,"brNDC");
 	pvtxt->SetFillColor(kWhite);
-	TText* txt = pvtxt->AddText( lumilabel.c_str() );
-	
-	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
-	TPaveText* pvtxt1 = new TPaveText(0.1421405,0.126943,0.2165552,0.1683938,"brNDC");
-	pvtxt1->SetFillColor(kWhite);
-	TText* txt1 = pvtxt1->AddText( muonLabel.c_str() );
+	TText* txt  = pvtxt->AddText( lumilabel.c_str() );
+	TText* txt1 = pvtxt->AddText( muonLabel.c_str() );
 	
 	string cName = "cnv_" + hNameFixed;
 	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);
@@ -241,7 +238,7 @@ void execute()
 	hData->SetMarkerStyle(20);
 	hData->SetMarkerColor(kBlack);
 	hData->SetMarkerSize(1.2);
-	leg->AddEntry( hData, "Data: A_{FB}#left(#hat{m}_{#mu#mu}#right)", "lep");
+	leg->AddEntry( hData, "Data: A_{FB}", "lep");
 	leg->AddEntry( hData, "Data: #frac{dN}{d#hat{m}_{#mu#mu}}", "l");
 	
 	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
@@ -281,7 +278,7 @@ void execute()
 	
 	
 	// Backgrounds
-	channel = "DYmumu: A_{FB}#left(#hat{m}_{#mu#mu}#right)";
+	channel = "DYmumu: A_{FB}(stat' uncertainty)";
 	TH1D* hBGsum;
 	if(doLogM) hBGsum = new TH1D("Afb_sumBG","Afb_sumBG", imass_nbins, M_bins );
 	else       hBGsum = new TH1D("Afb_sumBG","Afb_sumBG", imass_nbins, imass_min, imass_max );
@@ -427,7 +424,6 @@ void execute()
 	//hBGsumTmp->Draw("CSAMES");
 	hData->Draw("e1x0SAMES");
 	pvtxt->Draw("SAMES");
-	pvtxt1->Draw("SAMES");
 	leg->Draw("SAMES");
 	TLine* lUnit = new TLine(imass_min,0.,imass_max,0.);
 	lUnit->SetLineColor(kBlack);

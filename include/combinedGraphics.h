@@ -112,9 +112,10 @@ class combinedGraphics : public analysisModules
 		void relDiff(TH1D* hInp, TH1D* hRef, TH1D* hRelDiffPos, TH1D* hRelDiffNeg);
 		void relDiff(TH1D* hInp, TH1D* hRef, TH1D* hRelDiff);
 		void ratio(double xmin, double xmax, TH1D* hInp, TH1D* hRef, TH1D* hRat, TH1D* hRatUp, TH1D* hRatDwn);
+		void ratio(double xmin, double xmax, TH1D* hInp, TH1D* hRef, TH1D* hRat);
 		void drawRelDiff(double xmin, double xmax, TH1D* hRelDiff);
 		void drawRatio(double xmin, double xmax, TH1D* hRat);
-		void drawRatio(double xmin, double xmax, double ymin, double ymax, TH1D* hRat);
+		void drawRatio(double xmin, double xmax, double ymin, double ymax, string legTxt, TH1D* hRat);
 		void drawRatioWithBand(double xmin, double xmax, TH1D* hRat, TH1D* hRatUp, TH1D* hRatDwn);
 		
 		TH1D* getNormDYmumu(string dir, string hDir, string hName);
@@ -132,7 +133,8 @@ class combinedGraphics : public analysisModules
 		void draw_AfbMCvsData(string dir, string hDir, string hName, string xTitle, string yTitle);
 		
 		void draw_trigData(string dir, string hDir, string hName);
-		void draw_trigTRUvsTnP(string dir, string hDir, string hName);
+		//void draw_trigTRUvsTnP(string dir, string hDir, string hName);
+		void draw_trigTRUvsTnP(string dir, string hDir, string sVar);
 		void draw_trigMCvsData(string dir, string hDir, string sVar);
 	
 	private:

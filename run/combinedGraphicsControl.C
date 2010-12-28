@@ -140,13 +140,55 @@ void combinedGraphicsControl::executeTrigTRUvsTnP()
 void combinedGraphicsControl::executeTrigMCvsData()
 {
 	m_combinedGraphics->setStyle();
+	/*
+	TStyle* defaultstyle = (TStyle*)gROOT->GetStyle("Default");
+	defaultstyle->cd();
+	
+	defaultstyle->SetFrameBorderMode(0);
+	defaultstyle->SetCanvasBorderMode(0);
+	defaultstyle->SetPadBorderMode(0);
+	defaultstyle->SetPadColor(0);
+	defaultstyle->SetCanvasColor(0);
+	defaultstyle->SetStatColor(0);
+	defaultstyle->SetFillColor(0);
+	defaultstyle->SetFrameFillColor(0);
+	defaultstyle->SetTitleFillColor(0);
 
+	// set the paper & margin sizes
+	defaultstyle->SetPaperSize(20,26);
+	defaultstyle->SetPadTopMargin(0.05);
+	defaultstyle->SetPadRightMargin(0.05);
+	defaultstyle->SetPadBottomMargin(0.16);
+	defaultstyle->SetPadLeftMargin(0.12);
+
+	// use large fonts
+	//Int_t font=72;
+	Int_t font=42;
+	Double_t tsize=0.05;
+	defaultstyle->SetTextFont(font);
+	defaultstyle->SetTextSize(tsize);
+	defaultstyle->SetLabelFont(font,"x");
+	defaultstyle->SetTitleFont(font,"x");
+	defaultstyle->SetLabelFont(font,"y");
+	defaultstyle->SetTitleFont(font,"y");
+	defaultstyle->SetLabelFont(font,"z");
+	defaultstyle->SetTitleFont(font,"z");
+
+	defaultstyle->SetLabelSize(tsize,"x");
+	defaultstyle->SetTitleSize(tsize,"x");
+	defaultstyle->SetLabelSize(tsize,"y");
+	defaultstyle->SetTitleSize(tsize,"y");
+	defaultstyle->SetLabelSize(tsize,"z");
+	defaultstyle->SetTitleSize(tsize,"z");
+	*/
+	
 	//string dir  = "/data/hod/D3PDdigest/rel15_barrel_selection/";
 	string dir  = "/data/hod/D3PDdigest/rel15_eta24_selection/";
-	
+
 	m_combinedGraphics->draw_trigMCvsData(dir, "efficiency", "pT");
 	m_combinedGraphics->draw_trigMCvsData(dir, "efficiency", "eta");
 	m_combinedGraphics->draw_trigMCvsData(dir, "efficiency", "phi");
+
 	
 	/*
 	m_combinedGraphics->draw_trigMCvsData(dir, "efficiency", "tNp_effi_pT.L1_MU10", "pT");

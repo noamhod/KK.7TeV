@@ -183,8 +183,8 @@ void execute()
 	string m_dataAnalysisSelector = "digest";	
 	string m_muonSelector = "staco/";
 
-	double m_miny = -1.05;
-	double m_maxy = +1.05;
+	double m_miny = -0.6;
+	double m_maxy = +0.6;
 
 	string hNameFixed = hName;
 
@@ -267,6 +267,9 @@ void execute()
 	double dafb = 0.;
 	for(Int_t b=1 ; b<=hData->GetNbinsX() ; b++)
 	{
+		// norm to bin width
+		hDataM->SetBinContent(b, hDataM->GetBinContent(b)/hDataM->GetBinWidth(b));
+		
 		fillVec(Afb_data_tree, hData, b); // the VCOSTH vector is full
 		if((int)VCOSTH->size()<minEntriesDATA) continue;
 		minimize(a4, da4);
@@ -412,7 +415,7 @@ void execute()
 	
 	pad_mHat->Draw();
 	pad_mHat->cd();
-	hDataM->GetYaxis()->SetRangeUser(5.e-1,1.5*hDataM->GetMaximum());
+	hDataM->GetYaxis()->SetRangeUser(1,1.5*hDataM->GetMaximum());
 	hDataM->Draw();
 
 	cnv->cd();

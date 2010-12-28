@@ -591,6 +591,8 @@ void combinedGraphics::drawRatio(double xmin, double xmax, TH1D* hRat)
 	hRatFrame->SetMaximum(1*hmax);
 	hRatFrame->SetMinimum(hmin);
 	hRatFrame->SetTitle("");
+	hRatFrame->SetYTitle("");
+	hRatFrame->SetXTitle("");
 	hRatFrame->Draw();
 	
 	Int_t nfullbins = 0;
@@ -611,13 +613,16 @@ void combinedGraphics::drawRatio(double xmin, double xmax, TH1D* hRat)
 	TGraph *gRat = new TGraph(nfullbins, imassArray, ratioArray);
 	gRat->SetLineStyle(1);
 	gRat->SetLineWidth(2);
-	gRat->SetLineColor(kRed);
+	gRat->SetLineColor(kBlue);
 	gRat->SetTitle("");
 	gRat->Draw("CSAMES");
 	
 	hRat->SetTitle("");
-	//hRat->SetMarkerSize(0.8);
-	hRat->Draw("elx0SAMES");
+	hRat->SetLineColor(kBlack);
+	hRat->SetMarkerStyle(20);
+	hRat->SetMarkerSize(1);
+	hRat->SetMarkerColor(kBlack);
+	hRat->Draw("elSAMES");
 	
 	TLegend* leg_ratio = new TLegend(0.8008749,0.6868085,0.8951647,0.8289424,NULL,"brNDC");
 	leg_ratio->SetFillColor(kWhite);
@@ -627,16 +632,61 @@ void combinedGraphics::drawRatio(double xmin, double xmax, TH1D* hRat)
 	TLine* lUnit = new TLine(hRatFrame->GetXaxis()->GetXmin(),1,hRatFrame->GetXaxis()->GetXmax(),1);
 	lUnit->SetLineColor(kBlack);
 	lUnit->Draw("SAMES");
+}
+
+void combinedGraphics::drawRatio(double xmin, double xmax, double ymin, double ymax, TH1D* hRat)
+{
+	hFile->cd();
+
+	double hmin = ymin;
+	double hmax = ymax;
+
+	TH1D* hRatFrame = (TH1D*)hRat->Clone("");
+	hRatFrame->Reset();
+	hRatFrame->SetMaximum(1*hmax);
+	hRatFrame->SetMinimum(hmin);
+	hRatFrame->SetTitle("");
+	hRatFrame->SetYTitle("");
+	hRatFrame->SetXTitle("");
+	hRatFrame->Draw();
 	
-	/*
-	TLine* lLowBound = new TLine(xmin,hmin,xmin,hmax);
-	lLowBound->SetLineColor(kBlack);
-	lLowBound->SetLineWidth(3);
-	if(xmin!=hRatFrame->GetXaxis()->GetXmin())
+	Int_t nfullbins = 0;
+	for(Int_t i=1 ; i<=hRat->GetNbinsX() ; i++) { if(hRat->GetBinContent(i)>0) nfullbins++; }
+	Double_t *imassArray = (Double_t *)malloc(nfullbins*sizeof(Double_t));
+	Double_t *ratioArray = (Double_t *)malloc(nfullbins*sizeof(Double_t));
+	TAxis *xaxis = hRat->GetXaxis();
+	int index = 0;
+	for(Int_t i=1 ; i<=hRat->GetNbinsX() ; i++)
 	{
-		lLowBound->Draw("SAMES");
+		if(hRat->GetBinContent(i)>0)
+		{
+			imassArray[index] = xaxis->GetBinCenter(i);
+			ratioArray[index] = hRat->GetBinContent(i);
+			index++;
+		}
 	}
-	*/
+	TGraph *gRat = new TGraph(nfullbins, imassArray, ratioArray);
+	gRat->SetLineStyle(1);
+	gRat->SetLineWidth(2);
+	gRat->SetLineColor(kBlue);
+	gRat->SetTitle("");
+	gRat->Draw("CSAMES");
+	
+	hRat->SetTitle("");
+	hRat->SetLineColor(kBlack);
+	hRat->SetMarkerStyle(20);
+	hRat->SetMarkerSize(1);
+	hRat->SetMarkerColor(kBlack);
+	hRat->Draw("elSAMES");
+	
+	TLegend* leg_ratio = new TLegend(0.8008749,0.6868085,0.8951647,0.8289424,NULL,"brNDC");
+	leg_ratio->SetFillColor(kWhite);
+	leg_ratio->AddEntry( hRat, "R=#frac{Data}{MC}", "lep");
+	leg_ratio->Draw("SAMES");
+	
+	TLine* lUnit = new TLine(hRatFrame->GetXaxis()->GetXmin(),1,hRatFrame->GetXaxis()->GetXmax(),1);
+	lUnit->SetLineColor(kBlack);
+	lUnit->Draw("SAMES");
 }
 
 void combinedGraphics::drawRatioWithBand(double xmin, double xmax, TH1D* hRat, TH1D* hRatUp, TH1D* hRatDwn)
@@ -1842,6 +1892,25 @@ void combinedGraphics::draw_trigMCvsData(string dir, string hDir, string sVar)
 	
 	string cName = "cnv_trigMCvsData_" + sVar;
 	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);	
+	cnv->Divide(1,2);
+	
+	TVirtualPad* pad = cnv->cd(1);
+	pad->SetPad(0.009197324,0.2150259,0.9899666,0.9909326);
+	pad->SetFillColor(kWhite);
+	if(m_logx) pad->SetLogx();
+	if(m_logy) pad->SetLogy();
+	
+	TVirtualPad* pad_ratio = cnv->cd(2);
+	pad_ratio->SetPad(0.009197324,0.01036269,0.9899666,0.253886);
+	pad_ratio->SetFillColor(kWhite);
+	//pad_ratio->SetLogx();
+	//pad_ratio->SetLogy();
+	
+	cnv->Draw();
+	cnv->cd();
+	cnv->Update();
+	
+	
 	cnv->Draw();
 	cnv->cd();
 
@@ -1850,175 +1919,232 @@ void combinedGraphics::draw_trigMCvsData(string dir, string hDir, string sVar)
 	string sProc = "";
 	string channel = "";
 	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
+
 	
-	string sNameMC;
-	if(sVar=="pT") sNameMC = "tNp_effi_pT.L1_MU10";
-	if(sVar=="eta") sNameMC = "tNp_effi_eta.L1_MU10";
-	if(sVar=="phi") sNameMC = "tNp_effi_phi.L1_MU10";
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	
+	int nbins  = 0;
+	float xmin = 0;
+	float xmax = 0;
+	
+	string trigName     = "";
+	string sPrimaryTrig = "";
+	size_t pos   = 0;
+	float weight = 0;
+	string hTitle  = "";
+	string sBranch = "";
+	string xtitle  = "";
+	double ratioxmin;
+	string ytitle  = "#epsilon = #frac{N_{probes}}{N_{probe}^{candidates}}";
+	
+	vector<float>* cand = new vector<float>;
+	vector<float>* succ = new vector<float>;
+	vector<string>* svTrigName = new vector<string>;
+	
+	TH1D* hCandData = NULL;
+	TH1D* hSuccData = NULL;
+	TH1D* hEffiData = NULL;
+	TH1D* hCandMC = NULL;
+	TH1D* hSuccMC = NULL;
+	TH1D* hEffiMC = NULL;
+	
+	// https://twiki.cern.ch/twiki/bin/view/AtlasProtected/WZElectroweakCommonTopics
+	// pT bins  : [20.0, 40.0, 60.0, 80.0 ]
+	// eta bins : [ 0., 0.21, 0.42, 0.63, 0.84, 1.05, 1.37, 1.52, 1.74, 1.95, 2.18, 2.4 ]
+	// phi bins : [ ? ]
 	
 	
-	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-	// Data
+	Int_t pTnbins = tagNprobe_pT_nbins;
+	float pTmin_forLog = 1*GeV2TeV;
+	float pTmax_forLog = 100*GeV2TeV;
+	Double_t logpTmin = log10(pTmin_forLog);
+	Double_t logpTmax = log10(pTmax_forLog);
+	Double_t pTbins[tagNprobe_pT_nbins+1];
+	Double_t pTbinwidth = (Double_t)( (logpTmax-logpTmin)/(Double_t)pTnbins );
+	pTbins[0] = pTmin_forLog; // TeV
+	for(Int_t i=1 ; i<=pTnbins ; i++) pTbins[i] = TMath::Power( 10,(logpTmin + i*pTbinwidth) );
+	
+	//const int etanbins = 18;
+	//Double_t etabins[etanbins+1] = {-2.4,-1.95,-1.05,-0.908,-0.791,-0.652,-0.476,-0.324,-0.132,0,0.132,0.324,0.476,0.652,0.791,0.908,1.05,1.95,2.4};
+	const int etanbins = 22;
+	Double_t etabins[etanbins+1] = {-2.4,-2.18,-1.95,-1.74,-1.52,-1.37,-1.05,-0.84,-0.63,-0.42,-0.21,
+									0,
+									+0.21,+0.42,+0.63,+0.84,+1.05,+1.37,+1.52,+1.74,+1.95,+2.18,+2.4};
+	
+	//const phinbins_tgc = 8;
+	//const phinbins_rpc = 16;
+	//float phibins_tgc[phinbins_tgc+1] = {...};
+	//float phibins_rpc[phinbins_rpc+1] = {...};
+	
+	if(sVar=="pT")
+	{
+		nbins = tagNprobe_pT_nbins;
+		xmin  = tagNprobe_pT_min;
+		xmax  = tagNprobe_pT_max;
+		xtitle = "p_{T} TeV";
+		ratioxmin = 0.;
+		
+		hCandData = new TH1D("data_cand_pT", "data_cand_pT", pTnbins, pTbins);
+		hSuccData = new TH1D("data_succ_pT", "data_succ_pT", pTnbins, pTbins);
+		hEffiData = new TH1D("data_effi_pT", "data_effi_pT", pTnbins, pTbins);
+		
+		hCandMC = new TH1D("mc_cand_pT", "mc_cand_pT", pTnbins, pTbins);
+		hSuccMC = new TH1D("mc_succ_pT", "mc_succ_pT", pTnbins, pTbins);
+		hEffiMC = new TH1D("mc_effi_pT", "mc_effi_pT", pTnbins, pTbins);
+	}
+	if(sVar=="eta")
+	{
+		nbins = eta_nbins;
+		xmin  = eta_min;
+		xmax  = eta_max;
+		xtitle = "#eta";
+		ratioxmin = etabins[0];
+		
+		hCandData = new TH1D("data_cand_eta", "data_cand_eta", etanbins, etabins);
+		hSuccData = new TH1D("data_succ_eta", "data_succ_eta", etanbins, etabins);
+		hEffiData = new TH1D("data_effi_eta", "data_effi_eta", etanbins, etabins);
+		
+		hCandMC = new TH1D("mc_cand_eta", "mc_cand_eta", etanbins, etabins);
+		hSuccMC = new TH1D("mc_succ_eta", "mc_succ_eta", etanbins, etabins);
+		hEffiMC = new TH1D("mc_effi_eta", "mc_effi_eta", etanbins, etabins);
+	}
+	if(sVar=="phi")
+	{
+		nbins = phi_nbins;
+		xmin  = phi_min;
+		xmax  = phi_max;
+		xtitle = "#phi";
+		ratioxmin = phi_min;
+		
+		hCandData = new TH1D("data_cand_phi", "data_cand_phi", nbins, xmin, xmax);
+		hSuccData = new TH1D("data_succ_phi", "data_succ_phi", nbins, xmin, xmax);
+		hEffiData = new TH1D("data_effi_phi", "data_effi_phi", nbins, xmin, xmax);
+		
+		hCandMC = new TH1D("mc_cand_phi", "mc_cand_phi", nbins, xmin, xmax);
+		hSuccMC = new TH1D("mc_succ_phi", "mc_succ_phi", nbins, xmin, xmax);
+		hEffiMC = new TH1D("mc_effi_phi", "mc_effi_phi", nbins, xmin, xmax);
+	}
+	
+	
+	
+	///////////////////////////////////////////////
+	// DATA ///////////////////////////////////////
+	hEffiData->SetTitle("");
+	hEffiData->SetXTitle(xtitle.c_str());
+	hEffiData->SetYTitle(ytitle.c_str());
+	hEffiData->SetLineColor(kBlack);
+	hEffiData->SetLineWidth(1);
+	hEffiData->SetMarkerStyle(20);
+	hEffiData->SetMarkerColor(kBlack);
+	hEffiData->SetMarkerSize(1);
+	leg->AddEntry( hEffiData, "Data", "lep");
+	
 	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
 	path = dir + "AtoI2_ZprimeGRL/" + m_muonSelector + sData + ".root";
-	TFile* fdata = new TFile( path.c_str(), "READ" );
-	TH1D* hData = cloneHisto(fdata, hDir, "tNp_effi_"+sVar+".L1_MU10");
-	hData->Reset();
-	hData->SetTitle("");
-	leg->AddEntry( hData, "Data", "lep");
+	TFile* fData = new TFile( path.c_str(), "READ" );
+	TTree* trig_data_tree = (TTree*)fData->Get("efficiency/eff_tree");
+	sBranch = "tNp_cand_" + sVar;
+	trig_data_tree->SetBranchAddress( sBranch.c_str(),  &cand );
+	sBranch = "tNp_succ_" + sVar;
+	trig_data_tree->SetBranchAddress( sBranch.c_str(),  &succ );
+	trig_data_tree->SetBranchAddress( "tNp_triggerName", &svTrigName );
+	if (trig_data_tree==NULL)
+	{
+		cout << "ERROR: cannot retrieve tree named: efficiency/eff_tree" << endl;
+		exit(-1);
+	}
+	for (Long64_t l64t_jentry=0 ; l64t_jentry<trig_data_tree->GetEntries() ; l64t_jentry++)
+	{
+		trig_data_tree->GetEntry(l64t_jentry);
+		
+		if(svTrigName->size()==0) continue;
+		
+		trigName = svTrigName->at(0);
+		
+		sPrimaryTrig = "L1_MU10";
+		pos = trigName.find(sPrimaryTrig);
+		if(pos!=string::npos) weight = period2trigMap[sPrimaryTrig]/m_dataLumi_pb;
+		sPrimaryTrig = "EF_mu10";
+		pos = trigName.find(sPrimaryTrig);
+		if(pos!=string::npos) weight = period2trigMap[sPrimaryTrig]/m_dataLumi_pb;
+		sPrimaryTrig = "EF_mu13";
+		pos = trigName.find(sPrimaryTrig);
+		if(pos!=string::npos) weight = period2trigMap[sPrimaryTrig]/m_dataLumi_pb;
+		sPrimaryTrig = "EF_mu13_tight";
+		pos = trigName.find(sPrimaryTrig);
+		if(pos!=string::npos) weight = period2trigMap[sPrimaryTrig]/m_dataLumi_pb;
+		
+		for(int i=0 ; i<(int)cand->size() ; i++) hCandData->Fill(cand->at(i), weight);
+		for(int i=0 ; i<(int)succ->size() ; i++) hSuccData->Fill(succ->at(i), weight);
+	}
+	calculateEfficiency(hCandData,  hSuccData,  hEffiData,  false);
 	
-	string sEffPrefix = "tNp_effi_"+sVar+".";
-	string sPrimTrig = "";
-	string sTrig = "";
 	
-	sPrimTrig = "L1_MU10";
-	sTrig     = "L1_MU10";
-	addNscale(hData, 1., cloneHisto(fdata, hDir, sEffPrefix+sTrig), period2trigMap[sPrimTrig]/m_dataLumi_pb);
-	sPrimTrig = "EF_mu10";
-	sTrig     = "EF_mu10||EF_mu10_MG";
-	addNscale(hData, 1., cloneHisto(fdata, hDir, sEffPrefix+sTrig), period2trigMap[sPrimTrig]/m_dataLumi_pb);
-	sPrimTrig = "EF_mu13";
-	sTrig     = "EF_mu13||EF_mu13_MG";
-	addNscale(hData, 1., cloneHisto(fdata, hDir, sEffPrefix+sTrig), period2trigMap[sPrimTrig]/m_dataLumi_pb);
-	sPrimTrig = "EF_mu13_tight";
-	sTrig     = "EF_mu13_tight||EF_mu13_MG_tight";
-	addNscale(hData, 1., cloneHisto(fdata, hDir, sEffPrefix+sTrig), period2trigMap[sPrimTrig]/m_dataLumi_pb);
 	
-	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-	// MC
-	
-	double mcInversedLumiSum = 0.;
+	/////////////////////////////////////////////
+	// MC ///////////////////////////////////////
+	hEffiMC->SetTitle("");
+	hEffiMC->SetLineColor(kRed);
+	hEffiMC->SetLineWidth(1);
+	hEffiMC->SetMarkerStyle(1);
+	hEffiMC->SetMarkerSize(1);
+	hEffiMC->SetMarkerColor(kRed);
+	leg->AddEntry( hEffiMC, "DYmumu", "l");
 	
 	sProc = "DYmumu_75M120";
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
 	TFile* fDYmumu_75M120 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu_75M120  = cloneHisto(fDYmumu_75M120, hDir, sNameMC);
-	double lDYmumu_75M120 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
-	mcInversedLumiSum += 1./lDYmumu_75M120;
-	
-	sProc = "DYmumu_120M250";
-	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_120M250 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu_120M250  = cloneHisto(fDYmumu_120M250, hDir, sNameMC);
-	double lDYmumu_120M250 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
-	mcInversedLumiSum += 1./lDYmumu_120M250;
-	
-	sProc = "DYmumu_250M400";
-	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_250M400 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu_250M400  = cloneHisto(fDYmumu_250M400, hDir, sNameMC);
-	double lDYmumu_250M400 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
-	mcInversedLumiSum += 1./lDYmumu_250M400;
-	
-	sProc = "DYmumu_400M600";
-	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_400M600 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu_400M600  = cloneHisto(fDYmumu_400M600, hDir, sNameMC);
-	double lDYmumu_400M600 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
-	mcInversedLumiSum += 1./lDYmumu_400M600;
-	
-	/*
-	sProc = "DYmumu_600M800";
-	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_600M800 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu_600M800  = cloneHisto(fDYmumu_600M800, hDir, sNameMC);
-	double lDYmumu_600M800 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
-	mcInversedLumiSum += 1./lDYmumu_600M800;
-	
-	sProc = "DYmumu_800M1000";
-	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_800M1000 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu_800M1000  = cloneHisto(fDYmumu_800M1000, hDir, sNameMC);
-	double lDYmumu_800M1000 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
-	mcInversedLumiSum += 1./lDYmumu_800M1000;
-	
-	sProc = "DYmumu_1000M1250";
-	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_1000M1250 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu_1000M1250  = cloneHisto(fDYmumu_1000M1250, hDir, sNameMC);
-	double lDYmumu_1000M1250 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
-	mcInversedLumiSum += 1./lDYmumu_1000M1250;
-	
-	sProc = "DYmumu_1250M1500";
-	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_1250M1500 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu_1250M1500  = cloneHisto(fDYmumu_1250M1500, hDir, sNameMC);
-	double lDYmumu_1250M1500 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
-	mcInversedLumiSum += 1./lDYmumu_1250M1500;
-	
-	sProc = "DYmumu_1500M1750";
-	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_1500M1750 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu_1500M1750  = cloneHisto(fDYmumu_1500M1750, hDir, sNameMC);
-	double lDYmumu_1500M1750 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
-	mcInversedLumiSum += 1./lDYmumu_1500M1750;
-	
-	sProc = "DYmumu_1750M2000";
-	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_1750M2000 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu_1750M2000  = cloneHisto(fDYmumu_1750M2000, hDir, sNameMC);
-	double lDYmumu_1750M2000 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
-	mcInversedLumiSum += 1./lDYmumu_1750M2000;
-	
-	sProc = "DYmumu_M2000";
-	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_M2000 = new TFile( path.c_str(), "READ" );
-	TH1D* hDYmumu_M2000  = cloneHisto(fDYmumu_M2000, hDir, sNameMC);
-	double lDYmumu_M2000 = getMCLumi(mcProc2sigma[sProc],mcProc2br[sProc],mcProc2nevents[sProc],mcProc2kfactor[sProc],mcProc2geneff[sProc]);
-	mcInversedLumiSum += 1./lDYmumu_M2000;
-	*/
+	TTree* trig_mc_tree = (TTree*)fDYmumu_75M120->Get("efficiency/eff_tree");
+	sBranch = "tNp_cand_" + sVar;
+	trig_mc_tree->SetBranchAddress( sBranch.c_str(),  &cand );
+	sBranch = "tNp_succ_" + sVar;
+	trig_mc_tree->SetBranchAddress( sBranch.c_str(),  &succ );
+	trig_mc_tree->SetBranchAddress( "tNp_triggerName", &svTrigName );
+	if (trig_mc_tree==NULL)
+	{
+		cout << "ERROR: cannot retrieve tree named: efficiency/eff_tree" << endl;
+		exit(-1);
+	}
+	for (Long64_t l64t_jentry=0 ; l64t_jentry<trig_mc_tree->GetEntries() ; l64t_jentry++)
+	{
+		trig_mc_tree->GetEntry(l64t_jentry);
+		
+		if(svTrigName->size()==0) continue;
+		
+		trigName = svTrigName->at(0);
+		
+		sPrimaryTrig = "L1_MU10";
+		if(trigName!=sPrimaryTrig) continue; // only one trigger for MC
+		
+		for(int i=0 ; i<(int)cand->size() ; i++) hCandMC->Fill(cand->at(i));
+		for(int i=0 ; i<(int)succ->size() ; i++) hSuccMC->Fill(succ->at(i));
+	}
+	calculateEfficiency(hCandMC,  hSuccMC,  hEffiMC,  false);
 	
 	
-	channel = "DYmumu";
-	TH1D* hBGsum  = (TH1D*)hDYmumu_75M120->Clone("");
-	hBGsum->Reset();
-	hBGsum->SetLineColor(kRed);
-	hBGsum->SetLineWidth(2);
-	hBGsum->SetMarkerStyle(2);
-	hBGsum->SetMarkerSize(1);
-	hBGsum->SetMarkerColor(kRed);
-	hBGsum->SetTitle("");
-	leg->AddEntry( hBGsum, channel.c_str(), "l");
+	TH1D* hRat = (TH1D*)hEffiData->Clone("ratio");
+	hRat->Reset();
+	TH1D* hRatUp = (TH1D*)hEffiData->Clone("ratUp");
+	hRatUp->Reset();
+	TH1D* hRatDwn = (TH1D*)hEffiData->Clone("ratDwn");
+	hRatDwn->Reset();
+	ratio( hRat->GetXaxis()->GetXmin(), hRat->GetXaxis()->GetXmax(), hEffiData, hEffiMC, hRat, hRatUp, hRatDwn);
 	
 	
-	// epsilonAverage = SUM{h(i)*w(i)}/SUM{w(i)}
-	// w(i) = L(data)/L(i)
-	// epsilonAverage = SUM{h(i)*(L(data)/L(i))}/SUM{L(data)/L(i)}
-	//                = SUM{h(i)/L(i)}/SUM{1/L(i)}
-	
-	ScaleWerrors(hDYmumu_75M120,    1./lDYmumu_75M120);
-	ScaleWerrors(hDYmumu_120M250,   1./lDYmumu_120M250);
-	ScaleWerrors(hDYmumu_250M400,   1./lDYmumu_250M400);
-	ScaleWerrors(hDYmumu_400M600,   1./lDYmumu_400M600);
-	//ScaleWerrors(hDYmumu_600M800,   1./lDYmumu_600M800);
-	//ScaleWerrors(hDYmumu_800M1000,  1./lDYmumu_800M1000);
-	//ScaleWerrors(hDYmumu_1000M1250, 1./lDYmumu_1000M1250);
-	//ScaleWerrors(hDYmumu_1250M1500, 1./lDYmumu_1250M1500);
-	//ScaleWerrors(hDYmumu_1500M1750, 1./lDYmumu_1500M1750);
-	//ScaleWerrors(hDYmumu_1750M2000, 1./lDYmumu_1750M2000);
-	//ScaleWerrors(hDYmumu_M2000,     1./lDYmumu_M2000);
-	
-	addNscale(hBGsum,1., hDYmumu_75M120,  1./mcInversedLumiSum);
-	addNscale(hBGsum,1., hDYmumu_120M250, 1./mcInversedLumiSum);
-	addNscale(hBGsum,1., hDYmumu_250M400, 1./mcInversedLumiSum);
-	addNscale(hBGsum,1., hDYmumu_400M600, 1./mcInversedLumiSum);
-	
-	
-	
-	cnv->cd();
-	hBGsum->SetMinimum(0.);
-	hBGsum->SetMaximum(1.1);
-	hBGsum->Draw();
-	hData->Draw("e1x0SAMES");
+	pad->cd();
+	hEffiData->SetMinimum(0.);
+	hEffiData->SetMaximum(1.1);
+	hEffiData->Draw("e1");
+	hEffiMC->Draw("SAMES");
 	pvtxt->Draw("SAMES");
 	pvtxt1->Draw("SAMES");
 	leg->Draw("SAMES");
-	cnv->RedrawAxis();
-
+	pad->RedrawAxis();
 	
-	//size_t pos = hNameFixed.find("||");
-	//if(pos!=string::npos) hNameFixed = hNameFixed.substr(0,pos-1) + "_OR_" + hNameFixed.substr(pos+2);
-	//TString fName = "figures/trigMCvsData_" + (TString)hNameFixed + "." + (TString)muonLabel;
+	pad_ratio->cd();
+	drawRatio( hRat->GetXaxis()->GetXmin(), hRat->GetXaxis()->GetXmax(), 0., 2., hRat);
+	pad_ratio->RedrawAxis();
+
 	
 	TString fName = "figures/trigMCvsData_" + (TString)sVar + "." + (TString)muonLabel;
 	cnv->SaveAs(fName+".eps");

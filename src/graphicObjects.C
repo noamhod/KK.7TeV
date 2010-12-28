@@ -365,11 +365,11 @@ void graphicObjects::ginitialize()
 		pT_bins_cut[i] = TMath::Power( 10,(logpTmin_cut + i*pT_binwidth_cut) );
 	}
 	
-	phi_nbins   = 15;
+	phi_nbins   = 10;
 	phi_min     = -pi;
 	phi_max     = +pi;
 	
-	eta_nbins   = 150;
+	eta_nbins   = 50;
 	eta_min     = -3.;
 	eta_max     = 3.;
 
@@ -417,9 +417,9 @@ void graphicObjects::ginitialize()
 	Afb_min   = 60.*GeV2TeV;
 	Afb_max   = 460.*GeV2TeV;
 	
-	tagNprobe_pT_nbins = 150;
+	tagNprobe_pT_nbins = 16;
 	tagNprobe_pT_min   = 0.*MeV2GeV;
-	tagNprobe_pT_max   = 150.*MeV2GeV;
+	tagNprobe_pT_max   = 100.*MeV2GeV;
 }
 
 void graphicObjects::setStyle()

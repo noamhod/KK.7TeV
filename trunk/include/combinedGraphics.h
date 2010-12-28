@@ -114,6 +114,7 @@ class combinedGraphics : public analysisModules
 		void ratio(double xmin, double xmax, TH1D* hInp, TH1D* hRef, TH1D* hRat, TH1D* hRatUp, TH1D* hRatDwn);
 		void drawRelDiff(double xmin, double xmax, TH1D* hRelDiff);
 		void drawRatio(double xmin, double xmax, TH1D* hRat);
+		void drawRatio(double xmin, double xmax, double ymin, double ymax, TH1D* hRat);
 		void drawRatioWithBand(double xmin, double xmax, TH1D* hRat, TH1D* hRatUp, TH1D* hRatDwn);
 		
 		TH1D* getNormDYmumu(string dir, string hDir, string hName);

@@ -19,7 +19,7 @@
 //..BABAR style from RooLogon.C in workdir
 TStyle *atlasStyle= new TStyle("ATLAS","Atlas style");
 
-atlasStyle->SetErrorX(0.);
+//atlasStyle->SetErrorX(0.);
 
 // use plain black on white colors
 Int_t icol=0;

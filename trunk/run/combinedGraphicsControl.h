@@ -31,6 +31,7 @@ class combinedGraphicsControl : public utilities
 		void executeTrig();
 		void executeTrigTRUvsTnP();
 		void executeTrigMCvsData();
+		void executeTrigDataMap();
 
 	private:
 };

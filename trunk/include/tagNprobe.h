@@ -44,6 +44,7 @@ class tagNprobe
 						   TVectorP2VL& pmu, vector<float>* qOp, vector<float>* theta, vector<float>* charge,
 						   int& itag, int& iprobe);
 		void calculateEfficiency(TH1D* hCandidates, TH1D* hSucceeded, TH1D* hEfficiency, bool isTruth);
+		void calculateEfficiency(TH2D* hCandidates, TH2D* hSucceeded, TH2D* hEfficiency, bool isTruth);
 		void calculateEfficiency(TMapSP2TH1D* hMapCandidates, TMapSP2TH1D* hMapSucceeded, TMapSP2TH1D* hMapEfficiency, bool isTruth);
 
 		

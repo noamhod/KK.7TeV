@@ -136,6 +136,8 @@ class combinedGraphics : public analysisModules
 		//void draw_trigTRUvsTnP(string dir, string hDir, string hName);
 		void draw_trigTRUvsTnP(string dir, string hDir, string sVar);
 		void draw_trigMCvsData(string dir, string hDir, string sVar);
+		
+		void draw_trigMaps(string dir, string hDir, string sVar);
 	
 	private:
 };

@@ -438,7 +438,6 @@ void execute()
 	pad_mHat->Update();
 
 	cnv->Update();
-
 	
 	TString fName = "figures/" + (TString)hNameFixed + "_" + (TString)muonLabel;
 	cnv->SaveAs(fName+".eps");

@@ -101,6 +101,12 @@ void combinedGraphics::initialize(string analysisSelector, string muonSelector)
 	}
 	
 	//--- mc processes cross section values in pb
+	mcProc2sigma.insert(   make_pair("Zmumu",855.74));
+	mcProc2br.insert(      make_pair("Zmumu",1.));
+	mcProc2nevents.insert( make_pair("Zmumu",998722));
+	mcProc2geneff.insert(  make_pair("Zmumu",0.9));
+	mcProc2kfactor.insert( make_pair("Zmumu",1.));
+	
 	mcProc2sigma.insert(   make_pair("DYmumu_75M120",819.93));
 	mcProc2br.insert(      make_pair("DYmumu_75M120",1.));
 	mcProc2nevents.insert( make_pair("DYmumu_75M120",19994));
@@ -1905,14 +1911,15 @@ void combinedGraphics::draw_trigTRUvsTnP(string dir, string hDir, string sVar)
 	TLegend* leg = new TLegend(0.4572864,0.2132867,0.6243719,0.3496503,NULL,"brNDC");
 	leg->SetFillColor(kWhite);
 	
+	string sProc = "Zmumu";
 	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
 	TPaveText* pvtxt = new TPaveText(0.2550251,0.2237762,0.4208543,0.4,"brNDC");
 	pvtxt->SetFillColor(kWhite);
-	TText* txt  = pvtxt->AddText( "DYmumu" );
-	TText* txt1 = pvtxt->AddText( "75 #rightarrow 120 GeV" );
+	TText* txt  = pvtxt->AddText( sProc.c_str() );
+	//TText* txt1 = pvtxt->AddText( "75 #rightarrow 120 GeV" );
 	TText* txt2 = pvtxt->AddText( muonLabel.c_str() );
 	if(!txt) cout << "dummy" << endl;
-	if(!txt1) cout << "dummy" << endl;
+	//if(!txt1) cout << "dummy" << endl;
 	if(!txt2) cout << "dummy" << endl;
 	
 	
@@ -1937,7 +1944,6 @@ void combinedGraphics::draw_trigTRUvsTnP(string dir, string hDir, string sVar)
 	cnv->Update();
 
 	string path = "";
-	string sProc = "";
 	string channel = "";
 	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
 	
@@ -1974,35 +1980,42 @@ void combinedGraphics::draw_trigTRUvsTnP(string dir, string hDir, string sVar)
 	// phi bins : [ ? ]
 	
 	
+	/*
 	Int_t pTnbins = tagNprobe_pT_nbins;
 	float pTmin_forLog = 1*GeV2TeV;
 	float pTmax_forLog = 100*GeV2TeV;
 	Double_t logpTmin = log10(pTmin_forLog);
 	Double_t logpTmax = log10(pTmax_forLog);
-	Double_t pTbins[tagNprobe_pT_nbins+1];
+	Double_t pTbins[pTnbins+1];
 	Double_t pTbinwidth = (Double_t)( (logpTmax-logpTmin)/(Double_t)pTnbins );
 	pTbins[0] = pTmin_forLog; // TeV
 	for(Int_t i=1 ; i<=pTnbins ; i++) pTbins[i] = TMath::Power( 10,(logpTmin + i*pTbinwidth) );
+	*/
+	const int pTnbins = 11;
+	Double_t pTbins[pTnbins+1] = {0., 0.004, 0.006, 0.008, 0.010, 0.013, 0.020, 0.030, 0.040, 0.060, 0.080, 0.100};
 	
 	//const int etanbins = 18;
 	//Double_t etabins[etanbins+1] = {-2.4,-1.95,-1.05,-0.908,-0.791,-0.652,-0.476,-0.324,-0.132,0,0.132,0.324,0.476,0.652,0.791,0.908,1.05,1.95,2.4};
 	const int etanbins = 22;
 	Double_t etabins[etanbins+1] = {-2.4,-2.18,-1.95,-1.74,-1.52,-1.37,-1.05,-0.84,-0.63,-0.42,-0.21,
-									0,
-									+0.21,+0.42,+0.63,+0.84,+1.05,+1.37,+1.52,+1.74,+1.95,+2.18,+2.4};
+									0,+0.21,+0.42,+0.63,+0.84,+1.05,+1.37,+1.52,+1.74,+1.95,+2.18,+2.4
+								   };
 	
-	//const phinbins_tgc = 8;
-	//const phinbins_rpc = 16;
+	//const int phinbins_tgc = 8;
+	//const int phinbins_rpc = 16;
 	//float phibins_tgc[phinbins_tgc+1] = {...};
 	//float phibins_rpc[phinbins_rpc+1] = {...};
 	
+	const int phinbins = 10;
+	float dphi = fabs(phi_min/10);
+	float phibins[phinbins+1] = {phi_min, phi_min+1*dphi, phi_min+2*dphi, phi_min+3*dphi, phi_min+4*dphi, phi_min+5*dphi,
+								 phi_min+6*dphi, phi_min+7*dphi, phi_min+8*dphi, phi_min+9*dphi, phi_min+10*dphi
+								};
+	
 	if(sVar=="pT")
 	{
-		nbins = tagNprobe_pT_nbins;
-		xmin  = tagNprobe_pT_min;
-		xmax  = tagNprobe_pT_max;
 		xtitle = "p_{T} TeV";
-		ratioxmin = 0.;
+		ratioxmin = pTbins[0];
 		
 		hCandTNP = new TH1D("tNp_cand_pT", "tNp_cand_pT", pTnbins, pTbins);
 		hSuccTNP = new TH1D("tNp_succ_pT", "tNp_succ_pT", pTnbins, pTbins);
@@ -2014,9 +2027,6 @@ void combinedGraphics::draw_trigTRUvsTnP(string dir, string hDir, string sVar)
 	}
 	if(sVar=="eta")
 	{
-		nbins = eta_nbins;
-		xmin  = eta_min;
-		xmax  = eta_max;
 		xtitle = "#eta";
 		ratioxmin = etabins[0];
 		
@@ -2030,24 +2040,27 @@ void combinedGraphics::draw_trigTRUvsTnP(string dir, string hDir, string sVar)
 	}
 	if(sVar=="phi")
 	{
-		nbins = phi_nbins;
-		xmin  = phi_min;
-		xmax  = phi_max;
 		xtitle = "#phi";
 		ratioxmin = phi_min;
 		
-		hCandTNP = new TH1D("tNp_cand_phi", "tNp_cand_phi", nbins, xmin, xmax);
-		hSuccTNP = new TH1D("tNp_succ_phi", "tNp_succ_phi", nbins, xmin, xmax);
-		hEffiTNP = new TH1D("tNp_effi_phi", "tNp_effi_phi", nbins, xmin, xmax);
+		hCandTNP = new TH1D("tNp_cand_phi", "tNp_cand_phi", phinbins, phibins);
+		hSuccTNP = new TH1D("tNp_succ_phi", "tNp_succ_phi", phinbins, phibins);
+		hEffiTNP = new TH1D("tNp_effi_phi", "tNp_effi_phi", phinbins, phibins);
 		
-		hCandDirect = new TH1D("direct_cand_phi", "direct_cand_phi", nbins, xmin, xmax);
-		hSuccDirect = new TH1D("direct_succ_phi", "direct_succ_phi", nbins, xmin, xmax);
-		hEffiDirect = new TH1D("direct_effi_phi", "direct_effi_phi", nbins, xmin, xmax);
+		hCandDirect = new TH1D("direct_cand_phi", "direct_cand_phi", phinbins, phibins);
+		hSuccDirect = new TH1D("direct_succ_phi", "direct_succ_phi", phinbins, phibins);
+		hEffiDirect = new TH1D("direct_effi_phi", "direct_effi_phi", phinbins, phibins);
 	}
 	
+	/*
 	sProc = "DYmumu_75M120";
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
 	TFile* fDYmumu_75M120 = new TFile( path.c_str(), "READ" );
+	*/
+	
+	
+	path = dir + "Zmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fZmumu = new TFile( path.c_str(), "READ" );
 	
 	///////////////////////////////////////////////
 	// Tag&Probe ///////////////////////////////////////
@@ -2062,7 +2075,8 @@ void combinedGraphics::draw_trigTRUvsTnP(string dir, string hDir, string sVar)
 	leg->AddEntry( hEffiTNP, "MC: Tag&Probe", "lep");
 	
 	
-	TTree* trig_tNp_tree = (TTree*)fDYmumu_75M120->Get("efficiency/eff_tree");
+	//TTree* trig_tNp_tree = (TTree*)fDYmumu_75M120->Get("efficiency/eff_tree");
+	TTree* trig_tNp_tree = (TTree*)fZmumu->Get("efficiency/eff_tree");
 	sBranch = "tNp_cand_" + sVar;
 	trig_tNp_tree->SetBranchAddress( sBranch.c_str(),  &cand );
 	sBranch = "tNp_succ_" + sVar;
@@ -2100,7 +2114,8 @@ void combinedGraphics::draw_trigTRUvsTnP(string dir, string hDir, string sVar)
 	leg->AddEntry( hEffiDirect, "MC: Direct", "l");
 	
 	
-	TTree* trig_direct_tree = (TTree*)fDYmumu_75M120->Get("efficiency/eff_tree");
+	//TTree* trig_direct_tree = (TTree*)fDYmumu_75M120->Get("efficiency/eff_tree");
+	TTree* trig_direct_tree = (TTree*)fZmumu->Get("efficiency/eff_tree");
 	sBranch = "tru_cand_" + sVar;
 	trig_direct_tree->SetBranchAddress( sBranch.c_str(),  &cand );
 	sBranch = "tru_succ_" + sVar;
@@ -2236,15 +2251,20 @@ void combinedGraphics::draw_trigMCvsData(string dir, string hDir, string sVar)
 	// eta bins : [ 0., 0.21, 0.42, 0.63, 0.84, 1.05, 1.37, 1.52, 1.74, 1.95, 2.18, 2.4 ]
 	// phi bins : [ ? ]
 	
+	/*
 	Int_t pTnbins = tagNprobe_pT_nbins;
 	float pTmin_forLog = 1*GeV2TeV;
 	float pTmax_forLog = 100*GeV2TeV;
 	Double_t logpTmin = log10(pTmin_forLog);
 	Double_t logpTmax = log10(pTmax_forLog);
-	Double_t pTbins[tagNprobe_pT_nbins+1];
+	Double_t pTbins[pTnbins+1];
 	Double_t pTbinwidth = (Double_t)( (logpTmax-logpTmin)/(Double_t)pTnbins );
 	pTbins[0] = pTmin_forLog; // TeV
 	for(Int_t i=1 ; i<=pTnbins ; i++) pTbins[i] = TMath::Power( 10,(logpTmin + i*pTbinwidth) );
+	*/
+	const int pTnbins = 11;
+	Double_t pTbins[pTnbins+1] = {0., 0.004, 0.006, 0.008, 0.010, 0.013, 0.020, 0.030, 0.040, 0.060, 0.080, 0.100};
+	
 	
 	//const int etanbins = 18;
 	//Double_t etabins[etanbins+1] = {-2.4,-1.95,-1.05,-0.908,-0.791,-0.652,-0.476,-0.324,-0.132,0,0.132,0.324,0.476,0.652,0.791,0.908,1.05,1.95,2.4};
@@ -2252,18 +2272,21 @@ void combinedGraphics::draw_trigMCvsData(string dir, string hDir, string sVar)
 	Double_t etabins[etanbins+1] = {-2.4,-2.18,-1.95,-1.74,-1.52,-1.37,-1.05,-0.84,-0.63,-0.42,-0.21,
 									0,
 									+0.21,+0.42,+0.63,+0.84,+1.05,+1.37,+1.52,+1.74,+1.95,+2.18,+2.4};
-	//const phinbins_tgc = 8;
-	//const phinbins_rpc = 16;
+	//const int phinbins_tgc = 8;
+	//const int phinbins_rpc = 16;
 	//float phibins_tgc[phinbins_tgc+1] = {...};
 	//float phibins_rpc[phinbins_rpc+1] = {...};
 	
+	const int phinbins = 10;
+	float dphi = fabs(phi_min/10);
+	float phibins[phinbins+1] = {phi_min, phi_min+1*dphi, phi_min+2*dphi, phi_min+3*dphi, phi_min+4*dphi, phi_min+5*dphi,
+								 phi_min+6*dphi, phi_min+7*dphi, phi_min+8*dphi, phi_min+9*dphi, phi_min+10*dphi
+								};
+	
 	if(sVar=="pT")
 	{
-		nbins = tagNprobe_pT_nbins;
-		xmin  = tagNprobe_pT_min;
-		xmax  = tagNprobe_pT_max;
 		xtitle = "p_{T} TeV";
-		ratioxmin = 0.;
+		ratioxmin = pTbins[0];
 		
 		hCandData = new TH1D("data_cand_pT", "data_cand_pT", pTnbins, pTbins);
 		hSuccData = new TH1D("data_succ_pT", "data_succ_pT", pTnbins, pTbins);
@@ -2275,9 +2298,6 @@ void combinedGraphics::draw_trigMCvsData(string dir, string hDir, string sVar)
 	}
 	if(sVar=="eta")
 	{
-		nbins = eta_nbins;
-		xmin  = eta_min;
-		xmax  = eta_max;
 		xtitle = "#eta";
 		ratioxmin = etabins[0];
 		
@@ -2291,19 +2311,16 @@ void combinedGraphics::draw_trigMCvsData(string dir, string hDir, string sVar)
 	}
 	if(sVar=="phi")
 	{
-		nbins = phi_nbins;
-		xmin  = phi_min;
-		xmax  = phi_max;
 		xtitle = "#phi";
 		ratioxmin = phi_min;
 		
-		hCandData = new TH1D("data_cand_phi", "data_cand_phi", nbins, xmin, xmax);
-		hSuccData = new TH1D("data_succ_phi", "data_succ_phi", nbins, xmin, xmax);
-		hEffiData = new TH1D("data_effi_phi", "data_effi_phi", nbins, xmin, xmax);
+		hCandData = new TH1D("data_cand_phi", "data_cand_phi", phinbins, phibins);
+		hSuccData = new TH1D("data_succ_phi", "data_succ_phi", phinbins, phibins);
+		hEffiData = new TH1D("data_effi_phi", "data_effi_phi", phinbins, phibins);
 		
-		hCandMC = new TH1D("mc_cand_phi", "mc_cand_phi", nbins, xmin, xmax);
-		hSuccMC = new TH1D("mc_succ_phi", "mc_succ_phi", nbins, xmin, xmax);
-		hEffiMC = new TH1D("mc_effi_phi", "mc_effi_phi", nbins, xmin, xmax);
+		hCandMC = new TH1D("mc_cand_phi", "mc_cand_phi", phinbins, phibins);
+		hSuccMC = new TH1D("mc_succ_phi", "mc_succ_phi", phinbins, phibins);
+		hEffiMC = new TH1D("mc_effi_phi", "mc_effi_phi", phinbins, phibins);
 	}
 	
 	///////////////////////////////////////////////
@@ -2366,12 +2383,21 @@ void combinedGraphics::draw_trigMCvsData(string dir, string hDir, string sVar)
 	hEffiMC->SetMarkerStyle(1);
 	hEffiMC->SetMarkerSize(1);
 	hEffiMC->SetMarkerColor(kRed);
-	leg->AddEntry( hEffiMC, "DYmumu", "l");
 	
+	
+	/*
 	sProc = "DYmumu_75M120";
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
 	TFile* fDYmumu_75M120 = new TFile( path.c_str(), "READ" );
 	TTree* trig_mc_tree = (TTree*)fDYmumu_75M120->Get("efficiency/eff_tree");
+	*/
+	
+	sProc = "Zmumu";
+	path = dir + "Zmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fZmumu = new TFile( path.c_str(), "READ" );
+	TTree* trig_mc_tree = (TTree*)fZmumu->Get("efficiency/eff_tree");
+	leg->AddEntry( hEffiMC, sProc.c_str(), "l");
+	
 	sBranch = "tNp_cand_" + sVar;
 	trig_mc_tree->SetBranchAddress( sBranch.c_str(),  &cand );
 	sBranch = "tNp_succ_" + sVar;
@@ -2414,10 +2440,377 @@ void combinedGraphics::draw_trigMCvsData(string dir, string hDir, string sVar)
 	pad_ratio->cd();
 	drawRatio( hRat->GetXaxis()->GetXmin(), hRat->GetXaxis()->GetXmax(), 0., 2., "R=#frac{Data}{MC}", hRat);
 	pad_ratio->RedrawAxis();
-
+	
 	TString fName = "figures/trigMCvsData_" + (TString)sVar + "." + (TString)muonLabel;
 	cnv->SaveAs(fName+".eps");
 	cnv->SaveAs(fName+".C");
 	cnv->SaveAs(fName+".root");
 	cnv->SaveAs(fName+".png");
 }
+
+
+void combinedGraphics::draw_trigMaps(string dir, string hDir, string sVar)
+{
+	cout << "getting " << dir + " : " + hDir << " : " << sVar << endl;
+	
+	hFile->cd();
+
+	gStyle->SetOptStat(0);
+	gStyle->SetPalette(1);
+	
+	gStyle->SetFrameBorderMode(0);
+	gStyle->SetCanvasBorderMode(0);
+	gStyle->SetPadBorderMode(0);
+	gStyle->SetPadColor(0);
+	gStyle->SetCanvasColor(0);
+	gStyle->SetStatColor(0);
+	gStyle->SetFrameFillColor(0);
+	gStyle->SetTitleFillColor(0);
+	
+	TLegend* leg = new TLegend(0.4572864,0.2132867,0.6243719,0.3496503,NULL,"brNDC");
+	leg->SetFillColor(kWhite);
+	
+	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
+	m_dataLumi_pb = dataLumi_ipb;
+	stringstream strm;
+	string L;
+	string lumilabel = "";
+	strm << setprecision(2);
+	strm << dataLumi_ipb;
+	strm >> L;
+	lumilabel = "#intLdt~" + L + " pb^{-1}";
+	TPaveText* pvtxt = new TPaveText(0.2550251,0.2237762,0.4208543,0.3426573,"brNDC");
+	pvtxt->SetFillColor(kWhite);
+	TText* txt = pvtxt->AddText( lumilabel.c_str() );
+	TText* txt1 = pvtxt->AddText( muonLabel.c_str() );
+	if(!txt) cout << "dummy" << endl;
+	if(!txt1) cout << "dummy" << endl;
+	
+	
+	string cName = "cnv_trigMaps_" + sVar;
+	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);
+	cnv->SetFillColor(kWhite);
+	cnv->Divide(2,1);
+	
+	TVirtualPad* pad = cnv->cd(1);
+	pad->Divide(1,2);
+	pad->SetFillColor(kWhite);
+	
+	TVirtualPad* pad11 = pad->cd(1);
+	pad11->SetFillColor(kWhite);
+	TVirtualPad* pad12 = pad->cd(2);
+	pad12->SetFillColor(kWhite);
+	
+	TVirtualPad* pad_ratio = cnv->cd(2);
+	pad_ratio->SetFillColor(kWhite);
+
+	cnv->Draw();
+	cnv->cd();
+	cnv->Update();
+	
+	string path = "";
+	string sProc = "";
+	string channel = "";
+	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
+	
+	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	
+	string trigName     = "";
+	string sPrimaryTrig = "";
+	size_t pos   = 0;
+	float weight = 0;
+	string hTitle  = "";
+	string sBranch = "";
+	string xtitle  = "#eta";
+	string ytitle  = "#phi";
+	string ztitle  = "#epsilon";
+	double ratioxmin;
+	string title  = "#epsilon = N_{probes}/N_{probe}^{candidates}";
+	string sTitle = "";
+	
+	vector<float>* cand_pT = new vector<float>;
+	vector<float>* succ_pT = new vector<float>;
+	vector<float>* cand_eta = new vector<float>;
+	vector<float>* succ_eta = new vector<float>;
+	vector<float>* cand_phi = new vector<float>;
+	vector<float>* succ_phi = new vector<float>;
+	vector<string>* svTrigName = new vector<string>;
+	
+	TH2D* hCandData = NULL;
+	TH2D* hSuccData = NULL;
+	TH2D* hEffiData = NULL;
+	
+	TH2D* hCandMC = NULL;
+	TH2D* hSuccMC = NULL;
+	TH2D* hEffiMC = NULL;
+	
+	TH2D* hRatio = NULL;
+	
+	// https://twiki.cern.ch/twiki/bin/view/AtlasProtected/WZElectroweakCommonTopics
+	// pT bins  : [20.0, 40.0, 60.0, 80.0 ]
+	// eta bins : [ 0., 0.21, 0.42, 0.63, 0.84, 1.05, 1.37, 1.52, 1.74, 1.95, 2.18, 2.4 ]
+	// phi bins : [ ? ]
+	
+	/*
+	Int_t pTnbins = tagNprobe_pT_nbins;
+	float pTmin_forLog = 1*GeV2TeV;
+	float pTmax_forLog = 100*GeV2TeV;
+	Double_t logpTmin = log10(pTmin_forLog);
+	Double_t logpTmax = log10(pTmax_forLog);
+	Double_t pTbins[pTnbins+1];
+	Double_t pTbinwidth = (Double_t)( (logpTmax-logpTmin)/(Double_t)pTnbins );
+	pTbins[0] = pTmin_forLog; // TeV
+	for(Int_t i=1 ; i<=pTnbins ; i++) pTbins[i] = TMath::Power( 10,(logpTmin + i*pTbinwidth) );
+	*/
+	const int pTnbins = 11;
+	Double_t pTbins[pTnbins+1] = {0., 0.004, 0.006, 0.008, 0.010, 0.013, 0.020, 0.030, 0.040, 0.060, 0.080, 0.100};
+	
+	
+	//const int etanbins = 18;
+	//Double_t etabins[etanbins+1] = {-2.4,-1.95,-1.05,-0.908,-0.791,-0.652,-0.476,-0.324,-0.132,0,0.132,0.324,0.476,0.652,0.791,0.908,1.05,1.95,2.4};
+	const int etanbins = 22;
+	Double_t etabins[etanbins+1] = {-2.4,-2.18,-1.95,-1.74,-1.52,-1.37,-1.05,-0.84,-0.63,-0.42,-0.21,
+									0,
+									+0.21,+0.42,+0.63,+0.84,+1.05,+1.37,+1.52,+1.74,+1.95,+2.18,+2.4};
+	//const int phinbins_tgc = 8;
+	//const int phinbins_rpc = 16;
+	//float phibins_tgc[phinbins_tgc+1] = {...};
+	//float phibins_rpc[phinbins_rpc+1] = {...};
+	
+	const int phinbins = 10;
+	float dphi = fabs((phi_max-phi_min)/10);
+	Double_t phibins[phinbins+1] = {phi_min, phi_min+1*dphi, phi_min+2*dphi, phi_min+3*dphi, phi_min+4*dphi, phi_min+5*dphi,
+									phi_min+6*dphi, phi_min+7*dphi, phi_min+8*dphi, phi_min+9*dphi, phi_min+10*dphi
+									};
+	
+	if(sVar=="etaphi")
+	{
+		xtitle = "#eta";
+		ytitle = "#phi";
+		hTitle = "data_cand_" + sVar;
+		hCandData = new TH2D(hTitle.c_str(), hTitle.c_str(), etanbins, etabins, phinbins, phibins);
+		hTitle = "data_succ_" + sVar;
+		hSuccData = new TH2D(hTitle.c_str(), hTitle.c_str(), etanbins, etabins, phinbins, phibins);
+		hTitle = "data_effi_" + sVar;
+		hEffiData = new TH2D(hTitle.c_str(), hTitle.c_str(), etanbins, etabins, phinbins, phibins);
+		hTitle = "mc_cand_" + sVar;
+		hCandMC = new TH2D(hTitle.c_str(), hTitle.c_str(), etanbins, etabins, phinbins, phibins);
+		hTitle = "mc_succ_" + sVar;
+		hSuccMC = new TH2D(hTitle.c_str(), hTitle.c_str(), etanbins, etabins, phinbins, phibins);
+		hTitle = "mc_effi_" + sVar;
+		hEffiMC = new TH2D(hTitle.c_str(), hTitle.c_str(), etanbins, etabins, phinbins, phibins);
+		hTitle = "ratio_" + sVar;
+		hRatio  = new TH2D(hTitle.c_str(), hTitle.c_str(), etanbins, etabins, phinbins, phibins);
+	}
+	else if(sVar=="etapT")
+	{
+		xtitle = "#eta";
+		ytitle = "p_{T} TeV";
+		hTitle = "data_cand_" + sVar;
+		hCandData = new TH2D(hTitle.c_str(), hTitle.c_str(), etanbins, etabins, pTnbins, pTbins);
+		hTitle = "data_succ_" + sVar;
+		hSuccData = new TH2D(hTitle.c_str(), hTitle.c_str(), etanbins, etabins, pTnbins, pTbins);
+		hTitle = "data_effi_" + sVar;
+		hEffiData = new TH2D(hTitle.c_str(), hTitle.c_str(), etanbins, etabins, pTnbins, pTbins);
+		hTitle = "mc_cand_" + sVar;
+		hCandMC = new TH2D(hTitle.c_str(), hTitle.c_str(), etanbins, etabins, pTnbins, pTbins);
+		hTitle = "mc_succ_" + sVar;
+		hSuccMC = new TH2D(hTitle.c_str(), hTitle.c_str(), etanbins, etabins, pTnbins, pTbins);
+		hTitle = "mc_effi_" + sVar;
+		hEffiMC = new TH2D(hTitle.c_str(), hTitle.c_str(), etanbins, etabins, pTnbins, pTbins);
+		hTitle = "ratio_" + sVar;
+		hRatio  = new TH2D(hTitle.c_str(), hTitle.c_str(), etanbins, etabins, pTnbins, pTbins);
+	}
+	else if(sVar=="phipT")
+	{
+		xtitle = "#phi";
+		ytitle = "p_{T} TeV";
+		hTitle = "data_cand_" + sVar;
+		hCandData = new TH2D(hTitle.c_str(), hTitle.c_str(), phinbins, phibins, pTnbins, pTbins);
+		hTitle = "data_succ_" + sVar;
+		hSuccData = new TH2D(hTitle.c_str(), hTitle.c_str(), phinbins, phibins, pTnbins, pTbins);
+		hTitle = "data_effi_" + sVar;
+		hEffiData = new TH2D(hTitle.c_str(), hTitle.c_str(), phinbins, phibins, pTnbins, pTbins);
+		hTitle = "mc_cand_" + sVar;
+		hCandMC = new TH2D(hTitle.c_str(), hTitle.c_str(), phinbins, phibins, pTnbins, pTbins);
+		hTitle = "mc_succ_" + sVar;
+		hSuccMC = new TH2D(hTitle.c_str(), hTitle.c_str(), phinbins, phibins, pTnbins, pTbins);
+		hTitle = "mc_effi_" + sVar;
+		hEffiMC = new TH2D(hTitle.c_str(), hTitle.c_str(), phinbins, phibins, pTnbins, pTbins);
+		hTitle = "ratio_" + sVar;
+		hRatio  = new TH2D(hTitle.c_str(), hTitle.c_str(), phinbins, phibins, pTnbins, pTbins);
+	}
+	
+	///////////////////////////////////////////////
+	// DATA ///////////////////////////////////////
+	sTitle = "Data: " + title;
+	hEffiData->SetTitle(sTitle.c_str());
+	hEffiData->SetXTitle(xtitle.c_str());
+	hEffiData->SetYTitle(ytitle.c_str());
+	hEffiData->SetZTitle(ztitle.c_str());
+	hEffiData->SetMinimum(0.);
+	hEffiData->SetMaximum(1.);
+	
+	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
+	path = dir + "AtoI2_ZprimeGRL/" + m_muonSelector + sData + ".root";
+	TFile* fData = new TFile( path.c_str(), "READ" );
+	TTree* trig_data_tree = (TTree*)fData->Get("efficiency/eff_tree");
+	trig_data_tree->SetBranchAddress( "tNp_cand_pT",  &cand_pT );
+	trig_data_tree->SetBranchAddress( "tNp_succ_pT",  &succ_pT );
+	trig_data_tree->SetBranchAddress( "tNp_cand_eta",  &cand_eta );
+	trig_data_tree->SetBranchAddress( "tNp_succ_eta",  &succ_eta );
+	trig_data_tree->SetBranchAddress( "tNp_cand_phi",  &cand_phi );
+	trig_data_tree->SetBranchAddress( "tNp_succ_phi",  &succ_phi );
+	trig_data_tree->SetBranchAddress( "tNp_triggerName", &svTrigName );
+	if (trig_data_tree==NULL)
+	{
+		cout << "ERROR: cannot retrieve tree named: efficiency/eff_tree" << endl;
+		exit(-1);
+	}
+	for (Long64_t l64t_jentry=0 ; l64t_jentry<trig_data_tree->GetEntries() ; l64t_jentry++)
+	{
+		trig_data_tree->GetEntry(l64t_jentry);
+		
+		if(svTrigName->size()==0) continue;
+		
+		trigName = svTrigName->at(0);
+		
+		sPrimaryTrig = "L1_MU10";
+		pos = trigName.find(sPrimaryTrig);
+		if(pos!=string::npos) weight = period2trigMap[sPrimaryTrig]/m_dataLumi_pb;
+		sPrimaryTrig = "EF_mu10";
+		pos = trigName.find(sPrimaryTrig);
+		if(pos!=string::npos) weight = period2trigMap[sPrimaryTrig]/m_dataLumi_pb;
+		sPrimaryTrig = "EF_mu13";
+		pos = trigName.find(sPrimaryTrig);
+		if(pos!=string::npos) weight = period2trigMap[sPrimaryTrig]/m_dataLumi_pb;
+		sPrimaryTrig = "EF_mu13_tight";
+		pos = trigName.find(sPrimaryTrig);
+		if(pos!=string::npos) weight = period2trigMap[sPrimaryTrig]/m_dataLumi_pb;
+		
+		if(sVar=="etaphi")
+		{	
+			for(int i=0 ; i<(int)cand_eta->size() ; i++) hCandData->Fill(cand_eta->at(i), cand_phi->at(i), weight);
+			for(int i=0 ; i<(int)succ_eta->size() ; i++) hSuccData->Fill(succ_eta->at(i), succ_phi->at(i), weight);
+		}
+		else if(sVar=="etapT")
+		{
+			for(int i=0 ; i<(int)cand_eta->size() ; i++) hCandData->Fill(cand_eta->at(i), cand_pT->at(i), weight);
+			for(int i=0 ; i<(int)succ_eta->size() ; i++) hSuccData->Fill(succ_eta->at(i), succ_pT->at(i), weight);
+		}
+		else if(sVar=="phipT")
+		{
+			for(int i=0 ; i<(int)cand_phi->size() ; i++) hCandData->Fill(cand_phi->at(i), cand_pT->at(i), weight);
+			for(int i=0 ; i<(int)succ_phi->size() ; i++) hSuccData->Fill(succ_phi->at(i), succ_pT->at(i), weight);
+		}
+	}
+	calculateEfficiency(hCandData,  hSuccData,  hEffiData,  false);
+	
+	
+	/////////////////////////////////////////////
+	// MC ///////////////////////////////////////
+	sTitle = "MC: " + title;
+	hEffiMC->SetTitle(sTitle.c_str());
+	hEffiMC->SetXTitle(xtitle.c_str());
+	hEffiMC->SetYTitle(ytitle.c_str());
+	hEffiMC->SetZTitle(ztitle.c_str());
+	hEffiMC->SetMinimum(0.);
+	hEffiMC->SetMaximum(1.);
+	
+	
+	sProc = "Zmumu";
+	path = dir + "Zmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fZmumu = new TFile( path.c_str(), "READ" );
+	TTree* trig_mc_tree = (TTree*)fZmumu->Get("efficiency/eff_tree");
+	trig_mc_tree->SetBranchAddress( "tNp_cand_pT",  &cand_pT );
+	trig_mc_tree->SetBranchAddress( "tNp_succ_pT",  &succ_pT );
+	trig_mc_tree->SetBranchAddress( "tNp_cand_eta",  &cand_eta );
+	trig_mc_tree->SetBranchAddress( "tNp_succ_eta",  &succ_eta );
+	trig_mc_tree->SetBranchAddress( "tNp_cand_phi",  &cand_phi );
+	trig_mc_tree->SetBranchAddress( "tNp_succ_phi",  &succ_phi );
+	trig_mc_tree->SetBranchAddress( "tNp_triggerName", &svTrigName );
+	if (trig_mc_tree==NULL)
+	{
+		cout << "ERROR: cannot retrieve tree named: efficiency/eff_tree" << endl;
+		exit(-1);
+	}
+	for (Long64_t l64t_jentry=0 ; l64t_jentry<trig_mc_tree->GetEntries() ; l64t_jentry++)
+	{
+		trig_mc_tree->GetEntry(l64t_jentry);
+		
+		if(svTrigName->size()==0) continue;
+		
+		trigName = svTrigName->at(0);
+		
+		sPrimaryTrig = "L1_MU10";
+		if(trigName!=sPrimaryTrig) continue; // only one trigger for MC
+		
+		if(sVar=="etaphi")
+		{
+			for(int i=0 ; i<(int)cand_eta->size() ; i++) hCandMC->Fill(cand_eta->at(i), cand_phi->at(i));
+			for(int i=0 ; i<(int)succ_eta->size() ; i++) hSuccMC->Fill(succ_eta->at(i), succ_phi->at(i));
+		}
+		else if(sVar=="etapT")
+		{
+			for(int i=0 ; i<(int)cand_eta->size() ; i++) hCandMC->Fill(cand_eta->at(i), cand_pT->at(i));
+			for(int i=0 ; i<(int)succ_eta->size() ; i++) hSuccMC->Fill(succ_eta->at(i), succ_pT->at(i));
+		}
+		else if(sVar=="phipT")
+		{
+			for(int i=0 ; i<(int)cand_phi->size() ; i++) hCandMC->Fill(cand_phi->at(i), cand_pT->at(i));
+			for(int i=0 ; i<(int)succ_phi->size() ; i++) hSuccMC->Fill(succ_phi->at(i), succ_pT->at(i));
+		}
+	}
+	calculateEfficiency(hCandMC,  hSuccMC,  hEffiMC,  false);
+	
+	//////////////////////////////////////////////////
+	// RATIO /////////////////////////////////////////
+	sTitle = "R = #epsilon_{Data}/#epsilon_{MC}";
+	hRatio->SetTitle(sTitle.c_str());
+	hRatio->SetXTitle(xtitle.c_str());
+	hRatio->SetYTitle(ytitle.c_str());
+	hRatio->SetZTitle("R");
+	hRatio->SetMinimum(0.);
+	hRatio->SetMaximum(2.5);
+	
+	Double_t rat = 0.;
+	Double_t err = 0.;
+	Double_t nRef = 0.;
+	Double_t nInp = 0.;
+	for (Int_t bx=1 ; bx<=hEffiData->GetNbinsX() ; bx++)
+	{
+		for (Int_t by=1 ; by<=hEffiData->GetNbinsY() ; by++)
+		{
+			nRef = hEffiMC->GetBinContent(bx,by);
+			nInp = hEffiData->GetBinContent(bx,by);
+			if(nRef!=0.)
+			{
+				rat = nInp/nRef;
+				err = hEffiData->GetBinError(bx,by)/nRef;
+				
+				hRatio->SetBinContent(bx,by,rat);
+				hRatio->SetBinError(bx,by,err);
+			}
+		}
+	}
+	
+	pad11->cd();
+	hEffiData->Draw("COLZ");
+	pad11->RedrawAxis();
+	
+	pad12->cd();
+	hEffiMC->Draw("COLZ");
+	pad12->RedrawAxis();
+	
+	pad_ratio->cd();
+	hRatio->Draw("COLZ");
+	pad_ratio->RedrawAxis();
+		
+	
+	TString fName = "figures/trigEffMap_" + (TString)sVar + (TString)"." + (TString)muonLabel;
+	cnv->SaveAs(fName+".eps");
+	cnv->SaveAs(fName+".C");
+	cnv->SaveAs(fName+".root");
+	cnv->SaveAs(fName+".png");
+}
+

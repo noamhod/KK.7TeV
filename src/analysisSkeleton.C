@@ -427,7 +427,9 @@ void analysisSkeleton::fillAfterCuts()
 	py->push_back( mu_py->at(muMinus) );
 	py->push_back( mu_py->at(muPlus) );
 	pz->push_back( mu_pz->at(muMinus) );
-	pt->push_back( mu_pz->at(muPlus) );
+	pz->push_back( mu_pz->at(muPlus) );
+	pt->push_back( mu_pt->at(muMinus) );
+	pt->push_back( mu_pt->at(muPlus) );
 	qoverp_me->push_back( mu_me_qoverp->at(muMinus) );
 	qoverp_me->push_back( mu_me_qoverp->at(muPlus) );
 	theta_me->push_back( mu_me_theta->at(muMinus) );

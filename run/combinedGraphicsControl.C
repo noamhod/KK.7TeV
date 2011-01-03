@@ -47,7 +47,16 @@ void combinedGraphicsControl::executeTmp()
 	string dir  = "/data/hod/D3PDdigest/rel15_eta24_selection/";
 	
 	m_combinedGraphics->set_allMCvsData(true, true, 1.e-3, 5.e+6, 0.075);
-	m_combinedGraphics->treeDraw_MCvsData(dir, "allCuts", "imass", "#hat{m}_{#mu#mu} (TeV)", "#frac{dN}{d#hat{m}_{#mu#mu}} 1/TeV");
+	m_combinedGraphics->treeDraw_MCvsData(dir, "allCuts", "Mhat", "#hat{m}_{#mu#mu} (TeV)", "#frac{dN}{d#hat{m}_{#mu#mu}} 1/TeV");
+	
+	m_combinedGraphics->set_allMCvsData(true, true, 1.e-3, 5.e+6, 0.025);
+	m_combinedGraphics->treeDraw_MCvsData(dir, "allCuts", "Q_T", "Q_{T} TeV", "#frac{dN}{dQ_{T}} 1/TeV");
+	
+	m_combinedGraphics->set_allMCvsData(true, true, 1.e-3, 5.e+6, 0.025);
+	m_combinedGraphics->treeDraw_MCvsData(dir, "allCuts", "pt", "p_{T}(#mu^{-}) (TeV)", "#frac{dN}{dp_{T}} 1/TeV");
+	
+	m_combinedGraphics->set_allMCvsData(false, true, 1.e-3, 1.e+6, 0.);
+	m_combinedGraphics->treeDraw_MCvsData(dir, "allCuts", "eta", "#eta(#mu^{-})", "#frac{dN}{d#eta}");
 }
 
 	

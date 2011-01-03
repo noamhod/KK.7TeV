@@ -84,6 +84,7 @@ class combinedGraphics : public analysisModules
 		TH1D*    cloneHisto(TFile* f, string dir, string hname);
 		void fixHisto(TH1D* h);
 		void NormToBinWidth(TH1D* h);
+		void NormToBinWidthNoErr(TH1D* h);
 		double Integral(TH1D* h);
 		double IntegralOverFlow(TH1D* h);
 		void Scale(TH1D* h, double d);
@@ -128,6 +129,8 @@ class combinedGraphics : public analysisModules
 		
 		void set_sumMCvsData(bool logx = false, bool logx = false, Double_t min = 0., Double_t max = 0., Double_t minratiox = 0., bool doRatio = true);
 		void draw_sumMCvsData(string dir, string hDir, string hName, string xTitle, string yTitle);
+		
+		void treeDraw_MCvsData(string dir, string hDir, string hName, string xTitle, string yTitle);
 		
 		void set_AfbMCvsData(bool logx = false, bool logx = false, Double_t min = 0., Double_t max = 0., Double_t minratiox = 0.);
 		void draw_AfbMCvsData(string dir, string hDir, string hName, string xTitle, string yTitle);

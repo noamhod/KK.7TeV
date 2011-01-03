@@ -28,6 +28,7 @@ class combinedGraphicsControl : public utilities
 		
 		void execute();
 		void executeAfb();
+		void executeTmp();
 		void executeTrig();
 		void executeTrigTRUvsTnP();
 		void executeTrigMCvsData();

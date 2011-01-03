@@ -1428,11 +1428,11 @@ void combinedGraphics::draw_sumMCvsData(string dir, string hDir, string hName, s
 }
 
 
-void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string hName, string xTitle, string yTitle)
+void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName, string xTitle, string yTitle)
 {
-	cout << "getting " << dir + " : " + hDir + " : " + hName << endl;
+	cout << "getting " << dir + " : " + hDir + " : " + varName << endl;
 
-	string hNameFixed = hName;
+	string varNameFixed = varName;
 	
 	hFile->cd();
 
@@ -1459,7 +1459,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string hName, 
 	if(!txt1) cout << "dummy" << endl;
 	
 	
-	string cName = "cnv_" + hNameFixed;
+	string cName = "cnv_" + varNameFixed;
 	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);
 	cnv->Divide(1,2);
 	
@@ -1490,25 +1490,214 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string hName, 
 	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
 	
 	Double_t weight = 0.; // weight = dataLumi/mcLumi = dataLumi/(kFactor*nMC/(sigma*BR*eff))
-	Float_t mHat    = 0.;
+	Float_t var     = 0.;
+	vector<float>* vvar = 0;
+	TBranch*       b_vvar;
 	double ymin = 1.e10;
 	double ymax = 0.;
 	
 	// form graphicObjects
-	const int nbins = 50;
-	imass_nbins  = nbins;
+	const int constint_imass_nbins = 50;
+	imass_nbins  = constint_imass_nbins;
 	imass_min    = 75.*GeV2TeV;
 	imass_max    = 2075.*GeV2TeV;
 	logMmin      = log10(imass_min);
 	logMmax      = log10(imass_max);
 	Double_t imassBinWidth = (Double_t)( (logMmax-logMmin)/(Double_t)imass_nbins );
-	Double_t imassbins[nbins+1];
+	Double_t imassbins[constint_imass_nbins+1];
 	imassbins[0] = imass_min;
 	for (Int_t i=1 ; i<=imass_nbins ; i++) imassbins[i] = TMath::Power( 10,(logMmin + i*imassBinWidth) );
 	
 	
+	const int constint_pT_nbins = 50;
+	pT_nbins  = constint_pT_nbins;
+	pT_min    = 10.*GeV2TeV;
+	pT_max    = 510.*GeV2TeV;
+	logpTmin  = log10(pT_min);
+	logpTmax  = log10(pT_max);
+	Double_t pTBinWidth = (Double_t)( (logpTmax-logpTmin)/(Double_t)pT_nbins );
+	Double_t pTbins[constint_pT_nbins+1];
+	pTbins[0] = pT_min;
+	for (Int_t i=1 ; i<=pT_nbins ; i++) pTbins[i] = TMath::Power( 10,(logpTmin + i*pTBinWidth) );
+	
+	
+	const int etanbins = 22;
+	Double_t etabins[etanbins+1] = {-2.4,-2.18,-1.95,-1.74,-1.52,-1.37,-1.05,-0.84,-0.63,-0.42,-0.21,
+									0,
+									+0.21,+0.42,+0.63,+0.84,+1.05,+1.37,+1.52,+1.74,+1.95,+2.18,+2.4};
+	
+	const int phinbins = 16;
+	float dphi = fabs((phi_max-phi_min)/(float)phinbins);
+	Double_t phibins[phinbins+1];
+	for(int i=0 ; i<=phinbins ; i++) phibins[i] = phi_min+i*dphi;
+	
+	
+	TH1D* hData = NULL;
+	TH1D* hZprime_mumu_SSM1000 = NULL;
+	TH1D* hMC = NULL;
+	TH1D* hDYmumu = NULL;
+	TH1D* hZZ = NULL;
+	TH1D* hWZ = NULL;
+	TH1D* hWW = NULL;
+	TH1D* hTTbar = NULL;
+	TH1D* hDYtautau = NULL;
+	
+	TFile* fData = NULL;
+	TTree* data_tree = NULL;
+	
+	TFile* fZprime_mumu_SSM1000 = NULL;
+	TTree* Zprime_tree = NULL;
+	
+	TFile* fDYmumu_75M120 = NULL;
+	TTree* DYmumu_75M120_tree = NULL;
+	TFile* fDYmumu_120M250 = NULL;
+	TTree* DYmumu_120M250_tree = NULL;
+	TFile* fDYmumu_250M400 = NULL;
+	TTree* DYmumu_250M400_tree = NULL;
+	TFile* fDYmumu_400M600 = NULL;
+	TTree* DYmumu_400M600_tree = NULL;
+	TFile* fDYmumu_600M800 = NULL;
+	TTree* DYmumu_600M800_tree = NULL;
+	TFile* fDYmumu_800M1000 = NULL;
+	TTree* DYmumu_800M1000_tree = NULL;
+	TFile* fDYmumu_1000M1250 = NULL;
+	TTree* DYmumu_1000M1250_tree = NULL;
+	TFile* fDYmumu_1250M1500 = NULL;
+	TTree* DYmumu_1250M1500_tree = NULL;
+	TFile* fDYmumu_1500M1750 = NULL;
+	TTree* DYmumu_1500M1750_tree = NULL;
+	TFile* fDYmumu_1750M2000 = NULL;
+	TTree* DYmumu_1750M2000_tree = NULL;
+	TFile* fDYmumu_M2000 = NULL;
+	TTree* DYmumu_M2000_tree = NULL;
+	
+	TFile* fDYtautau_75M120 = NULL;
+	TTree* DYtautau_75M120_tree = NULL;
+	TFile* fDYtautau_120M250 = NULL;
+	TTree* DYtautau_120M250_tree = NULL;
+	TFile* fDYtautau_250M400 = NULL;
+	TTree* DYtautau_250M400_tree = NULL;
+	TFile* fDYtautau_400M600 = NULL;
+	TTree* DYtautau_400M600_tree = NULL;
+	TFile* fDYtautau_600M800 = NULL;
+	TTree* DYtautau_600M800_tree = NULL;
+	TFile* fDYtautau_800M1000 = NULL;
+	TTree* DYtautau_800M1000_tree = NULL;
+	TFile* fDYtautau_1000M1250 = NULL;
+	TTree* DYtautau_1000M1250_tree = NULL;
+	TFile* fDYtautau_1250M1500 = NULL;
+	TTree* DYtautau_1250M1500_tree = NULL;
+	TFile* fDYtautau_1500M1750 = NULL;
+	TTree* DYtautau_1500M1750_tree = NULL;
+	TFile* fDYtautau_1750M2000 = NULL;
+	TTree* DYtautau_1750M2000_tree = NULL;
+	TFile* fDYtautau_M2000 = NULL;
+	TTree* DYtautau_M2000_tree = NULL;
+
+	TFile* fWW = NULL;
+	TTree* WW_tree = NULL;
+	TFile* fWZ = NULL;
+	TTree* WZ_tree = NULL;
+	TFile* fZZ = NULL;
+	TTree* ZZ_tree = NULL;
+	
+	TFile* fTTbar = NULL;
+	TTree* TTbar_tree = NULL;
+	
+	string hName  = "";
+	bool isVector = false;
+	
+	if(varName=="Mhat")
+	{
+		isVector = false;
+		hName = varName + "_data";
+		hData  = new TH1D(hName.c_str(),hName.c_str(), imass_nbins, imassbins );
+		hName = varName + "_Zprime";
+		hZprime_mumu_SSM1000  = new TH1D(hName.c_str(),hName.c_str(), imass_nbins, imassbins );
+		hName = varName + "_sumBG";
+		hMC = new TH1D(hName.c_str(),hName.c_str(), imass_nbins, imassbins );
+		hName = varName + "_DYmumu";
+		hDYmumu  = new TH1D(hName.c_str(),hName.c_str(), imass_nbins, imassbins );
+		hName = varName + "_ZZ";
+		hZZ  = new TH1D(hName.c_str(),hName.c_str(), imass_nbins, imassbins );
+		hName = varName + "_WZ";
+		hWZ  = new TH1D(hName.c_str(),hName.c_str(), imass_nbins, imassbins );
+		hName = varName + "_WW";
+		hWW  = new TH1D(hName.c_str(),hName.c_str(), imass_nbins, imassbins );
+		hName = varName + "_TTbar";
+		hTTbar  = new TH1D(hName.c_str(),hName.c_str(), imass_nbins, imassbins );
+		hName = varName + "_DYtautau";
+		hDYtautau  = new TH1D(hName.c_str(),hName.c_str(), imass_nbins, imassbins );
+	}
+	if(varName=="Q_T")
+	{
+		isVector = false;
+		hName = varName + "_data";
+		hData  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hName = varName + "_Zprime";
+		hZprime_mumu_SSM1000  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hName = varName + "_sumBG";
+		hMC = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hName = varName + "_DYmumu";
+		hDYmumu  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hName = varName + "_ZZ";
+		hZZ  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hName = varName + "_WZ";
+		hWZ  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hName = varName + "_WW";
+		hWW  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hName = varName + "_TTbar";
+		hTTbar  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hName = varName + "_DYtautau";
+		hDYtautau  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+	}
+	if(varName=="pt")
+	{
+		isVector = true;
+		hName = varName + "_data";
+		hData  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hName = varName + "_Zprime";
+		hZprime_mumu_SSM1000  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hName = varName + "_sumBG";
+		hMC = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hName = varName + "_DYmumu";
+		hDYmumu  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hName = varName + "_ZZ";
+		hZZ  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hName = varName + "_WZ";
+		hWZ  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hName = varName + "_WW";
+		hWW  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hName = varName + "_TTbar";
+		hTTbar  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hName = varName + "_DYtautau";
+		hDYtautau  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+	}
+	if(varName=="eta")
+	{
+		isVector = true;
+		hName = varName + "_data";
+		hData  = new TH1D(hName.c_str(),hName.c_str(), etanbins, etabins );
+		hName = varName + "_Zprime";
+		hZprime_mumu_SSM1000  = new TH1D(hName.c_str(),hName.c_str(), etanbins, etabins );
+		hName = varName + "_sumBG";
+		hMC = new TH1D(hName.c_str(),hName.c_str(), etanbins, etabins );
+		hName = varName + "_DYmumu";
+		hDYmumu  = new TH1D(hName.c_str(),hName.c_str(), etanbins, etabins );
+		hName = varName + "_ZZ";
+		hZZ  = new TH1D(hName.c_str(),hName.c_str(), etanbins, etabins );
+		hName = varName + "_WZ";
+		hWZ  = new TH1D(hName.c_str(),hName.c_str(), etanbins, etabins );
+		hName = varName + "_WW";
+		hWW  = new TH1D(hName.c_str(),hName.c_str(), etanbins, etabins );
+		hName = varName + "_TTbar";
+		hTTbar  = new TH1D(hName.c_str(),hName.c_str(), etanbins, etabins );
+		hName = varName + "_DYtautau";
+		hDYtautau  = new TH1D(hName.c_str(),hName.c_str(), etanbins, etabins );
+	}
+	
+	
 	// Data
-	TH1D* hData  = new TH1D("mHat_data","mHat_data", imass_nbins, imassbins );
 	hData->SetTitle("");
 	hData->SetLineColor(kBlack);
 	hData->SetMarkerColor(kBlack);
@@ -1517,7 +1706,6 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string hName, 
 	leg->AddEntry( hData, "Data", "lep");
 	
 	// SIG
-	TH1D* hZprime_mumu_SSM1000  = new TH1D("mHat_Zprime","mHat_Zprime", imass_nbins, imassbins );
 	hZprime_mumu_SSM1000->SetLineColor(kBlue);
 	hZprime_mumu_SSM1000->SetLineWidth(2);
 	hZprime_mumu_SSM1000->SetTitle("");
@@ -1529,7 +1717,6 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string hName, 
 	unsigned int c = 0;
 	Color_t color = 0;
 	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
-	TH1D* hMC = new TH1D("sumBG","sumBG", imass_nbins, imassbins );
 	leg->AddEntry( hMC, "SM(all)", "f");
 	hMC->SetFillColor(color);
 	hMC->SetLineColor(color);
@@ -1537,7 +1724,6 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string hName, 
 	colorAccumulate+=colorOffset;
 	c++;
 	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
-	TH1D* hDYmumu  = new TH1D("mHat_DYmumu","mHat_DYmumu", imass_nbins, imassbins );
 	hDYmumu->SetFillColor(color);
 	hDYmumu->SetLineColor(color);
 	hDYmumu->SetTitle("");
@@ -1545,7 +1731,6 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string hName, 
 	colorAccumulate+=colorOffset;
 	c++;
 	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
-	TH1D* hZZ  = new TH1D("mHat_ZZ","mHat_ZZ", imass_nbins, imassbins );
 	leg->AddEntry( hZZ, "ZZ", "f");
 	hZZ->SetTitle("");
 	hZZ->SetFillColor(color);
@@ -1553,7 +1738,6 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string hName, 
 	colorAccumulate+=colorOffset;
 	c++;
 	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
-	TH1D* hWZ  = new TH1D("mHat_WZ","mHat_WZ", imass_nbins, imassbins );
 	leg->AddEntry( hWZ, "WZ", "f");
 	hWZ->SetTitle("");
 	hWZ->SetFillColor(color);
@@ -1561,7 +1745,6 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string hName, 
 	colorAccumulate+=colorOffset;
 	c++;
 	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
-	TH1D* hWW  = new TH1D("mHat_WW","mHat_WW", imass_nbins, imassbins );
 	leg->AddEntry( hWW, "WW", "f");
 	hWW->SetTitle("");
 	hWW->SetFillColor(color);
@@ -1569,7 +1752,6 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string hName, 
 	colorAccumulate+=colorOffset;
 	c++;
 	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
-	TH1D* hTTbar  = new TH1D("mHat_T1","mHat_T1", imass_nbins, imassbins );
 	leg->AddEntry( hTTbar, "t#bar{t}", "f");
 	hTTbar->SetTitle("");
 	hTTbar->SetFillColor(color);
@@ -1577,7 +1759,6 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string hName, 
 	colorAccumulate+=colorOffset;
 	c++;
 	color = (c<vcolors->size()) ? vcolors->at(c) : colorAccumulate;
-	TH1D* hDYtautau  = new TH1D("mHat_DYtautau","mHat_DYtautau", imass_nbins, imassbins );
 	leg->AddEntry( hDYtautau, "Binned DY#tau#tau", "f");
 	hDYtautau->SetTitle("");
 	hDYtautau->SetFillColor(color);
@@ -1591,158 +1772,242 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string hName, 
 	// data
 	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
 	path = dir + "AtoI2_ZprimeGRL/" + m_muonSelector + sData + ".root";
-	TFile* fData = new TFile( path.c_str(), "READ" );
-	TTree* data_tree = (TTree*)fData->Get("allCuts/allCuts_tree");
-	data_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<data_tree->GetEntries() ; l64t_jentry++)
+	fData = new TFile( path.c_str(), "READ" );
+	data_tree = (TTree*)fData->Get("allCuts/allCuts_tree");
+	if(!isVector) data_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  data_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	if(data_tree==0) return;
+	for (int n=0 ; n<(int)data_tree->GetEntries() ; n++)
 	{
-		data_tree->GetEntry(l64t_jentry);
-		hData->Fill(mHat, 1.);
+		try
+		{
+			Int_t check = data_tree->GetEntry(n);
+			if( check==0 )  throw "entry does not exist";
+			if( check==-1 ) throw "an I/O error occured";
+		}
+		catch( char * str )
+		{
+			cout << "Exception raised: " << str << endl;
+		}
+		if(!isVector) hData->Fill(var, 1.);
+		if(isVector && vvar!=0) hData->Fill(vvar->at(0), 1.);
 	}
 	NormToBinWidth(hData);
 	if(hData->GetMinimum()<ymin) ymin=hData->GetMinimum();
 	if(hData->GetMaximum()>ymax) ymax=hData->GetMaximum();
-	
+	cout << "after data" << endl;
 	
 	// SIG
 	sProc = "Zprime_mumu_SSM1000";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "Zprime_mumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fZprime_mumu_SSM1000 = new TFile( path.c_str(), "READ" );
-	TTree* Zprime_tree = (TTree*)fZprime_mumu_SSM1000->Get("allCuts/allCuts_tree");
-	Zprime_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<Zprime_tree->GetEntries() ; l64t_jentry++)
+	fZprime_mumu_SSM1000 = new TFile( path.c_str(), "READ" );
+	Zprime_tree = (TTree*)fZprime_mumu_SSM1000->Get("allCuts/allCuts_tree");
+	if(!isVector) Zprime_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  Zprime_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)Zprime_tree->GetEntries() ; n++)
 	{
-		Zprime_tree->GetEntry(l64t_jentry);
-		hZprime_mumu_SSM1000->Fill(mHat, weight);
+		try
+		{
+			Int_t check = Zprime_tree->GetEntry(n);
+			if( check==0 )  throw "entry does not exist";
+			else if( check==-1 ) throw "an I/O error occured";
+			//else throw "unknown problem";
+		}
+		catch( char * str )
+		{
+			cout << "Exception raised: " << str << endl;
+		}
+		if(!isVector) hZprime_mumu_SSM1000->Fill(var, weight);
+		if(isVector && vvar!=0) hZprime_mumu_SSM1000->Fill(vvar->at(0), weight);
 	}
 	NormToBinWidthNoErr(hZprime_mumu_SSM1000);
 	if(hZprime_mumu_SSM1000->GetMinimum()<ymin) ymin=hZprime_mumu_SSM1000->GetMinimum();
 	if(hZprime_mumu_SSM1000->GetMaximum()>ymax) ymax=hZprime_mumu_SSM1000->GetMaximum();
-	
+	cout << "after " << sProc << endl;
 	
 	// MC
 	sProc = "DYmumu_75M120";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_75M120 = new TFile( path.c_str(), "READ" );
-	TTree* DYmumu_75M120_tree = (TTree*)fDYmumu_75M120->Get("allCuts/allCuts_tree");
-	DYmumu_75M120_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYmumu_75M120_tree->GetEntries() ; l64t_jentry++)
+	fDYmumu_75M120 = new TFile( path.c_str(), "READ" );
+	DYmumu_75M120_tree = (TTree*)fDYmumu_75M120->Get("allCuts/allCuts_tree");
+	if(!isVector) DYmumu_75M120_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYmumu_75M120_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYmumu_75M120_tree->GetEntries() ; n++)
 	{
-		DYmumu_75M120_tree->GetEntry(l64t_jentry);
-		hDYmumu->Fill(mHat, weight);
+		try
+		{
+			Int_t check = DYmumu_75M120_tree->GetEntry(n);
+			if( check==0 )  throw "entry does not exist";
+			if( check==-1 ) throw "an I/O error occured";
+		}
+		catch( char * str )
+		{
+			cout << "Exception raised: " << str << endl;
+		}
+		if(!isVector) hDYmumu->Fill(var, weight);
+		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	sProc = "DYmumu_120M250";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_120M250 = new TFile( path.c_str(), "READ" );
-	TTree* DYmumu_120M250_tree = (TTree*)fDYmumu_120M250->Get("allCuts/allCuts_tree");
-	DYmumu_120M250_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYmumu_120M250_tree->GetEntries() ; l64t_jentry++)
+	fDYmumu_120M250 = new TFile( path.c_str(), "READ" );
+	DYmumu_120M250_tree = (TTree*)fDYmumu_120M250->Get("allCuts/allCuts_tree");
+	if(!isVector) DYmumu_120M250_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYmumu_120M250_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYmumu_120M250_tree->GetEntries() ; n++)
 	{
-		DYmumu_120M250_tree->GetEntry(l64t_jentry);
-		hDYmumu->Fill(mHat, weight);
+		try
+		{
+			Int_t check = DYmumu_120M250_tree->GetEntry(n);
+			if( check==0 )  throw "entry does not exist";
+			if( check==-1 ) throw "an I/O error occured";
+		}
+		catch( char * str )
+		{
+			cout << "Exception raised: " << str << endl;
+		}
+		if(!isVector) hDYmumu->Fill(var, weight);
+		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	sProc = "DYmumu_250M400";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_250M400 = new TFile( path.c_str(), "READ" );
-	TTree* DYmumu_250M400_tree = (TTree*)fDYmumu_250M400->Get("allCuts/allCuts_tree");
-	DYmumu_250M400_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYmumu_250M400_tree->GetEntries() ; l64t_jentry++)
+	fDYmumu_250M400 = new TFile( path.c_str(), "READ" );
+	DYmumu_250M400_tree = (TTree*)fDYmumu_250M400->Get("allCuts/allCuts_tree");
+	if(!isVector) DYmumu_250M400_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYmumu_250M400_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYmumu_250M400_tree->GetEntries() ; n++)
 	{
-		DYmumu_250M400_tree->GetEntry(l64t_jentry);
-		hDYmumu->Fill(mHat, weight);
+		
+		DYmumu_250M400_tree->GetEntry(n);
+		if(!isVector) hDYmumu->Fill(var, weight);
+		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	sProc = "DYmumu_400M600";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_400M600 = new TFile( path.c_str(), "READ" );
-	TTree* DYmumu_400M600_tree = (TTree*)fDYmumu_400M600->Get("allCuts/allCuts_tree");
-	DYmumu_400M600_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYmumu_400M600_tree->GetEntries() ; l64t_jentry++)
+	fDYmumu_400M600 = new TFile( path.c_str(), "READ" );
+	DYmumu_400M600_tree = (TTree*)fDYmumu_400M600->Get("allCuts/allCuts_tree");
+	if(!isVector) DYmumu_400M600_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYmumu_400M600_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYmumu_400M600_tree->GetEntries() ; n++)
 	{
-		DYmumu_400M600_tree->GetEntry(l64t_jentry);
-		hDYmumu->Fill(mHat, weight);
+		
+		DYmumu_400M600_tree->GetEntry(n);
+		if(!isVector) hDYmumu->Fill(var, weight);
+		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	sProc = "DYmumu_600M800";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_600M800 = new TFile( path.c_str(), "READ" );
-	TTree* DYmumu_600M800_tree = (TTree*)fDYmumu_600M800->Get("allCuts/allCuts_tree");
-	DYmumu_600M800_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYmumu_600M800_tree->GetEntries() ; l64t_jentry++)
+	fDYmumu_600M800 = new TFile( path.c_str(), "READ" );
+	DYmumu_600M800_tree = (TTree*)fDYmumu_600M800->Get("allCuts/allCuts_tree");
+	if(!isVector) DYmumu_600M800_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYmumu_600M800_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYmumu_600M800_tree->GetEntries() ; n++)
 	{
-		DYmumu_600M800_tree->GetEntry(l64t_jentry);
-		hDYmumu->Fill(mHat, weight);
+		
+		DYmumu_600M800_tree->GetEntry(n);
+		if(!isVector) hDYmumu->Fill(var, weight);
+		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	sProc = "DYmumu_800M1000";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_800M1000 = new TFile( path.c_str(), "READ" );
-	TTree* DYmumu_800M1000_tree = (TTree*)fDYmumu_800M1000->Get("allCuts/allCuts_tree");
-	DYmumu_800M1000_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYmumu_800M1000_tree->GetEntries() ; l64t_jentry++)
+	fDYmumu_800M1000 = new TFile( path.c_str(), "READ" );
+	DYmumu_800M1000_tree = (TTree*)fDYmumu_800M1000->Get("allCuts/allCuts_tree");
+	if(!isVector) DYmumu_800M1000_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYmumu_800M1000_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYmumu_800M1000_tree->GetEntries() ; n++)
 	{
-		DYmumu_800M1000_tree->GetEntry(l64t_jentry);
-		hDYmumu->Fill(mHat, weight);
+		
+		DYmumu_800M1000_tree->GetEntry(n);
+		if(!isVector) hDYmumu->Fill(var, weight);
+		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	sProc = "DYmumu_1000M1250";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_1000M1250 = new TFile( path.c_str(), "READ" );
-	TTree* DYmumu_1000M1250_tree = (TTree*)fDYmumu_1000M1250->Get("allCuts/allCuts_tree");
-	DYmumu_1000M1250_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYmumu_1000M1250_tree->GetEntries() ; l64t_jentry++)
+	fDYmumu_1000M1250 = new TFile( path.c_str(), "READ" );
+	DYmumu_1000M1250_tree = (TTree*)fDYmumu_1000M1250->Get("allCuts/allCuts_tree");
+	if(!isVector) DYmumu_1000M1250_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYmumu_1000M1250_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYmumu_1000M1250_tree->GetEntries() ; n++)
 	{
-		DYmumu_1000M1250_tree->GetEntry(l64t_jentry);
-		hDYmumu->Fill(mHat, weight);
+		
+		DYmumu_1000M1250_tree->GetEntry(n);
+		if(!isVector) hDYmumu->Fill(var, weight);
+		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	sProc = "DYmumu_1250M1500";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_1250M1500 = new TFile( path.c_str(), "READ" );
-	TTree* DYmumu_1250M1500_tree = (TTree*)fDYmumu_1250M1500->Get("allCuts/allCuts_tree");
-	DYmumu_1250M1500_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYmumu_1250M1500_tree->GetEntries() ; l64t_jentry++)
+	fDYmumu_1250M1500 = new TFile( path.c_str(), "READ" );
+	DYmumu_1250M1500_tree = (TTree*)fDYmumu_1250M1500->Get("allCuts/allCuts_tree");
+	if(!isVector) DYmumu_1250M1500_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYmumu_1250M1500_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYmumu_1250M1500_tree->GetEntries() ; n++)
 	{
-		DYmumu_1250M1500_tree->GetEntry(l64t_jentry);
-		hDYmumu->Fill(mHat, weight);
+		
+		DYmumu_1250M1500_tree->GetEntry(n);
+		if(!isVector) hDYmumu->Fill(var, weight);
+		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	sProc = "DYmumu_1500M1750";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_1500M1750 = new TFile( path.c_str(), "READ" );
-	TTree* DYmumu_1500M1750_tree = (TTree*)fDYmumu_1500M1750->Get("allCuts/allCuts_tree");
-	DYmumu_1500M1750_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYmumu_1500M1750_tree->GetEntries() ; l64t_jentry++)
+	fDYmumu_1500M1750 = new TFile( path.c_str(), "READ" );
+	DYmumu_1500M1750_tree = (TTree*)fDYmumu_1500M1750->Get("allCuts/allCuts_tree");
+	if(!isVector) DYmumu_1500M1750_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYmumu_1500M1750_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYmumu_1500M1750_tree->GetEntries() ; n++)
 	{
-		DYmumu_1500M1750_tree->GetEntry(l64t_jentry);
-		hDYmumu->Fill(mHat, weight);
+		
+		DYmumu_1500M1750_tree->GetEntry(n);
+		if(!isVector) hDYmumu->Fill(var, weight);
+		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	sProc = "DYmumu_1750M2000";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_1750M2000 = new TFile( path.c_str(), "READ" );
-	TTree* DYmumu_1750M2000_tree = (TTree*)fDYmumu_1750M2000->Get("allCuts/allCuts_tree");
-	DYmumu_1750M2000_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYmumu_1750M2000_tree->GetEntries() ; l64t_jentry++)
+	fDYmumu_1750M2000 = new TFile( path.c_str(), "READ" );
+	DYmumu_1750M2000_tree = (TTree*)fDYmumu_1750M2000->Get("allCuts/allCuts_tree");
+	if(!isVector) DYmumu_1750M2000_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYmumu_1750M2000_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYmumu_1750M2000_tree->GetEntries() ; n++)
 	{
-		DYmumu_1750M2000_tree->GetEntry(l64t_jentry);
-		hDYmumu->Fill(mHat, weight);
+		
+		DYmumu_1750M2000_tree->GetEntry(n);
+		if(!isVector) hDYmumu->Fill(var, weight);
+		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	sProc = "DYmumu_M2000";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_M2000 = new TFile( path.c_str(), "READ" );
-	TTree* DYmumu_M2000_tree = (TTree*)fDYmumu_M2000->Get("allCuts/allCuts_tree");
-	DYmumu_M2000_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYmumu_M2000_tree->GetEntries() ; l64t_jentry++)
+	fDYmumu_M2000 = new TFile( path.c_str(), "READ" );
+	DYmumu_M2000_tree = (TTree*)fDYmumu_M2000->Get("allCuts/allCuts_tree");
+	if(!isVector) DYmumu_M2000_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYmumu_M2000_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYmumu_M2000_tree->GetEntries() ; n++)
 	{
-		DYmumu_M2000_tree->GetEntry(l64t_jentry);
-		hDYmumu->Fill(mHat, weight);
+		
+		DYmumu_M2000_tree->GetEntry(n);
+		if(!isVector) hDYmumu->Fill(var, weight);
+		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	NormToBinWidthNoErr(hDYmumu);
 	if(hDYmumu->GetMinimum()<ymin) ymin=hDYmumu->GetMinimum();
 	if(hDYmumu->GetMaximum()>ymax) ymax=hDYmumu->GetMaximum();
@@ -1751,124 +2016,168 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string hName, 
 	sProc = "DYtautau_75M120";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYtautau/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYtautau_75M120 = new TFile( path.c_str(), "READ" );
-	TTree* DYtautau_75M120_tree = (TTree*)fDYtautau_75M120->Get("allCuts/allCuts_tree");
-	DYtautau_75M120_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYtautau_75M120_tree->GetEntries() ; l64t_jentry++)
+	fDYtautau_75M120 = new TFile( path.c_str(), "READ" );
+	DYtautau_75M120_tree = (TTree*)fDYtautau_75M120->Get("allCuts/allCuts_tree");
+	if(!isVector) DYtautau_75M120_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYtautau_75M120_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYtautau_75M120_tree->GetEntries() ; n++)
 	{
-		DYtautau_75M120_tree->GetEntry(l64t_jentry);
-		hDYtautau->Fill(mHat, weight);
+		
+		DYtautau_75M120_tree->GetEntry(n);
+		if(!isVector) hDYtautau->Fill(var, weight);
+		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	sProc = "DYtautau_120M250";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYtautau/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYtautau_120M250 = new TFile( path.c_str(), "READ" );
-	TTree* DYtautau_120M250_tree = (TTree*)fDYtautau_120M250->Get("allCuts/allCuts_tree");
-	DYtautau_120M250_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYtautau_120M250_tree->GetEntries() ; l64t_jentry++)
+	fDYtautau_120M250 = new TFile( path.c_str(), "READ" );
+	DYtautau_120M250_tree = (TTree*)fDYtautau_120M250->Get("allCuts/allCuts_tree");
+	if(!isVector) DYtautau_120M250_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYtautau_120M250_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYtautau_120M250_tree->GetEntries() ; n++)
 	{
-		DYtautau_120M250_tree->GetEntry(l64t_jentry);
-		hDYtautau->Fill(mHat, weight);
+		
+		DYtautau_120M250_tree->GetEntry(n);
+		if(!isVector) hDYtautau->Fill(var, weight);
+		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	sProc = "DYtautau_250M400";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYtautau/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYtautau_250M400 = new TFile( path.c_str(), "READ" );
-	TTree* DYtautau_250M400_tree = (TTree*)fDYtautau_250M400->Get("allCuts/allCuts_tree");
-	DYtautau_250M400_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYtautau_250M400_tree->GetEntries() ; l64t_jentry++)
+	fDYtautau_250M400 = new TFile( path.c_str(), "READ" );
+	DYtautau_250M400_tree = (TTree*)fDYtautau_250M400->Get("allCuts/allCuts_tree");
+	if(!isVector) DYtautau_250M400_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYtautau_250M400_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYtautau_250M400_tree->GetEntries() ; n++)
 	{
-		DYtautau_250M400_tree->GetEntry(l64t_jentry);
-		hDYtautau->Fill(mHat, weight);
+		
+		DYtautau_250M400_tree->GetEntry(n);
+		if(!isVector) hDYtautau->Fill(var, weight);
+		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	sProc = "DYtautau_400M600";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYtautau/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYtautau_400M600 = new TFile( path.c_str(), "READ" );
-	TTree* DYtautau_400M600_tree = (TTree*)fDYtautau_400M600->Get("allCuts/allCuts_tree");
-	DYtautau_400M600_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYtautau_400M600_tree->GetEntries() ; l64t_jentry++)
+	fDYtautau_400M600 = new TFile( path.c_str(), "READ" );
+	DYtautau_400M600_tree = (TTree*)fDYtautau_400M600->Get("allCuts/allCuts_tree");
+	if(!isVector) DYtautau_400M600_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYtautau_400M600_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYtautau_400M600_tree->GetEntries() ; n++)
 	{
-		DYtautau_400M600_tree->GetEntry(l64t_jentry);
-		hDYtautau->Fill(mHat, weight);
+		
+		DYtautau_400M600_tree->GetEntry(n);
+		if(!isVector) hDYtautau->Fill(var, weight);
+		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	sProc = "DYtautau_600M800";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYtautau/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYtautau_600M800 = new TFile( path.c_str(), "READ" );
-	TTree* DYtautau_600M800_tree = (TTree*)fDYtautau_600M800->Get("allCuts/allCuts_tree");
-	DYtautau_600M800_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYtautau_600M800_tree->GetEntries() ; l64t_jentry++)
+	fDYtautau_600M800 = new TFile( path.c_str(), "READ" );
+	DYtautau_600M800_tree = (TTree*)fDYtautau_600M800->Get("allCuts/allCuts_tree");
+	if(!isVector) DYtautau_600M800_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYtautau_600M800_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYtautau_600M800_tree->GetEntries() ; n++)
 	{
-		DYtautau_600M800_tree->GetEntry(l64t_jentry);
-		hDYtautau->Fill(mHat, weight);
+		
+		DYtautau_600M800_tree->GetEntry(n);
+		if(!isVector) hDYtautau->Fill(var, weight);
+		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	sProc = "DYtautau_800M1000";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYtautau/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYtautau_800M1000 = new TFile( path.c_str(), "READ" );
-	TTree* DYtautau_800M1000_tree = (TTree*)fDYtautau_800M1000->Get("allCuts/allCuts_tree");
-	DYtautau_800M1000_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYtautau_800M1000_tree->GetEntries() ; l64t_jentry++)
+	fDYtautau_800M1000 = new TFile( path.c_str(), "READ" );
+	DYtautau_800M1000_tree = (TTree*)fDYtautau_800M1000->Get("allCuts/allCuts_tree");
+	if(!isVector) DYtautau_800M1000_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYtautau_800M1000_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYtautau_800M1000_tree->GetEntries() ; n++)
 	{
-		DYtautau_800M1000_tree->GetEntry(l64t_jentry);
-		hDYtautau->Fill(mHat, weight);
+		
+		DYtautau_800M1000_tree->GetEntry(n);
+		if(!isVector) hDYtautau->Fill(var, weight);
+		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	sProc = "DYtautau_1000M1250";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYtautau/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYtautau_1000M1250 = new TFile( path.c_str(), "READ" );
-	TTree* DYtautau_1000M1250_tree = (TTree*)fDYtautau_1000M1250->Get("allCuts/allCuts_tree");
-	DYtautau_1000M1250_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYtautau_1000M1250_tree->GetEntries() ; l64t_jentry++)
+	fDYtautau_1000M1250 = new TFile( path.c_str(), "READ" );
+	DYtautau_1000M1250_tree = (TTree*)fDYtautau_1000M1250->Get("allCuts/allCuts_tree");
+	if(!isVector) DYtautau_1000M1250_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYtautau_1000M1250_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYtautau_1000M1250_tree->GetEntries() ; n++)
 	{
-		DYtautau_1000M1250_tree->GetEntry(l64t_jentry);
-		hDYtautau->Fill(mHat, weight);
+		
+		DYtautau_1000M1250_tree->GetEntry(n);
+		if(!isVector) hDYtautau->Fill(var, weight);
+		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	sProc = "DYtautau_1250M1500";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYtautau/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYtautau_1250M1500 = new TFile( path.c_str(), "READ" );
-	TTree* DYtautau_1250M1500_tree = (TTree*)fDYtautau_1250M1500->Get("allCuts/allCuts_tree");
-	DYtautau_1250M1500_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYtautau_1250M1500_tree->GetEntries() ; l64t_jentry++)
+	fDYtautau_1250M1500 = new TFile( path.c_str(), "READ" );
+	DYtautau_1250M1500_tree = (TTree*)fDYtautau_1250M1500->Get("allCuts/allCuts_tree");
+	if(!isVector) DYtautau_1250M1500_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYtautau_1250M1500_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYtautau_1250M1500_tree->GetEntries() ; n++)
 	{
-		DYtautau_1250M1500_tree->GetEntry(l64t_jentry);
-		hDYtautau->Fill(mHat, weight);
+		
+		DYtautau_1250M1500_tree->GetEntry(n);
+		if(!isVector) hDYtautau->Fill(var, weight);
+		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	sProc = "DYtautau_1500M1750";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYtautau/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYtautau_1500M1750 = new TFile( path.c_str(), "READ" );
-	TTree* DYtautau_1500M1750_tree = (TTree*)fDYtautau_1500M1750->Get("allCuts/allCuts_tree");
-	DYtautau_1500M1750_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYtautau_1500M1750_tree->GetEntries() ; l64t_jentry++)
+	fDYtautau_1500M1750 = new TFile( path.c_str(), "READ" );
+	DYtautau_1500M1750_tree = (TTree*)fDYtautau_1500M1750->Get("allCuts/allCuts_tree");
+	if(!isVector) DYtautau_1500M1750_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYtautau_1500M1750_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYtautau_1500M1750_tree->GetEntries() ; n++)
 	{
-		DYtautau_1500M1750_tree->GetEntry(l64t_jentry);
-		hDYtautau->Fill(mHat, weight);
+		
+		DYtautau_1500M1750_tree->GetEntry(n);
+		if(!isVector) hDYtautau->Fill(var, weight);
+		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	sProc = "DYtautau_1750M2000";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYtautau/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYtautau_1750M2000 = new TFile( path.c_str(), "READ" );
-	TTree* DYtautau_1750M2000_tree = (TTree*)fDYtautau_1750M2000->Get("allCuts/allCuts_tree");
-	DYtautau_1750M2000_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYtautau_1750M2000_tree->GetEntries() ; l64t_jentry++)
+	fDYtautau_1750M2000 = new TFile( path.c_str(), "READ" );
+	DYtautau_1750M2000_tree = (TTree*)fDYtautau_1750M2000->Get("allCuts/allCuts_tree");
+	if(!isVector) DYtautau_1750M2000_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYtautau_1750M2000_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYtautau_1750M2000_tree->GetEntries() ; n++)
 	{
-		DYtautau_1750M2000_tree->GetEntry(l64t_jentry);
-		hDYtautau->Fill(mHat, weight);
+		
+		DYtautau_1750M2000_tree->GetEntry(n);
+		if(!isVector) hDYtautau->Fill(var, weight);
+		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	sProc = "DYtautau_M2000";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "DYtautau/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYtautau_M2000 = new TFile( path.c_str(), "READ" );
-	TTree* DYtautau_M2000_tree = (TTree*)fDYtautau_M2000->Get("allCuts/allCuts_tree");
-	DYtautau_M2000_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<DYtautau_M2000_tree->GetEntries() ; l64t_jentry++)
+	fDYtautau_M2000 = new TFile( path.c_str(), "READ" );
+	DYtautau_M2000_tree = (TTree*)fDYtautau_M2000->Get("allCuts/allCuts_tree");
+	if(!isVector) DYtautau_M2000_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  DYtautau_M2000_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)DYtautau_M2000_tree->GetEntries() ; n++)
 	{
-		DYtautau_M2000_tree->GetEntry(l64t_jentry);
-		hDYtautau->Fill(mHat, weight);
+		
+		DYtautau_M2000_tree->GetEntry(n);
+		if(!isVector) hDYtautau->Fill(var, weight);
+		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	NormToBinWidthNoErr(hDYtautau);
 	if(hDYtautau->GetMinimum()<ymin) ymin=hDYtautau->GetMinimum();
 	if(hDYtautau->GetMaximum()>ymax) ymax=hDYtautau->GetMaximum();
@@ -1877,14 +2186,18 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string hName, 
 	sProc = "WW_Herwig";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "WW_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fWW = new TFile( path.c_str(), "READ" );
-	TTree* WW_tree = (TTree*)fWW ->Get("allCuts/allCuts_tree");
-	WW_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<WW_tree->GetEntries() ; l64t_jentry++)
+	fWW = new TFile( path.c_str(), "READ" );
+	WW_tree = (TTree*)fWW ->Get("allCuts/allCuts_tree");
+	if(!isVector) WW_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  WW_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)WW_tree->GetEntries() ; n++)
 	{
-		WW_tree->GetEntry(l64t_jentry);
-		hWW->Fill(mHat, weight);
+		
+		WW_tree->GetEntry(n);
+		if(!isVector) hWW->Fill(var, weight);
+		if(isVector && vvar!=0) hWW->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	NormToBinWidthNoErr(hWW);
 	if(hWW->GetMinimum()<ymin) ymin=hWW->GetMinimum();
 	if(hWW->GetMaximum()>ymax) ymax=hWW->GetMaximum();
@@ -1893,14 +2206,18 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string hName, 
 	sProc = "WZ_Herwig";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "WZ_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fWZ = new TFile( path.c_str(), "READ" );
-	TTree* WZ_tree = (TTree*)fWZ->Get("allCuts/allCuts_tree");
-	WZ_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<WZ_tree->GetEntries() ; l64t_jentry++)
+	fWZ = new TFile( path.c_str(), "READ" );
+	WZ_tree = (TTree*)fWZ->Get("allCuts/allCuts_tree");
+	if(!isVector) WZ_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  WZ_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)WZ_tree->GetEntries() ; n++)
 	{
-		WZ_tree->GetEntry(l64t_jentry);
-		hWZ->Fill(mHat, weight);
+		
+		WZ_tree->GetEntry(n);
+		if(!isVector) hWZ->Fill(var, weight);
+		if(isVector && vvar!=0) hWZ->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	NormToBinWidthNoErr(hWZ);
 	if(hWZ->GetMinimum()<ymin) ymin=hWZ->GetMinimum();
 	if(hWZ->GetMaximum()>ymax) ymax=hWZ->GetMaximum();
@@ -1909,14 +2226,18 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string hName, 
 	sProc = "ZZ_Herwig";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "ZZ_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fZZ = new TFile( path.c_str(), "READ" );
-	TTree* ZZ_tree = (TTree*)fZZ->Get("allCuts/allCuts_tree");
-	ZZ_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<ZZ_tree->GetEntries() ; l64t_jentry++)
+	fZZ = new TFile( path.c_str(), "READ" );
+	ZZ_tree = (TTree*)fZZ->Get("allCuts/allCuts_tree");
+	if(!isVector) ZZ_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  ZZ_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)ZZ_tree->GetEntries() ; n++)
 	{
-		ZZ_tree->GetEntry(l64t_jentry);
-		hZZ->Fill(mHat, weight);
+		
+		ZZ_tree->GetEntry(n);
+		if(!isVector) hZZ->Fill(var, weight);
+		if(isVector && vvar!=0) hZZ->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	NormToBinWidthNoErr(hZZ);
 	if(hZZ->GetMinimum()<ymin) ymin=hZZ->GetMinimum();
 	if(hZZ->GetMaximum()>ymax) ymax=hZZ->GetMaximum();
@@ -1925,14 +2246,18 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string hName, 
 	sProc = "T1_McAtNlo_Jimmy";
 	weight = m_dataLumi_pb/(mcProc2kfactor[sProc]*mcProc2nevents[sProc]/(mcProc2sigma[sProc]*mcProc2br[sProc]*mcProc2geneff[sProc]));
 	path = dir + "T1_McAtNlo_Jimmy/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fTTbar = new TFile( path.c_str(), "READ" );
-	TTree* TTbar_tree = (TTree*)fTTbar->Get("allCuts/allCuts_tree");
-	TTbar_tree->SetBranchAddress( "Mhat", &mHat );
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<TTbar_tree->GetEntries() ; l64t_jentry++)
+	fTTbar = new TFile( path.c_str(), "READ" );
+	TTbar_tree = (TTree*)fTTbar->Get("allCuts/allCuts_tree");
+	if(!isVector) TTbar_tree->SetBranchAddress( varName.c_str(), &var );
+	if(isVector)  TTbar_tree->SetBranchAddress( varName.c_str(), &vvar, &b_vvar );
+	for (int n=0 ; n<(int)TTbar_tree->GetEntries() ; n++)
 	{
-		TTbar_tree->GetEntry(l64t_jentry);
-		hTTbar->Fill(mHat, weight);
+		
+		TTbar_tree->GetEntry(n);
+		if(!isVector) hTTbar->Fill(var, weight);
+		if(isVector && vvar!=0) hTTbar->Fill(vvar->at(0), weight);
 	}
+	cout << "after " << sProc << endl;
 	NormToBinWidthNoErr(hTTbar);
 	if(hTTbar->GetMinimum()<ymin) ymin=hTTbar->GetMinimum();
 	if(hTTbar->GetMaximum()>ymax) ymax=hTTbar->GetMaximum();
@@ -1976,11 +2301,85 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string hName, 
 	drawRatio(hRat->GetXaxis()->GetXmin(), hRat->GetXaxis()->GetXmax(), hRat);
 	pad_ratio->RedrawAxis();
 	
-	TString fName = "figures/" + (TString)hNameFixed + "." + (TString)muonLabel;
+	TString fName = "figures/" + (TString)varNameFixed + "." + (TString)muonLabel;
 	cnv->SaveAs(fName+".eps");
 	cnv->SaveAs(fName+".C");
 	cnv->SaveAs(fName+".root");
 	cnv->SaveAs(fName+".png");
+	
+	/*
+	delete hData;
+	delete hZprime_mumu_SSM1000;
+	delete hMC;
+	delete hDYmumu;
+	delete hZZ;
+	delete hWZ;
+	delete hWW;
+	delete hTTbar;
+	delete hDYtautau;
+	
+	delete fData;
+	delete data_tree;
+	
+	delete fZprime_mumu_SSM1000;
+	delete Zprime_tree;
+	
+	delete fDYmumu_75M120;
+	delete DYmumu_75M120_tree;
+	delete fDYmumu_120M250;
+	delete DYmumu_120M250_tree;
+	delete fDYmumu_250M400;
+	delete DYmumu_250M400_tree;
+	delete fDYmumu_400M600;
+	delete DYmumu_400M600_tree;
+	delete fDYmumu_600M800;
+	delete DYmumu_600M800_tree;
+	delete fDYmumu_800M1000;
+	delete DYmumu_800M1000_tree;
+	delete fDYmumu_1000M1250;
+	delete DYmumu_1000M1250_tree;
+	delete fDYmumu_1250M1500;
+	delete DYmumu_1250M1500_tree;
+	delete fDYmumu_1500M1750;
+	delete DYmumu_1500M1750_tree;
+	delete fDYmumu_1750M2000;
+	delete DYmumu_1750M2000_tree;
+	delete fDYmumu_M2000;
+	delete DYmumu_M2000_tree;
+	
+	delete fDYtautau_75M120;
+	delete DYtautau_75M120_tree;
+	delete fDYtautau_120M250;
+	delete DYtautau_120M250_tree;
+	delete fDYtautau_250M400;
+	delete DYtautau_250M400_tree;
+	delete fDYtautau_400M600;
+	delete DYtautau_400M600_tree;
+	delete fDYtautau_600M800;
+	delete DYtautau_600M800_tree;
+	delete fDYtautau_800M1000;
+	delete DYtautau_800M1000_tree;
+	delete fDYtautau_1000M1250;
+	delete DYtautau_1000M1250_tree;
+	delete fDYtautau_1250M1500;
+	delete DYtautau_1250M1500_tree;
+	delete fDYtautau_1500M1750;
+	delete DYtautau_1500M1750_tree;
+	delete fDYtautau_1750M2000;
+	delete DYtautau_1750M2000_tree;
+	delete fDYtautau_M2000;
+	delete DYtautau_M2000_tree;
+
+	delete fWW;
+	delete WW_tree;
+	delete fWZ;
+	delete WZ_tree;
+	delete fZZ;
+	delete ZZ_tree;
+	
+	delete fTTbar;
+	delete TTbar_tree;
+	*/
 }
 
 void combinedGraphics::set_AfbMCvsData(bool logx, bool logy, Double_t min, Double_t max, Double_t minratiox)
@@ -3048,11 +3447,17 @@ void combinedGraphics::draw_trigMaps(string dir, string hDir, string sVar)
 	//float phibins_tgc[phinbins_tgc+1] = {...};
 	//float phibins_rpc[phinbins_rpc+1] = {...};
 	
-	const int phinbins = 10;
-	float dphi = fabs((phi_max-phi_min)/10);
+	const int phinbins = 16;
+	float dphi = fabs((phi_max-phi_min)/(float)phinbins);
+	Double_t phibins[phinbins+1];
+	/*
 	Double_t phibins[phinbins+1] = {phi_min, phi_min+1*dphi, phi_min+2*dphi, phi_min+3*dphi, phi_min+4*dphi, phi_min+5*dphi,
-									phi_min+6*dphi, phi_min+7*dphi, phi_min+8*dphi, phi_min+9*dphi, phi_min+10*dphi
+									phi_min+6*dphi, phi_min+7*dphi, phi_min+8*dphi, phi_min+9*dphi, phi_min+10*dphi,
+									phi_min+11*dphi, phi_min+12*dphi, phi_min+13*dphi, phi_min+14*dphi, phi_min+15*dphi,
+									phi_min+16*dphi
 									};
+	*/
+	for(int i=0 ; i<=phinbins ; i++) phibins[i] = phi_min + i*dphi;
 	
 	if(sVar=="etaphi")
 	{

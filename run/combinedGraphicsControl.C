@@ -55,8 +55,8 @@ void combinedGraphicsControl::executeTmp()
 	m_combinedGraphics->set_allMCvsData(true, true, 1.e-3, 5.e+6, 0.025);
 	m_combinedGraphics->treeDraw_MCvsData(dir, "allCuts", "pt", "p_{T}(#mu^{-}) (TeV)", "#frac{dN}{dp_{T}} 1/TeV");
 	
-	m_combinedGraphics->set_allMCvsData(false, true, 1.e-3, 1.e+6, 0.);
-	m_combinedGraphics->treeDraw_MCvsData(dir, "allCuts", "eta", "#eta(#mu^{-})", "#frac{dN}{d#eta}");
+	m_combinedGraphics->set_allMCvsData(false, true, 1.e-1, 1.e+3, 0.);
+	m_combinedGraphics->treeDraw_MCvsData(dir, "allCuts", "eta", "#eta(#mu^{-})", "N");
 }
 
 	

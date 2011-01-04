@@ -1509,16 +1509,27 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 	for (Int_t i=1 ; i<=imass_nbins ; i++) imassbins[i] = TMath::Power( 10,(logMmin + i*imassBinWidth) );
 	
 	
-	const int constint_pT_nbins = 50;
+	const int constint_pT_nbins = 100;
 	pT_nbins  = constint_pT_nbins;
-	pT_min    = 10.*GeV2TeV;
-	pT_max    = 510.*GeV2TeV;
+	pT_min    = 20.*GeV2TeV;
+	pT_max    = 2020.*GeV2TeV;
 	logpTmin  = log10(pT_min);
 	logpTmax  = log10(pT_max);
 	Double_t pTBinWidth = (Double_t)( (logpTmax-logpTmin)/(Double_t)pT_nbins );
 	Double_t pTbins[constint_pT_nbins+1];
 	pTbins[0] = pT_min;
 	for (Int_t i=1 ; i<=pT_nbins ; i++) pTbins[i] = TMath::Power( 10,(logpTmin + i*pTBinWidth) );
+	
+	const int constint_QT_nbins = 100;
+	Int_t QT_nbins  = constint_QT_nbins;
+	Double_t QT_min    = 1.*GeV2TeV;
+	Double_t QT_max    = 1501.*GeV2TeV;
+	Double_t logQTmin  = log10(QT_min);
+	Double_t logQTmax  = log10(QT_max);
+	Double_t QTBinWidth = (Double_t)( (logQTmax-logQTmin)/(Double_t)QT_nbins );
+	Double_t QTbins[constint_QT_nbins+1];
+	QTbins[0] = QT_min;
+	for (Int_t i=1 ; i<=QT_nbins ; i++) QTbins[i] = TMath::Power( 10,(logQTmin + i*QTBinWidth) );
 	
 	
 	const int etanbins = 22;
@@ -1633,23 +1644,23 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 	{
 		isVector = false;
 		hName = varName + "_data";
-		hData  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hData  = new TH1D(hName.c_str(),hName.c_str(), QT_nbins, QTbins );
 		hName = varName + "_Zprime";
-		hZprime_mumu_SSM1000  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hZprime_mumu_SSM1000  = new TH1D(hName.c_str(),hName.c_str(), QT_nbins, QTbins );
 		hName = varName + "_sumBG";
-		hMC = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hMC = new TH1D(hName.c_str(),hName.c_str(), QT_nbins, QTbins );
 		hName = varName + "_DYmumu";
-		hDYmumu  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hDYmumu  = new TH1D(hName.c_str(),hName.c_str(), QT_nbins, QTbins );
 		hName = varName + "_ZZ";
-		hZZ  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hZZ  = new TH1D(hName.c_str(),hName.c_str(), QT_nbins, QTbins );
 		hName = varName + "_WZ";
-		hWZ  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hWZ  = new TH1D(hName.c_str(),hName.c_str(), QT_nbins, QTbins );
 		hName = varName + "_WW";
-		hWW  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hWW  = new TH1D(hName.c_str(),hName.c_str(), QT_nbins, QTbins );
 		hName = varName + "_TTbar";
-		hTTbar  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hTTbar  = new TH1D(hName.c_str(),hName.c_str(), QT_nbins, QTbins );
 		hName = varName + "_DYtautau";
-		hDYtautau  = new TH1D(hName.c_str(),hName.c_str(), pT_nbins, pTbins );
+		hDYtautau  = new TH1D(hName.c_str(),hName.c_str(), QT_nbins, QTbins );
 	}
 	if(varName=="pt")
 	{
@@ -1790,9 +1801,9 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 			cout << "Exception raised: " << str << endl;
 		}
 		if(!isVector) hData->Fill(var, 1.);
-		if(isVector && vvar!=0) hData->Fill(vvar->at(0), 1.);
+		if(isVector && vvar!=0) hData->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), 1.);
 	}
-	NormToBinWidth(hData);
+	if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidth(hData);
 	if(hData->GetMinimum()<ymin) ymin=hData->GetMinimum();
 	if(hData->GetMaximum()>ymax) ymax=hData->GetMaximum();
 	cout << "after data" << endl;
@@ -1819,9 +1830,9 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 			cout << "Exception raised: " << str << endl;
 		}
 		if(!isVector) hZprime_mumu_SSM1000->Fill(var, weight);
-		if(isVector && vvar!=0) hZprime_mumu_SSM1000->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hZprime_mumu_SSM1000->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
-	NormToBinWidthNoErr(hZprime_mumu_SSM1000);
+	if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hZprime_mumu_SSM1000);
 	if(hZprime_mumu_SSM1000->GetMinimum()<ymin) ymin=hZprime_mumu_SSM1000->GetMinimum();
 	if(hZprime_mumu_SSM1000->GetMaximum()>ymax) ymax=hZprime_mumu_SSM1000->GetMaximum();
 	cout << "after " << sProc << endl;
@@ -1847,7 +1858,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 			cout << "Exception raised: " << str << endl;
 		}
 		if(!isVector) hDYmumu->Fill(var, weight);
-		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYmumu->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
 	sProc = "DYmumu_120M250";
@@ -1870,7 +1881,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 			cout << "Exception raised: " << str << endl;
 		}
 		if(!isVector) hDYmumu->Fill(var, weight);
-		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYmumu->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
 	sProc = "DYmumu_250M400";
@@ -1885,7 +1896,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		DYmumu_250M400_tree->GetEntry(n);
 		if(!isVector) hDYmumu->Fill(var, weight);
-		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYmumu->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
 	sProc = "DYmumu_400M600";
@@ -1900,7 +1911,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		DYmumu_400M600_tree->GetEntry(n);
 		if(!isVector) hDYmumu->Fill(var, weight);
-		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYmumu->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
 	sProc = "DYmumu_600M800";
@@ -1915,7 +1926,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		DYmumu_600M800_tree->GetEntry(n);
 		if(!isVector) hDYmumu->Fill(var, weight);
-		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYmumu->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
 	sProc = "DYmumu_800M1000";
@@ -1930,7 +1941,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		DYmumu_800M1000_tree->GetEntry(n);
 		if(!isVector) hDYmumu->Fill(var, weight);
-		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYmumu->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
 	sProc = "DYmumu_1000M1250";
@@ -1945,7 +1956,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		DYmumu_1000M1250_tree->GetEntry(n);
 		if(!isVector) hDYmumu->Fill(var, weight);
-		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYmumu->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
 	sProc = "DYmumu_1250M1500";
@@ -1960,7 +1971,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		DYmumu_1250M1500_tree->GetEntry(n);
 		if(!isVector) hDYmumu->Fill(var, weight);
-		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYmumu->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
 	sProc = "DYmumu_1500M1750";
@@ -1975,7 +1986,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		DYmumu_1500M1750_tree->GetEntry(n);
 		if(!isVector) hDYmumu->Fill(var, weight);
-		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYmumu->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
 	sProc = "DYmumu_1750M2000";
@@ -1990,7 +2001,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		DYmumu_1750M2000_tree->GetEntry(n);
 		if(!isVector) hDYmumu->Fill(var, weight);
-		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYmumu->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
 	sProc = "DYmumu_M2000";
@@ -2005,10 +2016,10 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		DYmumu_M2000_tree->GetEntry(n);
 		if(!isVector) hDYmumu->Fill(var, weight);
-		if(isVector && vvar!=0) hDYmumu->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYmumu->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
-	NormToBinWidthNoErr(hDYmumu);
+	if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hDYmumu);
 	if(hDYmumu->GetMinimum()<ymin) ymin=hDYmumu->GetMinimum();
 	if(hDYmumu->GetMaximum()>ymax) ymax=hDYmumu->GetMaximum();
 	
@@ -2025,7 +2036,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		DYtautau_75M120_tree->GetEntry(n);
 		if(!isVector) hDYtautau->Fill(var, weight);
-		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYtautau->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
 	sProc = "DYtautau_120M250";
@@ -2040,7 +2051,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		DYtautau_120M250_tree->GetEntry(n);
 		if(!isVector) hDYtautau->Fill(var, weight);
-		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYtautau->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
 	sProc = "DYtautau_250M400";
@@ -2055,7 +2066,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		DYtautau_250M400_tree->GetEntry(n);
 		if(!isVector) hDYtautau->Fill(var, weight);
-		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYtautau->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
 	sProc = "DYtautau_400M600";
@@ -2070,7 +2081,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		DYtautau_400M600_tree->GetEntry(n);
 		if(!isVector) hDYtautau->Fill(var, weight);
-		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYtautau->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
 	sProc = "DYtautau_600M800";
@@ -2085,7 +2096,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		DYtautau_600M800_tree->GetEntry(n);
 		if(!isVector) hDYtautau->Fill(var, weight);
-		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYtautau->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
 	sProc = "DYtautau_800M1000";
@@ -2100,7 +2111,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		DYtautau_800M1000_tree->GetEntry(n);
 		if(!isVector) hDYtautau->Fill(var, weight);
-		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYtautau->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
 	sProc = "DYtautau_1000M1250";
@@ -2115,7 +2126,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		DYtautau_1000M1250_tree->GetEntry(n);
 		if(!isVector) hDYtautau->Fill(var, weight);
-		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYtautau->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
 	sProc = "DYtautau_1250M1500";
@@ -2130,7 +2141,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		DYtautau_1250M1500_tree->GetEntry(n);
 		if(!isVector) hDYtautau->Fill(var, weight);
-		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYtautau->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
 	sProc = "DYtautau_1500M1750";
@@ -2145,7 +2156,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		DYtautau_1500M1750_tree->GetEntry(n);
 		if(!isVector) hDYtautau->Fill(var, weight);
-		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYtautau->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
 	sProc = "DYtautau_1750M2000";
@@ -2160,7 +2171,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		DYtautau_1750M2000_tree->GetEntry(n);
 		if(!isVector) hDYtautau->Fill(var, weight);
-		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYtautau->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
 	sProc = "DYtautau_M2000";
@@ -2175,10 +2186,10 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		DYtautau_M2000_tree->GetEntry(n);
 		if(!isVector) hDYtautau->Fill(var, weight);
-		if(isVector && vvar!=0) hDYtautau->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hDYtautau->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
-	NormToBinWidthNoErr(hDYtautau);
+	if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hDYtautau);
 	if(hDYtautau->GetMinimum()<ymin) ymin=hDYtautau->GetMinimum();
 	if(hDYtautau->GetMaximum()>ymax) ymax=hDYtautau->GetMaximum();
 	
@@ -2195,10 +2206,10 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		WW_tree->GetEntry(n);
 		if(!isVector) hWW->Fill(var, weight);
-		if(isVector && vvar!=0) hWW->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hWW->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
-	NormToBinWidthNoErr(hWW);
+	if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hWW);
 	if(hWW->GetMinimum()<ymin) ymin=hWW->GetMinimum();
 	if(hWW->GetMaximum()>ymax) ymax=hWW->GetMaximum();
 	
@@ -2215,10 +2226,10 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		WZ_tree->GetEntry(n);
 		if(!isVector) hWZ->Fill(var, weight);
-		if(isVector && vvar!=0) hWZ->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hWZ->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
-	NormToBinWidthNoErr(hWZ);
+	if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hWZ);
 	if(hWZ->GetMinimum()<ymin) ymin=hWZ->GetMinimum();
 	if(hWZ->GetMaximum()>ymax) ymax=hWZ->GetMaximum();
 	
@@ -2235,10 +2246,10 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		ZZ_tree->GetEntry(n);
 		if(!isVector) hZZ->Fill(var, weight);
-		if(isVector && vvar!=0) hZZ->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hZZ->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
-	NormToBinWidthNoErr(hZZ);
+	if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hZZ);
 	if(hZZ->GetMinimum()<ymin) ymin=hZZ->GetMinimum();
 	if(hZZ->GetMaximum()>ymax) ymax=hZZ->GetMaximum();
 	
@@ -2255,10 +2266,10 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		
 		TTbar_tree->GetEntry(n);
 		if(!isVector) hTTbar->Fill(var, weight);
-		if(isVector && vvar!=0) hTTbar->Fill(vvar->at(0), weight);
+		if(isVector && vvar!=0) hTTbar->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
-	NormToBinWidthNoErr(hTTbar);
+	if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hTTbar);
 	if(hTTbar->GetMinimum()<ymin) ymin=hTTbar->GetMinimum();
 	if(hTTbar->GetMaximum()>ymax) ymax=hTTbar->GetMaximum();
 	
@@ -2306,80 +2317,6 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 	cnv->SaveAs(fName+".C");
 	cnv->SaveAs(fName+".root");
 	cnv->SaveAs(fName+".png");
-	
-	/*
-	delete hData;
-	delete hZprime_mumu_SSM1000;
-	delete hMC;
-	delete hDYmumu;
-	delete hZZ;
-	delete hWZ;
-	delete hWW;
-	delete hTTbar;
-	delete hDYtautau;
-	
-	delete fData;
-	delete data_tree;
-	
-	delete fZprime_mumu_SSM1000;
-	delete Zprime_tree;
-	
-	delete fDYmumu_75M120;
-	delete DYmumu_75M120_tree;
-	delete fDYmumu_120M250;
-	delete DYmumu_120M250_tree;
-	delete fDYmumu_250M400;
-	delete DYmumu_250M400_tree;
-	delete fDYmumu_400M600;
-	delete DYmumu_400M600_tree;
-	delete fDYmumu_600M800;
-	delete DYmumu_600M800_tree;
-	delete fDYmumu_800M1000;
-	delete DYmumu_800M1000_tree;
-	delete fDYmumu_1000M1250;
-	delete DYmumu_1000M1250_tree;
-	delete fDYmumu_1250M1500;
-	delete DYmumu_1250M1500_tree;
-	delete fDYmumu_1500M1750;
-	delete DYmumu_1500M1750_tree;
-	delete fDYmumu_1750M2000;
-	delete DYmumu_1750M2000_tree;
-	delete fDYmumu_M2000;
-	delete DYmumu_M2000_tree;
-	
-	delete fDYtautau_75M120;
-	delete DYtautau_75M120_tree;
-	delete fDYtautau_120M250;
-	delete DYtautau_120M250_tree;
-	delete fDYtautau_250M400;
-	delete DYtautau_250M400_tree;
-	delete fDYtautau_400M600;
-	delete DYtautau_400M600_tree;
-	delete fDYtautau_600M800;
-	delete DYtautau_600M800_tree;
-	delete fDYtautau_800M1000;
-	delete DYtautau_800M1000_tree;
-	delete fDYtautau_1000M1250;
-	delete DYtautau_1000M1250_tree;
-	delete fDYtautau_1250M1500;
-	delete DYtautau_1250M1500_tree;
-	delete fDYtautau_1500M1750;
-	delete DYtautau_1500M1750_tree;
-	delete fDYtautau_1750M2000;
-	delete DYtautau_1750M2000_tree;
-	delete fDYtautau_M2000;
-	delete DYtautau_M2000_tree;
-
-	delete fWW;
-	delete WW_tree;
-	delete fWZ;
-	delete WZ_tree;
-	delete fZZ;
-	delete ZZ_tree;
-	
-	delete fTTbar;
-	delete TTbar_tree;
-	*/
 }
 
 void combinedGraphics::set_AfbMCvsData(bool logx, bool logy, Double_t min, Double_t max, Double_t minratiox)

@@ -13,34 +13,31 @@
 #define GRLinterface_cxx
 #include "GRLinterface.C"
 
-#define muon_staco_cxx
-#include "muon_staco.C"
-
-#define muon_muid_cxx
-#include "muon_muid.C"
-
-#define muD3PD_cxx
-#include "muD3PD.C"
+#define WZphysD3PDmaker_cxx
+#include "WZphysD3PDmaker.C"
 
 #ifndef ANALYSIS_H
 #define ANALYSIS_H
 
-class analysis : public physics, public analysisSkeleton
+class analysis : public WZphysD3PD, public analysisSkeleton
 {
 public:
 	// pointers
-	physics*      m_phys;
-	muon_muid*    m_muid;
-	muon_staco*   m_mustaco;
-	GRLinterface* m_analysis_grl;
-	muD3PD*       m_muD3PD;
-	TFile*		  m_treeFile;
+	WZphysD3PD*      m_WZphysD3PD;
+	GRLinterface*    m_analysis_grl;
+	WZphysD3PDmaker* m_WZphysD3PDmaker;
+	TFile*		     m_treeFile;
+	
+	//ofstream* f;
 	
 	// local
+	string sRunType;
 	string sMuonRecoAlgo;
-	int nMus;
+	bool   m_isMC;
+	int    nMus;
 	
 	// temp
+	int nSkim;
 	int nAll;
 	int n0mu;
 	int n1mu;
@@ -51,27 +48,46 @@ public:
 
 public:
 	analysis();
-	analysis(physics* phys, GRLinterface* grl, TFile* treeFile, string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath ) :
+	analysis(string runtype,
+			 string murecalg,
+			 bool isMC,
+			 WZphysD3PD* wzphysd3pd,
+			 GRLinterface* grl,
+			 TFile* treeFile,
+			 string sCutFlowFilePath,
+			 string sPeriodsFilePath,
+			 string sEventDumpFilePath) :
 	analysisSkeleton(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
 	{
-		sMuonRecoAlgo = "staco";
-		m_phys = phys;
+		sRunType       = runtype;  // grid OR local
+		sMuonRecoAlgo  = murecalg; // staco OR muid
+		m_isMC         = isMC;     // ...
+		
+		m_WZphysD3PD   = wzphysd3pd;
 		m_analysis_grl = grl;	
-		m_treeFile = treeFile;
-		//m_offTree = new offTree( m_phys, NULL, m_treeFile ); // the NULL arg is the [mcPhysics* m_mcPhys;] variable
-		m_muD3PD  = new muD3PD( m_phys, NULL, m_treeFile ); // the NULL arg is the [mcPhysics* m_mcPhys;] variable
-		m_muid    = new muon_muid(  m_phys ); // this will also "turn on" the desired branches (virtual in the base)
-		m_mustaco = new muon_staco( m_phys ); // this will also  "turn on" the desired branches (virtual in the base)
+		m_treeFile     = treeFile;
+
+		m_WZphysD3PDmaker  = new WZphysD3PDmaker( m_WZphysD3PD, sRunType, m_isMC, m_treeFile );
+		
+		nSkim = 0;
+		nAll = 0;
+		n0mu = 0;
+		n1mu = 0;
+		n2mu = 0;
+		n3mu = 0;
+		n4mu = 0;
+		nNmu = 0;
+		
+		//f = new ofstream("trig.txt");
 	}
 	~analysis();
-
 
 	void setEventVariables();
 	void setStacoVariables();
 	void setMuidVariables();
+	void setTrigVariables();
 	
-	void executeAdvanced();
-	void execute( string mualgo = "staco" );
+	void execute();
 	
 	void write();
 

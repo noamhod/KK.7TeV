@@ -628,6 +628,57 @@ bool selection::nIDhitsMCPrel15Cut(float nSCThitsCutVal, float nPIXhitsCutVal, f
 	return true;
 }
 
+bool selection::nIDhitsRel16Cut(float expectBLayerHitCutVal, float nBLHitsCutVal, 
+								float nPIXhitsCutVal,        float nSCThitsCutVal,     float nPIXSCTHolesCutVal,
+								float nTRThitsCutVal,        float nTRTratioThreshold, float etaAbsThreshold,
+								int   expectBLayerHit,       int nBLHits,
+								int   nPIXhits,              int nPixelDeadSensors,    int nPixHoles,
+								int   nSCThits,              int nSCTDeadSensors,      int nSCTHoles,   
+								int   nTRTHits,              int nTRTOutliers,
+								float eta
+								)
+{
+	// !expectBLayerHit OR numberOfBLayerHits >= 1,
+	// number of pixel hits + number of crossed dead pixel sensors >=2,
+	// number of SCT hits + number of crossed dead SCT sensors >= 6,
+	// Number of pixel holes + number of SCT holes <= 1, 
+	// TRT hits > 5 for eta<1.9, outlier fraction < 0.9.
+	// If TRT hits >5 for eta>=1.9, outlier fraction < 0.9
+	
+	//bool passedEXPBL = (!expectBLayerHit) ? true : false;
+	bool passedEXPBL = (expectBLayerHit==(int)expectBLayerHitCutVal) ? true : false;
+	bool passedBL    = (nBLHits>=nBLHitsCutVal)                 ? true : false;
+	if(!(passedEXPBL||passedBL)) return false;
+	
+	bool passedPIX = ((nPIXhits+nPixelDeadSensors) >= nPIXhitsCutVal) ? true : false;
+	if(!passedPIX) return false;
+	
+	bool passedSCT = ((nSCThits+nSCTDeadSensors) >= nSCThitsCutVal) ? true : false;
+	if(!passedSCT) return false;
+	
+	bool passedHOL = ((nPixHoles+nSCTHoles) <= nPIXSCTHolesCutVal) ? true : false;
+	if(!passedHOL) return false;
+	
+	int nTRT = nTRTHits+nTRTOutliers;
+	if(fabs(eta)<etaAbsThreshold)
+	{
+		bool passedTRTsum = (nTRT > nTRThitsCutVal) ? true : false;
+		bool passedTRTrat = ((float)nTRTOutliers < nTRTratioThreshold*(float)nTRT) ? true : false;
+		bool passedTRT = (passedTRTsum && passedTRTrat) ? true : false;
+		if(!passedTRT) return false;
+	}
+	else if(fabs(eta)>=etaAbsThreshold)
+	{
+		if(nTRT>nTRThitsCutVal)
+		{
+			bool passedTRTrat = ((float)nTRTOutliers < nTRTratioThreshold*(float)nTRT) ? true : false;
+			if(!passedTRTrat) return false;
+		}
+	}
+	
+	return true;
+}
+
 bool selection::nMS3stationsMDThits(float nMDTIHitsCutVal, float nMDTMHitsCutVal, float nMDTOHitsCutVal, float nMDTBEEHitsCutVal, float nMDTBIS78HitsCutVal,
 									int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,
 									int nMDTEIHits, int nMDTEMHits, int nMDTEOHits,
@@ -757,6 +808,50 @@ bool selection::nMShits2(float nMDTB_IMO_HitsCutVal, float nMDTE_IMEO_HitsCutVal
 	bool passedCSCPhi = (nCSCPhiHits                                                               >= nCSCPhiHitsCutVal) ? true : false;
 	bool passedRPCTGC = (((int)passedRPC+(int)passedTGC+(int)passedCSCPhi)                         >= nRPCTGCsumsCutVal) ? true : false;
 	if(!passedRPCTGC) return false;
+	
+	return true;
+}
+
+bool selection::nMShitsRel16(float nMDTB_IMO_HitsCutVal, float nMDTE_IMO_HitsCutVal,
+							 float nMDTBEEHitsCutVal, float nMDTEEHitsCutVal,
+							 float nCSCEtaHitsCutVal,
+							 float nMDTCSCsumCutVal, float nRPCTGCCSCsumsCutVal,
+							 int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,
+							 int nMDTEIHits, int nMDTEMHits, int nMDTEOHits,
+							 int nMDTBEEHits, int nMDTEEHits,
+							 int nRPCLayer1PhiHits, int nRPCLayer2PhiHits, int nRPCLayer3PhiHits,
+						  	 int nTGCLayer1PhiHits, int nTGCLayer2PhiHits, int nTGCLayer3PhiHits, int nTGCLayer4PhiHits,
+							 int nCSCEtaHits, int nCSCPhiHits
+							 )
+{
+	// ( \ Sum_$=IMO nMDTB$Hits>=3 + \Sum_$=IMO nMDTE$Hits>=3 + nCSCEtaHits>=3 ) >=3 &&
+	// mu_muid_nMDTBEEHits==0 &&
+	// mu_muid_nMDTEEHits==0 &&
+	// (\Sum_K=1^3 nRPCLayerKPhiHits + \Sum_K=1^4 nTGCLayerKPhiHits + nCSCPhiHits )>=1
+	
+	bool passedMDTBI = (nMDTBIHits >= nMDTB_IMO_HitsCutVal) ? true : false;
+	bool passedMDTBM = (nMDTBMHits >= nMDTB_IMO_HitsCutVal) ? true : false;
+	bool passedMDTBO = (nMDTBOHits >= nMDTB_IMO_HitsCutVal) ? true : false;
+	bool passedMDTEI = (nMDTEIHits >= nMDTE_IMO_HitsCutVal) ? true : false;
+	bool passedMDTEM = (nMDTEMHits >= nMDTE_IMO_HitsCutVal) ? true : false;
+	bool passedMDTEO = (nMDTEOHits >= nMDTE_IMO_HitsCutVal) ? true : false;
+	bool passedCSC   = (nCSCEtaHits >= nCSCEtaHitsCutVal)   ? true : false;
+	bool passedMDTCSC = ((passedMDTBI+passedMDTBM+passedMDTBO +
+						  passedMDTEI+passedMDTEM+passedMDTEO + 
+						  passedCSC) >= nMDTE_IMO_HitsCutVal) ? true : false;
+	if(!passedMDTCSC) return false;
+	 
+	bool passedMDTBEE = (nMDTBEEHits==nMDTBEEHitsCutVal) ? true : false;
+	if(!passedMDTBEE) return false;
+	
+	bool passedMDTEE  = (nMDTEEHits==nMDTEEHitsCutVal) ? true : false;
+	if(!passedMDTEE) return false;
+	
+	int nRPCTGCCSCsum = nRPCLayer1PhiHits+nRPCLayer2PhiHits+nRPCLayer3PhiHits + 
+						nTGCLayer1PhiHits+nTGCLayer2PhiHits+nTGCLayer3PhiHits+nTGCLayer4PhiHits +
+						nCSCPhiHits;
+	bool passedRPCTGCCSC = (nRPCTGCCSCsum >= nRPCTGCCSCsumsCutVal) ? true : false;
+	if(!passedRPCTGCCSC) return false;
 	
 	return true;
 }

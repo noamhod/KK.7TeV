@@ -5,30 +5,26 @@
 /* on 23/07/2010 14:34 */
 /* * * * * * * * * * * */
 
-#ifdef chains_cxx
-#include "chains.h"
+#ifdef chainMaker_cxx
+#include "chainMaker.h"
 
-chains::chains()
+chainMaker::chainMaker()
 {
-	cinitialize();
+	m_vStr2find = NULL;
 }
 
-chains::~chains()
+chainMaker::~chainMaker()
 {
-	cfinalize();
+	
 }
 
-void chains::cinitialize()
+void chainMaker::chainInit(vector<string>* vStr2find)
 {
 	m_chain = new TChain("physics");
+	m_vStr2find = vStr2find;
 }
 
-void chains::cfinalize()
-{
-
-}
-
-void chains::list2chain(string sListFilePath, string sListContentAbsolutePath)
+void chainMaker::list2chain(string sListFilePath, string sListContentAbsolutePath, int runNumber)
 {
 	ifstream file;
 	file.open(sListFilePath.c_str());
@@ -37,6 +33,7 @@ void chains::list2chain(string sListFilePath, string sListContentAbsolutePath)
 	size_t min = 32000;
 	int nfound = 0;
 	int nignored = 0;
+	bool strFound = true;
 	while(!file.eof())
 	{
 		getline(file,sLine);
@@ -44,9 +41,26 @@ void chains::list2chain(string sListFilePath, string sListContentAbsolutePath)
 		pos = sLine.find(".root");
 		if (pos == string::npos) { nignored++; continue; } // if pattern ".root" is not found
 		
-		pos = sLine.find("D3PD._");
-		if (pos == string::npos) { nignored++; continue; } // if pattern "D3PD._" is not found
-
+		if(m_vStr2find!=NULL)
+		{
+			for(int s=0 ; s<(int)m_vStr2find->size() ; s++)
+			{
+				pos = sLine.find( m_vStr2find->at(s) );
+				if (pos == string::npos) strFound = false;
+			}
+			if(!strFound) { nignored++; continue; } // if 1 pattern from all the patterns stored in m_vStr2find is not found
+		}
+		
+		if (runNumber != 0)
+		{
+			stringstream strm;
+			strm << runNumber;
+			string str = "";
+			strm >> str;
+			pos = sLine.find( str.c_str() );
+			if (pos == string::npos) { nignored++; continue; } // if pattern ".root" is not found
+		}
+		
 		size_t fileSize = 0;
 		ifstream infile(sLine.c_str());
 		if(infile.is_open())
@@ -67,14 +81,14 @@ void chains::list2chain(string sListFilePath, string sListContentAbsolutePath)
 	cout << "ignored " << nignored << " entries in " << sListFilePath << endl; 
 }
 
-void chains::makeChain(bool doList, string sListFilePath, string sListContentAbsolutePath)
+void chainMaker::makeChain(bool doList, string sListFilePath, string sListContentAbsolutePath, int runNumber)
 {
-	list2chain(sListFilePath, sListContentAbsolutePath);
+	list2chain(sListFilePath, sListContentAbsolutePath, runNumber);
 	if(doList) m_chain->ls();
 }
 
 
-void chains::drawFromChain()
+void chainMaker::drawFromChain()
 {
 	//TCut cut0  = "mu_muid_charge->size()==2";
 	TCut cut1  = "mu_muid_charge[0]+mu_muid_charge[1]==0";

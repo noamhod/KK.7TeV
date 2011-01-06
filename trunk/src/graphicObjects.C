@@ -305,7 +305,7 @@ void graphicObjects::ginitialize()
 	TMapsvd::iterator it7=cut_cutFlowMapSVD->find("pTandEta");
 	TMapsvd::iterator itEnd=cut_cutFlowMapSVD->end();
 	if     ( it1 != itEnd ) pTcutNmae = "pT";
-	if     ( it2 != itEnd ) pTcutNmae = "pT_loose";
+	else if( it2 != itEnd ) pTcutNmae = "pT_loose";
 	else if( it3 != itEnd ) pTcutNmae = "pT_qOp+theta";
 	else if( it4 != itEnd ) pTcutNmae = "pT_qOp+theta_loose";
 	else if( it5 != itEnd ) pTcutNmae = "pTandEtaTight";

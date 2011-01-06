@@ -22,6 +22,8 @@ class tagNprobe
 		float pTprobe;
 		float dRbest;
 		float dRthreshold;
+		float muTrig_dRthreshold;
+		float mu_dRthreshold;
 		int   truth_pTmaxIndex;
 		int   recon_pTmaxIndex;
 		int   tagIndex;
@@ -36,6 +38,28 @@ class tagNprobe
 		~tagNprobe();
 
 		void reset();
+		
+		//------- for rel 16 ------------------------------------------------------------
+		int matchLXtrigger(int mu_ROIindex,
+						   float mu_dR,
+						   float mu_phi,
+						   float mu_eta,
+						   float pTthreshold,
+						   vector<float>*  trig_phi,
+						   vector<float>*  trig_eta,
+						   vector<float>*  trig_pt,
+						   vector<string>* trig_thresholdName, ofstream* f);
+		int matchEFtrigger(int mu_ROIindex,
+						   float mu_dR,
+						   float mu_phi,
+						   float mu_eta,
+						   float pTthreshold,
+						   vector<vector<float> >* trig_phi,
+						   vector<vector<float> >* trig_eta,
+						   vector<vector<float> >* trig_pt,
+						   vector<vector<int> >*   trig_has, ofstream* f);
+		//-------------------------------------------------------------------------------  
+									 
 		bool findTag(vector<int>* trigger_match, vector<float>* dR);
 		int  findProbe(vector<int>* trigger_match, TVectorP2VL& pmu, vector<float>* charge, int itag);
 		int  tagNprobeMask(int wasEventTriggered, vector<int>* trigger_match, vector<float>* dR,

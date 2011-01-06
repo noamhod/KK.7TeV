@@ -17,6 +17,10 @@ using namespace std;
 
 TFile *fout;
 TChain *fChain;
+string sRun;
+string sRec;
+string sMCorData;
+bool   isMC;
 
 bool fileexists(string filename)
 {
@@ -37,11 +41,33 @@ void exitIfNotExist(string fullPath)
 
 void analysisGridControlRun()
 {
+	ifstream ifsel("runControl.txt");
+	ifsel >> sRun >> sRec >> sMCorData;
+	ifsel.close();
+	
+	if(sRun!="grid")
+	{
+		cout << "ERROR: YOU CHOSE RUN   [" << sRun << "], exitting now" << endl;
+		exit(-1);
+	}
+	if(sRec!="staco"  &&  sRec!="muid")
+	{
+		cout << "ERROR: YOU CHOSE REC ALG   [" << sRec << "], exitting now" << endl;
+		exit(-1);
+	}
+	if(sMCorData!="mc"  &&  sMCorData!="data")
+	{
+		cout << "ERROR: YOU CHOSE MC/DATA   [" << sMCorData << "], exitting now" << endl;
+		exit(-1);
+	}
+	isMC = (sMCorData=="mc") ? true : false;
+	
 	// read a string via file since long string causes memory error in CINT when it is read via stdin
 	string argStr;
 	char buf[256+1];
 	unsigned int delpos;
-	ifstream ifs("input.txt");
+	string sFileName = (isMC) ? "inputMC.txt" : "input.txt";
+	ifstream ifs(sFileName.c_str());
 	cout << "#################################################################################################" << endl;
 	while (true)
 	{
@@ -100,7 +126,8 @@ void analysisGridControlRun()
 	}
 
 	
-	TString fileName ="WZphys.root";
+	TString fileName;
+	fileName = (isMC) ? "mcWZphys.root" : "WZphys.root";
 	fout = new TFile(fileName, "RECREATE");
 	
 	// some includings and loadings
@@ -119,7 +146,7 @@ void analysisGridControlRun()
 	gROOT->ProcessLine(".L Loader.C+");
 	
 	gROOT->ProcessLine(".L analysisGridControl.C++");
-	gROOT->ProcessLine("analysisGridControl agc(fChain, fout);");
+	gROOT->ProcessLine("analysisGridControl agc(fChain, fout, sRun, sRec, isMC);");
 	gROOT->ProcessLine("agc.loop(0,0);");
 }
 

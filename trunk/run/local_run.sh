@@ -2,23 +2,17 @@
 
 # mc or data ?
 mcordata=$1
-controller=""
-if [ "$mcordata" = "mc" ] ; then
-   controller=mcAnalysisGridControlRun.C
-elif [ "$mcordata" = "data" ] ; then
-   controller=analysisGridControlRun.C
-else
-   echo "choose mc or data..."
-   return
-fi
+controller=analysisGridControlRun.C
+
 
 # the data set
-#datasetfiles=/tmp/hod/group10.phys-sm.data10_7TeV.00159224.physics_MuonswBeam.recon.ESD.x30.WZphys.100612.02.D3PD.D3PD._01067.root
 datasetfiles=$2
 
 
 # the GRL version
 grlvs=00-00-91
+
+runcontrolfile='runControl.txt'
 
 
 # add to LD_LIBRARY_PATH
@@ -37,7 +31,7 @@ dateandhour=`date +d%d%m%Y.h%H%M`
 
 
 # remove the arlier outputs
-rm -f input.txt
+#rm -f input.txt
 #rm -f WZphys.root
 rm -f Loader_C.so
 
@@ -54,4 +48,13 @@ chmod 777 Z_GRL_CURRENT.xml
 
 
 # submit the local run
-echo $datasetfiles > input.txt; root.exe -b $controller;
+rm -f $runcontrolfile;
+echo "grid"  >> $runcontrolfile;
+echo "staco" >> $runcontrolfile;
+if [ "$mcordata" = "mc" ] ; then
+   echo "mc" >> $runcontrolfile;
+elif [ "$mcordata" = "data" ] ; then
+   echo "data" >> $runcontrolfile;
+fi
+
+root.exe -b $controller

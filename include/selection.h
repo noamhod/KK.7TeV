@@ -109,6 +109,14 @@ public:
 							float etaAbsThreshold, float nTRTratioThreshold,
 							int nSCThits, int nPIXhits, int nTRTHits, int nTRTOutliers,
 							float eta);
+	bool nIDhitsRel16Cut(float expectBLayerHitCutVal, float nBLHitsCutVal, 
+						 float nPIXhitsCutVal,        float nSCThitsCutVal,     float nPIXSCTHolesCutVal,
+						 float nTRThitsCutVal,        float nTRTratioThreshold, float etaAbsThreshold,
+						 int   expectBLayerHit,       int nBLHits,
+						 int   nPIXhits,              int nPixelDeadSensors,    int nPixHoles,
+						 int   nSCThits,              int nSCTDeadSensors,      int nSCTHoles,   
+						 int   nTRTHits,              int nTRTOutliers,
+						 float eta);
 	
 	bool nMS3stationsMDThits(float nMDTIHitsCutVal, float nMDTMHitsCutVal, float nMDTOHitsCutVal, float nMDTBEEHitsCutVal, float nMDTBIS78HitsCutVal,
 							 int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,
@@ -142,6 +150,17 @@ public:
 				  int nTGCLayer1PhiHits, int nTGCLayer2PhiHits, int nTGCLayer3PhiHits, int nTGCLayer4PhiHits,
 				  int nCSCEtaHits, int nCSCPhiHits
 				 );
+	bool nMShitsRel16(float nMDTB_IMO_HitsCutVal, float nMDTE_IMO_HitsCutVal,
+					  float nMDTBEEHitsCutVal, float nMDTEEHitsCutVal,
+					  float nCSCEtaHitsCutVal,
+					  float nMDTCSCsumCutVal, float nRPCTGCCSCsumsCutVal,
+					  int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,
+					  int nMDTEIHits, int nMDTEMHits, int nMDTEOHits,
+					  int nMDTBEEHits, int nMDTEEHits,
+					  int nRPCLayer1PhiHits, int nRPCLayer2PhiHits, int nRPCLayer3PhiHits,
+					  int nTGCLayer1PhiHits, int nTGCLayer2PhiHits, int nTGCLayer3PhiHits, int nTGCLayer4PhiHits,
+					  int nCSCEtaHits, int nCSCPhiHits
+					  );
 	bool nMShits2noCSCphi(
 				  float nMDTB_IMO_HitsCutVal, float nMDTE_IMEO_HitsCutVal,
 				  float nMDTBIS78HitsCutVal, float nMDTBEEHitsCutVal,

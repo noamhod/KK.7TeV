@@ -7,13 +7,19 @@
 
 # ARGUMENT 1:
 #   run type
+type=""
 mcordata=$1
+inputtxt=""
 if [ "$mcordata" = "mc" ] ; then
    echo ""
    echo "MC run"
+   type="mcWZphys"
+   inputtxt="inputMC.txt"
 elif [ "$mcordata" = "data" ] ; then
    echo ""
    echo "DATA run"
+   type="WZphys"
+   inputtxt="input.txt"
 else
    exit
 fi
@@ -30,6 +36,7 @@ datasetname=$3
 # the GRL version
 grlvs=00-00-91
 athenatag=16.0.2
+runcontrolfile='runControl.txt'
 
 # add to LD_LIBRARY_PATH
 ispwdld=`echo $LD_LIBRARY_PATH | grep $PWD`
@@ -47,8 +54,7 @@ dateandhour=`date +d%d%m%Y.h%H%M`
 
 
 # remove the arlier outputs
-rm -f input.txt
-rm -f z0analysis.root
+#rm -f input.txt
 rm -f Loader_C.so
 
 # get the latest grl and cut flow
@@ -64,22 +70,13 @@ chmod 777 Z_GRL_CURRENT.xml
 
 
 # submit the panda run with a single dataset using --writeInputToTxt
+rm -f $runcontrolfile;
+echo "grid"  >> $runcontrolfile;
+echo "staco" >> $runcontrolfile;
 if [ "$mcordata" = "mc" ] ; then
-   prun --exec "root.exe -b -q mcAnalysisGridControlRun.C;" --writeInputToTxt IN:input.txt  --athenaTag=$athenatag --outDS user.hod.mcWZphys.$runnumber.$dateandhour  --outputs mcWZphys.root --inDS $datasetname  --extFile mcAnalysisGridControl_C.so, Loader_C.so, ../GoodRunsLists-$grlvs/StandAlone/libGoodRunsLists.so --workDir ../  --tmpDir /tmp/hod/prun_info --nGBPerJob=10
+   echo "1" >> $runcontrolfile;
 elif [ "$mcordata" = "data" ] ; then
-   prun --exec "root.exe -b -q analysisGridControlRun.C;" --writeInputToTxt IN:input.txt  --athenaTag=$athenatag --outDS user.hod.WZphys.$runnumber.$dateandhour  --outputs WZphys.root --inDS $datasetname  --extFile analysisGridControl_C.so, Loader_C.so, ../GoodRunsLists-$grlvs/StandAlone/libGoodRunsLists.so --workDir ../  --tmpDir /tmp/hod/prun_info  --nGBPerJob=10
-else
-   exit
+   echo "0" >> $runcontrolfile;
 fi
 
-#prun --exec "root.exe -b -q analysisGridControlRun.C;" --writeInputToTxt IN:input.txt  --athenaTag=$athenatag --outDS user.hod.WZphys.$runnumber.$dateandhour  --outputs WZphys.root --inDS $datasetname  --extFile analysisGridControl_C.so, Loader_C.so, ../GoodRunsLists-$grlvs/StandAlone/libGoodRunsLists.so --workDir ../  --tmpDir /tmp/hod/prun_info
-
-#prun --site WISC_GROUP --exec "root.exe -b -q analysisGridControlRun.C;" --writeInputToTxt IN:input.txt  --athenaTag=$athenatag --outDS user.hod.WZphys.$runnumber.$dateandhour  --outputs WZphys.root --inDS $datasetname  --extFile analysisGridControl_C.so, Loader_C.so, ../GoodRunsLists-$grlvs/StandAlone/libGoodRunsLists.so --workDir ../  --tmpDir /tmp/hod/prun_info
-
-# or, submit the panda run with a single dataset using shell echo command (can handle up to 200 files)
-#prun --exec "echo %IN > input.txt;  root.exe analysisGridControlRun.C;" --athenaTag=$athenatag --outDS user.hod.z0analysis.$dateandhour --outputs z0analysis.root --inDS group10.phys-sm.data10_7TeV.00159224.physics_MuonswBeam.recon.ESD.x30.WZphys.100612.02.D3PD  --extFile analysisGridControl_C.so, ../GoodRunsLists-$grlvs/StandAlone/libGoodRunsLists.so --workDir ../
-
-# submit the panda run with a single dataset, using only 10 of its files
-#prun --exec "echo %IN > input.txt;  root.exe analysisGridControlRun.C;" --athenaTag=$athenatag --outDS user.hod.z0analysis.$dateandhour --outputs z0analysis.root --inDS group10.phys-sm.data10_7TeV.00159224.physics_MuonswBeam.recon.ESD.x30.WZphys.100612.02.D3PD   --extFile analysisGridControl_C.so, ../GoodRunsLists-$grlvs/StandAlone/libGoodRunsLists.so --workDir ../  --nFiles 10
-
-# submit the panda run with multiple datasets
+prun --exec "root.exe -b -q analysisGridControlRun.C;" --writeInputToTxt IN:$iputtxt  --athenaTag=$athenatag --outDS user.hod.$type.$runnumber.$dateandhour  --outputs $type.root --inDS $datasetname  --extFile analysisGridControl_C.so, Loader_C.so, ../GoodRunsLists-$grlvs/StandAlone/libGoodRunsLists.so --workDir ../  --tmpDir /tmp/hod/prun_info  --nGBPerJob=10

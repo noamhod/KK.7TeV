@@ -21,7 +21,7 @@ class chains
 		~chains();
 	
 		void cinitialize();
-                void cfinalize();
+        void cfinalize();
 	
 		void list2chain(string sListFilePath, string sListContentAbsolutePath = "");
 		void makeChain(bool doList = false, string sListFilePath = "dataset.list", string sListContentAbsolutePath = "");

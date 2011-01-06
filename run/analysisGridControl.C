@@ -12,11 +12,13 @@ analysisGridControl::analysisGridControl()
 
 }
 
-analysisGridControl::analysisGridControl( TChain* inchain, TFile* outfile )
+analysisGridControl::analysisGridControl( TChain* inchain, TFile* outfile, string sRun, string sRec, bool isMC )
 {
 	startTimer();
 	
-	m_muRecAlgo = "staco";
+	m_RunType   = sRun; // "grid" OR "local"
+	m_muRecAlgo = sRec; // "staco" OR "muid"
+	m_isMC      = isMC;
 
 	string str = "";
 	
@@ -25,7 +27,7 @@ analysisGridControl::analysisGridControl( TChain* inchain, TFile* outfile )
 	m_chain    = inchain;
 	m_rootfile = outfile;
 
-	m_phys = new physics( m_chain );
+	m_WZphysD3PD = new WZphysD3PD( m_chain, m_isMC );
 
 	m_rootfile->cd();
 
@@ -33,7 +35,9 @@ analysisGridControl::analysisGridControl( TChain* inchain, TFile* outfile )
 	m_GRL = new GRLinterface();
 	m_GRL->glrinitialize( (TString)str );
 
-	m_analysis = new analysis( m_phys, m_GRL, m_rootfile, "cutFlow.cuts", "dataPeriods.data", "" );
+	m_analysis = new analysis( m_RunType, m_muRecAlgo, m_isMC,
+							   m_WZphysD3PD, m_GRL, m_rootfile,
+							   "cutFlow.cuts", "dataPeriods.data", "" );
 	
 	book();
 	
@@ -72,9 +76,9 @@ void analysisGridControl::finalize()
 
 	// tree
 	// the tree will split into multiple files
-	m_rootfile = m_analysis->m_muD3PD->m_tree->GetCurrentFile();
+	m_rootfile = m_analysis->m_WZphysD3PDmaker->m_tree->GetCurrentFile();
 	m_rootfile->cd();
-	m_analysis->m_muD3PD->m_tree->Write();
+	m_analysis->m_WZphysD3PDmaker->m_tree->Write();
 	m_rootfile->Write();
 	m_rootfile->Close();
 }
@@ -154,14 +158,15 @@ void analysisGridControl::fits()
 
 void analysisGridControl::analyze()
 {
-	m_analysis->execute(m_muRecAlgo);
+	//m_analysis->execute(m_muRecAlgo);
+	m_analysis->execute();
 }
 
 void analysisGridControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 {
-	if (m_phys->fChain == 0)  return;
+	if (m_WZphysD3PD->fChain == 0)  return;
 
-	l64t_nentries = m_phys->fChain->GetEntriesFast();
+	l64t_nentries = m_WZphysD3PD->fChain->GetEntriesFast();
 	l64t_nbytes = 0;
 	l64t_nb = 0;
 
@@ -176,13 +181,13 @@ void analysisGridControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 
 	for (l64t_jentry=l64t_startEvent ; l64t_jentry<l64t_stopEvent/*l64t_nentries*/ ; l64t_jentry++)
 	{
-		l64t_ientry = m_phys->LoadTree(l64t_jentry);
+		l64t_ientry = m_WZphysD3PD->LoadTree(l64t_jentry);
 		if (l64t_ientry < 0) break;
-		l64t_nb = m_phys->fChain->GetEntry(l64t_jentry);
+		l64t_nb = m_WZphysD3PD->fChain->GetEntry(l64t_jentry);
 		l64t_nbytes += l64t_nb;
 		// if (Cut(l64t_ientry) < 0) continue;
 		
-		if(l64t_jentry%1000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_phys->RunNumber << "\tlumiblock=" << m_phys->lbn << endl;
+		if(l64t_jentry%1000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_WZphysD3PD->RunNumber << "\tlumiblock=" << m_WZphysD3PD->lbn << endl;
 		if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries);
 		
 		if(l64t_jentry%1000==0)
@@ -203,12 +208,14 @@ void analysisGridControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	
 	stopTimer(true);
 	
-	cout << "nAll = " << m_analysis->nAll << endl;
-	cout << "n0mu(pT>15GeV) = " << m_analysis->n0mu << endl;
-	cout << "n1mu(pT>15GeV) = " << m_analysis->n1mu << endl;
-	cout << "n2mu(pT>15GeV) = " << m_analysis->n2mu << endl;
-	cout << "n3mu(pT>15GeV) = " << m_analysis->n3mu << endl;
-	cout << "n4mu(pT>15GeV) = " << m_analysis->n4mu << endl;
-	cout << "nNmu(pT>15GeV) = " << m_analysis->nNmu << endl;
+	cout << "nAll           = " << m_analysis->nAll << endl;
+	cout << "n0mu           = " << m_analysis->n0mu << endl;
+	cout << "n1mu(pT>10GeV) = " << m_analysis->n1mu << endl;
+	cout << "n2mu(pT>10GeV) = " << m_analysis->n2mu << endl;
+	cout << "n3mu(pT>10GeV) = " << m_analysis->n3mu << endl;
+	cout << "n4mu(pT>10GeV) = " << m_analysis->n4mu << endl;
+	cout << "nNmu(pT>10GeV) = " << m_analysis->nNmu << endl;
+	cout << "nSkim          = " << m_analysis->nSkim << endl;
+	cout << "nSkim%         = " << (double)m_analysis->nSkim/(double)m_analysis->nAll << endl;
 }
 

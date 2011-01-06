@@ -12,6 +12,8 @@
 tagNprobe::tagNprobe()
 {
 	dRthreshold = 0.2;
+	mu_dRthreshold = 0.2;
+	muTrig_dRthreshold = 0.2;
 	mHatDiffThreshold = 10.*GeV2TeV;
 }
 
@@ -26,9 +28,79 @@ void tagNprobe::reset()
 	probeIndex = -1;
 }
 
+//-------------- for rel16 -------------------------------------------------------------------------------
+// matchLXtrigger = matchL1trigger or matchL2trigger (X=1 or X=2)
+int tagNprobe::matchLXtrigger(int mu_ROIindex,
+							  float mu_dR,
+							  float mu_phi,
+							  float mu_eta,
+							  float pTthreshold,
+							  vector<float>*  trig_phi,
+							  vector<float>*  trig_eta,
+							  vector<float>*  trig_pt,
+							  vector<string>* trig_thresholdName, ofstream* f
+							  )
+{
+	if(mu_ROIindex<0)      return -999;
+	if(mu_dR<0.)           return -999;
+	if(trig_pt==0)         return -999;    
+	if(trig_pt->size()==0) return -999;    
+	if(trig_pt->at(mu_ROIindex)*MeV2GeV < pTthreshold) return -999;    
+	float dphi_muTrig = 100.;
+	float deta_muTrig = 100.;
+	float dR_muTrig   = 100.;
+	if(mu_dR<mu_dRthreshold)
+	{
+		dphi_muTrig = trig_phi->at(mu_ROIindex) - mu_phi;
+		deta_muTrig = trig_eta->at(mu_ROIindex) - mu_eta;
+		dR_muTrig   = sqrt(dphi_muTrig*dphi_muTrig + deta_muTrig*deta_muTrig);
+		if(dR_muTrig<=muTrig_dRthreshold  &&  dR_muTrig<=mu_dR) { (*f) << "L1: dR_muTrig=" << dR_muTrig << endl; return mu_ROIindex; }
+	}
+	return -999;
+}
+
+int tagNprobe::matchEFtrigger(int mu_ROIindex,
+							  float mu_dR,
+							  float mu_phi,
+							  float mu_eta,
+							  float pTthreshold,
+							  vector<vector<float> >* trig_phi,
+							  vector<vector<float> >* trig_eta,
+							  vector<vector<float> >* trig_pt,
+							  vector<vector<int> >*   trig_has, ofstream* f)
+{
+	if(mu_ROIindex<0) return -999;
+	if(mu_dR<0.)      return -999;
+	float dphi_muTrig = 100.;
+	float deta_muTrig = 100.;
+	float dR_muTrig   = 100.;
+	float dR_min      = 100.;
+	int iTrigTrack    = -999;
+	if(mu_dR<mu_dRthreshold)
+	{
+		for(int t=0 ; t<(int)trig_has->at(mu_ROIindex).size() ; t++)
+		{
+			if(!trig_has->at(mu_ROIindex)[t])                     continue;
+			if(trig_pt->at(mu_ROIindex)[t]*MeV2GeV < pTthreshold) continue;
+			dphi_muTrig = trig_phi->at(mu_ROIindex)[t] - mu_phi;
+			deta_muTrig = trig_eta->at(mu_ROIindex)[t] - mu_eta;
+			dR_muTrig   = sqrt(dphi_muTrig*dphi_muTrig + deta_muTrig*deta_muTrig);
+			if(dR_muTrig<dR_min)
+			{
+				iTrigTrack = t;
+				dR_min = dR_muTrig;
+			}
+		}
+		if(dR_min<=muTrig_dRthreshold  &&  dR_min<=mu_dR) { (*f) << "dR_min=" << dR_min << endl; return iTrigTrack; }
+	}
+	return -999;
+}
+//-----------------------------------------------------------------------------------------------------------
+
 bool tagNprobe::findTag(vector<int>* trigger_match, vector<float>* dR)
 {
 	if(trigger_match==0)         return false;
+	if(dR==0)                    return false;
 	if(trigger_match->size()==0) return false;
 
 	bool tagged = false;
@@ -64,6 +136,7 @@ int tagNprobe::findProbe(vector<int>* trigger_match, TVectorP2VL& pmu, vector<fl
 	// retrun 3: else
 
 	if(trigger_match==0)         return 0;
+	if(charge==0)                return 0;
 	if(trigger_match->size()==0) return 0;
 	
 	bool probeCandidate = false;
@@ -105,7 +178,10 @@ int tagNprobe::tagNprobeMask(int wasEventTriggered, vector<int>* trigger_match, 
 	
 	bool tagged = false;
 	
-	if(!wasEventTriggered)  return 0;
+	if(!wasEventTriggered)      return 0;
+	if(trigger_match==NULL)     return 0;
+	if(dR==NULL)                return 0;
+	if(charge==NULL)            return 0;
 	if(trigger_match->size()<1) return 1;
 	
 	// Tag first
@@ -164,6 +240,11 @@ int tagNprobe::tagNprobeMask(float trigger_min, float trigger_threshold, vector<
 	// retrun 5: event was tagged and probed
 	// retrun 6: else
 
+	if(trigger_match==NULL)     return 0;
+	if(trigger_pT==NULL)        return 0;
+	if(charge==NULL)            return 0;
+	if(qOp==NULL)               return 0;
+	if(theta==NULL)             return 0;
 	if(trigger_match->size()<1) return 0;
 	
 	bool btag = false;

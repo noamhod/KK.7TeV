@@ -106,11 +106,8 @@ typedef vector<TCanvas*> TVecCanvas;
 
 #include "units.h"
 
-#define physics_cxx
-#include "physics.C"
-
-#define mcPhysics_cxx
-#include "mcPhysics.C"
+#define WZphysD3PD_cxx
+#include "WZphysD3PD.C"
 
 /*
 #ifdef __CINT__
@@ -152,21 +149,6 @@ template class std::vector<std::vector<unsigned int> >;
 	template class std::vector<std::vector<unsigned int> >;
 #endif
 */
-
-#define offlinePhysics_cxx
-#include "offlinePhysics.C"
-
-#define mcOfflinePhysics_cxx
-#include "mcOfflinePhysics.C"
-
-#define digestPhysics_cxx
-#include "digestPhysics.C"
-
-#define mcDigestPhysics_cxx
-#include "mcDigestPhysics.C"
-
-#define particleBase_cxx
-#include "particleBase.C"
 
 #define fitParameters_cxx
 #include "fitParameters.C"

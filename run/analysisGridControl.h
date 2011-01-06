@@ -17,11 +17,16 @@ class analysisGridControl : public utilities
 {
 	public:
 		// pointers
-		physics*        m_phys;
+		WZphysD3PD*     m_WZphysD3PD;
 		GRLinterface*   m_GRL;
 		TFile*          m_rootfile;
 		TChain*			m_chain;
 		analysis*       m_analysis;
+		
+		// locals
+		bool   m_isMC;
+		string m_muRecAlgo;
+		string m_RunType;
 		
 		// more pointers
 		TDirectory*     m_dirCutProfile;
@@ -48,20 +53,18 @@ class analysisGridControl : public utilities
 		vector<double> vResMemory;
 		vector<double> vVirMemory;
 	
-		string m_muRecAlgo;
-	
 	public:
 		analysisGridControl();
-		analysisGridControl( TChain* inchain, TFile* outfile );
+		analysisGridControl( TChain* inchain, TFile* outfile, string sRun, string sRec, bool isMC );
 		~analysisGridControl();
-		void   setRecAlgo(string muRecAlgo);
-		void   initialize();
-		void   finalize();
-		void   book();
-		void   draw();
-		void   fits();
-		void   analyze();
-		void   loop(Long64_t startEvent = 0, Long64_t stopAfterNevents = 0);
+		void setRecAlgo(string muRecAlgo);
+		void initialize();
+		void finalize();
+		void book();
+		void draw();
+		void fits();
+		void analyze();
+		void loop(Long64_t startEvent = 0, Long64_t stopAfterNevents = 0);
 
 	private:
 };

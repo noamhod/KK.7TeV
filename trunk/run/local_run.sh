@@ -50,7 +50,7 @@ chmod 777 Z_GRL_CURRENT.xml
 # submit the local run
 rm -f $runcontrolfile;
 echo "grid"  >> $runcontrolfile;
-echo "staco" >> $runcontrolfile;
+echo "muid" >> $runcontrolfile;
 if [ "$mcordata" = "mc" ] ; then
    echo "mc" >> $runcontrolfile;
 elif [ "$mcordata" = "data" ] ; then

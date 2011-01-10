@@ -44,14 +44,30 @@ void graphicObjects::clearTreeVars()
 	py->clear();
 	pz->clear();
 	pt->clear();
-	qoverp_me->clear();
-	theta_me->clear();
-	qoverp_id->clear();
-	theta_id->clear();
 	eta->clear();
 	phi->clear();
 	d0_exPV->clear();
 	z0_exPV->clear();
+	qoverp_ms->clear();
+	theta_ms->clear();
+	phi_ms->clear();
+	qoverp_me->clear();
+	theta_me->clear();
+	phi_me->clear();
+	qoverp_id->clear();
+	theta_id->clear();
+	phi_id->clear();
+	qoverp_ie->clear();
+	theta_ie->clear();
+	phi_ie->clear();
+	mu_matchchi2->clear();
+	mu_matchndof->clear();
+	mu_allauthor->clear();
+	mu_author->clear();
+	mu_isStandAloneMuon->clear();
+	mu_isCombinedMuon->clear();
+	mu_trackfitchi2->clear();
+	mu_trackfitndof->clear();
 	
 	// cut profile vectors
 	vxp_z_profile->clear();
@@ -74,18 +90,39 @@ void graphicObjects::clearTreeVars()
 	isolation20_profile->clear();
 	isolation30_profile->clear();
 	isolation40_profile->clear();
-	nMDTBI_profile->clear();
-	nMDTBM_profile->clear();
-	nMDTBO_profile->clear();
-	nRPCPhi1_profile->clear();
-	nRPCPhi2_profile->clear();
-	nRPCPhi3_profile->clear();
-	nSCTHits_profile->clear();
-	nPixHits_profile->clear();
 	oppositeCharge_profile->clear();
 	imass_profile->clear();
 	cosThetaDimu_profile->clear();
 	etaSum_profile->clear();
+	
+	nMDTBI_profile->clear();
+	nMDTBM_profile->clear();
+	nMDTBO_profile->clear();
+	nMDTEI_profile->clear();
+	nMDTEM_profile->clear();
+	nMDTEO_profile->clear();
+	nMDTBEE_profile->clear();
+	nMDTEE_profile->clear();
+	nMDTBIS78_profile->clear();
+	nRPCPhi1_profile->clear();
+	nRPCPhi2_profile->clear();
+	nRPCPhi3_profile->clear();
+	nTGCPhi1_profile->clear();
+	nTGCPhi2_profile->clear();
+	nTGCPhi3_profile->clear();
+	nTGCPhi4_profile->clear();
+	nCSCEta_profile->clear();
+	nCSCPhi_profile->clear();
+	expectBLayerHit_profile->clear();
+	nBLHits_profile->clear();
+	nPixHits_profile->clear();
+	nPixelDeadSensors_profile->clear();
+	nPixHoles_profile->clear();
+	nSCTHits_profile->clear();
+	nSCTDeadSensors_profile->clear();
+	nSCTHoles_profile->clear();
+	nTRTHits_profile->clear();
+	nTRTOutliers_profile->clear();
 	
 	// eff - vectors
 	tNp_triggerName->clear();
@@ -133,14 +170,32 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	py = new vector<float>;
 	pz = new vector<float>;
 	pt = new vector<float>;
-	qoverp_me = new vector<float>;
-	theta_me = new vector<float>;
-	qoverp_id = new vector<float>;
-	theta_id = new vector<float>;
 	eta = new vector<float>;
 	phi = new vector<float>;
 	d0_exPV = new vector<float>;
 	z0_exPV = new vector<float>;
+	
+	qoverp_ms = new vector<float>;
+	theta_ms = new vector<float>;
+	phi_ms = new vector<float>;
+	qoverp_me = new vector<float>;
+	theta_me = new vector<float>;
+	phi_me = new vector<float>;
+	qoverp_id = new vector<float>;
+	theta_id = new vector<float>;
+	phi_id = new vector<float>;
+	qoverp_ie = new vector<float>;
+	theta_ie = new vector<float>;
+	phi_ie = new vector<float>;
+	mu_matchchi2 = new vector<float>;
+	mu_matchndof = new vector<int>;
+	mu_allauthor = new vector<unsigned short>;
+	mu_author = new vector<int>;
+	mu_isStandAloneMuon = new vector<int>;
+	mu_isCombinedMuon = new vector<int>;
+	mu_trackfitchi2 = new vector<float>;
+	mu_trackfitndof = new vector<int>;
+	
 	// cut profile vectors
 	pT_profile = new vector<float>;
 	pT_loose_profile = new vector<float>;
@@ -160,18 +215,40 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	isolation20_profile = new vector<float>;
 	isolation30_profile = new vector<float>;
 	isolation40_profile = new vector<float>;
-	nMDTBI_profile = new vector<int>;
-	nMDTBM_profile = new vector<int>;
-	nMDTBO_profile = new vector<int>;
-	nRPCPhi1_profile = new vector<int>;
-	nRPCPhi2_profile = new vector<int>;
-	nRPCPhi3_profile = new vector<int>;
-	nSCTHits_profile = new vector<int>;
-	nPixHits_profile = new vector<int>;
 	oppositeCharge_profile = new vector<float>;
 	imass_profile          = new vector<float>;
 	cosThetaDimu_profile   = new vector<float>;
 	etaSum_profile         = new vector<float>;
+	
+	nMDTBI_profile = new vector<int>;
+	nMDTBM_profile = new vector<int>;
+	nMDTBO_profile = new vector<int>;
+	nMDTEI_profile = new vector<int>;
+	nMDTEM_profile = new vector<int>;
+	nMDTEO_profile = new vector<int>;
+	nMDTBEE_profile = new vector<int>;
+	nMDTEE_profile = new vector<int>;
+	nMDTBIS78_profile = new vector<int>;
+	nRPCPhi1_profile = new vector<int>;
+	nRPCPhi2_profile = new vector<int>;
+	nRPCPhi3_profile = new vector<int>;
+	nTGCPhi1_profile = new vector<int>;
+	nTGCPhi2_profile = new vector<int>;
+	nTGCPhi3_profile = new vector<int>;
+	nTGCPhi4_profile = new vector<int>;
+	nCSCEta_profile = new vector<int>;
+	nCSCPhi_profile = new vector<int>;
+	expectBLayerHit_profile = new vector<int>;
+	nBLHits_profile = new vector<int>;
+	nPixHits_profile = new vector<int>;
+	nPixelDeadSensors_profile = new vector<int>;
+	nPixHoles_profile = new vector<int>;
+	nSCTHits_profile = new vector<int>;
+	nSCTDeadSensors_profile = new vector<int>;
+	nSCTHoles_profile = new vector<int>;
+	nTRTHits_profile = new vector<int>;
+	nTRTOutliers_profile = new vector<int>;
+	
 	// eff vectors
 	tNp_triggerName = new vector<string>; // only one entry but easier to access...
 	tNp_cand_pT = new vector<float>;
@@ -209,14 +286,31 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_allCuts->Branch( "py", &py );
 	tree_allCuts->Branch( "pz", &pz );
 	tree_allCuts->Branch( "pt", &pt );
-	tree_allCuts->Branch( "qoverp_me", &qoverp_me );
-	tree_allCuts->Branch( "theta_me",  &theta_me );
-	tree_allCuts->Branch( "qoverp_id", &qoverp_id );
-	tree_allCuts->Branch( "theta_id",  &theta_id );
 	tree_allCuts->Branch( "eta", &eta );
 	tree_allCuts->Branch( "phi", &phi );
 	tree_allCuts->Branch( "d0_exPV",  &d0_exPV );
 	tree_allCuts->Branch( "z0_exPV",  &z0_exPV );
+	
+	tree_allCuts->Branch( "qoverp_ms",  &qoverp_ms );
+	tree_allCuts->Branch( "theta_ms",  &theta_ms );
+	tree_allCuts->Branch( "phi_ms",  &phi_ms );
+	tree_allCuts->Branch( "qoverp_me",  &qoverp_me );
+	tree_allCuts->Branch( "theta_me",  &theta_me );
+	tree_allCuts->Branch( "phi_me",  &phi_me );
+	tree_allCuts->Branch( "qoverp_id",  &qoverp_id );
+	tree_allCuts->Branch( "theta_id",  &theta_id );
+	tree_allCuts->Branch( "phi_id",  &phi_id );
+	tree_allCuts->Branch( "qoverp_ie",  &qoverp_ie );
+	tree_allCuts->Branch( "theta_ie",  &theta_ie );
+	tree_allCuts->Branch( "phi_ie",  &phi_ie );
+	tree_allCuts->Branch( "mu_matchchi2",  &mu_matchchi2 );
+	tree_allCuts->Branch( "mu_matchndof",  &mu_matchndof );
+	tree_allCuts->Branch( "mu_allauthor",  &mu_allauthor );
+	tree_allCuts->Branch( "mu_author",  &mu_author );
+	tree_allCuts->Branch( "mu_isStandAloneMuon",  &mu_isStandAloneMuon );
+	tree_allCuts->Branch( "mu_isCombinedMuon",  &mu_isCombinedMuon );
+	tree_allCuts->Branch( "mu_trackfitchi2",  &mu_trackfitchi2 );
+	tree_allCuts->Branch( "mu_trackfitndof",  &mu_trackfitndof );
 	
 	
 	if(tDir_cutsProfile!=NULL) tDir_cutsProfile->cd();
@@ -242,20 +336,41 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_cutsProfile->Branch( "isolation20_profile", &isolation20_profile );
 	tree_cutsProfile->Branch( "isolation30_profile", &isolation30_profile );
 	tree_cutsProfile->Branch( "isolation40_profile", &isolation40_profile );
-	tree_cutsProfile->Branch( "nMDTBI_profile", &nMDTBI_profile );
-	tree_cutsProfile->Branch( "nMDTBM_profile", &nMDTBM_profile );
-	tree_cutsProfile->Branch( "nMDTBO_profile", &nMDTBO_profile );
-	tree_cutsProfile->Branch( "nRPCPhi1_profile", &nRPCPhi1_profile );
-	tree_cutsProfile->Branch( "nRPCPhi2_profile", &nRPCPhi2_profile );
-	tree_cutsProfile->Branch( "nRPCPhi3_profile", &nRPCPhi3_profile );
-	tree_cutsProfile->Branch( "nSCTHits_profile", &nSCTHits_profile );
-	tree_cutsProfile->Branch( "nPixHits_profile", &nPixHits_profile );
 	tree_cutsProfile->Branch( "ip_d0_profile", &ip_d0_profile );
 	tree_cutsProfile->Branch( "ip_z0_profile", &ip_z0_profile );
 	tree_cutsProfile->Branch( "oppositeCharge_profile", &oppositeCharge_profile );
 	tree_cutsProfile->Branch( "imass_profile", &imass_profile );
 	tree_cutsProfile->Branch( "cosThetaDimu_profile", &cosThetaDimu_profile );
 	tree_cutsProfile->Branch( "etaSum_profile", &etaSum_profile );
+	
+	tree_cutsProfile->Branch( "nMDTBI_profile", &nMDTBI_profile );
+	tree_cutsProfile->Branch( "nMDTBM_profile", &nMDTBM_profile );
+	tree_cutsProfile->Branch( "nMDTBO_profile", &nMDTBO_profile );
+	tree_cutsProfile->Branch( "nMDTEI_profile", &nMDTEI_profile );
+	tree_cutsProfile->Branch( "nMDTEM_profile", &nMDTEM_profile );
+	tree_cutsProfile->Branch( "nMDTEO_profile", &nMDTEO_profile );
+	tree_cutsProfile->Branch( "nMDTBEE_profile", &nMDTBEE_profile );
+	tree_cutsProfile->Branch( "nMDTEE_profile", &nMDTEE_profile );
+	tree_cutsProfile->Branch( "nMDTBIS78_profile", &nMDTBIS78_profile );
+	tree_cutsProfile->Branch( "nRPCPhi1_profile", &nRPCPhi1_profile );
+	tree_cutsProfile->Branch( "nRPCPhi2_profile", &nRPCPhi2_profile );
+	tree_cutsProfile->Branch( "nRPCPhi3_profile", &nRPCPhi3_profile );
+	tree_cutsProfile->Branch( "nTGCPhi1_profile", &nTGCPhi1_profile );
+	tree_cutsProfile->Branch( "nTGCPhi2_profile", &nTGCPhi2_profile );
+	tree_cutsProfile->Branch( "nTGCPhi3_profile", &nTGCPhi3_profile );
+	tree_cutsProfile->Branch( "nTGCPhi4_profile", &nTGCPhi4_profile );
+	tree_cutsProfile->Branch( "nCSCEta_profile", &nCSCEta_profile );
+	tree_cutsProfile->Branch( "nCSCPhi_profile", &nCSCPhi_profile );
+	tree_cutsProfile->Branch( "expectBLayerHit_profile", &expectBLayerHit_profile );
+	tree_cutsProfile->Branch( "nBLHits_profile", &nBLHits_profile );
+	tree_cutsProfile->Branch( "nPixHits_profile", &nPixHits_profile );
+	tree_cutsProfile->Branch( "nPixelDeadSensors_profile", &nPixelDeadSensors_profile );
+	tree_cutsProfile->Branch( "nPixHoles_profile", &nPixHoles_profile );
+	tree_cutsProfile->Branch( "nSCTHits_profile", &nSCTHits_profile );
+	tree_cutsProfile->Branch( "nSCTDeadSensors_profile", &nSCTDeadSensors_profile );
+	tree_cutsProfile->Branch( "nSCTHoles_profile", &nSCTHoles_profile );
+	tree_cutsProfile->Branch( "nTRTHits_profile", &nTRTHits_profile );
+	tree_cutsProfile->Branch( "nTRTOutliers_profile", &nTRTOutliers_profile );
 	
 	
 	if(tDir_efficiency!=NULL) tDir_efficiency->cd();
@@ -1336,69 +1451,177 @@ void graphicObjects::bookCutProfileHistosMap(TMapds* cutFlowOrdered, TDirectory*
 			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 		}
 		
-		else if(sname=="msHits")
+		else if(sname=="msHits" || sname=="msHitsRel16")
 		{
 			string stmp;
 			
 			stmp = "nMDTBI";
 			sname = stmp+"_1";
 			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
-			(*h1map_cutProfile)[sname]->SetXTitle("MDT BI passed hits");
+			(*h1map_cutProfile)[sname]->SetXTitle("MDT BI hits");
 			sname = stmp+"_2";
 			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
-			(*h1map_cutProfile)[sname]->SetXTitle("MDT BI passed hits");
+			(*h1map_cutProfile)[sname]->SetXTitle("MDT BI hits");
 			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 			
 			stmp = "nMDTBM";
 			sname = stmp+"_1";
 			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
-			(*h1map_cutProfile)[sname]->SetXTitle("MDT BM passed hits");
+			(*h1map_cutProfile)[sname]->SetXTitle("MDT BM hits");
 			sname = stmp+"_2";
 			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
-			(*h1map_cutProfile)[sname]->SetXTitle("MDT BM passed hits");
+			(*h1map_cutProfile)[sname]->SetXTitle("MDT BM hits");
 			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 			
 			stmp = "nMDTBO";
 			sname = stmp+"_1";
 			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
-			(*h1map_cutProfile)[sname]->SetXTitle("MDT BO passed hits");
+			(*h1map_cutProfile)[sname]->SetXTitle("MDT BO hits");
 			sname = stmp+"_2";
 			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
-			(*h1map_cutProfile)[sname]->SetXTitle("MDT BO passed hits");
+			(*h1map_cutProfile)[sname]->SetXTitle("MDT BO hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "nMDTEI";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("MDT EI hits");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("MDT EI hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "nMDTEM";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("MDT EM hits");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("MDT EM hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "nMDTEO";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("MDT EO hits");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("MDT EO hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			
+			stmp = "nMDTBEE";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("MDT BEE Hits");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("MDT BEE Hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "nMDTEE";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("MDT EE Hits");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("MDT EE Hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "nMDTBIS78";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("MDT BIS78 Hits");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("MDT BIS78 Hits");
 			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 			
 			
 			stmp = "nRPCPhi1";
 			sname = stmp+"_1";
 			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
-			(*h1map_cutProfile)[sname]->SetXTitle("RPC Phi1 passed hits");
+			(*h1map_cutProfile)[sname]->SetXTitle("RPC Phi1 Hits");
 			sname = stmp+"_2";
 			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
-			(*h1map_cutProfile)[sname]->SetXTitle("RPC Phi1 passed hits");
+			(*h1map_cutProfile)[sname]->SetXTitle("RPC Phi1 Hits");
 			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
-			
 			
 			stmp = "nRPCPhi2";
 			sname = stmp+"_1";
 			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
-			(*h1map_cutProfile)[sname]->SetXTitle("RPC Phi2 passed hits");
+			(*h1map_cutProfile)[sname]->SetXTitle("RPC Phi2 Hits");
 			sname = stmp+"_2";
 			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
-			(*h1map_cutProfile)[sname]->SetXTitle("RPC Phi2 passed hits");
+			(*h1map_cutProfile)[sname]->SetXTitle("RPC Phi2 Hits");
 			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 			
 			stmp = "nRPCPhi3";
 			sname = stmp+"_1";
 			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
-			(*h1map_cutProfile)[sname]->SetXTitle("RPC Phi3 passed hits");
+			(*h1map_cutProfile)[sname]->SetXTitle("RPC Phi3 Hits");
 			sname = stmp+"_2";
 			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
-			(*h1map_cutProfile)[sname]->SetXTitle("RPC Phi3 passed hits");
+			(*h1map_cutProfile)[sname]->SetXTitle("RPC Phi3 Hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "nTGCPhi1";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("TGC Phi1 Hits");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("TGC Phi1 Hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "nTGCPhi2";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("TGC Phi2 Hits");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("TGC Phi2 Hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "nTGCPhi3";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("TGC Phi3 Hits");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("TGC Phi3 Hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "nTGCPhi4";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("TGC Phi4 hits");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("TGC Phi4 hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "nCSCEta";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("CSC Eta Hits");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("CSC Eta Hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "nCSCPhi";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("CSC Phi Hits");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("CSC Phi Hits");
 			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 			
 		}
 		
-		else if(sname=="idHits")
+		else if(sname=="idHits" ||  sname=="idHitsRel16")
 		{
 			string stmp = sname;
 			sname = stmp+"_1";
@@ -1409,6 +1632,118 @@ void graphicObjects::bookCutProfileHistosMap(TMapds* cutFlowOrdered, TDirectory*
 			h2map_cutProfile->insert( make_pair( sname, new TH2D(sname.c_str(),sname.c_str(), 20,0,20,  20,0,20) ) );
 			(*h2map_cutProfile)[sname]->SetXTitle("SCT hits");
 			(*h2map_cutProfile)[sname]->SetYTitle("PIX hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "expectBLayerHit";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 20,0,20) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("expectBLayerHit");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 20,0,20) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("expectBLayerHit");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "nBLHits";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("BL Hits");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("BL Hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "nPixHits";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("nPix Hits");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("nPix Hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "nPixelDeadSensors";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("Pixel Dead Sensors");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("Pixel Dead Sensors");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "nPixHoles";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("Pix Holes");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("Pix Holes");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "nSCTHits";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("SCT Hits");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("SCT Hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "nSCTDeadSensors";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("SCT Dead Sensors");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("SCT Dead Sensors");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "nSCTHoles";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("SCT Holes");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("SCT Holes");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "nTRTHits";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("TRT Hits");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("TRT Hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = "nTRTOutliers";
+			sname = stmp+"_1";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("TRT Outliers");
+			sname = stmp+"_2";
+			h1map_cutProfile->insert( make_pair( sname, new TH1D(sname.c_str(),sname.c_str(), 50,0,50) ) );
+			(*h1map_cutProfile)[sname]->SetXTitle("TRT Outliers");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = sname;
+			sname = stmp+"TRTHitsVSeta_1";
+			h2map_cutProfile->insert( make_pair( sname, new TH2D(sname.c_str(),sname.c_str(), 30,-3,+3,  50,0,50) ) );
+			(*h2map_cutProfile)[sname]->SetXTitle("#eta");
+			(*h2map_cutProfile)[sname]->SetYTitle("TRT Hits");
+			sname = stmp+"TRTHitsVSeta_2";
+			h2map_cutProfile->insert( make_pair( sname, new TH2D(sname.c_str(),sname.c_str(), 30,-3,+3,  50,0,50) ) );
+			(*h2map_cutProfile)[sname]->SetXTitle("#eta");
+			(*h2map_cutProfile)[sname]->SetYTitle("TRT Hits");
+			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
+			
+			stmp = sname;
+			sname = stmp+"TRTOutliersVSeta_1";
+			h2map_cutProfile->insert( make_pair( sname, new TH2D(sname.c_str(),sname.c_str(), 30,-3,+3,  50,0,50) ) );
+			(*h2map_cutProfile)[sname]->SetXTitle("#eta");
+			(*h2map_cutProfile)[sname]->SetYTitle("TRT Outliers");
+			sname = stmp+"TRTOutliersVSeta_2";
+			h2map_cutProfile->insert( make_pair( sname, new TH2D(sname.c_str(),sname.c_str(), 30,-3,+3,  50,0,50) ) );
+			(*h2map_cutProfile)[sname]->SetXTitle("#eta");
+			(*h2map_cutProfile)[sname]->SetYTitle("TRT Outliers");
 			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 		}
 		

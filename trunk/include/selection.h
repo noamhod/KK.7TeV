@@ -151,12 +151,13 @@ public:
 				  int nCSCEtaHits, int nCSCPhiHits
 				 );
 	bool nMShitsRel16(float nMDTB_IMO_HitsCutVal, float nMDTE_IMO_HitsCutVal,
-					  float nMDTBEEHitsCutVal, float nMDTEEHitsCutVal,
+					  float nMDTBEEHitsCutVal, float nMDTEEHitsCutVal, float nMDTBIS78HitsCutVal, 
 					  float nCSCEtaHitsCutVal,
+					  float nPhiHitsCutVal,
 					  float nMDTCSCsumCutVal, float nRPCTGCCSCsumsCutVal,
 					  int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,
 					  int nMDTEIHits, int nMDTEMHits, int nMDTEOHits,
-					  int nMDTBEEHits, int nMDTEEHits,
+					  int nMDTBEEHits, int nMDTEEHits, int nMDTBIS78Hits,
 					  int nRPCLayer1PhiHits, int nRPCLayer2PhiHits, int nRPCLayer3PhiHits,
 					  int nTGCLayer1PhiHits, int nTGCLayer2PhiHits, int nTGCLayer3PhiHits, int nTGCLayer4PhiHits,
 					  int nCSCEtaHits, int nCSCPhiHits

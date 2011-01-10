@@ -222,8 +222,6 @@ void analysisLocalControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 
 	l64t_startEvent = startEvent;
 	l64t_stopEvent = l64t_nentries;
-
-	int nSkim = 0;
 	
 	if(stopAfterNevents <= 0)                            { l64t_stopEvent = l64t_nentries; cout << "1. stop at event " << l64t_stopEvent << endl; }
 	else if(startEvent+stopAfterNevents < l64t_nentries) { l64t_stopEvent = startEvent+stopAfterNevents; cout << "3. stop at event " << l64t_stopEvent << endl; }
@@ -271,9 +269,13 @@ void analysisLocalControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	cout << "nSkim          = " << m_analysis->nSkim << endl;
 	cout << "nSkim%         = " << (double)m_analysis->nSkim/(double)m_analysis->nAll << endl;
 	
+	cout << "################" << endl;
+	cout << "##### " << m_analysis->sMuonRecoAlgo << " #####" << endl;
+	cout << "################" << endl;
+	
 	stopTimer(true);
 	
-	cout << "stopped at period=" << m_analysis->getPeriodName(m_WZphysD3PD->RunNumber) << ", run=" << m_WZphysD3PD->RunNumber << ", lbn=" << m_WZphysD3PD->lbn << endl;
+	//cout << "stopped at period=" << m_analysis->getPeriodName(m_WZphysD3PD->RunNumber) << ", run=" << m_WZphysD3PD->RunNumber << ", lbn=" << m_WZphysD3PD->lbn << endl;
 }
 
 void analysisLocalControl::loop(int runNumber)

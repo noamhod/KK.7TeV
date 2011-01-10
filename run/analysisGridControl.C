@@ -206,8 +206,6 @@ void analysisGridControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	
 	finalize();
 	
-	stopTimer(true);
-	
 	cout << "nAll           = " << m_analysis->nAll << endl;
 	cout << "n0mu           = " << m_analysis->n0mu << endl;
 	cout << "n1mu(pT>10GeV) = " << m_analysis->n1mu << endl;
@@ -217,5 +215,11 @@ void analysisGridControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	cout << "nNmu(pT>10GeV) = " << m_analysis->nNmu << endl;
 	cout << "nSkim          = " << m_analysis->nSkim << endl;
 	cout << "nSkim%         = " << (double)m_analysis->nSkim/(double)m_analysis->nAll << endl;
+	
+	cout << "################" << endl;
+	cout << "##### " << m_analysis->sMuonRecoAlgo << " #####" << endl;
+	cout << "################" << endl;
+	
+	stopTimer(true);
 }
 

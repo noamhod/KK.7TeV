@@ -31,7 +31,7 @@ runnumber=$2
 #   dataset name
 datasetname=$3
 
-
+sitename=$4
 
 # the GRL version
 grlvs=00-00-91
@@ -72,11 +72,16 @@ chmod 777 Z_GRL_CURRENT.xml
 # submit the panda run with a single dataset using --writeInputToTxt
 rm -f $runcontrolfile;
 echo "grid"  >> $runcontrolfile;
-echo "staco" >> $runcontrolfile;
+echo "muid" >> $runcontrolfile;
 if [ "$mcordata" = "mc" ] ; then
-   echo "1" >> $runcontrolfile;
+   echo "mc" >> $runcontrolfile;
 elif [ "$mcordata" = "data" ] ; then
-   echo "0" >> $runcontrolfile;
+   echo "data" >> $runcontrolfile;
 fi
 
-prun --exec "root.exe -b -q analysisGridControlRun.C;" --writeInputToTxt IN:$iputtxt  --athenaTag=$athenatag --outDS user.hod.$type.$runnumber.$dateandhour  --outputs $type.root --inDS $datasetname  --extFile analysisGridControl_C.so, Loader_C.so, ../GoodRunsLists-$grlvs/StandAlone/libGoodRunsLists.so --workDir ../  --tmpDir /tmp/hod/prun_info  --nGBPerJob=10
+
+if [ "$sitename" = "" ] ; then
+   prun --exec "root.exe -b -q analysisGridControlRun.C;" --writeInputToTxt IN:$inputtxt  --athenaTag=$athenatag --outDS user.hod.$type.$runnumber.$dateandhour  --outputs $type.root --inDS $datasetname  --extFile analysisGridControl_C.so, Loader_C.so, ../GoodRunsLists-$grlvs/StandAlone/libGoodRunsLists.so --workDir ../  --tmpDir /tmp/hod/prun_info  --nGBPerJob=10
+else
+   prun --exec "root.exe -b -q analysisGridControlRun.C;" --writeInputToTxt IN:$inputtxt  --athenaTag=$athenatag --outDS user.hod.$type.$runnumber.$dateandhour  --outputs $type.root --inDS $datasetname  --extFile analysisGridControl_C.so, Loader_C.so, ../GoodRunsLists-$grlvs/StandAlone/libGoodRunsLists.so --workDir ../  --tmpDir /tmp/hod/prun_info  --nGBPerJob=10  --site=$sitename
+fi

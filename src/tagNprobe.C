@@ -41,6 +41,8 @@ int tagNprobe::matchLXtrigger(int mu_ROIindex,
 							  vector<string>* trig_thresholdName, ofstream* f
 							  )
 {
+	if(false) cout << "trig_thresholdName = " << trig_thresholdName << endl;
+
 	if(mu_ROIindex<0)      return -999;
 	if(mu_dR<0.)           return -999;
 	if(trig_pt==0)         return -999;    
@@ -295,6 +297,8 @@ int tagNprobe::tagNprobeMask(float trigger_min, float trigger_threshold, vector<
 
 void tagNprobe::calculateEfficiency(TH1D* hCandidates, TH1D* hSucceeded, TH1D* hEfficiency, bool isTruth)
 {
+	if(isTruth) cout << "isTruth = " << isTruth << endl;
+
 	Double_t cand;
 	Double_t prob;
 	Double_t eff;
@@ -313,6 +317,8 @@ void tagNprobe::calculateEfficiency(TH1D* hCandidates, TH1D* hSucceeded, TH1D* h
 
 void tagNprobe::calculateEfficiency(TH2D* hCandidates, TH2D* hSucceeded, TH2D* hEfficiency, bool isTruth)
 {
+	if(isTruth) cout << "isTruth = " << isTruth << endl;
+	
 	Double_t cand;
 	Double_t prob;
 	Double_t eff;
@@ -334,6 +340,8 @@ void tagNprobe::calculateEfficiency(TH2D* hCandidates, TH2D* hSucceeded, TH2D* h
 
 void tagNprobe::calculateEfficiency(TMapSP2TH1D* hMapCandidates, TMapSP2TH1D* hMapSucceeded, TMapSP2TH1D* hMapEfficiency, bool isTruth)
 {
+	if(isTruth) cout << "isTruth = " << isTruth << endl;
+	
 	for(TMapSP2TH1D::iterator it=hMapCandidates->begin() ; it!=hMapCandidates->end() ; it++)
 	{
 		Double_t cand;

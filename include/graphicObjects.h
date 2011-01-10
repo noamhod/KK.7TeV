@@ -249,6 +249,16 @@ class graphicObjects// : public utilities
 		float CosThetaDimu;
 		float ipTDiff;
 		float EtaSum;
+		
+		vector<float>   *mu_muid_matchchi2;
+		vector<int>     *mu_muid_matchndof;
+		vector<unsigned short> *mu_muid_allauthor;
+		vector<int>     *mu_muid_author;
+		vector<int>     *mu_muid_isStandAloneMuon;
+		vector<int>     *mu_muid_isCombinedMuon;
+		vector<float>   *mu_muid_trackfitchi2;
+		vector<int>     *mu_muid_trackfitndof;
+		
 		// all cuts - vectors
 		vector<float>* charge;
 		vector<float>* m;
@@ -257,15 +267,31 @@ class graphicObjects// : public utilities
 		vector<float>* py;
 		vector<float>* pz;
 		vector<float>* pt;
-		vector<float>* qoverp_me;
-		vector<float>* theta_me;
-		vector<float>* qoverp_id;
-		vector<float>* theta_id;
 		vector<float>* eta;
 		vector<float>* phi;
 		vector<float>* d0_exPV;
 		vector<float>* z0_exPV;
-		// cut profile vectors
+		vector<float>* qoverp_ms;
+		vector<float>* theta_ms;
+		vector<float>* phi_ms;
+		vector<float>* qoverp_me;
+		vector<float>* theta_me;
+		vector<float>* phi_me;
+		vector<float>* qoverp_id;
+		vector<float>* theta_id;
+		vector<float>* phi_id;
+		vector<float>* qoverp_ie;
+		vector<float>* theta_ie;
+		vector<float>* phi_ie;
+		vector<float>   *mu_matchchi2;
+		vector<int>     *mu_matchndof;
+		vector<unsigned short> *mu_allauthor;
+		vector<int>     *mu_author;
+		vector<int>     *mu_isStandAloneMuon;
+		vector<int>     *mu_isCombinedMuon;
+		vector<float>   *mu_trackfitchi2;
+		vector<int>     *mu_trackfitndof;
+		// cut profile 1d
 		vector<float>* pT_profile;
 		vector<float>* pT_loose_profile;
 		vector<float>* pT_qOp_and_theta_profile;
@@ -284,22 +310,44 @@ class graphicObjects// : public utilities
 		vector<float>* isolation20_profile;
 		vector<float>* isolation30_profile;
 		vector<float>* isolation40_profile;
+		vector<float>* vxp_z_profile;
+		vector<int>*   vxp_nTracks_profile;
+		
 		vector<int>* nMDTBI_profile;
 		vector<int>* nMDTBM_profile;
 		vector<int>* nMDTBO_profile;
+		vector<int>* nMDTEI_profile;
+		vector<int>* nMDTEM_profile;
+		vector<int>* nMDTEO_profile;
+		vector<int>* nMDTBEE_profile;
+		vector<int>* nMDTEE_profile;
+		vector<int>* nMDTBIS78_profile;
 		vector<int>* nRPCPhi1_profile;
 		vector<int>* nRPCPhi2_profile;
 		vector<int>* nRPCPhi3_profile;
-		vector<int>* nSCTHits_profile;
+		vector<int>* nTGCPhi1_profile;
+		vector<int>* nTGCPhi2_profile;
+		vector<int>* nTGCPhi3_profile;
+		vector<int>* nTGCPhi4_profile;
+		vector<int>* nCSCEta_profile;
+		vector<int>* nCSCPhi_profile;
+		vector<int>* expectBLayerHit_profile;
+		vector<int>* nBLHits_profile;
 		vector<int>* nPixHits_profile;
-		vector<float>* vxp_z_profile;
-		vector<int>*   vxp_nTracks_profile;
-		// cut profile - floats
+		vector<int>* nPixelDeadSensors_profile;
+		vector<int>* nPixHoles_profile;
+		vector<int>* nSCTHits_profile;
+		vector<int>* nSCTDeadSensors_profile;
+		vector<int>* nSCTHoles_profile;
+		vector<int>* nTRTHits_profile;
+		vector<int>* nTRTOutliers_profile;
+		
+		// cut profile 2d
 		vector<float>* oppositeCharge_profile;
 		vector<float>* imass_profile;
 		vector<float>* cosThetaDimu_profile;
 		vector<float>* etaSum_profile;
-		// eff - vectors
+		// eff
 		vector<string>* tNp_triggerName; // only one entry but easier to access...
 		vector<float>* tNp_cand_pT;
 		vector<float>* tNp_succ_pT;

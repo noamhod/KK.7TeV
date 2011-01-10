@@ -813,12 +813,13 @@ bool selection::nMShits2(float nMDTB_IMO_HitsCutVal, float nMDTE_IMEO_HitsCutVal
 }
 
 bool selection::nMShitsRel16(float nMDTB_IMO_HitsCutVal, float nMDTE_IMO_HitsCutVal,
-							 float nMDTBEEHitsCutVal, float nMDTEEHitsCutVal,
+							 float nMDTBEEHitsCutVal, float nMDTEEHitsCutVal, float nMDTBIS78HitsCutVal, 
 							 float nCSCEtaHitsCutVal,
+							 float nPhiHitsCutVal,
 							 float nMDTCSCsumCutVal, float nRPCTGCCSCsumsCutVal,
 							 int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,
 							 int nMDTEIHits, int nMDTEMHits, int nMDTEOHits,
-							 int nMDTBEEHits, int nMDTEEHits,
+							 int nMDTBEEHits, int nMDTEEHits, int nMDTBIS78Hits,
 							 int nRPCLayer1PhiHits, int nRPCLayer2PhiHits, int nRPCLayer3PhiHits,
 						  	 int nTGCLayer1PhiHits, int nTGCLayer2PhiHits, int nTGCLayer3PhiHits, int nTGCLayer4PhiHits,
 							 int nCSCEtaHits, int nCSCPhiHits
@@ -827,7 +828,19 @@ bool selection::nMShitsRel16(float nMDTB_IMO_HitsCutVal, float nMDTE_IMO_HitsCut
 	// ( \ Sum_$=IMO nMDTB$Hits>=3 + \Sum_$=IMO nMDTE$Hits>=3 + nCSCEtaHits>=3 ) >=3 &&
 	// mu_muid_nMDTBEEHits==0 &&
 	// mu_muid_nMDTEEHits==0 &&
+	// mu_muid_nMDTBIS78Hits==0 &&
 	// (\Sum_K=1^3 nRPCLayerKPhiHits + \Sum_K=1^4 nTGCLayerKPhiHits + nCSCPhiHits )>=1
+	
+	//1) at least one phi hit on the MS track
+	//2.1) MS track has at least 3 hits in each of Inner, Middle, Outer of Barrel
+	//OR
+	//2.2) MS track has at least 3 hits in each of Inner, Middle, Outer of Endcap
+	//3) BEE is vetoed & EE is vetoed & BIS78 is vetoed
+	//The motivation to implement component (2) is this way is that the 3hits x 3stations
+	//requirement should be satisfied by the barrel MS on its own or the endcap MS on its own.
+	//An MS track where the barrel alone (or endcap alone) cannot satisfy these quality requirements,
+	//may be sensitive to relative misalignments between barrel and endcap, and is not considered
+	//robust enough for the first Zprime publication. There are not many such tracks anyway. 
 	
 	bool passedMDTBI = (nMDTBIHits >= nMDTB_IMO_HitsCutVal) ? true : false;
 	bool passedMDTBM = (nMDTBMHits >= nMDTB_IMO_HitsCutVal) ? true : false;
@@ -838,18 +851,24 @@ bool selection::nMShitsRel16(float nMDTB_IMO_HitsCutVal, float nMDTE_IMO_HitsCut
 	bool passedCSC   = (nCSCEtaHits >= nCSCEtaHitsCutVal)   ? true : false;
 	bool passedMDTCSC = ((passedMDTBI+passedMDTBM+passedMDTBO +
 						  passedMDTEI+passedMDTEM+passedMDTEO + 
-						  passedCSC) >= nMDTE_IMO_HitsCutVal) ? true : false;
+						  passedCSC) >= nMDTCSCsumCutVal) ? true : false;
 	if(!passedMDTCSC) return false;
 	 
-	bool passedMDTBEE = (nMDTBEEHits==nMDTBEEHitsCutVal) ? true : false;
-	if(!passedMDTBEE) return false;
+	bool passedMDTBEE   = (nMDTBEEHits==nMDTBEEHitsCutVal) ? true : false;
+	if(!passedMDTBEE)   return false;
+	bool passedMDTEE    = (nMDTEEHits==nMDTEEHitsCutVal) ? true : false;
+	if(!passedMDTEE)    return false;
+	bool passedMDTBIS78 = (nMDTBIS78Hits==nMDTBIS78HitsCutVal) ? true : false;
+	if(!passedMDTBIS78) return false;
 	
-	bool passedMDTEE  = (nMDTEEHits==nMDTEEHitsCutVal) ? true : false;
-	if(!passedMDTEE) return false;
-	
-	int nRPCTGCCSCsum = nRPCLayer1PhiHits+nRPCLayer2PhiHits+nRPCLayer3PhiHits + 
-						nTGCLayer1PhiHits+nTGCLayer2PhiHits+nTGCLayer3PhiHits+nTGCLayer4PhiHits +
-						nCSCPhiHits;
+	int nRPCTGCCSCsum = (nRPCLayer1PhiHits>=nPhiHitsCutVal) +
+						(nRPCLayer2PhiHits>=nPhiHitsCutVal) +
+						(nRPCLayer3PhiHits>=nPhiHitsCutVal) + 
+						(nTGCLayer1PhiHits>=nPhiHitsCutVal) +
+						(nTGCLayer2PhiHits>=nPhiHitsCutVal) +
+						(nTGCLayer3PhiHits>=nPhiHitsCutVal) +
+						(nTGCLayer4PhiHits>=nPhiHitsCutVal) +
+						(nCSCPhiHits>=nPhiHitsCutVal);
 	bool passedRPCTGCCSC = (nRPCTGCCSCsum >= nRPCTGCCSCsumsCutVal) ? true : false;
 	if(!passedRPCTGCCSC) return false;
 	

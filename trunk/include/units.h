@@ -12,6 +12,8 @@ float MeV2TeV = 1.e-6;
 float MeV2GeV = 1.e-3;
 float GeV2TeV = 1.e-3;
 float GeV2MeV = 1.e+3;
+float TeV2MeV = 1.e+6;
+float TeV2GeV = 1.e+3;
 
 float muonMass = 0.105658367; // GeV
 

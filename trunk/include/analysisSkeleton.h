@@ -478,6 +478,8 @@ public:
 	float current_pTdiff_muplus;
 	float current_pTratio;
 	float current_pTratio_muplus;
+	float current_pTres;
+	float current_pTres_muplus;
 	float current_mu_pT;
 	float current_muplus_pT;
 	float current_mu_me_pT;
@@ -532,7 +534,8 @@ public:
 	void fillCutProfile2D();
 	void fillCutProfile();
 	
-	void fillTagNProbe();
+	//void fillTagNProbe();
+	void fill_tNp();
 	void fillTruthEfficiency();
 	
 	void applyTagNProbe(TMapsb& cutsToSkip, bool isMC);

@@ -29,12 +29,6 @@ void graphicObjects::clearTreeVars()
 	CosThetaDimu = -9999;
 	ipTDiff      = -9999;
 	EtaSum       = -9999;
-	
-	// cut profile - floats
-	//oppositeCharge_profile = -9999;
-	//imass_profile          = -9999;
-	//cosThetaDimu_profile   = -9999;
-	//etaSum_profile         = -9999;
 
 	// all cuts - vectors
 	charge->clear();
@@ -60,14 +54,14 @@ void graphicObjects::clearTreeVars()
 	qoverp_ie->clear();
 	theta_ie->clear();
 	phi_ie->clear();
-	mu_matchchi2->clear();
-	mu_matchndof->clear();
-	mu_allauthor->clear();
-	mu_author->clear();
-	mu_isStandAloneMuon->clear();
-	mu_isCombinedMuon->clear();
-	mu_trackfitchi2->clear();
-	mu_trackfitndof->clear();
+	matchchi2->clear();
+	matchndof->clear();
+	allauthor->clear();
+	author->clear();
+	isStandAloneMuon->clear();
+	isCombinedMuon->clear();
+	trackfitchi2->clear();
+	trackfitndof->clear();
 	
 	// cut profile vectors
 	vxp_z_profile->clear();
@@ -94,7 +88,6 @@ void graphicObjects::clearTreeVars()
 	imass_profile->clear();
 	cosThetaDimu_profile->clear();
 	etaSum_profile->clear();
-	
 	nMDTBI_profile->clear();
 	nMDTBM_profile->clear();
 	nMDTBO_profile->clear();
@@ -123,6 +116,7 @@ void graphicObjects::clearTreeVars()
 	nSCTHoles_profile->clear();
 	nTRTHits_profile->clear();
 	nTRTOutliers_profile->clear();
+	eta_forTRThits_profile->clear();
 	
 	// eff - vectors
 	tNp_triggerName->clear();
@@ -174,7 +168,6 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	phi = new vector<float>;
 	d0_exPV = new vector<float>;
 	z0_exPV = new vector<float>;
-	
 	qoverp_ms = new vector<float>;
 	theta_ms = new vector<float>;
 	phi_ms = new vector<float>;
@@ -187,14 +180,14 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	qoverp_ie = new vector<float>;
 	theta_ie = new vector<float>;
 	phi_ie = new vector<float>;
-	mu_matchchi2 = new vector<float>;
-	mu_matchndof = new vector<int>;
-	mu_allauthor = new vector<unsigned short>;
-	mu_author = new vector<int>;
-	mu_isStandAloneMuon = new vector<int>;
-	mu_isCombinedMuon = new vector<int>;
-	mu_trackfitchi2 = new vector<float>;
-	mu_trackfitndof = new vector<int>;
+	matchchi2 = new vector<float>;
+	matchndof = new vector<int>;
+	allauthor = new vector<unsigned short>;
+	author = new vector<int>;
+	isStandAloneMuon = new vector<int>;
+	isCombinedMuon = new vector<int>;
+	trackfitchi2 = new vector<float>;
+	trackfitndof = new vector<int>;
 	
 	// cut profile vectors
 	pT_profile = new vector<float>;
@@ -219,7 +212,6 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	imass_profile          = new vector<float>;
 	cosThetaDimu_profile   = new vector<float>;
 	etaSum_profile         = new vector<float>;
-	
 	nMDTBI_profile = new vector<int>;
 	nMDTBM_profile = new vector<int>;
 	nMDTBO_profile = new vector<int>;
@@ -248,6 +240,7 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	nSCTHoles_profile = new vector<int>;
 	nTRTHits_profile = new vector<int>;
 	nTRTOutliers_profile = new vector<int>;
+	eta_forTRThits_profile = new vector<float>;
 	
 	// eff vectors
 	tNp_triggerName = new vector<string>; // only one entry but easier to access...
@@ -290,7 +283,6 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_allCuts->Branch( "phi", &phi );
 	tree_allCuts->Branch( "d0_exPV",  &d0_exPV );
 	tree_allCuts->Branch( "z0_exPV",  &z0_exPV );
-	
 	tree_allCuts->Branch( "qoverp_ms",  &qoverp_ms );
 	tree_allCuts->Branch( "theta_ms",  &theta_ms );
 	tree_allCuts->Branch( "phi_ms",  &phi_ms );
@@ -303,14 +295,14 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_allCuts->Branch( "qoverp_ie",  &qoverp_ie );
 	tree_allCuts->Branch( "theta_ie",  &theta_ie );
 	tree_allCuts->Branch( "phi_ie",  &phi_ie );
-	tree_allCuts->Branch( "mu_matchchi2",  &mu_matchchi2 );
-	tree_allCuts->Branch( "mu_matchndof",  &mu_matchndof );
-	tree_allCuts->Branch( "mu_allauthor",  &mu_allauthor );
-	tree_allCuts->Branch( "mu_author",  &mu_author );
-	tree_allCuts->Branch( "mu_isStandAloneMuon",  &mu_isStandAloneMuon );
-	tree_allCuts->Branch( "mu_isCombinedMuon",  &mu_isCombinedMuon );
-	tree_allCuts->Branch( "mu_trackfitchi2",  &mu_trackfitchi2 );
-	tree_allCuts->Branch( "mu_trackfitndof",  &mu_trackfitndof );
+	tree_allCuts->Branch( "matchchi2",  &matchchi2 );
+	tree_allCuts->Branch( "matchndof",  &matchndof );
+	tree_allCuts->Branch( "allauthor",  &allauthor );
+	tree_allCuts->Branch( "author",  &author );
+	tree_allCuts->Branch( "isStandAloneMuon",  &isStandAloneMuon );
+	tree_allCuts->Branch( "isCombinedMuon",  &isCombinedMuon );
+	tree_allCuts->Branch( "trackfitchi2",  &trackfitchi2 );
+	tree_allCuts->Branch( "trackfitndof",  &trackfitndof );
 	
 	
 	if(tDir_cutsProfile!=NULL) tDir_cutsProfile->cd();
@@ -342,7 +334,6 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_cutsProfile->Branch( "imass_profile", &imass_profile );
 	tree_cutsProfile->Branch( "cosThetaDimu_profile", &cosThetaDimu_profile );
 	tree_cutsProfile->Branch( "etaSum_profile", &etaSum_profile );
-	
 	tree_cutsProfile->Branch( "nMDTBI_profile", &nMDTBI_profile );
 	tree_cutsProfile->Branch( "nMDTBM_profile", &nMDTBM_profile );
 	tree_cutsProfile->Branch( "nMDTBO_profile", &nMDTBO_profile );
@@ -371,6 +362,7 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_cutsProfile->Branch( "nSCTHoles_profile", &nSCTHoles_profile );
 	tree_cutsProfile->Branch( "nTRTHits_profile", &nTRTHits_profile );
 	tree_cutsProfile->Branch( "nTRTOutliers_profile", &nTRTOutliers_profile );
+	tree_cutsProfile->Branch( "eta_forTRThits_profile", &eta_forTRThits_profile );
 	
 	
 	if(tDir_efficiency!=NULL) tDir_efficiency->cd();
@@ -528,6 +520,10 @@ void graphicObjects::ginitialize()
 	pTmevspTid_min   = 0.*GeV2TeV;
 	pTmevspTid_max   = 500.*GeV2TeV;
 	
+	pTres_nbins = 100;
+	pTres_min   = -2;
+	pTres_max   = +2;
+	
 	Afb_nbins = 40;
 	Afb_min   = 60.*GeV2TeV;
 	Afb_max   = 460.*GeV2TeV;
@@ -578,10 +574,14 @@ void graphicObjects::bookHistos(TDirectory* tdir)
 
 	h1_pTdiff = new TH1D("pTdiff_mu-", "pTdiff_mu-", pTdiff_nbins, pTdiff_min, pTdiff_max);
 	h1_pTratio = new TH1D("pTratio_mu-", "pTratio_mu-", pTratio_nbins, pTratio_min, pTratio_max);
+	h1_pTres = new TH1D("pTres_mu-", "pTres_mu-", pTres_nbins, pTres_min, pTres_max);
 	h2_pTmevspTid = new TH2D("pTmevspTid_mu-", "pTmevspTid_mu-", pTmevspTid_nbins,pTmevspTid_min,pTmevspTid_max, pTmevspTid_nbins,pTmevspTid_min,pTmevspTid_max);
 	h1_pTdiff_muplus = new TH1D("pTdiff_mu+", "pTdiff_mu+", pTdiff_nbins, pTdiff_min, pTdiff_max);
 	h1_pTratio_muplus = new TH1D("pTratio_mu+", "pTratio_mu+", pTratio_nbins, pTratio_min, pTratio_max);
+	h1_pTres_muplus = new TH1D("pTres_mu+", "pTres_mu+", pTres_nbins, pTres_min, pTres_max);
 	h2_pTmevspTid_muplus = new TH2D("pTmevspTid_mu+", "pTmevspTid_mu+", pTmevspTid_nbins,pTmevspTid_min,pTmevspTid_max, pTmevspTid_nbins,pTmevspTid_min,pTmevspTid_max);
+	
+	
 	
 	h1_Afb = new TH1D("Afb","Afb",Afb_nbins,Afb_min,Afb_max);
 }
@@ -777,6 +777,18 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	h1_pTratio_muplus->Draw();
 	cnv_pTratio->Update();
     cnv_pTratio->Write();
+	
+	cnv_pTres = new TCanvas("pTres","pTres",canv_x,canv_y);
+	cnv_pTres->Divide(1,2);
+	pad_pTres = cnv_pTres->cd(1);
+	pad_pTres_muplus = cnv_pTres->cd(2);
+	cnv_pTres->Draw();
+	pad_pTres->cd();
+	h1_pTres->Draw();
+	pad_pTres_muplus->cd();
+	h1_pTres_muplus->Draw();
+	cnv_pTres->Update();
+    cnv_pTres->Write();
 	
 	cnv_pTmevspTid = new TCanvas("pTmevspTid","pTmevspTid",canv_x,canv_y);
 	cnv_pTmevspTid->Divide(1,2);
@@ -1724,23 +1736,23 @@ void graphicObjects::bookCutProfileHistosMap(TMapds* cutFlowOrdered, TDirectory*
 			(*h1map_cutProfile)[sname]->SetXTitle("TRT Outliers");
 			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 			
-			stmp = sname;
-			sname = stmp+"TRTHitsVSeta_1";
+			stmp = "nTRTHitsVSeta";
+			sname = stmp+"_1";
 			h2map_cutProfile->insert( make_pair( sname, new TH2D(sname.c_str(),sname.c_str(), 30,-3,+3,  50,0,50) ) );
 			(*h2map_cutProfile)[sname]->SetXTitle("#eta");
 			(*h2map_cutProfile)[sname]->SetYTitle("TRT Hits");
-			sname = stmp+"TRTHitsVSeta_2";
+			sname = stmp+"_2";
 			h2map_cutProfile->insert( make_pair( sname, new TH2D(sname.c_str(),sname.c_str(), 30,-3,+3,  50,0,50) ) );
 			(*h2map_cutProfile)[sname]->SetXTitle("#eta");
 			(*h2map_cutProfile)[sname]->SetYTitle("TRT Hits");
 			cout << "cutProfile: (" << snumber << ") booked " << sname << endl;
 			
-			stmp = sname;
-			sname = stmp+"TRTOutliersVSeta_1";
+			stmp = "nTRTOutliersVSeta";
+			sname = stmp+"_1";
 			h2map_cutProfile->insert( make_pair( sname, new TH2D(sname.c_str(),sname.c_str(), 30,-3,+3,  50,0,50) ) );
 			(*h2map_cutProfile)[sname]->SetXTitle("#eta");
 			(*h2map_cutProfile)[sname]->SetYTitle("TRT Outliers");
-			sname = stmp+"TRTOutliersVSeta_2";
+			sname = stmp+"_2";
 			h2map_cutProfile->insert( make_pair( sname, new TH2D(sname.c_str(),sname.c_str(), 30,-3,+3,  50,0,50) ) );
 			(*h2map_cutProfile)[sname]->SetXTitle("#eta");
 			(*h2map_cutProfile)[sname]->SetYTitle("TRT Outliers");

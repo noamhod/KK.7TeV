@@ -69,9 +69,9 @@ class analysisLocalControl : public chainMaker, public utilities
 	public:
 		analysisLocalControl();
 		~analysisLocalControl();
-		void   setRunControl(string localRunControlFile);
-		void   initialize(int runNumber = 0, string localRunControlFile = "localRunControl_noSkim.txt");
-		void   finalize();
+		void setRunControl(string localRunControlFile);
+		void initialize(int runNumber = 0, string localRunControlFile = "localRunControl_noSkim.txt");
+		void finalize();
 		
 		void book();
 		void draw();

@@ -33,6 +33,7 @@ class graphicObjects// : public utilities
 		TCanvas* cnv_pTdiff;
 		TCanvas* cnv_pTratio;
 		TCanvas* cnv_pTmevspTid;
+		TCanvas* cnv_pTres;
 		TCanvas* cnv_Afb;
 		TCanvas* cnv_efficiency_pT;
 		TCanvas* cnv_efficiency_eta;
@@ -51,6 +52,8 @@ class graphicObjects// : public utilities
 		TVirtualPad* pad_pTratio_muplus;
 		TVirtualPad* pad_pTmevspTid;
 		TVirtualPad* pad_pTmevspTid_muplus;
+		TVirtualPad* pad_pTres;
+		TVirtualPad* pad_pTres_muplus;
 		TVirtualPad* pad_candidates_pT;
 		TVirtualPad* pad_succeeded_pT;
 		TVirtualPad* pad_efficiency_pT;
@@ -80,6 +83,8 @@ class graphicObjects// : public utilities
 		TH1D* h1_pTdiff_muplus;
 		TH1D* h1_pTratio;
 		TH1D* h1_pTratio_muplus;
+		TH1D* h1_pTres;
+		TH1D* h1_pTres_muplus;
 		TH2D* h2_pTmevspTid;
 		TH2D* h2_pTmevspTid_muplus;
 		TH1D* h1_Afb;
@@ -230,6 +235,10 @@ class graphicObjects// : public utilities
 		Double_t pTmevspTid_min;
 		Double_t pTmevspTid_max;
 		
+		Int_t pTres_nbins;
+		Double_t pTres_min;
+		Double_t pTres_max;
+		
 		Int_t Afb_nbins;
 		Double_t Afb_min;
 		Double_t Afb_max;
@@ -283,14 +292,14 @@ class graphicObjects// : public utilities
 		vector<float>* qoverp_ie;
 		vector<float>* theta_ie;
 		vector<float>* phi_ie;
-		vector<float>   *mu_matchchi2;
-		vector<int>     *mu_matchndof;
-		vector<unsigned short> *mu_allauthor;
-		vector<int>     *mu_author;
-		vector<int>     *mu_isStandAloneMuon;
-		vector<int>     *mu_isCombinedMuon;
-		vector<float>   *mu_trackfitchi2;
-		vector<int>     *mu_trackfitndof;
+		vector<float>   *matchchi2;
+		vector<int>     *matchndof;
+		vector<unsigned short> *allauthor;
+		vector<int>     *author;
+		vector<int>     *isStandAloneMuon;
+		vector<int>     *isCombinedMuon;
+		vector<float>   *trackfitchi2;
+		vector<int>     *trackfitndof;
 		// cut profile 1d
 		vector<float>* pT_profile;
 		vector<float>* pT_loose_profile;
@@ -312,7 +321,6 @@ class graphicObjects// : public utilities
 		vector<float>* isolation40_profile;
 		vector<float>* vxp_z_profile;
 		vector<int>*   vxp_nTracks_profile;
-		
 		vector<int>* nMDTBI_profile;
 		vector<int>* nMDTBM_profile;
 		vector<int>* nMDTBO_profile;
@@ -341,6 +349,7 @@ class graphicObjects// : public utilities
 		vector<int>* nSCTHoles_profile;
 		vector<int>* nTRTHits_profile;
 		vector<int>* nTRTOutliers_profile;
+		vector<float>* eta_forTRThits_profile;
 		
 		// cut profile 2d
 		vector<float>* oppositeCharge_profile;

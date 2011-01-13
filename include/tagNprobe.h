@@ -53,6 +53,7 @@ class tagNprobe
 						   vector<vector<float> >* trig_pt,
 						   vector<vector<int> >*   trig_has);
 		
+		// tagMask for HLT
 		int tagMask
 		(
 			string sTrigName, string sTrigType, float pTtrigThreshold,
@@ -71,6 +72,24 @@ class tagNprobe
 			vector<vector<int> >*   trig_has
 		);
 		
+		// tagMask for LLT
+		int tagMask
+		(
+			string sTrigName, string sTrigType, float pTtrigThreshold,
+			vector<bool>& mu_qaflg,
+			int skipMuIndex, int& muTag, int& ROITag,
+			vector<int>*   mu_index,
+			vector<float>* mu_dr,
+			vector<float>* mu_phi,
+			vector<float>* mu_eta,
+			vector<float>* mu_pt,
+			vector<float>* mu_qoverp,
+			vector<float>* mu_theta,
+			vector<float>* trig_phi,
+			vector<float>* trig_eta,
+			vector<float>* trig_pt
+		);
+		
 		int probeCandMask
 		(
 			string sTrigType,
@@ -86,6 +105,7 @@ class tagNprobe
 			vector<float>* mu_charge
 		);
 		
+		// probeMask for HLT
 		int tagNprobe::probeMask
 		(
 			int iprobeCand,
@@ -101,6 +121,23 @@ class tagNprobe
 			vector<vector<float> >* trig_eta,
 			vector<vector<float> >* trig_pt,
 			vector<vector<int> >*   trig_has
+		);
+		
+		// probeMask for LLT
+		int tagNprobe::probeMask
+		(
+			int iprobeCand,
+			string sTrigName, float pTtrigThreshold,
+			vector<bool>& mu_qaflg,
+			int muTag, int ROITag,
+			int& muProb, int& ROIProb,
+			vector<int>*   mu_index,
+			vector<float>* mu_dr,
+			vector<float>* mu_phi,
+			vector<float>* mu_eta,
+			vector<float>* trig_phi,
+			vector<float>* trig_eta,
+			vector<float>* trig_pt
 		);
 		
 		void calculateEfficiency(TH1D* hCandidates, TH1D* hSucceeded, TH1D* hEfficiency, bool isTruth);

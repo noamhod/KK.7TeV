@@ -40,10 +40,20 @@ public:
 	TVectorP2VL pmuTruth;
 	TMapsd values2fill;
 	int nMultiMuonEvents;
-	vector<int>*   trigger_index;
-	vector<int>*   trigger_match;
-	vector<float>* trigger_pt;
-	vector<float>* trigger_dr;
+	
+	// tirg, local
+	vector<int>*   mu_LLT_index;
+	vector<float>* mu_LLT_dr;
+	vector<float>* LLT_pt;
+	vector<float>* LLT_phi;
+	vector<float>* LLT_eta;
+	
+	vector<int>*   mu_HLT_index;
+	vector<float>* mu_HLT_dr;
+	vector<vector<float> >* HLT_pt;
+	vector<vector<float> >* HLT_phi;
+	vector<vector<float> >* HLT_eta;
+	vector<vector<int> >*   HLT_has;
 	
 
 
@@ -519,7 +529,7 @@ public:
 	string          getPeriodName(int run);
 	vector<string>* getPeriodTriggers();
 	int             isTrigger(string trigName);
-	void            matchTrigger(string speriod);
+	void            matchTrigger(string speriod, string sTrigType);
 	void 			printAllProperties(int ai, int bi, int iv);
 	
 	void buildMU4Vector(int nMus);

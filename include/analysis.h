@@ -67,7 +67,7 @@ public:
 		m_analysis_grl = grl;	
 		m_treeFile     = treeFile;
 
-		m_WZphysD3PDmaker  = new WZphysD3PDmaker( m_WZphysD3PD, sRunType, m_isMC, m_treeFile );
+		if(m_treeFile!=NULL) m_WZphysD3PDmaker  = new WZphysD3PDmaker( m_WZphysD3PD, sRunType, m_isMC, m_treeFile );
 		
 		nSkim = 0;
 		nAll = 0;

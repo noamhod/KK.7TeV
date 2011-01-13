@@ -346,6 +346,12 @@ bool selection::imassCut( float imassCutVal, TLorentzVector* pa, TLorentzVector*
 	return ( imass(pa,pb) > imassCutVal ) ? true : false;
 }
 
+bool selection::imassMaxCut( float imassCutVal, TLorentzVector* pa, TLorentzVector* pb )
+{
+	if(b_print) cout << "in imassMaxCut: imass(pa,pb)=" << imass(pa,pb) << endl;
+	return ( imass(pa,pb) < imassCutVal ) ? true : false;
+}
+
 bool selection::cosThetaDimuCut( float cosThetaDimuCutVal, TLorentzVector* pa, TLorentzVector* pb )
 {
 	if(b_print) cout << "in cosThetaDimuCut: cosThetaDimu(pa,pb)=" << cosThetaDimu(pa,pb) << endl;
@@ -831,17 +837,17 @@ bool selection::nMShitsRel16(float nMDTB_IMO_HitsCutVal, float nMDTE_IMO_HitsCut
 	
 	/*
 	(
-		(mu_nRPCLayer1PhiHits>=1) + (mu_nRPCLayer2PhiHits>=1) + (mu_nRPCLayer3PhiHits>=1) +
-		(mu_nTGCLayer1PhiHits>=1) + (mu_nTGCLayer2PhiHits>=1) + (mu_nTGCLayer3PhiHits>=1) + (mu_nTGCLayer4PhiHits>=1) +
-		(mu_nCSCPhiHits>=1)
+		(nRPCLayer1PhiHits>=1) + (nRPCLayer2PhiHits>=1) + (nRPCLayer3PhiHits>=1) +
+		(nTGCLayer1PhiHits>=1) + (nTGCLayer2PhiHits>=1) + (nTGCLayer3PhiHits>=1) + (nTGCLayer4PhiHits>=1) +
+		(nCSCPhiHits>=1)
 	) >=1
 	&& 
 	(
-		((mu_nMDTBIHits>=3) + (mu_nMDTBMHits>=3) + (mu_nMDTBOHits>=3)) >= 3
+		((nMDTBIHits>=3) + (nMDTBMHits>=3) + (nMDTBOHits>=3)) >= 3
 		||
-		(((mu_nMDTEIHits>=3) || (mu_nCSCEtaHits>=3)) + (mu_nMDTEMHits>=3) + (mu_nMDTEOHits>=3)) >= 3
+		(((nMDTEIHits>=3) || (nCSCEtaHits>=3)) + (nMDTEMHits>=3) + (nMDTEOHits>=3)) >= 3
 	)
-	&& (mu_nMDTBEEHits==0) && (mu_nMDTEEHits==0) && (mu_nMDTBIS78Hits==0);
+	&& (nMDTBEEHits==0) && (nMDTEEHits==0) && (nMDTBIS78Hits==0);
 	*/
 	
 	//1) at least one phi hit on the MS track

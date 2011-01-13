@@ -2232,6 +2232,11 @@ bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
 		{
 			passCurrentCut = ( imassCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
 		}
+		
+		else if(sorderedcutname=="imassMax"  &&  !bSkipCut)
+		{
+			passCurrentCut = ( imassMaxCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
+		}
 
 		else if(sorderedcutname=="cosThetaDimu"  &&  !bSkipCut)
 		{

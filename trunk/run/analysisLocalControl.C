@@ -64,36 +64,64 @@ void analysisLocalControl::initialize(int runNumber, string localRunControlFile)
 	l64t_jentry   = 0;
 	l64t_ientry   = 0;
 	
-	string str = "";
+	string str_list = "";
+	string str_dir  = "";
+	string str_tree = "";
+	string str_hist = "";
 	
-	str = checkANDsetFilepath("PWD", "/../conf/Z_GRL_CURRENT.xml");;
+	string str = checkANDsetFilepath("PWD", "/../conf/Z_GRL_CURRENT.xml");;
 	m_GRL = new GRLinterface();
 	m_GRL->glrinitialize( (TString)str );
 	
-	str = checkANDsetFilepath("PWD", "/../conf/local_dataset.list");
-	string strb = checkANDsetFilepath("PWD", "/local_datasetdir/");
 	
-	////////////////////////////////////////////////////////////////////////////////////////
-	// for TESTS only //////////////////////////////////////////////////////////////////////
-	if(runNumber==-1)
+	if(m_isMC)
 	{
-		strb = checkANDsetFilepath("PWD", "/");
-		str = checkANDsetFilepath("PWD", "/../conf/local_dataset_WZphys_localTests.list");
+		//////////////////////////////////////////
+		// prompt to chose the MC sample here ////
+		string sMCsample = pickMCinputSampe(); ///
+		//////////////////////////////////////////
+		
+		if(m_RunType=="local")
+		{
+			str_list = checkANDsetFilepath("PWD", "/../conf/mc_local_dataset_"+sMCsample+".list");
+			str_dir = checkANDsetFilepath("PWD", "/mc_local_datasetdir/");
+			if(sMCsample=="mcWZphys_localTests") str_dir = checkANDsetFilepath("PWD", "/");
+			str_tree = checkANDsetFilepath("PWD", "/../data/mcLocalTree_"+sMCsample+".root");
+			str_hist = checkANDsetFilepath("PWD", "/../data/mcLocalControl_"+sMCsample+".root");
+		}
+		else if(m_RunType=="local_noskim")
+		{
+			str_list = checkANDsetFilepath("PWD", "/../conf/mc_localnoskim_dataset_"+sMCsample+".list");
+			str_dir = checkANDsetFilepath("PWD", "/mc_localnoskim_datasetdir/");
+			str_hist = checkANDsetFilepath("PWD", "/../data/mcLocalnkimControl_"+sMCsample+".root");
+		}
 	}
-	////////////////////////////////////////////////////////////////////////////////////////
+	else
+	{
+		str_list = checkANDsetFilepath("PWD", "/../conf/local_dataset.list");
+		str_dir  = checkANDsetFilepath("PWD", "/local_datasetdir/");
+		str_tree = checkANDsetFilepath("PWD", "/../data/localTree.root");
+		str_hist = checkANDsetFilepath("PWD", "/../data/analysisLocalControl.root");
+		
+		// for tests only
+		if(runNumber==-1)
+		{
+			str_dir  = checkANDsetFilepath("PWD", "/");
+			str_list = checkANDsetFilepath("PWD", "/../conf/local_dataset_WZphys_localTests.list");
+		}
+	}
 	
 	vector<string>* vStr2find = NULL; // all the patterns to be found except for ".root"
 	chainInit(vStr2find);
-	if(runNumber==-1) makeChain(true, str, strb);
-	else              makeChain(true, str, strb, runNumber);
+	if(runNumber==-1) makeChain(true, str_list, str_dir);
+	else              makeChain(true, str_list, str_dir, runNumber);
 
 	m_WZphysD3PD = new WZphysD3PD( m_chain );
 
-	str = checkANDsetFilepath("PWD", "/../data/localTree.root");
-	m_treefile = new TFile( str.c_str(), "RECREATE");
+	if(m_RunType!="local_noskim") m_treefile = new TFile( str_tree.c_str(), "RECREATE");
+	else m_treefile = NULL;
 	
-	str = checkANDsetFilepath("PWD", "/../data/analysisLocalControl.root");
-	m_histfile = new TFile( str.c_str(), "RECREATE");
+	m_histfile = new TFile( str_hist.c_str(), "RECREATE");
 	m_histfile->cd();
 
 	string str1 = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
@@ -105,7 +133,7 @@ void analysisLocalControl::initialize(int runNumber, string localRunControlFile)
 
 	book();
 
-	m_treefile->cd();
+	if(m_RunType!="local_noskim") m_treefile->cd();
 }
 
 void analysisLocalControl::finalize()
@@ -116,11 +144,14 @@ void analysisLocalControl::finalize()
 	// since in digestTree class there is the
 	// following statement m_tree->SetMaxTreeSize(50000000);
 	// i.e., 50Mb per file
-	m_treefile = m_analysis->m_WZphysD3PDmaker->m_tree->GetCurrentFile();
-	m_treefile->cd();
-	m_analysis->m_WZphysD3PDmaker->m_tree->Write();
-	m_treefile->Write();
-	m_treefile->Close();
+	if(m_RunType!="local_noskim")
+	{
+		m_treefile = m_analysis->m_WZphysD3PDmaker->m_tree->GetCurrentFile();
+		m_treefile->cd();
+		m_analysis->m_WZphysD3PDmaker->m_tree->Write();
+		m_treefile->Write();
+		m_treefile->Close();
+	}
 	
 	// histos
 	m_histfile->Write();
@@ -170,24 +201,24 @@ void analysisLocalControl::draw()
 	
 	bool isTruth = false;
 	m_analysis->calculateEfficiency(m_analysis->h1map_tagNprobe_candidates_pT,
-										   m_analysis->h1map_tagNprobe_succeeded_pT,
-										   m_analysis->h1map_tagNprobe_trigEff_pT, isTruth);
+									m_analysis->h1map_tagNprobe_succeeded_pT,
+									m_analysis->h1map_tagNprobe_trigEff_pT, isTruth);
 	m_analysis->calculateEfficiency(m_analysis->h1map_tagNprobe_candidates_eta,
-										   m_analysis->h1map_tagNprobe_succeeded_eta,
-										   m_analysis->h1map_tagNprobe_trigEff_eta, isTruth);
+									m_analysis->h1map_tagNprobe_succeeded_eta,
+									m_analysis->h1map_tagNprobe_trigEff_eta, isTruth);
 	m_analysis->calculateEfficiency(m_analysis->h1map_tagNprobe_candidates_phi,
-										   m_analysis->h1map_tagNprobe_succeeded_phi,
-										   m_analysis->h1map_tagNprobe_trigEff_phi, isTruth);
+									m_analysis->h1map_tagNprobe_succeeded_phi,
+									m_analysis->h1map_tagNprobe_trigEff_phi, isTruth);
 	isTruth = true;
 	m_analysis->calculateEfficiency(m_analysis->h1map_truth_candidates_pT,
-										   m_analysis->h1map_truth_succeeded_pT,
-										   m_analysis->h1map_truth_trigEff_pT, isTruth);
+									m_analysis->h1map_truth_succeeded_pT,
+									m_analysis->h1map_truth_trigEff_pT, isTruth);
 	m_analysis->calculateEfficiency(m_analysis->h1map_truth_candidates_eta,
-										   m_analysis->h1map_truth_succeeded_eta,
-										   m_analysis->h1map_truth_trigEff_eta, isTruth);
+									m_analysis->h1map_truth_succeeded_eta,
+									m_analysis->h1map_truth_trigEff_eta, isTruth);
 	m_analysis->calculateEfficiency(m_analysis->h1map_truth_candidates_phi,
-										   m_analysis->h1map_truth_succeeded_phi,
-										   m_analysis->h1map_truth_trigEff_phi, isTruth);
+									m_analysis->h1map_truth_succeeded_phi,
+									m_analysis->h1map_truth_trigEff_phi, isTruth);
 	m_analysis->drawEfficiencyHistosMap(m_dirEff);
 	
 	m_analysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );

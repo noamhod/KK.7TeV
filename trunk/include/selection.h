@@ -68,6 +68,7 @@ public:
 	bool cosThetaDimuCut( float cosThetaDimuCutVal, TLorentzVector* pa, TLorentzVector* pb );
 	bool etaSumCut(       float etaSumCutVal,       TLorentzVector* pa, TLorentzVector* pb );
 	bool imassCut(        float imassCutVal,        TLorentzVector* pa, TLorentzVector* pb );
+	bool imassMaxCut(     float imassCutVal,        TLorentzVector* pa, TLorentzVector* pb );
 
 	bool d0Cut(          float d0CutVal, float d0a, float d0b );
 	bool d0Cut(          float d0CutVal, float d0 );

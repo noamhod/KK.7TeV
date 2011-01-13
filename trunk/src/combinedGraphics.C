@@ -56,42 +56,18 @@ void combinedGraphics::initialize(string analysisSelector, string muonSelector)
 	
 	/////////////////////////////////////////////////
 	// integrated luminosity of the data in 1/pb ////
-	/*
-		Period	 Trigger	 	Lumi[/nb]
-		A		 L1_MU10		0.158011
-		B		 L1_MU10		8.88014
-		C		 L1_MU10		8.72868
-		D		 L1_MU10		297.341
-		E		 EF_mu10		1081.95
-		F		 EF_mu10		1958.16
-		G		 EF_mu13		8570.07
-		H		 EF_mu13_tight	8522.04
-		I		 EF_mu13_tight	22953.0
-				 total			43400.33
-	*/
-	//=======>
-	/*
-		Period	 Trigger	 	Lumi[1/pb]
-		A-D		 L1_MU10		0.315107831
-		E-F		 EF_mu10		3.04011
-		G		 EF_mu13		8.57007
-		H-I		 EF_mu13_tight	31.47504
-				 total			43.40033
-	*/
+	period2trigMap.insert( make_pair( "L1_MU10",0.272906894 ) );
+	period2trigMap.insert( make_pair( "EF_mu10",3.03978  ) );
+	period2trigMap.insert( make_pair( "EF_mu13",6.89501  ) );
+	period2trigMap.insert( make_pair( "EF_mu13_tight",31.47316  ) );
 	
-	
-	period2trigMap.insert( make_pair( "L1_MU10",0.315107831 ) );
-	period2trigMap.insert( make_pair( "EF_mu10",3.04011  ) );
-	period2trigMap.insert( make_pair( "EF_mu13",8.57007  ) );
-	period2trigMap.insert( make_pair( "EF_mu13_tight",31.47504  ) );
-	
-	period2lumiMap.insert( make_pair( "A",0.157183/1000 ) );
+	period2lumiMap.insert( make_pair( "A",0.157154/1000 ) );
 	period2lumiMap.insert( make_pair( "B",8.83395/1000  ) );
-	period2lumiMap.insert( make_pair( "C",8.71722/1000  ) );
+	period2lumiMap.insert( make_pair( "C",8.71179/1000  ) );
 	period2lumiMap.insert( make_pair( "D",255.204/1000  ) );
 	period2lumiMap.insert( make_pair( "E",1081.62/1000  ) );
 	period2lumiMap.insert( make_pair( "F",1958.16/1000  ) );
-	period2lumiMap.insert( make_pair( "G",8540.39/1000  ) );
+	period2lumiMap.insert( make_pair( "G",6895.01/1000  ) );
 	period2lumiMap.insert( make_pair( "H",8520.76/1000  ) );
 	period2lumiMap.insert( make_pair( "I",22952.4/1000  ) );
 	dataLumi_ipb = 0.;

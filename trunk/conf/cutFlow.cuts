@@ -30,18 +30,18 @@ preselection	2			0				PV						3				2.		 	1.		 200.
 #-------------------------------------------------------#
 
 selection		10			0				isCombMu				1				1.
-selection		11			1				pT						1				0.025
-#selection		12			1				pT_loose				1				0.020
-#selection		13			1				pT_qOp+theta			1				0.025
-#selection		14			1				pT_qOp+theta_loose		1				0.020
-selection		15			1				eta						1				2.4
-#selection		16			1				etaTight				1				2.0
-#selection		17			1				etaBarrel				1				1.05
-#selection		18			1				etaFwd					1				2.5
-#selection		19			1				etaFull					1				2.7
-#selection		20			1				pTandEta				2				0.025	 2.4
-#selection		21			1				pTandEtaTight			2				0.025	 2.0
-#selection		22			1				pTandEtaBarrel			2				0.025	 1.05
+selection		11			1				eta						1				2.4
+#selection		12			1				etaTight				1				2.0
+#selection		13			1				etaBarrel				1				1.05
+#selection		14			1				etaFwd					1				2.5
+#selection		15			1				etaFull					1				2.7
+#selection		16			1				pTandEta				2				0.025	 2.4
+#selection		17			1				pTandEtaTight			2				0.025	 2.0
+#selection		18			1				pTandEtaBarrel			2				0.025	 1.05
+selection		19			1				pT						1				0.025
+#selection		20			1				pT_loose				1				0.020
+#selection		21			1				pT_qOp+theta			1				0.025
+#selection		22			1				pT_qOp+theta_loose		1				0.020
 
 #selection		101			1				msHits					6				3.		 3.		 3.		0.		0.		1.
 #selection		102			0				msHits1					7				3.		 3.		 0.		0.		3.		2.		1.
@@ -65,7 +65,7 @@ selection		302			0				isolation30				1				0.05
 #selection		303			0				isolation40				1				0.2
 
 selection		401			1				oppositeCharge			1				0.
-selection		402			1				imass					1				0.06
+selection		402			1				imass					1				0.07
 
 
 #selection		501			0				cosThetaDimu			1				-0.96

@@ -81,140 +81,80 @@ int analysisSkeleton::isTrigger(string trigName)
 	return isTrig;
 }
 
-void analysisSkeleton::matchTrigger(string speriod)
+void analysisSkeleton::matchTrigger(string speriod, string sTrigType)
 {
+	/*
+	EFCB: the trig muon for the regular EF trigger
+	EFME: the MSonly trig muons
+	EFMG: trig mugirl (_MG type triggers)
+	L2CB: combinedmuonfeature (mucomb)
+	L1:   the level 1 RoI
+	
+	For the first two, the trigger block variables are the ones starting
+	with trig_EF_trigmuonef_ while for mugirl the trigger variables are trig_EF_trigmugirl_
+	The L2 information matches to the trig_L2_combmuonfeature_ blocks and L1 ->trig_L1_mu_
+	*/
+
 	if(speriod=="")
 	{
 		cout << "ERROR: in analysisSkeleton::matchTrigger -> (speriod==""), exitting now" << endl;
 		exit(-1);
 	}
 	
-	if(speriod=="MC")
+	if
+	(
+		speriod=="MC" ||
+		speriod=="A"  || speriod=="B1-B2" || speriod=="C1" || speriod=="C2" || speriod=="D1-D6" ||
+		speriod=="E1" || speriod=="E2"    || speriod=="E3"
+	)
 	{
-		//trigger_match = mu_L1_matched;
-		//trigger_pt    = mu_L1_pt;
-		//trigger_dr    = mu_L1_dr;
-		trigger_match = NULL;          // ????????????????????????????????????????????????????????????????????
-		trigger_index = mu_L1_index;
-		trigger_dr    = mu_L1_dr;
-		trigger_pt    = trig_L1_mu_pt; // ????????????????????????????????????????????????????????????????????
+		mu_LLT_index = mu_L1_index;
+		mu_LLT_dr    = mu_L1_dr;
+		LLT_pt       = trig_L1_mu_pt;
+		LLT_phi      = trig_L1_mu_phi;
+		LLT_eta      = trig_L1_mu_eta;
 	}
-	else if(speriod=="A" || speriod=="B1-B2" || speriod=="C1" || speriod=="C2" || speriod=="D1-D6")
+	
+	else if
+	(
+		speriod=="E4" || speriod=="E5" || speriod=="E6" || speriod=="E7" ||
+		speriod=="F1" || speriod=="F2" ||
+		speriod=="G1" || speriod=="G2" || speriod=="G3" || speriod=="G4" ||
+		speriod=="G5" || speriod=="G6" ||
+		speriod=="H1" || speriod=="H2" ||
+		speriod=="I1" || speriod=="I2"
+	)
 	{
-		//trigger_match = mu_L1_matched;
-		//trigger_pt    = mu_L1_pt;
-		//trigger_dr    = mu_L1_dr;
-		trigger_match = NULL;          // ????????????????????????????????????????????????????????????????????
-		trigger_index = mu_L1_index;
-		trigger_dr    = mu_L1_dr;
-		trigger_pt    = trig_L1_mu_pt; // ????????????????????????????????????????????????????????????????????
+		if(sTrigType=="CB")
+		{
+			mu_HLT_dr = mu_EFCB_dr;
+			mu_HLT_index = mu_EFCB_index;
+			HLT_pt = trig_EF_trigmuonef_track_CB_pt;
+			HLT_phi = trig_EF_trigmuonef_track_CB_phi;
+			HLT_eta = trig_EF_trigmuonef_track_CB_eta;
+			HLT_has = trig_EF_trigmuonef_track_CB_hasCB;
+		}
+		else if(sTrigType=="MS")
+		{
+			mu_HLT_dr = mu_EFME_dr;
+			mu_HLT_index = mu_EFME_index;
+			HLT_pt = trig_EF_trigmuonef_track_MS_pt;
+			HLT_phi = trig_EF_trigmuonef_track_MS_phi;
+			HLT_eta = trig_EF_trigmuonef_track_MS_eta;
+			HLT_has = trig_EF_trigmuonef_track_MS_hasMS;
+		}
+		else if(sTrigType=="MG")
+		{
+			mu_HLT_dr = mu_EFMG_dr;
+			mu_HLT_index = mu_EFMG_index;
+			HLT_pt = trig_EF_trigmugirl_track_CB_pt;
+			HLT_phi = trig_EF_trigmugirl_track_CB_phi;
+			HLT_eta = trig_EF_trigmugirl_track_CB_eta;
+			HLT_has = trig_EF_trigmugirl_track_CB_hasCB;
+		}
+		
 	}
-	else if(speriod=="E1" || speriod=="E2" || speriod=="E3")
-	{
-		//trigger_match = mu_L1_matched;
-		//trigger_pt    = mu_L1_pt;
-		//trigger_dr    = mu_L1_dr;
-		trigger_match = NULL;          // ????????????????????????????????????????????????????????????????????
-		trigger_index = mu_L1_index;
-		trigger_dr    = mu_L1_dr;
-		trigger_pt    = trig_L1_mu_pt; // ????????????????????????????????????????????????????????????????????
-	}
-	else if(speriod=="E4" || speriod=="E5" || speriod=="E6" || speriod=="E7")
-	{
-		//trigger_match = mu_EF_matched;
-		//trigger_pt    = mu_EF_me_pt;
-		//trigger_dr    = mu_EF_dr;
-		trigger_match = NULL;          // ????????????????????????????????????????????????????????????????????
-		trigger_dr    = mu_EFCB_dr;
-		trigger_index = mu_EFCB_index;
-		trigger_pt    = NULL;          // ????????????????????????????????????????????????????????????????????
-		//trigger_dr    = mu_EFMG_dr;
-		//trigger_index = mu_EFMG_index;
-		//trigger_pt    = NULL;          // ????????????????????????????????????????????????????????????????????
-		//trigger_dr    = mu_EFME_dr;
-		//trigger_index = mu_EFME_index;
-		//trigger_pt    = NULL;          // ????????????????????????????????????????????????????????????????????
-	}
-	else if(speriod=="F1" || speriod=="F2")
-	{
-		//trigger_match = mu_EF_matched;
-		//trigger_pt    = mu_EF_me_pt;
-		//trigger_dr    = mu_EF_dr;
-		trigger_match = NULL;          // ????????????????????????????????????????????????????????????????????
-		trigger_dr    = mu_EFCB_dr;
-		trigger_index = mu_EFCB_index;
-		trigger_pt    = NULL;          // ????????????????????????????????????????????????????????????????????
-		//trigger_dr    = mu_EFMG_dr;
-		//trigger_index = mu_EFMG_index;
-		//trigger_pt    = NULL;          // ????????????????????????????????????????????????????????????????????
-		//trigger_dr    = mu_EFME_dr;
-		//trigger_index = mu_EFME_index;
-		//trigger_pt    = NULL;          // ????????????????????????????????????????????????????????????????????
-	}
-	else if(speriod=="G1" || speriod=="G2" || speriod=="G3" || speriod=="G4")
-	{
-		//trigger_match = mu_EF_matched;
-		//trigger_pt    = mu_EF_me_pt;
-		//trigger_dr    = mu_EF_dr;
-		trigger_match = NULL;          // ????????????????????????????????????????????????????????????????????
-		trigger_dr    = mu_EFCB_dr;
-		trigger_index = mu_EFCB_index;
-		trigger_pt    = NULL;          // ????????????????????????????????????????????????????????????????????
-		//trigger_dr    = mu_EFMG_dr;
-		//trigger_index = mu_EFMG_index;
-		//trigger_pt    = NULL;          // ????????????????????????????????????????????????????????????????????
-		//trigger_dr    = mu_EFME_dr;
-		//trigger_index = mu_EFME_index;
-		//trigger_pt    = NULL;          // ????????????????????????????????????????????????????????????????????
-	}
-	else if(speriod=="G5" || speriod=="G6")
-	{
-		//trigger_match = mu_EF_matched;
-		//trigger_pt    = mu_EF_me_pt;
-		//trigger_dr    = mu_EF_dr;
-		trigger_match = NULL;          // ????????????????????????????????????????????????????????????????????
-		trigger_dr    = mu_EFCB_dr;
-		trigger_index = mu_EFCB_index;
-		trigger_pt    = NULL;          // ????????????????????????????????????????????????????????????????????
-		//trigger_dr    = mu_EFMG_dr;
-		//trigger_index = mu_EFMG_index;
-		//trigger_pt    = NULL;          // ????????????????????????????????????????????????????????????????????
-		//trigger_dr    = mu_EFME_dr;
-		//trigger_index = mu_EFME_index;
-		//trigger_pt    = NULL;          // ????????????????????????????????????????????????????????????????????
-	}
-	else if(speriod=="H1" || speriod=="H2")
-	{
-		//trigger_match = mu_EF_matched;
-		//trigger_pt    = mu_EF_me_pt;
-		//trigger_dr    = mu_EF_dr;
-		trigger_match = NULL;          // ????????????????????????????????????????????????????????????????????
-		trigger_dr    = mu_EFCB_dr;
-		trigger_index = mu_EFCB_index;
-		trigger_pt    = NULL;          // ????????????????????????????????????????????????????????????????????
-		//trigger_dr    = mu_EFMG_dr;
-		//trigger_index = mu_EFMG_index;
-		//trigger_pt    = NULL;          // ????????????????????????????????????????????????????????????????????
-		//trigger_dr    = mu_EFME_dr;
-		//trigger_index = mu_EFME_index;
-		//trigger_pt    = NULL;          // ????????????????????????????????????????????????????????????????????
-	}
-	else if(speriod=="I1" || speriod=="I2")
-	{
-		//trigger_match = mu_EF_matched;
-		//trigger_pt    = mu_EF_me_pt;
-		//trigger_dr    = mu_EF_dr;
-		trigger_match = NULL;          // ????????????????????????????????????????????????????????????????????
-		trigger_dr    = mu_EFCB_dr;
-		trigger_index = mu_EFCB_index;
-		trigger_pt    = NULL;          // ????????????????????????????????????????????????????????????????????
-		//trigger_dr    = mu_EFMG_dr;
-		//trigger_index = mu_EFMG_index;
-		//trigger_pt    = NULL;          // ????????????????????????????????????????????????????????????????????
-		//trigger_dr    = mu_EFME_dr;
-		//trigger_index = mu_EFME_index;
-		//trigger_pt    = NULL;          // ????????????????????????????????????????????????????????????????????
-	}
+	
 	else cout << "WARNING:  in analysisSkeleton::matchTrigger -> the period name " << speriod << " was not found" << endl;
 }
 
@@ -440,8 +380,8 @@ void analysisSkeleton::fillAfterCuts()
 	current_muplus_me_pT = pT(mu_me_qoverp->at(muPlus),mu_me_theta->at(muPlus))*MeV2TeV;
 	current_mu_id_pT     = pT(mu_id_qoverp->at(muMinus),mu_id_theta->at(muMinus))*MeV2TeV;
 	current_muplus_id_pT = pT(mu_id_qoverp->at(muPlus),mu_id_theta->at(muPlus))*MeV2TeV;
-	current_mu_pT        = mu_pt->at(muMinus);
-	current_muplus_pT    = mu_pt->at(muPlus);
+	current_mu_pT        = mu_pt->at(muMinus)*MeV2TeV;
+	current_muplus_pT    = mu_pt->at(muPlus)*MeV2TeV;
 	current_mu_eta       = mu_eta->at(muMinus);
 	current_muplus_eta   = mu_eta->at(muPlus);
 	current_mu_me_qop    = mu_me_qoverp->at(muMinus)*MeV2TeV;
@@ -1376,17 +1316,32 @@ void analysisSkeleton::fillCutProfile()
 void analysisSkeleton::fill_tNp()
 {
 	int mask = -1;
+	string sTrigType = "";
+	bool isLLT = false;
+	bool isHLT = false;
+	bool isCBpT = true;
 	
 	//////////////////////////////////////////////////////////////////////////////////
-	matchTrigger(sPeriod); ///////////////////////////////////////////////////////////
-	//float trig_pTmin       = (float)m_period2pTminMap->operator[](sPeriod); //////////
+	float trig_pTmin       = (float)m_period2pTminMap->operator[](sPeriod); //////////
 	float trig_pTthreshold = (float)m_period2pTthresholdMap->operator[](sPeriod); ////
 	string sTrigPeriod     = (*m_period2triggerperiodMap)[sPeriod]; //////////////////
+	//////////////////////////////////////////////////////////////////////////////////
+	if( (size_t)sTrigPeriod.find("L1")!=string::npos )      sTrigType = "L1"; ////////
+	else if( (size_t)sTrigPeriod.find("MG")!=string::npos ) sTrigType = "MG"; ////////
+	else if( (size_t)sTrigPeriod.find("MS")!=string::npos ) sTrigType = "MS"; ////////
+	else                                                    sTrigType = "CB"; ////////
+	//////////////////////////////////////////////////////////////////////////////////
+	if     ( (size_t)sTrigPeriod.find("L1")!=string::npos ) isLLT = true; ////////////
+	else if( (size_t)sTrigPeriod.find("EF")!=string::npos ) isHLT = true; ////////////
+	//////////////////////////////////////////////////////////////////////////////////
+	if     (sTrigType=="L1" || sTrigType=="MS") isCBpT = false; //////////////////////
+	else if(sTrigType=="MG" || sTrigType=="CB") isCBpT = true;  //////////////////////
+	//////////////////////////////////////////////////////////////////////////////////
+	matchTrigger(sPeriod, sTrigType); ////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	float pTtmp;
 	int previousTag;
-	
 	int muTag = -1;
 	int ROITag;
 	int trigTrkTag;
@@ -1394,24 +1349,37 @@ void analysisSkeleton::fill_tNp()
 	int ROIProb;
 	int trigTrkProb;
 	
-	string sTrigType = "CB";
-	
-	cout << "\n------------- evt=" << EventNumber << " -------------" << endl;
 	// tag&probe with respect to EFCB
 	for(int mu=0 ; mu<(int)mu_pt->size() ; mu++)
 	{
 		previousTag = muTag;
 	
-		mask = tagMask
-		(
-			sTrigPeriod, sTrigType, trig_pTthreshold,
-			muQAflags,
-			previousTag,
-			muTag, ROITag, trigTrkTag,
-			mu_EFCB_index, mu_EFCB_dr,
-			mu_phi, mu_eta, mu_pt, mu_me_qoverp, mu_me_theta,
-			trig_EF_trigmuonef_track_CB_phi, trig_EF_trigmuonef_track_CB_eta, trig_EF_trigmuonef_track_CB_pt, trig_EF_trigmuonef_track_CB_hasCB
-		);
+		if(isHLT)
+		{
+			mask = tagMask
+			(
+				sTrigPeriod, sTrigType, trig_pTthreshold,
+				muQAflags,
+				previousTag,
+				muTag, ROITag, trigTrkTag,
+				mu_HLT_index, mu_HLT_dr,
+				mu_phi, mu_eta, mu_pt, mu_me_qoverp, mu_me_theta,
+				HLT_phi, HLT_eta, HLT_pt, HLT_has
+			);
+		}
+		else if(isLLT)
+		{
+			mask = tagMask
+			(
+				sTrigPeriod, sTrigType, trig_pTthreshold,
+				muQAflags,
+				previousTag,
+				muTag, ROITag,
+				mu_LLT_index, mu_LLT_dr,
+				mu_phi, mu_eta, mu_pt, mu_me_qoverp, mu_me_theta,
+				LLT_phi, LLT_eta, LLT_pt
+			);
+		}
 		if(mask!=12) continue;
 		
 		mask = probeCandMask
@@ -1426,21 +1394,39 @@ void analysisSkeleton::fill_tNp()
 		for(int probs=0 ; probs<(int)m_viProbes.size() ; probs++)
 		{
 			int iprobeCand = m_viProbes[probs];
-			mask = probeMask
-			(
-				iprobeCand,
-				sTrigPeriod, trig_pTthreshold,
-				muQAflags,
-				muTag, ROITag, trigTrkTag,
-				muProb, ROIProb, trigTrkProb,
-				mu_EFCB_index, mu_EFCB_dr,
-				mu_phi, mu_eta,
-				trig_EF_trigmuonef_track_CB_phi, trig_EF_trigmuonef_track_CB_eta, trig_EF_trigmuonef_track_CB_pt, trig_EF_trigmuonef_track_CB_hasCB
-			);
+			if(!isCBpT) pTtmp = fabs(pT(mu_me_qoverp->at(iprobeCand)/MeV2TeV, mu_me_theta->at(iprobeCand)));
+			else        pTtmp = mu_pt->at(iprobeCand)*MeV2TeV;
+			
+			if(isHLT)
+			{
+				mask = probeMask
+				(
+					iprobeCand,
+					sTrigPeriod, trig_pTthreshold,
+					muQAflags,
+					muTag, ROITag, trigTrkTag,
+					muProb, ROIProb, trigTrkProb,
+					mu_HLT_index, mu_HLT_dr,
+					mu_phi, mu_eta,
+					HLT_phi, HLT_eta, HLT_pt, HLT_has
+				);
+			}
+			else if(isLLT)
+			{
+				mask = probeMask
+				(
+					iprobeCand,
+					sTrigPeriod, trig_pTthreshold,
+					muQAflags,
+					muTag, ROITag,
+					muProb, ROIProb,
+					mu_LLT_index, mu_LLT_dr,
+					mu_phi, mu_eta,
+					LLT_phi, LLT_eta, LLT_pt
+				);
+			}
 			if(mask!=12) // cannot probe the candidate, fill the denominator histos
 			{
-				if(sTrigType!="CB") pTtmp = fabs(pT(mu_me_qoverp->at(iprobeCand)/MeV2TeV, mu_me_theta->at(iprobeCand)));
-				else                pTtmp = mu_pt->at(iprobeCand)*MeV2TeV;
 				(*h1map_tagNprobe_candidates_pT)[sTrigPeriod]->Fill( pTtmp );
 				(*h1map_tagNprobe_candidates_eta)[sTrigPeriod]->Fill( mu_eta->at(iprobeCand) );
 				(*h1map_tagNprobe_candidates_phi)[sTrigPeriod]->Fill( mu_phi->at(iprobeCand) );
@@ -1452,8 +1438,6 @@ void analysisSkeleton::fill_tNp()
 			}
 			
 			// mask=12 ==> fill both the denominator and the numerator histograms
-			if(sTrigType!="CB") pTtmp = fabs(pT(mu_me_qoverp->at(iprobeCand)/MeV2TeV, mu_me_theta->at(iprobeCand)));
-			else                pTtmp = mu_pt->at(iprobeCand)*MeV2TeV;
 			(*h1map_tagNprobe_candidates_pT)[sTrigPeriod]->Fill( pTtmp );
 			(*h1map_tagNprobe_candidates_eta)[sTrigPeriod]->Fill( mu_eta->at(iprobeCand) );
 			(*h1map_tagNprobe_candidates_phi)[sTrigPeriod]->Fill( mu_phi->at(iprobeCand) );
@@ -1471,94 +1455,24 @@ void analysisSkeleton::fill_tNp()
 	}
 }
 
-
-/*
-void analysisSkeleton::fillTagNProbe()
-{
-	if(trigger_pt==NULL)    return;
-	if(trigger_match==NULL) return;
-	if(mu_charge==NULL)     return;
-	
-	int itag;
-	int iprobe;
-	int tNp_mask;
-	
-	//////////////////////////////////////////////////////////////////////////////////
-	matchTrigger(sPeriod); ///////////////////////////////////////////////////////////
-	float trig_pTmin       = (float)m_period2pTminMap->operator[](sPeriod); //////////
-	float trig_pTthreshold = (float)m_period2pTthresholdMap->operator[](sPeriod); ////
-	string sTrigPeriod     = (*m_period2triggerperiodMap)[sPeriod]; //////////////////
-	//////////////////////////////////////////////////////////////////////////////////
-	
-	float tmp = 0.;
-	
-	for(int i=1 ; i<=2 ; i++) // one tag, one probe but also the other way around...
-	{
-		if(i==1)
-		{
-			itag   = -1;
-			iprobe = -1;
-		}
-		////////////////////////////////////////////////////////////////////////////////////////////////
-		tNp_mask = tagNprobeMask(trig_pTmin, trig_pTthreshold, trigger_pt, trigger_match, //////////
-								 pmu, mu_me_qoverp, mu_me_theta, mu_charge, itag, iprobe); /////////////
-		////////////////////////////////////////////////////////////////////////////////////////////////
-		switch(tNp_mask)
-		{
-			case 0: break;
-			case 1: break;
-			case 2:
-				tmp = fabs(pT(mu_me_qoverp->at(iprobe)/MeV2TeV, mu_me_theta->at(iprobe)));
-				(*h1map_tagNprobe_candidates_pT)[sTrigPeriod]->Fill( tmp );
-				(*h1map_tagNprobe_candidates_eta)[sTrigPeriod]->Fill( mu_eta->at(iprobe) );
-				(*h1map_tagNprobe_candidates_phi)[sTrigPeriod]->Fill( mu_phi->at(iprobe) );
-				tNp_triggerName->push_back(sTrigPeriod);
-				tNp_cand_pT->push_back( tmp );
-				tNp_cand_eta->push_back( mu_eta->at(iprobe) );
-				tNp_cand_phi->push_back( mu_phi->at(iprobe) );
-				break;
-			case 3: break;
-			case 4: break;
-			case 5:
-				tmp = fabs(pT(mu_me_qoverp->at(iprobe)/MeV2TeV, mu_me_theta->at(iprobe)));
-				(*h1map_tagNprobe_candidates_pT)[sTrigPeriod]->Fill( tmp );
-				(*h1map_tagNprobe_candidates_eta)[sTrigPeriod]->Fill( mu_eta->at(iprobe) );
-				(*h1map_tagNprobe_candidates_phi)[sTrigPeriod]->Fill( mu_phi->at(iprobe) );
-				(*h1map_tagNprobe_succeeded_pT)[sTrigPeriod]->Fill( tmp );
-				(*h1map_tagNprobe_succeeded_eta)[sTrigPeriod]->Fill( mu_eta->at(iprobe) );
-				(*h1map_tagNprobe_succeeded_phi)[sTrigPeriod]->Fill( mu_phi->at(iprobe) );
-				tNp_triggerName->push_back( sTrigPeriod );
-				tNp_cand_pT->push_back( tmp );
-				tNp_cand_eta->push_back( mu_eta->at(iprobe) );
-				tNp_cand_phi->push_back( mu_phi->at(iprobe) );
-				tNp_succ_pT->push_back( tmp );
-				tNp_succ_eta->push_back( mu_eta->at(iprobe) );
-				tNp_succ_phi->push_back( mu_phi->at(iprobe) );
-				break;
-			case 6: break;
-			default: break;
-		}
-	}
-}
-*/
-
-
 void analysisSkeleton::fillTruthEfficiency()
 {
 	//mu_truth_matched    : True if muon is matched to the truth
 	//mu_truth_status     : Status oMC status = 1 pfinal particle, status = 3 intermediate particle (documentary)
 	//mu_truth_mothertype : description: True mother PDG type
 
-	if(trigger_match==NULL) return;
-	if(trigger_dr==NULL)    return;
-	if(trigger_pt==NULL)    return;
-	if(mu_truth_pt==NULL)   return;
+	if(mu_truth_pt==0)         return;
+	if(mu_truth_status==0)     return;
+	if(mu_truth_mothertype==0) return;
+	if(mu_me_qoverp==0)        return;
+	if(mu_me_theta==0)         return;
 	
 	//////////////////////////////////////////////////////////////////////////////////
-	matchTrigger(sPeriod); ///////////////////////////////////////////////////////////
 	float trig_pTmin       = (float)m_period2pTminMap->operator[](sPeriod); //////////
 	float trig_pTthreshold = (float)m_period2pTthresholdMap->operator[](sPeriod); ////
 	string sTrigPeriod     = (*m_period2triggerperiodMap)[sPeriod]; //////////////////
+	string sTrigType = "L1"; /////////////////////////////////////////////////////////
+	matchTrigger(sPeriod, sTrigType); ////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	//////////////////////////////////////
@@ -1568,30 +1482,45 @@ void analysisSkeleton::fillTruthEfficiency()
 	float pTreconstructed = 0.;
 	for(int t=0 ; t<(int)mu_truth_pt->size() ; t++)
 	{
-		pTreconstructed = fabs(pT(mu_me_qoverp->at(t), mu_me_theta->at(t)));
+		//if(sTrigType!="CB") pTreconstructed = fabs(pT(mu_me_qoverp->at(t), mu_me_theta->at(t))*MeV2GeV); ??????????????????????
+		//else                pTreconstructed = mu_pt->at(t)*MeV2GeV; // ????????????????????????????????????????????????????????
+		pTreconstructed = fabs(pT(mu_me_qoverp->at(t), mu_me_theta->at(t))*MeV2GeV); // L1 doesn't do CB measurement ????????????
 		
-		if(!mu_truth_status->at(t))             continue; // has to be final particle
-		if(mu_truth_mothertype->at(t)!=PDTZ)    continue; // has to come out of gamma/Z^0
-		if(pTreconstructed*MeV2GeV<=trig_pTmin) continue; // has to be above pT min
+	
+		if(!mu_truth_status->at(t))          continue; // has to be final particle
+		if(mu_truth_mothertype->at(t)!=PDTZ) continue; // has to come out of Z^0
+		if(pTreconstructed<=trig_pTmin)      continue; // has to be above pT min
 		
 		// fill the probe candidate histos
-		(*h1map_truth_candidates_pT)[sTrigPeriod]->Fill( pTreconstructed*MeV2TeV );
+		(*h1map_truth_candidates_pT)[sTrigPeriod]->Fill( pTreconstructed*GeV2TeV );
 		(*h1map_truth_candidates_eta)[sTrigPeriod]->Fill( mu_eta->at(t) );
 		(*h1map_truth_candidates_phi)[sTrigPeriod]->Fill( mu_phi->at(t) );
 		tru_triggerName->push_back( sTrigPeriod );
-		tru_cand_pT->push_back( pTreconstructed*MeV2TeV );
+		tru_cand_pT->push_back( pTreconstructed*GeV2TeV );
 		tru_cand_eta->push_back( mu_eta->at(t) );
 		tru_cand_phi->push_back( mu_phi->at(t) );
 		
-		if(trigger_pt->at(t)*MeV2GeV<trig_pTthreshold) continue;
-		if(!trigger_match->at(t))                      continue;
-		if(trigger_dr->at(t)<0.)                       continue;
+		// for monte carlo, use L1_MU10
+		float dr = mu_LLT_dr->at(t);
+		int iROI = mu_LLT_index->at(t); 
+		if(dr<0.)          continue;
+		if(dr>dRmax_mu_L1) continue;
+		if(iROI<0)         continue;
 	
+		float dphi = LLT_phi->at(iROI) - mu_phi->at(t);
+		float deta = LLT_eta->at(iROI) - mu_eta->at(t);
+		dr = sqrt(dphi*dphi + deta*deta);
+		if(dr>dRmax_mu_L1) continue;
+		
+		float pTprobTrig = LLT_pt->at(iROI)*MeV2GeV;
+		float pTtrigThreshold = 10.; // in GeV
+		if(pTprobTrig<pTtrigThreshold) continue;
+		
 		// fill the probe histos
-		(*h1map_truth_succeeded_pT)[sTrigPeriod]->Fill( pTreconstructed*MeV2TeV );
+		(*h1map_truth_succeeded_pT)[sTrigPeriod]->Fill( pTreconstructed*GeV2TeV );
 		(*h1map_truth_succeeded_eta)[sTrigPeriod]->Fill( mu_eta->at(t) );
 		(*h1map_truth_succeeded_phi)[sTrigPeriod]->Fill( mu_phi->at(t) );
-		tru_succ_pT->push_back( pTreconstructed*MeV2TeV );
+		tru_succ_pT->push_back( pTreconstructed*GeV2TeV );
 		tru_succ_eta->push_back( mu_eta->at(t) );
 		tru_succ_phi->push_back( mu_phi->at(t) );
 	}

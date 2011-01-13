@@ -155,6 +155,7 @@ int tagNprobe::matchEFtrigger(int mu_ROIindex,
 //-----------------------------------------------------------------------------------------------------------
 
 // needs to be called after the single muon selection, as done without the pT, eta and phi cuts.
+// tagMask for HLT
 int tagNprobe::tagMask
 (
 	string sTrigName, string sTrigType, float pTtrigThreshold,
@@ -210,6 +211,10 @@ int tagNprobe::tagMask
 	else if( (size_t)sTrigName.find("EF")!=string::npos ) dRmax_mu_trig = dRmax_mu_EF;
 	else return 3;
 	
+	bool isCBpT = true;
+	if     (sTrigType=="L1" || sTrigType=="MS") isCBpT = false;
+	else if(sTrigType=="MG" || sTrigType=="CB") isCBpT = true;
+	
 	float dRmax  = 999.;
 	int tagIndex = 0;
 	int iROI     = -1;
@@ -249,14 +254,13 @@ int tagNprobe::tagMask
 	if(iTrigTrk<0) return 7;
 	
 	float pTtag = 0.;
-	if(sTrigType=="SA" || sTrigType=="MS") pTtag = kin.pT(mu_qoverp->at(tagIndex),mu_theta->at(tagIndex))*MeV2GeV;
-	else if(sTrigType=="CB")               pTtag = mu_pt->at(tagIndex)*MeV2GeV;
-	else return 8;
+	if(!isCBpT) pTtag = kin.pT(mu_qoverp->at(tagIndex),mu_theta->at(tagIndex))*MeV2GeV;
+	else        pTtag = mu_pt->at(tagIndex)*MeV2GeV;
 	
 	if(pTtag<mu_pTmin) return 9;
 	if(pTtag>mu_pTmax) return 10;
 	
-	float pTtagTrig = trig_pt->at(iROI)[iTrigTrk];
+	float pTtagTrig = trig_pt->at(iROI)[iTrigTrk]*MeV2GeV;
 	if(pTtagTrig<pTtrigThreshold) return 11;
 	
 	// return indices by reference
@@ -266,6 +270,100 @@ int tagNprobe::tagMask
 	return 12;
 }
 
+// tagMask for LLT
+int tagNprobe::tagMask
+(
+	string sTrigName, string sTrigType, float pTtrigThreshold,
+	vector<bool>& mu_qaflg,
+	int skipMuIndex, int& muTag, int& ROITag,
+	vector<int>*   mu_index,
+	vector<float>* mu_dr,
+	vector<float>* mu_phi,
+	vector<float>* mu_eta,
+	vector<float>* mu_pt,
+	vector<float>* mu_qoverp,
+	vector<float>* mu_theta,
+	vector<float>* trig_phi,
+	vector<float>* trig_eta,
+	vector<float>* trig_pt
+)
+{
+	// mask:
+	// 0: at least one NULL pointer given
+	// 1: less than 2 muons in the event
+	// 2: less than 2 good muons in the event
+	// 3: problem with trigger name association
+	// 4: cannot find a tag muon candidate
+	// 5: found a tag muon candidate but there are no ROIs to match with
+	// 6: found a tag muon candidate but cannot match it with an ROI
+	// 7: found a tag muon candidate, matched it with an ROI but cannot match it with a trigger track
+	// 8: problem with "sTrigType"
+	// 9: found a tag muon and matched it with an ROI and a trigger track but pT(mu) is < mu_pTmin
+	// 10: found a tag muon candidate and matched it with an ROI and a trigger track but pT(mu) is > mu_pTmax
+	// 11: found a tag muon candidate and matched it with an ROI and a trigger track, pT(mu) is in bounds but pT(trigTrk) < pTtrigThreshold
+	// 12: found a tag muon
+	
+	if(mu_index==0)  return 0;
+	if(mu_dr==0)     return 0;
+	if(mu_phi==0)    return 0;
+	if(mu_eta==0)    return 0;
+	if(mu_pt==0)     return 0;
+	if(mu_qoverp==0) return 0;
+	if(mu_theta==0)  return 0;
+	if(trig_phi==0)  return 0;
+	if(trig_eta==0)  return 0;
+	if(trig_pt==0)   return 0;
+	
+	if(mu_qaflg.size()<2) return 1;
+	
+	int nGoodMus = 0;
+	for(int i=0 ; i<(int)mu_qaflg.size() ; i++) nGoodMus += mu_qaflg[i];
+	if(nGoodMus<2) return 2;
+	
+	if( (size_t)sTrigName.find("L1")!=string::npos ) dRmax_mu_trig = dRmax_mu_L1;
+	else return 3;
+	
+	bool isCBpT = true;
+	if     (sTrigType=="L1" || sTrigType=="MS") isCBpT = false;
+	else if(sTrigType=="MG" || sTrigType=="CB") isCBpT = true;
+	
+	float dRmax  = 999.;
+	int tagIndex = 0;
+	int iROI     = -1;
+	for(int i=0 ; i<(int)mu_dr->size() ; i++)
+	{
+		if(i==skipMuIndex) continue; // if this muon was already tagged
+		if(!mu_qaflg[i])   continue;
+		float dr  = mu_dr->at(i);
+		int index = mu_index->at(i); 
+		if(dr<0.)            continue;
+		if(dr>dRmax)         continue;
+		if(dr>dRmax_mu_trig) continue;
+		dRmax    = dr;
+		tagIndex = i;
+		iROI     = index;
+	}
+	if(iROI<0) return 4;
+	
+	float dphi = trig_phi->at(iROI) - mu_phi->at(tagIndex);
+	float deta = trig_eta->at(iROI) - mu_eta->at(tagIndex);
+	float dr = sqrt(dphi*dphi + deta*deta);
+	if(dr>dRmax_mu_trig) return 6;
+	
+	float pTtag = 0.;
+	if(!isCBpT) pTtag = kin.pT(mu_qoverp->at(tagIndex),mu_theta->at(tagIndex))*MeV2GeV;
+	else        pTtag = mu_pt->at(tagIndex)*MeV2GeV;
+	if(pTtag<mu_pTmin) return 7;
+	if(pTtag>mu_pTmax) return 8;
+	
+	float pTtagTrig = trig_pt->at(iROI)*MeV2GeV;
+	if(pTtagTrig<pTtrigThreshold) return 9;
+	
+	// return indices by reference
+	muTag      = tagIndex;
+	ROITag     = iROI;
+	return 12;
+}
 
 // needs to be called after tagMask returned 12.
 int tagNprobe::probeCandMask
@@ -310,7 +408,10 @@ int tagNprobe::probeCandMask
 	for(int i=0 ; i<(int)mu_qaflg.size() ; i++) nGoodMus += mu_qaflg[i];
 	if(nGoodMus<2) return 2;
 	
-	if(sTrigType!="SA" && sTrigType!="MS" && sTrigType!="CB") return 3;
+	if(sTrigType!="L1" && sTrigType!="MS" && sTrigType!="MG" && sTrigType!="CB") return 3;
+	bool isCBpT = true;
+	if     (sTrigType=="L1" || sTrigType=="MS") isCBpT = false;
+	else if(sTrigType=="MG" || sTrigType=="CB") isCBpT = true;
 	
 	for(int i=0 ; i<(int)mu_pt->size() ; i++)
 	{
@@ -333,8 +434,8 @@ int tagNprobe::probeCandMask
 		
 		// already checked that sTrigType is valid
 		float pTprob  = 0.;
-		if(sTrigType=="CB") pTprob = kin.pT(mu_qoverp->at(i),mu_theta->at(i))*MeV2GeV;
-		else                pTprob = mu_pt->at(i)*MeV2GeV;
+		if(!isCBpT) pTprob = kin.pT(mu_qoverp->at(i),mu_theta->at(i))*MeV2GeV;
+		else        pTprob = mu_pt->at(i)*MeV2GeV;
 		if(pTprob<mu_pTmin) continue;
 		if(pTprob>mu_pTmax) continue;
 		
@@ -347,7 +448,7 @@ int tagNprobe::probeCandMask
 	return 5;
 }
 	
-
+// probeMask for HLT
 int tagNprobe::probeMask
 (
 	int iprobeCand,
@@ -430,7 +531,7 @@ int tagNprobe::probeMask
 	if(nROIs==0)   return 9;
 	if(iTrigTrk<0) return 10;
 	
-	float pTprobTrig = trig_pt->at(iROI)[iTrigTrk];
+	float pTprobTrig = trig_pt->at(iROI)[iTrigTrk]*MeV2GeV;
 	if(pTprobTrig<pTtrigThreshold) return 11;
 	
 	// return indices by reference
@@ -439,6 +540,81 @@ int tagNprobe::probeMask
 	trigTrkProb = iTrigTrk;
 	return 12;
 }
+
+// probeMask for LLT
+int tagNprobe::probeMask
+(
+	int iprobeCand,
+	string sTrigName, float pTtrigThreshold,
+	vector<bool>& mu_qaflg,
+	int muTag, int ROITag,
+	int& muProb, int& ROIProb,
+	vector<int>*   mu_index,
+	vector<float>* mu_dr,
+	vector<float>* mu_phi,
+	vector<float>* mu_eta,
+	vector<float>* trig_phi,
+	vector<float>* trig_eta,
+	vector<float>* trig_pt
+)
+{
+	// mask:
+	// 0: at least one NULL pointer given
+	// 1: less than 2 muons in the event
+	// 2: less than 2 good muons in the event
+	// 3: problem with trigger name association
+	// 4: mu_prob = mu_tag  OR  ROIprob = ROItag
+	// 5: mu_dr_probe < 0
+	// 6: mu_dr_probe > dRmax_mu_trig
+	// 7: found ROI but it is < 0
+	// 8: found a valid ROI but the corresponding tigger track vector size is <=0
+	// 9: found a valid ROI and the corresponding tigger track vector size is >0 but there are no tracks with "has" flag turned on 
+	// 10: found a valid ROI with at least one track with "has" flag turned on, but cannot match it with the probe muon candidate
+	// 11: found a valid ROI with at least one track with "has" flag turned on, matched it with the probe muon candidate but trigger pT < pTtrigThreshold
+	// 12: found a probe muon
+
+	if(mu_index==0)  return 0;
+	if(mu_dr==0)     return 0;
+	if(mu_phi==0)    return 0;
+	if(mu_eta==0)    return 0;
+	if(trig_phi==0)  return 0;
+	if(trig_eta==0)  return 0;
+	if(trig_pt==0)   return 0;
+	
+	if(mu_qaflg.size()<2) return 1;
+	
+	int nGoodMus = 0;
+	for(int i=0 ; i<(int)mu_qaflg.size() ; i++) nGoodMus += mu_qaflg[i];
+	if(nGoodMus<2) return 2;
+	
+	if( (size_t)sTrigName.find("L1")!=string::npos ) dRmax_mu_trig = dRmax_mu_L1;
+	else return 3;
+
+	if(iprobeCand==muTag) return 4; // mu_probe!=mu_tag...
+	
+	float dr  = mu_dr->at(iprobeCand);
+	int index = mu_index->at(iprobeCand);
+	if(index==ROITag)    return 4; // ROI_probe!=ROI_tag...   ???????????????????????????????????????????
+	if(dr<0.)            return 5;
+	if(dr>dRmax_mu_trig) return 6;
+	int iROI = index;
+	if(iROI<0) return 7;
+	
+	float dphi = trig_phi->at(iROI) - mu_phi->at(iprobeCand);
+	float deta = trig_eta->at(iROI) - mu_eta->at(iprobeCand);
+	dr         = sqrt(dphi*dphi + deta*deta);
+	if(dr>dRmax_mu_trig) return 8;
+	
+	float pTprobTrig = trig_pt->at(iROI)*MeV2GeV;
+	if(pTprobTrig<pTtrigThreshold) return 9;
+	
+	// return indices by reference
+	muProb      = iprobeCand;
+	ROIProb     = iROI;
+	return 12;
+}
+
+
 
 void tagNprobe::calculateEfficiency(TH1D* hCandidates, TH1D* hSucceeded, TH1D* hEfficiency, bool isTruth)
 {

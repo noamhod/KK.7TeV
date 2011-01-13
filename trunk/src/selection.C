@@ -825,11 +825,24 @@ bool selection::nMShitsRel16(float nMDTB_IMO_HitsCutVal, float nMDTE_IMO_HitsCut
 							 int nCSCEtaHits, int nCSCPhiHits
 							 )
 {
-	// ( \ Sum_$=IMO nMDTB$Hits>=3 + \Sum_$=IMO nMDTE$Hits>=3 + nCSCEtaHits>=3 ) >=3 &&
-	// mu_muid_nMDTBEEHits==0 &&
-	// mu_muid_nMDTEEHits==0 &&
-	// mu_muid_nMDTBIS78Hits==0 &&
-	// (\Sum_K=1^3 nRPCLayerKPhiHits + \Sum_K=1^4 nTGCLayerKPhiHits + nCSCPhiHits )>=1
+	// At least 3 hits in all of Barrel or Endcap Inner,
+	// Middle and Outer MDT/CSC precision layers,
+	// at least one phi hit, and no BEE, EE or BIS78 hits
+	
+	/*
+	(
+		(mu_nRPCLayer1PhiHits>=1) + (mu_nRPCLayer2PhiHits>=1) + (mu_nRPCLayer3PhiHits>=1) +
+		(mu_nTGCLayer1PhiHits>=1) + (mu_nTGCLayer2PhiHits>=1) + (mu_nTGCLayer3PhiHits>=1) + (mu_nTGCLayer4PhiHits>=1) +
+		(mu_nCSCPhiHits>=1)
+	) >=1
+	&& 
+	(
+		((mu_nMDTBIHits>=3) + (mu_nMDTBMHits>=3) + (mu_nMDTBOHits>=3)) >= 3
+		||
+		(((mu_nMDTEIHits>=3) || (mu_nCSCEtaHits>=3)) + (mu_nMDTEMHits>=3) + (mu_nMDTEOHits>=3)) >= 3
+	)
+	&& (mu_nMDTBEEHits==0) && (mu_nMDTEEHits==0) && (mu_nMDTBIS78Hits==0);
+	*/
 	
 	//1) at least one phi hit on the MS track
 	//2.1) MS track has at least 3 hits in each of Inner, Middle, Outer of Barrel
@@ -849,9 +862,12 @@ bool selection::nMShitsRel16(float nMDTB_IMO_HitsCutVal, float nMDTE_IMO_HitsCut
 	bool passedMDTEM = (nMDTEMHits >= nMDTE_IMO_HitsCutVal) ? true : false;
 	bool passedMDTEO = (nMDTEOHits >= nMDTE_IMO_HitsCutVal) ? true : false;
 	bool passedCSC   = (nCSCEtaHits >= nCSCEtaHitsCutVal)   ? true : false;
-	bool passedMDTCSC = ((passedMDTBI+passedMDTBM+passedMDTBO +
-						  passedMDTEI+passedMDTEM+passedMDTEO + 
-						  passedCSC) >= nMDTCSCsumCutVal) ? true : false;
+	bool passedMDTCSC = ((passedMDTBI +
+						  passedMDTBM +
+						  passedMDTBO +
+						  (passedMDTEI||passedCSC) +
+						  passedMDTEM +
+						  passedMDTEO) >= nMDTCSCsumCutVal) ? true : false;
 	if(!passedMDTCSC) return false;
 	 
 	bool passedMDTBEE   = (nMDTBEEHits==nMDTBEEHitsCutVal) ? true : false;

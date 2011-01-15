@@ -119,7 +119,7 @@ void analysisLocalControl::initialize(int runNumber, string localRunControlFile)
 	m_WZphysD3PD = new WZphysD3PD( m_chain );
 
 	if(m_RunType!="local_noskim") m_treefile = new TFile( str_tree.c_str(), "RECREATE");
-	else m_treefile = NULL;
+	else                          m_treefile = NULL;
 	
 	m_histfile = new TFile( str_hist.c_str(), "RECREATE");
 	m_histfile->cd();

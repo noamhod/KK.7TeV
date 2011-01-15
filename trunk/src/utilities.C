@@ -101,54 +101,29 @@ string utilities::pickMCinputSampe()
 	mcSamplesMap.insert( make_pair( 203,"bbmu15X" ) );
 	mcSamplesMap.insert( make_pair( 204,"ccmu15X" ) );
 	
-	mcSamplesMap.insert( make_pair( 300,"AlpgenJimmyWWlnulnuNp0" ) );
-	mcSamplesMap.insert( make_pair( 301,"AlpgenJimmyWWlnulnuNp1" ) );
-	mcSamplesMap.insert( make_pair( 302,"AlpgenJimmyWWlnulnuNp2" ) );
-	mcSamplesMap.insert( make_pair( 303,"AlpgenJimmyWWlnulnuNp3" ) );
+	mcSamplesMap.insert( make_pair( 300,"AlpgenJimmyWmunuNp0_pt20" ) );
+	mcSamplesMap.insert( make_pair( 301,"AlpgenJimmyWmunuNp1_pt20" ) );
+	mcSamplesMap.insert( make_pair( 302,"AlpgenJimmyWmunuNp2_pt20" ) );
+	mcSamplesMap.insert( make_pair( 303,"AlpgenJimmyWmunuNp3_pt20" ) );
+	mcSamplesMap.insert( make_pair( 304,"AlpgenJimmyWmunuNp4_pt20" ) );
+	mcSamplesMap.insert( make_pair( 305,"AlpgenJimmyWmunuNp5_pt20" ) );
 	
-	mcSamplesMap.insert( make_pair( 311,"gg2WW0240_JIMMY_WW_munumunu" ) );
-	mcSamplesMap.insert( make_pair( 312,"gg2WW0240_JIMMY_WW_munutaunu" ) );
-	mcSamplesMap.insert( make_pair( 313,"gg2WW0240_JIMMY_WW_taunumunu" ) );
-	mcSamplesMap.insert( make_pair( 314,"gg2WW0240_JIMMY_WW_taunutaunu" ) );
+	mcSamplesMap.insert( make_pair( 400,"Zprime_mumu_SSM1000" ) );
+	mcSamplesMap.insert( make_pair( 401,"Zprime_mumu_SSM1250" ) );
+	mcSamplesMap.insert( make_pair( 402,"Zprime_mumu_SSM1500" ) );
+	mcSamplesMap.insert( make_pair( 403,"Zprime_mumu_SSM1750" ) );
+	mcSamplesMap.insert( make_pair( 404,"Zprime_mumu_SSM2000" ) );
 	
-	mcSamplesMap.insert( make_pair( 321,"McAtNlo_JIMMY_WpWm_munumunu" ) );
-	mcSamplesMap.insert( make_pair( 322,"McAtNlo_JIMMY_WpWm_munutaunu" ) );
-	mcSamplesMap.insert( make_pair( 323,"McAtNlo_JIMMY_WpWm_taunutaunu" ) );
-
-	mcSamplesMap.insert( make_pair( 401,"PythiaH200zzllnunu" ) );
-	mcSamplesMap.insert( make_pair( 402,"PythiaH300zzllnunu" ) );
-	mcSamplesMap.insert( make_pair( 403,"PythiaH400zzllnunu" ) );
-	mcSamplesMap.insert( make_pair( 404,"PythiaH500zzllnunu" ) );
-	mcSamplesMap.insert( make_pair( 405,"PythiaH600zzllnunu" ) );
+	mcSamplesMap.insert( make_pair( 500,"WW_Herwig" ) );
+	mcSamplesMap.insert( make_pair( 501,"WZ_Herwig" ) );
+	mcSamplesMap.insert( make_pair( 502,"ZZ_Herwig" ) );
 	
-	mcSamplesMap.insert( make_pair( 410,"Pythiazz4l" ) );
-
-	mcSamplesMap.insert( make_pair( 420,"McAtNlo_JIMMY_ZZ_llll" ) );
-	mcSamplesMap.insert( make_pair( 421,"McAtNlo_JIMMY_ZZ_llnunu" ) );
-	mcSamplesMap.insert( make_pair( 422,"McAtNlo_JIMMY_ZZ_2l2tau" ) );
-	mcSamplesMap.insert( make_pair( 422,"McAtNlo_JIMMY_ZZ_llqq" ) );
+	mcSamplesMap.insert( make_pair( 600,"T1_McAtNlo_Jimmy" ) );
 	
-	mcSamplesMap.insert( make_pair( 430,"AlpgenJimmyZZincllNp0" ) );
-	mcSamplesMap.insert( make_pair( 431,"AlpgenJimmyZZincllNp1" ) );
-	mcSamplesMap.insert( make_pair( 432,"AlpgenJimmyZZincllNp2" ) );
-	mcSamplesMap.insert( make_pair( 433,"AlpgenJimmyZZincllNp3" ) );
-	
-	mcSamplesMap.insert( make_pair( 500,"Zprime_mumu_SSM1000" ) );
-	mcSamplesMap.insert( make_pair( 501,"Zprime_mumu_SSM1250" ) );
-	mcSamplesMap.insert( make_pair( 502,"Zprime_mumu_SSM1500" ) );
-	mcSamplesMap.insert( make_pair( 503,"Zprime_mumu_SSM1750" ) );
-	mcSamplesMap.insert( make_pair( 504,"Zprime_mumu_SSM2000" ) );
-	
-	mcSamplesMap.insert( make_pair( 600,"WW_Herwig" ) );
-	mcSamplesMap.insert( make_pair( 601,"WZ_Herwig" ) );
-	mcSamplesMap.insert( make_pair( 602,"ZZ_Herwig" ) );
-	
-	mcSamplesMap.insert( make_pair( 700,"T1_McAtNlo_Jimmy" ) );
-	
-	mcSamplesMap.insert( make_pair( 800,"TTbar_McAtNlo_Jimmy_2mu15_30M150" ) );
-	mcSamplesMap.insert( make_pair( 801,"TTbar_McAtNlo_Jimmy_2mu15_150M300" ) );
-	mcSamplesMap.insert( make_pair( 802,"TTbar_McAtNlo_Jimmy_2mu15_300M450" ) );
-	mcSamplesMap.insert( make_pair( 803,"TTbar_McAtNlo_Jimmy_2mu15_M450" ) );
+	mcSamplesMap.insert( make_pair( 700,"TTbar_McAtNlo_Jimmy_2mu15_30M150" ) );
+	mcSamplesMap.insert( make_pair( 701,"TTbar_McAtNlo_Jimmy_2mu15_150M300" ) );
+	mcSamplesMap.insert( make_pair( 702,"TTbar_McAtNlo_Jimmy_2mu15_300M450" ) );
+	mcSamplesMap.insert( make_pair( 703,"TTbar_McAtNlo_Jimmy_2mu15_M450" ) );
 	
 	
 	cout << "PICK AN MC CHANNEL FORM THE LIST:" << endl;

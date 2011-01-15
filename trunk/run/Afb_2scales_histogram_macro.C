@@ -155,11 +155,12 @@ void execute()
 	string refframe = "CosThetaCS";
 	//string refframe = "CosThetaHE";
 	bool doLogM = true;
-	bool doLogx = true;
+	bool doLogx = false;
 	
 	float GeV2TeV = 1.e-3;
-	int    imass_nbins = 20;
-	double imass_min   = 80.*GeV2TeV;
+	/*
+	int    imass_nbins = 16;
+	double imass_min   = 70.*GeV2TeV;
 	double imass_max   = 400.*GeV2TeV;
 	//double imass_min   = 60.*GeV2TeV;
 	//double imass_max   = 360.*GeV2TeV;
@@ -172,16 +173,27 @@ void execute()
 	Double_t M_binwidth = (Double_t)( (logMmax-logMmin)/(Double_t)imass_nbins );
 	M_bins[0] = imass_min;
 	for(Int_t i=1 ; i<=imass_nbins ; i++) M_bins[i] = TMath::Power( 10,(logMmin + i*M_binwidth) );
-
+	*/
+	
+	const int imass_nbins = 12;
+	double imass_min   = 72.62*GeV2TeV;
+	double imass_max   = 381.09*GeV2TeV;
+	Double_t M_bins[imass_nbins+1] = {72.62*GeV2TeV, 83.37*GeV2TeV, 95.73*GeV2TeV, 109.91*GeV2TeV,
+									  126.19*GeV2TeV, 144.89*GeV2TeV, 166.35*GeV2TeV, 191.00*GeV2TeV,
+									  219.30*GeV2TeV, 251.79*GeV2TeV, 289.09*GeV2TeV, 331.92*GeV2TeV, 381.09*GeV2TeV};
+	//M_bins = {2.00*GeV, 2.30*GeV, 2.64*GeV, 3.03*GeV, 3.48*GeV, 3.99*GeV, 4.58*GeV, 5.26*GeV, 6.04*GeV, 6.93*GeV, 7.96*GeV, 9.14*GeV, 10.50*GeV, 12.05*GeV, 13.84*GeV, 15.89*GeV, 18.24*GeV, 20.94*GeV, 24.05*GeV, 27.61*GeV, 31.70*GeV, 36.39*GeV, 41.79*GeV, 47.98*GeV, 55.08*GeV, 63.25*GeV, 72.62*GeV, 83.37*GeV, 95.73*GeV, 109.91*GeV, 126.19*GeV, 144.89*GeV, 166.35*GeV, 191.00*GeV, 219.30*GeV, 251.79*GeV, 289.09*GeV, 331.92*GeV, 381.09*GeV, 437.55*GeV, 502.38*GeV, 576.81*GeV, 662.26*GeV, 760.38*GeV, 873.03*GeV, 1002.37*GeV, 1150.88*GeV, 1321.39*GeV, 1517.16*GeV, 1741.93*GeV, 2000.00*GeV};
+	
 	//string dir   = "/data/hod/D3PDdigest/rel15_barrel_selection/";
-	string dir   = "/data/hod/D3PDdigest/rel15_eta24_selection/";
+	//string dir   = "/data/hod/D3PDdigest/rel15_eta24_selection/";
+	string dir   = "/data/hod/D3PDfin/rel16/";
 	string hDir  = "allCuts";
 	string hName = "Afb";
 	string xTitle = "#hat{m}_{#mu#mu} TeV";
 	string yTitle= "A_{FB}#left(#hat{m}_{#mu#mu}#right)";
 
 	string m_dataAnalysisSelector = "digest";	
-	string m_muonSelector = "staco/";
+	//string m_muonSelector = "staco/";
+	string m_muonSelector = "muid/";
 
 	double m_miny = -0.6;
 	double m_maxy = +0.6;
@@ -194,7 +206,7 @@ void execute()
 	leg->SetFillColor(kWhite);
 	
 	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
-	string L = "43";
+	string L = "41";
 	string lumilabel = "#intLdt~" + L + " pb^{-1}";
 	TPaveText* pvtxt = new TPaveText(0.1195652,0.1334197,0.2458194,0.2318653,"brNDC");
 	pvtxt->SetFillColor(kWhite);
@@ -222,7 +234,8 @@ void execute()
 	string path = "";
 	string sProc = "";
 	string channel = "";
-	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
+	//string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
+	string analysisType = "mcLocalControl_";
 	
 	// Data
 	TH1D* hDataM;
@@ -241,9 +254,11 @@ void execute()
 	leg->AddEntry( hData, "Data: A_{FB}", "lep");
 	leg->AddEntry( hData, "Data: #frac{dN}{d#hat{m}_{#mu#mu}}", "l");
 	
-	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
+	//string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
+	string sData = "analysisLocalControl";
 	
-	path = dir + "AtoI2_ZprimeGRL/" + m_muonSelector + sData + ".root";
+	//path = dir + "AtoI2_ZprimeGRL/" + m_muonSelector + sData + ".root";
+	path = dir + "data_A-I2_eta24/" + m_muonSelector + sData + ".root";
 	cout << "path=" << path << endl;
 	TFile* fData = new TFile( path.c_str(), "READ" );
 	TTree* Afb_data_tree = (TTree*)fData->Get("allCuts/allCuts_tree");
@@ -295,13 +310,13 @@ void execute()
 	
 	TList* Afb_sumBG_list = new TList();
 	
-	/*
+	
 	sProc = "Zmumu";
 	path = dir + "Zmumu/" + m_muonSelector + analysisType + sProc + ".root";
 	cout << "path=" << path << endl;
 	TFile* fZmumu = new TFile( path.c_str(), "READ" );
 	Afb_sumBG_list->Add( (TTree*)fZmumu->Get("allCuts/allCuts_tree") );
-	*/
+	
 	
 	/*
 	sProc = "DYmumu_75M120";
@@ -310,7 +325,7 @@ void execute()
 	Afb_sumBG_list->Add( (TTree*)fDYmumu_75M120->Get("allCuts/allCuts_tree") );
 	*/
 	
-	
+	/*
 	sProc = "DYmumu_75M120";
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
 	cout << "path=" << path << endl;
@@ -322,6 +337,7 @@ void execute()
 	cout << "path=" << path << endl;
 	TFile* fDYmumu_120M250 = new TFile( path.c_str(), "READ" );
 	Afb_sumBG_list->Add( (TTree*)fDYmumu_120M250->Get("allCuts/allCuts_tree") );
+	*/
 	
 	sProc = "DYmumu_250M400";
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
@@ -334,7 +350,7 @@ void execute()
 	cout << "path=" << path << endl;
 	TFile* fDYmumu_400M600 = new TFile( path.c_str(), "READ" );
 	Afb_sumBG_list->Add( (TTree*)fDYmumu_400M600->Get("allCuts/allCuts_tree") );
-	
+
 	
 	/*	
 	sProc = "ZZ_Herwig";

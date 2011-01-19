@@ -36,7 +36,7 @@ Tag muon selection:
 	================
 ---------------------------
 Probe muon lookup:
-	0. |d0_tag–d0_probe|<0.2 mm
+	0. |d0_tag-d0_probe|<0.2 mm
 	1. |z0_tag-z0_probe|<1 mm
 	2. |phi_tag-phi_probe|>0.5pi
 	3. |m(tag+probe)-mZ0|<20 GeV

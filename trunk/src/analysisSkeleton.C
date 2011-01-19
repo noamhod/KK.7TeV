@@ -1460,7 +1460,7 @@ void analysisSkeleton::fillTruthEfficiency()
 	//mu_truth_matched    : True if muon is matched to the truth
 	//mu_truth_status     : Status oMC status = 1 pfinal particle, status = 3 intermediate particle (documentary)
 	//mu_truth_mothertype : description: True mother PDG type
-
+	
 	if(mu_truth_pt==0)         return;
 	if(mu_truth_status==0)     return;
 	if(mu_truth_mothertype==0) return;
@@ -1485,12 +1485,11 @@ void analysisSkeleton::fillTruthEfficiency()
 		//if(sTrigType!="CB") pTreconstructed = fabs(pT(mu_me_qoverp->at(t), mu_me_theta->at(t))*MeV2GeV); ??????????????????????
 		//else                pTreconstructed = mu_pt->at(t)*MeV2GeV; // ????????????????????????????????????????????????????????
 		pTreconstructed = fabs(pT(mu_me_qoverp->at(t), mu_me_theta->at(t))*MeV2GeV); // L1 doesn't do CB measurement ????????????
-		
 	
 		if(!mu_truth_status->at(t))          continue; // has to be final particle
 		if(mu_truth_mothertype->at(t)!=PDTZ) continue; // has to come out of Z^0
 		if(pTreconstructed<=trig_pTmin)      continue; // has to be above pT min
-		
+	
 		// fill the probe candidate histos
 		(*h1map_truth_candidates_pT)[sTrigPeriod]->Fill( pTreconstructed*GeV2TeV );
 		(*h1map_truth_candidates_eta)[sTrigPeriod]->Fill( mu_eta->at(t) );

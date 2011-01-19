@@ -77,129 +77,131 @@ void combinedGraphics::initialize(string analysisSelector, string muonSelector)
 	}
 	
 	//--- mc processes cross section values in pb
-	mcProc2sigma.insert(   make_pair("Zmumu",855.74));
+	mcProc2sigma.insert(   make_pair("Zmumu",855.25));
 	mcProc2br.insert(      make_pair("Zmumu",1.));
-	mcProc2nevents.insert( make_pair("Zmumu",998722));
-	mcProc2geneff.insert(  make_pair("Zmumu",0.9));
+	//mcProc2nevents.insert( make_pair("Zmumu",4985129));
+	mcProc2nevents.insert( make_pair("Zmumu",4979130));
+	mcProc2geneff.insert(  make_pair("Zmumu",1.));
 	mcProc2kfactor.insert( make_pair("Zmumu",1.));
 	
-	mcProc2sigma.insert(   make_pair("DYmumu_75M120",819.93));
+	mcProc2sigma.insert(   make_pair("DYmumu_75M120",817.05));
 	mcProc2br.insert(      make_pair("DYmumu_75M120",1.));
-	mcProc2nevents.insert( make_pair("DYmumu_75M120",19994));
+	mcProc2nevents.insert( make_pair("DYmumu_75M120",19996));
 	mcProc2geneff.insert(  make_pair("DYmumu_75M120",1.));
 	mcProc2kfactor.insert( make_pair("DYmumu_75M120",1.));
-	mcProc2sigma.insert(   make_pair("DYmumu_120M250",8.7158));
+	mcProc2sigma.insert(   make_pair("DYmumu_120M250",8.6861));
 	mcProc2br.insert(      make_pair("DYmumu_120M250",1.));
-	mcProc2nevents.insert( make_pair("DYmumu_120M250",19996));
+	mcProc2nevents.insert( make_pair("DYmumu_120M250",19999));
 	mcProc2geneff.insert(  make_pair("DYmumu_120M250",1.));
 	mcProc2kfactor.insert( make_pair("DYmumu_120M250",1.));
-	mcProc2sigma.insert(   make_pair("DYmumu_250M400",0.41571));
+	mcProc2sigma.insert(   make_pair("DYmumu_250M400",0.41431));
 	mcProc2br.insert(      make_pair("DYmumu_250M400",1.));
-	mcProc2nevents.insert( make_pair("DYmumu_250M400",19997));
+	mcProc2nevents.insert( make_pair("DYmumu_250M400",19996));
 	mcProc2geneff.insert(  make_pair("DYmumu_250M400",1.));
 	mcProc2kfactor.insert( make_pair("DYmumu_250M400",1.));
-	mcProc2sigma.insert(   make_pair("DYmumu_400M600",0.06724));
+	mcProc2sigma.insert(   make_pair("DYmumu_400M600",0.067464));
 	mcProc2br.insert(      make_pair("DYmumu_400M600",1.));
-	mcProc2nevents.insert( make_pair("DYmumu_400M600",19996));
+	mcProc2nevents.insert( make_pair("DYmumu_400M600",19993));
 	mcProc2geneff.insert(  make_pair("DYmumu_400M600",1.));
 	mcProc2kfactor.insert( make_pair("DYmumu_400M600",1.));
-	mcProc2sigma.insert(   make_pair("DYmumu_600M800",0.01116));
+	mcProc2sigma.insert(   make_pair("DYmumu_600M800",0.011168));
 	mcProc2br.insert(      make_pair("DYmumu_600M800",1.));
-	mcProc2nevents.insert( make_pair("DYmumu_600M800",19993));
+	mcProc2nevents.insert( make_pair("DYmumu_600M800",15994));
 	mcProc2geneff.insert(  make_pair("DYmumu_600M800",1.));
 	mcProc2kfactor.insert( make_pair("DYmumu_600M800",1.));
-	mcProc2sigma.insert(   make_pair("DYmumu_800M1000",0.0027437));
+	mcProc2sigma.insert(   make_pair("DYmumu_800M1000",0.0027277));
 	mcProc2br.insert(      make_pair("DYmumu_800M1000",1.));
-	mcProc2nevents.insert( make_pair("DYmumu_800M1000",19946));
+	mcProc2nevents.insert( make_pair("DYmumu_800M1000",19992));
 	mcProc2geneff.insert(  make_pair("DYmumu_800M1000",1.));
 	mcProc2kfactor.insert( make_pair("DYmumu_800M1000",1.));
-	mcProc2sigma.insert(   make_pair("DYmumu_1000M1250",0.00091775));
+	mcProc2sigma.insert(   make_pair("DYmumu_1000M1250",0.00091646));
 	mcProc2br.insert(      make_pair("DYmumu_1000M1250",1.));
-	mcProc2nevents.insert( make_pair("DYmumu_1000M1250",19992));
+	mcProc2nevents.insert( make_pair("DYmumu_1000M1250",19995));
 	mcProc2geneff.insert(  make_pair("DYmumu_1000M1250",1.));
 	mcProc2kfactor.insert( make_pair("DYmumu_1000M1250",1.));
-	mcProc2sigma.insert(   make_pair("DYmumu_1250M1500",0.00024866));
+	mcProc2sigma.insert(   make_pair("DYmumu_1250M1500",0.00024942));
 	mcProc2br.insert(      make_pair("DYmumu_1250M1500",1.));
-	mcProc2nevents.insert( make_pair("DYmumu_1250M1500",19995));
+	mcProc2nevents.insert( make_pair("DYmumu_1250M1500",19993));
 	mcProc2geneff.insert(  make_pair("DYmumu_1250M1500",1.));
 	mcProc2kfactor.insert( make_pair("DYmumu_1250M1500",1.));
-	mcProc2sigma.insert(   make_pair("DYmumu_1500M1750",0.00007659));
+	mcProc2sigma.insert(   make_pair("DYmumu_1500M1750",0.000076876));
 	mcProc2br.insert(      make_pair("DYmumu_1500M1750",1.));
-	mcProc2nevents.insert( make_pair("DYmumu_1500M1750",19987));
+	mcProc2nevents.insert( make_pair("DYmumu_1500M1750",19997));
 	mcProc2geneff.insert(  make_pair("DYmumu_1500M1750",1.));
 	mcProc2kfactor.insert( make_pair("DYmumu_1500M1750",1.));
-	mcProc2sigma.insert(   make_pair("DYmumu_1750M2000",0.000026361));
+	mcProc2sigma.insert(   make_pair("DYmumu_1750M2000",0.000026003));
 	mcProc2br.insert(      make_pair("DYmumu_1750M2000",1.));
-	mcProc2nevents.insert( make_pair("DYmumu_1750M2000",19991));
+	mcProc2nevents.insert( make_pair("DYmumu_1750M2000",19993));
 	mcProc2geneff.insert(  make_pair("DYmumu_1750M2000",1.));
 	mcProc2kfactor.insert( make_pair("DYmumu_1750M2000",1.));
-	mcProc2sigma.insert(   make_pair("DYmumu_M2000",0.000015325));
+	mcProc2sigma.insert(   make_pair("DYmumu_M2000",0.000015327));
 	mcProc2br.insert(      make_pair("DYmumu_M2000",1.));
-	mcProc2nevents.insert( make_pair("DYmumu_M2000",19990));
+	mcProc2nevents.insert( make_pair("DYmumu_M2000",19996));
 	mcProc2geneff.insert(  make_pair("DYmumu_M2000",1.));
 	mcProc2kfactor.insert( make_pair("DYmumu_M2000",1.));
 	
-	mcProc2sigma.insert(   make_pair("DYtautau_75M120",817.8));
+	mcProc2sigma.insert(   make_pair("DYtautau_75M120",815.22));
 	mcProc2br.insert(      make_pair("DYtautau_75M120",1.));
-	mcProc2nevents.insert( make_pair("DYtautau_75M120",19998));
+	mcProc2nevents.insert( make_pair("DYtautau_75M120",19993));
 	mcProc2geneff.insert(  make_pair("DYtautau_75M120",1.));
 	mcProc2kfactor.insert( make_pair("DYtautau_75M120",1.));
-	mcProc2sigma.insert(   make_pair("DYtautau_120M250",8.6608));
+	mcProc2sigma.insert(   make_pair("DYtautau_120M250",8.6656));
 	mcProc2br.insert(      make_pair("DYtautau_120M250",1.));
-	mcProc2nevents.insert( make_pair("DYtautau_120M250",19996));
+	mcProc2nevents.insert( make_pair("DYtautau_120M250",19995));
 	mcProc2geneff.insert(  make_pair("DYtautau_120M250",1.));
 	mcProc2kfactor.insert( make_pair("DYtautau_120M250",1.));
-	mcProc2sigma.insert(   make_pair("DYtautau_250M400",0.41613));
+	mcProc2sigma.insert(   make_pair("DYtautau_250M400",0.41509));
 	mcProc2br.insert(      make_pair("DYtautau_250M400",1.));
-	mcProc2nevents.insert( make_pair("DYtautau_250M400",19994));
+	mcProc2nevents.insert( make_pair("DYtautau_250M400",19995));
 	mcProc2geneff.insert(  make_pair("DYtautau_250M400",1.));
 	mcProc2kfactor.insert( make_pair("DYtautau_250M400",1.));
-	mcProc2sigma.insert(   make_pair("DYtautau_400M600",0.067269));
+	mcProc2sigma.insert(   make_pair("DYtautau_400M600",0.067457));
 	mcProc2br.insert(      make_pair("DYtautau_400M600",1.));
 	mcProc2nevents.insert( make_pair("DYtautau_400M600",19992));
 	mcProc2geneff.insert(  make_pair("DYtautau_400M600",1.));
 	mcProc2kfactor.insert( make_pair("DYtautau_400M600",1.));
-	mcProc2sigma.insert(   make_pair("DYtautau_600M800",0.01116));
+	mcProc2sigma.insert(   make_pair("DYtautau_600M800",0.011168));
 	mcProc2br.insert(      make_pair("DYtautau_600M800",1.));
-	mcProc2nevents.insert( make_pair("DYtautau_600M800",19986));
+	mcProc2nevents.insert( make_pair("DYtautau_600M800",18985));
 	mcProc2geneff.insert(  make_pair("DYtautau_600M800",1.));
 	mcProc2kfactor.insert( make_pair("DYtautau_600M800",1.));
-	mcProc2sigma.insert(   make_pair("DYtautau_800M1000",0.0027437));
+	mcProc2sigma.insert(   make_pair("DYtautau_800M1000",0.0027277));
 	mcProc2br.insert(      make_pair("DYtautau_800M1000",1.));
-	mcProc2nevents.insert( make_pair("DYtautau_800M1000",19984));
+	mcProc2nevents.insert( make_pair("DYtautau_800M1000",19982));
 	mcProc2geneff.insert(  make_pair("DYtautau_800M1000",1.));
 	mcProc2kfactor.insert( make_pair("DYtautau_800M1000",1.));
-	mcProc2sigma.insert(   make_pair("DYtautau_1000M1250",0.00091775));
+	mcProc2sigma.insert(   make_pair("DYtautau_1000M1250",0.00091645));
 	mcProc2br.insert(      make_pair("DYtautau_1000M1250",1.));
-	mcProc2nevents.insert( make_pair("DYtautau_1000M1250",19980));
+	mcProc2nevents.insert( make_pair("DYtautau_1000M1250",19981));
 	mcProc2geneff.insert(  make_pair("DYtautau_1000M1250",1.));
 	mcProc2kfactor.insert( make_pair("DYtautau_1000M1250",1.));
-	mcProc2sigma.insert(   make_pair("DYtautau_1250M1500",0.00024897));
+	mcProc2sigma.insert(   make_pair("DYtautau_1250M1500",0.00024929));
 	mcProc2br.insert(      make_pair("DYtautau_1250M1500",1.));
-	mcProc2nevents.insert( make_pair("DYtautau_1250M1500",19973));
+	mcProc2nevents.insert( make_pair("DYtautau_1250M1500",19970));
 	mcProc2geneff.insert(  make_pair("DYtautau_1250M1500",1.));
 	mcProc2kfactor.insert( make_pair("DYtautau_1250M1500",1.));
-	mcProc2sigma.insert(   make_pair("DYtautau_1500M1750",0.000076551));
+	mcProc2sigma.insert(   make_pair("DYtautau_1500M1750",0.000076878));
 	mcProc2br.insert(      make_pair("DYtautau_1500M1750",1.));
-	mcProc2nevents.insert( make_pair("DYtautau_1500M1750",19974));
+	mcProc2nevents.insert( make_pair("DYtautau_1500M1750",19960));
 	mcProc2geneff.insert(  make_pair("DYtautau_1500M1750",1.));
 	mcProc2kfactor.insert( make_pair("DYtautau_1500M1750",1.));
-	mcProc2sigma.insert(   make_pair("DYtautau_1750M2000",0.000026356));
+	mcProc2sigma.insert(   make_pair("DYtautau_1750M2000",0.000026004));
 	mcProc2br.insert(      make_pair("DYtautau_1750M2000",1.));
-	mcProc2nevents.insert( make_pair("DYtautau_1750M2000",19968));
+	mcProc2nevents.insert( make_pair("DYtautau_1750M2000",19949));
 	mcProc2geneff.insert(  make_pair("DYtautau_1750M2000",1.));
 	mcProc2kfactor.insert( make_pair("DYtautau_1750M2000",1.));
-	mcProc2sigma.insert(   make_pair("DYtautau_M2000",0.000015323));
+	mcProc2sigma.insert(   make_pair("DYtautau_M2000",0.000015321));
 	mcProc2br.insert(      make_pair("DYtautau_M2000",1.));
-	mcProc2nevents.insert( make_pair("DYtautau_M2000",18966));
+	mcProc2nevents.insert( make_pair("DYtautau_M2000",19950));
 	mcProc2geneff.insert(  make_pair("DYtautau_M2000",1.));
 	mcProc2kfactor.insert( make_pair("DYtautau_M2000",1.));
 	
-	mcProc2sigma.insert(   make_pair("Zprime_mumu_SSM1000",0.12881));
+	mcProc2sigma.insert(   make_pair("Zprime_mumu_SSM1000",0.12973));
 	mcProc2br.insert(      make_pair("Zprime_mumu_SSM1000",1.));
-	mcProc2nevents.insert( make_pair("Zprime_mumu_SSM1000",19996));
+	mcProc2nevents.insert( make_pair("Zprime_mumu_SSM1000",18996));
 	mcProc2geneff.insert(  make_pair("Zprime_mumu_SSM1000",1.));
-	mcProc2kfactor.insert( make_pair("Zprime_mumu_SSM1000",1.));
+	mcProc2kfactor.insert( make_pair("Zprime_mumu_SSM1000",1.25));
+	//mcProc2kfactor.insert( make_pair("Zprime_mumu_SSM1000",1.));
 	mcProc2sigma.insert(   make_pair("Zprime_mumu_SSM1250",0.041544));
 	mcProc2br.insert(      make_pair("Zprime_mumu_SSM1250",1.));
 	mcProc2nevents.insert( make_pair("Zprime_mumu_SSM1250",19995));
@@ -221,25 +223,26 @@ void combinedGraphics::initialize(string analysisSelector, string muonSelector)
 	mcProc2geneff.insert(  make_pair("Zprime_mumu_SSM2000",1.));
 	mcProc2kfactor.insert( make_pair("Zprime_mumu_SSM2000",1.));
 
-	mcProc2sigma.insert(   make_pair("T1_McAtNlo_Jimmy",80.201));
+	mcProc2sigma.insert(   make_pair("T1_McAtNlo_Jimmy",144.13));
 	mcProc2br.insert(      make_pair("T1_McAtNlo_Jimmy",1.));
-	mcProc2nevents.insert( make_pair("T1_McAtNlo_Jimmy",984390));
+	//mcProc2nevents.insert( make_pair("T1_McAtNlo_Jimmy",997333));
+	mcProc2nevents.insert( make_pair("T1_McAtNlo_Jimmy",797472));
 	mcProc2kfactor.insert( make_pair("T1_McAtNlo_Jimmy",1.09));
-	mcProc2geneff.insert(  make_pair("T1_McAtNlo_Jimmy",1.));
+	mcProc2geneff.insert(  make_pair("T1_McAtNlo_Jimmy",0.5558));
 	
 	mcProc2sigma.insert(   make_pair("WW_Herwig",29.592));
 	mcProc2br.insert(      make_pair("WW_Herwig",1.));
-	mcProc2nevents.insert( make_pair("WW_Herwig",249837));
+	mcProc2nevents.insert( make_pair("WW_Herwig",247916));
 	mcProc2kfactor.insert( make_pair("WW_Herwig",1.));
 	mcProc2geneff.insert(  make_pair("WW_Herwig",0.38863));
 	mcProc2sigma.insert(   make_pair("WZ_Herwig",11.23));
 	mcProc2br.insert(      make_pair("WZ_Herwig",1.));
-	mcProc2nevents.insert( make_pair("WZ_Herwig",244833));
+	mcProc2nevents.insert( make_pair("WZ_Herwig",249923));
 	mcProc2kfactor.insert( make_pair("WZ_Herwig",1.));
 	mcProc2geneff.insert(  make_pair("WZ_Herwig",0.30847));
 	mcProc2sigma.insert(   make_pair("ZZ_Herwig",4.5964));
 	mcProc2br.insert(      make_pair("ZZ_Herwig",1.));
-	mcProc2nevents.insert( make_pair("ZZ_Herwig",249725));
+	mcProc2nevents.insert( make_pair("ZZ_Herwig",249906));
 	mcProc2kfactor.insert( make_pair("ZZ_Herwig",1.));
 	mcProc2geneff.insert(  make_pair("ZZ_Herwig",0.21152));
 	
@@ -641,7 +644,7 @@ void combinedGraphics::drawRatio(double xmin, double xmax, TH1D* hRat)
 	gRat->SetLineWidth(2);
 	gRat->SetLineColor(kBlue);
 	gRat->SetTitle("");
-	gRat->Draw("CSAMES");
+	//gRat->Draw("CSAMES");
 	
 	hRat->SetTitle("");
 	hRat->SetLineColor(kBlack);
@@ -657,7 +660,7 @@ void combinedGraphics::drawRatio(double xmin, double xmax, TH1D* hRat)
 	
 	TLine* lUnit = new TLine(hRatFrame->GetXaxis()->GetXmin(),1,hRatFrame->GetXaxis()->GetXmax(),1);
 	lUnit->SetLineColor(kBlack);
-	lUnit->Draw("SAMES");
+	//lUnit->Draw("SAMES");
 }
 
 void combinedGraphics::drawRatio(double xmin, double xmax, double ymin, double ymax, string legTxt, TH1D* hRat)
@@ -696,7 +699,7 @@ void combinedGraphics::drawRatio(double xmin, double xmax, double ymin, double y
 	gRat->SetLineWidth(2);
 	gRat->SetLineColor(kBlue);
 	gRat->SetTitle("");
-	gRat->Draw("CSAMES");
+	//gRat->Draw("CSAMES");
 	
 	hRat->SetTitle("");
 	hRat->SetLineColor(kBlack);
@@ -712,7 +715,7 @@ void combinedGraphics::drawRatio(double xmin, double xmax, double ymin, double y
 	
 	TLine* lUnit = new TLine(hRatFrame->GetXaxis()->GetXmin(),1,hRatFrame->GetXaxis()->GetXmax(),1);
 	lUnit->SetLineColor(kBlack);
-	lUnit->Draw("SAMES");
+	//lUnit->Draw("SAMES");
 }
 
 void combinedGraphics::drawRatioWithBand(double xmin, double xmax, TH1D* hRat, TH1D* hRatUp, TH1D* hRatDwn)
@@ -771,7 +774,7 @@ TH1D* combinedGraphics::getNormDYmumu(string dir, string hDir, string hName)
 
 	string path  = "";
 	string sProc = "";
-	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
+	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcLocalControl_" : "mcLocalControl_";
 	
 	sProc = "DYmumu_75M120";
 	path = dir + analysisType + sProc + ".root";
@@ -870,7 +873,7 @@ TH1D* combinedGraphics::getNormDYtautau(string dir, string hDir, string hName)
 
 	string path  = "";
 	string sProc = "";
-	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
+	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcLocalControl_" : "mcLocalControl_";
 	
 	sProc = "DYtautau_75M120";
 	path = dir + analysisType + sProc + ".root";
@@ -1028,6 +1031,7 @@ void combinedGraphics::draw_allMCvsData(string dir, string hDir, string hName, s
 	TVirtualPad* pad_ratio = cnv->cd(2);
 	pad_ratio->SetPad(0.009197324,0.01036269,0.9899666,0.253886);
 	pad_ratio->SetFillColor(kWhite);
+	pad_ratio->SetGridy();
 	if(m_logx) pad_ratio->SetLogx();
 	pad_ratio->SetLogy();
 	
@@ -1044,13 +1048,13 @@ void combinedGraphics::draw_allMCvsData(string dir, string hDir, string hName, s
 	string path = "";
 	string sProc = "";
 	string channel = "";
-	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
+	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcLocalControl_" : "mcLocalControl_";
 	
 	double ymin = 1.e10;
 	double ymax = 0.;
 	
-	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
-	path = dir + "AtoI2_ZprimeGRL/" + m_muonSelector + sData + ".root";
+	string sData = (m_dataAnalysisSelector=="digest") ? "analysisLocalControl" : "analysisLocalControl";
+	path = dir + "data_A-I2_eta24/" + m_muonSelector + sData + ".root";
 	TFile* fdata = new TFile( path.c_str(), "READ" );
 	TH1D* hData = getHisto(fdata, hDir, hName);
 	if(hData==NULL)
@@ -1277,6 +1281,7 @@ void combinedGraphics::draw_sumMCvsData(string dir, string hDir, string hName, s
 	TVirtualPad* pad_ratio = cnv->cd(2);
 	pad_ratio->SetPad(0.009197324,0.01036269,0.9899666,0.253886);
 	pad_ratio->SetFillColor(kWhite);
+	pad_ratio->SetGridy();
 	if(m_logx) pad_ratio->SetLogx();
 	if(m_doRatio) pad_ratio->SetLogy();
 	
@@ -1290,13 +1295,13 @@ void combinedGraphics::draw_sumMCvsData(string dir, string hDir, string hName, s
 	string path = "";
 	string sProc = "";
 	string channel = "";
-	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
+	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcLocalControl_" : "mcLocalControl_";
 	
 	double ymin = 1.e10;
 	double ymax = 0.;
 	
-	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
-	path = dir + "AtoI2_ZprimeGRL/" + m_muonSelector + sData + ".root";
+	string sData = (m_dataAnalysisSelector=="digest") ? "analysisLocalControl" : "analysisLocalControl";
+	path = dir + "data_A-I2_eta24/" + m_muonSelector + sData + ".root";
 	TFile* fdata = new TFile( path.c_str(), "READ" );
 	TH1D* hData = getHisto(fdata, hDir, hName);
 	if(hData==NULL)
@@ -1448,6 +1453,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 	TVirtualPad* pad_ratio = cnv->cd(2);
 	pad_ratio->SetPad(0.009197324,0.01036269,0.9899666,0.253886);
 	pad_ratio->SetFillColor(kWhite);
+	pad_ratio->SetGridy();
 	if(m_logx) pad_ratio->SetLogx();
 	pad_ratio->SetLogy();
 	
@@ -1463,7 +1469,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 	string path = "";
 	string sProc = "";
 	string channel = "";
-	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
+	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcLocalControl_" : "mcLocalControl_";
 	
 	Double_t weight = 0.; // weight = dataLumi/mcLumi = dataLumi/(kFactor*nMC/(sigma*BR*eff))
 	Float_t var     = 0.;
@@ -1475,8 +1481,8 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 	// form graphicObjects
 	const int constint_imass_nbins = 50;
 	imass_nbins  = constint_imass_nbins;
-	imass_min    = 75.*GeV2TeV;
-	imass_max    = 2075.*GeV2TeV;
+	imass_min    = 70.*GeV2TeV;
+	imass_max    = 400.*GeV2TeV;
 	logMmin      = log10(imass_min);
 	logMmax      = log10(imass_max);
 	Double_t imassBinWidth = (Double_t)( (logMmax-logMmin)/(Double_t)imass_nbins );
@@ -1485,10 +1491,10 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 	for (Int_t i=1 ; i<=imass_nbins ; i++) imassbins[i] = TMath::Power( 10,(logMmin + i*imassBinWidth) );
 	
 	
-	const int constint_pT_nbins = 100;
+	const int constint_pT_nbins = 50;
 	pT_nbins  = constint_pT_nbins;
-	pT_min    = 20.*GeV2TeV;
-	pT_max    = 2020.*GeV2TeV;
+	pT_min    = 25.*GeV2TeV;
+	pT_max    = 700.*GeV2TeV;
 	logpTmin  = log10(pT_min);
 	logpTmax  = log10(pT_max);
 	Double_t pTBinWidth = (Double_t)( (logpTmax-logpTmin)/(Double_t)pT_nbins );
@@ -1496,10 +1502,10 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 	pTbins[0] = pT_min;
 	for (Int_t i=1 ; i<=pT_nbins ; i++) pTbins[i] = TMath::Power( 10,(logpTmin + i*pTBinWidth) );
 	
-	const int constint_QT_nbins = 100;
+	const int constint_QT_nbins = 50;
 	Int_t QT_nbins  = constint_QT_nbins;
-	Double_t QT_min    = 1.*GeV2TeV;
-	Double_t QT_max    = 1501.*GeV2TeV;
+	Double_t QT_min    = 5.*GeV2TeV;
+	Double_t QT_max    = 800.*GeV2TeV;
 	Double_t logQTmin  = log10(QT_min);
 	Double_t logQTmax  = log10(QT_max);
 	Double_t QTBinWidth = (Double_t)( (logQTmax-logQTmin)/(Double_t)QT_nbins );
@@ -1757,8 +1763,8 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 	
 	
 	// data
-	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
-	path = dir + "AtoI2_ZprimeGRL/" + m_muonSelector + sData + ".root";
+	string sData = (m_dataAnalysisSelector=="digest") ? "analysisLocalControl" : "analysisLocalControl";
+	path = dir + "data_A-I2_eta24/" + m_muonSelector + sData + ".root";
 	fData = new TFile( path.c_str(), "READ" );
 	data_tree = (TTree*)fData->Get("allCuts/allCuts_tree");
 	if(!isVector) data_tree->SetBranchAddress( varName.c_str(), &var );
@@ -1779,7 +1785,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		if(!isVector) hData->Fill(var, 1.);
 		if(isVector && vvar!=0) hData->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), 1.);
 	}
-	if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidth(hData);
+	//if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidth(hData);
 	if(hData->GetMinimum()<ymin) ymin=hData->GetMinimum();
 	if(hData->GetMaximum()>ymax) ymax=hData->GetMaximum();
 	cout << "after data" << endl;
@@ -1808,7 +1814,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		if(!isVector) hZprime_mumu_SSM1000->Fill(var, weight);
 		if(isVector && vvar!=0) hZprime_mumu_SSM1000->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
-	if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hZprime_mumu_SSM1000);
+	//if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hZprime_mumu_SSM1000);
 	if(hZprime_mumu_SSM1000->GetMinimum()<ymin) ymin=hZprime_mumu_SSM1000->GetMinimum();
 	if(hZprime_mumu_SSM1000->GetMaximum()>ymax) ymax=hZprime_mumu_SSM1000->GetMaximum();
 	cout << "after " << sProc << endl;
@@ -1995,7 +2001,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		if(isVector && vvar!=0) hDYmumu->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
-	if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hDYmumu);
+	//if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hDYmumu);
 	if(hDYmumu->GetMinimum()<ymin) ymin=hDYmumu->GetMinimum();
 	if(hDYmumu->GetMaximum()>ymax) ymax=hDYmumu->GetMaximum();
 	
@@ -2165,7 +2171,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		if(isVector && vvar!=0) hDYtautau->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
-	if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hDYtautau);
+	//if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hDYtautau);
 	if(hDYtautau->GetMinimum()<ymin) ymin=hDYtautau->GetMinimum();
 	if(hDYtautau->GetMaximum()>ymax) ymax=hDYtautau->GetMaximum();
 	
@@ -2185,7 +2191,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		if(isVector && vvar!=0) hWW->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
-	if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hWW);
+	//if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hWW);
 	if(hWW->GetMinimum()<ymin) ymin=hWW->GetMinimum();
 	if(hWW->GetMaximum()>ymax) ymax=hWW->GetMaximum();
 	
@@ -2205,7 +2211,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		if(isVector && vvar!=0) hWZ->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
-	if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hWZ);
+	//if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hWZ);
 	if(hWZ->GetMinimum()<ymin) ymin=hWZ->GetMinimum();
 	if(hWZ->GetMaximum()>ymax) ymax=hWZ->GetMaximum();
 	
@@ -2225,7 +2231,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		if(isVector && vvar!=0) hZZ->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
-	if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hZZ);
+	//if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hZZ);
 	if(hZZ->GetMinimum()<ymin) ymin=hZZ->GetMinimum();
 	if(hZZ->GetMaximum()>ymax) ymax=hZZ->GetMaximum();
 	
@@ -2245,7 +2251,7 @@ void combinedGraphics::treeDraw_MCvsData(string dir, string hDir, string varName
 		if(isVector && vvar!=0) hTTbar->Fill( (varName=="pt") ? vvar->at(0)*MeV2TeV : vvar->at(0), weight);
 	}
 	cout << "after " << sProc << endl;
-	if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hTTbar);
+	//if(varName=="pt" || varName=="Q_T" || varName=="Mhat")  NormToBinWidthNoErr(hTTbar);
 	if(hTTbar->GetMinimum()<ymin) ymin=hTTbar->GetMinimum();
 	if(hTTbar->GetMaximum()>ymax) ymax=hTTbar->GetMaximum();
 	
@@ -2359,7 +2365,7 @@ void combinedGraphics::draw_AfbMCvsData(string dir, string hDir, string hName, s
 	string path = "";
 	string sProc = "";
 	string channel = "";
-	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
+	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcLocalControl_" : "mcLocalControl_";
 	
 	Float_t mHat;
 	Float_t cosTh;
@@ -2380,9 +2386,9 @@ void combinedGraphics::draw_AfbMCvsData(string dir, string hDir, string hName, s
 	leg->AddEntry( hData, "Data: A_{FB}#left(#hat{m}_{#mu#mu}#right)", "lep");
 	leg->AddEntry( hData, "Data: #frac{dN}{d#hat{m}_{#mu#mu}}", "l");
 	
-	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
+	string sData = (m_dataAnalysisSelector=="digest") ? "analysisLocalControl" : "analysisLocalControl";
 	
-	path = dir + "AtoI2_ZprimeGRL/" + m_muonSelector + sData + ".root";
+	path = dir + "data_A-I2_eta24/" + m_muonSelector + sData + ".root";
 	TFile* fData = new TFile( path.c_str(), "READ" );
 	TTree* Afb_data_tree = (TTree*)fData->Get("Afb/Afb_tree");
 	Afb_data_tree->SetBranchAddress( "mHat",  &mHat );
@@ -2650,10 +2656,10 @@ void combinedGraphics::draw_trigData(string dir, string hDir, string hName)
 	string path = "";
 	string sProc = "";
 	string channel = "";
-	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
+	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcLocalControl_" : "mcLocalControl_";
 	
-	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
-	path = dir + "AtoI2_ZprimeGRL/" + m_muonSelector + sData + ".root";
+	string sData = (m_dataAnalysisSelector=="digest") ? "analysisLocalControl" : "analysisLocalControl";
+	path = dir + "data_A-I2_eta24/" + m_muonSelector + sData + ".root";
 	TFile* fdata = new TFile( path.c_str(), "READ" );
 	TH1D* hData = cloneHisto(fdata, hDir, hName);
 	hData->SetTitle(hName.c_str());
@@ -2713,12 +2719,12 @@ void combinedGraphics::draw_trigTRUvsTnP(string dir, string hDir, string sVar)
 	TVirtualPad* pad = cnv->cd(1);
 	pad->SetPad(0.009197324,0.2150259,0.9899666,0.9909326);
 	pad->SetFillColor(kWhite);
-	if(m_logx) pad->SetLogx();
-	if(m_logy) pad->SetLogy();
+
 	
 	TVirtualPad* pad_ratio = cnv->cd(2);
 	pad_ratio->SetPad(0.009197324,0.01036269,0.9899666,0.253886);
 	pad_ratio->SetFillColor(kWhite);
+	pad_ratio->SetGridy();
 	//pad_ratio->SetLogx();
 	//pad_ratio->SetLogy();
 	
@@ -2728,7 +2734,7 @@ void combinedGraphics::draw_trigTRUvsTnP(string dir, string hDir, string sVar)
 
 	string path = "";
 	string channel = "";
-	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
+	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcLocalControl_" : "mcLocalControl_";
 	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	
@@ -2835,15 +2841,6 @@ void combinedGraphics::draw_trigTRUvsTnP(string dir, string hDir, string sVar)
 		hEffiDirect = new TH1D("direct_effi_phi", "direct_effi_phi", phinbins, phibins);
 	}
 	
-	/*
-	sProc = "DYmumu_75M120";
-	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYmumu_75M120 = new TFile( path.c_str(), "READ" );
-	*/
-	
-	
-	path = dir + "Zmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fZmumu = new TFile( path.c_str(), "READ" );
 	
 	///////////////////////////////////////////////
 	// Tag&Probe ///////////////////////////////////////
@@ -2858,7 +2855,16 @@ void combinedGraphics::draw_trigTRUvsTnP(string dir, string hDir, string sVar)
 	leg->AddEntry( hEffiTNP, "MC: Tag&Probe", "lep");
 	
 	
-	//TTree* trig_tNp_tree = (TTree*)fDYmumu_75M120->Get("efficiency/eff_tree");
+	/*
+	sProc = "DYmumu_75M120";
+	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fDYmumu_75M120 = new TFile( path.c_str(), "READ" );
+	TTree* trig_tNp_tree = (TTree*)fDYmumu_75M120->Get("efficiency/eff_tree");
+	*/
+	
+	
+	path = dir + "Zmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	TFile* fZmumu = new TFile( path.c_str(), "READ" );
 	TTree* trig_tNp_tree = (TTree*)fZmumu->Get("efficiency/eff_tree");
 	sBranch = "tNp_cand_" + sVar;
 	trig_tNp_tree->SetBranchAddress( sBranch.c_str(),  &cand );
@@ -2990,6 +2996,7 @@ void combinedGraphics::draw_trigMCvsData(string dir, string hDir, string sVar)
 	TVirtualPad* pad_ratio = cnv->cd(2);
 	pad_ratio->SetPad(0.009197324,0.01036269,0.9899666,0.253886);
 	pad_ratio->SetFillColor(kWhite);
+	pad_ratio->SetGridy();
 	//pad_ratio->SetLogx();
 	//pad_ratio->SetLogy();
 	
@@ -3000,7 +3007,7 @@ void combinedGraphics::draw_trigMCvsData(string dir, string hDir, string sVar)
 	string path = "";
 	string sProc = "";
 	string channel = "";
-	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
+	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcLocalControl_" : "mcLocalControl_";
 	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	
@@ -3118,8 +3125,8 @@ void combinedGraphics::draw_trigMCvsData(string dir, string hDir, string sVar)
 	hEffiData->SetMarkerSize(1);
 	leg->AddEntry( hEffiData, "Data", "lep");
 	
-	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
-	path = dir + "AtoI2_ZprimeGRL/" + m_muonSelector + sData + ".root";
+	string sData = (m_dataAnalysisSelector=="digest") ? "analysisLocalControl" : "analysisLocalControl";
+	path = dir + "data_A-I2_eta24/" + m_muonSelector + sData + ".root";
 	TFile* fData = new TFile( path.c_str(), "READ" );
 	TTree* trig_data_tree = (TTree*)fData->Get("efficiency/eff_tree");
 	sBranch = "tNp_cand_" + sVar;
@@ -3286,6 +3293,7 @@ void combinedGraphics::draw_trigMaps(string dir, string hDir, string sVar)
 	
 	TVirtualPad* pad_ratio = cnv->cd(2);
 	pad_ratio->SetFillColor(kWhite);
+	//pad_ratio->SetGridy();
 
 	cnv->Draw();
 	cnv->cd();
@@ -3294,7 +3302,7 @@ void combinedGraphics::draw_trigMaps(string dir, string hDir, string sVar)
 	string path = "";
 	string sProc = "";
 	string channel = "";
-	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcDigestControl_" : "mcOfflineControl_";
+	string analysisType = (m_dataAnalysisSelector=="digest") ? "mcLocalControl_" : "mcLocalControl_";
 	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	
@@ -3440,8 +3448,8 @@ void combinedGraphics::draw_trigMaps(string dir, string hDir, string sVar)
 	hEffiData->SetMinimum(0.);
 	hEffiData->SetMaximum(1.);
 	
-	string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
-	path = dir + "AtoI2_ZprimeGRL/" + m_muonSelector + sData + ".root";
+	string sData = (m_dataAnalysisSelector=="digest") ? "analysisLocalControl" : "analysisLocalControl";
+	path = dir + "data_A-I2_eta24/" + m_muonSelector + sData + ".root";
 	TFile* fData = new TFile( path.c_str(), "READ" );
 	TTree* trig_data_tree = (TTree*)fData->Get("efficiency/eff_tree");
 	trig_data_tree->SetBranchAddress( "tNp_cand_pT",  &cand_pT );
@@ -3583,16 +3591,27 @@ void combinedGraphics::draw_trigMaps(string dir, string hDir, string sVar)
 		}
 	}
 	
+	gStyle->SetPaintTextFormat("1.2f");
+	
 	pad11->cd();
 	hEffiData->Draw("COLZ");
+	TH1D* hEffiDataMapTxt = (TH1D*)hEffiData->Clone("");
+	hEffiDataMapTxt->SetMarkerSize(0.7);
+	hEffiDataMapTxt->Draw("TEXT45E SAMES");
 	pad11->RedrawAxis();
 	
 	pad12->cd();
 	hEffiMC->Draw("COLZ");
+	TH1D* hEffiMCMapTxt = (TH1D*)hEffiData->Clone("");
+	hEffiMCMapTxt->SetMarkerSize(0.7);
+	hEffiMCMapTxt->Draw("TEXT45E SAMES");
 	pad12->RedrawAxis();
 	
 	pad_ratio->cd();
 	hRatio->Draw("COLZ");
+	TH1D* hRatioMapTxt = (TH1D*)hEffiData->Clone("");
+	hRatioMapTxt->SetMarkerSize(0.7);
+	hRatioMapTxt->Draw("TEXT45E SAMES");
 	pad_ratio->RedrawAxis();
 		
 	

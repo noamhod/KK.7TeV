@@ -98,7 +98,7 @@ void analysis::execute()
 	////////////////////////////////////////
 	
 	nAll++;
-	if(mu_n==0)        n0mu++;
+	if(mu_n==0) n0mu++;
 	int N=0;
 	for(int n=0 ; n<mu_n ; n++)
 	{

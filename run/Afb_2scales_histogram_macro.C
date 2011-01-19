@@ -189,7 +189,7 @@ void execute()
 	string hDir  = "allCuts";
 	string hName = "Afb";
 	string xTitle = "#hat{m}_{#mu#mu} TeV";
-	string yTitle= "A_{FB}#left(#hat{m}_{#mu#mu}#right)";
+	string yTitle= "A_{FB}";
 
 	string m_dataAnalysisSelector = "digest";	
 	//string m_muonSelector = "staco/";
@@ -206,8 +206,7 @@ void execute()
 	leg->SetFillColor(kWhite);
 	
 	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
-	string L = "41";
-	string lumilabel = "#intLdt~" + L + " pb^{-1}";
+	string lumilabel = "#intLdt~42 pb^{-1}";
 	TPaveText* pvtxt = new TPaveText(0.1195652,0.1334197,0.2458194,0.2318653,"brNDC");
 	pvtxt->SetFillColor(kWhite);
 	TText* txt  = pvtxt->AddText( lumilabel.c_str() );
@@ -242,7 +241,7 @@ void execute()
 	if(doLogM) hDataM  = new TH1D("mHat_data","mHat_data", imass_nbins, M_bins );
 	else       hDataM  = new TH1D("mHat_data","mHat_data", imass_nbins, imass_min, imass_max );
 	hDataM->SetTitle("");
-	hDataM->SetYTitle("#frac{dN}{d#hat{m}_{#mu#mu}} 1/TeV");
+	hDataM->SetYTitle("Events");
 	hDataM->SetLineColor(kBlack);
 	hDataM->SetLineWidth(2);
 	TH1D* hData;
@@ -252,7 +251,7 @@ void execute()
 	hData->SetMarkerColor(kBlack);
 	hData->SetMarkerSize(1.2);
 	leg->AddEntry( hData, "Data: A_{FB}", "lep");
-	leg->AddEntry( hData, "Data: #frac{dN}{d#hat{m}_{#mu#mu}}", "l");
+	leg->AddEntry( hData, "Data: Events", "l");
 	
 	//string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
 	string sData = "analysisLocalControl";
@@ -280,7 +279,7 @@ void execute()
 	for(Int_t b=1 ; b<=hData->GetNbinsX() ; b++)
 	{
 		// norm to bin width
-		hDataM->SetBinContent(b, hDataM->GetBinContent(b)/hDataM->GetBinWidth(b));
+		//hDataM->SetBinContent(b, hDataM->GetBinContent(b)/hDataM->GetBinWidth(b));
 		
 		fillVec(Afb_data_tree, hData, b); // the VCOSTH vector is full
 		if((int)VCOSTH->size()<minEntriesDATA) continue;
@@ -293,7 +292,7 @@ void execute()
 	
 	
 	// Backgrounds
-	channel = "DYmumu: A_{FB}(stat' uncertainty)";
+	channel = "Z#rightarrow#mu#mu: A_{FB}(stat' uncertainty)";
 	TH1D* hBGsum;
 	if(doLogM) hBGsum = new TH1D("Afb_sumBG","Afb_sumBG", imass_nbins, M_bins );
 	else       hBGsum = new TH1D("Afb_sumBG","Afb_sumBG", imass_nbins, imass_min, imass_max );

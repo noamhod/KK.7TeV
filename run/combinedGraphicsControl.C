@@ -44,19 +44,24 @@ void combinedGraphicsControl::executeTmp()
 	m_combinedGraphics->setStyle();
 
 	//string dir  = "/data/hod/D3PDdigest/rel15_barrel_selection/";
-	string dir  = "/data/hod/D3PDdigest/rel15_eta24_selection/";
+	//string dir  = "/data/hod/D3PDdigest/rel15_eta24_selection/";
+	string dir  = "/data/hod/D3PDfin/rel16/";
 	
 	m_combinedGraphics->set_allMCvsData(true, true, 1.e-3, 5.e+6, 0.075);
-	m_combinedGraphics->treeDraw_MCvsData(dir, "allCuts", "Mhat", "#hat{m}_{#mu#mu} (TeV)", "#frac{dN}{d#hat{m}_{#mu#mu}} 1/TeV");
+	//m_combinedGraphics->treeDraw_MCvsData(dir, "allCuts", "Mhat", "#hat{m}_{#mu#mu} (TeV)", "#frac{dN}{d#hat{m}_{#mu#mu}} 1/TeV");
+	m_combinedGraphics->treeDraw_MCvsData(dir, "allCuts", "Mhat", "#hat{m}_{#mu#mu} (TeV)", "Events");
 	
 	m_combinedGraphics->set_allMCvsData(true, true, 1.e-3, 5.e+6, 0.025);
-	m_combinedGraphics->treeDraw_MCvsData(dir, "allCuts", "Q_T", "Q_{T} TeV", "#frac{dN}{dQ_{T}} 1/TeV");
+	//m_combinedGraphics->treeDraw_MCvsData(dir, "allCuts", "Q_T", "Q_{T} TeV", "#frac{dN}{dQ_{T}} 1/TeV");
+	m_combinedGraphics->treeDraw_MCvsData(dir, "allCuts", "Q_T", "Q_{T} TeV", "Events");
 	
 	m_combinedGraphics->set_allMCvsData(true, true, 1.e-3, 5.e+6, 0.025);
-	m_combinedGraphics->treeDraw_MCvsData(dir, "allCuts", "pt", "p_{T}(#mu^{-}) (TeV)", "#frac{dN}{dp_{T}} 1/TeV");
+	//m_combinedGraphics->treeDraw_MCvsData(dir, "allCuts", "pt", "p_{T}(#mu^{-}) (TeV)", "#frac{dN}{dp_{T}} 1/TeV");
+	m_combinedGraphics->treeDraw_MCvsData(dir, "allCuts", "pt", "p_{T}(#mu^{-}) (TeV)", "Events");
 	
-	m_combinedGraphics->set_allMCvsData(false, true, 1.e-1, 1.e+3, 0.);
-	m_combinedGraphics->treeDraw_MCvsData(dir, "allCuts", "eta", "#eta(#mu^{-})", "N");
+	m_combinedGraphics->set_allMCvsData(false, true, 1.e-3, 1.e+3, 0.);
+	//m_combinedGraphics->treeDraw_MCvsData(dir, "allCuts", "eta", "#eta(#mu^{-})", "N");
+	m_combinedGraphics->treeDraw_MCvsData(dir, "allCuts", "eta", "#eta(#mu^{-})", "Events");
 }
 
 	
@@ -65,7 +70,8 @@ void combinedGraphicsControl::execute()
 	m_combinedGraphics->setStyle();
 
 	//string dir  = "/data/hod/D3PDdigest/rel15_barrel_selection/";
-	string dir  = "/data/hod/D3PDdigest/rel15_eta24_selection/";
+	//string dir  = "/data/hod/D3PDdigest/rel15_eta24_selection/";
+	string dir  = "/data/hod/D3PDfin/rel16/";
 	
 	// imass, etaSum and cos(theta_mumu) (dimu)
 	m_combinedGraphics->set_allMCvsData(true, true, 5.e-5, 3.e+4, 0.075);
@@ -129,7 +135,8 @@ void combinedGraphicsControl::executeTrig()
 	m_combinedGraphics->setStyle();
 
 	//string dir  = "/data/hod/D3PDdigest/rel15_barrel_selection/";
-	string dir  = "/data/hod/D3PDdigest/rel15_eta24_selection/";
+	//string dir  = "/data/hod/D3PDdigest/rel15_eta24_selection/";
+	string dir  = "/data/hod/D3PDfin/rel16/";
 	
 	m_combinedGraphics->draw_trigData(dir, "efficiency", "tNp_effi_pT.L1_MU10");
 	m_combinedGraphics->draw_trigData(dir, "efficiency", "tNp_effi_pT.EF_mu10||EF_mu10_MG");
@@ -152,7 +159,8 @@ void combinedGraphicsControl::executeTrigTRUvsTnP()
 	m_combinedGraphics->setStyle();
 
 	//string dir  = "/data/hod/D3PDdigest/rel15_barrel_selection/";
-	string dir  = "/data/hod/D3PDdigest/rel15_eta24_selection/";
+	//string dir  = "/data/hod/D3PDdigest/rel15_eta24_selection/";
+	string dir  = "/data/hod/D3PDfin/rel16/";
 	
 	m_combinedGraphics->draw_trigTRUvsTnP(dir, "efficiency", "pT");
 	m_combinedGraphics->draw_trigTRUvsTnP(dir, "efficiency", "eta");
@@ -170,7 +178,8 @@ void combinedGraphicsControl::executeTrigMCvsData()
 	m_combinedGraphics->setStyle();
 	
 	//string dir  = "/data/hod/D3PDdigest/rel15_barrel_selection/";
-	string dir  = "/data/hod/D3PDdigest/rel15_eta24_selection/";
+	//string dir  = "/data/hod/D3PDdigest/rel15_eta24_selection/";
+	string dir  = "/data/hod/D3PDfin/rel16/";
 
 	m_combinedGraphics->draw_trigMCvsData(dir, "efficiency", "pT");
 	m_combinedGraphics->draw_trigMCvsData(dir, "efficiency", "eta");
@@ -201,7 +210,8 @@ void combinedGraphicsControl::executeTrigDataMap()
 	defaultstyle->cd();
 	
 	//string dir  = "/data/hod/D3PDdigest/rel15_barrel_selection/";
-	string dir  = "/data/hod/D3PDdigest/rel15_eta24_selection/";
+	//string dir  = "/data/hod/D3PDdigest/rel15_eta24_selection/";
+	string dir  = "/data/hod/D3PDfin/rel16/";
 
 	m_combinedGraphics->draw_trigMaps(dir, "efficiency", "etaphi");
 	m_combinedGraphics->draw_trigMaps(dir, "efficiency", "etapT");

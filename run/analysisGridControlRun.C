@@ -109,10 +109,18 @@ void analysisGridControlRun()
 		{
 			int len = (int)fileList[iFile].length();
 			string slast = fileList[iFile].substr(len-1,1);
-			if( slast != "t" )
+			if( slast != "t" && slast != "1" )
 			{
 				cout << "slast=" << slast << endl;
 				fileList[iFile]+="t";
+				cout << "#################################################################" << endl;
+				cout << "### fixed missing character at the end of the last input file ###" << endl;
+				cout << "#################################################################" << endl;
+			}
+			else if( fileList[iFile].find("root.")!=string::npos  &&  slast=="." )
+			{
+				cout << "slast=" << slast << endl;
+				fileList[iFile]+="1";
 				cout << "#################################################################" << endl;
 				cout << "### fixed missing character at the end of the last input file ###" << endl;
 				cout << "#################################################################" << endl;

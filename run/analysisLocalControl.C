@@ -49,6 +49,10 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	m_RunType   = sRun; // "grid" OR "local"
 	m_muRecAlgo = sRec; // "staco" OR "muid"
 	m_isMC      = isMC;
+	
+	cout << "m_RunType="   << m_RunType   << endl;
+	cout << "m_muRecAlgo=" << m_muRecAlgo << endl;
+	cout << "m_isMC="      << m_isMC      << endl;
 }
 
 void analysisLocalControl::initialize(int runNumber, string localRunControlFile)
@@ -116,10 +120,11 @@ void analysisLocalControl::initialize(int runNumber, string localRunControlFile)
 	if(runNumber==-1) makeChain(true, str_list, str_dir);
 	else              makeChain(true, str_list, str_dir, runNumber);
 
-	m_WZphysD3PD = new WZphysD3PD( m_chain );
+	m_WZphysD3PD = new WZphysD3PD( m_chain, m_isMC );
 
-	if(m_RunType!="local_noskim") m_treefile = new TFile( str_tree.c_str(), "RECREATE");
-	else                          m_treefile = NULL;
+	
+	if(m_RunType=="local_noskim") m_treefile = NULL;
+	else                          m_treefile = new TFile( str_tree.c_str(), "RECREATE");
 	
 	m_histfile = new TFile( str_hist.c_str(), "RECREATE");
 	m_histfile->cd();
@@ -133,7 +138,7 @@ void analysisLocalControl::initialize(int runNumber, string localRunControlFile)
 
 	book();
 
-	if(m_RunType!="local_noskim") m_treefile->cd();
+	if(m_treefile!=NULL) m_treefile->cd();
 }
 
 void analysisLocalControl::finalize()
@@ -144,7 +149,7 @@ void analysisLocalControl::finalize()
 	// since in digestTree class there is the
 	// following statement m_tree->SetMaxTreeSize(50000000);
 	// i.e., 50Mb per file
-	if(m_RunType!="local_noskim")
+	if(m_treefile!=NULL)
 	{
 		m_treefile = m_analysis->m_WZphysD3PDmaker->m_tree->GetCurrentFile();
 		m_treefile->cd();

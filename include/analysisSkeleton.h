@@ -55,7 +55,13 @@ public:
 	vector<vector<float> >* HLT_eta;
 	vector<vector<int> >*   HLT_has;
 	
-
+	
+	// counter local
+	int m_allCuts_counter;
+	int m_cutsProfile_counter;
+	int m_efficiency_counter;
+	
+	
 
 	// event level
 	int isGRL;

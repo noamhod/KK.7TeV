@@ -50,15 +50,17 @@ void analysis::execute()
 	} //////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////
 	
-	////////////////////////////////////////////////////////////////////
-	// skim(local - data / MC) 2: at least 2 CB muons //////////////////
-	if(sRunType=="local") //////////////////////////////////////////////
-	{                     //////////////////////////////////////////////
-		bool passedSkim = m_WZphysD3PDmaker->passCBskim(); /////////////
-		if(passedSkim) m_WZphysD3PDmaker->fill(); //////////////////////
-		if(passedSkim) nSkim++; ////////////////////////////////////////
-	} //////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////
+	// skim 2: 2 mus at least and at least Nmu CB muons (staco/muid) with pT>pTthreshold2 
+	float pTthreshold2 = 25.; // in GeV ///////////////////////////////////////////////////
+	int   Nmu  = 1; ///////////////////////////////////////////////////////////////////////
+	if(sRunType=="local") /////////////////////////////////////////////////////////////////
+	{                     /////////////////////////////////////////////////////////////////
+		bool passedSkim = m_WZphysD3PDmaker->passNPTCBskim(Nmu, pTthreshold2); ////////////
+		if(passedSkim) m_WZphysD3PDmaker->fill(); /////////////////////////////////////////
+		if(passedSkim) nSkim++; ///////////////////////////////////////////////////////////
+	} /////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////
 	
 	////////////////////////////////////////////////////////
 	// set all the muon reco' alg vars /////////////////////
@@ -139,24 +141,6 @@ void analysis::setEventVariables()
 	analysisSkeleton::timestamp_ns = m_WZphysD3PD->timestamp_ns;
 	analysisSkeleton::lbn          = m_WZphysD3PD->lbn;
 	analysisSkeleton::bcid         = m_WZphysD3PD->bcid;
-	analysisSkeleton::detmask0     = m_WZphysD3PD->detmask0;
-	analysisSkeleton::detmask1     = m_WZphysD3PD->detmask1;
-	analysisSkeleton::pixelFlags   = m_WZphysD3PD->pixelFlags;
-	analysisSkeleton::sctFlags     = m_WZphysD3PD->sctFlags;
-	analysisSkeleton::trtFlags     = m_WZphysD3PD->trtFlags;
-	analysisSkeleton::larFlags     = m_WZphysD3PD->larFlags;
-	analysisSkeleton::tileFlags    = m_WZphysD3PD->tileFlags;
-	analysisSkeleton::muonFlags    = m_WZphysD3PD->muonFlags;
-	analysisSkeleton::fwdFlags     = m_WZphysD3PD->fwdFlags;
-	analysisSkeleton::coreFlags    = m_WZphysD3PD->coreFlags;
-	analysisSkeleton::pixelError   = m_WZphysD3PD->pixelError;
-	analysisSkeleton::sctError     = m_WZphysD3PD->sctError;
-	analysisSkeleton::trtError     = m_WZphysD3PD->trtError;
-	analysisSkeleton::larError     = m_WZphysD3PD->larError;
-	analysisSkeleton::tileError    = m_WZphysD3PD->tileError;
-	analysisSkeleton::muonError    = m_WZphysD3PD->muonError;
-	analysisSkeleton::fwdError     = m_WZphysD3PD->fwdError;
-	analysisSkeleton::coreError    = m_WZphysD3PD->coreError;
 	
 	//////////////////////////////////////////////////////
 	// do this only if the run number has changed ////////
@@ -171,11 +155,9 @@ void analysis::setEventVariables()
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// L1 triggers
-	analysisSkeleton::L1_MU0  = m_WZphysD3PD->L1_MU0;
 	analysisSkeleton::L1_MU10 = m_WZphysD3PD->L1_MU10;
 	analysisSkeleton::L1_MU15 = m_WZphysD3PD->L1_MU15;
 	analysisSkeleton::L1_MU20 = m_WZphysD3PD->L1_MU20;
-	analysisSkeleton::L1_MU6  = m_WZphysD3PD->L1_MU6;
 	
 	// EF triggers
 	analysisSkeleton::EF_mu10 = m_WZphysD3PD->EF_mu10;
@@ -196,7 +178,6 @@ void analysis::setEventVariables()
 	analysisSkeleton::EF_mu20_NoAlg = m_WZphysD3PD->EF_mu20_NoAlg;
 	analysisSkeleton::EF_mu20_slow = m_WZphysD3PD->EF_mu20_slow;
 	analysisSkeleton::EF_mu30_MSonly = m_WZphysD3PD->EF_mu30_MSonly;
-	analysisSkeleton::EF_mu4 = m_WZphysD3PD->EF_mu4;
 	analysisSkeleton::EF_mu40_MSonly = m_WZphysD3PD->EF_mu40_MSonly;
 	
 	// vertexes (for the PV preselection)

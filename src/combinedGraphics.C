@@ -80,7 +80,7 @@ void combinedGraphics::initialize(string analysisSelector, string muonSelector)
 	mcProc2sigma.insert(   make_pair("Zmumu",855.25));
 	mcProc2br.insert(      make_pair("Zmumu",1.));
 	//mcProc2nevents.insert( make_pair("Zmumu",4985129));
-	mcProc2nevents.insert( make_pair("Zmumu",4979130));
+	mcProc2nevents.insert( make_pair("Zmumu",4979130)); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 	mcProc2geneff.insert(  make_pair("Zmumu",1.));
 	mcProc2kfactor.insert( make_pair("Zmumu",1.));
 	
@@ -200,7 +200,7 @@ void combinedGraphics::initialize(string analysisSelector, string muonSelector)
 	mcProc2br.insert(      make_pair("Zprime_mumu_SSM1000",1.));
 	mcProc2nevents.insert( make_pair("Zprime_mumu_SSM1000",18996));
 	mcProc2geneff.insert(  make_pair("Zprime_mumu_SSM1000",1.));
-	mcProc2kfactor.insert( make_pair("Zprime_mumu_SSM1000",1.25));
+	mcProc2kfactor.insert( make_pair("Zprime_mumu_SSM1000",1.25)); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 	//mcProc2kfactor.insert( make_pair("Zprime_mumu_SSM1000",1.));
 	mcProc2sigma.insert(   make_pair("Zprime_mumu_SSM1250",0.041544));
 	mcProc2br.insert(      make_pair("Zprime_mumu_SSM1250",1.));
@@ -225,8 +225,7 @@ void combinedGraphics::initialize(string analysisSelector, string muonSelector)
 
 	mcProc2sigma.insert(   make_pair("T1_McAtNlo_Jimmy",144.13));
 	mcProc2br.insert(      make_pair("T1_McAtNlo_Jimmy",1.));
-	//mcProc2nevents.insert( make_pair("T1_McAtNlo_Jimmy",997333));
-	mcProc2nevents.insert( make_pair("T1_McAtNlo_Jimmy",797472));
+	mcProc2nevents.insert( make_pair("T1_McAtNlo_Jimmy",997333));
 	mcProc2kfactor.insert( make_pair("T1_McAtNlo_Jimmy",1.09));
 	mcProc2geneff.insert(  make_pair("T1_McAtNlo_Jimmy",0.5558));
 	

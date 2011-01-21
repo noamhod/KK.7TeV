@@ -49,10 +49,10 @@ selection		19			1				pT						1				0.025
 #selection		104			0				msHits2noCSCphi			9				3.		 3.		 0.		0.		3.		1.		1.		2.		1.
 #selection		105			0				msHits3					7				3.		 3.		 0.		0.		3.		3.		1.
 #selection		106			0				msHits4					10				3.		 3.		 0.		0.		0.		1.		1.		1.		2.		1.
-selection		107			0				msHitsRel16				9				3.		 3.		 0.		0.		0.		3.		1.		3.		1.
+selection		110			0				msHitsRel16				9				3.		 3.		 0.		0.		0.		3.		1.		3.		1.
 #selection		108			0				idHits					3				4.		 1.		 6.
 #selection		109			0				idHitsMCPrel15			5				6.		 1.		 5.		1.9		0.9
-selection		110			0				idHitsRel16				8				0.		 1.		 2.		6.		1.		5.		0.9		1.9
+selection		107			0				idHitsRel16				8				0.		 1.		 2.		6.		1.		6.		0.9		1.9
 #selection		111			0				pTmatchingRatio			2				2.		 0.5
 #selection		112			0				pTmatchingAbsDiff		1				0.015
 

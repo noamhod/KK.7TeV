@@ -140,14 +140,31 @@ void graphicObjects::writeTrees(TDirectory* tDir_allCuts,
 								TDirectory* tDir_cutsProfile,
 								TDirectory* tDir_efficiency)
 {
-	tDir_allCuts->cd();
-	tree_allCuts->Write();
+	TFile* f = NULL;
 
-	tDir_cutsProfile->cd();
+	f = tree_allCuts->GetCurrentFile();
+	f->cd( tDir_allCuts->GetName() );
+	tree_allCuts->Write();
+	
+	f = tree_cutsProfile->GetCurrentFile();
+	f->cd( tDir_cutsProfile->GetName() );
 	tree_cutsProfile->Write();
 	
-	tDir_efficiency->cd();
+	f = tree_efficiency->GetCurrentFile();
+	f->cd( tDir_efficiency->GetName() );
 	tree_efficiency->Write();
+	
+	f->Write();
+	f->Close();
+	
+	//tDir_allCuts->cd();
+	//tree_allCuts->Write();
+
+	//tDir_cutsProfile->cd();
+	//tree_cutsProfile->Write();
+	
+	//tDir_efficiency->cd();
+	//tree_efficiency->Write();
 }
 
 void graphicObjects::setTrees(TDirectory* tDir_allCuts,

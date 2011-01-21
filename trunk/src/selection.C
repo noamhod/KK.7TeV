@@ -668,7 +668,7 @@ bool selection::nIDhitsRel16Cut(float expectBLayerHitCutVal, float nBLHitsCutVal
 	int nTRT = nTRTHits+nTRTOutliers;
 	if(fabs(eta)<etaAbsThreshold)
 	{
-		bool passedTRTsum = (nTRT > nTRThitsCutVal) ? true : false;
+		bool passedTRTsum = (nTRT >= nTRThitsCutVal) ? true : false;
 		bool passedTRTrat = ((float)nTRTOutliers < nTRTratioThreshold*(float)nTRT) ? true : false;
 		bool passedTRT = (passedTRTsum && passedTRTrat) ? true : false;
 		if(!passedTRT) return false;
@@ -868,12 +868,17 @@ bool selection::nMShitsRel16(float nMDTB_IMO_HitsCutVal, float nMDTE_IMO_HitsCut
 	bool passedMDTEM = (nMDTEMHits >= nMDTE_IMO_HitsCutVal) ? true : false;
 	bool passedMDTEO = (nMDTEOHits >= nMDTE_IMO_HitsCutVal) ? true : false;
 	bool passedCSC   = (nCSCEtaHits >= nCSCEtaHitsCutVal)   ? true : false;
+	/*
 	bool passedMDTCSC = ((passedMDTBI +
 						  passedMDTBM +
 						  passedMDTBO +
 						  (passedMDTEI||passedCSC) +
 						  passedMDTEM +
 						  passedMDTEO) >= nMDTCSCsumCutVal) ? true : false;
+	*/
+	bool passedMDTBarrel = ((passedMDTBI + passedMDTBM + passedMDTBO)              >= nMDTCSCsumCutVal) ? true : false;
+	bool passedMDTEndcap = (((passedMDTEI||passedCSC) + passedMDTEM + passedMDTEO) >= nMDTCSCsumCutVal) ? true : false;
+	bool passedMDTCSC = (passedMDTBarrel || passedMDTEndcap) ? true : false;
 	if(!passedMDTCSC) return false;
 	 
 	bool passedMDTBEE   = (nMDTBEEHits==nMDTBEEHitsCutVal) ? true : false;

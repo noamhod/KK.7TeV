@@ -169,8 +169,8 @@ void analysisSkeleton::runEventDumper()
 		
 		current_imass       = imass(pmu[muMinus],pmu[muPlus]);
 		current_cosTheta    = cosThetaCollinsSoper( pmu[muMinus], -1, pmu[muPlus], +1 );
-		current_mu_pT       = pT(mu_me_qoverp->at(muMinus),mu_me_theta->at(muMinus))*MeV2TeV;
-		current_muplus_pT   = pT(mu_me_qoverp->at(muPlus),mu_me_theta->at(muPlus))*MeV2TeV;
+		current_mu_pT       = mu_pt->at(muMinus)*MeV2TeV;//pT(mu_me_qoverp->at(muMinus),mu_me_theta->at(muMinus))*MeV2TeV;
+		current_muplus_pT   = mu_pt->at(muPlus)*MeV2TeV;//pT(mu_me_qoverp->at(muPlus),mu_me_theta->at(muPlus))*MeV2TeV;
 		current_mu_eta      = mu_eta->at(muMinus);
 		current_muplus_eta  = mu_eta->at(muPlus);
 		current_cosmicCosth = cosThetaDimu(pmu[muMinus],pmu[muPlus]);
@@ -179,7 +179,8 @@ void analysisSkeleton::runEventDumper()
 		setCurrentEventMass( imass(pmu[muMinus],pmu[muPlus]) );
 		writeEventHeader(RunNumber, lbn, EventNumber);
 		
-		writeProperty("$p_T$", pT(mu_me_qoverp->at(muMinus),mu_me_theta->at(muMinus))*MeV2TeV, pT(mu_me_qoverp->at(muPlus),mu_me_theta->at(muPlus))*MeV2TeV);
+		//writeProperty("$p_T$", pT(mu_me_qoverp->at(muMinus),mu_me_theta->at(muMinus))*MeV2TeV, pT(mu_me_qoverp->at(muPlus),mu_me_theta->at(muPlus))*MeV2TeV);
+		writeProperty("$p_T$", mu_pt->at(muMinus)*MeV2TeV, mu_pt->at(muPlus)*MeV2TeV);
 		writeProperty("$\\eta$", mu_eta->at(muMinus), mu_eta->at(muPlus));
 		
 		writeProperty("$\\sum{p_T^{cone20}}/p_T$", mu_ptcone20->at(muMinus)/mu_pt->at(muMinus), mu_ptcone20->at(muPlus)/mu_pt->at(muPlus));
@@ -211,11 +212,9 @@ void analysisSkeleton::printAllProperties(int ai, int bi, int iv)
 	printProperty("imass", imass(pmu[ai],pmu[bi]));
 	
 	// L1 triggers
-	printProperty("L1_MU0", L1_MU0);
 	printProperty("L1_MU10", L1_MU10);
 	printProperty("L1_MU15", L1_MU15);
 	printProperty("L1_MU20", L1_MU20);
-	printProperty("L1_MU6", L1_MU6);
 
 	// EF triggers
 	printProperty("EF_mu10", EF_mu10);
@@ -504,11 +503,16 @@ void analysisSkeleton::fillAfterCuts()
 	trackfitndof->push_back( mu_trackfitndof->at(muMinus) );
 	trackfitndof->push_back( mu_trackfitndof->at(muPlus) );
 	
-	/////////////////////////////////////////////////
-	// fill the all cuts tree ///////////////////////
-	tree_allCuts->Fill(); ///////////////////////////
-	/////////////////////////////////////////////////
-	/////////////////////////////////////////////////
+	/////////////////////////////////////////////////////
+	// fill the all cuts tree ///////////////////////////
+	tree_allCuts->Fill(); ///////////////////////////////
+	if(m_allCuts_counter%100==0) ////////////////////////
+	{                             ///////////////////////
+		tree_allCuts->FlushBaskets(); ///////////////////
+		tree_allCuts->Write("", TObject::kOverwrite); ///
+	} ///////////////////////////////////////////////////
+	m_allCuts_counter++; ////////////////////////////////
+	/////////////////////////////////////////////////////
 	
 	///////////////////////////////////////////////////////////////////////
 	// for the Afb calculation ////////////////////////////////////////////
@@ -552,7 +556,6 @@ void analysisSkeleton::fillBeforeCuts()
 
 void analysisSkeleton::fillCutFlow(string sorderedcutname, string sIsPreselection)
 {
-
 	/////////////////////////////////////////////////////////
 	// count the cut flow numbers ///////////////////////////
 	m_cutFlowNumbers->operator[](sorderedcutname)++; ////////
@@ -567,7 +570,7 @@ void analysisSkeleton::fillCutFlow(string sorderedcutname, string sIsPreselectio
 		if(values2fill.size()>0) values2fill.clear();
 		
 		current_imass    = imass(pmu[muMinus],pmu[muPlus]);
-		current_mu_pT    = pT(mu_me_qoverp->at(muMinus),mu_me_theta->at(muMinus))*MeV2TeV;
+		current_mu_pT    = mu_pt->at(muMinus)*MeV2TeV; //pT(mu_me_qoverp->at(muMinus),mu_me_theta->at(muMinus))*MeV2TeV;
 		current_cosTheta = cosThetaCollinsSoper( pmu[muMinus], -1, pmu[muPlus], +1 );
 		
 		///////////////////////////////////////////////////////////////////////
@@ -1226,42 +1229,42 @@ void analysisSkeleton::fillCutProfile2D()
 			}
 			else if(sname=="pTandEta_1")
 			{
-				float tmp = pT(mu_me_qoverp->at(ai)/MeV2TeV, mu_me_theta->at(ai));
+				float tmp = mu_pt->at(ai)*MeV2TeV;//pT(mu_me_qoverp->at(ai)/MeV2TeV, mu_me_theta->at(ai));
 				(*h2map_cutProfile)[sname]->Fill( tmp, mu_eta->at(ai) );
 				pT_profile->push_back( tmp ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				eta_profile->push_back( mu_eta->at(ai) ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			}
 			else if(sname=="pTandEta_2")
 			{
-				float tmp = pT(mu_me_qoverp->at(bi)/MeV2TeV, mu_me_theta->at(bi));
+				float tmp = mu_pt->at(bi)*MeV2TeV;//pT(mu_me_qoverp->at(bi)/MeV2TeV, mu_me_theta->at(bi));
 				(*h2map_cutProfile)[sname]->Fill( tmp, mu_eta->at(bi) );
 				pT_profile->push_back( tmp ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				eta_profile->push_back( mu_eta->at(bi) ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			}
 			else if(sname=="pTandEtaTight_1")
 			{
-				float tmp = pT(mu_me_qoverp->at(ai)/MeV2TeV, mu_me_theta->at(ai));
+				float tmp = mu_pt->at(ai)*MeV2TeV;//pT(mu_me_qoverp->at(ai)/MeV2TeV, mu_me_theta->at(ai));
 				(*h2map_cutProfile)[sname]->Fill( tmp, mu_eta->at(ai) );
 				pT_profile->push_back( tmp ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				etaTight_profile->push_back( mu_eta->at(ai) ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			}
 			else if(sname=="pTandEtaTight_2") 
 			{
-				float tmp = pT(mu_me_qoverp->at(bi)/MeV2TeV, mu_me_theta->at(bi));
+				float tmp = mu_pt->at(bi)*MeV2TeV;//pT(mu_me_qoverp->at(bi)/MeV2TeV, mu_me_theta->at(bi));
 				(*h2map_cutProfile)[sname]->Fill( tmp, mu_eta->at(bi) );
 				pT_profile->push_back( tmp ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				etaTight_profile->push_back( mu_eta->at(bi) ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			}
 			else if(sname=="pTandEtaBarrel_1")
 			{
-				float tmp = pT(mu_me_qoverp->at(ai)/MeV2TeV, mu_me_theta->at(ai));
+				float tmp = mu_pt->at(ai)*MeV2TeV;//pT(mu_me_qoverp->at(ai)/MeV2TeV, mu_me_theta->at(ai));
 				(*h2map_cutProfile)[sname]->Fill( tmp, mu_eta->at(ai) );
 				pT_profile->push_back( tmp ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				etaBarrel_profile->push_back( mu_eta->at(ai) ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			}
 			else if(sname=="pTandEtaBarrel_2")
 			{
-				float tmp = pT(mu_me_qoverp->at(bi)/MeV2TeV, mu_me_theta->at(bi));
+				float tmp = mu_pt->at(bi)*MeV2TeV;//pT(mu_me_qoverp->at(bi)/MeV2TeV, mu_me_theta->at(bi));
 				(*h2map_cutProfile)[sname]->Fill( tmp, mu_eta->at(bi) );
 				pT_profile->push_back( tmp ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				etaBarrel_profile->push_back( mu_eta->at(bi) ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1307,10 +1310,16 @@ void analysisSkeleton::fillCutProfile()
 	
 	fillCutProfile2D();
 	
-	/////////////////////////////////
-	// fill the cut profile tree ////
-	tree_cutsProfile->Fill(); ///////
-	/////////////////////////////////
+	/////////////////////////////////////////////////////////
+	// fill the cut profile tree ////////////////////////////
+	tree_cutsProfile->Fill(); ///////////////////////////////
+	if(m_cutsProfile_counter%100==0) ////////////////////////
+	{                                ////////////////////////
+		tree_cutsProfile->FlushBaskets(); ///////////////////
+		tree_cutsProfile->Write("", TObject::kOverwrite); ///
+	} ///////////////////////////////////////////////////////
+	m_cutsProfile_counter++; ////////////////////////////////
+	/////////////////////////////////////////////////////////
 }
 
 void analysisSkeleton::fill_tNp()
@@ -1545,10 +1554,16 @@ void analysisSkeleton::applyTagNProbe(TMapsb& cutsToSkip, bool isMC)
 		if(isMC) fillTruthEfficiency(); /////////
 		/////////////////////////////////////////
 		
-		///////////////////////////////////
-		// fill the efficiency tree ///////
-		tree_efficiency->Fill(); //////////
-		///////////////////////////////////
+		////////////////////////////////////////////////////////
+		// fill the efficiency tree ////////////////////////////
+		tree_efficiency->Fill(); ///////////////////////////////
+		if(m_efficiency_counter%100==0) ////////////////////////
+		{                               ////////////////////////
+			tree_efficiency->FlushBaskets(); ///////////////////
+			tree_efficiency->Write("", TObject::kOverwrite); ///
+		} //////////////////////////////////////////////////////
+		m_efficiency_counter++; ////////////////////////////////
+		////////////////////////////////////////////////////////
 	}
 }
 
@@ -1606,11 +1621,6 @@ bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 		if(sorderedcutname=="GRL"  &&  !bSkipCut)
 		{
 			passCurrentCut = ( isGRLCut((*m_cutFlowMapSVD)[sorderedcutname][0], isGRL) ) ? true : false;
-		}
-
-		else if(sorderedcutname=="L1_MU6"  &&  !bSkipCut)
-		{
-			passCurrentCut = ( isL1_MU6Cut((*m_cutFlowMapSVD)[sorderedcutname][0], L1_MU6) ) ? true : false;
 		}
 		
 		else if(sorderedcutname=="Trigger"  &&  !bSkipCut)
@@ -2125,10 +2135,9 @@ bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
+				thisMuPass = ( isolationXXCut((*m_cutFlowMapSVD)[sorderedcutname][0],"isolation30",mu_pt->at(mu), mu_ptcone30->at(mu)) ) ? true : false;
 				//thisMuPass = ( isolationXXCut((*m_cutFlowMapSVD)[sorderedcutname][0],"isolation30",
-				//mu_pt->at(mu), mu_ptcone30->at(mu)) ) ? true : false;
-				thisMuPass = ( isolationXXCut((*m_cutFlowMapSVD)[sorderedcutname][0],"isolation30",
-				mu_me_qoverp->at(mu), mu_me_theta->at(mu), mu_ptcone30->at(mu)) ) ? true : false;
+				//mu_me_qoverp->at(mu), mu_me_theta->at(mu), mu_ptcone30->at(mu)) ) ? true : false;
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
 			}

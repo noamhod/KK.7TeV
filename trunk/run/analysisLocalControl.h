@@ -69,6 +69,9 @@ class analysisLocalControl : public chainMaker, public utilities
 	public:
 		analysisLocalControl();
 		~analysisLocalControl();
+		
+		void GetEntryMinimal(Long64_t entry);
+		
 		void setRunControl(string localRunControlFile);
 		void initialize(int runNumber = 0, string localRunControlFile = "localRunControl_noSkim.txt");
 		void finalize();
@@ -80,10 +83,6 @@ class analysisLocalControl : public chainMaker, public utilities
 		void loop(Long64_t startEvent = 0, Long64_t stopAfterNevents = kMaxLong64);
 		void loop(int runNumber);
 		void loop(string sPeriodStart, string sPeriodEnd, Long64_t l64t_initialGuess);
-		
-		void getCandidates(string sFilePath);
-		bool matchCandidates();
-		void loopCandidates();
 
 	private:
 };

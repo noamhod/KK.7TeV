@@ -63,6 +63,40 @@ bool WZphysD3PDmaker::passPTskim(float pTthreshold) // at least one mu(staco/mui
 	////////////////////////////
 }
 
+bool WZphysD3PDmaker::passNPTCBskim(int N, float pTthreshold) // at least one mu(staco/muid) with pT>pTthreshold
+{
+	// less than 1 mu staco and muid
+	if(m_WZphysD3PD->mu_staco_n<2  &&  m_WZphysD3PD->mu_muid_n<2) return false;
+	
+	int nstaco = 0;
+	int nmuid  = 0;
+	
+	// if at least one CB mu_staco pT>pTthreshold
+	for(int m=0 ; m<(int)m_WZphysD3PD->mu_staco_n ; m++)
+	{
+		//float pt = fabs(kin.pT(m_WZphysD3PD->mu_staco_me_qoverp->at(m), m_WZphysD3PD->mu_staco_me_theta->at(m)))*MeV2GeV;
+		float pt   = fabs(m_WZphysD3PD->mu_staco_pt->at(m))*MeV2GeV;
+		int   isCB = m_WZphysD3PD->mu_staco_isCombinedMuon->at(m);
+		if( pt>pTthreshold && isCB ) nstaco++;
+		
+	}
+	if(nstaco>=N) return true;
+	
+	// if at least one CB mu_muid pT>pTthreshold
+	for(int m=0 ; m<(int)m_WZphysD3PD->mu_muid_n ; m++)
+	{
+		//float pt = fabs(kin.pT(m_WZphysD3PD->mu_muid_me_qoverp->at(m), m_WZphysD3PD->mu_muid_me_theta->at(m)))*MeV2GeV;
+		float pt   = fabs(m_WZphysD3PD->mu_muid_pt->at(m))*MeV2GeV;
+		int   isCB = m_WZphysD3PD->mu_muid_isCombinedMuon->at(m);
+		if( pt>pTthreshold && isCB ) nmuid++;
+	}
+	if(nmuid>=N) return true;
+	
+	////////////////////////////
+	return false; //////////////
+	////////////////////////////
+}
+
 bool WZphysD3PDmaker::passPTCBskim(float pTthreshold) // at least one CB mu(staco/muid) with pT>pTthreshold
 {
 	// less than 1 mu staco and muid

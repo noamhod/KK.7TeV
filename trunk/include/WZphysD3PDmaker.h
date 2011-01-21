@@ -1668,6 +1668,7 @@ public:
 	~WZphysD3PDmaker();
 	
 	bool passPTskim(float pTthreshold);
+	bool passNPTCBskim(int N, float pTthreshold);
 	bool passPTCBskim(float pTthreshold);
 	bool passCBskim();
 	

@@ -67,4 +67,9 @@ source panda_run.sh	mc	107692		group10.phys-sm.mc10_7TeV.107691.AlpgenJimmyWmunu
 source panda_run.sh	mc	107693		group10.phys-sm.mc10_7TeV.107692.AlpgenJimmyWmunuNp2_pt20.merge.AOD.e600_s933_s946_r1831_r1700.WZphys.101222.01.D3PD/
 source panda_run.sh	mc	107694		group10.phys-sm.mc10_7TeV.107693.AlpgenJimmyWmunuNp3_pt20.merge.AOD.e600_s933_s946_r1831_r1700.WZphys.101222.01.D3PD/
 source panda_run.sh	mc	107695		group10.phys-sm.mc10_7TeV.107694.AlpgenJimmyWmunuNp4_pt20.merge.AOD.e600_s933_s946_r1831_r1700.WZphys.101222.01.D3PD/
-source panda_run.sh	mc	107696		group10.phys-sm.mc10_7TeV.107695.AlpgenJimmyWmunuNp5_pt20.merge.AOD.e600_s933_s946_r1831_r1700.WZphys.101222.01.D3PD/	
+source panda_run.sh	mc	107696		group10.phys-sm.mc10_7TeV.107695.AlpgenJimmyWmunuNp5_pt20.merge.AOD.e600_s933_s946_r1831_r1700.WZphys.101222.01.D3PD/
+
+source panda_run.sh     mc      115374          group10.phys-sm.mc10_7TeV.115374.TTbar_McAtNlo_Jimmy_2mu15_30M150.merge.AOD.e643_s933_s946_r1831_r1700.WZphys.101222.04.D3PD/
+source panda_run.sh     mc      115375          group10.phys-sm.mc10_7TeV.115375.TTbar_McAtNlo_Jimmy_2mu15_150M300.merge.AOD.e643_s933_s946_r1831_r1700.WZphys.101222.04.D3PD/
+source panda_run.sh     mc      115376          group10.phys-sm.mc10_7TeV.115376.TTbar_McAtNlo_Jimmy_2mu15_300M450.merge.AOD.e643_s933_s946_r1831_r1700.WZphys.101222.06.D3PD/
+source panda_run.sh     mc      115377          group10.phys-sm.mc10_7TeV.115377.TTbar_McAtNlo_Jimmy_2mu15_M450.merge.AOD.e643_s933_s946_r1831_r1700.WZphys.101222.06.D3PD/

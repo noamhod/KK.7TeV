@@ -69,6 +69,7 @@ public:
 
 		if(m_treeFile!=NULL) m_WZphysD3PDmaker  = new WZphysD3PDmaker( m_WZphysD3PD, sRunType, m_isMC, m_treeFile );
 		
+		m_trees_counter_mod   = 1000; 
 		m_allCuts_counter     = 0;
 		m_cutsProfile_counter = 0;
 		m_efficiency_counter  = 0;

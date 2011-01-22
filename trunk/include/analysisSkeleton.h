@@ -57,6 +57,7 @@ public:
 	
 	
 	// counter local
+	int m_trees_counter_mod;
 	int m_allCuts_counter;
 	int m_cutsProfile_counter;
 	int m_efficiency_counter;

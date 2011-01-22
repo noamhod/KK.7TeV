@@ -12,28 +12,28 @@ kinematics::kinematics() {}
 
 kinematics::~kinematics() {}
 
-float kinematics::imass( TLorentzVector* pa, TLorentzVector* pb )
+inline float kinematics::imass( TLorentzVector* pa, TLorentzVector* pb )
 {
 	m_pTmp = (*pa)+(*pb);
 	return m_pTmp.M();
 }
 
-float kinematics::pT( TLorentzVector* p )
+inline float kinematics::pT( TLorentzVector* p )
 {
 	return p->Perp();
 }
 
-float kinematics::pT( float qOp, float theta )
+inline float kinematics::pT( float qOp, float theta )
 { 
 	return (qOp!=0) ? fabs(1./qOp)*sin(theta) : 0.;
 }
 
-float kinematics::eta( TLorentzVector* p )
+inline float kinematics::eta( TLorentzVector* p )
 {
 	return p->PseudoRapidity();
 }
 
-float kinematics::dR( TLorentzVector* pa, TLorentzVector* pb )
+inline float kinematics::dR( TLorentzVector* pa, TLorentzVector* pb )
 {
 	pa = NULL;
 	pb = NULL;
@@ -41,12 +41,12 @@ float kinematics::dR( TLorentzVector* pa, TLorentzVector* pb )
 	return 0.;
 }
 
-float kinematics::pAbs( TLorentzVector* p )
+inline float kinematics::pAbs( TLorentzVector* p )
 {       
 	return p->Mag();
 }       
 
-float kinematics::cosThetaDimu( TLorentzVector* pa, TLorentzVector* pb )
+inline float kinematics::cosThetaDimu( TLorentzVector* pa, TLorentzVector* pb )
 {
 	float paMag = sqrt( pa->Px()*pa->Px() + pa->Py()*pa->Py() + pa->Pz()*pa->Pz() );
 	float pbMag = sqrt( pb->Px()*pb->Px() + pb->Py()*pb->Py() + pb->Pz()*pb->Pz() );	
@@ -54,25 +54,25 @@ float kinematics::cosThetaDimu( TLorentzVector* pa, TLorentzVector* pb )
 	return costh;
 }
 
-float kinematics::QT( TLorentzVector* pa, TLorentzVector* pb )
+inline float kinematics::QT( TLorentzVector* pa, TLorentzVector* pb )
 {
 	m_pTmp = (*pa)+(*pb);
 	return m_pTmp.Perp();
 }       
 
-float kinematics::y( TLorentzVector* p )
+inline float kinematics::y( TLorentzVector* p )
 {       
 	return p->Rapidity();
 }       
 
-float kinematics::ySystem( TLorentzVector* pa, TLorentzVector* pb )
+inline float kinematics::ySystem( TLorentzVector* pa, TLorentzVector* pb )
 {
 	m_pTmp = (*pa)+(*pb);
 	return m_pTmp.Rapidity();
 }
 
 
-float kinematics::cosThetaBoost( TLorentzVector* pa, float ca,
+inline float kinematics::cosThetaBoost( TLorentzVector* pa, float ca,
 								 TLorentzVector* pb, float cb )
 {
 	// http://xrootd.slac.stanford.edu/BFROOT/www/doc/workbook_backup_010108/analysis/analysis.html
@@ -94,7 +94,7 @@ float kinematics::cosThetaBoost( TLorentzVector* pa, float ca,
 	return cosThetaB;
 }
 
-float kinematics::cosThetaCollinsSoper( TLorentzVector* pa, float ca,
+inline float kinematics::cosThetaCollinsSoper( TLorentzVector* pa, float ca,
 										TLorentzVector* pb, float cb )
 {
 	// this will work only for leptons e, mu and tau

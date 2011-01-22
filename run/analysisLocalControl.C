@@ -339,7 +339,7 @@ void analysisLocalControl::loop(int runNumber)
 		{
 			////////////////////////////////////////////
 			// read only the minimal set of branches ///
-			GetEntryMinimal(l64t_jentry); //////////////
+			GetEntryMinimal(l64t_ientry); //////////////
 			////////////////////////////////////////////
 		}
 		
@@ -435,7 +435,7 @@ void analysisLocalControl::loop(string sPeriodStart, string sPeriodEnd, Long64_t
 		{
 			////////////////////////////////////////////
 			// read only the minimal set of branches ///
-			GetEntryMinimal(l64t_jmid); //////////////
+			GetEntryMinimal(l64t_imid); //////////////
 			////////////////////////////////////////////
 		}
 		
@@ -475,7 +475,7 @@ void analysisLocalControl::loop(string sPeriodStart, string sPeriodEnd, Long64_t
 		{
 			////////////////////////////////////////////
 			// read only the minimal set of branches ///
-			GetEntryMinimal(l64t_jentry); //////////////
+			GetEntryMinimal(l64t_ientry); //////////////
 			////////////////////////////////////////////
 		}
 		

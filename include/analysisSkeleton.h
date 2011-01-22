@@ -552,21 +552,21 @@ public:
 	void fillCutProfile();
 	
 	//void fillTagNProbe();
-	void fill_tNp();
-	void fillTruthEfficiency();
+	inline void fill_tNp();
+	inline void fillTruthEfficiency();
 	
 	void applyTagNProbe(TMapsb& cutsToSkip, bool isMC);
 
 private:
 	void runEventDumper();
 	
-	bool preselection(TMapsb& cutsToSkip);
-	bool singleSelection(TMapsb& cutsToSkip);
-	bool doubleSelection(TMapsb& cutsToSkip);
-	
 	bool preselection(string sSkipCut);
 	bool singleSelection(string sSkipCut);
 	bool doubleSelection(string sSkipCut);
+	
+	inline bool preselection(TMapsb& cutsToSkip);
+	inline bool singleSelection(TMapsb& cutsToSkip);
+	inline bool doubleSelection(TMapsb& cutsToSkip);
 	
 	void fillAfterCuts();
 	void fillBeforeCuts();

@@ -13,27 +13,26 @@
 class kinematics
 {
 	public:
-		// utilities
 		TLorentzVector m_pTmp;
 		
 	public:
 		kinematics();
 		~kinematics();
 		
-		float pT(   TLorentzVector* p );
-		float pT(   float qOp, float theta);
-		float eta(  TLorentzVector* p );
-		float pAbs( TLorentzVector* p );
-		float y(    TLorentzVector* p );
+		inline float pT(   TLorentzVector* p );
+		inline float pT(   float qOp, float theta);
+		inline float eta(  TLorentzVector* p );
+		inline float pAbs( TLorentzVector* p );
+		inline float y(    TLorentzVector* p );
 
-		float cosThetaDimu(         TLorentzVector* pa, TLorentzVector* pb );
-		float dR(                   TLorentzVector* pa, TLorentzVector* pb );
-		float imass(                TLorentzVector* pa, TLorentzVector* pb );
-		float QT(                   TLorentzVector* pa, TLorentzVector* pb );
-		float ySystem(              TLorentzVector* pa, TLorentzVector* pb );
-		float cosThetaCollinsSoper( TLorentzVector* pa, float ca,
-									TLorentzVector* pb, float cb );
-		float cosThetaBoost( 		TLorentzVector* pa, float ca,
+		inline float cosThetaDimu(         TLorentzVector* pa, TLorentzVector* pb );
+		inline float dR(                   TLorentzVector* pa, TLorentzVector* pb );
+		inline float imass(                TLorentzVector* pa, TLorentzVector* pb );
+		inline float QT(                   TLorentzVector* pa, TLorentzVector* pb );
+		inline float ySystem(              TLorentzVector* pa, TLorentzVector* pb );
+		inline float cosThetaCollinsSoper( TLorentzVector* pa, float ca,
+										   TLorentzVector* pb, float cb );
+		inline float cosThetaBoost( TLorentzVector* pa, float ca,
 									TLorentzVector* pb, float cb );
 
 	private:

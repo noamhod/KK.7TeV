@@ -1590,7 +1590,7 @@ bool analysisSkeleton::doubleSelection(string sSkipCut)
 	return doubleSelection(cutsToSkip);
 }
 
-bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
+inline bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 {
 	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;
 	TMapsb::iterator itrEnd = cutsToSkip.end();
@@ -1674,7 +1674,7 @@ bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 	return passCutFlow;
 }
 
-bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
+inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 {
 	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;
 	TMapsb::iterator itrEnd = cutsToSkip.end();
@@ -2185,7 +2185,7 @@ bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 	return passCutFlow;
 }
 
-bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
+inline bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
 {
 	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;
 	TMapsb::iterator itrEnd = cutsToSkip.end();

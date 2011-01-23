@@ -28,7 +28,7 @@ public:
 	WZphysD3PDmaker* m_WZphysD3PDmaker;
 	TFile*		     m_treeFile;
 	
-	//ofstream* f;
+	ofstream* fCandidates;
 	
 	// local
 	string sRunType;
@@ -83,7 +83,7 @@ public:
 		n4mu = 0;
 		nNmu = 0;
 		
-		//f = new ofstream("trig.txt");
+		if(!m_isMC) fCandidates = new ofstream("candidates.txt");
 	}
 	~analysis();
 

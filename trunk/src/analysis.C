@@ -14,7 +14,7 @@ analysis::analysis()
 
 analysis::~analysis()
 {
-
+	if(!m_isMC) fCandidates->close();
 }
 
 void analysis::execute()
@@ -129,6 +129,12 @@ void analysis::execute()
 	bool pass2MUselection = applyDoubleMuonSelection(m_isMC); ////
 	if( !pass2MUselection ) return; //////////////////////////////
 	//////////////////////////////////////////////////////////////
+	
+	if(!m_isMC) (*fCandidates)	<< "Run-LB-Evt  "
+								<< analysisSkeleton::RunNumber	 << " "
+								<< analysisSkeleton::lbn 		 << " "
+								<< analysisSkeleton::EventNumber
+								<< endl;
 }
 
 void analysis::setEventVariables()

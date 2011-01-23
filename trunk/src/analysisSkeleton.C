@@ -1073,17 +1073,20 @@ void analysisSkeleton::fillCutFlow(string sorderedcutname, string sIsPreselectio
 	m_cutFlowNumbers->operator[](sorderedcutname)++; ////////
 	/////////////////////////////////////////////////////////
 
+	/////////////////////////////////
+	// THIS IS DEPRECATED !!!! //////
+	/////////////////////////////////
 	int muSize = (int)mu_pt->size();
 	if(sIsPreselection != "preselection"  &&  muSize==2)
 	{
 		//int lead_mu = (mu_charge->at(0)<0) ? 0 : 1;
 		//int sublead_mu  = (mu_charge->at(0)>0) ? 0 : 1;
-		int lead_mu     = ai;
-		int sublead_mu  = bi;
-		if( mu_pt->at(ai) < mu_pt->at(bi) )
+		int lead_mu     = 0;
+		int sublead_mu  = 1;
+		if( mu_pt->at(0) < mu_pt->at(1) )
 		{
-			lead_mu     = bi;
-			sublead_mu  = ai;
+			lead_mu     = 1;
+			sublead_mu  = 0;
 		}
 
 		if(values2fill.size()>0) values2fill.clear();
@@ -2390,11 +2393,9 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
-				cout << "before: run=" << RunNumber << ", evt=" << EventNumber << ": mu/muSize=" << mu+1 << "/" << muSize << endl;
 				thisMuPass = ( isCombMuCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_isCombinedMuon->at(mu)) ) ? true : false;
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
-				cout << "after run=" << RunNumber << ", evt=" << EventNumber << ": mu/muSize=" << mu+1 << "/" << muSize << endl;
 			}
 		}
 		
@@ -2699,12 +2700,7 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 		
 		////////////////////////////////////////////////////////////////////////
 		// cutFlow /////////////////////////////////////////////////////////////
-		if(passCutFlow  &&  !isSkippedCut)
-		{
-			cout << "before fill" << endl;
-			fillCutFlow(sorderedcutname); ///////
-			cout << "after fill" << endl;
-		}
+		if(passCutFlow  &&  !isSkippedCut) fillCutFlow(sorderedcutname); ///////
 		////////////////////////////////////////////////////////////////////////
 		
 	} // end for(m_cutFlowOrdered)

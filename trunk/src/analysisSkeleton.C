@@ -164,37 +164,44 @@ void analysisSkeleton::runEventDumper()
 	// write the interesting events to a flat file ///////////////////////////////////////////////
 	if(doEventDump)
 	{
-		int muMinus = (mu_charge->at(ai)<0) ? ai : bi;
-		int muPlus  = (mu_charge->at(ai)>0) ? ai : bi;
+		//int lead_mu = (mu_charge->at(ai)<0) ? ai : bi;
+		//int sublead_mu  = (mu_charge->at(ai)>0) ? ai : bi;
+		int lead_mu     = ai;
+		int sublead_mu  = bi;
+		if( mu_pt->at(ai) < mu_pt->at(bi) )
+		{
+			lead_mu     = bi;
+			sublead_mu  = ai;
+		}
 		
-		current_imass       = imass(pmu[muMinus],pmu[muPlus]);
-		current_cosTheta    = cosThetaCollinsSoper( pmu[muMinus], -1, pmu[muPlus], +1 );
-		current_mu_pT       = mu_pt->at(muMinus)*MeV2TeV;//pT(mu_me_qoverp->at(muMinus),mu_me_theta->at(muMinus))*MeV2TeV;
-		current_muplus_pT   = mu_pt->at(muPlus)*MeV2TeV;//pT(mu_me_qoverp->at(muPlus),mu_me_theta->at(muPlus))*MeV2TeV;
-		current_mu_eta      = mu_eta->at(muMinus);
-		current_muplus_eta  = mu_eta->at(muPlus);
-		current_cosmicCosth = cosThetaDimu(pmu[muMinus],pmu[muPlus]);
+		current_imass       = imass(pmu[lead_mu],pmu[sublead_mu]);
+		current_cosTheta    = cosThetaCollinsSoper( pmu[lead_mu], -1, pmu[sublead_mu], +1 );
+		current_mu_pT       = mu_pt->at(lead_mu)*MeV2TeV;//pT(mu_me_qoverp->at(lead_mu),mu_me_theta->at(lead_mu))*MeV2TeV;
+		current_muplus_pT   = mu_pt->at(sublead_mu)*MeV2TeV;//pT(mu_me_qoverp->at(sublead_mu),mu_me_theta->at(sublead_mu))*MeV2TeV;
+		current_mu_eta      = mu_eta->at(lead_mu);
+		current_muplus_eta  = mu_eta->at(sublead_mu);
+		current_cosmicCosth = cosThetaDimu(pmu[lead_mu],pmu[sublead_mu]);
 		current_etaSum      = current_muplus_eta + current_mu_eta;
 		
-		setCurrentEventMass( imass(pmu[muMinus],pmu[muPlus]) );
+		setCurrentEventMass( imass(pmu[lead_mu],pmu[sublead_mu]) );
 		writeEventHeader(RunNumber, lbn, EventNumber);
 		
-		//writeProperty("$p_T$", pT(mu_me_qoverp->at(muMinus),mu_me_theta->at(muMinus))*MeV2TeV, pT(mu_me_qoverp->at(muPlus),mu_me_theta->at(muPlus))*MeV2TeV);
-		writeProperty("$p_T$", mu_pt->at(muMinus)*MeV2TeV, mu_pt->at(muPlus)*MeV2TeV);
-		writeProperty("$\\eta$", mu_eta->at(muMinus), mu_eta->at(muPlus));
+		//writeProperty("$p_T$", pT(mu_me_qoverp->at(lead_mu),mu_me_theta->at(lead_mu))*MeV2TeV, pT(mu_me_qoverp->at(sublead_mu),mu_me_theta->at(sublead_mu))*MeV2TeV);
+		writeProperty("$p_T$", mu_pt->at(lead_mu)*MeV2TeV, mu_pt->at(sublead_mu)*MeV2TeV);
+		writeProperty("$\\eta$", mu_eta->at(lead_mu), mu_eta->at(sublead_mu));
 		
-		writeProperty("$\\sum{p_T^{cone20}}/p_T$", mu_ptcone20->at(muMinus)/mu_pt->at(muMinus), mu_ptcone20->at(muPlus)/mu_pt->at(muPlus));
-		writeProperty("$\\sum{p_T^{cone30}}/p_T$", mu_ptcone30->at(muMinus)/mu_pt->at(muMinus), mu_ptcone30->at(muPlus)/mu_pt->at(muPlus));
-		writeProperty("$\\sum{p_T^{cone40}}/p_T$", mu_ptcone40->at(muMinus)/mu_pt->at(muMinus), mu_ptcone40->at(muPlus)/mu_pt->at(muPlus));
+		writeProperty("$\\sum{p_T^{cone20}}/p_T$", mu_ptcone20->at(lead_mu)/mu_pt->at(lead_mu), mu_ptcone20->at(sublead_mu)/mu_pt->at(sublead_mu));
+		writeProperty("$\\sum{p_T^{cone30}}/p_T$", mu_ptcone30->at(lead_mu)/mu_pt->at(lead_mu), mu_ptcone30->at(sublead_mu)/mu_pt->at(sublead_mu));
+		writeProperty("$\\sum{p_T^{cone40}}/p_T$", mu_ptcone40->at(lead_mu)/mu_pt->at(lead_mu), mu_ptcone40->at(sublead_mu)/mu_pt->at(sublead_mu));
 		
-		writeProperty("nSCThits", mu_nSCTHits->at(muMinus), mu_nSCTHits->at(muPlus));
-		writeProperty("nPIXhits", mu_nPixHits->at(muMinus), mu_nPixHits->at(muPlus));
-		writeProperty("nIDhits ", mu_nSCTHits->at(muMinus)+mu_nPixHits->at(muMinus), mu_nSCTHits->at(muPlus)+mu_nPixHits->at(muPlus));
+		writeProperty("nSCThits", mu_nSCTHits->at(lead_mu), mu_nSCTHits->at(sublead_mu));
+		writeProperty("nPIXhits", mu_nPixHits->at(lead_mu), mu_nPixHits->at(sublead_mu));
+		writeProperty("nIDhits ", mu_nSCTHits->at(lead_mu)+mu_nPixHits->at(lead_mu), mu_nSCTHits->at(sublead_mu)+mu_nPixHits->at(sublead_mu));
 		
-		writeProperty("$\\hat{m}_{\\mu\\mu}$", "red", imass(pmu[muMinus],pmu[muPlus]));
+		writeProperty("$\\hat{m}_{\\mu\\mu}$", "red", imass(pmu[lead_mu],pmu[sublead_mu]));
 		writeProperty("$\\sum{\\eta_{\\mu}}$", "red", current_muplus_eta + current_mu_eta);
-		writeProperty("$\\hat{p}_{\\mu^-}\\cdot\\hat{p}_{\\mu^+}$", cosThetaDimu(pmu[muMinus],pmu[muPlus]));
-		writeProperty("$\\cos\\theta_{\\mu^-}$", cosThetaCollinsSoper( pmu[muMinus], -1, pmu[muPlus], +1 ));
+		writeProperty("$\\hat{p}_{\\mu^-}\\cdot\\hat{p}_{\\mu^+}$", cosThetaDimu(pmu[lead_mu],pmu[sublead_mu]));
+		writeProperty("$\\cos\\theta_{\\mu^-}$", cosThetaCollinsSoper( pmu[lead_mu], -1, pmu[sublead_mu], +1 ));
 		
 		
 		writeEventFooter();
@@ -365,40 +372,48 @@ void analysisSkeleton::printAllProperties(int ai, int bi, int iv)
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 
-void analysisSkeleton::fillAfterCuts()
+void analysisSkeleton::fillAfterCuts(bool isMC)
 {
 	///////////////////////////////////////////////////////////
 	// fill the "allCuts" histograms only after the last cut 
 	// for the final histograms:
 	// i.e., not the curFlow histos
 	
-	int muMinus = (mu_charge->at(ai)<0) ? ai : bi;
-	int muPlus  = (mu_charge->at(ai)>0) ? ai : bi;
+	//int lead_mu = (mu_charge->at(ai)<0) ? ai : bi;
+	//int sublead_mu  = (mu_charge->at(ai)>0) ? ai : bi;
+	int lead_mu     = ai;
+	int sublead_mu  = bi;
+	if( mu_pt->at(ai) < mu_pt->at(bi) )
+	{
+		lead_mu     = bi;
+		sublead_mu  = ai;
+	}	
+
+
+	current_mu_me_pT     = pT(mu_me_qoverp->at(lead_mu),mu_me_theta->at(lead_mu))*MeV2TeV;
+	current_muplus_me_pT = pT(mu_me_qoverp->at(sublead_mu),mu_me_theta->at(sublead_mu))*MeV2TeV;
+	current_mu_id_pT     = pT(mu_id_qoverp->at(lead_mu),mu_id_theta->at(lead_mu))*MeV2TeV;
+	current_muplus_id_pT = pT(mu_id_qoverp->at(sublead_mu),mu_id_theta->at(sublead_mu))*MeV2TeV;
+	current_mu_pT        = mu_pt->at(lead_mu)*MeV2TeV;
+	current_muplus_pT    = mu_pt->at(sublead_mu)*MeV2TeV;
+	current_mu_eta       = mu_eta->at(lead_mu);
+	current_muplus_eta   = mu_eta->at(sublead_mu);
+	current_mu_me_qop    = mu_me_qoverp->at(lead_mu)*MeV2TeV;
+	current_muplus_me_qop = mu_me_qoverp->at(sublead_mu)*MeV2TeV;
+	current_mu_id_qop     = mu_id_qoverp->at(lead_mu)*MeV2TeV;
+	current_muplus_id_qop = mu_me_qoverp->at(sublead_mu)*MeV2TeV;
+	current_mu_me_theta     = mu_me_theta->at(lead_mu);
+	current_muplus_me_theta = mu_me_theta->at(sublead_mu);;
+	current_mu_id_theta     = mu_id_theta->at(lead_mu);;
+	current_muplus_id_theta = mu_id_theta->at(sublead_mu);;
 	
-	current_mu_me_pT     = pT(mu_me_qoverp->at(muMinus),mu_me_theta->at(muMinus))*MeV2TeV;
-	current_muplus_me_pT = pT(mu_me_qoverp->at(muPlus),mu_me_theta->at(muPlus))*MeV2TeV;
-	current_mu_id_pT     = pT(mu_id_qoverp->at(muMinus),mu_id_theta->at(muMinus))*MeV2TeV;
-	current_muplus_id_pT = pT(mu_id_qoverp->at(muPlus),mu_id_theta->at(muPlus))*MeV2TeV;
-	current_mu_pT        = mu_pt->at(muMinus)*MeV2TeV;
-	current_muplus_pT    = mu_pt->at(muPlus)*MeV2TeV;
-	current_mu_eta       = mu_eta->at(muMinus);
-	current_muplus_eta   = mu_eta->at(muPlus);
-	current_mu_me_qop    = mu_me_qoverp->at(muMinus)*MeV2TeV;
-	current_muplus_me_qop = mu_me_qoverp->at(muPlus)*MeV2TeV;
-	current_mu_id_qop     = mu_id_qoverp->at(muMinus)*MeV2TeV;
-	current_muplus_id_qop = mu_me_qoverp->at(muPlus)*MeV2TeV;
-	current_mu_me_theta     = mu_me_theta->at(muMinus);
-	current_muplus_me_theta = mu_me_theta->at(muPlus);;
-	current_mu_id_theta     = mu_id_theta->at(muMinus);;
-	current_muplus_id_theta = mu_id_theta->at(muPlus);;
-	
-	current_imass       = imass(pmu[muMinus],pmu[muPlus]);
-	current_cosTheta    = cosThetaCollinsSoper( pmu[muMinus], -1, pmu[muPlus], +1 );
-	current_cosThetaCS  = cosThetaCollinsSoper( pmu[muMinus], -1, pmu[muPlus], +1 );
-	current_cosThetaHE  = cosThetaBoost( pmu[muMinus], -1, pmu[muPlus], +1 );
-	current_ySystem     = ySystem( pmu[muMinus], pmu[muPlus] );
-	current_QT          = QT( pmu[muMinus], pmu[muPlus] );
-	current_cosmicCosth = cosThetaDimu(pmu[muMinus],pmu[muPlus]);
+	current_imass       = imass(pmu[lead_mu],pmu[sublead_mu]);
+	current_cosTheta    = cosThetaCollinsSoper( pmu[lead_mu], -1, pmu[sublead_mu], +1 );
+	current_cosThetaCS  = cosThetaCollinsSoper( pmu[lead_mu], -1, pmu[sublead_mu], +1 );
+	current_cosThetaHE  = cosThetaBoost( pmu[lead_mu], -1, pmu[sublead_mu], +1 );
+	current_ySystem     = ySystem( pmu[lead_mu], pmu[sublead_mu] );
+	current_QT          = QT( pmu[lead_mu], pmu[sublead_mu] );
+	current_cosmicCosth = cosThetaDimu(pmu[lead_mu],pmu[sublead_mu]);
 	current_ipTdiff     = (current_muplus_pT!=0.  &&  current_mu_pT!=0.) ? 1./current_muplus_pT-1./current_mu_pT : -999.;
 	current_etaSum      = current_muplus_eta + current_mu_eta;
 	current_pTdiff      = current_mu_me_pT - current_mu_id_pT;
@@ -431,77 +446,576 @@ void analysisSkeleton::fillAfterCuts()
 	
 	/////////////////////////////////////////////////
 	// fill the graphicObjects all cuts tree ////////
-	charge->push_back( mu_charge->at(muMinus) );
-	charge->push_back( mu_charge->at(muPlus) );
-	m->push_back( mu_m->at(muMinus) );
-	m->push_back( mu_m->at(muPlus) );
-	e->push_back( mu_E->at(muMinus) );
-	e->push_back( mu_E->at(muPlus) );
-	px->push_back( mu_px->at(muMinus) );
-	px->push_back( mu_px->at(muPlus) );
-	py->push_back( mu_py->at(muMinus) );
-	py->push_back( mu_py->at(muPlus) );
-	pz->push_back( mu_pz->at(muMinus) );
-	pz->push_back( mu_pz->at(muPlus) );
-	pt->push_back( mu_pt->at(muMinus) );
-	pt->push_back( mu_pt->at(muPlus) );
-	graphicObjects::eta->push_back( mu_eta->at(muMinus) );
-	graphicObjects::eta->push_back( mu_eta->at(muPlus) );
-	phi->push_back( mu_phi->at(muMinus) );
-	phi->push_back( mu_phi->at(muPlus) );
-	d0_exPV->push_back( mu_d0_exPV->at(muMinus) );
-	d0_exPV->push_back( mu_d0_exPV->at(muPlus) );
-	z0_exPV->push_back( mu_z0_exPV->at(muMinus) );
-	z0_exPV->push_back( mu_z0_exPV->at(muPlus) );
-	Mhat         = current_imass;
-	CosThetaCS   = current_cosThetaCS;
-	CosThetaHE   = current_cosThetaHE;
-	Ysystem      = current_ySystem;
-	Q_T          = current_QT;
-	CosThetaDimu = current_cosmicCosth;
-	ipTDiff      = current_ipTdiff;
-	EtaSum       = current_etaSum;
+	graphicObjects::RunNumber;
+	graphicObjects::EventNumber;
+	graphicObjects::timestamp;
+	graphicObjects::timestamp_ns;
+	graphicObjects::lbn;
+	graphicObjects::bcid;
+
+	graphicObjects::ivxp            = getPVindex();
+	graphicObjects::iLeadingMuon    = lead_mu;
+	graphicObjects::iSubLeadingMuon = sublead_mu;
 	
-	qoverp_ms->push_back( mu_ms_qoverp->at(muMinus) );
-	qoverp_ms->push_back( mu_ms_qoverp->at(muPlus) );
-	theta_ms->push_back( mu_ms_theta->at(muMinus) );
-	theta_ms->push_back( mu_ms_theta->at(muPlus) );
-	phi_ms->push_back( mu_ms_phi->at(muMinus) );
-	phi_ms->push_back( mu_ms_phi->at(muPlus) );
-	qoverp_me->push_back( mu_me_qoverp->at(muMinus) );
-	qoverp_me->push_back( mu_me_qoverp->at(muPlus) );
-	theta_me->push_back( mu_me_theta->at(muMinus) );
-	theta_me->push_back( mu_me_theta->at(muPlus) );
-	phi_me->push_back( mu_me_phi->at(muMinus) );
-	phi_me->push_back( mu_me_phi->at(muPlus) );
-	qoverp_id->push_back( mu_id_qoverp->at(muMinus) );
-	qoverp_id->push_back( mu_id_qoverp->at(muPlus) );
-	theta_id->push_back( mu_id_theta->at(muMinus) );
-	theta_id->push_back( mu_id_theta->at(muPlus) );
-	phi_id->push_back( mu_id_phi->at(muMinus) );
-	phi_id->push_back( mu_id_phi->at(muPlus) );
-	qoverp_ie->push_back( mu_ie_qoverp->at(muMinus) );
-	qoverp_ie->push_back( mu_ie_qoverp->at(muPlus) );
-	theta_ie->push_back( mu_ie_theta->at(muMinus) );
-	theta_ie->push_back( mu_ie_theta->at(muPlus) );
-	phi_ie->push_back( mu_ie_phi->at(muMinus) );
-	phi_ie->push_back( mu_ie_phi->at(muPlus) );
-	matchchi2->push_back( mu_matchchi2->at(muMinus) );
-	matchchi2->push_back( mu_matchchi2->at(muPlus) );
-	matchndof->push_back( mu_matchndof->at(muMinus) );
-	matchndof->push_back( mu_matchndof->at(muPlus) );
-	allauthor->push_back( mu_allauthor->at(muMinus) );
-	allauthor->push_back( mu_allauthor->at(muPlus) );
-	author->push_back( mu_author->at(muMinus) );
-	author->push_back( mu_author->at(muPlus) );
-	isStandAloneMuon->push_back( mu_isStandAloneMuon->at(muMinus) );
-	isStandAloneMuon->push_back( mu_isStandAloneMuon->at(muPlus) );
-	isCombinedMuon->push_back( mu_isCombinedMuon->at(muMinus) );
-	isCombinedMuon->push_back( mu_isCombinedMuon->at(muPlus) );
-	trackfitchi2->push_back( mu_trackfitchi2->at(muMinus) );
-	trackfitchi2->push_back( mu_trackfitchi2->at(muPlus) );
-	trackfitndof->push_back( mu_trackfitndof->at(muMinus) );
-	trackfitndof->push_back( mu_trackfitndof->at(muPlus) );
+	// all cuts - vectors
+	graphicObjects::graphicObjects::vxp_n;
+	graphicObjects::vxp_nTracks->push_back(vxp_nTracks->at(getPVindex()));
+	graphicObjects::vxp_type->push_back(vxp_type->at(getPVindex()));
+	graphicObjects::vxp_z->push_back(vxp_z->at(getPVindex()));
+	
+	graphicObjects::Mhat         = current_imass;
+	graphicObjects::CosThetaCS   = current_cosThetaCS;
+	graphicObjects::CosThetaHE   = current_cosThetaHE;
+	graphicObjects::Ysystem      = current_ySystem;
+	graphicObjects::Q_T          = current_QT;
+	graphicObjects::CosThetaDimu = current_cosmicCosth;
+	graphicObjects::ipTDiff      = current_ipTdiff;
+	graphicObjects::EtaSum       = current_etaSum;
+
+	graphicObjects::n = mu_n;
+	graphicObjects::E->push_back(mu_E->at(lead_mu));
+	graphicObjects::pt->push_back(mu_pt->at(lead_mu));
+	graphicObjects::m->push_back(mu_m->at(lead_mu));
+	graphicObjects::eta->push_back(mu_eta->at(lead_mu));
+	graphicObjects::phi->push_back(mu_phi->at(lead_mu));
+	graphicObjects::px->push_back(mu_px->at(lead_mu));
+	graphicObjects::py->push_back(mu_py->at(lead_mu));
+	graphicObjects::pz->push_back(mu_pz->at(lead_mu));
+	graphicObjects::charge->push_back(mu_charge->at(lead_mu));
+	graphicObjects::allauthor->push_back(mu_allauthor->at(lead_mu));
+	graphicObjects::author->push_back(mu_author->at(lead_mu));
+	graphicObjects::beta->push_back(mu_beta->at(lead_mu));
+	graphicObjects::isMuonLikelihood->push_back(mu_isMuonLikelihood->at(lead_mu));
+	graphicObjects::matchchi2->push_back(mu_matchchi2->at(lead_mu));
+	graphicObjects::matchndof->push_back(mu_matchndof->at(lead_mu));
+	graphicObjects::etcone20->push_back(mu_etcone20->at(lead_mu));
+	graphicObjects::etcone30->push_back(mu_etcone30->at(lead_mu));
+	graphicObjects::etcone40->push_back(mu_etcone40->at(lead_mu));
+	graphicObjects::nucone20->push_back(mu_nucone20->at(lead_mu));
+	graphicObjects::nucone30->push_back(mu_nucone30->at(lead_mu));
+	graphicObjects::nucone40->push_back(mu_nucone40->at(lead_mu));
+	graphicObjects::ptcone20->push_back(mu_ptcone20->at(lead_mu));
+	graphicObjects::ptcone30->push_back(mu_ptcone30->at(lead_mu));
+	graphicObjects::ptcone40->push_back(mu_ptcone40->at(lead_mu));
+	graphicObjects::energyLossPar->push_back(mu_energyLossPar->at(lead_mu));
+	graphicObjects::energyLossErr->push_back(mu_energyLossErr->at(lead_mu));
+	graphicObjects::etCore->push_back(mu_etCore->at(lead_mu));
+	graphicObjects::energyLossType->push_back(mu_energyLossType->at(lead_mu));
+	graphicObjects::caloMuonIdTag->push_back(mu_caloMuonIdTag->at(lead_mu));
+	graphicObjects::caloLRLikelihood->push_back(mu_caloLRLikelihood->at(lead_mu));
+	graphicObjects::bestMatch->push_back(mu_bestMatch->at(lead_mu));
+	graphicObjects::isStandAloneMuon->push_back(mu_isStandAloneMuon->at(lead_mu));
+	graphicObjects::isCombinedMuon->push_back(mu_isCombinedMuon->at(lead_mu));
+	graphicObjects::isLowPtReconstructedMuon->push_back(mu_isLowPtReconstructedMuon->at(lead_mu));
+	graphicObjects::loose->push_back(mu_loose->at(lead_mu));
+	graphicObjects::medium->push_back(mu_medium->at(lead_mu));
+	graphicObjects::tight->push_back(mu_tight->at(lead_mu));
+	graphicObjects::d0_exPV->push_back(mu_d0_exPV->at(lead_mu));
+	graphicObjects::z0_exPV->push_back(mu_z0_exPV->at(lead_mu));
+	graphicObjects::phi_exPV->push_back(mu_phi_exPV->at(lead_mu));
+	graphicObjects::theta_exPV->push_back(mu_theta_exPV->at(lead_mu));
+	graphicObjects::qoverp_exPV->push_back(mu_qoverp_exPV->at(lead_mu));
+	graphicObjects::cb_d0_exPV->push_back(mu_cb_d0_exPV->at(lead_mu));
+	graphicObjects::cb_z0_exPV->push_back(mu_cb_z0_exPV->at(lead_mu));
+	graphicObjects::cb_phi_exPV->push_back(mu_cb_phi_exPV->at(lead_mu));
+	graphicObjects::cb_theta_exPV->push_back(mu_cb_theta_exPV->at(lead_mu));
+	graphicObjects::cb_qoverp_exPV->push_back(mu_cb_qoverp_exPV->at(lead_mu));
+	graphicObjects::id_d0_exPV->push_back(mu_id_d0_exPV->at(lead_mu));
+	graphicObjects::id_z0_exPV->push_back(mu_id_z0_exPV->at(lead_mu));
+	graphicObjects::id_phi_exPV->push_back(mu_id_phi_exPV->at(lead_mu));
+	graphicObjects::id_theta_exPV->push_back(mu_id_theta_exPV->at(lead_mu));
+	graphicObjects::id_qoverp_exPV->push_back(mu_id_qoverp_exPV->at(lead_mu));
+	graphicObjects::me_d0_exPV->push_back(mu_me_d0_exPV->at(lead_mu));
+	graphicObjects::me_z0_exPV->push_back(mu_me_z0_exPV->at(lead_mu));
+	graphicObjects::me_phi_exPV->push_back(mu_me_phi_exPV->at(lead_mu));
+	graphicObjects::me_theta_exPV->push_back(mu_me_theta_exPV->at(lead_mu));
+	graphicObjects::me_qoverp_exPV->push_back(mu_me_qoverp_exPV->at(lead_mu));
+	graphicObjects::ie_d0_exPV->push_back(mu_ie_d0_exPV->at(lead_mu));
+	graphicObjects::ie_z0_exPV->push_back(mu_ie_z0_exPV->at(lead_mu));
+	graphicObjects::ie_phi_exPV->push_back(mu_ie_phi_exPV->at(lead_mu));
+	graphicObjects::ie_theta_exPV->push_back(mu_ie_theta_exPV->at(lead_mu));
+	graphicObjects::ie_qoverp_exPV->push_back(mu_ie_qoverp_exPV->at(lead_mu));
+	//graphicObjects::SpaceTime_detID->push_back(mu_SpaceTime_detID->at(lead_mu));
+	//graphicObjects::SpaceTime_t->push_back(mu_SpaceTime_t->at(lead_mu));
+	//graphicObjects::SpaceTime_tError->push_back(mu_SpaceTime_tError->at(lead_mu));
+	//graphicObjects::SpaceTime_weight->push_back(mu_SpaceTime_weight->at(lead_mu));
+	//graphicObjects::SpaceTime_x->push_back(mu_SpaceTime_x->at(lead_mu));
+	//graphicObjects::SpaceTime_y->push_back(mu_SpaceTime_y->at(lead_mu));
+	//graphicObjects::SpaceTime_z->push_back(mu_SpaceTime_z->at(lead_mu));
+	//graphicObjects::SpaceTime_t_Tile->push_back(mu_SpaceTime_t_Tile->at(lead_mu));
+	//graphicObjects::SpaceTime_tError_Tile->push_back(mu_SpaceTime_tError_Tile->at(lead_mu));
+	//graphicObjects::SpaceTime_weight_Tile->push_back(mu_SpaceTime_weight_Tile->at(lead_mu));
+	//graphicObjects::SpaceTime_x_Tile->push_back(mu_SpaceTime_x_Tile->at(lead_mu));
+	//graphicObjects::SpaceTime_y_Tile->push_back(mu_SpaceTime_y_Tile->at(lead_mu));
+	//graphicObjects::SpaceTime_z_Tile->push_back(mu_SpaceTime_z_Tile->at(lead_mu));
+	//graphicObjects::SpaceTime_t_TRT->push_back(mu_SpaceTime_t_TRT->at(lead_mu));
+	//graphicObjects::SpaceTime_tError_TRT->push_back(mu_SpaceTime_tError_TRT->at(lead_mu));
+	//graphicObjects::SpaceTime_weight_TRT->push_back(mu_SpaceTime_weight_TRT->at(lead_mu));
+	//graphicObjects::SpaceTime_x_TRT->push_back(mu_SpaceTime_x_TRT->at(lead_mu));
+	//graphicObjects::SpaceTime_y_TRT->push_back(mu_SpaceTime_y_TRT->at(lead_mu));
+	//graphicObjects::SpaceTime_z_TRT->push_back(mu_SpaceTime_z_TRT->at(lead_mu));
+	//graphicObjects::SpaceTime_t_MDT->push_back(mu_SpaceTime_t_MDT->at(lead_mu));
+	//graphicObjects::SpaceTime_tError_MDT->push_back(mu_SpaceTime_tError_MDT->at(lead_mu));
+	//graphicObjects::SpaceTime_weight_MDT->push_back(mu_SpaceTime_weight_MDT->at(lead_mu));
+	//graphicObjects::SpaceTime_x_MDT->push_back(mu_SpaceTime_x_MDT->at(lead_mu));
+	//graphicObjects::SpaceTime_y_MDT->push_back(mu_SpaceTime_y_MDT->at(lead_mu));
+	//graphicObjects::SpaceTime_z_MDT->push_back(mu_SpaceTime_z_MDT->at(lead_mu));
+	graphicObjects::TileCellEnergyLayer1->push_back(mu_TileCellEnergyLayer1->at(lead_mu));
+	graphicObjects::TileTimeLayer1->push_back(mu_TileTimeLayer1->at(lead_mu));
+	graphicObjects::TileCellRmsNoiseLayer1->push_back(mu_TileCellRmsNoiseLayer1->at(lead_mu));
+	graphicObjects::TileCellSignLayer1->push_back(mu_TileCellSignLayer1->at(lead_mu));
+	graphicObjects::TileCellEnergyLayer2->push_back(mu_TileCellEnergyLayer2->at(lead_mu));
+	graphicObjects::TileTimeLayer2->push_back(mu_TileTimeLayer2->at(lead_mu));
+	graphicObjects::TileCellRmsNoiseLayer2->push_back(mu_TileCellRmsNoiseLayer2->at(lead_mu));
+	graphicObjects::TileCellSignLayer2->push_back(mu_TileCellSignLayer2->at(lead_mu));
+	graphicObjects::TileCellEnergyLayer3->push_back(mu_TileCellEnergyLayer3->at(lead_mu));
+	graphicObjects::TileTimeLayer3->push_back(mu_TileTimeLayer3->at(lead_mu));
+	graphicObjects::TileCellRmsNoiseLayer3->push_back(mu_TileCellRmsNoiseLayer3->at(lead_mu));
+	graphicObjects::TileCellSignLayer3->push_back(mu_TileCellSignLayer3->at(lead_mu));
+	graphicObjects::MSTrkT0_1->push_back(mu_MSTrkT0_1->at(lead_mu));
+	graphicObjects::MSTrkT0_2->push_back(mu_MSTrkT0_2->at(lead_mu));
+	graphicObjects::MSTrkT0_3->push_back(mu_MSTrkT0_3->at(lead_mu));
+	graphicObjects::cov_d0_exPV->push_back(mu_cov_d0_exPV->at(lead_mu));
+	graphicObjects::cov_z0_exPV->push_back(mu_cov_z0_exPV->at(lead_mu));
+	graphicObjects::cov_phi_exPV->push_back(mu_cov_phi_exPV->at(lead_mu));
+	graphicObjects::cov_theta_exPV->push_back(mu_cov_theta_exPV->at(lead_mu));
+	graphicObjects::cov_qoverp_exPV->push_back(mu_cov_qoverp_exPV->at(lead_mu));
+	graphicObjects::cov_d0_z0_exPV->push_back(mu_cov_d0_z0_exPV->at(lead_mu));
+	graphicObjects::cov_d0_phi_exPV->push_back(mu_cov_d0_phi_exPV->at(lead_mu));
+	graphicObjects::cov_d0_theta_exPV->push_back(mu_cov_d0_theta_exPV->at(lead_mu));
+	graphicObjects::cov_d0_qoverp_exPV->push_back(mu_cov_d0_qoverp_exPV->at(lead_mu));
+	graphicObjects::cov_z0_phi_exPV->push_back(mu_cov_z0_phi_exPV->at(lead_mu));
+	graphicObjects::cov_z0_theta_exPV->push_back(mu_cov_z0_theta_exPV->at(lead_mu));
+	graphicObjects::cov_z0_qoverp_exPV->push_back(mu_cov_z0_qoverp_exPV->at(lead_mu));
+	graphicObjects::cov_phi_theta_exPV->push_back(mu_cov_phi_theta_exPV->at(lead_mu));
+	graphicObjects::cov_phi_qoverp_exPV->push_back(mu_cov_phi_qoverp_exPV->at(lead_mu));
+	graphicObjects::cov_theta_qoverp_exPV->push_back(mu_cov_theta_qoverp_exPV->at(lead_mu));
+	graphicObjects::id_cov_d0_exPV->push_back(mu_id_cov_d0_exPV->at(lead_mu));
+	graphicObjects::id_cov_z0_exPV->push_back(mu_id_cov_z0_exPV->at(lead_mu));
+	graphicObjects::id_cov_phi_exPV->push_back(mu_id_cov_phi_exPV->at(lead_mu));
+	graphicObjects::id_cov_theta_exPV->push_back(mu_id_cov_theta_exPV->at(lead_mu));
+	graphicObjects::id_cov_qoverp_exPV->push_back(mu_id_cov_qoverp_exPV->at(lead_mu));
+	graphicObjects::id_cov_d0_z0_exPV->push_back(mu_id_cov_d0_z0_exPV->at(lead_mu));
+	graphicObjects::id_cov_d0_phi_exPV->push_back(mu_id_cov_d0_phi_exPV->at(lead_mu));
+	graphicObjects::id_cov_d0_theta_exPV->push_back(mu_id_cov_d0_theta_exPV->at(lead_mu));
+	graphicObjects::id_cov_d0_qoverp_exPV->push_back(mu_id_cov_d0_qoverp_exPV->at(lead_mu));
+	graphicObjects::id_cov_z0_phi_exPV->push_back(mu_id_cov_z0_phi_exPV->at(lead_mu));
+	graphicObjects::id_cov_z0_theta_exPV->push_back(mu_id_cov_z0_theta_exPV->at(lead_mu));
+	graphicObjects::id_cov_z0_qoverp_exPV->push_back(mu_id_cov_z0_qoverp_exPV->at(lead_mu));
+	graphicObjects::id_cov_phi_theta_exPV->push_back(mu_id_cov_phi_theta_exPV->at(lead_mu));
+	graphicObjects::id_cov_phi_qoverp_exPV->push_back(mu_id_cov_phi_qoverp_exPV->at(lead_mu));
+	graphicObjects::id_cov_theta_qoverp_exPV->push_back(mu_id_cov_theta_qoverp_exPV->at(lead_mu));
+	graphicObjects::me_cov_d0_exPV->push_back(mu_me_cov_d0_exPV->at(lead_mu));
+	graphicObjects::me_cov_z0_exPV->push_back(mu_me_cov_z0_exPV->at(lead_mu));
+	graphicObjects::me_cov_phi_exPV->push_back(mu_me_cov_phi_exPV->at(lead_mu));
+	graphicObjects::me_cov_theta_exPV->push_back(mu_me_cov_theta_exPV->at(lead_mu));
+	graphicObjects::me_cov_qoverp_exPV->push_back(mu_me_cov_qoverp_exPV->at(lead_mu));
+	graphicObjects::me_cov_d0_z0_exPV->push_back(mu_me_cov_d0_z0_exPV->at(lead_mu));
+	graphicObjects::me_cov_d0_phi_exPV->push_back(mu_me_cov_d0_phi_exPV->at(lead_mu));
+	graphicObjects::me_cov_d0_theta_exPV->push_back(mu_me_cov_d0_theta_exPV->at(lead_mu));
+	graphicObjects::me_cov_d0_qoverp_exPV->push_back(mu_me_cov_d0_qoverp_exPV->at(lead_mu));
+	graphicObjects::me_cov_z0_phi_exPV->push_back(mu_me_cov_z0_phi_exPV->at(lead_mu));
+	graphicObjects::me_cov_z0_theta_exPV->push_back(mu_me_cov_z0_theta_exPV->at(lead_mu));
+	graphicObjects::me_cov_z0_qoverp_exPV->push_back(mu_me_cov_z0_qoverp_exPV->at(lead_mu));
+	graphicObjects::me_cov_phi_theta_exPV->push_back(mu_me_cov_phi_theta_exPV->at(lead_mu));
+	graphicObjects::me_cov_phi_qoverp_exPV->push_back(mu_me_cov_phi_qoverp_exPV->at(lead_mu));
+	graphicObjects::me_cov_theta_qoverp_exPV->push_back(mu_me_cov_theta_qoverp_exPV->at(lead_mu));
+	graphicObjects::ms_d0->push_back(mu_ms_d0->at(lead_mu));
+	graphicObjects::ms_z0->push_back(mu_ms_z0->at(lead_mu));
+	graphicObjects::ms_phi->push_back(mu_ms_phi->at(lead_mu));
+	graphicObjects::ms_theta->push_back(mu_ms_theta->at(lead_mu));
+	graphicObjects::ms_qoverp->push_back(mu_ms_qoverp->at(lead_mu));
+	graphicObjects::id_d0->push_back(mu_id_d0->at(lead_mu));
+	graphicObjects::id_z0->push_back(mu_id_z0->at(lead_mu));
+	graphicObjects::id_phi->push_back(mu_id_phi->at(lead_mu));
+	graphicObjects::id_theta->push_back(mu_id_theta->at(lead_mu));
+	graphicObjects::id_qoverp->push_back(mu_id_qoverp->at(lead_mu));
+	graphicObjects::me_d0->push_back(mu_me_d0->at(lead_mu));
+	graphicObjects::me_z0->push_back(mu_me_z0->at(lead_mu));
+	graphicObjects::me_phi->push_back(mu_me_phi->at(lead_mu));
+	graphicObjects::me_theta->push_back(mu_me_theta->at(lead_mu));
+	graphicObjects::me_qoverp->push_back(mu_me_qoverp->at(lead_mu));
+	graphicObjects::ie_d0->push_back(mu_ie_d0->at(lead_mu));
+	graphicObjects::ie_z0->push_back(mu_ie_z0->at(lead_mu));
+	graphicObjects::ie_phi->push_back(mu_ie_phi->at(lead_mu));
+	graphicObjects::ie_theta->push_back(mu_ie_theta->at(lead_mu));
+	graphicObjects::ie_qoverp->push_back(mu_ie_qoverp->at(lead_mu));
+	graphicObjects::nOutliersOnTrack->push_back(mu_nOutliersOnTrack->at(lead_mu));
+	graphicObjects::nBLHits->push_back(mu_nBLHits->at(lead_mu));
+	graphicObjects::nPixHits->push_back(mu_nPixHits->at(lead_mu));
+	graphicObjects::nSCTHits->push_back(mu_nSCTHits->at(lead_mu));
+	graphicObjects::nTRTHits->push_back(mu_nTRTHits->at(lead_mu));
+	graphicObjects::nTRTHighTHits->push_back(mu_nTRTHighTHits->at(lead_mu));
+	graphicObjects::nBLSharedHits->push_back(mu_nBLSharedHits->at(lead_mu));
+	graphicObjects::nPixSharedHits->push_back(mu_nPixSharedHits->at(lead_mu));
+	graphicObjects::nPixHoles->push_back(mu_nPixHoles->at(lead_mu));
+	graphicObjects::nSCTSharedHits->push_back(mu_nSCTSharedHits->at(lead_mu));
+	graphicObjects::nSCTHoles->push_back(mu_nSCTHoles->at(lead_mu));
+	graphicObjects::nTRTOutliers->push_back(mu_nTRTOutliers->at(lead_mu));
+	graphicObjects::nTRTHighTOutliers->push_back(mu_nTRTHighTOutliers->at(lead_mu));
+	graphicObjects::nGangedPixels->push_back(mu_nGangedPixels->at(lead_mu));
+	graphicObjects::nPixelDeadSensors->push_back(mu_nPixelDeadSensors->at(lead_mu));
+	graphicObjects::nSCTDeadSensors->push_back(mu_nSCTDeadSensors->at(lead_mu));
+	graphicObjects::nTRTDeadStraws->push_back(mu_nTRTDeadStraws->at(lead_mu));
+	graphicObjects::expectBLayerHit->push_back(mu_expectBLayerHit->at(lead_mu));
+	graphicObjects::nMDTHits->push_back(mu_nMDTHits->at(lead_mu));
+	graphicObjects::nMDTHoles->push_back(mu_nMDTHoles->at(lead_mu));
+	graphicObjects::nCSCEtaHits->push_back(mu_nCSCEtaHits->at(lead_mu));
+	graphicObjects::nCSCEtaHoles->push_back(mu_nCSCEtaHoles->at(lead_mu));
+	graphicObjects::nCSCPhiHits->push_back(mu_nCSCPhiHits->at(lead_mu));
+	graphicObjects::nCSCPhiHoles->push_back(mu_nCSCPhiHoles->at(lead_mu));
+	graphicObjects::nRPCEtaHits->push_back(mu_nRPCEtaHits->at(lead_mu));
+	graphicObjects::nRPCEtaHoles->push_back(mu_nRPCEtaHoles->at(lead_mu));
+	graphicObjects::nRPCPhiHits->push_back(mu_nRPCPhiHits->at(lead_mu));
+	graphicObjects::nRPCPhiHoles->push_back(mu_nRPCPhiHoles->at(lead_mu));
+	graphicObjects::nTGCEtaHits->push_back(mu_nTGCEtaHits->at(lead_mu));
+	graphicObjects::nTGCEtaHoles->push_back(mu_nTGCEtaHoles->at(lead_mu));
+	graphicObjects::nTGCPhiHits->push_back(mu_nTGCPhiHits->at(lead_mu));
+	graphicObjects::nTGCPhiHoles->push_back(mu_nTGCPhiHoles->at(lead_mu));
+	graphicObjects::nMDTBIHits->push_back(mu_nMDTBIHits->at(lead_mu));
+	graphicObjects::nMDTBMHits->push_back(mu_nMDTBMHits->at(lead_mu));
+	graphicObjects::nMDTBOHits->push_back(mu_nMDTBOHits->at(lead_mu));
+	graphicObjects::nMDTBEEHits->push_back(mu_nMDTBEEHits->at(lead_mu));
+	graphicObjects::nMDTBIS78Hits->push_back(mu_nMDTBIS78Hits->at(lead_mu));
+	graphicObjects::nMDTEIHits->push_back(mu_nMDTEIHits->at(lead_mu));
+	graphicObjects::nMDTEMHits->push_back(mu_nMDTEMHits->at(lead_mu));
+	graphicObjects::nMDTEOHits->push_back(mu_nMDTEOHits->at(lead_mu));
+	graphicObjects::nMDTEEHits->push_back(mu_nMDTEEHits->at(lead_mu));
+	graphicObjects::nRPCLayer1EtaHits->push_back(mu_nRPCLayer1EtaHits->at(lead_mu));
+	graphicObjects::nRPCLayer2EtaHits->push_back(mu_nRPCLayer2EtaHits->at(lead_mu));
+	graphicObjects::nRPCLayer3EtaHits->push_back(mu_nRPCLayer3EtaHits->at(lead_mu));
+	graphicObjects::nRPCLayer1PhiHits->push_back(mu_nRPCLayer1PhiHits->at(lead_mu));
+	graphicObjects::nRPCLayer2PhiHits->push_back(mu_nRPCLayer2PhiHits->at(lead_mu));
+	graphicObjects::nRPCLayer3PhiHits->push_back(mu_nRPCLayer3PhiHits->at(lead_mu));
+	graphicObjects::nTGCLayer1EtaHits->push_back(mu_nTGCLayer1EtaHits->at(lead_mu));
+	graphicObjects::nTGCLayer2EtaHits->push_back(mu_nTGCLayer2EtaHits->at(lead_mu));
+	graphicObjects::nTGCLayer3EtaHits->push_back(mu_nTGCLayer3EtaHits->at(lead_mu));
+	graphicObjects::nTGCLayer4EtaHits->push_back(mu_nTGCLayer4EtaHits->at(lead_mu));
+	graphicObjects::nTGCLayer1PhiHits->push_back(mu_nTGCLayer1PhiHits->at(lead_mu));
+	graphicObjects::nTGCLayer2PhiHits->push_back(mu_nTGCLayer2PhiHits->at(lead_mu));
+	graphicObjects::nTGCLayer3PhiHits->push_back(mu_nTGCLayer3PhiHits->at(lead_mu));
+	graphicObjects::nTGCLayer4PhiHits->push_back(mu_nTGCLayer4PhiHits->at(lead_mu));
+	graphicObjects::barrelSectors->push_back(mu_barrelSectors->at(lead_mu));
+	graphicObjects::endcapSectors->push_back(mu_endcapSectors->at(lead_mu));
+	graphicObjects::trackd0->push_back(mu_trackd0->at(lead_mu));
+	graphicObjects::trackz0->push_back(mu_trackz0->at(lead_mu));
+	graphicObjects::trackphi->push_back(mu_trackphi->at(lead_mu));
+	graphicObjects::tracktheta->push_back(mu_tracktheta->at(lead_mu));
+	graphicObjects::trackqoverp->push_back(mu_trackqoverp->at(lead_mu));
+	graphicObjects::trackcov_d0->push_back(mu_trackcov_d0->at(lead_mu));
+	graphicObjects::trackcov_z0->push_back(mu_trackcov_z0->at(lead_mu));
+	graphicObjects::trackcov_phi->push_back(mu_trackcov_phi->at(lead_mu));
+	graphicObjects::trackcov_theta->push_back(mu_trackcov_theta->at(lead_mu));
+	graphicObjects::trackcov_qoverp->push_back(mu_trackcov_qoverp->at(lead_mu));
+	graphicObjects::trackcov_d0_z0->push_back(mu_trackcov_d0_z0->at(lead_mu));
+	graphicObjects::trackcov_d0_phi->push_back(mu_trackcov_d0_phi->at(lead_mu));
+	graphicObjects::trackcov_d0_theta->push_back(mu_trackcov_d0_theta->at(lead_mu));
+	graphicObjects::trackcov_d0_qoverp->push_back(mu_trackcov_d0_qoverp->at(lead_mu));
+	graphicObjects::trackcov_z0_phi->push_back(mu_trackcov_z0_phi->at(lead_mu));
+	graphicObjects::trackcov_z0_theta->push_back(mu_trackcov_z0_theta->at(lead_mu));
+	graphicObjects::trackcov_z0_qoverp->push_back(mu_trackcov_z0_qoverp->at(lead_mu));
+	graphicObjects::trackcov_phi_theta->push_back(mu_trackcov_phi_theta->at(lead_mu));
+	graphicObjects::trackcov_phi_qoverp->push_back(mu_trackcov_phi_qoverp->at(lead_mu));
+	graphicObjects::trackcov_theta_qoverp->push_back(mu_trackcov_theta_qoverp->at(lead_mu));
+	graphicObjects::trackfitchi2->push_back(mu_trackfitchi2->at(lead_mu));
+	graphicObjects::trackfitndof->push_back(mu_trackfitndof->at(lead_mu));
+	graphicObjects::hastrack->push_back(mu_hastrack->at(lead_mu));
+	if(isMC)
+	{
+		graphicObjects::truth_dr->push_back(mu_truth_dr->at(lead_mu));
+		graphicObjects::truth_E->push_back(mu_truth_E->at(lead_mu));
+		graphicObjects::truth_pt->push_back(mu_truth_pt->at(lead_mu));
+		graphicObjects::truth_eta->push_back(mu_truth_eta->at(lead_mu));
+		graphicObjects::truth_phi->push_back(mu_truth_phi->at(lead_mu));
+		graphicObjects::truth_type->push_back(mu_truth_type->at(lead_mu));
+		graphicObjects::truth_status->push_back(mu_truth_status->at(lead_mu));
+		graphicObjects::truth_barcode->push_back(mu_truth_barcode->at(lead_mu));
+		graphicObjects::truth_mothertype->push_back(mu_truth_mothertype->at(lead_mu));
+		graphicObjects::truth_motherbarcode->push_back(mu_truth_motherbarcode->at(lead_mu));
+		graphicObjects::truth_matched->push_back(mu_truth_matched->at(lead_mu));
+	}
+	graphicObjects::EFCB_dr->push_back(mu_EFCB_dr->at(lead_mu));
+	graphicObjects::EFCB_index->push_back(mu_EFCB_index->at(lead_mu));
+	graphicObjects::EFMG_dr->push_back(mu_EFMG_dr->at(lead_mu));
+	graphicObjects::EFMG_index->push_back(mu_EFMG_index->at(lead_mu));
+	graphicObjects::EFME_dr->push_back(mu_EFME_dr->at(lead_mu));
+	graphicObjects::EFME_index->push_back(mu_EFME_index->at(lead_mu));
+	graphicObjects::L2CB_dr->push_back(mu_L2CB_dr->at(lead_mu));
+	graphicObjects::L2CB_index->push_back(mu_L2CB_index->at(lead_mu));
+	graphicObjects::L1_dr->push_back(mu_L1_dr->at(lead_mu));
+	graphicObjects::L1_index->push_back(mu_L1_index->at(lead_mu));
+
+	graphicObjects::E->push_back(mu_E->at(sublead_mu));
+	graphicObjects::pt->push_back(mu_pt->at(sublead_mu));
+	graphicObjects::m->push_back(mu_m->at(sublead_mu));
+	graphicObjects::eta->push_back(mu_eta->at(sublead_mu));
+	graphicObjects::phi->push_back(mu_phi->at(sublead_mu));
+	graphicObjects::px->push_back(mu_px->at(sublead_mu));
+	graphicObjects::py->push_back(mu_py->at(sublead_mu));
+	graphicObjects::pz->push_back(mu_pz->at(sublead_mu));
+	graphicObjects::charge->push_back(mu_charge->at(sublead_mu));
+	graphicObjects::allauthor->push_back(mu_allauthor->at(sublead_mu));
+	graphicObjects::author->push_back(mu_author->at(sublead_mu));
+	graphicObjects::beta->push_back(mu_beta->at(sublead_mu));
+	graphicObjects::isMuonLikelihood->push_back(mu_isMuonLikelihood->at(sublead_mu));
+	graphicObjects::matchchi2->push_back(mu_matchchi2->at(sublead_mu));
+	graphicObjects::matchndof->push_back(mu_matchndof->at(sublead_mu));
+	graphicObjects::etcone20->push_back(mu_etcone20->at(sublead_mu));
+	graphicObjects::etcone30->push_back(mu_etcone30->at(sublead_mu));
+	graphicObjects::etcone40->push_back(mu_etcone40->at(sublead_mu));
+	graphicObjects::nucone20->push_back(mu_nucone20->at(sublead_mu));
+	graphicObjects::nucone30->push_back(mu_nucone30->at(sublead_mu));
+	graphicObjects::nucone40->push_back(mu_nucone40->at(sublead_mu));
+	graphicObjects::ptcone20->push_back(mu_ptcone20->at(sublead_mu));
+	graphicObjects::ptcone30->push_back(mu_ptcone30->at(sublead_mu));
+	graphicObjects::ptcone40->push_back(mu_ptcone40->at(sublead_mu));
+	graphicObjects::energyLossPar->push_back(mu_energyLossPar->at(sublead_mu));
+	graphicObjects::energyLossErr->push_back(mu_energyLossErr->at(sublead_mu));
+	graphicObjects::etCore->push_back(mu_etCore->at(sublead_mu));
+	graphicObjects::energyLossType->push_back(mu_energyLossType->at(sublead_mu));
+	graphicObjects::caloMuonIdTag->push_back(mu_caloMuonIdTag->at(sublead_mu));
+	graphicObjects::caloLRLikelihood->push_back(mu_caloLRLikelihood->at(sublead_mu));
+	graphicObjects::bestMatch->push_back(mu_bestMatch->at(sublead_mu));
+	graphicObjects::isStandAloneMuon->push_back(mu_isStandAloneMuon->at(sublead_mu));
+	graphicObjects::isCombinedMuon->push_back(mu_isCombinedMuon->at(sublead_mu));
+	graphicObjects::isLowPtReconstructedMuon->push_back(mu_isLowPtReconstructedMuon->at(sublead_mu));
+	graphicObjects::loose->push_back(mu_loose->at(sublead_mu));
+	graphicObjects::medium->push_back(mu_medium->at(sublead_mu));
+	graphicObjects::tight->push_back(mu_tight->at(sublead_mu));
+	graphicObjects::d0_exPV->push_back(mu_d0_exPV->at(sublead_mu));
+	graphicObjects::z0_exPV->push_back(mu_z0_exPV->at(sublead_mu));
+	graphicObjects::phi_exPV->push_back(mu_phi_exPV->at(sublead_mu));
+	graphicObjects::theta_exPV->push_back(mu_theta_exPV->at(sublead_mu));
+	graphicObjects::qoverp_exPV->push_back(mu_qoverp_exPV->at(sublead_mu));
+	graphicObjects::cb_d0_exPV->push_back(mu_cb_d0_exPV->at(sublead_mu));
+	graphicObjects::cb_z0_exPV->push_back(mu_cb_z0_exPV->at(sublead_mu));
+	graphicObjects::cb_phi_exPV->push_back(mu_cb_phi_exPV->at(sublead_mu));
+	graphicObjects::cb_theta_exPV->push_back(mu_cb_theta_exPV->at(sublead_mu));
+	graphicObjects::cb_qoverp_exPV->push_back(mu_cb_qoverp_exPV->at(sublead_mu));
+	graphicObjects::id_d0_exPV->push_back(mu_id_d0_exPV->at(sublead_mu));
+	graphicObjects::id_z0_exPV->push_back(mu_id_z0_exPV->at(sublead_mu));
+	graphicObjects::id_phi_exPV->push_back(mu_id_phi_exPV->at(sublead_mu));
+	graphicObjects::id_theta_exPV->push_back(mu_id_theta_exPV->at(sublead_mu));
+	graphicObjects::id_qoverp_exPV->push_back(mu_id_qoverp_exPV->at(sublead_mu));
+	graphicObjects::me_d0_exPV->push_back(mu_me_d0_exPV->at(sublead_mu));
+	graphicObjects::me_z0_exPV->push_back(mu_me_z0_exPV->at(sublead_mu));
+	graphicObjects::me_phi_exPV->push_back(mu_me_phi_exPV->at(sublead_mu));
+	graphicObjects::me_theta_exPV->push_back(mu_me_theta_exPV->at(sublead_mu));
+	graphicObjects::me_qoverp_exPV->push_back(mu_me_qoverp_exPV->at(sublead_mu));
+	graphicObjects::ie_d0_exPV->push_back(mu_ie_d0_exPV->at(sublead_mu));
+	graphicObjects::ie_z0_exPV->push_back(mu_ie_z0_exPV->at(sublead_mu));
+	graphicObjects::ie_phi_exPV->push_back(mu_ie_phi_exPV->at(sublead_mu));
+	graphicObjects::ie_theta_exPV->push_back(mu_ie_theta_exPV->at(sublead_mu));
+	graphicObjects::ie_qoverp_exPV->push_back(mu_ie_qoverp_exPV->at(sublead_mu));
+	//graphicObjects::SpaceTime_detID->push_back(mu_SpaceTime_detID->at(sublead_mu));
+	//graphicObjects::SpaceTime_t->push_back(mu_SpaceTime_t->at(sublead_mu));
+	//graphicObjects::SpaceTime_tError->push_back(mu_SpaceTime_tError->at(sublead_mu));
+	//graphicObjects::SpaceTime_weight->push_back(mu_SpaceTime_weight->at(sublead_mu));
+	//graphicObjects::SpaceTime_x->push_back(mu_SpaceTime_x->at(sublead_mu));
+	//graphicObjects::SpaceTime_y->push_back(mu_SpaceTime_y->at(sublead_mu));
+	//graphicObjects::SpaceTime_z->push_back(mu_SpaceTime_z->at(sublead_mu));
+	//graphicObjects::SpaceTime_t_Tile->push_back(mu_SpaceTime_t_Tile->at(sublead_mu));
+	//graphicObjects::SpaceTime_tError_Tile->push_back(mu_SpaceTime_tError_Tile->at(sublead_mu));
+	//graphicObjects::SpaceTime_weight_Tile->push_back(mu_SpaceTime_weight_Tile->at(sublead_mu));
+	//graphicObjects::SpaceTime_x_Tile->push_back(mu_SpaceTime_x_Tile->at(sublead_mu));
+	//graphicObjects::SpaceTime_y_Tile->push_back(mu_SpaceTime_y_Tile->at(sublead_mu));
+	//graphicObjects::SpaceTime_z_Tile->push_back(mu_SpaceTime_z_Tile->at(sublead_mu));
+	//graphicObjects::SpaceTime_t_TRT->push_back(mu_SpaceTime_t_TRT->at(sublead_mu));
+	//graphicObjects::SpaceTime_tError_TRT->push_back(mu_SpaceTime_tError_TRT->at(sublead_mu));
+	//graphicObjects::SpaceTime_weight_TRT->push_back(mu_SpaceTime_weight_TRT->at(sublead_mu));
+	//graphicObjects::SpaceTime_x_TRT->push_back(mu_SpaceTime_x_TRT->at(sublead_mu));
+	//graphicObjects::SpaceTime_y_TRT->push_back(mu_SpaceTime_y_TRT->at(sublead_mu));
+	//graphicObjects::SpaceTime_z_TRT->push_back(mu_SpaceTime_z_TRT->at(sublead_mu));
+	//graphicObjects::SpaceTime_t_MDT->push_back(mu_SpaceTime_t_MDT->at(sublead_mu));
+	//graphicObjects::SpaceTime_tError_MDT->push_back(mu_SpaceTime_tError_MDT->at(sublead_mu));
+	//graphicObjects::SpaceTime_weight_MDT->push_back(mu_SpaceTime_weight_MDT->at(sublead_mu));
+	//graphicObjects::SpaceTime_x_MDT->push_back(mu_SpaceTime_x_MDT->at(sublead_mu));
+	//graphicObjects::SpaceTime_y_MDT->push_back(mu_SpaceTime_y_MDT->at(sublead_mu));
+	//graphicObjects::SpaceTime_z_MDT->push_back(mu_SpaceTime_z_MDT->at(sublead_mu));
+	graphicObjects::TileCellEnergyLayer1->push_back(mu_TileCellEnergyLayer1->at(sublead_mu));
+	graphicObjects::TileTimeLayer1->push_back(mu_TileTimeLayer1->at(sublead_mu));
+	graphicObjects::TileCellRmsNoiseLayer1->push_back(mu_TileCellRmsNoiseLayer1->at(sublead_mu));
+	graphicObjects::TileCellSignLayer1->push_back(mu_TileCellSignLayer1->at(sublead_mu));
+	graphicObjects::TileCellEnergyLayer2->push_back(mu_TileCellEnergyLayer2->at(sublead_mu));
+	graphicObjects::TileTimeLayer2->push_back(mu_TileTimeLayer2->at(sublead_mu));
+	graphicObjects::TileCellRmsNoiseLayer2->push_back(mu_TileCellRmsNoiseLayer2->at(sublead_mu));
+	graphicObjects::TileCellSignLayer2->push_back(mu_TileCellSignLayer2->at(sublead_mu));
+	graphicObjects::TileCellEnergyLayer3->push_back(mu_TileCellEnergyLayer3->at(sublead_mu));
+	graphicObjects::TileTimeLayer3->push_back(mu_TileTimeLayer3->at(sublead_mu));
+	graphicObjects::TileCellRmsNoiseLayer3->push_back(mu_TileCellRmsNoiseLayer3->at(sublead_mu));
+	graphicObjects::TileCellSignLayer3->push_back(mu_TileCellSignLayer3->at(sublead_mu));
+	graphicObjects::MSTrkT0_1->push_back(mu_MSTrkT0_1->at(sublead_mu));
+	graphicObjects::MSTrkT0_2->push_back(mu_MSTrkT0_2->at(sublead_mu));
+	graphicObjects::MSTrkT0_3->push_back(mu_MSTrkT0_3->at(sublead_mu));
+	graphicObjects::cov_d0_exPV->push_back(mu_cov_d0_exPV->at(sublead_mu));
+	graphicObjects::cov_z0_exPV->push_back(mu_cov_z0_exPV->at(sublead_mu));
+	graphicObjects::cov_phi_exPV->push_back(mu_cov_phi_exPV->at(sublead_mu));
+	graphicObjects::cov_theta_exPV->push_back(mu_cov_theta_exPV->at(sublead_mu));
+	graphicObjects::cov_qoverp_exPV->push_back(mu_cov_qoverp_exPV->at(sublead_mu));
+	graphicObjects::cov_d0_z0_exPV->push_back(mu_cov_d0_z0_exPV->at(sublead_mu));
+	graphicObjects::cov_d0_phi_exPV->push_back(mu_cov_d0_phi_exPV->at(sublead_mu));
+	graphicObjects::cov_d0_theta_exPV->push_back(mu_cov_d0_theta_exPV->at(sublead_mu));
+	graphicObjects::cov_d0_qoverp_exPV->push_back(mu_cov_d0_qoverp_exPV->at(sublead_mu));
+	graphicObjects::cov_z0_phi_exPV->push_back(mu_cov_z0_phi_exPV->at(sublead_mu));
+	graphicObjects::cov_z0_theta_exPV->push_back(mu_cov_z0_theta_exPV->at(sublead_mu));
+	graphicObjects::cov_z0_qoverp_exPV->push_back(mu_cov_z0_qoverp_exPV->at(sublead_mu));
+	graphicObjects::cov_phi_theta_exPV->push_back(mu_cov_phi_theta_exPV->at(sublead_mu));
+	graphicObjects::cov_phi_qoverp_exPV->push_back(mu_cov_phi_qoverp_exPV->at(sublead_mu));
+	graphicObjects::cov_theta_qoverp_exPV->push_back(mu_cov_theta_qoverp_exPV->at(sublead_mu));
+	graphicObjects::id_cov_d0_exPV->push_back(mu_id_cov_d0_exPV->at(sublead_mu));
+	graphicObjects::id_cov_z0_exPV->push_back(mu_id_cov_z0_exPV->at(sublead_mu));
+	graphicObjects::id_cov_phi_exPV->push_back(mu_id_cov_phi_exPV->at(sublead_mu));
+	graphicObjects::id_cov_theta_exPV->push_back(mu_id_cov_theta_exPV->at(sublead_mu));
+	graphicObjects::id_cov_qoverp_exPV->push_back(mu_id_cov_qoverp_exPV->at(sublead_mu));
+	graphicObjects::id_cov_d0_z0_exPV->push_back(mu_id_cov_d0_z0_exPV->at(sublead_mu));
+	graphicObjects::id_cov_d0_phi_exPV->push_back(mu_id_cov_d0_phi_exPV->at(sublead_mu));
+	graphicObjects::id_cov_d0_theta_exPV->push_back(mu_id_cov_d0_theta_exPV->at(sublead_mu));
+	graphicObjects::id_cov_d0_qoverp_exPV->push_back(mu_id_cov_d0_qoverp_exPV->at(sublead_mu));
+	graphicObjects::id_cov_z0_phi_exPV->push_back(mu_id_cov_z0_phi_exPV->at(sublead_mu));
+	graphicObjects::id_cov_z0_theta_exPV->push_back(mu_id_cov_z0_theta_exPV->at(sublead_mu));
+	graphicObjects::id_cov_z0_qoverp_exPV->push_back(mu_id_cov_z0_qoverp_exPV->at(sublead_mu));
+	graphicObjects::id_cov_phi_theta_exPV->push_back(mu_id_cov_phi_theta_exPV->at(sublead_mu));
+	graphicObjects::id_cov_phi_qoverp_exPV->push_back(mu_id_cov_phi_qoverp_exPV->at(sublead_mu));
+	graphicObjects::id_cov_theta_qoverp_exPV->push_back(mu_id_cov_theta_qoverp_exPV->at(sublead_mu));
+	graphicObjects::me_cov_d0_exPV->push_back(mu_me_cov_d0_exPV->at(sublead_mu));
+	graphicObjects::me_cov_z0_exPV->push_back(mu_me_cov_z0_exPV->at(sublead_mu));
+	graphicObjects::me_cov_phi_exPV->push_back(mu_me_cov_phi_exPV->at(sublead_mu));
+	graphicObjects::me_cov_theta_exPV->push_back(mu_me_cov_theta_exPV->at(sublead_mu));
+	graphicObjects::me_cov_qoverp_exPV->push_back(mu_me_cov_qoverp_exPV->at(sublead_mu));
+	graphicObjects::me_cov_d0_z0_exPV->push_back(mu_me_cov_d0_z0_exPV->at(sublead_mu));
+	graphicObjects::me_cov_d0_phi_exPV->push_back(mu_me_cov_d0_phi_exPV->at(sublead_mu));
+	graphicObjects::me_cov_d0_theta_exPV->push_back(mu_me_cov_d0_theta_exPV->at(sublead_mu));
+	graphicObjects::me_cov_d0_qoverp_exPV->push_back(mu_me_cov_d0_qoverp_exPV->at(sublead_mu));
+	graphicObjects::me_cov_z0_phi_exPV->push_back(mu_me_cov_z0_phi_exPV->at(sublead_mu));
+	graphicObjects::me_cov_z0_theta_exPV->push_back(mu_me_cov_z0_theta_exPV->at(sublead_mu));
+	graphicObjects::me_cov_z0_qoverp_exPV->push_back(mu_me_cov_z0_qoverp_exPV->at(sublead_mu));
+	graphicObjects::me_cov_phi_theta_exPV->push_back(mu_me_cov_phi_theta_exPV->at(sublead_mu));
+	graphicObjects::me_cov_phi_qoverp_exPV->push_back(mu_me_cov_phi_qoverp_exPV->at(sublead_mu));
+	graphicObjects::me_cov_theta_qoverp_exPV->push_back(mu_me_cov_theta_qoverp_exPV->at(sublead_mu));
+	graphicObjects::ms_d0->push_back(mu_ms_d0->at(sublead_mu));
+	graphicObjects::ms_z0->push_back(mu_ms_z0->at(sublead_mu));
+	graphicObjects::ms_phi->push_back(mu_ms_phi->at(sublead_mu));
+	graphicObjects::ms_theta->push_back(mu_ms_theta->at(sublead_mu));
+	graphicObjects::ms_qoverp->push_back(mu_ms_qoverp->at(sublead_mu));
+	graphicObjects::id_d0->push_back(mu_id_d0->at(sublead_mu));
+	graphicObjects::id_z0->push_back(mu_id_z0->at(sublead_mu));
+	graphicObjects::id_phi->push_back(mu_id_phi->at(sublead_mu));
+	graphicObjects::id_theta->push_back(mu_id_theta->at(sublead_mu));
+	graphicObjects::id_qoverp->push_back(mu_id_qoverp->at(sublead_mu));
+	graphicObjects::me_d0->push_back(mu_me_d0->at(sublead_mu));
+	graphicObjects::me_z0->push_back(mu_me_z0->at(sublead_mu));
+	graphicObjects::me_phi->push_back(mu_me_phi->at(sublead_mu));
+	graphicObjects::me_theta->push_back(mu_me_theta->at(sublead_mu));
+	graphicObjects::me_qoverp->push_back(mu_me_qoverp->at(sublead_mu));
+	graphicObjects::ie_d0->push_back(mu_ie_d0->at(sublead_mu));
+	graphicObjects::ie_z0->push_back(mu_ie_z0->at(sublead_mu));
+	graphicObjects::ie_phi->push_back(mu_ie_phi->at(sublead_mu));
+	graphicObjects::ie_theta->push_back(mu_ie_theta->at(sublead_mu));
+	graphicObjects::ie_qoverp->push_back(mu_ie_qoverp->at(sublead_mu));
+	graphicObjects::nOutliersOnTrack->push_back(mu_nOutliersOnTrack->at(sublead_mu));
+	graphicObjects::nBLHits->push_back(mu_nBLHits->at(sublead_mu));
+	graphicObjects::nPixHits->push_back(mu_nPixHits->at(sublead_mu));
+	graphicObjects::nSCTHits->push_back(mu_nSCTHits->at(sublead_mu));
+	graphicObjects::nTRTHits->push_back(mu_nTRTHits->at(sublead_mu));
+	graphicObjects::nTRTHighTHits->push_back(mu_nTRTHighTHits->at(sublead_mu));
+	graphicObjects::nBLSharedHits->push_back(mu_nBLSharedHits->at(sublead_mu));
+	graphicObjects::nPixSharedHits->push_back(mu_nPixSharedHits->at(sublead_mu));
+	graphicObjects::nPixHoles->push_back(mu_nPixHoles->at(sublead_mu));
+	graphicObjects::nSCTSharedHits->push_back(mu_nSCTSharedHits->at(sublead_mu));
+	graphicObjects::nSCTHoles->push_back(mu_nSCTHoles->at(sublead_mu));
+	graphicObjects::nTRTOutliers->push_back(mu_nTRTOutliers->at(sublead_mu));
+	graphicObjects::nTRTHighTOutliers->push_back(mu_nTRTHighTOutliers->at(sublead_mu));
+	graphicObjects::nGangedPixels->push_back(mu_nGangedPixels->at(sublead_mu));
+	graphicObjects::nPixelDeadSensors->push_back(mu_nPixelDeadSensors->at(sublead_mu));
+	graphicObjects::nSCTDeadSensors->push_back(mu_nSCTDeadSensors->at(sublead_mu));
+	graphicObjects::nTRTDeadStraws->push_back(mu_nTRTDeadStraws->at(sublead_mu));
+	graphicObjects::expectBLayerHit->push_back(mu_expectBLayerHit->at(sublead_mu));
+	graphicObjects::nMDTHits->push_back(mu_nMDTHits->at(sublead_mu));
+	graphicObjects::nMDTHoles->push_back(mu_nMDTHoles->at(sublead_mu));
+	graphicObjects::nCSCEtaHits->push_back(mu_nCSCEtaHits->at(sublead_mu));
+	graphicObjects::nCSCEtaHoles->push_back(mu_nCSCEtaHoles->at(sublead_mu));
+	graphicObjects::nCSCPhiHits->push_back(mu_nCSCPhiHits->at(sublead_mu));
+	graphicObjects::nCSCPhiHoles->push_back(mu_nCSCPhiHoles->at(sublead_mu));
+	graphicObjects::nRPCEtaHits->push_back(mu_nRPCEtaHits->at(sublead_mu));
+	graphicObjects::nRPCEtaHoles->push_back(mu_nRPCEtaHoles->at(sublead_mu));
+	graphicObjects::nRPCPhiHits->push_back(mu_nRPCPhiHits->at(sublead_mu));
+	graphicObjects::nRPCPhiHoles->push_back(mu_nRPCPhiHoles->at(sublead_mu));
+	graphicObjects::nTGCEtaHits->push_back(mu_nTGCEtaHits->at(sublead_mu));
+	graphicObjects::nTGCEtaHoles->push_back(mu_nTGCEtaHoles->at(sublead_mu));
+	graphicObjects::nTGCPhiHits->push_back(mu_nTGCPhiHits->at(sublead_mu));
+	graphicObjects::nTGCPhiHoles->push_back(mu_nTGCPhiHoles->at(sublead_mu));
+	graphicObjects::nMDTBIHits->push_back(mu_nMDTBIHits->at(sublead_mu));
+	graphicObjects::nMDTBMHits->push_back(mu_nMDTBMHits->at(sublead_mu));
+	graphicObjects::nMDTBOHits->push_back(mu_nMDTBOHits->at(sublead_mu));
+	graphicObjects::nMDTBEEHits->push_back(mu_nMDTBEEHits->at(sublead_mu));
+	graphicObjects::nMDTBIS78Hits->push_back(mu_nMDTBIS78Hits->at(sublead_mu));
+	graphicObjects::nMDTEIHits->push_back(mu_nMDTEIHits->at(sublead_mu));
+	graphicObjects::nMDTEMHits->push_back(mu_nMDTEMHits->at(sublead_mu));
+	graphicObjects::nMDTEOHits->push_back(mu_nMDTEOHits->at(sublead_mu));
+	graphicObjects::nMDTEEHits->push_back(mu_nMDTEEHits->at(sublead_mu));
+	graphicObjects::nRPCLayer1EtaHits->push_back(mu_nRPCLayer1EtaHits->at(sublead_mu));
+	graphicObjects::nRPCLayer2EtaHits->push_back(mu_nRPCLayer2EtaHits->at(sublead_mu));
+	graphicObjects::nRPCLayer3EtaHits->push_back(mu_nRPCLayer3EtaHits->at(sublead_mu));
+	graphicObjects::nRPCLayer1PhiHits->push_back(mu_nRPCLayer1PhiHits->at(sublead_mu));
+	graphicObjects::nRPCLayer2PhiHits->push_back(mu_nRPCLayer2PhiHits->at(sublead_mu));
+	graphicObjects::nRPCLayer3PhiHits->push_back(mu_nRPCLayer3PhiHits->at(sublead_mu));
+	graphicObjects::nTGCLayer1EtaHits->push_back(mu_nTGCLayer1EtaHits->at(sublead_mu));
+	graphicObjects::nTGCLayer2EtaHits->push_back(mu_nTGCLayer2EtaHits->at(sublead_mu));
+	graphicObjects::nTGCLayer3EtaHits->push_back(mu_nTGCLayer3EtaHits->at(sublead_mu));
+	graphicObjects::nTGCLayer4EtaHits->push_back(mu_nTGCLayer4EtaHits->at(sublead_mu));
+	graphicObjects::nTGCLayer1PhiHits->push_back(mu_nTGCLayer1PhiHits->at(sublead_mu));
+	graphicObjects::nTGCLayer2PhiHits->push_back(mu_nTGCLayer2PhiHits->at(sublead_mu));
+	graphicObjects::nTGCLayer3PhiHits->push_back(mu_nTGCLayer3PhiHits->at(sublead_mu));
+	graphicObjects::nTGCLayer4PhiHits->push_back(mu_nTGCLayer4PhiHits->at(sublead_mu));
+	graphicObjects::barrelSectors->push_back(mu_barrelSectors->at(sublead_mu));
+	graphicObjects::endcapSectors->push_back(mu_endcapSectors->at(sublead_mu));
+	graphicObjects::trackd0->push_back(mu_trackd0->at(sublead_mu));
+	graphicObjects::trackz0->push_back(mu_trackz0->at(sublead_mu));
+	graphicObjects::trackphi->push_back(mu_trackphi->at(sublead_mu));
+	graphicObjects::tracktheta->push_back(mu_tracktheta->at(sublead_mu));
+	graphicObjects::trackqoverp->push_back(mu_trackqoverp->at(sublead_mu));
+	graphicObjects::trackcov_d0->push_back(mu_trackcov_d0->at(sublead_mu));
+	graphicObjects::trackcov_z0->push_back(mu_trackcov_z0->at(sublead_mu));
+	graphicObjects::trackcov_phi->push_back(mu_trackcov_phi->at(sublead_mu));
+	graphicObjects::trackcov_theta->push_back(mu_trackcov_theta->at(sublead_mu));
+	graphicObjects::trackcov_qoverp->push_back(mu_trackcov_qoverp->at(sublead_mu));
+	graphicObjects::trackcov_d0_z0->push_back(mu_trackcov_d0_z0->at(sublead_mu));
+	graphicObjects::trackcov_d0_phi->push_back(mu_trackcov_d0_phi->at(sublead_mu));
+	graphicObjects::trackcov_d0_theta->push_back(mu_trackcov_d0_theta->at(sublead_mu));
+	graphicObjects::trackcov_d0_qoverp->push_back(mu_trackcov_d0_qoverp->at(sublead_mu));
+	graphicObjects::trackcov_z0_phi->push_back(mu_trackcov_z0_phi->at(sublead_mu));
+	graphicObjects::trackcov_z0_theta->push_back(mu_trackcov_z0_theta->at(sublead_mu));
+	graphicObjects::trackcov_z0_qoverp->push_back(mu_trackcov_z0_qoverp->at(sublead_mu));
+	graphicObjects::trackcov_phi_theta->push_back(mu_trackcov_phi_theta->at(sublead_mu));
+	graphicObjects::trackcov_phi_qoverp->push_back(mu_trackcov_phi_qoverp->at(sublead_mu));
+	graphicObjects::trackcov_theta_qoverp->push_back(mu_trackcov_theta_qoverp->at(sublead_mu));
+	graphicObjects::trackfitchi2->push_back(mu_trackfitchi2->at(sublead_mu));
+	graphicObjects::trackfitndof->push_back(mu_trackfitndof->at(sublead_mu));
+	graphicObjects::hastrack->push_back(mu_hastrack->at(sublead_mu));
+	if(isMC)
+	{
+		graphicObjects::truth_dr->push_back(mu_truth_dr->at(sublead_mu));
+		graphicObjects::truth_E->push_back(mu_truth_E->at(sublead_mu));
+		graphicObjects::truth_pt->push_back(mu_truth_pt->at(sublead_mu));
+		graphicObjects::truth_eta->push_back(mu_truth_eta->at(sublead_mu));
+		graphicObjects::truth_phi->push_back(mu_truth_phi->at(sublead_mu));
+		graphicObjects::truth_type->push_back(mu_truth_type->at(sublead_mu));
+		graphicObjects::truth_status->push_back(mu_truth_status->at(sublead_mu));
+		graphicObjects::truth_barcode->push_back(mu_truth_barcode->at(sublead_mu));
+		graphicObjects::truth_mothertype->push_back(mu_truth_mothertype->at(sublead_mu));
+		graphicObjects::truth_motherbarcode->push_back(mu_truth_motherbarcode->at(sublead_mu));
+		graphicObjects::truth_matched->push_back(mu_truth_matched->at(sublead_mu));
+	}
+	graphicObjects::EFCB_dr->push_back(mu_EFCB_dr->at(sublead_mu));
+	graphicObjects::EFCB_index->push_back(mu_EFCB_index->at(sublead_mu));
+	graphicObjects::EFMG_dr->push_back(mu_EFMG_dr->at(sublead_mu));
+	graphicObjects::EFMG_index->push_back(mu_EFMG_index->at(sublead_mu));
+	graphicObjects::EFME_dr->push_back(mu_EFME_dr->at(sublead_mu));
+	graphicObjects::EFME_index->push_back(mu_EFME_index->at(sublead_mu));
+	graphicObjects::L2CB_dr->push_back(mu_L2CB_dr->at(sublead_mu));
+	graphicObjects::L2CB_index->push_back(mu_L2CB_index->at(sublead_mu));
+	graphicObjects::L1_dr->push_back(mu_L1_dr->at(sublead_mu));
+	graphicObjects::L1_index->push_back(mu_L1_index->at(sublead_mu));
 	
 	/////////////////////////////////////////////////////
 	// fill the all cuts tree ///////////////////////////
@@ -564,14 +1078,21 @@ void analysisSkeleton::fillCutFlow(string sorderedcutname, string sIsPreselectio
 	int muSize = (int)mu_pt->size();
 	if(sIsPreselection != "preselection"  &&  muSize==2)
 	{
-		int muMinus = (mu_charge->at(0)<0) ? 0 : 1;
-		int muPlus  = (mu_charge->at(0)>0) ? 0 : 1;
-		
+		//int lead_mu = (mu_charge->at(0)<0) ? 0 : 1;
+		//int sublead_mu  = (mu_charge->at(0)>0) ? 0 : 1;
+		int lead_mu     = ai;
+		int sublead_mu  = bi;
+		if( mu_pt->at(ai) < mu_pt->at(bi) )
+		{
+			lead_mu     = bi;
+			sublead_mu  = ai;
+		}
+
 		if(values2fill.size()>0) values2fill.clear();
 		
-		current_imass    = imass(pmu[muMinus],pmu[muPlus]);
-		current_mu_pT    = mu_pt->at(muMinus)*MeV2TeV; //pT(mu_me_qoverp->at(muMinus),mu_me_theta->at(muMinus))*MeV2TeV;
-		current_cosTheta = cosThetaCollinsSoper( pmu[muMinus], -1, pmu[muPlus], +1 );
+		current_imass    = imass(pmu[lead_mu],pmu[sublead_mu]);
+		current_mu_pT    = mu_pt->at(lead_mu)*MeV2TeV; //pT(mu_me_qoverp->at(lead_mu),mu_me_theta->at(lead_mu))*MeV2TeV;
+		current_cosTheta = cosThetaCollinsSoper( pmu[lead_mu], -1, pmu[sublead_mu], +1 );
 		
 		///////////////////////////////////////////////////////////////////////
 		// these values go in the cutFlow histograms //////////////////////////
@@ -751,7 +1272,7 @@ bool analysisSkeleton::applySingleMuonSelection()
 	return passCutFlow;
 }
 
-bool analysisSkeleton::applyDoubleMuonSelection()
+bool analysisSkeleton::applyDoubleMuonSelection(bool isMC)
 {
 	TMapsb cutsToSkip; // dummy (empty)
 	passCutFlow = doubleSelection(cutsToSkip);
@@ -760,7 +1281,7 @@ bool analysisSkeleton::applyDoubleMuonSelection()
 	{
 		///////////////////////////////////////////////
 		// fill the cutFlow and the allCuts items /////
-		fillAfterCuts(); //////////////////////////////
+		fillAfterCuts(isMC); //////////////////////////////
 		///////////////////////////////////////////////
 		
 		////////////////////////////////////////////////////
@@ -1680,7 +2201,7 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 	TMapsb::iterator itrEnd = cutsToSkip.end();
 	TMapsb::iterator itr;
 	
-	int muSize  = (int)mu_charge->size();
+	int muSize  = (int)mu_pt->size();
 
 	passCutFlow = true;
 	

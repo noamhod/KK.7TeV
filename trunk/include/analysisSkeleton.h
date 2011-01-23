@@ -545,7 +545,7 @@ public:
 	
 	bool applyPreselection();
 	bool applySingleMuonSelection();
-	bool applyDoubleMuonSelection();
+	bool applyDoubleMuonSelection(bool isMC);
 	
 	void fillCutProfile1D();
 	void fillCutProfile2D();
@@ -568,7 +568,7 @@ private:
 	inline bool singleSelection(TMapsb& cutsToSkip);
 	inline bool doubleSelection(TMapsb& cutsToSkip);
 	
-	void fillAfterCuts();
+	void fillAfterCuts(bool isMC);
 	void fillBeforeCuts();
 	void fillCutFlow(string sorderedcutname, string sIsPreselection = "");
 

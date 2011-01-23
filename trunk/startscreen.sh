@@ -1,4 +1,4 @@
 #!/bin/bash/
 host=$1
-screen -S Z -c scripts/.screenrc_Z_$host
-
+dirname=`pwd | sed 's,^\(.*/\)\?\([^/]*\),\2,'`
+screen -S Zscreen_$dirname -c scripts/.screenrc_Z_$host

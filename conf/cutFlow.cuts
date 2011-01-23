@@ -64,9 +64,9 @@ selection		202			0				z0						1				1.
 selection		302			0				isolation30				1				0.05
 #selection		303			0				isolation40				1				0.2
 
-selection		401			1				oppositeCharge			1				0.
+#selection		401			1				oppositeCharge			1				0.
 selection		402			1				imass					1				0.07
-selection		403			1				imassMax				1				0.4
+#selection		403			1				imassMax				1				0.4
 
 
 #selection		501			0				cosThetaDimu			1				-0.96

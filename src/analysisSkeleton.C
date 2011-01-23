@@ -387,8 +387,7 @@ void analysisSkeleton::fillAfterCuts(bool isMC)
 	{
 		lead_mu     = bi;
 		sublead_mu  = ai;
-	}	
-
+	}
 
 	current_mu_me_pT     = pT(mu_me_qoverp->at(lead_mu),mu_me_theta->at(lead_mu))*MeV2TeV;
 	current_muplus_me_pT = pT(mu_me_qoverp->at(sublead_mu),mu_me_theta->at(sublead_mu))*MeV2TeV;
@@ -471,7 +470,7 @@ void analysisSkeleton::fillAfterCuts(bool isMC)
 	graphicObjects::CosThetaDimu = current_cosmicCosth;
 	graphicObjects::ipTDiff      = current_ipTdiff;
 	graphicObjects::EtaSum       = current_etaSum;
-
+	
 	graphicObjects::n = mu_n;
 	graphicObjects::E->push_back(mu_E->at(lead_mu));
 	graphicObjects::pt->push_back(mu_pt->at(lead_mu));
@@ -744,7 +743,6 @@ void analysisSkeleton::fillAfterCuts(bool isMC)
 	graphicObjects::L2CB_index->push_back(mu_L2CB_index->at(lead_mu));
 	graphicObjects::L1_dr->push_back(mu_L1_dr->at(lead_mu));
 	graphicObjects::L1_index->push_back(mu_L1_index->at(lead_mu));
-
 	graphicObjects::E->push_back(mu_E->at(sublead_mu));
 	graphicObjects::pt->push_back(mu_pt->at(sublead_mu));
 	graphicObjects::m->push_back(mu_m->at(sublead_mu));
@@ -1266,9 +1264,10 @@ bool analysisSkeleton::applySingleMuonSelection()
 	// fill the NO CUTS items //////////////
 	fillBeforeCuts(); //////////////////////
 	////////////////////////////////////////
-
+	
 	TMapsb cutsToSkip; // dummy (empty)
 	passCutFlow = singleSelection(cutsToSkip);
+	
 	return passCutFlow;
 }
 
@@ -2201,7 +2200,7 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 	TMapsb::iterator itrEnd = cutsToSkip.end();
 	TMapsb::iterator itr;
 	
-	int muSize  = (int)mu_pt->size();
+	int muSize  = (int)mu_charge->size();
 
 	passCutFlow = true;
 	
@@ -2391,9 +2390,11 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
+				cout << "before: run=" << RunNumber << ", evt=" << EventNumber << ": mu/muSize=" << mu+1 << "/" << muSize << endl;
 				thisMuPass = ( isCombMuCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_isCombinedMuon->at(mu)) ) ? true : false;
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
+				cout << "after run=" << RunNumber << ", evt=" << EventNumber << ": mu/muSize=" << mu+1 << "/" << muSize << endl;
 			}
 		}
 		
@@ -2698,7 +2699,12 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 		
 		////////////////////////////////////////////////////////////////////////
 		// cutFlow /////////////////////////////////////////////////////////////
-		if(passCutFlow  &&  !isSkippedCut) fillCutFlow(sorderedcutname); ///////
+		if(passCutFlow  &&  !isSkippedCut)
+		{
+			cout << "before fill" << endl;
+			fillCutFlow(sorderedcutname); ///////
+			cout << "after fill" << endl;
+		}
 		////////////////////////////////////////////////////////////////////////
 		
 	} // end for(m_cutFlowOrdered)

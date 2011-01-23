@@ -2989,8 +2989,8 @@ void combinedGraphics::draw_trigMCvsData(string dir, string hDir, string sVar)
 	TVirtualPad* pad = cnv->cd(1);
 	pad->SetPad(0.009197324,0.2150259,0.9899666,0.9909326);
 	pad->SetFillColor(kWhite);
-	if(m_logx) pad->SetLogx();
-	if(m_logy) pad->SetLogy();
+	//if(m_logx) pad->SetLogx();
+	//if(m_logy) pad->SetLogy();
 	
 	TVirtualPad* pad_ratio = cnv->cd(2);
 	pad_ratio->SetPad(0.009197324,0.01036269,0.9899666,0.253886);
@@ -3061,6 +3061,15 @@ void combinedGraphics::draw_trigMCvsData(string dir, string hDir, string sVar)
 	Double_t etabins[etanbins+1] = {-2.4,-2.18,-1.95,-1.74,-1.52,-1.37,-1.05,-0.84,-0.63,-0.42,-0.21,
 									0,
 									+0.21,+0.42,+0.63,+0.84,+1.05,+1.37,+1.52,+1.74,+1.95,+2.18,+2.4};
+	/*
+	const int etanbins = 20;
+	Double_t etabins[etanbins+1];
+	Double_t etaAbsMax = 2.5;
+	etabins[0] = -etaAbsMax;
+	Double_t deta = (2.*etaAbsMax)/(Double_t)etanbins;
+	for(int i=1 ; i<=etanbins ; i++) etabins[i] = etabins[0] + i*deta;
+	*/
+	
 	//const int phinbins_tgc = 8;
 	//const int phinbins_rpc = 16;
 	//float phibins_tgc[phinbins_tgc+1] = {...};
@@ -3218,8 +3227,16 @@ void combinedGraphics::draw_trigMCvsData(string dir, string hDir, string sVar)
 	ratio( hRat->GetXaxis()->GetXmin(), hRat->GetXaxis()->GetXmax(), hEffiData, hEffiMC, hRat);
 	
 	pad->cd();
-	hEffiData->SetMinimum(0.);
-	hEffiData->SetMaximum(1.1);
+	if(sVar=="eta")
+	{
+		hEffiData->SetMinimum(0.7);
+		hEffiData->SetMaximum(1.);
+	}
+	else
+	{
+		hEffiData->SetMinimum(0.);
+		hEffiData->SetMaximum(1.1);
+	}
 	hEffiData->Draw("e1");
 	hEffiMC->Draw("SAMES");
 	pvtxt->Draw("SAMES");

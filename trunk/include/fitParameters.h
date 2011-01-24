@@ -38,7 +38,7 @@ static double   outparSignalBackground[7];   // out errors
 static double   errSignal[6];                // out paramenters
 static double   errSignalBackground[7];      // out errors
 
-static double p[7];
+static double ppar[7];
 
 #endif
 

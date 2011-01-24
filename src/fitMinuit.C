@@ -303,18 +303,18 @@ void fitMinuit::minimize(bool signal_only, TH1D* h, double* yields)
 	//--------------------------- test ---------------------------
 	///// INITIALIZATION:  SIGNAL + BACKGROUND
 	// Exponential
-	p[0] = scale2bg(h);   // Scale Background (Nb)
-	p[1] = scale2data(h);   // Scale Signal (Ns)
-	p[2] = 2.;       // Exp: constant argument
-	p[3] = -0.00001; // Exp: the multiplier of the x argument
+	ppar[0] = scale2bg(h);   // Scale Background (Nb)
+	ppar[1] = scale2data(h);   // Scale Signal (Ns)
+	ppar[2] = 2.;       // Exp: constant argument
+	ppar[3] = -0.00001; // Exp: the multiplier of the x argument
 	// Breit-Wigner x Gaussian convolution
-	p[4] = 2.5*GeV2TeV;    // Breit Wigner Width (gamma)
-	p[5] = 90.*GeV2TeV;   // Most probable location (peak mean) 
-	p[6] = 2.*GeV2TeV;    // Gaussian sigma 1
-	//p[7] = 3000.;    // Gaussian sigma 2 
-	//p[8] = 3000.;    // Gaussian sigma 3
+	ppar[4] = 2.5*GeV2TeV;    // Breit Wigner Width (gamma)
+	ppar[5] = 90.*GeV2TeV;   // Most probable location (peak mean) 
+	ppar[6] = 2.*GeV2TeV;    // Gaussian sigma 1
+	//ppar[7] = 3000.;    // Gaussian sigma 2 
+	//ppar[8] = 3000.;    // Gaussian sigma 3
 	guess = new TF1("guess",fitFunctionSB, XMIN, XMAX ,8);
-	guess->SetParameters(p);
+	guess->SetParameters(ppar);
 	//fGuess = (TF1*)guess->Clone();
 	//cout << "\nIntegral = " << guess->Integral(XMIN, XMAX) << "\n" << endl;
 	//---------------------------------------------------------------

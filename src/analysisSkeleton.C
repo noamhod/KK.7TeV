@@ -445,12 +445,12 @@ void analysisSkeleton::fillAfterCuts(bool isMC)
 	
 	/////////////////////////////////////////////////
 	// fill the graphicObjects all cuts tree ////////
-	graphicObjects::RunNumber;
-	graphicObjects::EventNumber;
-	graphicObjects::timestamp;
-	graphicObjects::timestamp_ns;
-	graphicObjects::lbn;
-	graphicObjects::bcid;
+	graphicObjects::RunNumber = RunNumber;
+	graphicObjects::EventNumber = EventNumber;
+	graphicObjects::timestamp = timestamp;
+	graphicObjects::timestamp_ns = timestamp_ns;
+	graphicObjects::lbn = lbn;
+	graphicObjects::bcid = bcid;
 
 	graphicObjects::ivxp            = getPVindex();
 	graphicObjects::iLeadingMuon    = lead_mu;
@@ -1127,28 +1127,32 @@ int analysisSkeleton::countQAflags()
 			nGoodQAflags++;
 		}
 	}
+	
 	return nGoodQAflags;
 }
 
 void analysisSkeleton::pTSort()
 {
-	// build a reduced pT to index map of the good QA muons only
-	TMapdi pTtoIndexMapReduced;
-	for(TMapdi::iterator it=pTtoIndexMap.begin() ; it!=pTtoIndexMap.end() ; it++)
-	{
-		if(muQAflags[it->second]) pTtoIndexMapReduced.insert( make_pair(it->first,it->second) );
-	}
-
 	// the map is already sorted by the pT size but,
 	// from the lowest to the highest, so there's
 	// no need to convert values.
 	// the following line defines the reversed iterator
 	// so the "rbegin()" points the iterator to the entry
 	// with the largest pT and so on.
-	TMapdi::reverse_iterator rit=pTtoIndexMapReduced.rbegin();
-	ai = rit->second;
-	rit++;
-	bi = rit->second;
+	
+	if(pTtoIndexMap.size()<2)
+	{
+		cout << "ERROR: in pTSort(), trying to sort a <2 map. Exitting now !" << endl;
+		exit(-1);
+	}
+	
+	///////////////////////////////////////////////////////////////////////////////
+	// no matter how many entries in the map, just take the 2 with highest pT: ////
+	TMapdi::reverse_iterator rit=pTtoIndexMap.rbegin(); ///////////////////////////
+	ai = rit->second; /////////////////////////////////////////////////////////////
+	rit++; ////////////////////////////////////////////////////////////////////////
+	bi = rit->second; /////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////
 }
 
 void analysisSkeleton::imassSort()
@@ -1222,8 +1226,9 @@ bool analysisSkeleton::assignPairIndices()
 	// select the final muon pair
 	if(pTtoIndexMap.size()==2)
 	{
-		ai = 0;
-		bi = 1;
+		pTSort();
+		//ai = 0;
+		//bi = 1;
 	}
 	else if(pTtoIndexMap.size()>2)
 	{
@@ -2708,6 +2713,16 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 	return passCutFlow;
 }
 
+/*
+for(int i=0 ; i<muSize ; i++)
+	{
+		if(!muQAflags[i]) continue;
+		for(int j=0 ; (j<muSize && j!=i) ; j++)
+		{
+			if(!muQAflags[j]) continue;
+			ai = i;
+			bi = j;
+*/
 inline bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
 {
 	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;
@@ -2732,7 +2747,7 @@ inline bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
 	bool isPair = assignPairIndices(); //////////////////
 	if(!isPair) return false; ///////////////////////////
 	/////////////////////////////////////////////////////
-
+	
 	passCutFlow    = true;
 	passCurrentCut = true;
 	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)

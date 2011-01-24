@@ -545,41 +545,6 @@ class graphicObjects// : public utilities
 		float ipTDiff;
 		float EtaSum;
 		
-		// all cuts - vectors
-		/*
-		vector<float>* charge;
-		vector<float>* m;
-		vector<float>* e;
-		vector<float>* px;
-		vector<float>* py;
-		vector<float>* pz;
-		vector<float>* pt;
-		vector<float>* eta;
-		vector<float>* phi;
-		vector<float>* d0_exPV;
-		vector<float>* z0_exPV;
-		vector<float>* qoverp_ms;
-		vector<float>* theta_ms;
-		vector<float>* phi_ms;
-		vector<float>* qoverp_me;
-		vector<float>* theta_me;
-		vector<float>* phi_me;
-		vector<float>* qoverp_id;
-		vector<float>* theta_id;
-		vector<float>* phi_id;
-		vector<float>* qoverp_ie;
-		vector<float>* theta_ie;
-		vector<float>* phi_ie;
-		vector<float>   *matchchi2;
-		vector<int>     *matchndof;
-		vector<unsigned short> *allauthor;
-		vector<int>     *author;
-		vector<int>     *isStandAloneMuon;
-		vector<int>     *isCombinedMuon;
-		vector<float>   *trackfitchi2;
-		vector<int>     *trackfitndof;
-		*/
-		
 		
 		// cut profile 1d
 		vector<float>* pT_profile;

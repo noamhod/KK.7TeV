@@ -1,4 +1,4 @@
-#define lvl1MCphysics_cxx
+#define WZphysD3PD_cxx
 #include "WZphysD3PD.h"
 #include <TH2.h>
 #include <TStyle.h>

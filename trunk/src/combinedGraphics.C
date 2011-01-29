@@ -3229,8 +3229,10 @@ void combinedGraphics::draw_trigMCvsData(string dir, string hDir, string sVar)
 	pad->cd();
 	if(sVar=="eta")
 	{
-		hEffiData->SetMinimum(0.7);
-		hEffiData->SetMaximum(1.);
+		//hEffiData->SetMinimum(0.7);
+		//hEffiData->SetMaximum(1.);
+		hEffiData->SetMinimum(0.);
+		hEffiData->SetMaximum(1.1);
 	}
 	else
 	{

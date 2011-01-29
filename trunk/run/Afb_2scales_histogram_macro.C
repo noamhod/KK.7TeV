@@ -40,9 +40,86 @@
 using namespace std;
 
 // Declare pointer to data as global (not elegant but TMinuit needs this).
-vector<double> *VCOSTH = new vector<double>();
+vector<vector<double> *> VVCOSTH;
+vector<TH1D*> VHIST_Z0;
+vector<TH1D*> VHIST_DATA;
+vector<TH1D*> VHIST_ZPRIME;
+vector<TVirtualPad*> VPAD;
+TCanvas* CNV = new TCanvas("C", "C", 1200, 800);
+unsigned int CURRENTBIN;
+bool ISZMUMU;
+bool ISZPRIME;
+bool ISDATA;
+string REFNAME = "CosThetaCS";
+//string REFNAME = "CosThetaHE";
 Float_t IMASS;
 Float_t COSTH;
+vector<float>* CHARGE;
+vector<float>* PX;
+vector<float>* PY;
+vector<float>* PZ;
+vector<float>* E;
+TLorentzVector* pa = new TLorentzVector();
+TLorentzVector* pb = new TLorentzVector();
+TLorentzVector m_pTmp;
+float GeV2TeV = 1.e-3;
+float MeV2TeV = 1.e-6;
+float muonMass = 0.105658367; // GeV
+
+inline float imass( TLorentzVector* pa, TLorentzVector* pb )
+{
+	m_pTmp = (*pa)+(*pb);
+	return m_pTmp.M();
+}
+
+inline float QT( TLorentzVector* pa, TLorentzVector* pb )
+{
+	m_pTmp = (*pa)+(*pb);
+	return m_pTmp.Perp();
+}
+
+inline float ySystem( TLorentzVector* pa, TLorentzVector* pb )
+{
+	m_pTmp = (*pa)+(*pb);
+	return m_pTmp.Rapidity();
+}
+
+inline float cosThetaBoost( TLorentzVector* pa, float ca, TLorentzVector* pb, float cb )
+{
+	// http://xrootd.slac.stanford.edu/BFROOT/www/doc/workbook_backup_010108/analysis/analysis.html
+	// A useful quantity in many analyses is the helicity angle.
+	// In the reaction Y -> X -> a + b, the helicity angle of 
+	// particle a is the angle measured in the rest frame of the
+	//decaying parent particle, X, between the direction of the
+	// decay daughter a and the direction of the grandparent particle Y.
+
+	m_pTmp = (*pa)+(*pb); // this is the mumu system (Z) 4vector
+	TVector3 ZboostVector = m_pTmp.BoostVector(); // this is the 3vector of the Z
+	TLorentzVector p; // this is the muon 4vector
+	
+	if(ca<0)      p.SetPxPyPzE(pa->Px(),pa->Py(),pa->Pz(),pa->E());
+	else if(cb<0) p.SetPxPyPzE(pb->Px(),pb->Py(),pb->Pz(),pb->E());
+	p.Boost( -ZboostVector ); // boost p to the dimuon CM (rest) frame
+	float cosThetaB = p.Vect()*m_pTmp.Vect()/(p.P()*m_pTmp.P());
+	//if (ySystem(pa,pb) < 0) cosThetaB *= -1.; // reclassify ???
+	return cosThetaB;
+}
+
+inline float cosThetaCollinsSoper( TLorentzVector* pa, float ca, TLorentzVector* pb, float cb )
+{
+	// this will work only for leptons e, mu and tau
+	// by default it is assumed that pa is the lepton
+	// if instead pb is the lepton, then the result is
+	// reclassified by a (-) sign - see line 4.
+	float mass2 = imass(pa,pb)*imass(pa,pb);
+	float QT2 = QT(pa,pb)*QT(pa,pb);
+	//float cosThetaCS = 2.*( pa->Plus()*pb->Minus() - pa->Minus()*pb->Plus() ) / sqrt( mass2 * (mass2 + QT2) );
+	float cosThetaCS = 2.*( pa->Pz()*pb->E() - pa->E()*pb->Pz() ) / sqrt( mass2 * (mass2 + QT2) );
+	if (ca>0. && cb<0.)     cosThetaCS *= -1.; // if pb is the lepton
+	if (ySystem(pa,pb) < 0) cosThetaCS *= -1.; // reclassify
+	return cosThetaCS;
+}
+
 
 // The pdf to be fitted
 // First argument needs to be a pointer in order to plot with the TF1 class.
@@ -68,7 +145,8 @@ double cosThetaPdf(double* xPtr, double par[])
 // fcn passes back f = - 2*ln(L), the function to be minimized.
 void fcn(int& npar, double* deriv, double& f, double par[], int flag)
 {
-	vector<double> xVec = *VCOSTH; // VCOSTH is global
+	//vector<double> xVec = *VCOSTH; // VCOSTH is global
+	vector<double> xVec = *VVCOSTH[CURRENTBIN]; // VVCOSTH is global
 	int n = xVec.size();
 	double lnL = 0.;
 	double x   = 0.;
@@ -87,7 +165,7 @@ void fcn(int& npar, double* deriv, double& f, double par[], int flag)
 
 void fillVec(TTree* t, TH1D* h, Int_t b)
 {
-	VCOSTH->clear();
+	//VCOSTH->clear();
 	if (t==0) return;
 	
 	Double_t bmin = h->GetBinLowEdge(b);
@@ -97,11 +175,38 @@ void fillVec(TTree* t, TH1D* h, Int_t b)
 	for (Long64_t l64t_jentry=0 ; l64t_jentry<t->GetEntries() ; l64t_jentry++)
 	{
 		t->GetEntry(l64t_jentry);
-		if( IMASS>=(Float_t)bmin  &&  IMASS<(Float_t)bmax ) VCOSTH->push_back(COSTH);
+		//if( IMASS>=(Float_t)bmin  &&  IMASS<(Float_t)bmax ) VCOSTH->push_back(COSTH);
+		if( IMASS>=(Float_t)bmin  &&  IMASS<(Float_t)bmax ) VVCOSTH[CURRENTBIN]->push_back(COSTH);
 	}
 }
 
-void minimize(double& A4, double& dA4)
+void fillVec(TTree* t, TH1D* h)
+{
+	for(int v=0 ; v<(int)VVCOSTH.size() ; v++) VVCOSTH[v]->clear();
+	if (t==0) return;
+	
+	TAxis* xaxis = h->GetXaxis();
+	
+	for (Long64_t l64t_jentry=0 ; l64t_jentry<t->GetEntries() ; l64t_jentry++)
+	{
+		t->GetEntry(l64t_jentry);
+		int bin = (int)xaxis->FindBin((Double_t)IMASS);
+		if(bin<0 || bin>=(int)VVCOSTH.size()) continue;
+		if(CHARGE->at(0)*CHARGE->at(1)>=0) continue;
+		pa->SetPxPyPzE(PX->at(0)*MeV2TeV,PY->at(0)*MeV2TeV,PZ->at(0)*MeV2TeV,E->at(0)*MeV2TeV);
+		pb->SetPxPyPzE(PX->at(1)*MeV2TeV,PY->at(1)*MeV2TeV,PZ->at(1)*MeV2TeV,E->at(1)*MeV2TeV);
+		if(REFNAME=="CosThetaCS") COSTH = cosThetaCollinsSoper( pa, CHARGE->at(0), pb, CHARGE->at(1) );
+		else COSTH = 0.;
+		
+		VVCOSTH[bin]->push_back(COSTH);
+		
+		if(ISZMUMU)  VHIST_Z0[bin]->Fill(COSTH);
+		if(ISZPRIME) VHIST_ZPRIME[bin]->Fill(COSTH);
+		if(ISDATA)   VHIST_DATA[bin]->Fill(COSTH);
+	}
+}
+
+void minimize(double guess, double& A4, double& dA4)
 {
 	int npar = 1;      // the number of parameters
 	TMinuit minuit(npar);
@@ -113,8 +218,8 @@ void minimize(double& A4, double& dA4)
 	double maxVal[npar];     // maximum bound on parameter
 	string parName[npar];
 
-	par[0]      = 0.01; 
-	stepSize[0] = 1e-6;
+	par[0]      = guess; 
+	stepSize[0] = 1e-4;
 	minVal[0]   = -1.;
 	maxVal[0]   = +1.;
 	parName[0]  = "A4";
@@ -152,12 +257,11 @@ void execute()
 {
 	int minEntriesDATA = 10;
 	int minEntriesMC   = 10;
-	string refframe = "CosThetaCS";
-	//string refframe = "CosThetaHE";
+	string refframe = REFNAME;
 	bool doLogM = true;
 	bool doLogx = false;
 	
-	float GeV2TeV = 1.e-3;
+	
 	/*
 	int    imass_nbins = 16;
 	double imass_min   = 70.*GeV2TeV;
@@ -176,6 +280,8 @@ void execute()
 	*/
 	
 	const int imass_nbins = 12;
+	const int ncol_pads   = 2; // = imass_nbins/nrow_pads !!!
+	const int nrow_pads   = 6; // = imass_nbins/ncol_pads !!!
 	double imass_min   = 72.62*GeV2TeV;
 	double imass_max   = 381.09*GeV2TeV;
 	Double_t M_bins[imass_nbins+1] = {72.62*GeV2TeV, 83.37*GeV2TeV, 95.73*GeV2TeV, 109.91*GeV2TeV,
@@ -183,8 +289,31 @@ void execute()
 									  219.30*GeV2TeV, 251.79*GeV2TeV, 289.09*GeV2TeV, 331.92*GeV2TeV, 381.09*GeV2TeV};
 	//M_bins = {2.00*GeV, 2.30*GeV, 2.64*GeV, 3.03*GeV, 3.48*GeV, 3.99*GeV, 4.58*GeV, 5.26*GeV, 6.04*GeV, 6.93*GeV, 7.96*GeV, 9.14*GeV, 10.50*GeV, 12.05*GeV, 13.84*GeV, 15.89*GeV, 18.24*GeV, 20.94*GeV, 24.05*GeV, 27.61*GeV, 31.70*GeV, 36.39*GeV, 41.79*GeV, 47.98*GeV, 55.08*GeV, 63.25*GeV, 72.62*GeV, 83.37*GeV, 95.73*GeV, 109.91*GeV, 126.19*GeV, 144.89*GeV, 166.35*GeV, 191.00*GeV, 219.30*GeV, 251.79*GeV, 289.09*GeV, 331.92*GeV, 381.09*GeV, 437.55*GeV, 502.38*GeV, 576.81*GeV, 662.26*GeV, 760.38*GeV, 873.03*GeV, 1002.37*GeV, 1150.88*GeV, 1321.39*GeV, 1517.16*GeV, 1741.93*GeV, 2000.00*GeV};
 	
-	//string dir   = "/data/hod/D3PDdigest/rel15_barrel_selection/";
-	//string dir   = "/data/hod/D3PDdigest/rel15_eta24_selection/";
+	//////////////////////////////////////////////////////////////////////////////////
+	// fill the vector with new vector<double> pointers //////////////////////////////
+	CNV->Divide(ncol_pads,nrow_pads);
+	stringstream strm;
+	string str;
+	for(int i=0 ; i<imass_nbins ; i++)
+	{
+		VVCOSTH.push_back(new vector<double>); ////////
+		
+		strm.clear();
+		str.clear();
+		strm << M_bins[i]+(M_bins[i+1]-M_bins[i])/2.;
+		strm >> str;
+		str = "#hat{m}_{#mu#mu} = " + str + " TeV";
+		VHIST_Z0.push_back(new TH1D(("Z^{0} "+str).c_str(), ("Z^{0} "+str).c_str(), 20, -1., +1.));
+		VHIST_Z0[i]->SetLineColor(kAzure-5);
+		VHIST_DATA.push_back(new TH1D(("Data "+str).c_str(), ("Data "+str).c_str(), 20, -1., +1.));
+		VHIST_ZPRIME.push_back(new TH1D(("Z' "+str).c_str(), ("Z' "+str).c_str(), 20, -1., +1.));
+		VHIST_ZPRIME[i]->SetLineColor(kRed);
+		if(i<nrow_pads) VPAD.push_back( CNV->cd(2*i+1) );
+		else            VPAD.push_back( CNV->cd(2*(i-nrow_pads)+2) );
+	}
+	//////////////////////////////////////////////////////////////////////////////////
+	
+
 	string dir   = "/data/hod/D3PDfin/rel16/";
 	string hDir  = "allCuts";
 	string hName = "Afb";
@@ -261,8 +390,13 @@ void execute()
 	cout << "path=" << path << endl;
 	TFile* fData = new TFile( path.c_str(), "READ" );
 	TTree* Afb_data_tree = (TTree*)fData->Get("allCuts/allCuts_tree");
-	Afb_data_tree->SetBranchAddress( "Mhat",       &IMASS );
-	Afb_data_tree->SetBranchAddress( refframe.c_str(), &COSTH );
+	Afb_data_tree->SetBranchAddress( "Mhat",   &IMASS );
+	//Afb_data_tree->SetBranchAddress( refframe.c_str(), &COSTH );
+	Afb_data_tree->SetBranchAddress( "charge", &CHARGE );
+	Afb_data_tree->SetBranchAddress( "px", &PX );
+	Afb_data_tree->SetBranchAddress( "py", &PY );
+	Afb_data_tree->SetBranchAddress( "pz", &PZ );
+	Afb_data_tree->SetBranchAddress( "E", &E );
 	
 	// fill the imass histo
 	if (Afb_data_tree==0) return;
@@ -272,26 +406,91 @@ void execute()
 		hDataM->Fill(IMASS);
 	}
 	
+	TAxis *xaxis = hData->GetXaxis();
+	
 	double a4  = 0.;
 	double da4 = 0.;
 	double afb  = 0.;
 	double dafb = 0.;
+	double guess = -0.1;
+	ISZMUMU  = false;
+	ISZPRIME = false;
+	ISDATA   = true;
+	fillVec(Afb_data_tree, hData); // the VVCOSTH vectors are full
 	for(Int_t b=1 ; b<=hData->GetNbinsX() ; b++)
 	{
 		// norm to bin width
 		//hDataM->SetBinContent(b, hDataM->GetBinContent(b)/hDataM->GetBinWidth(b));
-		
-		fillVec(Afb_data_tree, hData, b); // the VCOSTH vector is full
-		if((int)VCOSTH->size()<minEntriesDATA) continue;
-		minimize(a4, da4);
+		CURRENTBIN = (unsigned int)(b-1);
+		if((int)VVCOSTH[CURRENTBIN]->size()<minEntriesDATA) continue;
+		minimize(guess, a4, da4);
 		afb = (3./8.)*a4;
 		dafb = (3./8.)*da4;
+		guess = a4;
 		hData->SetBinContent(b,afb);
 		hData->SetBinError(b,dafb);
+		cout << "mHat["<< b << "/" << hData->GetNbinsX() << "]=" << xaxis->GetBinCenter(b) << ", Afb=" << afb << " +- " << dafb << "\n" << endl;
 	}
 	
 	
-	// Backgrounds
+	///////////////////////////////////////////////
+	// Z' /////////////////////////////////////////
+	channel = "0.25 TeV Z' SSM#rightarrow#mu#mu: A_{FB}(stat' uncertainty)";
+	TH1D* hSignal;
+	if(doLogM) hSignal = new TH1D("Afb_sig","Afb_sig", imass_nbins, M_bins );
+	else       hSignal = new TH1D("Afb_sig","Afb_sig", imass_nbins, imass_min, imass_max );
+	hSignal->SetLineColor(kRed);
+	hSignal->SetFillColor(kRed);
+	hSignal->SetLineWidth(1);
+	hSignal->SetMarkerSize(0);
+	hSignal->SetMarkerColor(0);
+	hSignal->SetTitle("");
+	hSignal->SetXTitle( xTitle.c_str() );
+	hSignal->SetYTitle( yTitle.c_str() );
+	leg->AddEntry( hSignal, channel.c_str(), "f");
+	
+	sProc = "Zprime_mumu_SSM250";
+	path = dir + "Zprime_mumu/" + m_muonSelector + analysisType + sProc + ".root";
+	cout << "path=" << path << endl;
+	TFile* fZprime = new TFile( path.c_str(), "READ" );
+	TTree* Afb_sig_tree = (TTree*)fZprime->Get("allCuts/allCuts_tree");
+	Afb_sig_tree->SetBranchAddress( "Mhat",       &IMASS );
+	//Afb_sig_tree->SetBranchAddress( refframe.c_str(), &COSTH );
+	Afb_sig_tree->SetBranchAddress( "charge", &CHARGE );
+	Afb_sig_tree->SetBranchAddress( "px", &PX );
+	Afb_sig_tree->SetBranchAddress( "py", &PY );
+	Afb_sig_tree->SetBranchAddress( "pz", &PZ );
+	Afb_sig_tree->SetBranchAddress( "E", &E );
+	
+	a4   = 0.;
+	da4  = 0.;
+	afb  = 0.;
+	dafb = 0.;
+	guess = -0.1;
+	ISZMUMU  = false;
+	ISZPRIME = true;
+	ISDATA   = false;
+	fillVec(Afb_sig_tree, hSignal); // the VVCOSTH vectors are full
+	for(Int_t b=1 ; b<=hSignal->GetNbinsX() ; b++)
+	{
+		CURRENTBIN = (unsigned int)(b-1);
+		if((int)VVCOSTH[CURRENTBIN]->size()<minEntriesDATA) continue;
+		minimize(guess, a4, da4);
+		afb = (3./8.)*a4;
+		dafb = (3./8.)*da4;
+		guess = a4;
+		hSignal->SetBinContent(b,afb);
+		hSignal->SetBinError(b,dafb);
+		cout << "mHat["<< b << "/" << hSignal->GetNbinsX() << "]=" << xaxis->GetBinCenter(b) << ", Afb=" << afb << " +- " << dafb << "\n" << endl;
+	}
+	
+	TH1D* hSignalTmp = (TH1D*)hSignal->Clone("");
+	hSignalTmp->Reset();
+	for(Int_t b=1 ; b<hSignalTmp->GetNbinsX() ; b++) hSignalTmp->SetBinContent(b,hSignal->GetBinContent(b));
+	hSignalTmp->SetLineColor(kRed+8);
+	
+	/////////////////////////////////////////////////////////////////////
+	// Backgrounds //////////////////////////////////////////////////////
 	channel = "Z#rightarrow#mu#mu: A_{FB}(stat' uncertainty)";
 	TH1D* hBGsum;
 	if(doLogM) hBGsum = new TH1D("Afb_sumBG","Afb_sumBG", imass_nbins, M_bins );
@@ -306,37 +505,23 @@ void execute()
 	hBGsum->SetYTitle( yTitle.c_str() );
 	leg->AddEntry( hBGsum, channel.c_str(), "f");
 	
+	/*
+	sProc = "Zmumu";
+	path = dir + "Zmumu/" + m_muonSelector + analysisType + sProc + ".root";
+	cout << "path=" << path << endl;
+	TFile* fZmumu = new TFile( path.c_str(), "READ" );
+	TTree* Afb_sumBG_tree = (TTree*)fZmumu->Get("allCuts/allCuts_tree");
+	Afb_sumBG_tree->SetBranchAddress( "Mhat",       &IMASS );
+	Afb_sumBG_tree->SetBranchAddress( refframe.c_str(), &COSTH );
+	*/
 	
 	TList* Afb_sumBG_list = new TList();
-	
 	
 	sProc = "Zmumu";
 	path = dir + "Zmumu/" + m_muonSelector + analysisType + sProc + ".root";
 	cout << "path=" << path << endl;
 	TFile* fZmumu = new TFile( path.c_str(), "READ" );
 	Afb_sumBG_list->Add( (TTree*)fZmumu->Get("allCuts/allCuts_tree") );
-	
-	
-	/*
-	sProc = "DYmumu_75M120";
-	path = "/srv01/tau/hod/z0analysis-tests/z0analysis-dev/run/mcWZphys.root";
-	TFile* fDYmumu_75M120 = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fDYmumu_75M120->Get("allCuts/allCuts_tree") );
-	*/
-	
-	/*
-	sProc = "DYmumu_75M120";
-	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	cout << "path=" << path << endl;
-	TFile* fDYmumu_75M120 = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fDYmumu_75M120->Get("allCuts/allCuts_tree") );
-	
-	sProc = "DYmumu_120M250";
-	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
-	cout << "path=" << path << endl;
-	TFile* fDYmumu_120M250 = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fDYmumu_120M250->Get("allCuts/allCuts_tree") );
-	*/
 	
 	sProc = "DYmumu_250M400";
 	path = dir + "DYmumu/" + m_muonSelector + analysisType + sProc + ".root";
@@ -349,46 +534,6 @@ void execute()
 	cout << "path=" << path << endl;
 	TFile* fDYmumu_400M600 = new TFile( path.c_str(), "READ" );
 	Afb_sumBG_list->Add( (TTree*)fDYmumu_400M600->Get("allCuts/allCuts_tree") );
-
-	
-	/*	
-	sProc = "ZZ_Herwig";
-	path = dir + "ZZ_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fZZ = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fZZ->Get("allCuts/allCuts_tree") );
-	
-	sProc = "WZ_Herwig";
-	path = dir + "WZ_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fWZ = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fWZ->Get("allCuts/allCuts_tree") );
-	
-	sProc = "WW_Herwig";
-	path = dir + "WW_Herwig/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fWW = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fWW->Get("allCuts/allCuts_tree") );
-	
-	sProc = "T1_McAtNlo_Jimmy";
-	path = dir + "T1_McAtNlo_Jimmy/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fT1 = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fT1->Get("allCuts/allCuts_tree") );
-	
-	
-	sProc = "DYtautau_75M120";
-	path = dir + "DYtautau/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYtautau_75M120 = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fDYtautau_75M120->Get("allCuts/allCuts_tree") );
-	
-	sProc = "DYtautau_120M250";
-	path = dir + "DYtautau/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYtautau_120M250 = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fDYtautau_120M250->Get("allCuts/allCuts_tree") );
-	
-	sProc = "DYtautau_250M400";
-	path = dir + "DYtautau/" + m_muonSelector + analysisType + sProc + ".root";
-	TFile* fDYtautau_250M400 = new TFile( path.c_str(), "READ" );
-	Afb_sumBG_list->Add( (TTree*)fDYtautau_250M400->Get("allCuts/allCuts_tree") );
-
-*/	
 	
 	TFile* mergedFile = new TFile("Afb_sumBG_merged.root", "RECREATE");
 	cout << "Merging trees...patience..." << endl;
@@ -397,32 +542,43 @@ void execute()
 	mergedFile->Close();
 	
 	TFile* fBG = new TFile("Afb_sumBG_merged.root", "READ");
-	//TTree* Afb_sumBG_tree = (TTree*)fBG->Get("Afb_tree");
-	//Afb_sumBG_tree->SetBranchAddress( "mHat",  &IMASS );
-	//Afb_sumBG_tree->SetBranchAddress( "cosTh", &COSTH );
-	
 	TTree* Afb_sumBG_tree = (TTree*)fBG->Get("allCuts_tree");
 	Afb_sumBG_tree->SetBranchAddress( "Mhat",       &IMASS );
-	Afb_sumBG_tree->SetBranchAddress( refframe.c_str(), &COSTH );
-
+	//Afb_sumBG_tree->SetBranchAddress( refframe.c_str(), &COSTH );
+	Afb_sumBG_tree->SetBranchAddress( "charge", &CHARGE );
+	Afb_sumBG_tree->SetBranchAddress( "px", &PX );
+	Afb_sumBG_tree->SetBranchAddress( "py", &PY );
+	Afb_sumBG_tree->SetBranchAddress( "pz", &PZ );
+	Afb_sumBG_tree->SetBranchAddress( "E", &E );
+	
+	
 	a4   = 0.;
 	da4  = 0.;
 	afb  = 0.;
 	dafb = 0.;
+	guess = -0.1;
+	ISZMUMU  = true;
+	ISZPRIME = false;
+	ISDATA   = false;
+	fillVec(Afb_sumBG_tree, hBGsum); // the VVCOSTH vectors are full
 	for(Int_t b=1 ; b<=hBGsum->GetNbinsX() ; b++)
 	{
-		fillVec(Afb_sumBG_tree, hBGsum, b); // the VCOSTH vector is full
-		if((int)VCOSTH->size()<minEntriesMC) continue;
-		minimize(a4, da4);
+		CURRENTBIN = (unsigned int)(b-1);
+		if((int)VVCOSTH[CURRENTBIN]->size()<minEntriesDATA) continue;
+		minimize(guess, a4, da4);
 		afb = (3./8.)*a4;
 		dafb = (3./8.)*da4;
+		guess = a4;
 		hBGsum->SetBinContent(b,afb);
 		hBGsum->SetBinError(b,dafb);
+		cout << "mHat["<< b << "/" << hBGsum->GetNbinsX() << "]=" << xaxis->GetBinCenter(b) << ", Afb=" << afb << " +- " << dafb << "\n" << endl;
 	}
 	TH1D* hBGsumTmp = (TH1D*)hBGsum->Clone("");
 	hBGsumTmp->Reset();
 	for(Int_t b=1 ; b<hBGsumTmp->GetNbinsX() ; b++) hBGsumTmp->SetBinContent(b,hBGsum->GetBinContent(b));
 	hBGsumTmp->SetLineColor(kAzure+8);
+	
+	
 	
 	
 	pad_mHat->Draw();
@@ -434,8 +590,10 @@ void execute()
 
 	pad_Afb->Draw();
 	pad_Afb->cd();
-	hBGsum->GetYaxis()->SetRangeUser(m_miny,m_maxy);
-	hBGsum->Draw("E5 Y+");
+	hSignal->GetYaxis()->SetRangeUser(m_miny,m_maxy);
+	hSignal->Draw("E5 Y+");
+	//hSignalTmp->Draw("CSAMES");
+	hBGsum->Draw("E5 Y+ SAMES");
 	//hBGsumTmp->Draw("CSAMES");
 	hData->Draw("e1x0SAMES");
 	pvtxt->Draw("SAMES");
@@ -459,4 +617,25 @@ void execute()
 	cnv->SaveAs(fName+".C");
 	cnv->SaveAs(fName+".root");
 	cnv->SaveAs(fName+".png");
+	
+	CNV->Draw();
+	for(int i=0 ; i<imass_nbins ; i++)
+	{
+		VPAD[i]->cd();
+		VHIST_Z0[i]->SetMaximum(1.1);
+		VHIST_Z0[i]->SetMinimum(0.);
+		VHIST_Z0[i]->Scale(1./VHIST_Z0[i]->GetEntries());
+		VHIST_Z0[i]->Draw();
+		
+		VHIST_ZPRIME[i]->Scale(1./VHIST_ZPRIME[i]->GetEntries());
+		VHIST_ZPRIME[i]->Draw("SAMES");
+		
+		VHIST_DATA[i]->Scale(1./VHIST_DATA[i]->GetEntries());
+		VHIST_DATA[i]->Draw("e1x0SAMES");
+	}
+	fName += ".costh";
+	CNV->SaveAs(fName+".eps");
+	CNV->SaveAs(fName+".C");
+	CNV->SaveAs(fName+".root");
+	CNV->SaveAs(fName+".png");
 }

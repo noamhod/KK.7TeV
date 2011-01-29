@@ -20,9 +20,9 @@ analysis::~analysis()
 void analysis::execute()
 {
 	////////////////////////////////////////////////
-        // set all the graphicObjects trees branches ///
-        clearTreeVars(); ///////////////////////////////
-        ////////////////////////////////////////////////
+	//set all the graphicObjects trees branches ////
+	clearTreeVars(); ///////////////////////////////
+	////////////////////////////////////////////////
 	
 	///////////////////////////////////
 	// set all the event-level vars ///
@@ -111,7 +111,7 @@ void analysis::execute()
 	if(mu_n==3 && N>0) n3mu++;
 	if(mu_n==4 && N>0) n4mu++;
 	if(mu_n>4  && N>0) nNmu++;
-	
+ 	
 	/////////////////////////////////////////////////////
 	// preform the entire preselection //////////////////
 	bool passPreselection = applyPreselection(); ////////
@@ -139,7 +139,7 @@ void analysis::execute()
 
 void analysis::setEventVariables()
 {
-	// event level (for preselection)
+	// event level
 	analysisSkeleton::RunNumber    = m_WZphysD3PD->RunNumber;
 	analysisSkeleton::EventNumber  = m_WZphysD3PD->EventNumber;
 	analysisSkeleton::timestamp    = m_WZphysD3PD->timestamp;

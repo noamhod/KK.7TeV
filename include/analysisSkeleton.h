@@ -40,6 +40,8 @@ public:
 	TVectorP2VL pmuTruth;
 	TMapsd values2fill;
 	int nMultiMuonEvents;
+	bool inApplySingleSelection;
+	ofstream* fCand;
 	
 	// tirg, local
 	vector<int>*   mu_LLT_index;
@@ -523,6 +525,7 @@ public:
 		sCurrentPeriod = "";
 		nMultiMuonEvents = 0;
 		setStyle();
+		fCand = new ofstream("cand.txt");
 	}
 	~analysisSkeleton();
 	

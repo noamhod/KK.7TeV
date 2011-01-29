@@ -15,7 +15,7 @@ analysisSkeleton::analysisSkeleton()
 
 analysisSkeleton::~analysisSkeleton()
 {
-
+	fCand->close();
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -1273,8 +1273,12 @@ bool analysisSkeleton::applySingleMuonSelection()
 	fillBeforeCuts(); //////////////////////
 	////////////////////////////////////////
 	
+	inApplySingleSelection = true;
+	
 	TMapsb cutsToSkip; // dummy (empty)
 	passCutFlow = singleSelection(cutsToSkip);
+	
+	inApplySingleSelection = false;
 	
 	return passCutFlow;
 }
@@ -2706,6 +2710,14 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 		////////////////////////////////////////////////////////////////////////
 		// cutFlow /////////////////////////////////////////////////////////////
 		if(passCutFlow  &&  !isSkippedCut) fillCutFlow(sorderedcutname); ///////
+		if(passCutFlow  &&  !isSkippedCut  &&  sorderedcutname=="pT"  &&  inApplySingleSelection)
+		{
+			(*fCand)	<< "Run-LB-Evt  "
+						<< RunNumber  << " "
+						<< lbn 		 << " "
+						<< EventNumber
+						<< endl;
+		}
 		////////////////////////////////////////////////////////////////////////
 		
 	} // end for(m_cutFlowOrdered)
@@ -2713,16 +2725,6 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 	return passCutFlow;
 }
 
-/*
-for(int i=0 ; i<muSize ; i++)
-	{
-		if(!muQAflags[i]) continue;
-		for(int j=0 ; (j<muSize && j!=i) ; j++)
-		{
-			if(!muQAflags[j]) continue;
-			ai = i;
-			bi = j;
-*/
 inline bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
 {
 	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;

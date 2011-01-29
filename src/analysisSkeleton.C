@@ -407,9 +407,9 @@ void analysisSkeleton::fillAfterCuts(bool isMC)
 	current_muplus_id_theta = mu_id_theta->at(sublead_mu);;
 	
 	current_imass       = imass(pmu[lead_mu],pmu[sublead_mu]);
-	current_cosTheta    = cosThetaCollinsSoper( pmu[lead_mu], -1, pmu[sublead_mu], +1 );
-	current_cosThetaCS  = cosThetaCollinsSoper( pmu[lead_mu], -1, pmu[sublead_mu], +1 );
-	current_cosThetaHE  = cosThetaBoost( pmu[lead_mu], -1, pmu[sublead_mu], +1 );
+	current_cosTheta    = cosThetaCollinsSoper( pmu[lead_mu], mu_charge->at(lead_mu), pmu[sublead_mu], mu_charge->at(sublead_mu) );
+	current_cosThetaCS  = cosThetaCollinsSoper( pmu[lead_mu], mu_charge->at(lead_mu), pmu[sublead_mu], mu_charge->at(sublead_mu) );
+	current_cosThetaHE  = cosThetaBoost( pmu[lead_mu], mu_charge->at(lead_mu), pmu[sublead_mu], mu_charge->at(sublead_mu) );
 	current_ySystem     = ySystem( pmu[lead_mu], pmu[sublead_mu] );
 	current_QT          = QT( pmu[lead_mu], pmu[sublead_mu] );
 	current_cosmicCosth = cosThetaDimu(pmu[lead_mu],pmu[sublead_mu]);

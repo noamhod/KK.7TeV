@@ -66,6 +66,25 @@ float GeV2TeV = 1.e-3;
 float MeV2TeV = 1.e-6;
 float muonMass = 0.105658367; // GeV
 
+void Scale(TH1D* h, double d)
+{ 
+	/// scale including over/underflow
+	for(int i=0 ; i<=h->GetNbinsX()+1 ; i++)
+	{ 
+		h->SetBinContent(i,h->GetBinContent(i)*d);
+	}
+}
+
+void ScaleWerrors(TH1D* h, double d)
+{ 
+	/// scale including over/underflow
+	for ( int i=0 ; i<=h->GetNbinsX()+1 ; i++ )
+	{ 
+		h->SetBinContent(i,h->GetBinContent(i)*d);
+		h->SetBinError(i,h->GetBinError(i)*d);
+	}
+}
+
 inline float imass( TLorentzVector* pa, TLorentzVector* pb )
 {
 	m_pTmp = (*pa)+(*pb);
@@ -253,8 +272,16 @@ void minimize(double guess, double& A4, double& dA4)
 }
 
 
-void execute()
+void execute(string isHistos = "")
 {
+	if(isHistos=="only_histos")
+	{
+		gROOT->ProcessLine(".x rootlogon_atlas.C");
+		gROOT->SetStyle("ATLAS");
+		gROOT->ForceStyle();
+	}
+
+
 	int minEntriesDATA = 10;
 	int minEntriesMC   = 10;
 	string refframe = REFNAME;
@@ -292,6 +319,7 @@ void execute()
 	//////////////////////////////////////////////////////////////////////////////////
 	// fill the vector with new vector<double> pointers //////////////////////////////
 	CNV->Divide(ncol_pads,nrow_pads);
+	CNV->SetFillColor(0);
 	stringstream strm;
 	string str;
 	for(int i=0 ; i<imass_nbins ; i++)
@@ -310,6 +338,9 @@ void execute()
 		VHIST_ZPRIME[i]->SetLineColor(kRed);
 		if(i<nrow_pads) VPAD.push_back( CNV->cd(2*i+1) );
 		else            VPAD.push_back( CNV->cd(2*(i-nrow_pads)+2) );
+		VPAD[i]->SetFillColor(kWhite);
+		VPAD[i]->SetTicky(1);
+		VPAD[i]->SetTickx(1);
 	}
 	//////////////////////////////////////////////////////////////////////////////////
 	
@@ -333,6 +364,9 @@ void execute()
 	
 	TLegend* leg = new TLegend(0.6262542,0.7098446,0.867893,0.8717617,NULL,"brNDC");
 	leg->SetFillColor(kWhite);
+	
+	TLegend* leg_histos = new TLegend(0.85, 0.15, 0.97, 0.45,NULL,"brNDC");
+	leg_histos->SetFillColor(kWhite);
 	
 	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
 	string lumilabel = "#intLdt~42 pb^{-1}";
@@ -621,17 +655,43 @@ void execute()
 	CNV->Draw();
 	for(int i=0 ; i<imass_nbins ; i++)
 	{
+		if(i==0)
+		{
+			leg_histos->AddEntry(VHIST_Z0[i], "Z#rightarrow#mu#mu");
+			leg_histos->AddEntry(VHIST_Z0[i], "0.25 TeV Z' SSM#rightarrow#mu#mu");
+			leg_histos->AddEntry(VHIST_Z0[i], "Data", "lep");
+		}
+	
 		VPAD[i]->cd();
-		VHIST_Z0[i]->SetMaximum(1.1);
-		VHIST_Z0[i]->SetMinimum(0.);
-		VHIST_Z0[i]->Scale(1./VHIST_Z0[i]->GetEntries());
-		VHIST_Z0[i]->Draw();
 		
-		VHIST_ZPRIME[i]->Scale(1./VHIST_ZPRIME[i]->GetEntries());
+		Scale(VHIST_Z0[i], 1./VHIST_Z0[i]->GetEntries());
+		Scale(VHIST_ZPRIME[i], 1./VHIST_ZPRIME[i]->GetEntries());
+		ScaleWerrors(VHIST_DATA[i], 1./VHIST_DATA[i]->GetEntries());
+		
+		Double_t max = 0.;
+		Double_t tmp = 0.;
+		tmp = VHIST_Z0[i]->GetMaximum();
+		max = (tmp>max) ? tmp : max;
+		tmp = VHIST_ZPRIME[i]->GetMaximum();
+		max = (tmp>max) ? tmp : max;
+		tmp = VHIST_DATA[i]->GetMaximum();
+		max = (tmp>max) ? tmp : max;
+		
+		
+		VHIST_Z0[i]->SetMaximum(1.2*max);
+		VHIST_Z0[i]->SetMinimum(0.);
+		VHIST_Z0[i]->SetTitle("");
+		VHIST_Z0[i]->SetXTitle("#cos#theta^{*}");
+		VHIST_Z0[i]->SetYTitle("Events (normalized)");
+		VHIST_Z0[i]->Draw();
+
+		VHIST_ZPRIME[i]->SetTitle("");
 		VHIST_ZPRIME[i]->Draw("SAMES");
 		
-		VHIST_DATA[i]->Scale(1./VHIST_DATA[i]->GetEntries());
+		VHIST_DATA[i]->SetTitle("");
 		VHIST_DATA[i]->Draw("e1x0SAMES");
+		
+		leg_histos->Draw("SAMES");
 	}
 	fName += ".costh";
 	CNV->SaveAs(fName+".eps");

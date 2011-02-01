@@ -1,129 +1,127 @@
-#/bin/bash/
+#!/bin/bash
 
-export DATDIR=/storage/t3_data/hod/D3PDntp/rel16/user.hod.WZphysD3PD/submission_08012011
-export HEREDIR=/srv01/tau/hod/z0analysis-tests/z0analysis-dev/run
-export CONFDIR=/srv01/tau/hod/z0analysis-tests/z0analysis-dev/conf/tmp
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$HEREDIR
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$HEREDIR/GoodRunsLists-00-00-91/StandAlone
-source ~hod/setROOT528.sh
+source qsub_setup.sh
 
-rm -f $HEREDIR/../data/tmp/*
-rm -f $HEREDIR/../conf/tmp/*
+rm -f ../data/tmp/*
+rm -f ../conf/tmp/*
+rm -f tmp/*
+rm -f tmp/err/*
+rm -f tmp/out/*
 
-source $HEREDIR/qsub_run.sh	152844	$DATDIR/user.hod.WZphys.152844.d08012011.h0818.110108081858	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	152845	$DATDIR/user.hod.WZphys.152845.d08012011.h0819.110108081923	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	152878	$DATDIR/user.hod.WZphys.152878.d08012011.h0819.110108081946	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	152933	$DATDIR/user.hod.WZphys.152933.d08012011.h0819.110108082009	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	152994	$DATDIR/user.hod.WZphys.152994.d08012011.h0820.110108082035	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	153030	$DATDIR/user.hod.WZphys.153030.d08012011.h0820.110108082059	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	153134	$DATDIR/user.hod.WZphys.153134.d08012011.h0821.110108082125	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	153136	$DATDIR/user.hod.WZphys.153136.d08012011.h0821.110108082150	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	153159	$DATDIR/user.hod.WZphys.153159.d08012011.h0821.110108082213	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	153200	$DATDIR/user.hod.WZphys.153200.d08012011.h0822.110108082237	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	153565	$DATDIR/user.hod.WZphys.153565.d08012011.h0822.110108082302	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	153599	$DATDIR/user.hod.WZphys.153599.d08012011.h0823.110108082338	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	154810	$DATDIR/user.hod.WZphys.154810.d08012011.h0823.110108082402	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	154813	$DATDIR/user.hod.WZphys.154813.d08012011.h0824.110108082425	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	154815	$DATDIR/user.hod.WZphys.154815.d08012011.h0824.110108082451	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	154817	$DATDIR/user.hod.WZphys.154817.d08012011.h0824.110108082514	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	154822	$DATDIR/user.hod.WZphys.154822.d08012011.h0825.110108082540	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	155073	$DATDIR/user.hod.WZphys.155073.d08012011.h0825.110108082606	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	155112	$DATDIR/user.hod.WZphys.155112.d08012011.h0826.110108082633	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	155116	$DATDIR/user.hod.WZphys.155116.d08012011.h0826.110108082658	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	155118	$DATDIR/user.hod.WZphys.155118.d08012011.h0827.110108082727	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	155160	$DATDIR/user.hod.WZphys.155160.d08012011.h0827.110108082753	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	155228	$DATDIR/user.hod.WZphys.155228.d08012011.h0827.110108082816	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	155280	$DATDIR/user.hod.WZphys.155280.d08012011.h0828.110108082841	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	155569	$DATDIR/user.hod.WZphys.155569.d08012011.h0828.110108082905	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	155634	$DATDIR/user.hod.WZphys.155634.d08012011.h0829.110108082930	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	155669	$DATDIR/user.hod.WZphys.155669.d08012011.h0829.110108082954	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	155678	$DATDIR/user.hod.WZphys.155678.d08012011.h0829.110108083018	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	155697	$DATDIR/user.hod.WZphys.155697.d08012011.h0830.110108083045	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	156682	$DATDIR/user.hod.WZphys.156682.d08012011.h0830.110108083110	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	158045	$DATDIR/user.hod.WZphys.158045.d08012011.h0831.110108083134	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	158116	$DATDIR/user.hod.WZphys.158116.d08012011.h0831.110108083201	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	158269	$DATDIR/user.hod.WZphys.158269.d08012011.h0832.110108083228	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	158299	$DATDIR/user.hod.WZphys.158299.d08012011.h0832.110108083253	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	158392	$DATDIR/user.hod.WZphys.158392.d08012011.h0832.110108083322	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	158443	$DATDIR/user.hod.WZphys.158443.d08012011.h0833.110108083349	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	158466	$DATDIR/user.hod.WZphys.158466.d08012011.h0833.110108083413	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	158545	$DATDIR/user.hod.WZphys.158545.d08012011.h0834.110108083439	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	158548	$DATDIR/user.hod.WZphys.158548.d08012011.h0834.110108083505	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	158549	$DATDIR/user.hod.WZphys.158549.d08012011.h0835.110108083533	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	158582	$DATDIR/user.hod.WZphys.158582.d08012011.h0835.110108083610	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	158632	$DATDIR/user.hod.WZphys.158632.d08012011.h0836.110108083639	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	158801	$DATDIR/user.hod.WZphys.158801.d08012011.h0836.110108083703	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	158975	$DATDIR/user.hod.WZphys.158975.d08012011.h0837.110108083735	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	159041	$DATDIR/user.hod.WZphys.159041.d08012011.h0837.110108083826	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	159086	$DATDIR/user.hod.WZphys.159086.d08012011.h0838.110108083905	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	159113	$DATDIR/user.hod.WZphys.159113.d08012011.h0839.110108083935	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	159179	$DATDIR/user.hod.WZphys.159179.d08012011.h0839.110108084002	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	159202	$DATDIR/user.hod.WZphys.159202.d08012011.h0840.110108084029	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	159203	$DATDIR/user.hod.WZphys.159203.d08012011.h0840.110108084053	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	159224	$DATDIR/user.hod.WZphys.159224.d25012011.h2212.110125221327	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	160387	$DATDIR/user.hod.WZphys.160387.d08012011.h0841.110108084156	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	160472	$DATDIR/user.hod.WZphys.160472.d08012011.h0842.110108084251	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	160479	$DATDIR/user.hod.WZphys.160479.d08012011.h0842.110108084317	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	160530	$DATDIR/user.hod.WZphys.160530.d08012011.h0843.110108084350	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	160613	$DATDIR/user.hod.WZphys.160613.d08012011.h0843.110108084420	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	160736	$DATDIR/user.hod.WZphys.160736.d08012011.h0844.110108084447	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	160800	$DATDIR/user.hod.WZphys.160800.d08012011.h0844.110108084513	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	160801	$DATDIR/user.hod.WZphys.160801.d08012011.h0845.110108084547	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	160879	$DATDIR/user.hod.WZphys.160879.d08012011.h0845.110108084622	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	160899	$DATDIR/user.hod.WZphys.160899.d08012011.h0846.110108084649	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	160953	$DATDIR/user.hod.WZphys.160953.d08012011.h0846.110108084714	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	160954	$DATDIR/user.hod.WZphys.160954.d08012011.h0847.110108084742	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	160958	$DATDIR/user.hod.WZphys.160958.d25012011.h2220.110125222029	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	160963	$DATDIR/user.hod.WZphys.160963.d08012011.h0848.110108084839	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	160975	$DATDIR/user.hod.WZphys.160975.d08012011.h0848.110108084903	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	160980	$DATDIR/user.hod.WZphys.160980.d08012011.h0849.110108084928	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	161118	$DATDIR/user.hod.WZphys.161118.d08012011.h0849.110108084953	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	161379	$DATDIR/user.hod.WZphys.161379.d08012011.h0849.110108085020	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	161407	$DATDIR/user.hod.WZphys.161407.d08012011.h0850.110108085049	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	161520	$DATDIR/user.hod.WZphys.161520.d08012011.h0850.110108085115	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	161562	$DATDIR/user.hod.WZphys.161562.d08012011.h0851.110108085150	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	161948	$DATDIR/user.hod.WZphys.161948.d08012011.h1944.110108194453	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	162347	$DATDIR/user.hod.WZphys.162347.d08012011.h0852.110108085301	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	162526	$DATDIR/user.hod.WZphys.162526.d08012011.h0853.110108085337	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	162576	$DATDIR/user.hod.WZphys.162576.d08012011.h0853.110108085403	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	162577	$DATDIR/user.hod.WZphys.162577.d08012011.h0854.110108085429	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	162620	$DATDIR/user.hod.WZphys.162620.d08012011.h0854.110108085454	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	162623	$DATDIR/user.hod.WZphys.162623.d08012011.h1946.110108194657	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	162690	$DATDIR/user.hod.WZphys.162690.d08012011.h0855.110108085547	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	162764	$DATDIR/user.hod.WZphys.162764.d08012011.h0855.110108085614	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	162843	$DATDIR/user.hod.WZphys.162843.d09012011.h1109.110109110940	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	162882	$DATDIR/user.hod.WZphys.162882.d09012011.h1107.110109110727	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	165591	$DATDIR/user.hod.WZphys.165591.d08012011.h0857.110108085740	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	165632	$DATDIR/user.hod.WZphys.165632.d09012011.h1115.110109111520	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	165703	$DATDIR/user.hod.WZphys.165703.d08012011.h0858.110108085844	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	165732	$DATDIR/user.hod.WZphys.165732.d08012011.h0858.110108085914	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	165767	$DATDIR/user.hod.WZphys.165767.d08012011.h0859.110108085948	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	165815	$DATDIR/user.hod.WZphys.165815.d08012011.h0859.110108090015	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	165817	$DATDIR/user.hod.WZphys.165817.d08012011.h0900.110108090040	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	165818	$DATDIR/user.hod.WZphys.165818.d08012011.h0900.110108090105	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	165821	$DATDIR/user.hod.WZphys.165821.d08012011.h0901.110108090131	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	165954	$DATDIR/user.hod.WZphys.165954.d08012011.h0901.110108090157	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	165956	$DATDIR/user.hod.WZphys.165956.d08012011.h0901.110108090223	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	166094	$DATDIR/user.hod.WZphys.166094.d08012011.h0902.110108090248	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	166097	$DATDIR/user.hod.WZphys.166097.d08012011.h0902.110108090312	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	166142	$DATDIR/user.hod.WZphys.166142.d08012011.h0903.110108090348	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	166143	$DATDIR/user.hod.WZphys.166143.d08012011.h0903.110108090418	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	166198	$DATDIR/user.hod.WZphys.166198.d08012011.h0904.110108090513	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	166305	$DATDIR/user.hod.WZphys.166305.d08012011.h0905.110108090542	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	166383	$DATDIR/user.hod.WZphys.166383.d08012011.h0905.110108090609	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	166466	$DATDIR/user.hod.WZphys.166466.d08012011.h0906.110108090645	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	166658	$DATDIR/user.hod.WZphys.166658.d08012011.h0906.110108090722	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	166786	$DATDIR/user.hod.WZphys.166786.d09012011.h1112.110109111237	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	166850	$DATDIR/user.hod.WZphys.166850.d08012011.h0908.110108090836	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	166856	$DATDIR/user.hod.WZphys.166856.d08012011.h0908.110108090900	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	166924	$DATDIR/user.hod.WZphys.166924.d08012011.h0909.110108090928	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	166925	$DATDIR/user.hod.WZphys.166925.d08012011.h0909.110108090954	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	166927	$DATDIR/user.hod.WZphys.166927.d08012011.h0909.110108091021	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	166964	$DATDIR/user.hod.WZphys.166964.d08012011.h0910.110108091045	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	167575	$DATDIR/user.hod.WZphys.167575.d08012011.h0910.110108091110	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	167576	$DATDIR/user.hod.WZphys.167576.d08012011.h0911.110108091143	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	167607	$DATDIR/user.hod.WZphys.167607.d09012011.h1113.110109111418	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	167661	$DATDIR/user.hod.WZphys.167661.d08012011.h0912.110108091317	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	167680	$DATDIR/user.hod.WZphys.167680.d08012011.h0913.110108091400	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	167776	$DATDIR/user.hod.WZphys.167776.d08012011.h0914.110108091436	$CONFDIR	$HEREDIR
-source $HEREDIR/qsub_run.sh	167844	$DATDIR/user.hod.WZphys.167844.d08012011.h0914.110108091511	$CONFDIR	$HEREDIR
+qsub -q N -e tmp/err -o tmp/out -v 152844,user.hod.WZphys.152844.d08012011.h0818.110108081858 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 152845,user.hod.WZphys.152845.d08012011.h0819.110108081923 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 152878,user.hod.WZphys.152878.d08012011.h0819.110108081946 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 152933,user.hod.WZphys.152933.d08012011.h0819.110108082009 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 152994,user.hod.WZphys.152994.d08012011.h0820.110108082035 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 153030,user.hod.WZphys.153030.d08012011.h0820.110108082059 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 153134,user.hod.WZphys.153134.d08012011.h0821.110108082125 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 153136,user.hod.WZphys.153136.d08012011.h0821.110108082150 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 153159,user.hod.WZphys.153159.d08012011.h0821.110108082213 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 153200,user.hod.WZphys.153200.d08012011.h0822.110108082237 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 153565,user.hod.WZphys.153565.d08012011.h0822.110108082302 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 153599,user.hod.WZphys.153599.d08012011.h0823.110108082338 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 154810,user.hod.WZphys.154810.d08012011.h0823.110108082402 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 154813,user.hod.WZphys.154813.d08012011.h0824.110108082425 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 154815,user.hod.WZphys.154815.d08012011.h0824.110108082451 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 154817,user.hod.WZphys.154817.d08012011.h0824.110108082514 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 154822,user.hod.WZphys.154822.d08012011.h0825.110108082540 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 155073,user.hod.WZphys.155073.d08012011.h0825.110108082606 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 155112,user.hod.WZphys.155112.d08012011.h0826.110108082633 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 155116,user.hod.WZphys.155116.d08012011.h0826.110108082658 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 155118,user.hod.WZphys.155118.d08012011.h0827.110108082727 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 155160,user.hod.WZphys.155160.d08012011.h0827.110108082753 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 155228,user.hod.WZphys.155228.d08012011.h0827.110108082816 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 155280,user.hod.WZphys.155280.d08012011.h0828.110108082841 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 155569,user.hod.WZphys.155569.d08012011.h0828.110108082905 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 155634,user.hod.WZphys.155634.d08012011.h0829.110108082930 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 155669,user.hod.WZphys.155669.d08012011.h0829.110108082954 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 155678,user.hod.WZphys.155678.d08012011.h0829.110108083018 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 155697,user.hod.WZphys.155697.d08012011.h0830.110108083045 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 156682,user.hod.WZphys.156682.d08012011.h0830.110108083110 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 158045,user.hod.WZphys.158045.d08012011.h0831.110108083134 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 158116,user.hod.WZphys.158116.d08012011.h0831.110108083201 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 158269,user.hod.WZphys.158269.d08012011.h0832.110108083228 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 158299,user.hod.WZphys.158299.d08012011.h0832.110108083253 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 158392,user.hod.WZphys.158392.d08012011.h0832.110108083322 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 158443,user.hod.WZphys.158443.d08012011.h0833.110108083349 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 158466,user.hod.WZphys.158466.d08012011.h0833.110108083413 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 158545,user.hod.WZphys.158545.d08012011.h0834.110108083439 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 158548,user.hod.WZphys.158548.d08012011.h0834.110108083505 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 158549,user.hod.WZphys.158549.d08012011.h0835.110108083533 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 158582,user.hod.WZphys.158582.d08012011.h0835.110108083610 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 158632,user.hod.WZphys.158632.d08012011.h0836.110108083639 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 158801,user.hod.WZphys.158801.d08012011.h0836.110108083703 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 158975,user.hod.WZphys.158975.d08012011.h0837.110108083735 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 159041,user.hod.WZphys.159041.d08012011.h0837.110108083826 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 159086,user.hod.WZphys.159086.d26012011.h2243.110126224333 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 159113,user.hod.WZphys.159113.d08012011.h0839.110108083935 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 159179,user.hod.WZphys.159179.d08012011.h0839.110108084002 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 159202,user.hod.WZphys.159202.d08012011.h0840.110108084029 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 159203,user.hod.WZphys.159203.d08012011.h0840.110108084053 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 159224,user.hod.WZphys.159224.d25012011.h2212.110125221327 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 160387,user.hod.WZphys.160387.d08012011.h0841.110108084156 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 160472,user.hod.WZphys.160472.d08012011.h0842.110108084251 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 160479,user.hod.WZphys.160479.d08012011.h0842.110108084317 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 160530,user.hod.WZphys.160530.d08012011.h0843.110108084350 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 160613,user.hod.WZphys.160613.d08012011.h0843.110108084420 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 160736,user.hod.WZphys.160736.d08012011.h0844.110108084447 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 160800,user.hod.WZphys.160800.d08012011.h0844.110108084513 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 160801,user.hod.WZphys.160801.d08012011.h0845.110108084547 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 160879,user.hod.WZphys.160879.d08012011.h0845.110108084622 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 160899,user.hod.WZphys.160899.d08012011.h0846.110108084649 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 160953,user.hod.WZphys.160953.d08012011.h0846.110108084714 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 160954,user.hod.WZphys.160954.d08012011.h0847.110108084742 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 160958,user.hod.WZphys.160958.d25012011.h2220.110125222029 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 160963,user.hod.WZphys.160963.d08012011.h0848.110108084839 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 160975,user.hod.WZphys.160975.d08012011.h0848.110108084903 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 160980,user.hod.WZphys.160980.d08012011.h0849.110108084928 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 161118,user.hod.WZphys.161118.d08012011.h0849.110108084953 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 161379,user.hod.WZphys.161379.d26012011.h2244.110126224501 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 161407,user.hod.WZphys.161407.d08012011.h0850.110108085049 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 161520,user.hod.WZphys.161520.d08012011.h0850.110108085115 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 161562,user.hod.WZphys.161562.d08012011.h0851.110108085150 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 161948,user.hod.WZphys.161948.d08012011.h1944.110108194453 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 162347,user.hod.WZphys.162347.d08012011.h0852.110108085301 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 162526,user.hod.WZphys.162526.d27012011.h0737.110127073816 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 162576,user.hod.WZphys.162576.d08012011.h0853.110108085403 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 162577,user.hod.WZphys.162577.d08012011.h0854.110108085429 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 162620,user.hod.WZphys.162620.d08012011.h0854.110108085454 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 162623,user.hod.WZphys.162623.d08012011.h1946.110108194657 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 162690,user.hod.WZphys.162690.d08012011.h0855.110108085547 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 162764,user.hod.WZphys.162764.d08012011.h0855.110108085614 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 162843,user.hod.WZphys.162843.d09012011.h1109.110109110940 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 162882,user.hod.WZphys.162882.d09012011.h1107.110109110727 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 165591,user.hod.WZphys.165591.d08012011.h0857.110108085740 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 165632,user.hod.WZphys.165632.d09012011.h1115.110109111520 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 165703,user.hod.WZphys.165703.d08012011.h0858.110108085844 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 165732,user.hod.WZphys.165732.d08012011.h0858.110108085914 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 165767,user.hod.WZphys.165767.d08012011.h0859.110108085948 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 165815,user.hod.WZphys.165815.d08012011.h0859.110108090015 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 165817,user.hod.WZphys.165817.d08012011.h0900.110108090040 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 165818,user.hod.WZphys.165818.d08012011.h0900.110108090105 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 165821,user.hod.WZphys.165821.d08012011.h0901.110108090131 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 165954,user.hod.WZphys.165954.d08012011.h0901.110108090157 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 165956,user.hod.WZphys.165956.d08012011.h0901.110108090223 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 166094,user.hod.WZphys.166094.d08012011.h0902.110108090248 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 166097,user.hod.WZphys.166097.d08012011.h0902.110108090312 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 166142,user.hod.WZphys.166142.d08012011.h0903.110108090348 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 166143,user.hod.WZphys.166143.d08012011.h0903.110108090418 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 166198,user.hod.WZphys.166198.d08012011.h0904.110108090513 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 166305,user.hod.WZphys.166305.d08012011.h0905.110108090542 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 166383,user.hod.WZphys.166383.d08012011.h0905.110108090609 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 166466,user.hod.WZphys.166466.d08012011.h0906.110108090645 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 166658,user.hod.WZphys.166658.d08012011.h0906.110108090722 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 166786,user.hod.WZphys.166786.d09012011.h1112.110109111237 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 166850,user.hod.WZphys.166850.d08012011.h0908.110108090836 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 166856,user.hod.WZphys.166856.d08012011.h0908.110108090900 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 166924,user.hod.WZphys.166924.d08012011.h0909.110108090928 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 166925,user.hod.WZphys.166925.d08012011.h0909.110108090954 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 166927,user.hod.WZphys.166927.d08012011.h0909.110108091021 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 166964,user.hod.WZphys.166964.d08012011.h0910.110108091045 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 167575,user.hod.WZphys.167575.d08012011.h0910.110108091110 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 167576,user.hod.WZphys.167576.d28012011.h1012.110128101324 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 167607,user.hod.WZphys.167607.d09012011.h1113.110109111418 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 167661,user.hod.WZphys.167661.d08012011.h0912.110108091317 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 167680,user.hod.WZphys.167680.d08012011.h0913.110108091400 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 167776,user.hod.WZphys.167776.d08012011.h0914.110108091436 -V qsub_run.sh
+qsub -q N -e tmp/err -o tmp/out -v 167844,user.hod.WZphys.167844.d08012011.h0914.110108091511 -V qsub_run.sh

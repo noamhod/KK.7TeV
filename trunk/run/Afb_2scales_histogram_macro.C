@@ -274,12 +274,14 @@ void minimize(double guess, double& A4, double& dA4)
 
 void execute(string isHistos = "")
 {
+	/*
 	if(isHistos=="only_histos")
 	{
 		gROOT->ProcessLine(".x rootlogon_atlas.C");
 		gROOT->SetStyle("ATLAS");
 		gROOT->ForceStyle();
 	}
+	*/
 
 
 	int minEntriesDATA = 10;
@@ -338,7 +340,7 @@ void execute(string isHistos = "")
 		VHIST_ZPRIME[i]->SetLineColor(kRed);
 		if(i<nrow_pads) VPAD.push_back( CNV->cd(2*i+1) );
 		else            VPAD.push_back( CNV->cd(2*(i-nrow_pads)+2) );
-		VPAD[i]->SetFillColor(kWhite);
+		VPAD[i]->SetFillColor(0);
 		VPAD[i]->SetTicky(1);
 		VPAD[i]->SetTickx(1);
 	}
@@ -361,6 +363,46 @@ void execute(string isHistos = "")
 	string hNameFixed = hName;
 
 	gStyle->SetOptStat(0);
+	gStyle->SetFrameBorderMode(0);
+	gStyle->SetCanvasBorderMode(0);
+	gStyle->SetPadBorderMode(0);
+	gStyle->SetPadColor(0);
+	gStyle->SetCanvasColor(0);
+	gStyle->SetStatColor(0);
+	//gStyle->SetFillColor(0);
+	gStyle->SetFrameFillColor(0);
+	gStyle->SetTitleFillColor(0);
+	gStyle->SetPaperSize(20,26);
+	gStyle->SetPadTopMargin(0.05);
+	gStyle->SetPadRightMargin(0.05);
+	gStyle->SetPadBottomMargin(0.16);
+	gStyle->SetPadLeftMargin(0.12);
+	Int_t font=42;
+	Double_t tsize=0.05;
+	gStyle->SetTextFont(font);
+	gStyle->SetTextSize(tsize);
+	gStyle->SetLabelFont(font,"x");
+	gStyle->SetTitleFont(font,"x");
+	gStyle->SetLabelFont(font,"y");
+	gStyle->SetTitleFont(font,"y");
+	gStyle->SetLabelFont(font,"z");
+	gStyle->SetTitleFont(font,"z");
+	gStyle->SetLabelSize(tsize,"x");
+	gStyle->SetTitleSize(tsize,"x");
+	gStyle->SetLabelSize(tsize,"y");
+	gStyle->SetTitleSize(tsize,"y");
+	gStyle->SetLabelSize(tsize,"z");
+	gStyle->SetTitleSize(tsize,"z");
+	gStyle->SetStatBorderSize(0);
+	gStyle->SetStatColor(0);
+	gStyle->SetStatX(0);
+	gStyle->SetStatY(0);
+	gStyle->SetStatFont(42);
+	gStyle->SetStatFontSize(0);
+	gStyle->SetOptStat(0);
+	gStyle->SetStatW(0);
+	gStyle->SetStatH(0);
+	
 	
 	TLegend* leg = new TLegend(0.6262542,0.7098446,0.867893,0.8717617,NULL,"brNDC");
 	leg->SetFillColor(kWhite);
@@ -469,7 +511,7 @@ void execute(string isHistos = "")
 	
 	///////////////////////////////////////////////
 	// Z' /////////////////////////////////////////
-	channel = "0.25 TeV Z' SSM#rightarrow#mu#mu: A_{FB}(stat' uncertainty)";
+	channel = "0.25 TeV Z' SSM: A_{FB}(stat' uncertainty)";
 	TH1D* hSignal;
 	if(doLogM) hSignal = new TH1D("Afb_sig","Afb_sig", imass_nbins, M_bins );
 	else       hSignal = new TH1D("Afb_sig","Afb_sig", imass_nbins, imass_min, imass_max );
@@ -664,18 +706,28 @@ void execute(string isHistos = "")
 	
 		VPAD[i]->cd();
 		
-		Scale(VHIST_Z0[i], 1./VHIST_Z0[i]->GetEntries());
-		Scale(VHIST_ZPRIME[i], 1./VHIST_ZPRIME[i]->GetEntries());
-		ScaleWerrors(VHIST_DATA[i], 1./VHIST_DATA[i]->GetEntries());
+		Double_t NZ0     = VHIST_Z0[i]->GetEntries();
+		Double_t NZprime = VHIST_ZPRIME[i]->GetEntries();
+		Double_t NDATA   = VHIST_DATA[i]->GetEntries();
+		
+		Scale(VHIST_Z0[i], 1./NZ0);
+		Scale(VHIST_ZPRIME[i], 1./NZprime);
+		ScaleWerrors(VHIST_DATA[i], 1./NDATA);
 		
 		Double_t max = 0.;
 		Double_t tmp = 0.;
 		tmp = VHIST_Z0[i]->GetMaximum();
 		max = (tmp>max) ? tmp : max;
-		tmp = VHIST_ZPRIME[i]->GetMaximum();
-		max = (tmp>max) ? tmp : max;
-		tmp = VHIST_DATA[i]->GetMaximum();
-		max = (tmp>max) ? tmp : max;
+		if(NZprime>=minEntriesDATA)
+		{
+			tmp = VHIST_ZPRIME[i]->GetMaximum();
+			max = (tmp>max) ? tmp : max;
+		}
+		if(NDATA>=minEntriesDATA)
+		{
+			tmp = VHIST_DATA[i]->GetMaximum();
+			max = (tmp>max) ? tmp : max;
+		}
 		
 		
 		VHIST_Z0[i]->SetMaximum(1.2*max);
@@ -686,10 +738,10 @@ void execute(string isHistos = "")
 		VHIST_Z0[i]->Draw();
 
 		VHIST_ZPRIME[i]->SetTitle("");
-		VHIST_ZPRIME[i]->Draw("SAMES");
+		if(NZprime>=minEntriesDATA) VHIST_ZPRIME[i]->Draw("SAMES");
 		
 		VHIST_DATA[i]->SetTitle("");
-		VHIST_DATA[i]->Draw("e1x0SAMES");
+		if(NDATA>=minEntriesDATA) VHIST_DATA[i]->Draw("e1x0SAMES");
 		
 		leg_histos->Draw("SAMES");
 	}

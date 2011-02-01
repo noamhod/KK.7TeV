@@ -83,7 +83,13 @@ public:
 		n4mu = 0;
 		nNmu = 0;
 		
-		if(!m_isMC) fCandidates = new ofstream("candidates.txt");
+		if(!m_isMC)
+		{
+			string fCandidatesName;
+			if(sRunNumber!="") fCandidatesName = "tmp/candidates."+sRunNumber+".txt"; // sRunNumber is static string from basicIncludes.h
+			else               fCandidatesName = "candidates.txt";
+			fCandidates = new ofstream(fCandidatesName.c_str());
+		}
 	}
 	~analysis();
 

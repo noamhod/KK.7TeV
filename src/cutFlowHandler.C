@@ -25,7 +25,9 @@ cutFlowHandler::cutFlowHandler(string sCutFlowFilePath)
 	nAllEvents = 0;
 	
 	file = new ofstream();
-	string sTime = "RunCutFlow_" + getDateHour() + ".cuts";
+	string sTime;
+	if(sRunNumber!="") sTime = "tmp/RunCutFlow." + sRunNumber + ".cuts"; // sRunNumber is static string from basicIncludes.h
+	else               sTime = "RunCutFlow_" + getDateHour() + ".cuts";
 	file->open( sTime.c_str() );
 	
 	readCutFlow(sCutFlowFilePath);

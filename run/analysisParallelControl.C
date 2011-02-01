@@ -75,10 +75,13 @@ void analysisParallelControl::initialize()
 	string str_hist = "";
 	string str_run  = "";
 	
-	str_run = checkANDsetFilepath("RUNNUM", "");
+	///////////////////////////////////////////////////////////////////////////////////
+	// get the run number form the environment and initialize the static sRunNumber ///
+	str_run = checkANDsetFilepath("RUNNUM", "");   ////////////////////////////////////
+	sRunNumber = str_run; // static string sRunNumber (basicIncludes.h) ///////////////
+	///////////////////////////////////////////////////////////////////////////////////
 	
-	
-	string str = checkANDsetFilepath("HEREDIR", "/../conf/Z_GRL_CURRENT.xml");
+	string str = checkANDsetFilepath("RUNDIR", "/../conf/Z_GRL_CURRENT.xml");
 	m_GRL = new GRLinterface();
 	m_GRL->glrinitialize( (TString)str );
 	
@@ -90,22 +93,22 @@ void analysisParallelControl::initialize()
 		string sMCsample = pickMCinputSampe(); ///
 		//////////////////////////////////////////
 		
-		str_list = checkANDsetFilepath("HEREDIR", "/../conf/tmp/mc_local_dataset_"+sMCsample+".list");
+		str_list = checkANDsetFilepath("RUNDIR", "/../conf/tmp/mc_local_dataset_"+sMCsample+".list");
 		str_dir  = checkANDsetFilepath("DATDIR", "/");
-		str_hist = checkANDsetFilepath("HEREDIR", "/../data/tmp/mcLocalControl_"+sMCsample+".root");
+		str_hist = checkANDsetFilepath("RUNDIR", "/../data/tmp/mcLocalControl_"+sMCsample+".root");
 		
 		if(m_RunType!="local_noskim")
 		{
-			if(sMCsample=="mcWZphys_localTests") str_dir = checkANDsetFilepath("HEREDIR", "/");
-			str_tree = checkANDsetFilepath("HEREDIR", "/../data/tmp/mcLocalTree_"+sMCsample+".root");
+			if(sMCsample=="mcWZphys_localTests") str_dir = checkANDsetFilepath("RUNDIR", "/");
+			str_tree = checkANDsetFilepath("RUNDIR", "/../data/tmp/mcLocalTree_"+sMCsample+".root");
 		}
 	}
 	else
 	{
-		str_list = checkANDsetFilepath("HEREDIR", "/../conf/tmp/local_dataset_"+str_run+".list");
+		str_list = checkANDsetFilepath("RUNDIR", "/../conf/tmp/local_dataset_"+str_run+".list");
 		str_dir  = checkANDsetFilepath("DATDIR", "/");
-		str_tree = checkANDsetFilepath("HEREDIR", "/../data/tmp/localTree"+str_run+".root");
-		str_hist = checkANDsetFilepath("HEREDIR", "/../data/tmp/analysisParallelControl"+str_run+".root");
+		str_tree = checkANDsetFilepath("RUNDIR", "/../data/tmp/localTree."+str_run+".root");
+		str_hist = checkANDsetFilepath("RUNDIR", "/../data/tmp/analysisParallelControl."+str_run+".root");
 	}
 	
 	vector<string>* vStr2find = NULL; // all the patterns to be found except for ".root"
@@ -121,12 +124,16 @@ void analysisParallelControl::initialize()
 	m_histfile = new TFile( str_hist.c_str(), "RECREATE");
 	m_histfile->cd();
 
-	string str1 = checkANDsetFilepath("HEREDIR", "/../conf/cutFlow.cuts");
-	string str2 = checkANDsetFilepath("HEREDIR", "/../conf/dataPeriods.data");
+	string str1 = checkANDsetFilepath("RUNDIR", "/../conf/cutFlow.cuts");
+	string str2 = checkANDsetFilepath("RUNDIR", "/../conf/dataPeriods.data");
+	
+	string str3;
+	if(sRunNumber!="") str3 = "tmp/interestingEvents."+sRunNumber+".dump"; // sRunNumber is static string from basicIncludes.h
+	else               str3 = "interestingEvents.dump";
 	
 	m_analysis = new analysis(m_RunType, m_muRecAlgo, m_isMC,
 							  m_WZphysD3PD, m_GRL, m_treefile,
-							  str1, str2, "interestingEvents.dump" );
+							  str1, str2, str3 );
 
 	book();
 

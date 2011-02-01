@@ -1,12 +1,13 @@
-#!/bin/bash/
+#!/bin/bash
+source /srv01/tau/hod/z0analysis-tests/z0analysis-dev/run/qsub_setup.sh
 
 runnumber=$1
 dataset=$2
-
-source $HEREDIR/makeList.sh	$runnumber	$dataset	$CONFDIR	$HEREDIR
-cd $HEREDIR/
-#root.exe -b -q analysisParallelControlRun.C; load("00-00-91"); alc.initialize($runnumber,"localRunControl_noSkim.txt"); alc.loop(); .q;
+echo 'DATDIR ' $DATDIR
+echo 'dataset ' $dataset
+echo 'run number ' $runnumber
+source $RUNDIR/makeList.sh	$runnumber	$DATDIR/$dataset
+cd $RUNDIR/
 export RUNNUM=$runnumber
-#root.exe -b -q $HEREDIR/analysisParallelControlRun.C;
-$ROOTSYS/bin/root.exe -b -q /srv01/tau/hod/z0analysis-tests/z0analysis-dev/run/analysisParallelControlMain.C;
+#$ROOTSYS/bin/root.exe -b -q $RUNDIR/analysisParallelControlMain.C;
 export RUNNUM=0

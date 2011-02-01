@@ -166,5 +166,7 @@ enum pdtEnum { // *** note that this is not a complete list of pdt's particles *
 	PDTFIRSTBARYON=1103, PDTLASTBARYON=5554
 };
 
+static string sRunNumber = "";
+
 #endif
 

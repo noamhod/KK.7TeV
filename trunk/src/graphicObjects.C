@@ -398,15 +398,15 @@ void graphicObjects::writeTrees(TDirectory* tDir_allCuts,
 
 	f = tree_allCuts->GetCurrentFile();
 	f->cd( tDir_allCuts->GetName() );
-	tree_allCuts->Write();
+	tree_allCuts->Write("", TObject::kOverwrite);
 	
 	f = tree_cutsProfile->GetCurrentFile();
 	f->cd( tDir_cutsProfile->GetName() );
-	tree_cutsProfile->Write();
+	tree_cutsProfile->Write("", TObject::kOverwrite);
 	
 	f = tree_efficiency->GetCurrentFile();
 	f->cd( tDir_efficiency->GetName() );
-	tree_efficiency->Write();
+	tree_efficiency->Write("", TObject::kOverwrite);
 	
 	f->Write();
 	f->Close();

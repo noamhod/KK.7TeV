@@ -148,7 +148,7 @@ void analysisLocalControl::finalize()
 	{
 		m_treefile = m_analysis->m_WZphysD3PDmaker->m_tree->GetCurrentFile();
 		m_treefile->cd();
-		m_analysis->m_WZphysD3PDmaker->m_tree->Write();
+		m_analysis->m_WZphysD3PDmaker->m_tree->Write("", TObject::kOverwrite);
 		m_treefile->Write();
 		m_treefile->Close();
 	}

@@ -78,7 +78,10 @@ void analysisGridControl::finalize()
 	// the tree will split into multiple files
 	m_rootfile = m_analysis->m_WZphysD3PDmaker->m_tree->GetCurrentFile();
 	m_rootfile->cd();
-	m_analysis->m_WZphysD3PDmaker->m_tree->Write();
+	m_analysis->m_WZphysD3PDmaker->m_tree->Write("", TObject::kOverwrite);
+	
+	m_analysis->writeTrees(m_dirAllCuts,m_dirCutProfile,m_dirEff);
+	
 	m_rootfile->Write();
 	m_rootfile->Close();
 }

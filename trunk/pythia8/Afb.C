@@ -36,6 +36,7 @@
 #include <TPaveText.h>
 #include <TThread.h>
 #include <TList.h>
+#include <TRandom.h>
 
 using namespace std;
 
@@ -54,18 +55,78 @@ string REFNAME = "CosThetaCS";
 //string REFNAME = "CosThetaHE";
 Float_t IMASS;
 Float_t COSTH;
-vector<float>* CHARGE;
-vector<int>* ID;
-vector<float>* PX;
-vector<float>* PY;
-vector<float>* PZ;
-vector<float>* E;
+vector<double>* CHARGE;
+vector<int>*    ID;
+vector<double>* PX;
+vector<double>* PY;
+vector<double>* PZ;
+vector<double>* E;
+vector<double>* PT;
+vector<double>* PHI;
+vector<double>* THETA;
+vector<double>* ETA;
 TLorentzVector* pa = new TLorentzVector();
 TLorentzVector* pb = new TLorentzVector();
+
+vector<double>* PXsmr = new vector<double>;
+vector<double>* PYsmr = new vector<double>;
+vector<double>* PZsmr = new vector<double>;
+vector<double>* Esmr  = new vector<double>;
+vector<double>* PTsmr = new vector<double>;
+
+
+vector<bool>* muQAflag = new vector<bool>;
+
 TLorentzVector m_pTmp;
-float GeV2TeV = 1.e-3;
-float MeV2TeV = 1.e-6;
-float muonMass = 0.105658367; // GeV
+double GeV2TeV = 1.e-3;
+double MeV2TeV = 1.e-6;
+double muonMass = 0.105658367; // GeV
+
+bool DOSELECTION = true;
+bool DOSMEAR     = true;
+
+//////////////////////////////////////////////////////////////////////////////////
+// smearing
+double   AVERAGE        = 0.;
+double   SIGMA          = 1.;
+double   RESOLUTION     = 0.12;
+double   PTTRACKSCALE   = 1.e+3; // in GeV/c
+TRandom* GAUSSGENERATOR = new TRandom();
+
+inline double gaussRand()
+{
+	return GAUSSGENERATOR->Gaus(AVERAGE, SIGMA); 
+}
+inline double smear_pT(double pT)
+{
+	return 1./(1./pT + gaussRand()*RESOLUTION/PTTRACKSCALE);
+}
+inline double smear_px(double pTsmeared, double phi)
+{
+	return pTsmeared*cos(phi);
+}
+inline double smear_py(double pTsmeared, double phi)
+{
+	return pTsmeared*sin(phi);
+}
+inline double smear_pz(double pTsmeared, double theta)
+{
+	return pTsmeared/tan(theta);
+}
+inline double smear_e(double pTsmeared,  double theta)
+{
+	return pTsmeared/sin(theta);
+}
+inline void compare2true(double px0, double py0, double pz0, double e0,
+						 double pxS, double pyS, double pzS, double eS
+						)
+{
+	cout << "(pxS[" << pxS << "]/px0[" << px0 << "] - 1)% = " << (pxS/px0 - 1.)*100 << endl;
+	cout << "(pyS[" << pyS << "]/py0[" << py0 << "] - 1)% = " << (pyS/py0 - 1.)*100 << endl;
+	cout << "(pzS[" << pzS << "]/pz0[" << pz0 << "] - 1)% = " << (pzS/pz0 - 1.)*100 << endl;
+	cout << "(eS[" <<  eS  << "]/e0["  << e0  << "] - 1)% = " << (eS/e0 - 1.)*100 << "\n" << endl;
+}
+//////////////////////////////////////////////////////////////////////////////////
 
 void Scale(TH1D* h, double d)
 { 
@@ -182,25 +243,53 @@ void fcn(int& npar, double* deriv, double& f, double par[], int flag)
 	f = -2.0 * lnL; // factor of -2 so minuit gets the errors right
 }
 
-
-void fillVec(TTree* t, TH1D* h, Int_t b)
+inline void smear(bool print)
 {
-	//VCOSTH->clear();
-	if (t==0) return;
+	PXsmr->clear();
+	PYsmr->clear();
+	PZsmr->clear();
+	Esmr->clear();
+	PTsmr->clear();
+	double pTSmeared;
 	
-	Double_t bmin = h->GetBinLowEdge(b);
-	Double_t bwid = h->GetBinWidth(b);
-	Double_t bmax = bmin+bwid;
-	
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<t->GetEntries() ; l64t_jentry++)
+	for(int i=0 ; i<(int)PT->size() ; i++)
 	{
-		t->GetEntry(l64t_jentry);
-		//if( IMASS>=(Float_t)bmin  &&  IMASS<(Float_t)bmax ) VCOSTH->push_back(COSTH);
-		if( IMASS>=(Float_t)bmin  &&  IMASS<(Float_t)bmax ) VVCOSTH[CURRENTBIN]->push_back(COSTH);
+		
+		pTSmeared = smear_pT(PT->at(i));
+		
+		PTsmr->push_back(pTSmeared);
+		PXsmr->push_back(smear_px(pTSmeared, PHI->at(i)));
+		PYsmr->push_back(smear_py(pTSmeared, PHI->at(i)));
+		PZsmr->push_back(smear_pz(pTSmeared, THETA->at(i)));
+		Esmr->push_back(smear_e(pTSmeared,   THETA->at(i)));
+		
+		if(pTSmeared<0)
+		{
+			CHARGE->at(i)*=-1.;
+			ID->at(i)*=-1.;
+			cout << "smeared pT=" << pTSmeared  << " ==> charge flip !" << endl;
+		}
+
+		if(print)
+		{
+			compare2true(
+						 PX->at(i),PY->at(i),PZ->at(i),E->at(i),
+						 PXsmr->at(i),PYsmr->at(i),PZsmr->at(i),Esmr->at(i)
+						);
+		}
 	}
 }
 
-void fillVec(TTree* t, TH1D* h)
+inline bool selection(TLorentzVector* pa, TLorentzVector* pb)
+{
+	// pa and pb are in TeV
+	if(imass(pa,pb)<0.06)                          return false;
+	if(pa->Pt()<0.025      || pb->Pt()<0.025)      return false;
+	if(fabs(pa->Eta())>2.4 || fabs(pb->Eta())>2.4) return false;
+	return true;
+}
+
+inline void fill(TTree* t, TH1D* h, TH1D* hMass)
 {
 	for(int v=0 ; v<(int)VVCOSTH.size() ; v++) VVCOSTH[v]->clear();
 	if (t==0) return;
@@ -211,26 +300,59 @@ void fillVec(TTree* t, TH1D* h)
 	{
 		t->GetEntry(l64t_jentry);
 		
-		int bin = (int)xaxis->FindBin((Double_t)IMASS*GeV2TeV);
-		if(bin<0 || bin>=(int)VVCOSTH.size()) continue;
 		/*
-		//if(CHARGE->at(0)*CHARGE->at(1)>=0) continue;
-		if(ID->at(0)*ID->at(1)>=0) continue;
-		pa->SetPxPyPzE(PX->at(0)*GeV2TeV,PY->at(0)*GeV2TeV,PZ->at(0)*GeV2TeV,E->at(0)*GeV2TeV);
-		pb->SetPxPyPzE(PX->at(1)*GeV2TeV,PY->at(1)*GeV2TeV,PZ->at(1)*GeV2TeV,E->at(1)*GeV2TeV);
-		//if(REFNAME=="CosThetaCS") COSTH = cosThetaCollinsSoper( pa, CHARGE->at(0), pb, CHARGE->at(1) );
-		float ca = (ID->at(0)>0) ? -1. : +1.;
-		float cb = (ID->at(1)<0) ? -1. : +1.;
-		if(REFNAME=="CosThetaCS") COSTH = cosThetaCollinsSoper( pa, ca, pb, cb );
-		else COSTH = 0.;
+		int bin = (int)xaxis->FindBin((Double_t)IMASS*GeV2TeV);
+		if(bin<=0 || bin>(int)VVCOSTH.size()) continue;
 		*/
 		
+		if(CHARGE->at(0)*CHARGE->at(1)>=0) continue;
+		if(DOSMEAR)
+		{
+			//////////////////
+			// smear by pT ///
+			smear(false); ////
+			//////////////////
+			pa->SetPxPyPzE(PXsmr->at(0)*GeV2TeV,PYsmr->at(0)*GeV2TeV,PZsmr->at(0)*GeV2TeV,Esmr->at(0)*GeV2TeV);
+			pb->SetPxPyPzE(PXsmr->at(1)*GeV2TeV,PYsmr->at(1)*GeV2TeV,PZsmr->at(1)*GeV2TeV,Esmr->at(1)*GeV2TeV);
+		}
+		else
+		{
+			pa->SetPxPyPzE(PX->at(0)*GeV2TeV,PY->at(0)*GeV2TeV,PZ->at(0)*GeV2TeV,E->at(0)*GeV2TeV);
+			pb->SetPxPyPzE(PX->at(1)*GeV2TeV,PY->at(1)*GeV2TeV,PZ->at(1)*GeV2TeV,E->at(1)*GeV2TeV);
+		}
 		
-		VVCOSTH[bin]->push_back(COSTH);
+		/////////////////////////////////////////////////
+		// apply selection (namely acceptance cuts) /////
+		if(DOSELECTION) /////////////////////////////////
+		{               /////////////////////////////////
+			if(!selection(pa,pb)) continue; /////////////
+		} ///////////////////////////////////////////////
+		/////////////////////////////////////////////////
 		
-		if(ISZ0) VHIST_Z0[bin]->Fill(COSTH);
-		if(ISZP) VHIST_ZP[bin]->Fill(COSTH);
-		if(ISKK) VHIST_KK[bin]->Fill(COSTH);
+		double mHat = imass(pa,pb);
+		int bin = (int)xaxis->FindBin((Double_t)mHat);
+		if(bin<=0 || bin>(int)VVCOSTH.size()) continue;
+		if     (REFNAME=="CosThetaCS") COSTH = cosThetaCollinsSoper( pa, CHARGE->at(0), pb, CHARGE->at(1) );
+		else if(REFNAME=="CosThetaHE") COSTH = cosThetaBoost( pa, CHARGE->at(0), pb, CHARGE->at(1) );
+		else COSTH = 0.;
+		
+		///////////////////////////////////////////////////
+		// fill the appropriate vector with cos(theta) //// 
+		VVCOSTH[bin-1]->push_back(COSTH); /////////////////
+		///////////////////////////////////////////////////
+		
+		///////////////////////////////////////////////////
+		// fill the appropriate cos(theta) histogram //////
+		if(ISZ0) VHIST_Z0[bin-1]->Fill(COSTH); ////////////
+		if(ISZP) VHIST_ZP[bin-1]->Fill(COSTH); ////////////
+		if(ISKK) VHIST_KK[bin-1]->Fill(COSTH); ////////////
+		///////////////////////////////////////////////////
+		
+		
+		//////////////////////////////////////
+		// fill the invariant mass histo /////
+		hMass->Fill(mHat); ///////////////////
+		//////////////////////////////////////
 	}
 }
 
@@ -321,6 +443,9 @@ void execute(string isHistos = "")
 	}
 	*/
 
+	ofstream* of = new ofstream;
+	of->open("test.tmp");
+	
 
 	int minEntriesDATA = 10;
 	int minEntriesMC   = 10;
@@ -330,9 +455,9 @@ void execute(string isHistos = "")
 	
 	
 	// logarithmic boundries and bins of histograms
-	const int imass_nbins = 12;
+	const int imass_nbins = 12; //14;
 	double    imass_min   = 120.*GeV2TeV;
-	double    imass_max   = 1400.*GeV2TeV;
+	double    imass_max   = 1620.*GeV2TeV;
 	const int ncol_pads   = 2; // = imass_nbins/nrow_pads !!!
 	const int nrow_pads   = 50; // = imass_nbins/ncol_pads !!!
 	Double_t logMmin     = log10(imass_min);
@@ -350,8 +475,8 @@ void execute(string isHistos = "")
 	double imass_min   = 72.62*GeV2TeV;
 	double imass_max   = 381.09*GeV2TeV;
 	Double_t M_bins[imass_nbins+1] = {72.62*GeV2TeV, 83.37*GeV2TeV, 95.73*GeV2TeV, 109.91*GeV2TeV,
-									  126.19*GeV2TeV, 144.89*GeV2TeV, 166.35*GeV2TeV, 191.00*GeV2TeV,
-									  219.30*GeV2TeV, 251.79*GeV2TeV, 289.09*GeV2TeV, 331.92*GeV2TeV, 381.09*GeV2TeV};
+									126.19*GeV2TeV, 144.89*GeV2TeV, 166.35*GeV2TeV, 191.00*GeV2TeV,
+									219.30*GeV2TeV, 251.79*GeV2TeV, 289.09*GeV2TeV, 331.92*GeV2TeV, 381.09*GeV2TeV};
 	//M_bins = {2.00*GeV, 2.30*GeV, 2.64*GeV, 3.03*GeV, 3.48*GeV, 3.99*GeV, 4.58*GeV, 5.26*GeV, 6.04*GeV, 6.93*GeV, 7.96*GeV, 9.14*GeV, 10.50*GeV, 12.05*GeV, 13.84*GeV, 15.89*GeV, 18.24*GeV, 20.94*GeV, 24.05*GeV, 27.61*GeV, 31.70*GeV, 36.39*GeV, 41.79*GeV, 47.98*GeV, 55.08*GeV, 63.25*GeV, 72.62*GeV, 83.37*GeV, 95.73*GeV, 109.91*GeV, 126.19*GeV, 144.89*GeV, 166.35*GeV, 191.00*GeV, 219.30*GeV, 251.79*GeV, 289.09*GeV, 331.92*GeV, 381.09*GeV, 437.55*GeV, 502.38*GeV, 576.81*GeV, 662.26*GeV, 760.38*GeV, 873.03*GeV, 1002.37*GeV, 1150.88*GeV, 1321.39*GeV, 1517.16*GeV, 1741.93*GeV, 2000.00*GeV};
 	*/
 	
@@ -391,12 +516,11 @@ void execute(string isHistos = "")
 	string xTitle = "#hat{m}_{#mu#mu} TeV";
 	string yTitle= "A_{FB}";
 
-	string m_dataAnalysisSelector = "digest";	
-	//string m_muonSelector = "staco/";
-	string m_muonSelector = "muid/";
-
 	double m_miny = -0.6;
 	double m_maxy = +0.6;
+	
+	double ifb2imb = 1.e+12;
+	double L = 1.; // 1/fb
 
 	string hNameFixed = hName;
 
@@ -412,11 +536,11 @@ void execute(string isHistos = "")
 	gStyle->SetTitleFillColor(0);
 	gStyle->SetPaperSize(20,26);
 	gStyle->SetPadTopMargin(0.05);
-	gStyle->SetPadRightMargin(0.05);
+	gStyle->SetPadRightMargin(0.12);
 	gStyle->SetPadBottomMargin(0.16);
 	gStyle->SetPadLeftMargin(0.12);
 	Int_t font=42;
-	Double_t tsize=0.05;
+	Double_t tsize=0.04;
 	gStyle->SetTextFont(font);
 	gStyle->SetTextSize(tsize);
 	gStyle->SetLabelFont(font,"x");
@@ -442,18 +566,26 @@ void execute(string isHistos = "")
 	gStyle->SetStatH(0);
 	
 	
-	TLegend* leg = new TLegend(0.1413043,0.8290155,0.3729097,0.9313472,NULL,"brNDC");
-	leg->SetFillColor(kWhite);
+	TLegend* leg_mHat = new TLegend(0.1557789,0.1818182,0.3806533,0.458042,NULL,"brNDC");
+	leg_mHat->SetFillColor(kWhite);
 	
 	TLegend* leg_histos = new TLegend(0.85, 0.15, 0.97, 0.45,NULL,"brNDC");
 	leg_histos->SetFillColor(kWhite);
 	
-	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
-	string lumilabel = "#intLdt~42 pb^{-1}";
-	TPaveText* pvtxt = new TPaveText(0.1195652,0.1334197,0.2458194,0.2318653,"brNDC");
-	pvtxt->SetFillColor(kWhite);
-	TText* txt  = pvtxt->AddText( lumilabel.c_str() );
-	TText* txt1 = pvtxt->AddText( muonLabel.c_str() );
+	strm.clear();
+	str.clear();
+	strm << L;
+	strm >> str;
+	string lumilabel = "#intLdt~" + str + " fb^{-1}";
+	TPaveText* pvtxt_lumi = new TPaveText(0.1620603,0.458042,0.3140704,0.5716783,"brNDC");
+	pvtxt_lumi->SetFillColor(kWhite);
+	TText* txt  = pvtxt_lumi->AddText( lumilabel.c_str() );
+	
+	TPaveText* pvtxt_smear = new TPaveText(0.4824415,0.1818182,0.6714047,0.3199482,"brNDC");
+	pvtxt_smear->SetFillColor(0);
+	pvtxt_smear->SetTextFont(42);
+	txt = pvtxt_smear->AddText("#splitline{smear muon p_{T} by:}{#frac{#Delta p_{T}}{p_{T}} #approx #frac{12%}{1 TeV} #times p_{T}}");
+	pvtxt_smear->Draw();
 	
 	string cName = "cnv_" + hNameFixed;
 	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);
@@ -465,7 +597,7 @@ void execute(string isHistos = "")
 	if(doLogx) pad_mHat->SetLogx();
 
 	TPad *pad_Afb  = new TPad("pad_Afb", "",0,0,1,1);
-	pad_Afb->SetGridy();
+	//pad_Afb->SetGridy();
 	pad_Afb->SetTicky(0);
 	pad_Afb->SetTickx(1);
 	pad_Afb->SetFillStyle(0);
@@ -486,30 +618,24 @@ void execute(string isHistos = "")
 	hMZ0->SetTitle("");
 	hMZ0->SetYTitle("Events");
 	hMZ0->SetLineColor(kAzure-5);
-	hMZ0->SetLineWidth(2);
-	/*
-	TH1D* hAfbZ0;
-	if(doLogM) hAfbZ0   = new TH1D("Afb_Z0","Afb_Z0", imass_nbins, M_bins );
-	else       hAfbZ0   = new TH1D("Afb_Z0","Afb_Z0", imass_nbins, imass_min, imass_max );
-	hAfbZ0->SetMarkerStyle(20);
-	hAfbZ0->SetMarkerColor(kBlack);
-	hAfbZ0->SetMarkerSize(1.2);
-	leg->AddEntry( hAfbZ0, "Z0: A_{FB}", "lep");
-	leg->AddEntry( hAfbZ0, "Z0: Events", "l");
-	*/
-	channel = "Z#rightarrow#mu#mu: A_{FB}(stat' uncertainty)";
+	hMZ0->SetLineWidth(1);
+	hMZ0->SetLineStyle(2);
+	leg_mHat->AddEntry( hMZ0, "#gamma/Z^{0}: Events", "l");
+	
+	channel = "#gamma/Z^{0}: A_{FB} fit";
 	TH1D* hAfbZ0;
 	if(doLogM) hAfbZ0 = new TH1D("Afb_Z0","Afb_Z0", imass_nbins, M_bins );
 	else       hAfbZ0 = new TH1D("Afb_Z0","Afb_Z0", imass_nbins, imass_min, imass_max );
 	hAfbZ0->SetLineColor(kAzure-5);
 	hAfbZ0->SetFillColor(kAzure-5);
+	hAfbZ0->SetFillStyle(3003);
 	hAfbZ0->SetLineWidth(1);
 	hAfbZ0->SetMarkerSize(0);
 	hAfbZ0->SetMarkerColor(0);
 	hAfbZ0->SetTitle("");
 	hAfbZ0->SetXTitle( xTitle.c_str() );
 	hAfbZ0->SetYTitle( yTitle.c_str() );
-	leg->AddEntry( hAfbZ0, channel.c_str(), "f");
+	leg_mHat->AddEntry( hAfbZ0, channel.c_str(), "f");
 	
 	
 	///////////////////////////////////////////////
@@ -520,21 +646,24 @@ void execute(string isHistos = "")
 	hMZP->SetTitle("");
 	hMZP->SetYTitle("Events");
 	hMZP->SetLineColor(kRed);
-	hMZP->SetLineWidth(2);
+	hMZP->SetLineWidth(1);
+	hMZP->SetLineStyle(3);
+	leg_mHat->AddEntry( hMZP, "1 TeV Z'_{SSM}: Events", "l");
 	
-	channel = "1 TeV Z' SSM: A_{FB}(stat' uncertainty)";
+	channel = "1 TeV Z'_{SSM}: A_{FB} fit";
 	TH1D* hAfbZP;
 	if(doLogM) hAfbZP = new TH1D("Afb_ZP","Afb_ZP", imass_nbins, M_bins );
 	else       hAfbZP = new TH1D("Afb_ZP","Afb_ZP", imass_nbins, imass_min, imass_max );
 	hAfbZP->SetLineColor(kRed);
 	hAfbZP->SetFillColor(kRed);
+	hAfbZP->SetFillStyle(3017);
 	hAfbZP->SetLineWidth(1);
 	hAfbZP->SetMarkerSize(0);
 	hAfbZP->SetMarkerColor(0);
 	hAfbZP->SetTitle("");
 	hAfbZP->SetXTitle( xTitle.c_str() );
 	hAfbZP->SetYTitle( yTitle.c_str() );
-	leg->AddEntry( hAfbZP, channel.c_str(), "f");
+	leg_mHat->AddEntry( hAfbZP, channel.c_str(), "f");
 	
 	
 	///////////////////////////////////////////////
@@ -545,21 +674,24 @@ void execute(string isHistos = "")
 	hMKK->SetTitle("");
 	hMKK->SetYTitle("Events");
 	hMKK->SetLineColor(kBlack);
-	hMKK->SetLineWidth(2);
+	hMKK->SetLineWidth(1);
+	hMKK->SetLineStyle(1);
+	leg_mHat->AddEntry( hMKK, "1 TeV #gamma_{KK}/Z_{KK}: Events", "l");
 	
-	channel = "1 TeV KK: A_{FB}(stat' uncertainty)";
+	channel = "1 TeV #gamma_{KK}/Z_{KK}: A_{FB} fit";
 	TH1D* hAfbKK;
 	if(doLogM) hAfbKK = new TH1D("Afb_KK","Afb_KK", imass_nbins, M_bins );
 	else       hAfbKK = new TH1D("Afb_KK","Afb_KK", imass_nbins, imass_min, imass_max );
 	hAfbKK->SetLineColor(kBlack);
 	hAfbKK->SetFillColor(kBlack);
+	hAfbKK->SetFillStyle(3018);
 	hAfbKK->SetLineWidth(1);
 	hAfbKK->SetMarkerSize(0);
 	hAfbKK->SetMarkerColor(0);
 	hAfbKK->SetTitle("");
 	hAfbKK->SetXTitle( xTitle.c_str() );
 	hAfbKK->SetYTitle( yTitle.c_str() );
-	leg->AddEntry( hAfbKK, channel.c_str(), "f");
+	leg_mHat->AddEntry( hAfbKK, channel.c_str(), "f");
 	
 	
 	string sMergedFileName; 
@@ -576,8 +708,8 @@ void execute(string isHistos = "")
 	ISKK = false;
 	vsNames.clear();
 	sMergedFileName = "Z0.merged.root";
-	vsNames.push_back("bu/Z0.M1000.root");
-	vsNames.push_back("bu/Z0.lowMass.M1000.root");
+	vsNames.push_back("bu/Z0.M1000.5e5.root");
+	vsNames.push_back("bu/Z0.M1000.1e6.root");
 	merge(sMergedFileName, dir, vsNames);
 	//sMergedFileName = dir+"bu/Z0.lowMass.M1000.root";
 	TFile* fZ0 = new TFile(sMergedFileName.c_str(), "READ");
@@ -590,15 +722,10 @@ void execute(string isHistos = "")
 	tree_Z0->SetBranchAddress( "py", &PY );
 	tree_Z0->SetBranchAddress( "pz", &PZ );
 	tree_Z0->SetBranchAddress( "E", &E );
-	
-	// fill the imass histo
-	if(tree_Z0==0) return;
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<tree_Z0->GetEntries() ; l64t_jentry++)
-	{
-		tree_Z0->GetEntry(l64t_jentry);
-		hMZ0->Fill(IMASS*GeV2TeV);
-	}
-	
+	tree_Z0->SetBranchAddress( "pT", &PT );
+	tree_Z0->SetBranchAddress( "phi", &PHI );
+	tree_Z0->SetBranchAddress( "theta", &THETA );
+	tree_Z0->SetBranchAddress( "eta", &ETA );
 	a4   = 0.;
 	da4  = 0.;
 	afb  = 0.;
@@ -607,13 +734,13 @@ void execute(string isHistos = "")
 	ISZ0 = false;
 	ISZP = true;
 	ISKK = false;
-	fillVec(tree_Z0, hAfbZ0); // the VVCOSTH vectors are full
+	fill(tree_Z0, hAfbZ0, hMZ0); // the VVCOSTH vectors are full
 	for(Int_t b=1 ; b<=hAfbZ0->GetNbinsX() ; b++)
 	{
 		// norm to bin width
 		//hMZ0->SetBinContent(b, hMZ0->GetBinContent(b)/hMZ0->GetBinWidth(b));
 		CURRENTBIN = (unsigned int)(b-1);
-		if((int)VVCOSTH[CURRENTBIN]->size()<minEntriesDATA) continue;
+		//if((int)VVCOSTH[CURRENTBIN]->size()<minEntriesDATA) continue;
 		minimize(guess, a4, da4);
 		afb = (3./8.)*a4;
 		dafb = (3./8.)*da4;
@@ -621,13 +748,15 @@ void execute(string isHistos = "")
 		hAfbZ0->SetBinContent(b,afb);
 		hAfbZ0->SetBinError(b,dafb);
 		cout << "mHat["<< b << "/" << hAfbZ0->GetNbinsX() << "]=" << xaxis->GetBinCenter(b) << ", Afb=" << afb << " +- " << dafb << "\n" << endl;
+		(*of) << "Z0[currentbin=" << CURRENTBIN << "][bin=" << b << "]: " << VVCOSTH[CURRENTBIN]->size() << ", from histo: " << hMZ0->GetBinContent(b) << endl;
 	}
+	(*of) << endl;
 	
 	
 	vsNames.clear();
 	sMergedFileName = "ZP.merged.root";
-	vsNames.push_back("bu/ZP.M1000.root");
-	vsNames.push_back("bu/ZP.lowMass.M1000.root");
+	vsNames.push_back("bu/ZP.M1000.5e5.root");
+	vsNames.push_back("bu/ZP.M1000.1e6.root");
 	merge(sMergedFileName, dir, vsNames);
 	//sMergedFileName = dir+"bu/ZP.lowMass.M1000.root";
 	TFile* fZP = new TFile(sMergedFileName.c_str(), "READ");
@@ -640,15 +769,10 @@ void execute(string isHistos = "")
 	tree_ZP->SetBranchAddress( "py", &PY );
 	tree_ZP->SetBranchAddress( "pz", &PZ );
 	tree_ZP->SetBranchAddress( "E", &E );
-	
-	if(tree_ZP==0) return;
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<tree_ZP->GetEntries() ; l64t_jentry++)
-	{
-		tree_ZP->GetEntry(l64t_jentry);
-		hMZP->Fill(IMASS*GeV2TeV);
-	}
-	
-	
+	tree_ZP->SetBranchAddress( "pT", &PT );
+	tree_ZP->SetBranchAddress( "phi", &PHI );
+	tree_ZP->SetBranchAddress( "theta", &THETA );
+	tree_ZP->SetBranchAddress( "eta", &ETA );
 	a4   = 0.;
 	da4  = 0.;
 	afb  = 0.;
@@ -657,13 +781,13 @@ void execute(string isHistos = "")
 	ISZ0 = false;
 	ISZP = false;
 	ISKK = true;
-	fillVec(tree_ZP, hAfbZP); // the VVCOSTH vectors are full
+	fill(tree_ZP, hAfbZP, hMZP); // the VVCOSTH vectors are full
 	for(Int_t b=1 ; b<=hAfbZP->GetNbinsX() ; b++)
 	{
 		// norm to bin width
 		//hMZ0->SetBinContent(b, hMZ0->GetBinContent(b)/hMZ0->GetBinWidth(b));
 		CURRENTBIN = (unsigned int)(b-1);
-		if((int)VVCOSTH[CURRENTBIN]->size()<minEntriesDATA) continue;
+		//if((int)VVCOSTH[CURRENTBIN]->size()<minEntriesDATA) continue;
 		minimize(guess, a4, da4);
 		afb = (3./8.)*a4;
 		dafb = (3./8.)*da4;
@@ -671,13 +795,16 @@ void execute(string isHistos = "")
 		hAfbZP->SetBinContent(b,afb);
 		hAfbZP->SetBinError(b,dafb);
 		cout << "mHat["<< b << "/" << hAfbZP->GetNbinsX() << "]=" << xaxis->GetBinCenter(b) << ", Afb=" << afb << " +- " << dafb << "\n" << endl;
+		(*of) << "ZP[currentbin=" << CURRENTBIN << "][bin=" << b << "]: " << VVCOSTH[CURRENTBIN]->size() << ", from histo: " << hMZP->GetBinContent(b) << endl;
 	}
+	(*of) << endl;
+	
 	
 	
 	vsNames.clear();
 	sMergedFileName = "KK.merged.root";
-	vsNames.push_back("bu/KK.M1000.root");
-	vsNames.push_back("bu/KK.lowMass.M1000.root");
+	vsNames.push_back("bu/KK.M1000.5e5.root");
+	vsNames.push_back("bu/KK.M1000.1e6.root");
 	merge(sMergedFileName, dir, vsNames);
 	//sMergedFileName = dir+"bu/KK.lowMass.M1000.root";
 	TFile* fKK = new TFile(sMergedFileName.c_str(), "READ");
@@ -690,14 +817,10 @@ void execute(string isHistos = "")
 	tree_KK->SetBranchAddress( "py", &PY );
 	tree_KK->SetBranchAddress( "pz", &PZ );
 	tree_KK->SetBranchAddress( "E", &E );
-	
-	if(tree_KK==0) return;
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<tree_KK->GetEntries() ; l64t_jentry++)
-	{
-		tree_KK->GetEntry(l64t_jentry);
-		hMKK->Fill(IMASS*GeV2TeV);
-	}
-	
+	tree_KK->SetBranchAddress( "pT", &PT );
+	tree_KK->SetBranchAddress( "phi", &PHI );
+	tree_KK->SetBranchAddress( "theta", &THETA );
+	tree_KK->SetBranchAddress( "eta", &ETA );
 	a4   = 0.;
 	da4  = 0.;
 	afb  = 0.;
@@ -706,13 +829,13 @@ void execute(string isHistos = "")
 	ISZ0 = false;
 	ISZP = false;
 	ISKK = true;
-	fillVec(tree_KK, hAfbKK); // the VVCOSTH vectors are full
+	fill(tree_KK, hAfbKK, hMKK); // the VVCOSTH vectors are full
 	for(Int_t b=1 ; b<=hAfbKK->GetNbinsX() ; b++)
 	{
 		// norm to bin width
 		//hMZ0->SetBinContent(b, hMZ0->GetBinContent(b)/hMZ0->GetBinWidth(b));
 		CURRENTBIN = (unsigned int)(b-1);
-		if((int)VVCOSTH[CURRENTBIN]->size()<minEntriesDATA) continue;
+		//if((int)VVCOSTH[CURRENTBIN]->size()<minEntriesDATA) continue;
 		minimize(guess, a4, da4);
 		afb = (3./8.)*a4;
 		dafb = (3./8.)*da4;
@@ -720,41 +843,54 @@ void execute(string isHistos = "")
 		hAfbKK->SetBinContent(b,afb);
 		hAfbKK->SetBinError(b,dafb);
 		cout << "mHat["<< b << "/" << hAfbKK->GetNbinsX() << "]=" << xaxis->GetBinCenter(b) << ", Afb=" << afb << " +- " << dafb << "\n" << endl;
+		(*of) << "KK[currentbin=" << CURRENTBIN << "][bin=" << b << "]: " << VVCOSTH[CURRENTBIN]->size() << ", from histo: " << hMKK->GetBinContent(b) << endl;
 	}
+	(*of) << endl;
+	
+	
+	
+	
+	// scale all to lumi
+	Scale(hMKK, (L*ifb2imb)*(7.68E-09/1500000.));
+	Scale(hMZP, (L*ifb2imb)*(7.88E-09/1500000.));
+	Scale(hMZ0, (L*ifb2imb)*(7.96E-09/1500000.));
 	
 	
 	
 	
 	pad_mHat->Draw();
 	pad_mHat->cd();
-	//hMZ0->GetYaxis()->SetRangeUser(1,1.5*hMZ0->GetMaximum());
-	hMZ0->Draw();
+	//hMKK->GetYaxis()->SetRangeUser(1,1.5*hMKK->GetMaximum());
+	hMKK->SetMaximum(1.5*hMKK->GetMaximum());
+	hMKK->SetMinimum(0.5*hMZ0->GetMinimum());
+	hMKK->Draw();
+	hMKK->GetXaxis()->SetMoreLogLabels(); 
+	hMKK->GetXaxis()->SetNoExponent(); 
+	hMZ0->Draw("SAMES");
 	hMZ0->GetXaxis()->SetMoreLogLabels(); 
 	hMZ0->GetXaxis()->SetNoExponent(); 
 	hMZP->Draw("SAMES");
 	hMZP->GetXaxis()->SetMoreLogLabels(); 
 	hMZP->GetXaxis()->SetNoExponent(); 
-	hMKK->Draw("SAMES");
-	hMKK->GetXaxis()->SetMoreLogLabels(); 
-	hMKK->GetXaxis()->SetNoExponent(); 
 
 	cnv->cd();
 
 	pad_Afb->Draw();
 	pad_Afb->cd();
-	hAfbZP->GetYaxis()->SetRangeUser(m_miny,m_maxy);
-	hAfbZP->Draw("E5 Y+");
-	hAfbZP->GetXaxis()->SetMoreLogLabels(); 
-	hAfbZP->GetXaxis()->SetNoExponent(); 
+	hAfbKK->GetYaxis()->SetRangeUser(m_miny,m_maxy);
+	hAfbKK->Draw("E5 Y+");
+	hAfbKK->GetXaxis()->SetMoreLogLabels(); 
+	hAfbKK->GetXaxis()->SetNoExponent(); 
 	hAfbZ0->Draw("E5 Y+ SAMES");
 	hAfbZ0->GetXaxis()->SetMoreLogLabels(); 
 	hAfbZ0->GetXaxis()->SetMoreLogLabels(); 
 	//hAfbZ0->Draw("e1x0SAMES");
-	hAfbKK->Draw("E5 Y+ SAMES");
-	hAfbKK->GetXaxis()->SetMoreLogLabels(); 
-	hAfbKK->GetXaxis()->SetMoreLogLabels(); 
-	//pvtxt->Draw("SAMES");
-	leg->Draw("SAMES");
+	hAfbZP->Draw("E5 Y+ SAMES");
+	hAfbZP->GetXaxis()->SetMoreLogLabels(); 
+	hAfbZP->GetXaxis()->SetMoreLogLabels(); 
+	pvtxt_lumi->Draw("SAMES");
+	if(DOSMEAR) pvtxt_smear->Draw("SAMES");
+	leg_mHat->Draw("SAMES");
 	TLine* lUnit = new TLine(imass_min,0.,imass_max,0.);
 	lUnit->SetLineColor(kBlack);
 	lUnit->SetLineStyle(2);
@@ -769,11 +905,13 @@ void execute(string isHistos = "")
 
 	cnv->Update();
 	
-	TString fName = (TString)hNameFixed + "_" + (TString)muonLabel;
+	TString fName = (DOSMEAR) ? (TString)hNameFixed + ".smear.plot"  :  (TString)hNameFixed + ".true.plot";
 	cnv->SaveAs(fName+".eps");
 	cnv->SaveAs(fName+".C");
 	cnv->SaveAs(fName+".root");
 	cnv->SaveAs(fName+".png");
+	
+	of->close();
 	
 	/*
 	CNV->Draw();

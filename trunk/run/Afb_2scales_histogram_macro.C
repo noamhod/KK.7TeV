@@ -181,28 +181,10 @@ void fcn(int& npar, double* deriv, double& f, double par[], int flag)
 	f = -2.0 * lnL; // factor of -2 so minuit gets the errors right
 }
 
-
-void fillVec(TTree* t, TH1D* h, Int_t b)
-{
-	//VCOSTH->clear();
-	if (t==0) return;
-	
-	Double_t bmin = h->GetBinLowEdge(b);
-	Double_t bwid = h->GetBinWidth(b);
-	Double_t bmax = bmin+bwid;
-	
-	for (Long64_t l64t_jentry=0 ; l64t_jentry<t->GetEntries() ; l64t_jentry++)
-	{
-		t->GetEntry(l64t_jentry);
-		//if( IMASS>=(Float_t)bmin  &&  IMASS<(Float_t)bmax ) VCOSTH->push_back(COSTH);
-		if( IMASS>=(Float_t)bmin  &&  IMASS<(Float_t)bmax ) VVCOSTH[CURRENTBIN]->push_back(COSTH);
-	}
-}
-
 void fillVec(TTree* t, TH1D* h)
 {
 	for(int v=0 ; v<(int)VVCOSTH.size() ; v++) VVCOSTH[v]->clear();
-	if (t==0) return;
+	if(t==0) return;
 	
 	TAxis* xaxis = h->GetXaxis();
 	
@@ -210,18 +192,18 @@ void fillVec(TTree* t, TH1D* h)
 	{
 		t->GetEntry(l64t_jentry);
 		int bin = (int)xaxis->FindBin((Double_t)IMASS);
-		if(bin<0 || bin>=(int)VVCOSTH.size()) continue;
-		if(CHARGE->at(0)*CHARGE->at(1)>=0) continue;
+		if(bin<=0 || bin>(int)VVCOSTH.size()) continue;
+		if(CHARGE->at(0)*CHARGE->at(1)>=0)   continue;
 		pa->SetPxPyPzE(PX->at(0)*MeV2TeV,PY->at(0)*MeV2TeV,PZ->at(0)*MeV2TeV,E->at(0)*MeV2TeV);
 		pb->SetPxPyPzE(PX->at(1)*MeV2TeV,PY->at(1)*MeV2TeV,PZ->at(1)*MeV2TeV,E->at(1)*MeV2TeV);
 		if(REFNAME=="CosThetaCS") COSTH = cosThetaCollinsSoper( pa, CHARGE->at(0), pb, CHARGE->at(1) );
 		else COSTH = 0.;
 		
-		VVCOSTH[bin]->push_back(COSTH);
+		VVCOSTH[bin-1]->push_back(COSTH);
 		
-		if(ISZMUMU)  VHIST_Z0[bin]->Fill(COSTH);
-		if(ISZPRIME) VHIST_ZPRIME[bin]->Fill(COSTH);
-		if(ISDATA)   VHIST_DATA[bin]->Fill(COSTH);
+		if(ISZMUMU)  VHIST_Z0[bin-1]->Fill(COSTH);
+		if(ISZPRIME) VHIST_ZPRIME[bin-1]->Fill(COSTH);
+		if(ISDATA)   VHIST_DATA[bin-1]->Fill(COSTH);
 	}
 }
 
@@ -292,7 +274,7 @@ void execute(string isHistos = "")
 	
 	
 	/*
-	int    imass_nbins = 16;
+	const int    imass_nbins = 16;
 	double imass_min   = 70.*GeV2TeV;
 	double imass_max   = 400.*GeV2TeV;
 	//double imass_min   = 60.*GeV2TeV;
@@ -374,11 +356,11 @@ void execute(string isHistos = "")
 	gStyle->SetTitleFillColor(0);
 	gStyle->SetPaperSize(20,26);
 	gStyle->SetPadTopMargin(0.05);
-	gStyle->SetPadRightMargin(0.05);
+	gStyle->SetPadRightMargin(0.12);
 	gStyle->SetPadBottomMargin(0.16);
 	gStyle->SetPadLeftMargin(0.12);
 	Int_t font=42;
-	Double_t tsize=0.05;
+	Double_t tsize=0.04;
 	gStyle->SetTextFont(font);
 	gStyle->SetTextSize(tsize);
 	gStyle->SetLabelFont(font,"x");
@@ -404,7 +386,7 @@ void execute(string isHistos = "")
 	gStyle->SetStatH(0);
 	
 	
-	TLegend* leg = new TLegend(0.6262542,0.7098446,0.867893,0.8717617,NULL,"brNDC");
+	TLegend* leg = new TLegend(0.5552764,0.763986,0.7964824,0.9248252,NULL,"brNDC");
 	leg->SetFillColor(kWhite);
 	
 	TLegend* leg_histos = new TLegend(0.85, 0.15, 0.97, 0.45,NULL,"brNDC");
@@ -412,10 +394,12 @@ void execute(string isHistos = "")
 	
 	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
 	string lumilabel = "#intLdt~42 pb^{-1}";
-	TPaveText* pvtxt = new TPaveText(0.1195652,0.1334197,0.2458194,0.2318653,"brNDC");
+	string label = "#splitline{" + lumilabel + "}{" + muonLabel + " 2010}";
+	TPaveText* pvtxt = new TPaveText(0.1394472,0.1730769,0.3103015,0.3234266,"brNDC");
 	pvtxt->SetFillColor(kWhite);
-	TText* txt  = pvtxt->AddText( lumilabel.c_str() );
-	TText* txt1 = pvtxt->AddText( muonLabel.c_str() );
+	TText* txt  = pvtxt->AddText( label.c_str() );
+	//TText* txt  = pvtxt->AddText( lumilabel.c_str() );
+	//TText* txt1 = pvtxt->AddText( muonLabel.c_str() );
 	
 	string cName = "cnv_" + hNameFixed;
 	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);
@@ -427,7 +411,7 @@ void execute(string isHistos = "")
 	if(doLogx) pad_mHat->SetLogx();
 
 	TPad *pad_Afb  = new TPad("pad_Afb", "",0,0,1,1);
-	pad_Afb->SetGridy();
+	//pad_Afb->SetGridy();
 	pad_Afb->SetTicky(0);
 	pad_Afb->SetTickx(1);
 	pad_Afb->SetFillStyle(0);
@@ -448,7 +432,7 @@ void execute(string isHistos = "")
 	hDataM->SetTitle("");
 	hDataM->SetYTitle("Events");
 	hDataM->SetLineColor(kBlack);
-	hDataM->SetLineWidth(2);
+	hDataM->SetLineWidth(1);
 	TH1D* hData;
 	if(doLogM) hData   = new TH1D("Afb_data","Afb_data", imass_nbins, M_bins );
 	else       hData   = new TH1D("Afb_data","Afb_data", imass_nbins, imass_min, imass_max );
@@ -492,7 +476,13 @@ void execute(string isHistos = "")
 	ISZMUMU  = false;
 	ISZPRIME = false;
 	ISDATA   = true;
+	
+	cout << "### 1 ###" << endl;
+	
 	fillVec(Afb_data_tree, hData); // the VVCOSTH vectors are full
+	
+	cout << "### 2 ###" << endl;
+	
 	for(Int_t b=1 ; b<=hData->GetNbinsX() ; b++)
 	{
 		// norm to bin width
@@ -511,7 +501,7 @@ void execute(string isHistos = "")
 	
 	///////////////////////////////////////////////
 	// Z' /////////////////////////////////////////
-	channel = "0.25 TeV Z' SSM: A_{FB}(stat' uncertainty)";
+	channel = "0.25 TeV Z' SSM: A_{FB} fit";
 	TH1D* hSignal;
 	if(doLogM) hSignal = new TH1D("Afb_sig","Afb_sig", imass_nbins, M_bins );
 	else       hSignal = new TH1D("Afb_sig","Afb_sig", imass_nbins, imass_min, imass_max );
@@ -523,7 +513,7 @@ void execute(string isHistos = "")
 	hSignal->SetTitle("");
 	hSignal->SetXTitle( xTitle.c_str() );
 	hSignal->SetYTitle( yTitle.c_str() );
-	leg->AddEntry( hSignal, channel.c_str(), "f");
+	//leg->AddEntry( hSignal, channel.c_str(), "f");
 	
 	sProc = "Zprime_mumu_SSM250";
 	path = dir + "Zprime_mumu/" + m_muonSelector + analysisType + sProc + ".root";
@@ -567,12 +557,13 @@ void execute(string isHistos = "")
 	
 	/////////////////////////////////////////////////////////////////////
 	// Backgrounds //////////////////////////////////////////////////////
-	channel = "Z#rightarrow#mu#mu: A_{FB}(stat' uncertainty)";
+	channel = "MC(Z#rightarrow#mu#mu): A_{FB} fit";
 	TH1D* hBGsum;
 	if(doLogM) hBGsum = new TH1D("Afb_sumBG","Afb_sumBG", imass_nbins, M_bins );
 	else       hBGsum = new TH1D("Afb_sumBG","Afb_sumBG", imass_nbins, imass_min, imass_max );
 	hBGsum->SetLineColor(kAzure-5);
 	hBGsum->SetFillColor(kAzure-5);
+	hBGsum->SetFillStyle(3003);
 	hBGsum->SetLineWidth(1);
 	hBGsum->SetMarkerSize(0);
 	hBGsum->SetMarkerColor(0);
@@ -660,16 +651,19 @@ void execute(string isHistos = "")
 	pad_mHat->Draw();
 	pad_mHat->cd();
 	hDataM->GetYaxis()->SetRangeUser(1,1.5*hDataM->GetMaximum());
+	hDataM->GetXaxis()->SetMoreLogLabels(); 
+	hDataM->GetXaxis()->SetNoExponent(); 
 	hDataM->Draw();
 
 	cnv->cd();
 
 	pad_Afb->Draw();
 	pad_Afb->cd();
-	hSignal->GetYaxis()->SetRangeUser(m_miny,m_maxy);
-	hSignal->Draw("E5 Y+");
+	//hSignal->GetYaxis()->SetRangeUser(m_miny,m_maxy);
+	//hSignal->Draw("E5 Y+");
 	//hSignalTmp->Draw("CSAMES");
-	hBGsum->Draw("E5 Y+ SAMES");
+	hBGsum->GetYaxis()->SetRangeUser(m_miny,m_maxy);
+	hBGsum->Draw("E5 Y+");
 	//hBGsumTmp->Draw("CSAMES");
 	hData->Draw("e1x0SAMES");
 	pvtxt->Draw("SAMES");

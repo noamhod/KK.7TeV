@@ -266,28 +266,27 @@ void execute(string isHistos = "")
 	*/
 
 
-	int minEntriesDATA = 10;
-	int minEntriesMC   = 10;
+	int minEntriesDATA = 1;//10;
+	int minEntriesMC   = 1;//10;
 	string refframe = REFNAME;
 	bool doLogM = true;
 	bool doLogx = false;
 	
 	
 	/*
-	const int    imass_nbins = 16;
-	double imass_min   = 70.*GeV2TeV;
-	double imass_max   = 400.*GeV2TeV;
-	//double imass_min   = 60.*GeV2TeV;
-	//double imass_max   = 360.*GeV2TeV;
-	
 	// logarithmic boundries and bins of histograms
-	Double_t logMmin     = log10(imass_min);
-	Double_t logMmax     = log10(imass_max);
-	Double_t M_bins[100+1];
-	
+	const int imass_nbins = 12;
+	const int ncol_pads   = 2; // = imass_nbins/nrow_pads !!!
+	const int nrow_pads   = 6; // = imass_nbins/ncol_pads !!!
+	double imass_min      = 70.*GeV2TeV;
+	double imass_max      = 400.*GeV2TeV;
+	Double_t logMmin = log10(imass_min);
+	Double_t logMmax = log10(imass_max);
+	Double_t M_bins[imass_nbins+1];
 	Double_t M_binwidth = (Double_t)( (logMmax-logMmin)/(Double_t)imass_nbins );
 	M_bins[0] = imass_min;
 	for(Int_t i=1 ; i<=imass_nbins ; i++) M_bins[i] = TMath::Power( 10,(logMmin + i*M_binwidth) );
+	doLogx = true;
 	*/
 	
 	const int imass_nbins = 12;
@@ -298,7 +297,9 @@ void execute(string isHistos = "")
 	Double_t M_bins[imass_nbins+1] = {72.62*GeV2TeV, 83.37*GeV2TeV, 95.73*GeV2TeV, 109.91*GeV2TeV,
 									  126.19*GeV2TeV, 144.89*GeV2TeV, 166.35*GeV2TeV, 191.00*GeV2TeV,
 									  219.30*GeV2TeV, 251.79*GeV2TeV, 289.09*GeV2TeV, 331.92*GeV2TeV, 381.09*GeV2TeV};
+	doLogx = false;
 	//M_bins = {2.00*GeV, 2.30*GeV, 2.64*GeV, 3.03*GeV, 3.48*GeV, 3.99*GeV, 4.58*GeV, 5.26*GeV, 6.04*GeV, 6.93*GeV, 7.96*GeV, 9.14*GeV, 10.50*GeV, 12.05*GeV, 13.84*GeV, 15.89*GeV, 18.24*GeV, 20.94*GeV, 24.05*GeV, 27.61*GeV, 31.70*GeV, 36.39*GeV, 41.79*GeV, 47.98*GeV, 55.08*GeV, 63.25*GeV, 72.62*GeV, 83.37*GeV, 95.73*GeV, 109.91*GeV, 126.19*GeV, 144.89*GeV, 166.35*GeV, 191.00*GeV, 219.30*GeV, 251.79*GeV, 289.09*GeV, 331.92*GeV, 381.09*GeV, 437.55*GeV, 502.38*GeV, 576.81*GeV, 662.26*GeV, 760.38*GeV, 873.03*GeV, 1002.37*GeV, 1150.88*GeV, 1321.39*GeV, 1517.16*GeV, 1741.93*GeV, 2000.00*GeV};
+	
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	// fill the vector with new vector<double> pointers //////////////////////////////
@@ -339,8 +340,8 @@ void execute(string isHistos = "")
 	//string m_muonSelector = "staco/";
 	string m_muonSelector = "muid/";
 
-	double m_miny = -0.6;
-	double m_maxy = +0.6;
+	double m_miny = -1.;
+	double m_maxy = +1.;
 
 	string hNameFixed = hName;
 
@@ -386,7 +387,7 @@ void execute(string isHistos = "")
 	gStyle->SetStatH(0);
 	
 	
-	TLegend* leg = new TLegend(0.5552764,0.763986,0.7964824,0.9248252,NULL,"brNDC");
+	TLegend* leg = new TLegend(0.3687291,0.8108808,0.5802676,0.9326425,NULL,"brNDC");
 	leg->SetFillColor(kWhite);
 	
 	TLegend* leg_histos = new TLegend(0.85, 0.15, 0.97, 0.45,NULL,"brNDC");
@@ -395,7 +396,7 @@ void execute(string isHistos = "")
 	string muonLabel = m_muonSelector.substr(0, m_muonSelector.length()-1);
 	string lumilabel = "#intLdt~42 pb^{-1}";
 	string label = "#splitline{" + lumilabel + "}{" + muonLabel + " 2010}";
-	TPaveText* pvtxt = new TPaveText(0.1394472,0.1730769,0.3103015,0.3234266,"brNDC");
+	TPaveText* pvtxt = new TPaveText(0.1655518,0.2072539,0.3102007,0.3316062,"brNDC");
 	pvtxt->SetFillColor(kWhite);
 	TText* txt  = pvtxt->AddText( label.c_str() );
 	//TText* txt  = pvtxt->AddText( lumilabel.c_str() );
@@ -439,7 +440,7 @@ void execute(string isHistos = "")
 	hData->SetMarkerStyle(20);
 	hData->SetMarkerColor(kBlack);
 	hData->SetMarkerSize(1.2);
-	leg->AddEntry( hData, "Data: A_{FB}", "lep");
+	leg->AddEntry( hData, "Data: A_{FB} fit", "lep");
 	leg->AddEntry( hData, "Data: Events", "l");
 	
 	//string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
@@ -650,7 +651,8 @@ void execute(string isHistos = "")
 	
 	pad_mHat->Draw();
 	pad_mHat->cd();
-	hDataM->GetYaxis()->SetRangeUser(1,1.5*hDataM->GetMaximum());
+	if(doLogx) hDataM->GetYaxis()->SetRangeUser(0.1,1.5*hDataM->GetMaximum());
+	else       hDataM->GetYaxis()->SetRangeUser(1,1.5*hDataM->GetMaximum());
 	hDataM->GetXaxis()->SetMoreLogLabels(); 
 	hDataM->GetXaxis()->SetNoExponent(); 
 	hDataM->Draw();
@@ -663,6 +665,8 @@ void execute(string isHistos = "")
 	//hSignal->Draw("E5 Y+");
 	//hSignalTmp->Draw("CSAMES");
 	hBGsum->GetYaxis()->SetRangeUser(m_miny,m_maxy);
+	hBGsum->GetXaxis()->SetMoreLogLabels(); 
+	hBGsum->GetXaxis()->SetNoExponent(); 
 	hBGsum->Draw("E5 Y+");
 	//hBGsumTmp->Draw("CSAMES");
 	hData->Draw("e1x0SAMES");

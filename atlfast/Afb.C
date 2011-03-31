@@ -41,6 +41,7 @@
 using namespace std;
 
 // Declare pointer to data as global (not elegant but TMinuit needs this).
+vector<TLorentzVector*> vLV;
 vector<vector<double> *> VVCOSTH;
 vector<TH1D*> VHIST_Z0;
 vector<TH1D*> VHIST_KK;
@@ -65,6 +66,20 @@ vector<double>* PT;
 vector<double>* PHI;
 vector<double>* THETA;
 vector<double>* ETA;
+
+Float_t IMASStmp;
+Float_t COSTHtmp;
+vector<double>* CHARGEtmp = new vector<double>;
+vector<int>*    IDtmp = new vector<int>;
+vector<double>* PXtmp = new vector<double>;
+vector<double>* PYtmp = new vector<double>;
+vector<double>* PZtmp = new vector<double>;
+vector<double>* Etmp = new vector<double>;
+vector<double>* PTtmp = new vector<double>;
+vector<double>* PHItmp = new vector<double>;
+vector<double>* THETAtmp = new vector<double>;
+vector<double>* ETAtmp = new vector<double>;
+
 TLorentzVector* pa = new TLorentzVector();
 TLorentzVector* pb = new TLorentzVector();
 
@@ -83,14 +98,15 @@ TLorentzVector m_pTmp;
 // definitions /////////////////////////////////////////////////////////////
 const double GeV2TeV  = 1.e-3;
 const double MeV2TeV  = 1.e-6;
+const double GeV2MeV  = 1.e+3;
 const double muonMass = 0.105658367; // GeV
 
 const double sigma_KK   = 7.68E-09; // mb
-const double nevents_KK = 1500000.;
+double nevents_KK = 1500000.;
 const double sigma_ZP   = 7.88E-09; // mb
-const double nevents_ZP = 1500000.;
+double nevents_ZP = 1500000.;
 const double sigma_Z0   = 7.96E-09; // mb
-const double nevents_Z0 = 1500000.;
+double nevents_Z0 = 1500000.;
 
 const double minAsymmetry  = -1.; //-0.6;
 const double maxAsymmetry  = +1.; //+0.6;
@@ -98,8 +114,8 @@ const double maxAsymmetry  = +1.; //+0.6;
 const double ifb2imb = 1.e+12;
 const double L       = 5.; // 1/fb
 
-const bool DOSELECTION      = true;
-const bool DOSMEAR          = true;
+const bool DOSELECTION      = false;
+const bool DOSMEAR          = false;
 const bool FITWITHALLEVENTS = true; // false if only fit to N events for a given luminosity (see L above)
 
 const int minEntriesDATA = 10;
@@ -115,63 +131,113 @@ const double PTTRACKSCALE = 1.e+3; // in GeV/c
 ////////////////////////////////////////////////////////////////////////////
 
 
-//////////////////////////////////////////////////////////////////////////////////
-// smearing
-TRandom* GAUSSGENERATOR = new TRandom();
 
-inline double gaussRand()
-{
-	return GAUSSGENERATOR->Gaus(AVERAGE, SIGMA); 
-}
-inline double smear_pT(double pT)
-{
-	return 1./(1./pT + gaussRand()*RESOLUTION/PTTRACKSCALE);
-}
-inline double smear_px(double pTsmeared, double phi)
-{
-	return pTsmeared*cos(phi);
-}
-inline double smear_py(double pTsmeared, double phi)
-{
-	return pTsmeared*sin(phi);
-}
-inline double smear_pz(double pTsmeared, double theta)
-{
-	return pTsmeared/tan(theta);
-}
-inline double smear_e(double pTsmeared,  double theta)
-{
-	return pTsmeared/sin(theta);
-}
-inline void compare2true(double px0, double py0, double pz0, double e0,
-						 double pxS, double pyS, double pzS, double eS
-						)
-{
-	cout << "(pxS[" << pxS << "]/px0[" << px0 << "] - 1)% = " << (pxS/px0 - 1.)*100 << endl;
-	cout << "(pyS[" << pyS << "]/py0[" << py0 << "] - 1)% = " << (pyS/py0 - 1.)*100 << endl;
-	cout << "(pzS[" << pzS << "]/pz0[" << pz0 << "] - 1)% = " << (pzS/pz0 - 1.)*100 << endl;
-	cout << "(eS[" <<  eS  << "]/e0["  << e0  << "] - 1)% = " << (eS/e0 - 1.)*100 << "\n" << endl;
-}
-//////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+// global branches and variables
+TBranch        *b_RunNumber;   //!
+TBranch        *b_EventNumber;   //!
+TBranch        *b_Token;   //!
+TBranch        *b_Run;   //!
+TBranch        *b_Event;   //!
+TBranch        *b_Time;   //!
+TBranch        *b_LumiBlock;   //!
+TBranch        *b_BCID;   //!
+TBranch        *b_LVL1ID;   //!
+TBranch        *b_Weight;   //!
+TBranch        *b_IEvent;   //!
+TBranch        *b_StatusElement;   //!
+TBranch        *b_LVL1TriggerType;   //!
+TBranch        *b_LVL1TriggerInfo;   //!
+TBranch        *b_LVL2TriggerInfo;   //!
+TBranch        *b_EventFilterInfo;   //!
+TBranch        *b_StreamTagName;   //!
+TBranch        *b_StreamTagType;   //!
 
-void Scale(TH1D* h, double d)
-{ 
-	/// scale including over/underflow
-	for(int i=0 ; i<=h->GetNbinsX()+1 ; i++)
-	{ 
-		h->SetBinContent(i,h->GetBinContent(i)*d);
-	}
-}
+TBranch        *b_MuonN;   //!
+TBranch        *b_MuonAuthor;   //!
+TBranch        *b_MuonCombTrkNt;   //!
+TBranch        *b_MuonInDetTrkNt;   //!
+TBranch        *b_MuonExtrNt;   //!
+TBranch        *b_MuonEta;   //!
+TBranch        *b_MuonPhi;   //!
+TBranch        *b_MuonPt;   //!
+TBranch        *b_MuonZ0;   //!
+TBranch        *b_MuonD0;   //!
+TBranch        *b_MuonCharge;   //!
+TBranch        *b_MuonKf;   //!
+TBranch        *b_MuonPx;   //!
+TBranch        *b_MuonPy;   //!
+TBranch        *b_MuonPz;   //!
+TBranch        *b_MuonEtCone10;   //!
+TBranch        *b_MuonEtCone20;   //!
+TBranch        *b_MuonEtCone30;   //!
+TBranch        *b_MuonEtCone40;   //!
+TBranch        *b_MuonNuCone10;   //!
+TBranch        *b_MuonNuCone20;   //!
+TBranch        *b_MuonNuCone30;   //!
+TBranch        *b_MuonNuCone40;   //!
+TBranch        *b_MuonFitChi2;   //!
+TBranch        *b_MuonFitNumberDoF;   //!
+TBranch        *b_MuonEnergyLossDeposit;   //!
+TBranch        *b_MuonEnergyLossSigma;   //!
+TBranch        *b_MuonMatchChi2;   //!
+TBranch        *b_MuonMatchNumberDoF;   //!
+TBranch        *b_MuonBestMatch;   //!
+TBranch        *b_MuonIsCombinedMuon;   //!
 
-void ScaleWerrors(TH1D* h, double d)
-{ 
-	/// scale including over/underflow
-	for ( int i=0 ; i<=h->GetNbinsX()+1 ; i++ )
-	{ 
-		h->SetBinContent(i,h->GetBinContent(i)*d);
-		h->SetBinError(i,h->GetBinError(i)*d);
-	}
-}
+Int_t           RunNumber;
+Int_t           EventNumber;
+Char_t          Token;
+Int_t           Run;
+Int_t           Event;
+Int_t           Time;
+Int_t           LumiBlock;
+Int_t           BCID;
+Int_t           LVL1ID;
+Double_t        Weight;
+Int_t           IEvent;
+Int_t           StatusElement;
+Int_t           LVL1TriggerType;
+vector<unsigned int> *LVL1TriggerInfo;
+vector<unsigned int> *LVL2TriggerInfo;
+vector<unsigned int> *EventFilterInfo;
+vector<string>  *StreamTagName;
+vector<string>  *StreamTagType;
+UInt_t          MuonN;
+vector<double>  *MuonAuthor;
+vector<double>  *MuonCombTrkNt;
+vector<double>  *MuonInDetTrkNt;
+vector<double>  *MuonExtrNt;
+vector<double>  *MuonEta;
+vector<double>  *MuonPhi;
+vector<double>  *MuonPt;
+vector<double>  *MuonZ0;
+vector<double>  *MuonD0;
+vector<double>  *MuonCharge;
+vector<double>  *MuonKf;
+vector<double>  *MuonPx;
+vector<double>  *MuonPy;
+vector<double>  *MuonPz;
+vector<double>  *MuonEtCone10;
+vector<double>  *MuonEtCone20;
+vector<double>  *MuonEtCone30;
+vector<double>  *MuonEtCone40;
+vector<double>  *MuonNuCone10;
+vector<double>  *MuonNuCone20;
+vector<double>  *MuonNuCone30;
+vector<double>  *MuonNuCone40;
+vector<double>  *MuonFitChi2;
+vector<long>    *MuonFitNumberDoF;
+vector<double>  *MuonEnergyLossDeposit;
+vector<double>  *MuonEnergyLossSigma;
+vector<double>  *MuonMatchChi2;
+vector<long>    *MuonMatchNumberDoF;
+vector<long>    *MuonBestMatch;
+vector<long>    *MuonIsCombinedMuon;
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -232,6 +298,189 @@ inline float cosThetaCollinsSoper( TLorentzVector* pa, float ca, TLorentzVector*
 ///////////////////////////////////////////////////////////////////////////////////////
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////
+// initialize the tree
+inline void initTree(TTree* t)
+{
+	LVL1TriggerInfo = 0;
+	LVL2TriggerInfo = 0;
+	EventFilterInfo = 0;
+	StreamTagName = 0;
+	StreamTagType = 0;
+
+	MuonAuthor = 0;
+	MuonCombTrkNt = 0;
+	MuonInDetTrkNt = 0;
+	MuonExtrNt = 0;
+	MuonEta = 0;
+	MuonPhi = 0;
+	MuonPt = 0;
+	MuonZ0 = 0;
+	MuonD0 = 0;
+	MuonCharge = 0;
+	MuonKf = 0;
+	MuonPx = 0;
+	MuonPy = 0;
+	MuonPz = 0;
+	MuonEtCone10 = 0;
+	MuonEtCone20 = 0;
+	MuonEtCone30 = 0;
+	MuonEtCone40 = 0;
+	MuonNuCone10 = 0;
+	MuonNuCone20 = 0;
+	MuonNuCone30 = 0;
+	MuonNuCone40 = 0;
+	MuonFitChi2 = 0;
+	MuonFitNumberDoF = 0;
+	MuonEnergyLossDeposit = 0;
+	MuonEnergyLossSigma = 0;
+	MuonMatchChi2 = 0;
+	MuonMatchNumberDoF = 0;
+	MuonBestMatch = 0;
+	MuonIsCombinedMuon = 0;
+	
+	t->SetBranchAddress("RunNumber", &RunNumber, &b_RunNumber);
+	t->SetBranchAddress("EventNumber", &EventNumber, &b_EventNumber);
+	t->SetBranchAddress("Token", &Token, &b_Token);
+	t->SetBranchAddress("Run", &Run, &b_Run);
+	t->SetBranchAddress("Event", &Event, &b_Event);
+	t->SetBranchAddress("Time", &Time, &b_Time);
+	t->SetBranchAddress("LumiBlock", &LumiBlock, &b_LumiBlock);
+	t->SetBranchAddress("BCID", &BCID, &b_BCID);
+	t->SetBranchAddress("LVL1ID", &LVL1ID, &b_LVL1ID);
+	t->SetBranchAddress("Weight", &Weight, &b_Weight);
+	t->SetBranchAddress("IEvent", &IEvent, &b_IEvent);
+	t->SetBranchAddress("StatusElement", &StatusElement, &b_StatusElement);
+	t->SetBranchAddress("LVL1TriggerType", &LVL1TriggerType, &b_LVL1TriggerType);
+	t->SetBranchAddress("LVL1TriggerInfo", &LVL1TriggerInfo, &b_LVL1TriggerInfo);
+	t->SetBranchAddress("LVL2TriggerInfo", &LVL2TriggerInfo, &b_LVL2TriggerInfo);
+	t->SetBranchAddress("EventFilterInfo", &EventFilterInfo, &b_EventFilterInfo);
+	t->SetBranchAddress("StreamTagName", &StreamTagName, &b_StreamTagName);
+	t->SetBranchAddress("StreamTagType", &StreamTagType, &b_StreamTagType);
+
+	t->SetBranchAddress("MuonN", &MuonN, &b_MuonN);
+	t->SetBranchAddress("MuonAuthor", &MuonAuthor, &b_MuonAuthor);
+	t->SetBranchAddress("MuonCombTrkNt", &MuonCombTrkNt, &b_MuonCombTrkNt);
+	t->SetBranchAddress("MuonInDetTrkNt", &MuonInDetTrkNt, &b_MuonInDetTrkNt);
+	t->SetBranchAddress("MuonExtrNt", &MuonExtrNt, &b_MuonExtrNt);
+	t->SetBranchAddress("MuonEta", &MuonEta, &b_MuonEta);
+	t->SetBranchAddress("MuonPhi", &MuonPhi, &b_MuonPhi);
+	t->SetBranchAddress("MuonPt", &MuonPt, &b_MuonPt);
+	t->SetBranchAddress("MuonZ0", &MuonZ0, &b_MuonZ0);
+	t->SetBranchAddress("MuonD0", &MuonD0, &b_MuonD0);
+	t->SetBranchAddress("MuonCharge", &MuonCharge, &b_MuonCharge);
+	t->SetBranchAddress("MuonKf", &MuonKf, &b_MuonKf);
+	t->SetBranchAddress("MuonPx", &MuonPx, &b_MuonPx);
+	t->SetBranchAddress("MuonPy", &MuonPy, &b_MuonPy);
+	t->SetBranchAddress("MuonPz", &MuonPz, &b_MuonPz);
+	t->SetBranchAddress("MuonEtCone10", &MuonEtCone10, &b_MuonEtCone10);
+	t->SetBranchAddress("MuonEtCone20", &MuonEtCone20, &b_MuonEtCone20);
+	t->SetBranchAddress("MuonEtCone30", &MuonEtCone30, &b_MuonEtCone30);
+	t->SetBranchAddress("MuonEtCone40", &MuonEtCone40, &b_MuonEtCone40);
+	t->SetBranchAddress("MuonNuCone10", &MuonNuCone10, &b_MuonNuCone10);
+	t->SetBranchAddress("MuonNuCone20", &MuonNuCone20, &b_MuonNuCone20);
+	t->SetBranchAddress("MuonNuCone30", &MuonNuCone30, &b_MuonNuCone30);
+	t->SetBranchAddress("MuonNuCone40", &MuonNuCone40, &b_MuonNuCone40);
+	t->SetBranchAddress("MuonFitChi2", &MuonFitChi2, &b_MuonFitChi2);
+	t->SetBranchAddress("MuonFitNumberDoF", &MuonFitNumberDoF, &b_MuonFitNumberDoF);
+	t->SetBranchAddress("MuonEnergyLossDeposit", &MuonEnergyLossDeposit, &b_MuonEnergyLossDeposit);
+	t->SetBranchAddress("MuonEnergyLossSigma", &MuonEnergyLossSigma, &b_MuonEnergyLossSigma);
+	t->SetBranchAddress("MuonMatchChi2", &MuonMatchChi2, &b_MuonMatchChi2);
+	t->SetBranchAddress("MuonMatchNumberDoF", &MuonMatchNumberDoF, &b_MuonMatchNumberDoF);
+	t->SetBranchAddress("MuonBestMatch", &MuonBestMatch, &b_MuonBestMatch);
+	t->SetBranchAddress("MuonIsCombinedMuon", &MuonIsCombinedMuon, &b_MuonIsCombinedMuon);
+}
+
+inline bool getEntry(TTree* t, Long64_t l64t_entry)
+{
+	t->GetEntry(l64t_entry);
+	
+	CHARGEtmp->clear();
+	IDtmp->clear();
+	PXtmp->clear();
+	PYtmp->clear();
+	PZtmp->clear();
+	Etmp->clear();
+	PTtmp->clear();
+	PHItmp->clear();
+	ETAtmp->clear();
+	
+	int nPassed = 0;
+	for(UInt_t mu=0 ; mu<MuonN ; mu++)
+	{		
+		//////////////////////////////////////////////////////////////////////
+		// Single muon selection /////////////////////////////////////////////
+		if(MuonPt->at(mu)*MeV2TeV<0.025)                     continue; /////////
+		if(fabs(MuonEta->at(mu)*MeV2TeV)>2.4)                continue; /////////
+		//if(fabs(MuonZ0->at(mu))>0.2)                       continue; /////////
+		//if(fabs(MuonD0->at(mu))>1.)                        continue; /////////
+		//if(fabs(MuonEtCone30->at(mu)/MuonPt->at(mu))>0.05) continue; /////////
+		//////////////////////////////////////////////////////////////////////
+		
+		nPassed++;
+		
+		double nrg = sqrt(MuonPx->at(mu)*MuonPx->at(mu) + MuonPy->at(mu)*MuonPy->at(mu) + MuonPz->at(mu)*MuonPz->at(mu) + muonMass*GeV2MeV*muonMass*GeV2MeV);
+		
+		//Etmp->push_back(MuonKf->at(mu));
+		Etmp->push_back(nrg);
+		PXtmp->push_back(MuonPx->at(mu));
+		PYtmp->push_back(MuonPy->at(mu));
+		PZtmp->push_back(MuonPz->at(mu));
+		PTtmp->push_back(MuonPt->at(mu));
+		PHItmp->push_back(MuonPhi->at(mu));
+		ETAtmp->push_back(MuonEta->at(mu));
+		CHARGEtmp->push_back(MuonCharge->at(mu));
+		IDtmp->push_back( (MuonCharge->at(mu)<0)?13:-13 );
+	}
+	
+	if(nPassed!=2)                           return false; // 2 muons ???????????????????????????????????????????
+	if(CHARGEtmp->at(0)*CHARGEtmp->at(1)>=0) return false; // opposite charge
+	
+	pa->SetPxPyPzE(PXtmp->at(0)*MeV2TeV,PYtmp->at(0)*MeV2TeV,PZtmp->at(0)*MeV2TeV,Etmp->at(0)*MeV2TeV);
+	pb->SetPxPyPzE(PXtmp->at(1)*MeV2TeV,PYtmp->at(1)*MeV2TeV,PZtmp->at(1)*MeV2TeV,Etmp->at(1)*MeV2TeV);
+	
+	if(imass(pa,pb)<0.06)                    return false; // invariant mass
+	
+	E = Etmp;
+	PX = PXtmp;
+	PY = PYtmp;
+	PZ = PZtmp;
+	PT = PTtmp;
+	PHI = PHItmp;
+	ETA = ETAtmp;
+	CHARGE = CHARGEtmp;
+	ID = IDtmp;
+	IMASS = imass(pa,pb);
+	if     (REFNAME=="CosThetaCS") COSTH = cosThetaCollinsSoper( pa, CHARGE->at(0), pb, CHARGE->at(1) );
+	else if(REFNAME=="CosThetaHE") COSTH = cosThetaBoost( pa, CHARGE->at(0), pb, CHARGE->at(1) );
+	else COSTH = 0.;
+	
+	return true;
+}
+////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+
+void Scale(TH1D* h, double d)
+{ 
+	/// scale including over/underflow
+	for(int i=0 ; i<=h->GetNbinsX()+1 ; i++)
+	{ 
+		h->SetBinContent(i,h->GetBinContent(i)*d);
+	}
+}
+
+void ScaleWerrors(TH1D* h, double d)
+{ 
+	/// scale including over/underflow
+	for ( int i=0 ; i<=h->GetNbinsX()+1 ; i++ )
+	{ 
+		h->SetBinContent(i,h->GetBinContent(i)*d);
+		h->SetBinError(i,h->GetBinError(i)*d);
+	}
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////////////
 // The pdf to be fitted ///////////////////////////////////////////////////////////////
 // First argument needs to be a pointer in order to plot with the TF1 class.
@@ -256,9 +505,9 @@ double cosThetaPdf(double* xPtr, double par[])
 
 // fcn passes back f = - 2*ln(L), the function to be minimized.
 void fcn(int& npar, double* deriv, double& f, double par[], int flag)
-{
-	//vector<double> xVec = *VCOSTH; // VCOSTH is global
+{	
 	vector<double> xVec = *VVCOSTH[CURRENTBIN]; // VVCOSTH is global
+
 	int n = xVec.size();
 	double lnL = 0.;
 	double x   = 0.;
@@ -275,51 +524,6 @@ void fcn(int& npar, double* deriv, double& f, double par[], int flag)
 }
 ///////////////////////////////////////////////////////////////////////////////////////
 
-inline void smear(bool print)
-{
-	PXsmr->clear();
-	PYsmr->clear();
-	PZsmr->clear();
-	Esmr->clear();
-	PTsmr->clear();
-	double pTSmeared;
-	
-	for(int i=0 ; i<(int)PT->size() ; i++)
-	{
-		
-		pTSmeared = smear_pT(PT->at(i));
-		
-		PTsmr->push_back(pTSmeared);
-		PXsmr->push_back(smear_px(pTSmeared, PHI->at(i)));
-		PYsmr->push_back(smear_py(pTSmeared, PHI->at(i)));
-		PZsmr->push_back(smear_pz(pTSmeared, THETA->at(i)));
-		Esmr->push_back(smear_e(pTSmeared,   THETA->at(i)));
-		
-		if(pTSmeared<0)
-		{
-			CHARGE->at(i)*=-1.;
-			ID->at(i)*=-1.;
-			cout << "smeared pT=" << pTSmeared  << " ==> charge flip !" << endl;
-		}
-
-		if(print)
-		{
-			compare2true(
-						 PX->at(i),PY->at(i),PZ->at(i),E->at(i),
-						 PXsmr->at(i),PYsmr->at(i),PZsmr->at(i),Esmr->at(i)
-						);
-		}
-	}
-}
-
-inline bool selection(TLorentzVector* pa, TLorentzVector* pb)
-{
-	// pa and pb are in TeV
-	if(imass(pa,pb)<0.06)                          return false;
-	if(pa->Pt()<0.025      || pb->Pt()<0.025)      return false;
-	if(fabs(pa->Eta())>2.4 || fabs(pb->Eta())>2.4) return false;
-	return true;
-}
 
 inline void fill(TTree* t, Int_t Nmax, TH1D* h, TH1D* hMass)
 {
@@ -332,40 +536,19 @@ inline void fill(TTree* t, Int_t Nmax, TH1D* h, TH1D* hMass)
 	
 	for (Long64_t l64t_jentry=0 ; l64t_jentry<t->GetEntries() ; l64t_jentry++)
 	{
-		t->GetEntry(l64t_jentry);
+		///////////////////////////////////////////////////
+		// getEntry already include the basic selection ///
+		if( !getEntry(t,l64t_jentry) ) continue; //////////
+		///////////////////////////////////////////////////
 		
-		/*
-		int bin = (int)xaxis->FindBin((Double_t)IMASS*GeV2TeV);
-		if(bin<=0 || bin>(int)VVCOSTH.size()) continue;
-		*/
-		
-		if(CHARGE->at(0)*CHARGE->at(1)>=0) continue;
-		if(DOSMEAR)
-		{
-			//////////////////
-			// smear by pT ///
-			smear(false); ////
-			//////////////////
-			pa->SetPxPyPzE(PXsmr->at(0)*GeV2TeV,PYsmr->at(0)*GeV2TeV,PZsmr->at(0)*GeV2TeV,Esmr->at(0)*GeV2TeV);
-			pb->SetPxPyPzE(PXsmr->at(1)*GeV2TeV,PYsmr->at(1)*GeV2TeV,PZsmr->at(1)*GeV2TeV,Esmr->at(1)*GeV2TeV);
-		}
-		else
-		{
-			pa->SetPxPyPzE(PX->at(0)*GeV2TeV,PY->at(0)*GeV2TeV,PZ->at(0)*GeV2TeV,E->at(0)*GeV2TeV);
-			pb->SetPxPyPzE(PX->at(1)*GeV2TeV,PY->at(1)*GeV2TeV,PZ->at(1)*GeV2TeV,E->at(1)*GeV2TeV);
-		}
-		
-		/////////////////////////////////////////////////
-		// apply selection (namely acceptance cuts) /////
-		if(DOSELECTION) /////////////////////////////////
-		{               /////////////////////////////////
-			if(!selection(pa,pb)) continue; /////////////
-		} ///////////////////////////////////////////////
-		/////////////////////////////////////////////////
+		pa->SetPxPyPzE(PX->at(0)*MeV2TeV,PY->at(0)*MeV2TeV,PZ->at(0)*MeV2TeV,E->at(0)*MeV2TeV);
+		pb->SetPxPyPzE(PX->at(1)*MeV2TeV,PY->at(1)*MeV2TeV,PZ->at(1)*MeV2TeV,E->at(1)*MeV2TeV);
 		
 		double mHat = imass(pa,pb);
+		
 		int bin = (int)xaxis->FindBin((Double_t)mHat);
 		if(bin<=0 || bin>(int)VVCOSTH.size()) continue;
+		
 		if     (REFNAME=="CosThetaCS") COSTH = cosThetaCollinsSoper( pa, CHARGE->at(0), pb, CHARGE->at(1) );
 		else if(REFNAME=="CosThetaHE") COSTH = cosThetaBoost( pa, CHARGE->at(0), pb, CHARGE->at(1) );
 		else COSTH = 0.;
@@ -379,13 +562,6 @@ inline void fill(TTree* t, Int_t Nmax, TH1D* h, TH1D* hMass)
 			////////////////////////////////////////////////////////////////////////
 			// fill the appropriate vector with cos(theta) /////////////////////////
 			VVCOSTH[bin-1]->push_back(COSTH); //////////////////////////////////////
-			////////////////////////////////////////////////////////////////////////
-		
-			////////////////////////////////////////////////////////////////////////
-			// fill the appropriate cos(theta) histogram ///////////////////////////
-			if(ISZ0) VHIST_Z0[bin-1]->Fill(COSTH); /////////////////////////////////
-			if(ISZP) VHIST_ZP[bin-1]->Fill(COSTH); /////////////////////////////////
-			if(ISKK) VHIST_KK[bin-1]->Fill(COSTH); /////////////////////////////////
 			////////////////////////////////////////////////////////////////////////
 		} //////////////////////////////////////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////
@@ -447,18 +623,25 @@ void minimize(double guess, double& A4, double& dA4)
 }
 
 
-void merge(string sMergedFileName, string dir, vector<string>& vsNames)
+////////////////////////////////////////////////////////////////////////////////
+double merge(string sMergedFileName, string dir, vector<string>& vsNames)
 {
 	TList* list = new TList();
 	string path;
 	vector<TFile*> vf;
+	
+	double N = 0.;
+	TTree* t = NULL;
 	
 	for(int i=0 ; i<(int)vsNames.size() ; i++)
 	{
 		path = dir + vsNames[i];
 		cout << "path=" << path << endl;
 		vf.push_back( new TFile( path.c_str(),"READ") );
-		list->Add( (TTree*)vf[i]->Get("tree") );
+		list->Add( (TTree*)vf[i]->Get("FastTree") );
+		
+		t = (TTree*)vf[i]->Get("FastTree");
+		N += t->GetEntries();
 	}
 	
 	cout << "Merging trees...patience..." << endl;
@@ -473,20 +656,18 @@ void merge(string sMergedFileName, string dir, vector<string>& vsNames)
 	vf.clear();
 	delete list;
 	delete mergedFile;
+	
+	cout << "N events = " << N << endl;
+	
+	return N;
 }
+////////////////////////////////////////////////////////////////////////////////
 
 
-void execute(string isHistos = "")
+
+////////////////////////////////////////////////////////////////////////////////
+void execute()
 {
-	/*
-	if(isHistos=="only_histos")
-	{
-		gROOT->ProcessLine(".x rootlogon_atlas.C");
-		gROOT->SetStyle("ATLAS");
-		gROOT->ForceStyle();
-	}
-	*/
-
 	ofstream* of = new ofstream;
 	of->open("test.tmp");
 	
@@ -496,7 +677,7 @@ void execute(string isHistos = "")
 	Double_t logMmax;
 	Double_t logMbinwidth;
 	
-	const int imass_asymmetry_nbins = 10; //14;
+	const int imass_asymmetry_nbins = 8; //14;
 	double    imass_asymmetry_min   = 120.*GeV2TeV;
 	double    imass_asymmetry_max   = 1620.*GeV2TeV;
 	const int ncol_pads   = 2; // = imass_asymmetry_nbins/nrow_pads !!!
@@ -520,7 +701,7 @@ void execute(string isHistos = "")
 	//imass_asymmetry_bins = {2.00*GeV, 2.30*GeV, 2.64*GeV, 3.03*GeV, 3.48*GeV, 3.99*GeV, 4.58*GeV, 5.26*GeV, 6.04*GeV, 6.93*GeV, 7.96*GeV, 9.14*GeV, 10.50*GeV, 12.05*GeV, 13.84*GeV, 15.89*GeV, 18.24*GeV, 20.94*GeV, 24.05*GeV, 27.61*GeV, 31.70*GeV, 36.39*GeV, 41.79*GeV, 47.98*GeV, 55.08*GeV, 63.25*GeV, 72.62*GeV, 83.37*GeV, 95.73*GeV, 109.91*GeV, 126.19*GeV, 144.89*GeV, 166.35*GeV, 191.00*GeV, 219.30*GeV, 251.79*GeV, 289.09*GeV, 331.92*GeV, 381.09*GeV, 437.55*GeV, 502.38*GeV, 576.81*GeV, 662.26*GeV, 760.38*GeV, 873.03*GeV, 1002.37*GeV, 1150.88*GeV, 1321.39*GeV, 1517.16*GeV, 1741.93*GeV, 2000.00*GeV};
 	*/
 	
-	const int imass_nbins = 100;
+	const int imass_nbins = 40;
 	double    imass_min   = 120.*GeV2TeV;
 	double    imass_max   = 1620.*GeV2TeV;
 	logMmin     = log10(imass_min);
@@ -531,36 +712,15 @@ void execute(string isHistos = "")
 	for(Int_t i=1 ; i<=imass_nbins ; i++) imass_bins[i] = TMath::Power( 10,(logMmin + i*logMbinwidth) );
 	
 	
+	
 	//////////////////////////////////////////////////////////////////////////////////
 	// fill the vector with new vector<double> pointers //////////////////////////////
-	CNV->Divide(ncol_pads,nrow_pads);
-	CNV->SetFillColor(0);
-	stringstream strm;
-	string str;
-	for(int i=0 ; i<imass_asymmetry_nbins ; i++)
-	{
-		VVCOSTH.push_back(new vector<double>); ////////
-		
-		strm.clear();
-		str.clear();
-		strm << imass_asymmetry_bins[i]+(imass_asymmetry_bins[i+1]-imass_asymmetry_bins[i])/2.;
-		strm >> str;
-		str = "#hat{m}_{#mu#mu} = " + str + " TeV";
-		VHIST_Z0.push_back(new TH1D(("Z^{0} "+str).c_str(), ("Z^{0} "+str).c_str(), 20, -1., +1.));
-		VHIST_Z0[i]->SetLineColor(kAzure-5);
-		VHIST_KK.push_back(new TH1D(("Data "+str).c_str(), ("Data "+str).c_str(), 20, -1., +1.));
-		VHIST_ZP.push_back(new TH1D(("Z' "+str).c_str(), ("Z' "+str).c_str(), 20, -1., +1.));
-		VHIST_ZP[i]->SetLineColor(kRed);
-		if(i<nrow_pads) VPAD.push_back( CNV->cd(2*i+1) );
-		else            VPAD.push_back( CNV->cd(2*(i-nrow_pads)+2) );
-		VPAD[i]->SetFillColor(0);
-		VPAD[i]->SetTicky(1);
-		VPAD[i]->SetTickx(1);
-	}
+	for(int i=0 ; i<imass_asymmetry_nbins ; i++) VVCOSTH.push_back(new vector<double>);
 	//////////////////////////////////////////////////////////////////////////////////
+	
 
 
-	string dir   = "/srv01/tau/hod/pythia8145/rootexample/";
+	string dir   = "/data/hod/ATLFAST/26032011/";
 	string hDir  = "";
 	string hName = "Afb";
 	string xTitle = "#hat{m}_{#mu#mu} TeV";
@@ -616,6 +776,10 @@ void execute(string isHistos = "")
 	TLegend* leg_histos = new TLegend(0.85, 0.15, 0.97, 0.45,NULL,"brNDC");
 	leg_histos->SetFillColor(kWhite);
 	
+	
+	stringstream strm;
+	string str;
+	
 	strm.clear();
 	str.clear();
 	strm << L;
@@ -625,11 +789,11 @@ void execute(string isHistos = "")
 	pvtxt_lumi->SetFillColor(kWhite);
 	TText* txt  = pvtxt_lumi->AddText( lumilabel.c_str() );
 	
-	TPaveText* pvtxt_smear = new TPaveText(0.4824415,0.1818182,0.6714047,0.3199482,"brNDC");
-	pvtxt_smear->SetFillColor(0);
-	pvtxt_smear->SetTextFont(42);
-	txt = pvtxt_smear->AddText("#splitline{smear muon p_{T} by:}{#frac{#Delta p_{T}}{p_{T}} #approx #frac{12%}{1 TeV} #times p_{T}}");
-	pvtxt_smear->Draw();
+	TPaveText* pvtxt_atlfast = new TPaveText(0.2537688,0.8076923,0.3932161,0.9090909,"brNDC");
+	pvtxt_atlfast->SetFillColor(0);
+	pvtxt_atlfast->SetTextFont(42);
+	txt = pvtxt_atlfast->AddText("#bf{#it{ATLFAST}}");
+	pvtxt_atlfast->Draw();
 	
 	string cName = "cnv_" + hNameFixed;
 	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);
@@ -740,8 +904,8 @@ void execute(string isHistos = "")
 	
 	Int_t maxEvents = 0;
 	Int_t lumEvents = 0;
-	string sMergedFileName; 
 	vector<string> vsNames;
+	string sMergedFileName; 
 	TAxis *xaxis = hAfbZ0->GetXaxis();
 	double a4  = 0.;
 	double da4 = 0.;
@@ -754,24 +918,16 @@ void execute(string isHistos = "")
 	ISKK = false;
 	vsNames.clear();
 	sMergedFileName = "Z0.merged.root";
-	vsNames.push_back("bu/Z0.M1000.5e5.root");
-	vsNames.push_back("bu/Z0.M1000.1e6.root");
-	merge(sMergedFileName, dir, vsNames);
-	//sMergedFileName = dir+"bu/Z0.lowMass.M1000.root";
+	vsNames.push_back("MC10.000000.Pythia8_Z0_M1000_mumu.NTUP._00001.pool.root");
+	vsNames.push_back("MC10.000000.Pythia8_Z0_M1000_mumu.NTUP._00002.pool.root");
+	vsNames.push_back("MC10.000000.Pythia8_Z0_M1000_mumu.NTUP._00003.pool.root");
+	vsNames.push_back("MC10.000000.Pythia8_Z0_M1000_mumu.NTUP._00004.pool.root");
+	vsNames.push_back("MC10.000000.Pythia8_Z0_M1000_mumu.NTUP._00005.pool.root");
+	nevents_Z0 = merge(sMergedFileName, dir, vsNames);
+	//sMergedFileName = "MC10.000000.Pythia8_Z0_M1000_mumu.NTUP._00001.pool.root";
 	TFile* fZ0 = new TFile(sMergedFileName.c_str(), "READ");
-	TTree* tree_Z0 = (TTree*)fZ0->Get("tree");
-	tree_Z0->SetBranchAddress( "mHat",   &IMASS );
-	tree_Z0->SetBranchAddress( "cosThetaCS", &COSTH );
-	tree_Z0->SetBranchAddress( "charge", &CHARGE );
-	tree_Z0->SetBranchAddress( "id", &ID );
-	tree_Z0->SetBranchAddress( "px", &PX );
-	tree_Z0->SetBranchAddress( "py", &PY );
-	tree_Z0->SetBranchAddress( "pz", &PZ );
-	tree_Z0->SetBranchAddress( "E", &E );
-	tree_Z0->SetBranchAddress( "pT", &PT );
-	tree_Z0->SetBranchAddress( "phi", &PHI );
-	tree_Z0->SetBranchAddress( "theta", &THETA );
-	tree_Z0->SetBranchAddress( "eta", &ETA );
+	TTree* tree_Z0 = (TTree*)fZ0->Get("FastTree");
+	initTree(tree_Z0);
 	a4   = 0.;
 	da4  = 0.;
 	afb  = 0.;
@@ -803,25 +959,17 @@ void execute(string isHistos = "")
 	
 	
 	vsNames.clear();
-	sMergedFileName = "ZP.merged.root";
-	vsNames.push_back("bu/ZP.M1000.5e5.root");
-	vsNames.push_back("bu/ZP.M1000.1e6.root");
-	merge(sMergedFileName, dir, vsNames);
-	//sMergedFileName = dir+"bu/ZP.lowMass.M1000.root";
+	sMergedFileName = "ZprimeSSM.merged.root";
+	vsNames.push_back("MC10.000000.Pythia8_ZprimeSSM_M1000_mumu.NTUP._00001.pool.root");
+	vsNames.push_back("MC10.000000.Pythia8_ZprimeSSM_M1000_mumu.NTUP._00002.pool.root");
+	vsNames.push_back("MC10.000000.Pythia8_ZprimeSSM_M1000_mumu.NTUP._00003.pool.root");
+	vsNames.push_back("MC10.000000.Pythia8_ZprimeSSM_M1000_mumu.NTUP._00004.pool.root");
+	vsNames.push_back("MC10.000000.Pythia8_ZprimeSSM_M1000_mumu.NTUP._00005.pool.root");
+	nevents_ZP = merge(sMergedFileName, dir, vsNames);
+	//sMergedFileName = "MC10.000000.Pythia8_ZprimeSSM_M1000_mumu.NTUP._00001.pool.root";
 	TFile* fZP = new TFile(sMergedFileName.c_str(), "READ");
-	TTree* tree_ZP = (TTree*)fZP->Get("tree");
-	tree_ZP->SetBranchAddress( "mHat",   &IMASS );
-	tree_ZP->SetBranchAddress( "cosThetaCS", &COSTH );
-	tree_ZP->SetBranchAddress( "charge", &CHARGE );
-	tree_ZP->SetBranchAddress( "id", &ID );
-	tree_ZP->SetBranchAddress( "px", &PX );
-	tree_ZP->SetBranchAddress( "py", &PY );
-	tree_ZP->SetBranchAddress( "pz", &PZ );
-	tree_ZP->SetBranchAddress( "E", &E );
-	tree_ZP->SetBranchAddress( "pT", &PT );
-	tree_ZP->SetBranchAddress( "phi", &PHI );
-	tree_ZP->SetBranchAddress( "theta", &THETA );
-	tree_ZP->SetBranchAddress( "eta", &ETA );
+	TTree* tree_ZP = (TTree*)fZP->Get("FastTree");
+	initTree(tree_ZP);
 	a4   = 0.;
 	da4  = 0.;
 	afb  = 0.;
@@ -852,27 +1000,18 @@ void execute(string isHistos = "")
 	(*of) << endl;
 	
 	
-	
 	vsNames.clear();
 	sMergedFileName = "KK.merged.root";
-	vsNames.push_back("bu/KK.M1000.5e5.root");
-	vsNames.push_back("bu/KK.M1000.1e6.root");
-	merge(sMergedFileName, dir, vsNames);
-	//sMergedFileName = dir+"bu/KK.lowMass.M1000.root";
+	vsNames.push_back("MC10.000000.Pythia8_KK_M1000_mumu.NTUP._00001.pool.root");
+	vsNames.push_back("MC10.000000.Pythia8_KK_M1000_mumu.NTUP._00002.pool.root");
+	vsNames.push_back("MC10.000000.Pythia8_KK_M1000_mumu.NTUP._00003.pool.root");
+	vsNames.push_back("MC10.000000.Pythia8_KK_M1000_mumu.NTUP._00004.pool.root");
+	vsNames.push_back("MC10.000000.Pythia8_KK_M1000_mumu.NTUP._00005.pool.root");
+	nevents_KK = merge(sMergedFileName, dir, vsNames);
+	//sMergedFileName = "MC10.000000.Pythia8_KK_M1000_mumu.NTUP._00001.pool.root";
 	TFile* fKK = new TFile(sMergedFileName.c_str(), "READ");
-	TTree* tree_KK = (TTree*)fKK->Get("tree");
-	tree_KK->SetBranchAddress( "mHat",   &IMASS );
-	tree_KK->SetBranchAddress( "cosThetaCS", &COSTH );
-	tree_KK->SetBranchAddress( "charge", &CHARGE );
-	tree_KK->SetBranchAddress( "id", &ID );
-	tree_KK->SetBranchAddress( "px", &PX );
-	tree_KK->SetBranchAddress( "py", &PY );
-	tree_KK->SetBranchAddress( "pz", &PZ );
-	tree_KK->SetBranchAddress( "E", &E );
-	tree_KK->SetBranchAddress( "pT", &PT );
-	tree_KK->SetBranchAddress( "phi", &PHI );
-	tree_KK->SetBranchAddress( "theta", &THETA );
-	tree_KK->SetBranchAddress( "eta", &ETA );
+	TTree* tree_KK = (TTree*)fKK->Get("FastTree");
+	initTree(tree_KK);
 	a4   = 0.;
 	da4  = 0.;
 	afb  = 0.;
@@ -919,13 +1058,13 @@ void execute(string isHistos = "")
 	
 	
 	// scale all to lumi
-	Scale(hMKK, (L*ifb2imb)*(sigma_KK/nevents_KK));
-	Scale(hMZP, (L*ifb2imb)*(sigma_ZP/nevents_ZP));
 	Scale(hMZ0, (L*ifb2imb)*(sigma_Z0/nevents_Z0));
+	Scale(hMZP, (L*ifb2imb)*(sigma_ZP/nevents_ZP));
+	Scale(hMKK, (L*ifb2imb)*(sigma_KK/nevents_KK));
 	
-	ScaleWerrors(hMKKerr, (L*ifb2imb)*(sigma_KK/nevents_KK));
-	ScaleWerrors(hMZPerr, (L*ifb2imb)*(sigma_ZP/nevents_ZP));
 	ScaleWerrors(hMZ0err, (L*ifb2imb)*(sigma_Z0/nevents_Z0));
+	ScaleWerrors(hMZPerr, (L*ifb2imb)*(sigma_ZP/nevents_ZP));
+	ScaleWerrors(hMKKerr, (L*ifb2imb)*(sigma_KK/nevents_KK));
 	
 	
 	
@@ -934,9 +1073,9 @@ void execute(string isHistos = "")
 	pad_mHat->cd();
 	//hMKK->GetYaxis()->SetRangeUser(1,1.5*hMKK->GetMaximum());
 	hMKK->SetMaximum(1.5*hMKK->GetMaximum());
-	hMKK->SetMinimum(0.5*hMZ0->GetMinimum());
+	hMKK->SetMinimum((hMZ0->GetMinimum()<=0) ? 1. : 0.5*hMZ0->GetMinimum());
 	hMKK->Draw();
-	hMKKerr->Draw();
+	hMKKerr->Draw("SAMES");
 	hMKK->GetXaxis()->SetMoreLogLabels(); 
 	hMKK->GetXaxis()->SetNoExponent();
 	hMKKerr->GetXaxis()->SetMoreLogLabels(); 
@@ -970,7 +1109,7 @@ void execute(string isHistos = "")
 	hAfbZP->GetXaxis()->SetMoreLogLabels(); 
 	hAfbZP->GetXaxis()->SetMoreLogLabels(); 
 	pvtxt_lumi->Draw("SAMES");
-	if(DOSMEAR) pvtxt_smear->Draw("SAMES");
+	pvtxt_atlfast->Draw("SAMES");
 	leg_mHat->Draw("SAMES");
 	TLine* lUnit = new TLine(imass_asymmetry_min,0.,imass_asymmetry_max,0.);
 	lUnit->SetLineColor(kBlack);
@@ -993,63 +1132,4 @@ void execute(string isHistos = "")
 	cnv->SaveAs(fName+".png");
 	
 	of->close();
-	
-	/*
-	CNV->Draw();
-	for(int i=0 ; i<imass_asymmetry_nbins ; i++)
-	{
-		if(i==0)
-		{
-			leg_histos->AddEntry(VHIST_Z0[i], "Z#rightarrow#mu#mu");
-			leg_histos->AddEntry(VHIST_Z0[i], "0.25 TeV Z' SSM#rightarrow#mu#mu");
-			leg_histos->AddEntry(VHIST_Z0[i], "Data", "lep");
-		}
-	
-		VPAD[i]->cd();
-		
-		Double_t NZ0     = VHIST_Z0[i]->GetEntries();
-		Double_t NZprime = VHIST_ZP[i]->GetEntries();
-		Double_t NDATA   = VHIST_KK[i]->GetEntries();
-		
-		Scale(VHIST_Z0[i], 1./NZ0);
-		Scale(VHIST_ZP[i], 1./NZprime);
-		ScaleWerrors(VHIST_KK[i], 1./NDATA);
-		
-		Double_t max = 0.;
-		Double_t tmp = 0.;
-		tmp = VHIST_Z0[i]->GetMaximum();
-		max = (tmp>max) ? tmp : max;
-		if(NZprime>=minEntriesDATA)
-		{
-			tmp = VHIST_ZP[i]->GetMaximum();
-			max = (tmp>max) ? tmp : max;
-		}
-		if(NDATA>=minEntriesDATA)
-		{
-			tmp = VHIST_KK[i]->GetMaximum();
-			max = (tmp>max) ? tmp : max;
-		}
-		
-		
-		VHIST_Z0[i]->SetMaximum(1.2*max);
-		VHIST_Z0[i]->SetMinimum(0.);
-		VHIST_Z0[i]->SetTitle("");
-		VHIST_Z0[i]->SetXTitle("#cos#theta^{*}");
-		VHIST_Z0[i]->SetYTitle("Events (normalized)");
-		VHIST_Z0[i]->Draw();
-
-		VHIST_ZP[i]->SetTitle("");
-		if(NZprime>=minEntriesDATA) VHIST_ZP[i]->Draw("SAMES");
-		
-		VHIST_KK[i]->SetTitle("");
-		if(NDATA>=minEntriesDATA) VHIST_KK[i]->Draw("e1x0SAMES");
-		
-		leg_histos->Draw("SAMES");
-	}
-	fName += ".costh";
-	CNV->SaveAs(fName+".eps");
-	CNV->SaveAs(fName+".C");
-	CNV->SaveAs(fName+".root");
-	CNV->SaveAs(fName+".png");
-	*/
 }

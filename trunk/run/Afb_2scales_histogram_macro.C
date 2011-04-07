@@ -36,6 +36,7 @@
 #include <TPaveText.h>
 #include <TThread.h>
 #include <TList.h>
+#include <TGraphAsymmErrors.h>
 
 using namespace std;
 
@@ -65,6 +66,48 @@ TLorentzVector m_pTmp;
 float GeV2TeV = 1.e-3;
 float MeV2TeV = 1.e-6;
 float muonMass = 0.105658367; // GeV
+
+
+///////////////////////////////////////////////////////////////////////
+double error_poisson_up(double data)
+{
+	double y1 = data + 1.0;
+	double d = 1.0 - 1.0/(9.0*y1) + 1.0/(3*TMath::Sqrt(y1));
+	return y1*d*d*d-data;
+}
+
+double error_poisson_down(double data)
+{
+	double y = data;
+	if (y == 0.0) return 0.0;
+	double d = 1.0 - 1.0/(9.0*y) - 1.0/(3.0*TMath::Sqrt(y));
+	return data-y*d*d*d;
+}
+
+TGraphAsymmErrors* GetPoissonizedGraph(TH1D* histo, bool isXerr)
+{
+	TGraphAsymmErrors* graph = new TGraphAsymmErrors();
+	int j=0;
+	for (int i=1;i<=histo->GetNbinsX();++i)
+	{
+		if (histo->GetBinContent(i)!=0)
+		{ 
+			graph->SetPoint(j,histo->GetBinCenter(i),histo->GetBinContent(i));
+			graph->SetPointError(
+								 j,
+								 (isXerr) ? histo->GetBinWidth(i)/2. : 0.,
+								 (isXerr) ? histo->GetBinWidth(i)/2. : 0.,
+								 error_poisson_down(histo->GetBinContent(i)),
+								 error_poisson_up(histo->GetBinContent(i))
+								);
+			++j;
+		}
+	}
+	return graph;
+}
+///////////////////////////////////////////////////////////////////////
+
+
 
 void Scale(TH1D* h, double d)
 { 
@@ -200,10 +243,12 @@ void fillVec(TTree* t, TH1D* h)
 		else COSTH = 0.;
 		
 		VVCOSTH[bin-1]->push_back(COSTH);
-		
+	
+		/*	
 		if(ISZMUMU)  VHIST_Z0[bin-1]->Fill(COSTH);
 		if(ISZPRIME) VHIST_ZPRIME[bin-1]->Fill(COSTH);
 		if(ISDATA)   VHIST_DATA[bin-1]->Fill(COSTH);
+		*/
 	}
 }
 
@@ -270,7 +315,7 @@ void execute(string isHistos = "")
 	int minEntriesMC   = 1;//10;
 	string refframe = REFNAME;
 	bool doLogM = true;
-	bool doLogx = false;
+	bool doLogx = true;
 	
 	
 	/*
@@ -282,27 +327,58 @@ void execute(string isHistos = "")
 	double imass_max      = 400.*GeV2TeV;
 	Double_t logMmin = log10(imass_min);
 	Double_t logMmax = log10(imass_max);
-	Double_t M_bins[imass_nbins+1];
+	Double_t imass_bins[imass_nbins+1];
 	Double_t M_binwidth = (Double_t)( (logMmax-logMmin)/(Double_t)imass_nbins );
-	M_bins[0] = imass_min;
-	for(Int_t i=1 ; i<=imass_nbins ; i++) M_bins[i] = TMath::Power( 10,(logMmin + i*M_binwidth) );
-	doLogx = true;
+	imass_bins[0] = imass_min;
+	for(Int_t i=1 ; i<=imass_nbins ; i++) imass_bins[i] = TMath::Power( 10,(logMmin + i*M_binwidth) );
 	*/
 	
+	Double_t logMmin;
+	Double_t logMmax;
+	Double_t logMbinwidth;
+
+	const double imass_min_const = 75.*GeV2TeV; //72.62*GeV2TeV
+	const double imass_max_const = 400.*GeV2TeV; //381.09*GeV2TeV
+
+
+	const int imass_asymmetry_nbins = 7; //14;
+	double    imass_asymmetry_min   = imass_min_const;
+	double    imass_asymmetry_max   = imass_max_const;
+	logMmin     = log10(imass_asymmetry_min);
+	logMmax     = log10(imass_asymmetry_max);
+	Double_t imass_asymmetry_bins[imass_asymmetry_nbins+1];
+	logMbinwidth = (Double_t)( (logMmax-logMmin)/(Double_t)imass_asymmetry_nbins );
+	imass_asymmetry_bins[0] = imass_asymmetry_min;
+	for(Int_t i=1 ; i<=imass_asymmetry_nbins ; i++) imass_asymmetry_bins[i] = TMath::Power( 10,(logMmin + i*logMbinwidth) );
+
+
+	/*	
 	const int imass_nbins = 12;
 	const int ncol_pads   = 2; // = imass_nbins/nrow_pads !!!
 	const int nrow_pads   = 6; // = imass_nbins/ncol_pads !!!
-	double imass_min   = 72.62*GeV2TeV;
-	double imass_max   = 381.09*GeV2TeV;
-	Double_t M_bins[imass_nbins+1] = {72.62*GeV2TeV, 83.37*GeV2TeV, 95.73*GeV2TeV, 109.91*GeV2TeV,
+	double imass_min   = imass_min_const;
+	double imass_max   = imass_max_const;
+	Double_t imass_bins[imass_nbins+1] = {72.62*GeV2TeV, 83.37*GeV2TeV, 95.73*GeV2TeV, 109.91*GeV2TeV,
 									  126.19*GeV2TeV, 144.89*GeV2TeV, 166.35*GeV2TeV, 191.00*GeV2TeV,
 									  219.30*GeV2TeV, 251.79*GeV2TeV, 289.09*GeV2TeV, 331.92*GeV2TeV, 381.09*GeV2TeV};
 	doLogx = false;
-	//M_bins = {2.00*GeV, 2.30*GeV, 2.64*GeV, 3.03*GeV, 3.48*GeV, 3.99*GeV, 4.58*GeV, 5.26*GeV, 6.04*GeV, 6.93*GeV, 7.96*GeV, 9.14*GeV, 10.50*GeV, 12.05*GeV, 13.84*GeV, 15.89*GeV, 18.24*GeV, 20.94*GeV, 24.05*GeV, 27.61*GeV, 31.70*GeV, 36.39*GeV, 41.79*GeV, 47.98*GeV, 55.08*GeV, 63.25*GeV, 72.62*GeV, 83.37*GeV, 95.73*GeV, 109.91*GeV, 126.19*GeV, 144.89*GeV, 166.35*GeV, 191.00*GeV, 219.30*GeV, 251.79*GeV, 289.09*GeV, 331.92*GeV, 381.09*GeV, 437.55*GeV, 502.38*GeV, 576.81*GeV, 662.26*GeV, 760.38*GeV, 873.03*GeV, 1002.37*GeV, 1150.88*GeV, 1321.39*GeV, 1517.16*GeV, 1741.93*GeV, 2000.00*GeV};
-	
+	//imass_bins = {2.00*GeV, 2.30*GeV, 2.64*GeV, 3.03*GeV, 3.48*GeV, 3.99*GeV, 4.58*GeV, 5.26*GeV, 6.04*GeV, 6.93*GeV, 7.96*GeV, 9.14*GeV, 10.50*GeV, 12.05*GeV, 13.84*GeV, 15.89*GeV, 18.24*GeV, 20.94*GeV, 24.05*GeV, 27.61*GeV, 31.70*GeV, 36.39*GeV, 41.79*GeV, 47.98*GeV, 55.08*GeV, 63.25*GeV, 72.62*GeV, 83.37*GeV, 95.73*GeV, 109.91*GeV, 126.19*GeV, 144.89*GeV, 166.35*GeV, 191.00*GeV, 219.30*GeV, 251.79*GeV, 289.09*GeV, 331.92*GeV, 381.09*GeV, 437.55*GeV, 502.38*GeV, 576.81*GeV, 662.26*GeV, 760.38*GeV, 873.03*GeV, 1002.37*GeV, 1150.88*GeV, 1321.39*GeV, 1517.16*GeV, 1741.93*GeV, 2000.00*GeV};
+	*/
+
+	const int imass_nbins = 50;
+	double    imass_min   = imass_min_const;
+	double    imass_max   = imass_max_const;
+	logMmin     = log10(imass_min);
+	logMmax     = log10(imass_max);
+	Double_t imass_bins[imass_nbins+1];
+	logMbinwidth = (Double_t)( (logMmax-logMmin)/(Double_t)imass_nbins );
+	imass_bins[0] = imass_min;
+	for(Int_t i=1 ; i<=imass_nbins ; i++) imass_bins[i] = TMath::Power( 10,(logMmin + i*logMbinwidth) );
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	// fill the vector with new vector<double> pointers //////////////////////////////
+	
+	/*
 	CNV->Divide(ncol_pads,nrow_pads);
 	CNV->SetFillColor(0);
 	stringstream strm;
@@ -310,10 +386,9 @@ void execute(string isHistos = "")
 	for(int i=0 ; i<imass_nbins ; i++)
 	{
 		VVCOSTH.push_back(new vector<double>); ////////
-		
 		strm.clear();
 		str.clear();
-		strm << M_bins[i]+(M_bins[i+1]-M_bins[i])/2.;
+		strm << imass_bins[i]+(imass_bins[i+1]-imass_bins[i])/2.;
 		strm >> str;
 		str = "#hat{m}_{#mu#mu} = " + str + " TeV";
 		VHIST_Z0.push_back(new TH1D(("Z^{0} "+str).c_str(), ("Z^{0} "+str).c_str(), 20, -1., +1.));
@@ -327,6 +402,11 @@ void execute(string isHistos = "")
 		VPAD[i]->SetTicky(1);
 		VPAD[i]->SetTickx(1);
 	}
+	*/
+	
+	stringstream strm;
+	string str;
+	for(int i=0 ; i<imass_nbins ; i++) VVCOSTH.push_back(new vector<double>);
 	//////////////////////////////////////////////////////////////////////////////////
 	
 
@@ -428,20 +508,20 @@ void execute(string isHistos = "")
 	
 	// Data
 	TH1D* hDataM;
-	if(doLogM) hDataM  = new TH1D("mHat_data","mHat_data", imass_nbins, M_bins );
+	if(doLogM) hDataM  = new TH1D("mHat_data","mHat_data", imass_nbins, imass_bins );
 	else       hDataM  = new TH1D("mHat_data","mHat_data", imass_nbins, imass_min, imass_max );
 	hDataM->SetTitle("");
 	hDataM->SetYTitle("Events");
 	hDataM->SetLineColor(kBlack);
 	hDataM->SetLineWidth(1);
 	TH1D* hData;
-	if(doLogM) hData   = new TH1D("Afb_data","Afb_data", imass_nbins, M_bins );
-	else       hData   = new TH1D("Afb_data","Afb_data", imass_nbins, imass_min, imass_max );
+	if(doLogM) hData   = new TH1D("Afb_data","Afb_data", imass_asymmetry_nbins, imass_asymmetry_bins );
+	else       hData   = new TH1D("Afb_data","Afb_data", imass_asymmetry_nbins, imass_asymmetry_min, imass_asymmetry_max );
 	hData->SetMarkerStyle(20);
 	hData->SetMarkerColor(kBlack);
 	hData->SetMarkerSize(1.2);
-	leg->AddEntry( hData, "Data: A_{FB} fit", "lep");
-	leg->AddEntry( hData, "Data: Events", "l");
+	leg->AddEntry( hData, "2010 Data: A_{FB} fit", "lep");
+	leg->AddEntry( hData, "2010 Data: Events", "l");
 	
 	//string sData = (m_dataAnalysisSelector=="digest") ? "digestControl" : "offlineControl";
 	string sData = "analysisLocalControl";
@@ -504,8 +584,8 @@ void execute(string isHistos = "")
 	// Z' /////////////////////////////////////////
 	channel = "0.25 TeV Z' SSM: A_{FB} fit";
 	TH1D* hSignal;
-	if(doLogM) hSignal = new TH1D("Afb_sig","Afb_sig", imass_nbins, M_bins );
-	else       hSignal = new TH1D("Afb_sig","Afb_sig", imass_nbins, imass_min, imass_max );
+	if(doLogM) hSignal = new TH1D("Afb_sig","Afb_sig", imass_asymmetry_nbins, imass_asymmetry_bins );
+	else       hSignal = new TH1D("Afb_sig","Afb_sig", imass_asymmetry_nbins, imass_asymmetry_min, imass_asymmetry_max );
 	hSignal->SetLineColor(kRed);
 	hSignal->SetFillColor(kRed);
 	hSignal->SetLineWidth(1);
@@ -560,8 +640,8 @@ void execute(string isHistos = "")
 	// Backgrounds //////////////////////////////////////////////////////
 	channel = "MC(Z#rightarrow#mu#mu): A_{FB} fit";
 	TH1D* hBGsum;
-	if(doLogM) hBGsum = new TH1D("Afb_sumBG","Afb_sumBG", imass_nbins, M_bins );
-	else       hBGsum = new TH1D("Afb_sumBG","Afb_sumBG", imass_nbins, imass_min, imass_max );
+	if(doLogM) hBGsum = new TH1D("Afb_sumBG","Afb_sumBG", imass_asymmetry_nbins, imass_asymmetry_bins );
+	else       hBGsum = new TH1D("Afb_sumBG","Afb_sumBG", imass_asymmetry_nbins, imass_asymmetry_min, imass_asymmetry_max );
 	hBGsum->SetLineColor(kAzure-5);
 	hBGsum->SetFillColor(kAzure-5);
 	hBGsum->SetFillStyle(3003);
@@ -647,7 +727,19 @@ void execute(string isHistos = "")
 	hBGsumTmp->SetLineColor(kAzure+8);
 	
 	
-	
+	/*	
+	TH1D* hDataMerr = (TH1D*)hDataM->Clone("");
+	hDataMerr->SetMarkerStyle(1);
+	hDataMerr->SetMarkerSize(1);
+	for(Int_t i=0 ; i<=hDataMerr->GetNbinsX()+1 ; i++) hDataMerr->SetBinError(i,sqrt(hDataMerr->GetBinContent(i)));
+	*/
+	bool isXerr = false;
+	TGraphAsymmErrors* gDataMpoissonErr = GetPoissonizedGraph(hDataM,isXerr);
+	gDataMpoissonErr->SetMarkerStyle(1);
+	gDataMpoissonErr->SetMarkerSize(1);
+	gDataMpoissonErr->SetLineColor(kBlack);
+	gDataMpoissonErr->SetLineStyle(1);
+
 	
 	pad_mHat->Draw();
 	pad_mHat->cd();
@@ -656,6 +748,9 @@ void execute(string isHistos = "")
 	hDataM->GetXaxis()->SetMoreLogLabels(); 
 	hDataM->GetXaxis()->SetNoExponent(); 
 	hDataM->Draw();
+	gDataMpoissonErr->GetXaxis()->SetMoreLogLabels(); 
+	gDataMpoissonErr->GetXaxis()->SetNoExponent(); 
+	gDataMpoissonErr->Draw("SAMES");
 
 	cnv->cd();
 
@@ -692,6 +787,7 @@ void execute(string isHistos = "")
 	cnv->SaveAs(fName+".root");
 	cnv->SaveAs(fName+".png");
 	
+	/*
 	CNV->Draw();
 	for(int i=0 ; i<imass_nbins ; i++)
 	{
@@ -748,4 +844,5 @@ void execute(string isHistos = "")
 	CNV->SaveAs(fName+".C");
 	CNV->SaveAs(fName+".root");
 	CNV->SaveAs(fName+".png");
+	*/
 }

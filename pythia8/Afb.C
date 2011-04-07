@@ -37,6 +37,7 @@
 #include <TThread.h>
 #include <TList.h>
 #include <TRandom.h>
+#include <TGraphAsymmErrors.h>
 
 using namespace std;
 
@@ -100,7 +101,7 @@ const double L       = 5.; // 1/fb
 
 const bool DOSELECTION      = true;
 const bool DOSMEAR          = true;
-const bool FITWITHALLEVENTS = true; // false if only fit to N events for a given luminosity (see L above)
+const bool FITWITHALLEVENTS = false; // false if only fit to N events for a given luminosity (see L above)
 
 const int minEntriesDATA = 10;
 const int minEntriesMC   = 10;
@@ -114,6 +115,45 @@ const double RESOLUTION   = 0.12; // resolution for smearing pT~1TeV
 const double PTTRACKSCALE = 1.e+3; // in GeV/c
 ////////////////////////////////////////////////////////////////////////////
 
+
+///////////////////////////////////////////////////////////////////////
+double error_poisson_up(double data)
+{
+	double y1 = data + 1.0;
+	double d = 1.0 - 1.0/(9.0*y1) + 1.0/(3*TMath::Sqrt(y1));
+	return y1*d*d*d-data;
+}
+
+double error_poisson_down(double data)
+{
+	double y = data;
+	if (y == 0.0) return 0.0;
+	double d = 1.0 - 1.0/(9.0*y) - 1.0/(3.0*TMath::Sqrt(y));
+	return data-y*d*d*d;
+}
+
+TGraphAsymmErrors* GetPoissonizedGraph(TH1D* histo, bool isXerr)
+{
+	TGraphAsymmErrors* graph = new TGraphAsymmErrors();
+	
+	int j=0;
+	for (int i=1;i<=histo->GetNbinsX();++i)
+	{
+		if (histo->GetBinContent(i)!=0)
+		{ 
+			graph->SetPoint(j,histo->GetBinCenter(i),histo->GetBinContent(i));
+			graph->SetPointError(j,
+								 (isXerr) ? histo->GetBinWidth(i)/2. : 0.,
+								 (isXerr) ? histo->GetBinWidth(i)/2. : 0.,
+								 error_poisson_down(histo->GetBinContent(i)),
+								 error_poisson_up(histo->GetBinContent(i))
+								 );
+			++j;
+		}
+	}
+	return graph;
+}
+///////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////////
 // smearing
@@ -631,6 +671,12 @@ void execute(string isHistos = "")
 	txt = pvtxt_smear->AddText("#splitline{smear muon p_{T} by:}{#frac{#Delta p_{T}}{p_{T}} #approx #frac{12%}{1 TeV} #times p_{T}}");
 	pvtxt_smear->Draw();
 	
+	TPaveText* pvtxt_atlfast = new TPaveText(0.2537688,0.8076923,0.3932161,0.9090909,"brNDC");
+	pvtxt_atlfast->SetFillColor(0);
+	pvtxt_atlfast->SetTextFont(42);
+	txt = pvtxt_atlfast->AddText("#bf{#it{#scale[1.2]{P}#scale[1.0]{YTHIA8}}}");
+	
+	
 	string cName = "cnv_" + hNameFixed;
 	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);
 	
@@ -901,58 +947,61 @@ void execute(string isHistos = "")
 		(*of) << "KK[currentbin=" << CURRENTBIN << "][bin=" << b << "]: " << VVCOSTH[CURRENTBIN]->size() << ", from histo: " << hMKK->GetBinContent(b) << endl;
 	}
 	(*of) << endl;
-	
-	
-	
-	
-	TH1D* hMKKerr = (TH1D*)hMKK->Clone("");
-	hMKKerr->SetMarkerStyle(1);
-	hMKKerr->SetMarkerSize(1);
-	
-	TH1D* hMZPerr = (TH1D*)hMZP->Clone("");
-	hMZPerr->SetMarkerStyle(1);
-	hMZPerr->SetMarkerSize(1);
-	
-	TH1D* hMZ0err = (TH1D*)hMZ0->Clone("");
-	hMZ0err->SetMarkerStyle(1);
-	hMZ0err->SetMarkerSize(1);
+
 	
 	
 	// scale all to lumi
-	Scale(hMKK, (L*ifb2imb)*(sigma_KK/nevents_KK));
-	Scale(hMZP, (L*ifb2imb)*(sigma_ZP/nevents_ZP));
 	Scale(hMZ0, (L*ifb2imb)*(sigma_Z0/nevents_Z0));
-	
-	ScaleWerrors(hMKKerr, (L*ifb2imb)*(sigma_KK/nevents_KK));
-	ScaleWerrors(hMZPerr, (L*ifb2imb)*(sigma_ZP/nevents_ZP));
-	ScaleWerrors(hMZ0err, (L*ifb2imb)*(sigma_Z0/nevents_Z0));
+	Scale(hMZP, (L*ifb2imb)*(sigma_ZP/nevents_ZP));
+	Scale(hMKK, (L*ifb2imb)*(sigma_KK/nevents_KK));
 	
 	
+	bool isXerr = false;
+	TGraphAsymmErrors* gMZ0poissonErr = GetPoissonizedGraph(hMZ0, isXerr);
+	gMZ0poissonErr->SetMarkerStyle(1);
+	gMZ0poissonErr->SetMarkerSize(1);
+	gMZ0poissonErr->SetLineColor(kBlue);
+	gMZ0poissonErr->SetLineStyle(2);
+
+	TGraphAsymmErrors* gMZPpoissonErr = GetPoissonizedGraph(hMZP, isXerr);
+	gMZPpoissonErr->SetMarkerStyle(1);
+	gMZPpoissonErr->SetMarkerSize(1);
+	gMZPpoissonErr->SetLineColor(kRed);
+	gMZPpoissonErr->SetLineStyle(3);
+
+	TGraphAsymmErrors* gMKKpoissonErr = GetPoissonizedGraph(hMKK, isXerr);
+	gMKKpoissonErr->SetMarkerStyle(1);
+	gMKKpoissonErr->SetMarkerSize(1);
+	gMKKpoissonErr->SetLineColor(kBlack);
+	gMKKpoissonErr->SetLineStyle(1);
 	
 	
 	pad_mHat->Draw();
 	pad_mHat->cd();
 	//hMKK->GetYaxis()->SetRangeUser(1,1.5*hMKK->GetMaximum());
 	hMKK->SetMaximum(1.5*hMKK->GetMaximum());
-	hMKK->SetMinimum(0.5*hMZ0->GetMinimum());
-	hMKK->Draw();
-	hMKKerr->Draw();
+	hMKK->SetMinimum((hMZ0->GetMinimum()<=0) ? 1. : 0.5*hMZ0->GetMinimum());
 	hMKK->GetXaxis()->SetMoreLogLabels(); 
 	hMKK->GetXaxis()->SetNoExponent();
-	hMKKerr->GetXaxis()->SetMoreLogLabels(); 
-	hMKKerr->GetXaxis()->SetNoExponent(); 
-	hMZ0->Draw("SAMES");
-	hMZ0err->Draw("SAMES");
+	hMKK->Draw();
+	gMKKpoissonErr->GetXaxis()->SetMoreLogLabels(); 
+	gMKKpoissonErr->GetXaxis()->SetNoExponent();
+	gMKKpoissonErr->Draw("SAMES");
+	
 	hMZ0->GetXaxis()->SetMoreLogLabels(); 
 	hMZ0->GetXaxis()->SetNoExponent();
-	hMZ0err->GetXaxis()->SetMoreLogLabels(); 
-	hMZ0err->GetXaxis()->SetNoExponent(); 
-	hMZP->Draw("SAMES");
-	hMZPerr->Draw("SAMES");
+	hMZ0->Draw("SAMES");
+	gMZ0poissonErr->GetXaxis()->SetMoreLogLabels(); 
+	gMZ0poissonErr->GetXaxis()->SetNoExponent();
+	gMZ0poissonErr->Draw("SAMES");
+
 	hMZP->GetXaxis()->SetMoreLogLabels(); 
 	hMZP->GetXaxis()->SetNoExponent(); 
-	hMZPerr->GetXaxis()->SetMoreLogLabels(); 
-	hMZPerr->GetXaxis()->SetNoExponent(); 
+	hMZP->Draw("SAMES");
+	gMZPpoissonErr->GetXaxis()->SetMoreLogLabels(); 
+	gMZPpoissonErr->GetXaxis()->SetNoExponent(); 
+	gMZPpoissonErr->Draw("SAMES");
+	
 
 	cnv->cd();
 
@@ -970,6 +1019,7 @@ void execute(string isHistos = "")
 	hAfbZP->GetXaxis()->SetMoreLogLabels(); 
 	hAfbZP->GetXaxis()->SetMoreLogLabels(); 
 	pvtxt_lumi->Draw("SAMES");
+	pvtxt_atlfast->Draw("SAMES");
 	if(DOSMEAR) pvtxt_smear->Draw("SAMES");
 	leg_mHat->Draw("SAMES");
 	TLine* lUnit = new TLine(imass_asymmetry_min,0.,imass_asymmetry_max,0.);

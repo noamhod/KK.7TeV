@@ -557,7 +557,7 @@ void fcn(int& npar, double* deriv, double& f, double par[], int flag)
 ///////////////////////////////////////////////////////////////////////////////////////
 
 
-inline void fill(TTree* t, Int_t Nmax, TH1D* h, TH1D* hMass)
+inline void fill(TTree* t, Int_t Nmax, TH1D* h, TH1D* hMass, TH1D* hpT)
 {
 	for(int v=0 ; v<(int)VVCOSTH.size() ; v++) VVCOSTH[v]->clear();
 	if (t==0) return;
@@ -604,6 +604,7 @@ inline void fill(TTree* t, Int_t Nmax, TH1D* h, TH1D* hMass)
 		// the sample and afterwards, scale ///
 		// the histograms to the luminosity /// 
 		hMass->Fill(mHat); ////////////////////
+		hpT->Fill( (CHARGE->at(0)<0.  &&  CHARGE->at(1)>0) ? pa->Pt() : pb->Pt() );
 		///////////////////////////////////////
 	}
 }
@@ -656,7 +657,7 @@ void minimize(double guess, double& A4, double& dA4)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-double merge(string sMergedFileName, string dir, vector<string>& vsNames)
+double merge(string sMergedFileName, string dir, vector<string>& vsNames, string sTreeName)
 {
 	TList* list = new TList();
 	string path;
@@ -670,9 +671,9 @@ double merge(string sMergedFileName, string dir, vector<string>& vsNames)
 		path = dir + vsNames[i];
 		cout << "path=" << path << endl;
 		vf.push_back( new TFile( path.c_str(),"READ") );
-		list->Add( (TTree*)vf[i]->Get("FastTree") );
+		list->Add( (TTree*)vf[i]->Get(sTreeName.c_str()) );
 		
-		t = (TTree*)vf[i]->Get("FastTree");
+		t = (TTree*)vf[i]->Get(sTreeName.c_str());
 		N += t->GetEntries();
 	}
 	
@@ -745,6 +746,21 @@ void execute()
 	
 	
 	
+	Double_t logpTmin;
+	Double_t logpTmax;
+	Double_t logpTbinwidth;
+	const int pT_nbins = 40;
+	double    pT_min   = 20.*GeV2TeV;
+	double    pT_max   = 1020.*GeV2TeV;
+	logpTmin     = log10(pT_min);
+	logpTmax     = log10(pT_max);
+	Double_t pT_bins[pT_nbins+1];
+	logpTbinwidth = (Double_t)( (logpTmax-logpTmin)/(Double_t)pT_nbins );
+	pT_bins[0] = pT_min;
+	for(Int_t i=1 ; i<=pT_nbins ; i++) pT_bins[i] = TMath::Power( 10,(logpTmin + i*logpTbinwidth) );
+	
+	
+	
 	//////////////////////////////////////////////////////////////////////////////////
 	// fill the vector with new vector<double> pointers //////////////////////////////
 	for(int i=0 ; i<imass_asymmetry_nbins ; i++) VVCOSTH.push_back(new vector<double>);
@@ -805,6 +821,10 @@ void execute()
 	TLegend* leg_mHat = new TLegend(0.1557789,0.1818182,0.3806533,0.458042,NULL,"brNDC");
 	leg_mHat->SetFillColor(kWhite);
 	
+	
+	TLegend* leg_pT = new TLegend(0.22,0.1818182,0.45,0.358042,NULL,"brNDC");
+	leg_pT->SetFillColor(kWhite);
+	
 	TLegend* leg_histos = new TLegend(0.85, 0.15, 0.97, 0.45,NULL,"brNDC");
 	leg_histos->SetFillColor(kWhite);
 	
@@ -821,11 +841,24 @@ void execute()
 	pvtxt_lumi->SetFillColor(kWhite);
 	TText* txt  = pvtxt_lumi->AddText( lumilabel.c_str() );
 	
+	TPaveText* pvtxt_lumi_pT = new TPaveText(0.22,0.358042,0.37,0.4716783,"brNDC");
+	pvtxt_lumi_pT->SetFillColor(kWhite);
+	txt  = pvtxt_lumi_pT->AddText( lumilabel.c_str() );
+	
+	
+	
 	TPaveText* pvtxt_atlfast = new TPaveText(0.2537688,0.8076923,0.3932161,0.9090909,"brNDC");
 	pvtxt_atlfast->SetFillColor(0);
 	pvtxt_atlfast->SetTextFont(42);
 	txt = pvtxt_atlfast->AddText("#bf{#it{ATLFAST}}");
 	pvtxt_atlfast->Draw();
+	
+	TPaveText* pvtxt_atlfast_pT = new TPaveText(0.45,0.8076923,0.6,0.9090909,"brNDC");
+	pvtxt_atlfast_pT->SetFillColor(0);
+	pvtxt_atlfast_pT->SetTextFont(42);
+	txt = pvtxt_atlfast_pT->AddText("#bf{#it{ATLFAST}}");
+	pvtxt_atlfast_pT->Draw();
+	
 	
 	string cName = "cnv_" + hNameFixed;
 	TCanvas* cnv = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);
@@ -845,6 +878,16 @@ void execute()
 	pad_Afb->SetFrameFillColor(0);
 	if(doLogx) pad_Afb->SetLogx();
 	
+	
+	cName = "cnv_pT";
+	TCanvas* cnv_pT = new TCanvas(cName.c_str(), cName.c_str(), 0,0,1200,800);
+	
+	TPad *pad_pT = new TPad("pad_pT","",0,0,1,1);
+	pad_pT->SetFillColor(kWhite);
+	pad_pT->SetTicky(0);
+	pad_pT->SetLogy();
+	if(doLogx) pad_pT->SetLogx();
+	
 	string path = "";
 	string sProc = "";
 	string channel = "";
@@ -862,6 +905,19 @@ void execute()
 	hMZ0->SetLineWidth(1);
 	hMZ0->SetLineStyle(2);
 	leg_mHat->AddEntry( hMZ0, "#gamma/Z^{0}: Events", "l");
+	
+	
+	TH1D* hpTZ0;
+	if(doLogM) hpTZ0  = new TH1D("pT_Z0","pT_Z0", pT_nbins, pT_bins );
+	else       hpTZ0  = new TH1D("pT_Z0","pT_Z0", pT_nbins, pT_min, pT_max );
+	hpTZ0->SetTitle("");
+	hpTZ0->SetYTitle("Events");
+	hpTZ0->SetXTitle("p_{T}(#mu^{-}) TeV");
+	hpTZ0->SetLineColor(kAzure-5);
+	hpTZ0->SetLineWidth(1);
+	hpTZ0->SetLineStyle(2);
+	leg_pT->AddEntry( hpTZ0, "#gamma/Z^{0}: Events", "l");
+	
 	
 	channel = "#gamma/Z^{0}: A_{FB} fit";
 	TH1D* hAfbZ0;
@@ -891,6 +947,17 @@ void execute()
 	hMZP->SetLineStyle(3);
 	leg_mHat->AddEntry( hMZP, "1 TeV Z'_{SSM}: Events", "l");
 	
+	TH1D* hpTZP;
+	if(doLogM) hpTZP  = new TH1D("pT_ZP","pT_ZP", pT_nbins, pT_bins );
+	else       hpTZP  = new TH1D("pT_ZP","pT_ZP", pT_nbins, pT_min, pT_max );
+	hpTZP->SetTitle("");
+	hpTZP->SetYTitle("Events");
+	hpTZP->SetXTitle("p_{T}(#mu^{-}) TeV");
+	hpTZP->SetLineColor(kRed);
+	hpTZP->SetLineWidth(1);
+	hpTZP->SetLineStyle(3);
+	leg_pT->AddEntry( hpTZP, "1 TeV Z'_{SSM}: Events", "l");
+	
 	channel = "1 TeV Z'_{SSM}: A_{FB} fit";
 	TH1D* hAfbZP;
 	if(doLogM) hAfbZP = new TH1D("Afb_ZP","Afb_ZP", imass_asymmetry_nbins, imass_asymmetry_bins );
@@ -919,6 +986,17 @@ void execute()
 	hMKK->SetLineStyle(1);
 	leg_mHat->AddEntry( hMKK, "1 TeV #gamma_{KK}/Z_{KK}: Events", "l");
 	
+	TH1D* hpTKK;
+	if(doLogM) hpTKK  = new TH1D("pT_KK","pT_KK", pT_nbins, pT_bins );
+	else       hpTKK  = new TH1D("pT_KK","pT_KK", pT_nbins, pT_min, pT_max );
+	hpTKK->SetTitle("");
+	hpTKK->SetYTitle("Events");
+	hpTKK->SetXTitle("p_{T}(#mu^{-}) TeV");
+	hpTKK->SetLineColor(kBlack);
+	hpTKK->SetLineWidth(1);
+	hpTKK->SetLineStyle(1);
+	leg_pT->AddEntry( hpTKK, "1 TeV #gamma_{KK}/Z_{KK}: Events", "l");
+	
 	channel = "1 TeV #gamma_{KK}/Z_{KK}: A_{FB} fit";
 	TH1D* hAfbKK;
 	if(doLogM) hAfbKK = new TH1D("Afb_KK","Afb_KK", imass_asymmetry_nbins, imass_asymmetry_bins );
@@ -945,6 +1023,16 @@ void execute()
 	double dafb = 0.;
 	double guess = -0.1;
 
+	
+	
+	bool doMerge = false;
+	cout << "do merge(1/0)?...";
+	cin >> doMerge;
+	if(doMerge) cout << "merging files" << endl;
+	else        cout << "skipping merge" << endl;
+	
+	
+	
 	ISZ0 = true;
 	ISZP = false;
 	ISKK = false;
@@ -955,11 +1043,19 @@ void execute()
 	vsNames.push_back("MC10.000000.Pythia8_Z0_M1000_mumu.NTUP._00003.pool.root");
 	vsNames.push_back("MC10.000000.Pythia8_Z0_M1000_mumu.NTUP._00004.pool.root");
 	vsNames.push_back("MC10.000000.Pythia8_Z0_M1000_mumu.NTUP._00005.pool.root");
+	
+	if(doMerge) nevents_Z0 = merge(sMergedFileName, dir, vsNames, "FastTree");
+	TFile* fZ0 = new TFile(sMergedFileName.c_str(), "READ");
+	TTree* tree_Z0 = (TTree*)fZ0->Get("FastTree");
+	initTree(tree_Z0);
+	if(!doMerge) nevents_Z0 = tree_Z0->GetEntries();
+	/*
 	nevents_Z0 = merge(sMergedFileName, dir, vsNames);
 	//sMergedFileName = "MC10.000000.Pythia8_Z0_M1000_mumu.NTUP._00001.pool.root";
 	TFile* fZ0 = new TFile(sMergedFileName.c_str(), "READ");
 	TTree* tree_Z0 = (TTree*)fZ0->Get("FastTree");
 	initTree(tree_Z0);
+	*/
 	a4   = 0.;
 	da4  = 0.;
 	afb  = 0.;
@@ -971,7 +1067,7 @@ void execute()
 	lumEvents = (Int_t)(L*ifb2imb*sigma_Z0);
 	maxEvents = (FITWITHALLEVENTS) ? tree_Z0->GetEntries() : lumEvents;
 	cout << "Using " << maxEvents << "/" << tree_Z0->GetEntries() << " events" << endl;
-	fill(tree_Z0, maxEvents, hAfbZ0, hMZ0); // the VVCOSTH vectors are full
+	fill(tree_Z0, maxEvents, hAfbZ0, hMZ0, hpTZ0); // the VVCOSTH vectors are full
 	for(Int_t b=1 ; b<=hAfbZ0->GetNbinsX() ; b++)
 	{
 		// norm to bin width
@@ -997,11 +1093,19 @@ void execute()
 	vsNames.push_back("MC10.000000.Pythia8_ZprimeSSM_M1000_mumu.NTUP._00003.pool.root");
 	vsNames.push_back("MC10.000000.Pythia8_ZprimeSSM_M1000_mumu.NTUP._00004.pool.root");
 	vsNames.push_back("MC10.000000.Pythia8_ZprimeSSM_M1000_mumu.NTUP._00005.pool.root");
+	
+	if(doMerge) nevents_ZP = merge(sMergedFileName, dir, vsNames, "FastTree");
+	TFile* fZP = new TFile(sMergedFileName.c_str(), "READ");
+	TTree* tree_ZP = (TTree*)fZP->Get("FastTree");
+	initTree(tree_ZP);
+	if(!doMerge) nevents_ZP = tree_ZP->GetEntries();
+	/*
 	nevents_ZP = merge(sMergedFileName, dir, vsNames);
 	//sMergedFileName = "MC10.000000.Pythia8_ZprimeSSM_M1000_mumu.NTUP._00001.pool.root";
 	TFile* fZP = new TFile(sMergedFileName.c_str(), "READ");
 	TTree* tree_ZP = (TTree*)fZP->Get("FastTree");
 	initTree(tree_ZP);
+	*/
 	a4   = 0.;
 	da4  = 0.;
 	afb  = 0.;
@@ -1013,7 +1117,7 @@ void execute()
 	lumEvents = (Int_t)(L*ifb2imb*sigma_ZP);
 	maxEvents = (FITWITHALLEVENTS) ? tree_ZP->GetEntries() : lumEvents;
 	cout << "Using " << maxEvents << "/" << tree_ZP->GetEntries() << " events" << endl;
-	fill(tree_ZP, maxEvents, hAfbZP, hMZP); // the VVCOSTH vectors are full
+	fill(tree_ZP, maxEvents, hAfbZP, hMZP, hpTZP); // the VVCOSTH vectors are full
 	for(Int_t b=1 ; b<=hAfbZP->GetNbinsX() ; b++)
 	{
 		// norm to bin width
@@ -1039,11 +1143,19 @@ void execute()
 	vsNames.push_back("MC10.000000.Pythia8_KK_M1000_mumu.NTUP._00003.pool.root");
 	vsNames.push_back("MC10.000000.Pythia8_KK_M1000_mumu.NTUP._00004.pool.root");
 	vsNames.push_back("MC10.000000.Pythia8_KK_M1000_mumu.NTUP._00005.pool.root");
+	
+	if(doMerge) nevents_KK = merge(sMergedFileName, dir, vsNames, "FastTree");
+	TFile* fKK = new TFile(sMergedFileName.c_str(), "READ");
+	TTree* tree_KK = (TTree*)fKK->Get("FastTree");
+	initTree(tree_KK);
+	if(!doMerge) nevents_KK = tree_KK->GetEntries();
+	/*
 	nevents_KK = merge(sMergedFileName, dir, vsNames);
 	//sMergedFileName = "MC10.000000.Pythia8_KK_M1000_mumu.NTUP._00001.pool.root";
 	TFile* fKK = new TFile(sMergedFileName.c_str(), "READ");
 	TTree* tree_KK = (TTree*)fKK->Get("FastTree");
 	initTree(tree_KK);
+	*/
 	a4   = 0.;
 	da4  = 0.;
 	afb  = 0.;
@@ -1055,7 +1167,7 @@ void execute()
 	lumEvents = (Int_t)(L*ifb2imb*sigma_KK);
 	maxEvents = (FITWITHALLEVENTS) ? tree_KK->GetEntries() : lumEvents;
 	cout << "Using " << maxEvents << "/" << tree_KK->GetEntries() << " events" << endl;
-	fill(tree_KK, maxEvents, hAfbKK, hMKK); // the VVCOSTH vectors are full
+	fill(tree_KK, maxEvents, hAfbKK, hMKK, hpTKK); // the VVCOSTH vectors are full
 	for(Int_t b=1 ; b<=hAfbKK->GetNbinsX() ; b++)
 	{
 		// norm to bin width
@@ -1078,6 +1190,10 @@ void execute()
 	Scale(hMZ0, (L*ifb2imb)*(sigma_Z0/nevents_Z0));
 	Scale(hMZP, (L*ifb2imb)*(sigma_ZP/nevents_ZP));
 	Scale(hMKK, (L*ifb2imb)*(sigma_KK/nevents_KK));
+	
+	Scale(hpTZ0, (L*ifb2imb)*(sigma_Z0/nevents_Z0));
+	Scale(hpTZP, (L*ifb2imb)*(sigma_ZP/nevents_ZP));
+	Scale(hpTKK, (L*ifb2imb)*(sigma_KK/nevents_KK));
 
 	bool isXerr = false;
 	TGraphAsymmErrors* gMZ0poissonErr = GetPoissonizedGraph(hMZ0, isXerr);
@@ -1099,13 +1215,36 @@ void execute()
 	gMKKpoissonErr->SetLineStyle(1);
 	
 	
+	isXerr = false;
+	TGraphAsymmErrors* gpTZ0poissonErr = GetPoissonizedGraph(hpTZ0, isXerr);
+	gpTZ0poissonErr->SetMarkerStyle(1);
+	gpTZ0poissonErr->SetMarkerSize(1);
+	gpTZ0poissonErr->SetLineColor(kBlue);
+	gpTZ0poissonErr->SetLineStyle(2);
+
+	TGraphAsymmErrors* gpTZPpoissonErr = GetPoissonizedGraph(hpTZP, isXerr);
+	gpTZPpoissonErr->SetMarkerStyle(1);
+	gpTZPpoissonErr->SetMarkerSize(1);
+	gpTZPpoissonErr->SetLineColor(kRed);	
+	gpTZPpoissonErr->SetLineStyle(3);	
+
+	TGraphAsymmErrors* gpTKKpoissonErr = GetPoissonizedGraph(hpTKK, isXerr);
+	gpTKKpoissonErr->SetMarkerStyle(1);
+	gpTKKpoissonErr->SetMarkerSize(1);
+	gpTKKpoissonErr->SetLineColor(kBlack);
+	gpTKKpoissonErr->SetLineStyle(1);
+	
+	
+	
+	
+	cnv->cd();
 	pad_mHat->Draw();
 	pad_mHat->cd();
 	//hMKK->GetYaxis()->SetRangeUser(1,1.5*hMKK->GetMaximum());
 	hMKK->SetMaximum(1.5*hMKK->GetMaximum());
 	hMKK->SetMinimum((hMZ0->GetMinimum()<=0) ? 1. : 0.5*hMZ0->GetMinimum());
 	hMKK->GetXaxis()->SetMoreLogLabels();
-        hMKK->GetXaxis()->SetNoExponent();
+	hMKK->GetXaxis()->SetNoExponent();
 	hMKK->Draw();
 	gMKKpoissonErr->GetXaxis()->SetMoreLogLabels();
 	gMKKpoissonErr->GetXaxis()->SetNoExponent();
@@ -1162,6 +1301,54 @@ void execute()
 	cnv->SaveAs(fName+".C");
 	cnv->SaveAs(fName+".root");
 	cnv->SaveAs(fName+".png");
+	
+	
+	
+	
+	
+	
+	cnv_pT->cd();
+	//cnv_pT->Draw();
+	pad_pT->Draw();
+	pad_pT->cd();
+	//hpTKK->GetYaxis()->SetRangeUser(1,1.5*hpTKK->GetMaximum());
+	hpTKK->SetMaximum(1.5*hpTKK->GetMaximum());
+	hpTKK->SetMinimum((hpTZ0->GetMinimum()<=0) ? 1. : 0.5*hpTZ0->GetMinimum());
+	hpTKK->GetXaxis()->SetMoreLogLabels();
+	hpTKK->GetXaxis()->SetNoExponent();
+	hpTKK->Draw();
+	gpTKKpoissonErr->GetXaxis()->SetMoreLogLabels();
+	gpTKKpoissonErr->GetXaxis()->SetNoExponent();
+	gpTKKpoissonErr->Draw("SAMES");
+	
+	hpTZ0->GetXaxis()->SetMoreLogLabels();
+	hpTZ0->GetXaxis()->SetNoExponent();
+	hpTZ0->Draw("SAMES");
+	gpTZ0poissonErr->GetXaxis()->SetMoreLogLabels();
+	gpTZ0poissonErr->GetXaxis()->SetNoExponent();
+	gpTZ0poissonErr->Draw("SAMES");
+
+	hpTZP->GetXaxis()->SetMoreLogLabels();
+	hpTZP->GetXaxis()->SetNoExponent();
+	hpTZP->Draw("SAMES");
+	gpTZPpoissonErr->GetXaxis()->SetMoreLogLabels(); 
+	gpTZPpoissonErr->GetXaxis()->SetNoExponent(); 
+	gpTZPpoissonErr->Draw("SAMES");
+	
+	pvtxt_lumi_pT->Draw("SAMES");
+	pvtxt_atlfast_pT->Draw("SAMES");
+	leg_pT->Draw("SAMES");
+	
+	pad_pT->RedrawAxis();
+	pad_pT->Update();
+	cnv_pT->Update();
+	
+	
+	fName = "pT.atlfast.plot";
+	cnv_pT->SaveAs(fName+".eps");
+	cnv_pT->SaveAs(fName+".C");
+	cnv_pT->SaveAs(fName+".root");
+	cnv_pT->SaveAs(fName+".png");
 	
 	of->close();
 }

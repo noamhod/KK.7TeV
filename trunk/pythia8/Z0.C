@@ -45,7 +45,9 @@ int main() {
 	//ROOT
 	TLorentzVector* pa = new TLorentzVector();
 	TLorentzVector* pb = new TLorentzVector();
-	string sFileName = "Z0." + prm.sName + ".root";
+	string sDir   = "/data/hod/pythia8_ntuples/";
+	string sTitle = prm.sName + sNewMass + prm.sFFbar + "_" + sNewLowBound + "M" + sNewHighBound;
+	string sFileName = sDir + sTitle + ".root";
 	TFile *file = TFile::Open(sFileName.c_str(),"recreate");
 	TTree *tree = new TTree("tree","tree");
 	float mHat;
@@ -206,6 +208,16 @@ int main() {
 	tree->Write("", TObject::kOverwrite);
 	file->Write();
 	file->Close();
+	
+	ofstream* f = new ofstream("XSs.dat", ios_base::app);
+	(*f) << sTitle << "\t\t"
+		 << pythia.info.nTried() << "\t\t"
+		 << pythia.info.nSelected() << "\t\t"
+		 << pythia.info.nAccepted() << "\t\t"
+		 << pythia.info.sigmaGen() << "\t\t"
+		 << pythia.info.sigmaErr() << endl;
+	f->close();
+	delete f;
 
 	return 0;
 }

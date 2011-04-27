@@ -1,6 +1,7 @@
 fermion		13
-mBSM		1000
-mMin		120
+mBSM		2000
+mMin		2200
 mMax		0
-nEvents		500000
-name		""
+nEvents		100000
+name		Pythia8_KK
+ffbar		mumu

@@ -20,6 +20,7 @@ struct parameters
 	double mMin; // GeV
 	double mMax; // GeV
 	string sName;
+	string sFFbar;
 };
 
 parameters prm;
@@ -50,6 +51,7 @@ void readParameters()
 		else if(identifier=="mMax")    strm >> prm.mMax;
 		else if(identifier=="nEvents") strm >> prm.nEvents;
 		else if(identifier=="name")    strm >> prm.sName;
+		else if(identifier=="ffbar")   strm >> prm.sFFbar;
 		else
 		{
 			cout << "problem in identifier: " << identifier << endl;

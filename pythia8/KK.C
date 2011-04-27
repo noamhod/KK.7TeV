@@ -39,7 +39,6 @@ int main() {
 	strm << prm.mMax; //prm.newMass*1.5; // prm.newMass*2.;
 	strm >> sNewHighBound;
 
-
 	// Feed in KK state information and other generation specifics.
 	pythia.readString("5000023:m0 = " + sNewMass);
 	pythia.readString("5000023:mWidth = " + sNewWidth);
@@ -55,13 +54,14 @@ int main() {
 
 	// Initialize.
 	pythia.init( 2212, 2212, 7000.);
-
-
+	
+	
 	//ROOT
 	TLorentzVector* pa = new TLorentzVector();
 	TLorentzVector* pb = new TLorentzVector();
-	
-	string sFileName = "KK." + prm.sName + ".M" + sNewMass + ".root";
+	string sDir   = "/data/hod/pythia8_ntuples/";
+	string sTitle = prm.sName + sNewMass + prm.sFFbar + "_" + sNewLowBound + "M" + sNewHighBound;
+	string sFileName = sDir + sTitle + ".root";
 	TFile *file = TFile::Open(sFileName.c_str(),"recreate");
 	TTree *tree = new TTree("tree","tree");
 	float mHat;
@@ -110,6 +110,7 @@ int main() {
 	//assert((start = clock()) != -1u); // Start timer; clock_t unsigned.
 
 	// Begin event loop. Generate event. Skip if error. List first one.
+	int mod = (int)(prm.nEvents/10.);
 	for (int iEvent=0 ; iEvent<prm.nEvents ; ++iEvent)
 	{
 		if (!pythia.next()) continue;
@@ -202,7 +203,7 @@ int main() {
 			tree->Fill(); /////
 			///////////////////
 		}
-		if(iEvent%1000==0) cout << "Event: " << iEvent << endl;
+		if(iEvent%mod==0) cout << "Event: " << iEvent << endl;
 	} // end for iEvent<prm.nEvents
 
 	// Done. Print results.
@@ -224,5 +225,15 @@ int main() {
 	file->Write();
 	file->Close();
 
+	ofstream* f = new ofstream("XSs.dat", ios_base::app);
+	(*f) << sTitle << "\t\t"
+		 << pythia.info.nTried() << "\t\t"
+		 << pythia.info.nSelected() << "\t\t"
+		 << pythia.info.nAccepted() << "\t\t"
+		 << pythia.info.sigmaGen() << "\t\t"
+		 << pythia.info.sigmaErr() << endl;
+	f->close();
+	delete f;
+	
 	return 0;
 }

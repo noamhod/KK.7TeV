@@ -117,6 +117,10 @@ int main() {
 	assert((start = clock()) != -1); // Start timer; clock_t signed.
 	//assert((start = clock()) != -1u); // Start timer; clock_t unsigned.
 
+	// list changes before the run
+	pythia.settings.listChanged();
+	pythia.particleData.listChanged();
+	
 	// Begin event loop. Generate event. Skip if error. List first one.
 	for (int iEvent=0 ; iEvent<prm.nEvents ; ++iEvent)
 	{
@@ -231,7 +235,7 @@ int main() {
 	file->Write();
 	file->Close();
 	
-	ofstream* f = new ofstream("XSs.dat", ios_base::app);
+	ofstream* f = new ofstream("XSs_ZP_current.dat", ios_base::app);
 	(*f) << sTitle << "\t\t"
 		 << pythia.info.nTried() << "\t\t"
 		 << pythia.info.nSelected() << "\t\t"

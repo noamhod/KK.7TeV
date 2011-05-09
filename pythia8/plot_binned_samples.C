@@ -39,10 +39,11 @@ vector<string> svNames;
 vector<string> svPaths;
 vector<TH1D*>  hvHistos;
 vector<double> dvWeights;
+vector<Color_t> cvColors;
 string sDir  = "/data/hod/pythia8_ntuples/";
 string sName = "";
 
-void addSample(string name, double events, double sigma)
+void addSample(string name, Color_t color, double events, double sigma)
 {	
 	svNames.push_back(name);
 
@@ -51,6 +52,19 @@ void addSample(string name, double events, double sigma)
 	svPaths.push_back(sDir+sName+".root");
 	hvHistos.push_back(new TH1D(sName.c_str(),sName.c_str(),nbins,xmin,xmax));
 	dvWeights.push_back(lumi/(events/(sigma*mb2fb)));
+	cvColors.push_back(color);
+}
+
+double getYmin(TH1D* h)
+{
+	double min = 1.e20;
+	double binval = 0.;
+	for(int b=1 ; b<=h->GetNbinsX() ; b++)
+	{
+		binval = h->GetBinContent(b);
+		min = (binval<min  &&  binval>0.) ? binval : min;
+	}
+	return min;
 }
 
 int plot_binned_samples()
@@ -126,46 +140,98 @@ int plot_binned_samples()
 	
 	TString fname = (TString)sModel + (TString)sMass;
 	
+	/*
+	Z/gamma*	kAzure-9
+	TTBar		kRed+1
+	Diboson		kOrange+7
+	QCD			kYellow-9
+	W+Jets		kGreen-3
+	*/
+	
 	if(sModel=="KK" && sMass=="1000")
 	{
-		addSample("Pythia8_KK1000mumu_120M500",   1e5, 6.88E-09);
-		addSample("Pythia8_KK1000mumu_500M800",   1e5, 2.37E-11);
-		addSample("Pythia8_KK1000mumu_800M1200",  1e5, 7.58E-10);
-		addSample("Pythia8_KK1000mumu_1200M1500", 1e5, 3.01E-12);
-		addSample("Pythia8_KK1000mumu_1500M0",    1e5, 1.12E-11);
+		addSample("Pythia8_KK1000mumu_120M500",   kBlack,    1e5, 6.88E-09);
+		addSample("Pythia8_KK1000mumu_500M800",   kAzure-9,  1e5, 2.37E-11);
+		addSample("Pythia8_KK1000mumu_800M1200",  kRed+1,    1e5, 7.58E-10);
+		addSample("Pythia8_KK1000mumu_1200M1500", kOrange+7, 1e5, 3.01E-12);
+		addSample("Pythia8_KK1000mumu_1500M0",    kGreen-3,  1e5, 1.12E-11);
 	}
 	if(sModel=="KK" && sMass=="1250")
 	{
-		addSample("Pythia8_KK1250mumu_120M400",   1e5, 7.24E-09);
-		addSample("Pythia8_KK1250mumu_400M800",   1e5, 1.60E-11);
-		addSample("Pythia8_KK1250mumu_800M1100",  1e5, 1.74E-11);
-		addSample("Pythia8_KK1250mumu_1100M1600", 1e5, 2.28E-10);
-		addSample("Pythia8_KK1250mumu_1600M0",    1e5, 1.84E-12);
+		addSample("Pythia8_KK1250mumu_120M400",   kBlack,    1e5, 7.24E-09);
+		addSample("Pythia8_KK1250mumu_400M800",   kAzure-9,  1e5, 1.60E-11);
+		addSample("Pythia8_KK1250mumu_800M1100",  kRed+1,    1e5, 1.74E-11);
+		addSample("Pythia8_KK1250mumu_1100M1600", kOrange+7, 1e5, 2.28E-10);
+		addSample("Pythia8_KK1250mumu_1600M0",    kGreen-3,  1e5, 1.84E-12);
 	}
 	if(sModel=="KK" && sMass=="1500")
 	{
-		addSample("Pythia8_KK1500mumu_120M400",   1e5, 7.43E-09);
-		addSample("Pythia8_KK1500mumu_400M800",   1e5, 2.58E-11);
-		addSample("Pythia8_KK1500mumu_800M1200",  1e5, 3.59E-12);
-		addSample("Pythia8_KK1500mumu_1200M1700", 1e5, 8.16E-11);
-		addSample("Pythia8_KK1500mumu_1700M0",    1e5, 1.01E-12);
+		addSample("Pythia8_KK1500mumu_120M400",   kBlack,    1e5, 7.43E-09);
+		addSample("Pythia8_KK1500mumu_400M800",   kAzure-9,  1e5, 2.58E-11);
+		addSample("Pythia8_KK1500mumu_800M1200",  kRed+1,    1e5, 3.59E-12);
+		addSample("Pythia8_KK1500mumu_1200M1700", kOrange+7, 1e5, 8.16E-11);
+		addSample("Pythia8_KK1500mumu_1700M0",    kGreen-3,  1e5, 1.01E-12);
 	}
 	if(sModel=="KK" && sMass=="1750")
 	{
-		addSample("Pythia8_KK1750mumu_120M400",   1e5, 7.55E-09);
-		addSample("Pythia8_KK1750mumu_400M900",   1e5, 3.48E-11);
-		addSample("Pythia8_KK1750mumu_900M1400",  1e5, 1.58E-12);
-		addSample("Pythia8_KK1750mumu_1400M1900", 1e5, 2.96E-11);
-		addSample("Pythia8_KK1750mumu_1900M0",    1e5, 7.04E-13);
+		addSample("Pythia8_KK1750mumu_120M400",   kBlack,    1e5, 7.55E-09);
+		addSample("Pythia8_KK1750mumu_400M900",   kAzure-9,  1e5, 3.48E-11);
+		addSample("Pythia8_KK1750mumu_900M1400",  kRed+1,    1e5, 1.58E-12);
+		addSample("Pythia8_KK1750mumu_1400M1900", kOrange+7, 1e5, 2.96E-11);
+		addSample("Pythia8_KK1750mumu_1900M0",    kGreen-3,  1e5, 7.04E-13);
 	}
 	if(sModel=="KK" && sMass=="2000")
 	{
-		addSample("Pythia8_KK2000mumu_120M500",   1e5, 7.66E-09);
-		addSample("Pythia8_KK2000mumu_500M1100",  1e5, 1.22E-11);
-		addSample("Pythia8_KK2000mumu_1100M1600", 1e5, 7.25E-13);
-		addSample("Pythia8_KK2000mumu_1600M2200", 1e5, 1.13E-11);
-		addSample("Pythia8_KK2000mumu_2200M0",    1e5, 1.63E-13);
+		addSample("Pythia8_KK2000mumu_120M500",   kBlack,    1e5, 7.66E-09);
+		addSample("Pythia8_KK2000mumu_500M1100",  kAzure-9,  1e5, 1.22E-11);
+		addSample("Pythia8_KK2000mumu_1100M1600", kRed+1,    1e5, 7.25E-13);
+		addSample("Pythia8_KK2000mumu_1600M2200", kOrange+7, 1e5, 1.13E-11);
+		addSample("Pythia8_KK2000mumu_2200M0",    kGreen-3,  1e5, 1.63E-13);
 	}
+	
+	
+	if(sModel=="ZP" && sMass=="1000")
+	{
+		addSample("Pythia8_ZprimeSSM1000mumu_120M500",   kBlack,    1e5, 7.77E-09);
+		addSample("Pythia8_ZprimeSSM1000mumu_500M800",   kAzure-9,  1e5, 1.81E-11);
+		addSample("Pythia8_ZprimeSSM1000mumu_800M1200",  kRed+1,    1e5, 8.91E-11);
+		addSample("Pythia8_ZprimeSSM1000mumu_1200M1500", kOrange+7, 1e5, 1.31E-12);
+		addSample("Pythia8_ZprimeSSM1000mumu_1500M0",    kGreen-3,  1e5, 2.42E-13);
+	}
+	if(sModel=="ZP" && sMass=="1250")
+	{
+		addSample("Pythia8_ZprimeSSM1250mumu_120M400",   kBlack,    1e5, 7.79E-09);
+		addSample("Pythia8_ZprimeSSM1250mumu_400M800",   kAzure-9,  1e5, 5.82E-11);
+		addSample("Pythia8_ZprimeSSM1250mumu_800M1100",  kRed+1,    1e5, 2.08E-12);
+		addSample("Pythia8_ZprimeSSM1250mumu_1100M1600", kOrange+7, 1e5, 2.67E-11);
+		addSample("Pythia8_ZprimeSSM1250mumu_1600M0",    kGreen-3,  1e5, 1.97E-13);
+	}
+	if(sModel=="ZP" && sMass=="1500")
+	{
+		addSample("Pythia8_ZprimeSSM1500mumu_120M400",   kBlack,    1e5, 7.83E-09);
+		addSample("Pythia8_ZprimeSSM1500mumu_400M800",   kAzure-9,  1e5, 6.10E-11);
+		addSample("Pythia8_ZprimeSSM1500mumu_800M1200",  kRed+1,    1e5, 2.13E-12);
+		addSample("Pythia8_ZprimeSSM1500mumu_1200M1700", kOrange+7, 1e5, 9.05E-12);
+		addSample("Pythia8_ZprimeSSM1500mumu_1700M0",    kGreen-3,  1e5, 2.00E-13);
+	}
+	if(sModel=="ZP" && sMass=="1750")
+	{
+		addSample("Pythia8_ZprimeSSM1750mumu_120M400",   kBlack,    1e5, 7.83E-09);
+		addSample("Pythia8_ZprimeSSM1750mumu_400M900",   kAzure-9,  1e5, 6.39E-11);
+		addSample("Pythia8_ZprimeSSM1750mumu_900M1400",  kRed+1,    1e5, 1.25E-12);
+		addSample("Pythia8_ZprimeSSM1750mumu_1400M1900", kOrange+7, 1e5, 3.15E-12);
+		addSample("Pythia8_ZprimeSSM1750mumu_1900M0",    kGreen-3,  1e5, 1.18E-13);
+	}
+	if(sModel=="ZP" && sMass=="2000")
+	{
+		addSample("Pythia8_ZprimeSSM2000mumu_120M500",   kBlack,    1e5, 7.89E-09);
+		addSample("Pythia8_ZprimeSSM2000mumu_500M1100",  kAzure-9,  1e5, 2.54E-11);
+		addSample("Pythia8_ZprimeSSM2000mumu_1100M1600", kRed+1,    1e5, 4.03E-13);
+		addSample("Pythia8_ZprimeSSM2000mumu_1600M2200", kOrange+7, 1e5, 1.17E-12);
+		addSample("Pythia8_ZprimeSSM2000mumu_2200M0",    kGreen-3,  1e5, 2.90E-14);
+	}
+	
+	
 	
 	
 	
@@ -183,11 +249,13 @@ int plot_binned_samples()
 	
 	TCanvas* c = new TCanvas("c", "c", 0,0,1200,800);
 	c->SetLogy();
+	c->cd();
+	c->Draw();
 	
 	TLegend* leg = new TLegend(0.5852843,0.6619171,0.8712375,0.9378238,NULL,"brNDC");
 	leg->SetFillColor(kWhite);
 	
-	TPaveText* pvtxt = new TPaveText(0.1638796,0.7901554,0.3770903,0.9443005,"brNDC");
+	TPaveText* pvtxt = new TPaveText(0.3244147,0.7849741,0.5376254,0.9391192,"brNDC");
 	pvtxt->SetFillColor(kWhite);
 	TText* txt = pvtxt->AddText( sModel.c_str() );
 	txt = pvtxt->AddText( sMass.c_str() );
@@ -195,12 +263,9 @@ int plot_binned_samples()
 	TFile* file;
 	TTree* tree;
 	
-	c->cd();
-	c->Draw();
+	int vsize = (int)svPaths.size();
 	
-	Color_t col = 1;
-	
-	for(int n=0 ; n<(int)svPaths.size() ; n++)
+	for(int n=vsize-1 ; n>=0 ; n--)
 	{
 		cout << "svPaths[" << n << "]=" << svPaths[n] << endl;
 		file = TFile::Open(svPaths[n].c_str(),"READ");
@@ -232,27 +297,31 @@ int plot_binned_samples()
 		
 		
 		leg->AddEntry(hvHistos[n], svNames[n].c_str(), "l");
-		hvHistos[n]->SetLineColor(col+n);
+		hvHistos[n]->SetLineColor(cvColors[n]);
+		hvHistos[n]->SetLineWidth(2);
 		hvHistos[n]->Scale(dvWeights[n]);
 		hvHistos[n]->SetTitle("");
 		
-		if(n==0)
+		if(n==vsize-1)
 		{
-			hvHistos[0]->SetMinimum(1.e-3);
-			hvHistos[0]->SetXTitle("#hat{m}_{#mu#mu} GeV");
-			hvHistos[0]->SetYTitle("Events");
-			hvHistos[0]->Draw();
+			double ymin = 0.5*getYmin(hvHistos[n]);
+			hvHistos[n]->SetMinimum(ymin);
+			hvHistos[n]->SetXTitle("#hat{m}_{#mu#mu} GeV");
+			hvHistos[n]->SetYTitle("Events");
+			hvHistos[n]->Draw();
 		}
 		else hvHistos[n]->Draw("SAMES");
 		
 		file->Close();
 	}
+	
+	hvHistos[vsize-1]->SetMaximum(1.5*hvHistos[0]->GetMaximum());
 	leg->Draw("SAMES");
 	pvtxt->Draw("SAMES");
 	
 	c->RedrawAxis();
 	c->Update();
-	TString name = "plot_" + fname;
+	TString name = "plots/plot_" + fname;
 	c->SaveAs(name+".eps");
 	c->SaveAs(name+".C");
 	c->SaveAs(name+".root");

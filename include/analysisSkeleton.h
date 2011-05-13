@@ -63,6 +63,7 @@ public:
 	int m_allCuts_counter;
 	int m_cutsProfile_counter;
 	int m_efficiency_counter;
+	int m_truth_counter;
 	
 	
 
@@ -561,7 +562,12 @@ public:
 	inline void fill_tNp();
 	inline void fillTruthEfficiency();
 	
+	inline void fillTruth();
+	inline void fillRecon(int a, int b);
+	
 	void applyTagNProbe(TMapsb& cutsToSkip, bool isMC);
+	
+	void applyTruth();
 
 private:
 	void runEventDumper();

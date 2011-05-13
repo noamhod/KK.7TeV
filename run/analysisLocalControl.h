@@ -34,6 +34,7 @@ class analysisLocalControl : public chainMaker, public utilities
 		TDirectory*   m_dirFit;
 		TDirectory*   m_dirPerformance;
 		TDirectory*   m_dirEff;
+		TDirectory*   m_dirTruth;
 		
 		// locals
 		string m_muRecAlgo;

@@ -73,6 +73,7 @@ public:
 		m_allCuts_counter     = 0;
 		m_cutsProfile_counter = 0;
 		m_efficiency_counter  = 0;
+		m_truth_counter       = 0;
 		
 		nSkim = 0;
 		nAll = 0;

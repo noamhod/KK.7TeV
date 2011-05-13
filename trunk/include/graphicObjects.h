@@ -16,6 +16,7 @@ class graphicObjects// : public utilities
 		TTree* tree_allCuts;
 		TTree* tree_cutsProfile;
 		TTree* tree_efficiency;
+		TTree* tree_truth;
 	
 	
 		// canvases
@@ -544,7 +545,7 @@ class graphicObjects// : public utilities
 		float CosThetaDimu;
 		float ipTDiff;
 		float EtaSum;
-		
+
 		
 		// cut profile 1d
 		vector<float>* pT_profile;
@@ -618,6 +619,47 @@ class graphicObjects// : public utilities
 		vector<float>* tru_cand_phi;
 		vector<float>* tru_succ_phi;
 		//--------------------------------
+		
+		
+		///////////////////////////////////////////
+		// for the truth tree (for the weights) ///
+		bool truth_all_isValid;
+		vector<float>* truth_all_dr;
+		vector<float>* truth_all_E;
+		vector<float>* truth_all_pt;
+		vector<float>* truth_all_eta;
+		vector<float>* truth_all_phi;
+		vector<int>*   truth_all_type;
+		vector<int>*   truth_all_status;
+		vector<int>*   truth_all_barcode;
+		vector<int>*   truth_all_mothertype;
+		vector<int>*   truth_all_motherbarcode;
+		vector<int>*   truth_all_matched;
+		float truth_all_Mhat;
+		float truth_all_CosThetaCS;
+		float truth_all_CosThetaHE;
+		float truth_all_ySystem;
+		float truth_all_QT;
+		
+		bool recon_all_isValid;
+		vector<float>* recon_all_E;
+		vector<float>* recon_all_pt;
+		vector<float>* recon_all_m;
+		vector<float>* recon_all_eta;
+		vector<float>* recon_all_phi;
+		vector<float>* recon_all_px;
+		vector<float>* recon_all_py;
+		vector<float>* recon_all_pz;
+		vector<float>* recon_all_charge;
+		vector<float>* recon_all_y;
+		vector<int>*   recon_all_id;
+		vector<float>* recon_all_theta;
+		float recon_all_Mhat;
+		float recon_all_CosThetaCS;
+		float recon_all_CosThetaHE;
+		float recon_all_ySystem;
+		float recon_all_QT;
+		
 	
 	public:
 		graphicObjects();
@@ -631,9 +673,18 @@ class graphicObjects// : public utilities
 		void setTrees(TDirectory* tDir_allCuts,
 					  TDirectory* tDir_cutsProfile,
 					  TDirectory* tDir_efficiency);
+		void setTrees(TDirectory* tDir_allCuts,
+					  TDirectory* tDir_cutsProfile,
+					  TDirectory* tDir_efficiency,
+					  TDirectory* tDir_truth);
 		void writeTrees(TDirectory* tDir_allCuts,
 						TDirectory* tDir_cutsProfile,
 						TDirectory* tDir_efficiency);
+		void writeTrees(TDirectory* tDir_allCuts,
+						TDirectory* tDir_cutsProfile,
+						TDirectory* tDir_efficiency,
+						TDirectory* tDir_truth
+						);
 		void clearTreeVars();
 		
 		void setCutFlowMapSVDPtr(TMapsvd* cutFlowMapSVD);

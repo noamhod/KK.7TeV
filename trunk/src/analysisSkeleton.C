@@ -1999,7 +1999,7 @@ void analysisSkeleton::fill_tNp()
 void analysisSkeleton::fillTruthEfficiency()
 {
 	//mu_truth_matched    : True if muon is matched to the truth
-	//mu_truth_status     : Status oMC status = 1 pfinal particle, status = 3 intermediate particle (documentary)
+	//mu_truth_status     : Status oMC status = 1 final particle, status = 3 intermediate particle (documentary)
 	//mu_truth_mothertype : description: True mother PDG type
 	
 	if(mu_truth_pt==0)         return;
@@ -2066,6 +2066,124 @@ void analysisSkeleton::fillTruthEfficiency()
 	}
 }
 
+
+void analysisSkeleton::fillTruth()
+{
+	//mu_truth_matched    : True if muon is matched to the truth
+	//mu_truth_status     : Status oMC status = 1 final particle, status = 3 intermediate particle (documentary)
+	//mu_truth_mothertype : description: True mother PDG type
+	
+	if(mu_truth_pt==0)         return;
+	if(mu_truth_status==0)     return;
+	if(mu_truth_mothertype==0) return;
+	
+	//////////////////////////////////////
+	if(mu_truth_pt->size()<2) return;  ///
+	//////////////////////////////////////
+	
+	int mu_tru_ai=-1, mu_tru_bi=-1;
+	for(int t=0 ; t<(int)mu_truth_pt->size() ; t++)
+	{	
+		if(!mu_truth_status->at(t))                                                    continue; // has to be final particle
+		if(mu_truth_mothertype->at(t)!=PDTZ  &&  mu_truth_mothertype->at(t)!=PDTGAMMA) continue; // has to come out of Z^0
+		if(mu_tru_ai<0) mu_tru_ai = t;
+		if(mu_tru_bi<0  &&  mu_tru_ai>=0  &&  mu_tru_ai!=t) mu_tru_bi = t;
+		if(mu_tru_ai>=0  &&  mu_tru_bi>=0) break;
+		/*
+		truth_all_dr->push_back( mu_truth_dr->at(t) );
+		truth_all_E->push_back( mu_truth_E->at(t) );
+		truth_all_pt->push_back( mu_truth_pt->at(t) );
+		truth_all_eta->push_back( mu_truth_eta->at(t) );
+		truth_all_phi->push_back( mu_truth_phi->at(t) );
+		truth_all_type->push_back( mu_truth_type->at(t) );
+		truth_all_status->push_back( mu_truth_status->at(t) );
+		truth_all_barcode->push_back( mu_truth_barcode->at(t) );
+		truth_all_mothertype->push_back( mu_truth_mothertype->at(t) );
+		truth_all_motherbarcode->push_back( mu_truth_motherbarcode->at(t) );
+		truth_all_matched->push_back( mu_truth_matched->at(t) );
+		*/
+	}
+	
+	if(mu_tru_ai>=0  &&  mu_tru_bi>=0)
+	{
+		truth_all_dr->push_back( mu_truth_dr->at(mu_tru_ai) );
+		truth_all_dr->push_back( mu_truth_dr->at(mu_tru_bi) );
+		truth_all_E->push_back( mu_truth_E->at(mu_tru_ai) );
+		truth_all_E->push_back( mu_truth_E->at(mu_tru_bi) );
+		truth_all_pt->push_back( mu_truth_pt->at(mu_tru_ai) );
+		truth_all_pt->push_back( mu_truth_pt->at(mu_tru_bi) );
+		truth_all_eta->push_back( mu_truth_eta->at(mu_tru_ai) );
+		truth_all_eta->push_back( mu_truth_eta->at(mu_tru_bi) );
+		truth_all_phi->push_back( mu_truth_phi->at(mu_tru_ai) );
+		truth_all_phi->push_back( mu_truth_phi->at(mu_tru_bi) );
+		truth_all_type->push_back( mu_truth_type->at(mu_tru_ai) );
+		truth_all_type->push_back( mu_truth_type->at(mu_tru_bi) );
+		truth_all_status->push_back( mu_truth_status->at(mu_tru_ai) );
+		truth_all_status->push_back( mu_truth_status->at(mu_tru_bi) );
+		truth_all_barcode->push_back( mu_truth_barcode->at(mu_tru_ai) );
+		truth_all_barcode->push_back( mu_truth_barcode->at(mu_tru_bi) );
+		truth_all_mothertype->push_back( mu_truth_mothertype->at(mu_tru_ai) );
+		truth_all_mothertype->push_back( mu_truth_mothertype->at(mu_tru_bi) );
+		truth_all_motherbarcode->push_back( mu_truth_motherbarcode->at(mu_tru_ai) );
+		truth_all_motherbarcode->push_back( mu_truth_motherbarcode->at(mu_tru_bi) );
+		truth_all_matched->push_back( mu_truth_matched->at(mu_tru_ai) );
+		truth_all_matched->push_back( mu_truth_matched->at(mu_tru_bi) );
+	
+		float c1 = (mu_truth_type->at(mu_tru_ai)<0) ? -1. : +1.;
+		float c2 = (mu_truth_type->at(mu_tru_bi)<0) ? -1. : +1.;
+		
+		truth_all_isValid = true;
+		
+		TLorentzVector* p1 = new TLorentzVector();
+		TLorentzVector* p2 = new TLorentzVector();
+		p1->SetPtEtaPhiE( mu_truth_pt->at(mu_tru_ai), mu_truth_eta->at(mu_tru_ai), mu_truth_phi->at(mu_tru_ai), mu_truth_E->at(mu_tru_ai));
+		p2->SetPtEtaPhiE( mu_truth_pt->at(mu_tru_bi), mu_truth_eta->at(mu_tru_bi), mu_truth_phi->at(mu_tru_bi), mu_truth_E->at(mu_tru_bi));
+		truth_all_Mhat       = imass(p1,p2);
+		truth_all_CosThetaCS = cosThetaCollinsSoper(p1,c1, p2,c2);
+		truth_all_CosThetaHE = cosThetaBoost(p1,c1, p2,c2);
+		truth_all_ySystem    = ySystem(p1,p2);
+		truth_all_QT         = QT(p1,p2);
+		delete p1;
+		delete p2;
+	}
+}
+
+void analysisSkeleton::fillRecon(int a, int b)
+{
+	recon_all_E->push_back(mu_E->at(ai));
+	recon_all_E->push_back(mu_E->at(bi));
+	recon_all_pt->push_back(mu_pt->at(ai));;
+	recon_all_pt->push_back(mu_pt->at(bi));;
+	recon_all_m->push_back(mu_m->at(ai));
+	recon_all_m->push_back(mu_m->at(bi));
+	recon_all_eta->push_back(mu_eta->at(ai));
+	recon_all_eta->push_back(mu_eta->at(bi));
+	recon_all_phi->push_back(mu_phi->at(ai));
+	recon_all_phi->push_back(mu_phi->at(bi));
+	recon_all_px->push_back(mu_px->at(ai));
+	recon_all_px->push_back(mu_px->at(bi));
+	recon_all_py->push_back(mu_py->at(ai));
+	recon_all_py->push_back(mu_py->at(bi));
+	recon_all_pz->push_back(mu_pz->at(ai));
+	recon_all_pz->push_back(mu_pz->at(bi));
+	recon_all_charge->push_back(mu_charge->at(ai));
+	recon_all_charge->push_back(mu_charge->at(bi));
+	recon_all_y->push_back(y(pmu[ai]));
+	recon_all_y->push_back(y(pmu[bi]));
+	recon_all_id->push_back((mu_charge->at(ai)<0.) ? PDTMU : -1*PDTMU);
+	recon_all_id->push_back((mu_charge->at(bi)<0.) ? PDTMU : -1*PDTMU);
+	recon_all_theta->push_back( pmu[ai]->Theta() );
+	recon_all_theta->push_back( pmu[bi]->Theta() );
+	
+	recon_all_Mhat = imass(pmu[ai],pmu[bi])*TeV2MeV;
+	recon_all_CosThetaCS = cosThetaCollinsSoper(pmu[ai],mu_charge->at(ai),pmu[bi],mu_charge->at(bi));
+	recon_all_CosThetaHE = cosThetaBoost(pmu[ai],mu_charge->at(ai),pmu[bi],mu_charge->at(bi));
+	recon_all_ySystem = ySystem(pmu[ai],pmu[bi]);
+	recon_all_QT = QT(pmu[ai],pmu[bi])*TeV2MeV;
+	
+	recon_all_isValid = true;
+}
+
 void analysisSkeleton::applyTagNProbe(TMapsb& cutsToSkip, bool isMC)
 {
 	bool pass;
@@ -2097,6 +2215,40 @@ void analysisSkeleton::applyTagNProbe(TMapsb& cutsToSkip, bool isMC)
 		m_efficiency_counter++; ////////////////////////////////
 		////////////////////////////////////////////////////////
 	}
+}
+
+void analysisSkeleton::applyTruth()
+{
+	///////////////////////////
+	// fill all events ////////
+	fillTruth(); //////////////
+	///////////////////////////
+
+	bool didItPass = true;
+	// passing an empty string will deal with it as if there is a skipped cut
+	// and therefore no fill will be done in the pre-/single-/double-selection calls:
+	didItPass      = (didItPass && preselection("noFills"))    ? true : false;
+	didItPass      = (didItPass && singleSelection("noFills")) ? true : false;
+	didItPass      = (didItPass && doubleSelection("noFills")) ? true : false;
+	
+	/////////////////////////////////////////////
+	// fill the recon vars only if passed ///////
+	// but fill the tree anyway, also if ////////
+	// these vars are empty so the matching /////
+	// to truth will be easy ////////////////////
+	if(didItPass) fillRecon(ai,bi); /////////////
+	/////////////////////////////////////////////
+	
+	////////////////////////////////////////////////////////
+	// fill the truth tree ////////////////////////////
+	tree_truth->Fill(); ///////////////////////////////
+	if(m_truth_counter%m_trees_counter_mod==0) ////////
+	{                               ////////////////////////
+		tree_truth->FlushBaskets(); ///////////////////
+		//tree_truth->Write("", TObject::kOverwrite); ///
+	} //////////////////////////////////////////////////////
+	m_truth_counter++; ////////////////////////////////
+	////////////////////////////////////////////////////////
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -2144,10 +2296,16 @@ inline bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 		string sorderedcutname = ii->second;
 		
 		bool bSkipCut = false;
+		bool bDoFill  = true;
 		if(isSkippedCut)
 		{
 			itr = cutsToSkip.find(sorderedcutname);
 			if(itr!=itrEnd) bSkipCut = itr->second;
+			else
+			{
+				itr = cutsToSkip.find("noFills");
+				if(itr!=itrEnd) bDoFill = false;
+			}
 		}
 
 		if(sorderedcutname=="GRL"  &&  !bSkipCut)
@@ -2197,10 +2355,10 @@ inline bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 		
 		passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
 		
-		////////////////////////////////////////////////////////////////////////////////////////
-		// cutFlow /////////////////////////////////////////////////////////////////////////////
-		if(passCutFlow  &&  !isSkippedCut) fillCutFlow(sorderedcutname, "preselection"); ///////
-		////////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		// cutFlow /////////////////////////////////////////////////////////////////////////////////////////
+		if(passCutFlow  &&  !isSkippedCut  && bDoFill) fillCutFlow(sorderedcutname, "preselection"); ///////
+		////////////////////////////////////////////////////////////////////////////////////////////////////
 	}
 	
 	return passCutFlow;
@@ -2228,10 +2386,16 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 		nMusPassed = 0;
 		
 		bool bSkipCut = false;
+		bool bDoFill  = true;
 		if(isSkippedCut)
 		{
 			itr = cutsToSkip.find(sorderedcutname);
 			if(itr!=itrEnd) bSkipCut = itr->second;
+			else
+			{
+				itr = cutsToSkip.find("noFills");
+				if(itr!=itrEnd) bDoFill = false;
+			}
 		}
 		
 		
@@ -2707,10 +2871,13 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 		passCutFlow = (passCutFlow  &&  nMusPassed>1) ? true : false; ///////////
 		/////////////////////////////////////////////////////////////////////////
 		
-		////////////////////////////////////////////////////////////////////////
-		// cutFlow /////////////////////////////////////////////////////////////
-		if(passCutFlow  &&  !isSkippedCut) fillCutFlow(sorderedcutname); ///////
-		if(passCutFlow  &&  !isSkippedCut  &&  sorderedcutname=="pT"  &&  inApplySingleSelection)
+		////////////////////////////////////////////////////////////////////////////////////////
+		// cutFlow /////////////////////////////////////////////////////////////////////////////
+		if(passCutFlow  &&  !isSkippedCut  && bDoFill) fillCutFlow(sorderedcutname); ///////////
+		if(passCutFlow  &&  !isSkippedCut 
+						&&  sorderedcutname=="pT"
+						&&  inApplySingleSelection
+						&&  bDoFill)
 		{
 			(*fCand)	<< "Run-LB-Evt  "
 						<< RunNumber  << " "
@@ -2718,7 +2885,7 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 						<< EventNumber
 						<< endl;
 		}
-		////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////
 		
 	} // end for(m_cutFlowOrdered)
 	
@@ -2726,7 +2893,7 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 }
 
 inline bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
-{
+{	
 	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;
 	TMapsb::iterator itrEnd = cutsToSkip.end();
 	TMapsb::iterator itr;
@@ -2763,10 +2930,16 @@ inline bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
 		string sorderedcutname = ii->second;
 		
 		bool bSkipCut = false;
+		bool bDoFill  = true;
 		if(isSkippedCut)
 		{
 			itr = cutsToSkip.find(sorderedcutname);
 			if(itr!=itrEnd) bSkipCut = itr->second;
+			else
+			{
+				itr = cutsToSkip.find("noFills");
+				if(itr!=itrEnd) bDoFill = false;
+			}
 		}
 
 		if(sorderedcutname=="oppositeCharge"  &&  !bSkipCut)
@@ -2800,10 +2973,10 @@ inline bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
 		
 		passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
 		
-		/////////////////////////////////////////////////////////////////////
-		// cutFlow //////////////////////////////////////////////////////////
-		if(passCutFlow  &&  !isSkippedCut) fillCutFlow(sorderedcutname); ////
-		/////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////
+		// cutFlow ///////////////////////////////////////////////////////////////////////
+		if(passCutFlow  &&  !isSkippedCut  &&  bDoFill) fillCutFlow(sorderedcutname); ////
+		//////////////////////////////////////////////////////////////////////////////////
 		
 	} // end for(m_cutFlowOrdered)
 	

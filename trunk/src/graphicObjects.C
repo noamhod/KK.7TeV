@@ -388,6 +388,43 @@ void graphicObjects::clearTreeVars()
 	tru_cand_phi->clear();
 	tru_succ_phi->clear();
 	
+	// truth_all (for weights)
+	truth_all_dr->clear();
+	truth_all_E->clear();
+	truth_all_pt->clear();
+	truth_all_eta->clear();
+	truth_all_phi->clear();
+	truth_all_type->clear();
+	truth_all_status->clear();
+	truth_all_barcode->clear();
+	truth_all_mothertype->clear();
+	truth_all_motherbarcode->clear();
+	truth_all_matched->clear();
+	truth_all_isValid    = false;
+	truth_all_Mhat       = 0.;
+	truth_all_CosThetaCS = 0.;
+	truth_all_CosThetaHE = 0.;
+	truth_all_ySystem    = 0.;
+	truth_all_QT         = 0.;
+	
+	recon_all_E->clear();
+	recon_all_pt->clear();
+	recon_all_m->clear();
+	recon_all_eta->clear();
+	recon_all_phi->clear();
+	recon_all_px->clear();
+	recon_all_py->clear();
+	recon_all_pz->clear();
+	recon_all_charge->clear();
+	recon_all_y->clear();
+	recon_all_id->clear();
+	recon_all_theta->clear();
+	recon_all_isValid    = false;
+	recon_all_Mhat       = 0.;
+	recon_all_CosThetaCS = 0.;
+	recon_all_CosThetaHE = 0.;
+	recon_all_ySystem    = 0.;
+	recon_all_QT         = 0.;
 }
 
 void graphicObjects::writeTrees(TDirectory* tDir_allCuts,
@@ -419,6 +456,23 @@ void graphicObjects::writeTrees(TDirectory* tDir_allCuts,
 	
 	//tDir_efficiency->cd();
 	//tree_efficiency->Write();
+}
+
+void graphicObjects::writeTrees(TDirectory* tDir_allCuts,
+								TDirectory* tDir_cutsProfile,
+								TDirectory* tDir_efficiency,
+								TDirectory* tDir_truth)
+{
+	TFile* f = NULL;
+	
+	f = tree_truth->GetCurrentFile();
+	f->cd( tDir_truth->GetName() );
+	tree_truth->Write("", TObject::kOverwrite);
+
+	//f->Write();
+	//f->Close();
+	
+	writeTrees(tDir_allCuts, tDir_cutsProfile, tDir_efficiency);
 }
 
 void graphicObjects::setTrees(TDirectory* tDir_allCuts,
@@ -1152,6 +1206,80 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_efficiency->Branch( "tru_cand_phi", &tru_cand_phi );
 	tree_efficiency->Branch( "tru_succ_phi", &tru_succ_phi );
 }
+
+void graphicObjects::setTrees(TDirectory* tDir_allCuts,
+							  TDirectory* tDir_cutsProfile,
+							  TDirectory* tDir_efficiency,
+							  TDirectory* tDir_truth)
+{
+	setTrees(tDir_allCuts, tDir_cutsProfile, tDir_efficiency);
+	
+	truth_all_dr = new vector<float>;
+	truth_all_E = new vector<float>;
+	truth_all_pt = new vector<float>;
+	truth_all_eta = new vector<float>;
+	truth_all_phi = new vector<float>;
+	truth_all_type = new vector<int>;
+	truth_all_status = new vector<int>;
+	truth_all_barcode = new vector<int>;
+	truth_all_mothertype = new vector<int>;
+	truth_all_motherbarcode = new vector<int>;
+	truth_all_matched = new vector<int>;
+	
+	recon_all_E = new vector<float>;
+	recon_all_pt = new vector<float>;
+	recon_all_m = new vector<float>;
+	recon_all_eta = new vector<float>;
+	recon_all_phi = new vector<float>;
+	recon_all_px = new vector<float>;
+	recon_all_py = new vector<float>;
+	recon_all_pz = new vector<float>;
+	recon_all_charge = new vector<float>;
+	recon_all_y = new vector<float>;
+	recon_all_id = new vector<int>;
+	recon_all_theta = new vector<float>;
+	
+	if(tDir_truth!=NULL) tDir_truth->cd();
+	tree_truth = new TTree("truth_tree","truth_tree");
+	tree_truth->SetDirectory(tDir_truth);
+	tree_truth->Branch( "truth_all_isValid",  &recon_all_isValid );
+	tree_truth->Branch( "truth_all_dr",  &truth_all_dr );
+	tree_truth->Branch( "truth_all_E",  &truth_all_E );
+	tree_truth->Branch( "truth_all_pt",  &truth_all_pt );
+	tree_truth->Branch( "truth_all_eta",  &truth_all_eta );
+	tree_truth->Branch( "truth_all_phi", &truth_all_phi );
+	tree_truth->Branch( "truth_all_type", &truth_all_type );
+	tree_truth->Branch( "truth_all_status", &truth_all_status );
+	tree_truth->Branch( "truth_all_barcode", &truth_all_barcode );
+	tree_truth->Branch( "truth_all_mothertype",  &truth_all_mothertype );
+	tree_truth->Branch( "truth_all_motherbarcode",  &truth_all_motherbarcode );
+	tree_truth->Branch( "truth_all_matched", &truth_all_matched );
+	tree_truth->Branch( "truth_all_Mhat", &truth_all_Mhat );
+	tree_truth->Branch( "truth_all_CosThetaCS", &truth_all_CosThetaCS );
+	tree_truth->Branch( "truth_all_CosThetaHE", &truth_all_CosThetaHE );
+	tree_truth->Branch( "truth_all_ySystem", &truth_all_ySystem );
+	tree_truth->Branch( "truth_all_QT", &truth_all_QT );
+	
+	tree_truth->Branch( "recon_all_isValid",  &recon_all_isValid );
+	tree_truth->Branch( "recon_all_E", &recon_all_E );
+	tree_truth->Branch( "recon_all_pt", &recon_all_pt );
+	tree_truth->Branch( "recon_all_m", &recon_all_m );
+	tree_truth->Branch( "recon_all_eta", &recon_all_eta );
+	tree_truth->Branch( "recon_all_phi", &recon_all_phi );
+	tree_truth->Branch( "recon_all_px", &recon_all_px );
+	tree_truth->Branch( "recon_all_py", &recon_all_py );
+	tree_truth->Branch( "recon_all_pz", &recon_all_pz );
+	tree_truth->Branch( "recon_all_charge", &recon_all_charge );
+	tree_truth->Branch( "recon_all_y", &recon_all_y );
+	tree_truth->Branch( "recon_all_id", &recon_all_id );
+	tree_truth->Branch( "recon_all_theta", &recon_all_theta );
+	tree_truth->Branch( "recon_all_Mhat", &recon_all_Mhat );
+	tree_truth->Branch( "recon_all_CosThetaCS", &recon_all_CosThetaCS );
+	tree_truth->Branch( "recon_all_CosThetaHE", &recon_all_CosThetaHE );
+	tree_truth->Branch( "recon_all_ySystem", &recon_all_ySystem );
+	tree_truth->Branch( "recon_all_QT", &recon_all_QT );
+}
+
 
 void graphicObjects::setCutFlowMapSVDPtr(TMapsvd* cutFlowMapSVD)
 {

@@ -156,7 +156,7 @@ void analysisLocalControl::finalize()
 	// histos
 	//m_histfile->Write();
 	//m_histfile->Close();
-	m_analysis->writeTrees(m_dirAllCuts,m_dirCutProfile,m_dirEff);
+	m_analysis->writeTrees(m_dirAllCuts,m_dirCutProfile,m_dirEff,m_dirTruth);
 	
 }
 
@@ -180,7 +180,9 @@ void analysisLocalControl::book()
 	m_dirEff = m_histfile->mkdir("efficiency");
 	m_analysis->bookEfficiencyHistos(m_analysis->m_period2triggerperiodMap, m_dirEff);
 	
-	m_analysis->setTrees(m_dirAllCuts, m_dirCutProfile, m_dirEff);
+	m_dirTruth = m_histfile->mkdir("truth");
+	
+	m_analysis->setTrees(m_dirAllCuts, m_dirCutProfile, m_dirEff, m_dirTruth);
 	
 	m_dirPerformance = m_histfile->mkdir("performance");
 }

@@ -1242,7 +1242,7 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	if(tDir_truth!=NULL) tDir_truth->cd();
 	tree_truth = new TTree("truth_tree","truth_tree");
 	tree_truth->SetDirectory(tDir_truth);
-	tree_truth->Branch( "truth_all_isValid",  &recon_all_isValid );
+	tree_truth->Branch( "truth_all_isValid",  &truth_all_isValid );
 	tree_truth->Branch( "truth_all_dr",  &truth_all_dr );
 	tree_truth->Branch( "truth_all_E",  &truth_all_E );
 	tree_truth->Branch( "truth_all_pt",  &truth_all_pt );

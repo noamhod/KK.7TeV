@@ -4,6 +4,9 @@
 #include "TFile.h"
 #include "kinematics.h"
 #include "read.h"
+#include "smearing.h"
+#include "asymgraph.h"
+
 
 #include <iostream>
 #include <stdlib.h>

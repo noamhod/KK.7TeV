@@ -1,0 +1,73 @@
+############################################
+# !!! NOTE !!! all units are in TeV and mm #
+############################################
+
+#TYPE#			#ORDER#		#SKIPFORT&P		#NAME#					#NVALUES#		#VALUE(S)
+#																					[1]		[2]		[3]# ...
+
+
+################
+# PRESELECTION #
+################
+preselection	0			0				GRL						1				1.
+preselection	1			0				Trigger					1				1.
+preselection	2			0				PV						3				2.		 	1.		 200.
+#preselection	3			0				hipTmuon				2				0.015	 	0.010
+
+
+
+#############
+# SELECTION #
+#############
+#-------------------------------------------------------#
+# THE 1st SELECTION CUT ***MUST*** BE "isCombMu" or     #
+# "oppositeCharge" or any cut that ensures 2 muons.     #
+# In the looper, after the preselection part ends and   #
+# before the selection part begins, there is this line: #
+# if(m_phys->mu_staco_n<2) return;                      #
+# so the sequential oppositeCharge cut is redundant but #
+# necessary for the counting procedure                  #
+#-------------------------------------------------------#
+
+selection		10			0				isCombMu				1				1.
+selection		11			1				eta						1				2.4
+#selection		12			1				etaTight				1				2.0
+#selection		13			1				etaBarrel				1				1.05
+#selection		14			1				etaFwd					1				2.5
+#selection		15			1				etaFull					1				2.7
+#selection		16			1				pTandEta				2				0.025	 2.4
+#selection		17			1				pTandEtaTight			2				0.025	 2.0
+#selection		18			1				pTandEtaBarrel			2				0.025	 1.05
+selection		19			1				pT						1				0.025
+#selection		20			1				pT_loose				1				0.020
+#selection		21			1				pT_qOp+theta			1				0.025
+#selection		22			1				pT_qOp+theta_loose		1				0.020
+
+#selection		101			1				msHits					6				3.		 3.		 3.		0.		0.		1.
+#selection		102			0				msHits1					7				3.		 3.		 0.		0.		3.		2.		1.
+#selection		103			0				msHits2					10				3.		 3.		 0.		0.		3.		1.		1.		1.		2.		1.
+#selection		104			0				msHits2noCSCphi			9				3.		 3.		 0.		0.		3.		1.		1.		2.		1.
+#selection		105			0				msHits3					7				3.		 3.		 0.		0.		3.		3.		1.
+#selection		106			0				msHits4					10				3.		 3.		 0.		0.		0.		1.		1.		1.		2.		1.
+selection		107			0				msHitsRel16				9				3.		 3.		 0.		0.		0.		3.		1.		3.		1.
+#selection		108			0				idHits					3				4.		 1.		 6.
+#selection		109			0				idHitsMCPrel15			5				6.		 1.		 5.		1.9		0.9
+selection		110			0				idHitsRel16				8				0.		 1.		 2.		6.		1.		5.		0.9		1.9
+#selection		111			0				pTmatchingRatio			2				2.		 0.5
+#selection		112			0				pTmatchingAbsDiff		1				0.015
+
+selection		201			0				d0						1				0.2
+selection		202			0				z0						1				1.
+#selection		203			0				impactParameter			2				0.2		 1.
+
+#selection		301			0				isolation20				1				999
+selection		302			0				isolation30				1				0.05
+#selection		303			0				isolation40				1				0.2
+
+selection		401			1				oppositeCharge			1				0.
+selection		402			1				imass					1				0.07
+selection		403			1				imassMax				1				0.4
+
+
+#selection		501			0				cosThetaDimu			1				-0.96
+#selection		502			0				etaSum					1				0.01

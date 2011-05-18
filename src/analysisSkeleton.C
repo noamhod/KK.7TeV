@@ -2108,10 +2108,10 @@ void analysisSkeleton::fillTruth()
 	{
 		truth_all_dr->push_back( mu_truth_dr->at(mu_tru_ai) );
 		truth_all_dr->push_back( mu_truth_dr->at(mu_tru_bi) );
-		truth_all_E->push_back( mu_truth_E->at(mu_tru_ai) );
-		truth_all_E->push_back( mu_truth_E->at(mu_tru_bi) );
-		truth_all_pt->push_back( mu_truth_pt->at(mu_tru_ai) );
-		truth_all_pt->push_back( mu_truth_pt->at(mu_tru_bi) );
+		truth_all_E->push_back( mu_truth_E->at(mu_tru_ai)*MeV2GeV );
+		truth_all_E->push_back( mu_truth_E->at(mu_tru_bi)*MeV2GeV );
+		truth_all_pt->push_back( mu_truth_pt->at(mu_tru_ai)*MeV2GeV );
+		truth_all_pt->push_back( mu_truth_pt->at(mu_tru_bi)*MeV2GeV );
 		truth_all_eta->push_back( mu_truth_eta->at(mu_tru_ai) );
 		truth_all_eta->push_back( mu_truth_eta->at(mu_tru_bi) );
 		truth_all_phi->push_back( mu_truth_phi->at(mu_tru_ai) );
@@ -2136,8 +2136,8 @@ void analysisSkeleton::fillTruth()
 		
 		TLorentzVector* p1 = new TLorentzVector();
 		TLorentzVector* p2 = new TLorentzVector();
-		p1->SetPtEtaPhiE( mu_truth_pt->at(mu_tru_ai), mu_truth_eta->at(mu_tru_ai), mu_truth_phi->at(mu_tru_ai), mu_truth_E->at(mu_tru_ai));
-		p2->SetPtEtaPhiE( mu_truth_pt->at(mu_tru_bi), mu_truth_eta->at(mu_tru_bi), mu_truth_phi->at(mu_tru_bi), mu_truth_E->at(mu_tru_bi));
+		p1->SetPtEtaPhiE( mu_truth_pt->at(mu_tru_ai)*MeV2GeV, mu_truth_eta->at(mu_tru_ai), mu_truth_phi->at(mu_tru_ai), mu_truth_E->at(mu_tru_ai)*MeV2GeV);
+		p2->SetPtEtaPhiE( mu_truth_pt->at(mu_tru_bi)*MeV2GeV, mu_truth_eta->at(mu_tru_bi), mu_truth_phi->at(mu_tru_bi), mu_truth_E->at(mu_tru_bi)*MeV2GeV);
 		truth_all_Mhat       = imass(p1,p2);
 		truth_all_CosThetaCS = cosThetaCollinsSoper(p1,c1, p2,c2);
 		truth_all_CosThetaHE = cosThetaBoost(p1,c1, p2,c2);
@@ -2150,22 +2150,22 @@ void analysisSkeleton::fillTruth()
 
 void analysisSkeleton::fillRecon(int a, int b)
 {
-	recon_all_E->push_back(mu_E->at(ai));
-	recon_all_E->push_back(mu_E->at(bi));
-	recon_all_pt->push_back(mu_pt->at(ai));;
-	recon_all_pt->push_back(mu_pt->at(bi));;
-	recon_all_m->push_back(mu_m->at(ai));
-	recon_all_m->push_back(mu_m->at(bi));
+	recon_all_E->push_back(mu_E->at(ai)*MeV2GeV);
+	recon_all_E->push_back(mu_E->at(bi)*MeV2GeV);
+	recon_all_pt->push_back(mu_pt->at(ai)*MeV2GeV);
+	recon_all_pt->push_back(mu_pt->at(bi)*MeV2GeV);
+	recon_all_m->push_back(mu_m->at(ai)*MeV2GeV);
+	recon_all_m->push_back(mu_m->at(bi)*MeV2GeV);
 	recon_all_eta->push_back(mu_eta->at(ai));
 	recon_all_eta->push_back(mu_eta->at(bi));
 	recon_all_phi->push_back(mu_phi->at(ai));
 	recon_all_phi->push_back(mu_phi->at(bi));
-	recon_all_px->push_back(mu_px->at(ai));
-	recon_all_px->push_back(mu_px->at(bi));
-	recon_all_py->push_back(mu_py->at(ai));
-	recon_all_py->push_back(mu_py->at(bi));
-	recon_all_pz->push_back(mu_pz->at(ai));
-	recon_all_pz->push_back(mu_pz->at(bi));
+	recon_all_px->push_back(mu_px->at(ai)*MeV2GeV);
+	recon_all_px->push_back(mu_px->at(bi)*MeV2GeV);
+	recon_all_py->push_back(mu_py->at(ai)*MeV2GeV);
+	recon_all_py->push_back(mu_py->at(bi)*MeV2GeV);
+	recon_all_pz->push_back(mu_pz->at(ai)*MeV2GeV);
+	recon_all_pz->push_back(mu_pz->at(bi)*MeV2GeV);
 	recon_all_charge->push_back(mu_charge->at(ai));
 	recon_all_charge->push_back(mu_charge->at(bi));
 	recon_all_y->push_back(y(pmu[ai]));
@@ -2175,11 +2175,19 @@ void analysisSkeleton::fillRecon(int a, int b)
 	recon_all_theta->push_back( pmu[ai]->Theta() );
 	recon_all_theta->push_back( pmu[bi]->Theta() );
 	
-	recon_all_Mhat = imass(pmu[ai],pmu[bi])*TeV2MeV;
-	recon_all_CosThetaCS = cosThetaCollinsSoper(pmu[ai],mu_charge->at(ai),pmu[bi],mu_charge->at(bi));
-	recon_all_CosThetaHE = cosThetaBoost(pmu[ai],mu_charge->at(ai),pmu[bi],mu_charge->at(bi));
-	recon_all_ySystem = ySystem(pmu[ai],pmu[bi]);
-	recon_all_QT = QT(pmu[ai],pmu[bi])*TeV2MeV;
+	TLorentzVector* p1 = new TLorentzVector();
+	TLorentzVector* p2 = new TLorentzVector();
+	p1->SetPtEtaPhiE( mu_pt->at(ai)*MeV2GeV, mu_eta->at(ai), mu_phi->at(ai), mu_E->at(ai)*MeV2GeV);
+	p2->SetPtEtaPhiE( mu_pt->at(bi)*MeV2GeV, mu_eta->at(bi), mu_phi->at(bi), mu_E->at(bi)*MeV2GeV);
+	float c1 = mu_charge->at(ai);
+	float c2 = mu_charge->at(bi);
+	recon_all_Mhat = imass(p1,p2);
+	recon_all_CosThetaCS = cosThetaCollinsSoper(p1,c1, p2,c2);
+	recon_all_CosThetaHE = cosThetaBoost(p1,c1, p2,c2);
+	recon_all_ySystem = ySystem(p1,p2);
+	recon_all_QT = QT(p1,p2);
+	delete p1;
+	delete p2;
 	
 	recon_all_isValid = true;
 }

@@ -64,41 +64,41 @@ void analysisGridControlRun()
 	
 	// read a string via file since long string causes memory error in CINT when it is read via stdin
 	string argStr;
-	char buf[256+1];
 	unsigned int delpos;
 	string sFileName = (isMC) ? "inputMC.txt" : "input.txt";
 	ifstream ifs(sFileName.c_str());
 	cout << "#################################################################################################" << endl;
-	while (true)
+	string sLine = "";
+	while(!ifs.eof())
 	{
-		ifs.read(buf,256);
-		if (ifs.eof())
-		{
-			if (ifs.gcount() == 0) break;
-			delpos = ifs.gcount()-1;
-		}
-		else
-		{
-			delpos = ifs.gcount();
-		}
-		buf[delpos] = 0x00;
-		argStr += buf;
-		
-		cout << "buf=" << buf << endl;
+		getline(ifs,sLine);
+		argStr += sLine;
+		cout << "[1] sLine = " << sLine << endl;
 	}
 	cout << "#################################################################################################" << endl;
-
-
+	cout << "[2] argStr = " << argStr << endl;
+	cout << "#################################################################################################" << endl;
 	// split by ','
 	vector<string> fileList;
-	for (size_t i=0,n; i <= argStr.length(); i=n+1)
+	string tmp;
+	for (size_t i=0 ; i<argStr.length(); ++i)
 	{
-		n = argStr.find_first_of(',',i);
-		if (n == string::npos)
-		n = argStr.length();
-		string tmp = argStr.substr(i,n-i);
-		fileList.push_back(tmp);
+		if(argStr.substr(i,1)!=",") tmp += argStr.substr(i,1);
+		else
+		{
+			fileList.push_back(tmp);
+			cout << "tmp=" << tmp << endl;
+			tmp.clear();
+		}
+		
+		if(i==argStr.length()-1) 
+		{
+			fileList.push_back(tmp);
+			cout << "tmp=" << tmp << endl;
+			tmp.clear();
+		}
 	}
+	cout << "#################################################################################################" << endl;
 
 	TString chainName ="physics";
 	fChain = new TChain(chainName);

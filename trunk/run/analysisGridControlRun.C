@@ -104,6 +104,7 @@ void analysisGridControlRun()
 	fChain = new TChain(chainName);
 	for (unsigned int iFile=0; iFile<fileList.size(); ++iFile)
 	{
+		/*
 		//--------------- fix the last entry (a missing "t" at the end of the file name suffix) -------------
 		if(iFile==fileList.size()-1)
 		{
@@ -127,8 +128,9 @@ void analysisGridControlRun()
 			}
 		}
 		//---------------------------------------------------------------------------------------------------
-	
-		cout << "open " << fileList[iFile].c_str() << endl;
+		*/	
+
+		cout << "open " << fileList[iFile] << endl;
 	
 		fChain->Add(fileList[iFile].c_str());
 	}

@@ -81,7 +81,7 @@ fi
 
 
 if [ "$sitename" = "" ] ; then
-   prun --exec "root.exe -b -q analysisGridControlRun.C;" --writeInputToTxt IN:$inputtxt  --athenaTag=$athenatag --outDS user.hod.$type.$runnumber.$dateandhour  --outputs $type.root --inDS $datasetname  --extFile analysisGridControl_C.so, Loader_C.so, ../GoodRunsLists-$grlvs/StandAlone/libGoodRunsLists.so --workDir ../  --tmpDir /tmp/hod/prun_info  --nGBPerJob=10
+   prun --exec "root.exe -b -q analysisGridControlRun.C;" --writeInputToTxt IN:$inputtxt  --athenaTag=$athenatag --outDS user.hod.$type.$runnumber.$dateandhour  --outputs "$inputtxt,$type.root" --inDS $datasetname  --extFile analysisGridControl_C.so, Loader_C.so, ../GoodRunsLists-$grlvs/StandAlone/libGoodRunsLists.so --workDir ../  --tmpDir /tmp/hod/prun_info  --nGBPerJob=10
 else
-   prun --exec "root.exe -b -q analysisGridControlRun.C;" --writeInputToTxt IN:$inputtxt  --athenaTag=$athenatag --outDS user.hod.$type.$runnumber.$dateandhour  --outputs $type.root --inDS $datasetname  --extFile analysisGridControl_C.so, Loader_C.so, ../GoodRunsLists-$grlvs/StandAlone/libGoodRunsLists.so --workDir ../  --tmpDir /tmp/hod/prun_info  --nGBPerJob=10  --site=$sitename
+   prun --exec "root.exe -b -q analysisGridControlRun.C;" --writeInputToTxt IN:$inputtxt  --athenaTag=$athenatag --outDS user.hod.$type.$runnumber.$dateandhour  --outputs "$inputtxt,$type.root" --inDS $datasetname  --extFile analysisGridControl_C.so, Loader_C.so, ../GoodRunsLists-$grlvs/StandAlone/libGoodRunsLists.so --workDir ../  --tmpDir /tmp/hod/prun_info  --nGBPerJob=10  --site=$sitename
 fi

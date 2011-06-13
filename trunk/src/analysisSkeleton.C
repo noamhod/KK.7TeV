@@ -2089,19 +2089,6 @@ void analysisSkeleton::fillTruth()
 		if(mu_tru_ai<0) mu_tru_ai = t;
 		if(mu_tru_bi<0  &&  mu_tru_ai>=0  &&  mu_tru_ai!=t) mu_tru_bi = t;
 		if(mu_tru_ai>=0  &&  mu_tru_bi>=0) break;
-		/*
-		truth_all_dr->push_back( mu_truth_dr->at(t) );
-		truth_all_E->push_back( mu_truth_E->at(t) );
-		truth_all_pt->push_back( mu_truth_pt->at(t) );
-		truth_all_eta->push_back( mu_truth_eta->at(t) );
-		truth_all_phi->push_back( mu_truth_phi->at(t) );
-		truth_all_type->push_back( mu_truth_type->at(t) );
-		truth_all_status->push_back( mu_truth_status->at(t) );
-		truth_all_barcode->push_back( mu_truth_barcode->at(t) );
-		truth_all_mothertype->push_back( mu_truth_mothertype->at(t) );
-		truth_all_motherbarcode->push_back( mu_truth_motherbarcode->at(t) );
-		truth_all_matched->push_back( mu_truth_matched->at(t) );
-		*/
 	}
 	
 	if(mu_tru_ai>=0  &&  mu_tru_bi>=0)

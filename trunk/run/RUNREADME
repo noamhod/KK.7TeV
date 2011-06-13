@@ -1,0 +1,11 @@
+LOCAL:
+	[1] make sure you have either localRunControl.txt OR localRunControl_noSkim.txt (see the "initialize" function)
+	[2] see if these files have your desired run properties
+	[3] root -b
+	[4] .L analysisLocalControlMain.C
+	[5] compile("00-00-91"); # OR load("00-00-91");
+	[6] alc.initialize();    # alc.initialize(int runNumber = 0, string localRunControlFile = "localRunControl_noSkim.txt");
+	[7] alc.loop(0,0);       # there are more options to run this function
+GRID:
+
+

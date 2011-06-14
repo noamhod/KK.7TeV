@@ -1155,6 +1155,30 @@ void analysisSkeleton::pTSort()
 	///////////////////////////////////////////////////////////////////////////////
 }
 
+void analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b)
+{
+	// the map is already sorted by the pT size but,
+	// from the lowest to the highest, so there's
+	// no need to convert values.
+	// the following line defines the reversed iterator
+	// so the "rbegin()" points the iterator to the entry
+	// with the largest pT and so on.
+	
+	if(pTtoIndex.size()<2)
+	{
+		cout << "ERROR: in pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b), trying to sort a <2 map. Exitting now !" << endl;
+		exit(-1);
+	}
+	
+	///////////////////////////////////////////////////////////////////////////////
+	// no matter how many entries in the map, just take the 2 with highest pT: ////
+	TMapdi::reverse_iterator rit=pTtoIndex.rbegin(); //////////////////////////////
+	index_a = rit->second; ///////////////////////////////////////////////////////
+	rit++; ////////////////////////////////////////////////////////////////////////
+	index_b = rit->second; ///////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////
+}
+
 void analysisSkeleton::imassSort()
 {
 	float im   = 0.;
@@ -1224,12 +1248,7 @@ void analysisSkeleton::wipeMU4Vector()
 bool analysisSkeleton::assignPairIndices()
 {
 	// select the final muon pair
-	if(pTtoIndexMap.size()==2)
-	{
-		pTSort();
-		//ai = 0;
-		//bi = 1;
-	}
+	if(pTtoIndexMap.size()==2) pTSort();
 	else if(pTtoIndexMap.size()>2)
 	{
 		pTSort();
@@ -2066,7 +2085,7 @@ void analysisSkeleton::fillTruthEfficiency()
 	}
 }
 
-
+/*
 void analysisSkeleton::fillTruth()
 {
 	//mu_truth_matched    : True if muon is matched to the truth
@@ -2134,6 +2153,89 @@ void analysisSkeleton::fillTruth()
 		delete p2;
 	}
 }
+*/
+
+
+void analysisSkeleton::fillTruth()
+{
+	//mu_truth_matched    : True if muon is matched to the truth
+	//mu_truth_status     : Status oMC status = 1 final particle, status = 3 intermediate particle (documentary)
+	
+	if(mu_truth_pt==0)         return;
+	if(mu_truth_status==0)     return;
+	
+	//////////////////////////////////////
+	if(mu_truth_pt->size()<2) return;  ///
+	//////////////////////////////////////
+	
+	int truth_valid_index = 0;
+	//////////////////////////////////////
+	pTtoIndexMapTruth.clear(); ///////////
+	//////////////////////////////////////
+	for(int t=0 ; t<(int)mu_truth_pt->size() ; t++)
+	{
+		if(!mu_truth_status->at(t)) continue; // has to be final particle
+		if(mu_truth_mothertype->at(t)!=PDTZ  &&  mu_truth_mothertype->at(t)!=PDTGAMMA) continue; // has to come out of Z^0 (since the cuts on the reconstructed muons are Z^0-oriented) ?????
+		
+		truth_all_dr->push_back( mu_truth_dr->at(t) );
+		truth_all_E->push_back( mu_truth_E->at(t)*MeV2GeV );
+		truth_all_pt->push_back( mu_truth_pt->at(t)*MeV2GeV );
+		truth_all_eta->push_back( mu_truth_eta->at(t) );
+		truth_all_phi->push_back( mu_truth_phi->at(t) );
+		truth_all_type->push_back( mu_truth_type->at(t) );
+		truth_all_status->push_back( mu_truth_status->at(t) );
+		truth_all_barcode->push_back( mu_truth_barcode->at(t) );
+		truth_all_mothertype->push_back( mu_truth_mothertype->at(t) );
+		truth_all_motherbarcode->push_back( mu_truth_motherbarcode->at(t) );
+		truth_all_matched->push_back( mu_truth_matched->at(t) );
+		truth_all_isValid = true;
+		
+		///////////////////////////////////////////////////////////////////////////////////////
+		// FILL THE pTtoIndexMapTruth MAP WITH THE PT(KEY) AND INDEX(VALUE) ///////////////////
+		pTtoIndexMapTruth.insert(make_pair(mu_truth_pt->at(t)*MeV2GeV,truth_valid_index)); ////
+		///////////////////////////////////////////////////////////////////////////////////////
+		
+		truth_valid_index++;
+	}
+	
+	// SORT BY PT AND FIND THE INDICES OF THE FIRST 2 MUONS (HIGHEST PT).
+	ai_truth = -1;
+	bi_truth = -1;
+	if(truth_valid_index>=2  &&  pTtoIndexMapTruth.size()>=2  &&  truth_all_isValid) pTSort(pTtoIndexMapTruth, ai_truth, bi_truth);
+	else
+	{
+		truth_valid_index = 0;
+		truth_all_isValid = false;
+		return;
+	}
+	
+	// CALCULATE ALL THE 'EVENT-LEVEL' VARIABLES (DI-MUON VARIABLES)
+	if( truth_valid_index>=2  &&  ai_truth>=0  &&  bi_truth>=0  &&  ai_truth!=bi_truth )
+	{
+		if( truth_all_type->at(ai_truth)*truth_all_type->at(bi_truth) >= 0. ) // require opposite charge
+		{
+			truth_valid_index = 0;
+			truth_all_isValid = false;
+			return;
+		}
+	
+		float c1 = (truth_all_type->at(ai_truth)>0) ? -1. : +1.;
+		float c2 = (truth_all_type->at(bi_truth)>0) ? -1. : +1.;
+		
+		TLorentzVector* p1 = new TLorentzVector();
+		TLorentzVector* p2 = new TLorentzVector();
+		p1->SetPtEtaPhiE( truth_all_pt->at(ai_truth), truth_all_eta->at(ai_truth), truth_all_phi->at(ai_truth), truth_all_E->at(ai_truth));
+		p2->SetPtEtaPhiE( truth_all_pt->at(bi_truth), truth_all_eta->at(bi_truth), truth_all_phi->at(bi_truth), truth_all_E->at(bi_truth));
+		truth_all_Mhat       = imass(p1,p2);
+		truth_all_CosThetaCS = cosThetaCollinsSoper(p1,c1, p2,c2);
+		truth_all_CosThetaHE = cosThetaBoost(p1,c1, p2,c2);
+		truth_all_ySystem    = ySystem(p1,p2);
+		truth_all_QT         = QT(p1,p2);
+		delete p1;
+		delete p2;
+	}
+}
+
 
 void analysisSkeleton::fillRecon(int a, int b)
 {

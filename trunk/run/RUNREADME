@@ -5,7 +5,8 @@ LOCAL:
 	[4] .L analysisLocalControlMain.C
 	[5] compile("00-00-91"); # OR load("00-00-91");
 	[6] alc.initialize();    # alc.initialize(int runNumber = 0, string localRunControlFile = "localRunControl_noSkim.txt");
-	[7] alc.loop(0,0);       # there are more options to run this function
+	[7] if in MC, choose a dataset number
+	[8] alc.loop(0,0);       # there are more options to run this function
 GRID:
 
 

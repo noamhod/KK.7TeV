@@ -34,9 +34,7 @@ using namespace std;
 
 enum models
 {
-	Z0,
-	ZP,
-	KK
+	Z0,ZP,KK
 };
 
 static Color_t cData    = kBlack;
@@ -53,13 +51,24 @@ static Color_t col3 = kOrange+7;
 static Color_t col4 = kYellow-9;
 static Color_t col5 = kGreen-3;
 
-static double xmin  = 120.;
-static double xmax  = 5000.;
-const int     nxbins = 200;
+
+// bins for the mHat histos
+static double   xmin  = 120.;
+static double   xmax  = 5000.;
+const  int      nxbins = 200;
 static Double_t logMmin;
 static Double_t logMmax;
 static Double_t logMbinwidth;
 static Double_t xbins[nxbins+1];
+
+// bins for the afb (the binning is in mHat)
+static double   imass_afb_min   = 120.;
+static double   imass_afb_max   = 1620.;
+const  int      imass_afb_nbins = 10;
+static Double_t logMmin_afb;
+static Double_t logMmax_afb;
+static Double_t logMbinwidth_afb;
+static Double_t imass_afb_bins[imass_afb_nbins+1];
 
 static double lumi = 5.;
 static double mb2fb = 1.e12;
@@ -69,14 +78,19 @@ vector<string> svNames;
 vector<string> svPaths;
 vector<TH1D*>  hvBinnedHistos_imass;
 vector<TH1D*>  hvBinnedHistos_imassRes;
+vector<vector<TH1D*> > hvvBinnedHistos_cosTh;
 vector<double> dvWeights;
 vector<Color_t> cvColors;
+
 string sDir  = "/data/hod/pythia8_ntuples/";
 string sName = "";
 
 bool doLogx = true;
 
-double sumSigma = 0.;
+double sumWeights = 0.;
+
+
+
 
 void clearSamples()
 {	
@@ -86,14 +100,20 @@ void clearSamples()
 	{
 		if(hvBinnedHistos_imass[n]!=NULL) delete hvBinnedHistos_imass[n];
 		if(hvBinnedHistos_imassRes[n]!=NULL) delete hvBinnedHistos_imassRes[n];
+		for(int m=0 ; m<(int)hvvBinnedHistos_cosTh[n].size() ; m++)
+		{
+			if(hvvBinnedHistos_cosTh[n][m]!=NULL) delete hvvBinnedHistos_cosTh[n][m];
+		}
+		hvvBinnedHistos_cosTh[n].clear();
 	}
 	hvBinnedHistos_imass.clear();
 	hvBinnedHistos_imassRes.clear();
+	hvvBinnedHistos_cosTh.clear();
 	dvWeights.clear();
 	cvColors.clear();
 }
 
-void addSample(string name, Color_t color, double events, double sigma, bool calcSumSigma=false)
+void addSample(string name, Color_t color, double events, double sigma)
 {	
 	svNames.push_back(name);
 
@@ -103,13 +123,26 @@ void addSample(string name, Color_t color, double events, double sigma, bool cal
 	
 	if(doLogx) hvBinnedHistos_imass.push_back(new TH1D(sName.c_str(),sName.c_str(),nxbins,xbins));
 	else       hvBinnedHistos_imass.push_back(new TH1D(sName.c_str(),sName.c_str(),nxbins,xmin,xmax));
-	
+
 	hvBinnedHistos_imassRes.push_back(new TH1D((sName+"Res").c_str(),(sName+"Res").c_str(),nxbins,-0.2,+0.2));
+
+	vector<TH1D*> vTmp;
+	stringstream strm;
+	string s;
+	for(int b=0 ; b<imass_afb_nbins ; b++)
+	{
+		strm.clear();
+		s.clear();
+		strm << b;
+		strm >> s;
+		vTmp.push_back( new TH1D((sName+"_massbin_"+s).c_str(),(sName+"_massbin_"+s).c_str(),50,-1.,+1.) );
+	}
+	hvvBinnedHistos_cosTh.push_back( vTmp );
 	
 	dvWeights.push_back(lumi/(events/(sigma*mb2fb)));
 	cvColors.push_back(color);
 	
-	if(calcSumSigma) sumSigma += sigma;
+	sumWeights += lumi/(events/(sigma*mb2fb));
 }
 
 double getYmin(TH1D* h)
@@ -166,6 +199,10 @@ int plot_ratio_weights()
 	gStyle->SetOptStat(0);
 	gStyle->SetStatW(0);
 	gStyle->SetStatH(0);
+	gStyle->SetTitleX(0.12);
+	gStyle->SetTitleY(1);
+	//gStyle->SetTitleW(1);
+	//gStyle->SetTitleH(1);
 	
 	float mHat;
 	float qT;
@@ -294,49 +331,95 @@ int plot_ratio_weights()
 	pvtxt_compare->SetFillColor(kWhite);
 	txt = pvtxt_compare->AddText( "#splitline{Template vs. #it{ATLAS}}{MC10 reconstructed}" );
 	
+	
+	// for the binned-wights histograms
+	logMmin_afb       = log10(imass_afb_min);
+	logMmax_afb       = log10(imass_afb_max);
+	logMbinwidth_afb  = (Double_t)( (logMmax_afb-logMmin_afb)/(Double_t)imass_afb_nbins );
+	imass_afb_bins[0] = imass_afb_min;
+	for(Int_t i=1 ; i<=imass_afb_nbins ; i++) imass_afb_bins[i] = TMath::Power( 10,(logMmin_afb + i*logMbinwidth_afb) );
+	
+	
+	
+	TH1D* hDummy_afb = new TH1D("dummy","dummy",imass_afb_nbins,imass_afb_bins);
+	
+	vector<TH1D*> vhCosThSumTmp;
+	vector<TH1D*> vhCosThSumZ0;
+	vector<TH1D*> vhCosThSumKK;
+	vector<TH1D*> vhCosThSumZP;
+	vector<TH1D*> vhCosThSumKKweights;
+	vector<TH1D*> vhCosThSumZPweights;
+	stringstream strm;
+	string str;
+	string range;
+	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
+	{
+		range.clear();
+		strm.clear();
+		str.clear();
+		strm << imass_afb_bins[i];
+		strm >> str;
+		range += str + " GeV #rightarrow ";
+		strm.clear();
+		str.clear();
+		strm << imass_afb_bins[i+1];
+		strm >> str;
+		range += str + " GeV";
+		
+		vhCosThSumTmp.push_back( new TH1D((""+range).c_str(),(""+range).c_str(), 50,-1.,+1.) );
+		
+		vhCosThSumZ0.push_back( new TH1D(("sumZ0_"+range).c_str(),("sumZ0_"+range).c_str(), 50,-1.,+1.) );
+		vhCosThSumZP.push_back( new TH1D(("sumZP_"+range).c_str(),("sumZP_"+range).c_str(), 50,-1.,+1.) );
+		vhCosThSumKK.push_back( new TH1D(("sumKK_"+range).c_str(),("sumKK_"+range).c_str(), 50,-1.,+1.) );
+		
+		vhCosThSumZPweights.push_back( new TH1D(("wgtZP_"+range).c_str(),("wgtZP_"+range).c_str(), 50,-1.,+1.) );
+		vhCosThSumKKweights.push_back( new TH1D(("wgtKK_"+range).c_str(),("wgtKK_"+range).c_str(), 50,-1.,+1.) );
+	}
+	
+	
 	// combined histos
-	TH1D* hSumTmp;
+	TH1D* hMassSumTmp;
 	TH1D* hResTmp;
-	TH1D* hSumZ0;
-	TH1D* hSumZP;
-	TH1D* hSumKK;
+	TH1D* hMassSumZ0;
+	TH1D* hMassSumZP;
+	TH1D* hMassSumKK;
 	TH1D* hWeightsZP;
 	TH1D* hWeightsKK;
-	TH1D* hReconZ0;
-	TH1D* hReconZP;
-	TH1D* hReconTemplateZP;
-	TH1D* hReconTemplateKK;
+	TH1D* hMassReconZ0;
+	TH1D* hMassReconZP;
+	TH1D* hMassReconTemplateZP;
+	TH1D* hMassReconTemplateKK;
 	TH1D* hResReconZ0;
 	TH1D* hResReconZP;
 	TH1D* hResTemplateZP;
 	TH1D* hResTemplateKK;
 	if(doLogx)
 	{
-		hSumTmp = new TH1D("sumTmp","sumTmp",nxbins,xbins);
-		hSumZ0 = new TH1D("sumZ0","sumZ0",nxbins,xbins);
-		hSumZP = new TH1D("sumZP","sumZP",nxbins,xbins);
-		hSumKK = new TH1D("sumKK","sumKK",nxbins,xbins);
+		hMassSumTmp = new TH1D("sumTmp","sumTmp",nxbins,xbins);
+		hMassSumZ0 = new TH1D("sumZ0","sumZ0",nxbins,xbins);
+		hMassSumZP = new TH1D("sumZP","sumZP",nxbins,xbins);
+		hMassSumKK = new TH1D("sumKK","sumKK",nxbins,xbins);
 		hWeightsZP = new TH1D("weightsZP","weightsZP",nxbins,xbins);
 		hWeightsKK = new TH1D("weightsKK","weightsKK",nxbins,xbins);
 		
-		hReconZ0 = new TH1D("ReconZ0","ReconZ0",nxbins,xbins);
-		hReconZP = new TH1D("ReconZP","ReconZP",nxbins,xbins);
-		hReconTemplateZP = new TH1D("ReconTemplateZP","ReconTemplateZP",nxbins,xbins);
-		hReconTemplateKK = new TH1D("ReconTemplateKK","ReconTemplateKK",nxbins,xbins);
+		hMassReconZ0 = new TH1D("ReconZ0","ReconZ0",nxbins,xbins);
+		hMassReconZP = new TH1D("ReconZP","ReconZP",nxbins,xbins);
+		hMassReconTemplateZP = new TH1D("ReconTemplateZP","ReconTemplateZP",nxbins,xbins);
+		hMassReconTemplateKK = new TH1D("ReconTemplateKK","ReconTemplateKK",nxbins,xbins);
 	}
 	else
 	{
-		hSumTmp = new TH1D("sumTmp","sumTmp",nxbins,xmin,xmax);
-		hSumZ0 = new TH1D("sumZ0","sumZ0",nxbins,xmin,xmax);
-		hSumZP = new TH1D("sumZP","sumZP",nxbins,xmin,xmax);
-		hSumKK = new TH1D("sumKK","sumKK",nxbins,xmin,xmax);
+		hMassSumTmp = new TH1D("sumTmp","sumTmp",nxbins,xmin,xmax);
+		hMassSumZ0 = new TH1D("sumZ0","sumZ0",nxbins,xmin,xmax);
+		hMassSumZP = new TH1D("sumZP","sumZP",nxbins,xmin,xmax);
+		hMassSumKK = new TH1D("sumKK","sumKK",nxbins,xmin,xmax);
 		hWeightsZP = new TH1D("weightsZP","weightsZP",nxbins,xmin,xmax);
 		hWeightsKK = new TH1D("weightsKK","weightsKK",nxbins,xmin,xmax);
 		
-		hReconZ0 = new TH1D("ReconZ0","ReconZ0",nxbins,xmin,xmax);
-		hReconZP = new TH1D("ReconZP","ReconZP",nxbins,xmin,xmax);
-		hReconTemplateZP = new TH1D("ReconTemplateZP","ReconTemplateZP",nxbins,xmin,xmax);
-		hReconTemplateKK = new TH1D("ReconTemplateKK","ReconTemplateKK",nxbins,xmin,xmax);
+		hMassReconZ0 = new TH1D("ReconZ0","ReconZ0",nxbins,xmin,xmax);
+		hMassReconZP = new TH1D("ReconZP","ReconZP",nxbins,xmin,xmax);
+		hMassReconTemplateZP = new TH1D("ReconTemplateZP","ReconTemplateZP",nxbins,xmin,xmax);
+		hMassReconTemplateKK = new TH1D("ReconTemplateKK","ReconTemplateKK",nxbins,xmin,xmax);
 	}
 	
 	hResTmp = new TH1D("ResTmp","ResTmp",nxbins,-0.2,+0.2);
@@ -360,8 +443,9 @@ int plot_ratio_weights()
 		////////////////////////////
 		// reset all ///////////////
 		clearSamples(); ////////////
-		if(doLogx) hSumTmp->Reset(); //////////
-		else { for(Int_t b=0 ; b<=hSumTmp->GetNbinsX() ; b++) hSumTmp->SetBinContent(b,0.); }
+		if(doLogx) hMassSumTmp->Reset(); //////////
+		else { for(Int_t b=0 ; b<=hMassSumTmp->GetNbinsX() ; b++) hMassSumTmp->SetBinContent(b,0.); }
+		for(int i=0 ; i<imass_afb_nbins ; i++) vhCosThSumTmp[i]->Reset();
 		////////////////////////////
 	
 		if(model==Z0)
@@ -446,18 +530,25 @@ int plot_ratio_weights()
 				tree->SetBranchAddress("truth_all_ySystem",&truth_all_ySystem);
 				tree->SetBranchAddress("truth_all_QT", &truth_all_QT);
 				
+				int valids = 0;
+
 				for(Int_t i=0 ; i<tree->GetEntries() ; i++)
 				{
 					tree->GetEntry(i);
 					
 					if(truth_all_isValid)
 					{
+						valids++;
 						hvBinnedHistos_imass[n]->Fill(truth_all_Mhat);
+						int bin = hDummy_afb->FindBin(truth_all_Mhat);
+						if(bin<=0 || bin>imass_afb_nbins) continue;
+						hvvBinnedHistos_cosTh[n][bin-1]->Fill(truth_all_CosThetaCS);
 					}
 				}
+				cout << "n=" << n << ", valids=" << valids << endl;
 			}
 			else
-			{
+			{ 
 				tree = (TTree*)file->Get("tree");
 				tree->SetBranchAddress("mHat",&mHat);
 				tree->SetBranchAddress("QT",&qT);
@@ -481,60 +572,227 @@ int plot_ratio_weights()
 				{
 					tree->GetEntry(i);
 					hvBinnedHistos_imass[n]->Fill(mHat);
+					
+					int bin = hDummy_afb->FindBin(mHat);
+					if(bin<=0 || bin>imass_afb_nbins) continue;
+					hvvBinnedHistos_cosTh[n][bin-1]->Fill(cosThetaCS); 
 				}
 			}
 			
-			////////////////////////////////////////////////////
-			hvBinnedHistos_imass[n]->Scale(dvWeights[n]); // scale ///
-			////////////////////////////////////////////////////
+			/////////////////////////////////////////////////////////////
+			hvBinnedHistos_imass[n]->Scale(dvWeights[n]); // scale //////
+			for(Int_t i=0 ; i<imass_afb_nbins ; i++)       // scale /////
+			{
+				hvvBinnedHistos_cosTh[n][i]->Scale(dvWeights[n]);
+			}
+			/////////////////////////////////////////////////////////////
 			
-			///////////////////////////////////////////
-			hSumTmp->Add(hvBinnedHistos_imass[n]); // sum ///
-			///////////////////////////////////////////
+			////////////////////////////////////////////////////////
+			hMassSumTmp->Add(hvBinnedHistos_imass[n]); // sum //////
+			for(Int_t i=0 ; i<imass_afb_nbins ; i++)   // sum //////
+			{
+				vhCosThSumTmp[i]->Add(hvvBinnedHistos_cosTh[n][i]);
+			}
+			////////////////////////////////////////////////////////
 			
 			file->Close();
 		}
 		
-		if(model==Z0) hSumZ0 = (TH1D*)hSumTmp->Clone("");
-		if(model==ZP) hSumZP = (TH1D*)hSumTmp->Clone("");
-		if(model==KK) hSumKK = (TH1D*)hSumTmp->Clone("");
+		
+		if(model==Z0)
+		{
+			hMassSumZ0 = (TH1D*)hMassSumTmp->Clone("");
+			for(Int_t i=0 ; i<imass_afb_nbins ; i++) vhCosThSumZ0[i] = (TH1D*)vhCosThSumTmp[i]->Clone("");
+		}
+		if(model==ZP)
+		{
+			hMassSumZP = (TH1D*)hMassSumTmp->Clone("");
+			for(Int_t i=0 ; i<imass_afb_nbins ; i++) vhCosThSumZP[i] = (TH1D*)vhCosThSumTmp[i]->Clone("");
+		}
+		if(model==KK)
+		{
+			hMassSumKK = (TH1D*)hMassSumTmp->Clone("");
+			for(Int_t i=0 ; i<imass_afb_nbins ; i++) vhCosThSumKK[i] = (TH1D*)vhCosThSumTmp[i]->Clone("");
+		}
 	}
 	
 	
-	/////////////////////////////////////////////////
-	// The ratios ///////////////////////////////////
-	hWeightsZP = (TH1D*)hSumZP->Clone(""); //////////
-	hWeightsZP->Divide(hSumZ0); /////////////////////
-	hWeightsKK = (TH1D*)hSumKK->Clone(""); //////////
-	hWeightsKK->Divide(hSumZ0); /////////////////////
-	/////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+	// The ratios //////////////////////////////////////////////////
+	hWeightsZP = (TH1D*)hMassSumZP->Clone(""); /////////////////////
+	hWeightsZP->Divide(hMassSumZ0); ////////////////////////////////
+	for(Int_t i=0 ; i<imass_afb_nbins ; i++) 
+	{
+		vhCosThSumZPweights[i] = (TH1D*)vhCosThSumZP[i]->Clone(""); //////////
+		vhCosThSumZPweights[i]->Divide(vhCosThSumZ0[i]); /////////////////////
+	}
+	//--------------------------------------------------------------
+	hWeightsKK = (TH1D*)hMassSumKK->Clone(""); /////////////////////
+	hWeightsKK->Divide(hMassSumZ0); ////////////////////////////////
+	for(Int_t i=0 ; i<imass_afb_nbins ; i++) 
+	{
+		vhCosThSumKKweights[i] = (TH1D*)vhCosThSumKK[i]->Clone(""); //////////
+		vhCosThSumKKweights[i]->Divide(vhCosThSumZ0[i]); /////////////////////
+	}
+	////////////////////////////////////////////////////////////////
+	
+	
+	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
+	{
+		// WEIGHTS ....
+		vhCosThSumZPweights[i]->SetTitle((TString)"weights: " + (TString)vhCosThSumZPweights[i]->GetTitle());
+		vhCosThSumKKweights[i]->SetTitle((TString)"weights: " + (TString)vhCosThSumKKweights[i]->GetTitle());
+	}
+	////////////////////////////////////////////////////////////////////////////
+	
+	
+	// test draw
+	vector<TCanvas*> vC;
+	vector<TVirtualPad*> vP1;
+	vector<TVirtualPad*> vP2;
+	vector<TLegend*> vL1;
+	vector<TLegend*> vL2;
+	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
+	{
+		strm.clear();
+		str.clear();
+		strm << i;
+		strm >> str;
+		vC.push_back( new TCanvas(("c"+str).c_str(),("c"+str).c_str(),0,0,1200,800) );
+		vC[i]->Divide(1,2);
+		vC[i]->Draw();
+		
+		vP1.push_back( vC[i]->cd(1) );
+		//vP1[i]->Range(-1.315789,-270.0778,1.315789,1417.908);
+		vP1[i]->SetLogy();
+		
+		vP2.push_back( vC[i]->cd(2) );
+		//vP2[i]->Range(-1.315789,-1.165699,1.315789,0.9704915);
+		vP2[i]->SetLogy();
+		
+		//vL1.push_back( new TLegend(0.1462841,0.1774325,0.5373268,0.4004816,NULL,"brNDC") );
+		vL1.push_back( new TLegend(0.6518668,0.1842617,0.8583373,0.3434801,NULL,"brNDC") );
+		vL1[i]->SetFillColor(kWhite);
+		
+		//vL2.push_back( new TLegend(0.1480616,0.7509715,0.4342337,0.9272078,NULL,"brNDC") );
+		vL2.push_back( new TLegend(0.7315023,0.181969,0.8745992,0.3018068,NULL,"brNDC") );
+		vL2[i]->SetFillColor(kWhite);
+		
+		
+		
+		vP1[i]->cd();
+		vP1[i]->Draw();
+		float max = vhCosThSumZ0[i]->GetMaximum();
+		max = (vhCosThSumZP[i]->GetMaximum() > max) ? vhCosThSumZP[i]->GetMaximum() : max;
+		max = (vhCosThSumKK[i]->GetMaximum() > max) ? vhCosThSumKK[i]->GetMaximum() : max;
+	
+		vhCosThSumZ0[i]->SetMinimum(1.e-2);
+		vhCosThSumZ0[i]->SetMaximum(2.*max);
+		vhCosThSumZ0[i]->SetLineColor(col0);
+		vhCosThSumZ0[i]->SetLineStyle(1);
+		vhCosThSumZ0[i]->SetLineWidth(2);
+		vhCosThSumZ0[i]->SetXTitle("cos#theta*");
+		vhCosThSumZ0[i]->SetYTitle("Events");
+		/*if(2.*max<1.e2)*/ vhCosThSumZ0[i]->GetYaxis()->SetMoreLogLabels();
+		vhCosThSumZ0[i]->Draw();
+		vL1[i]->AddEntry(vhCosThSumZ0[i], "SM #gamma/Z^{0} (#it{ATLAS} MC10 truth)", "l");
+		vhCosThSumZP[i]->SetMinimum(1.e-2);
+		vhCosThSumZP[i]->SetMaximum(2.*max);
+		vhCosThSumZP[i]->SetLineColor(col2);
+		vhCosThSumZP[i]->SetLineStyle(1);
+		vhCosThSumZP[i]->SetLineWidth(2);
+		vhCosThSumZP[i]->SetXTitle("cos#theta*");
+		vhCosThSumZP[i]->SetYTitle("Events");
+		/*if(2.*max<1.e2)*/ vhCosThSumZP[i]->GetYaxis()->SetMoreLogLabels();
+		vhCosThSumZP[i]->Draw("SAMES");
+		sName = sMass + " GeV Z' SSM (#scale[1.1]{P}#scale[0.9]{YTHIA8})";
+		vL1[i]->AddEntry(vhCosThSumZP[i], sName.c_str(), "l");
+		vhCosThSumKK[i]->SetMinimum(1.e-2);
+		vhCosThSumKK[i]->SetMaximum(2.*max);
+		vhCosThSumKK[i]->SetLineColor(col1);
+		vhCosThSumKK[i]->SetLineStyle(1);
+		vhCosThSumKK[i]->SetLineWidth(2);
+		vhCosThSumKK[i]->SetXTitle("cos#theta*");
+		vhCosThSumKK[i]->SetYTitle("Events");
+		/*if(2.*max<1.e2)*/ vhCosThSumKK[i]->GetYaxis()->SetMoreLogLabels();
+		vhCosThSumKK[i]->Draw("SAMES");
+		sName = sMass + " GeV S^{1}/Z_{2} KK (#scale[1.1]{P}#scale[0.9]{YTHIA8})"; 
+		vL1[i]->AddEntry(vhCosThSumKK[i], sName.c_str(), "l");
+		vL1[i]->Draw("SAMES");
+		
+		vP1[i]->cd();
+		vP1[i]->RedrawAxis();
+		vP1[i]->Update();
+		
+		//--------------------------------------------
+		
+		vP2[i]->cd();
+		vP2[i]->Draw();
+		max = vhCosThSumZPweights[i]->GetMaximum();
+		max = (vhCosThSumKKweights[i]->GetMaximum() > max) ? vhCosThSumKKweights[i]->GetMaximum() : max;
+		
+		string sYTitle = "Events_{BSM}/Events_{#gamma/Z^{0}}";
+		sName = sMass + " GeV Z' SSM";
+		vhCosThSumZPweights[i]->SetMinimum(1.e-1);
+		vhCosThSumZPweights[i]->SetMaximum(2.*max);
+		vhCosThSumZPweights[i]->SetLineColor(col2);
+		vhCosThSumZPweights[i]->SetLineStyle(1);
+		vhCosThSumZPweights[i]->SetLineWidth(2);
+		vhCosThSumZPweights[i]->SetXTitle("cos#theta*");
+		vhCosThSumZPweights[i]->SetYTitle(sYTitle.c_str());
+		/*if(2.*max<1.e2)*/ vhCosThSumZPweights[i]->GetYaxis()->SetMoreLogLabels(); 
+		vhCosThSumZPweights[i]->Draw();
+		vL2[i]->AddEntry(vhCosThSumZPweights[i], sName.c_str(), "l");
+		sName   = sMass + " GeV S^{1}/Z_{2} KK";
+		vhCosThSumKKweights[i]->SetMinimum(1.e-1);
+		vhCosThSumKKweights[i]->SetMaximum(2.*max);
+		vhCosThSumKKweights[i]->SetLineColor(col1);
+		vhCosThSumKKweights[i]->SetLineStyle(1);
+		vhCosThSumKKweights[i]->SetLineWidth(2);
+		vhCosThSumKKweights[i]->SetXTitle("cos#theta*");
+		vhCosThSumKKweights[i]->SetYTitle(sYTitle.c_str());
+		/*if(2.*max<1.e2)*/ vhCosThSumKKweights[i]->GetYaxis()->SetMoreLogLabels(); 
+		vhCosThSumKKweights[i]->Draw("SAMES");
+		vL2[i]->AddEntry(vhCosThSumKKweights[i], sName.c_str(), "l");
+		vL2[i]->Draw("SAMES");
+		
+		vP2[i]->cd();
+		vP2[i]->RedrawAxis();
+		vP2[i]->Update();
+		
+		vC[i]->Update();
+		TString name = "plots/plot_cosTheta_" + str;
+		vC[i]->SaveAs(name+".eps");
+		vC[i]->SaveAs(name+".C");
+		vC[i]->SaveAs(name+".root");
+		vC[i]->SaveAs(name+".png");
+	}
+	
+	
 	cout << "Weights are calculated\n" << endl;
 	//-------------------------------------------------------------------------------------
 	
 	
-	
-	
-	bool calcSumSigma = true;
 	for(int model=Z0 ; model<=KK ; model++)
 	{
 		////////////////////////////
 		// reset all ///////////////
 		clearSamples(); ////////////
-		if(doLogx) hSumTmp->Reset(); //////////
-		else { for(Int_t b=0 ; b<=hSumTmp->GetNbinsX() ; b++) hSumTmp->SetBinContent(b,0.); }
+		if(doLogx) hMassSumTmp->Reset(); //////////
+		else { for(Int_t b=0 ; b<=hMassSumTmp->GetNbinsX() ; b++) hMassSumTmp->SetBinContent(b,0.); }
 		hResTmp->Reset();
 		////////////////////////////
 	
-		addSample("ATLASZ0/mcLocalControl_DYmumu_120M250",   col0, 19999, 0.0086861*nb2mb, calcSumSigma);
-		addSample("ATLASZ0/mcLocalControl_DYmumu_250M400",   col1, 19996, 0.00041431*nb2mb, calcSumSigma);
-		addSample("ATLASZ0/mcLocalControl_DYmumu_400M600",   col2, 19993, 0.000067464*nb2mb, calcSumSigma);
-		addSample("ATLASZ0/mcLocalControl_DYmumu_600M800",   col3, 15994, 0.000011168*nb2mb, calcSumSigma);
-		addSample("ATLASZ0/mcLocalControl_DYmumu_800M1000",  col5, 19992, 0.0000027277*nb2mb, calcSumSigma);
-		addSample("ATLASZ0/mcLocalControl_DYmumu_1000M1250", col5, 19995, 0.00000091646*nb2mb, calcSumSigma);
-		addSample("ATLASZ0/mcLocalControl_DYmumu_1250M1500", col5, 19993, 0.00000024942*nb2mb, calcSumSigma);
-		addSample("ATLASZ0/mcLocalControl_DYmumu_1500M1750", col5, 19997, 0.000000076876*nb2mb, calcSumSigma);
-		addSample("ATLASZ0/mcLocalControl_DYmumu_1750M2000", col5, 19993, 0.000000026003*nb2mb, calcSumSigma);
-		addSample("ATLASZ0/mcLocalControl_DYmumu_M2000",     col5, 19996, 0.000000015327*nb2mb, calcSumSigma);
+		addSample("ATLASZ0/mcLocalControl_DYmumu_120M250",   col0, 19999, 0.0086861*nb2mb);
+		addSample("ATLASZ0/mcLocalControl_DYmumu_250M400",   col1, 19996, 0.00041431*nb2mb);
+		addSample("ATLASZ0/mcLocalControl_DYmumu_400M600",   col2, 19993, 0.000067464*nb2mb);
+		addSample("ATLASZ0/mcLocalControl_DYmumu_600M800",   col3, 15994, 0.000011168*nb2mb);
+		addSample("ATLASZ0/mcLocalControl_DYmumu_800M1000",  col5, 19992, 0.0000027277*nb2mb);
+		addSample("ATLASZ0/mcLocalControl_DYmumu_1000M1250", col5, 19995, 0.00000091646*nb2mb);
+		addSample("ATLASZ0/mcLocalControl_DYmumu_1250M1500", col5, 19993, 0.00000024942*nb2mb);
+		addSample("ATLASZ0/mcLocalControl_DYmumu_1500M1750", col5, 19997, 0.000000076876*nb2mb);
+		addSample("ATLASZ0/mcLocalControl_DYmumu_1750M2000", col5, 19993, 0.000000026003*nb2mb);
+		addSample("ATLASZ0/mcLocalControl_DYmumu_M2000",     col5, 19996, 0.000000015327*nb2mb);
 			
 		// get the data
 		ymin = 0.;
@@ -619,16 +877,16 @@ int plot_ratio_weights()
 			/////////////////////////////////////////////////////////////
 			
 			////////////////////////////////////////////////////
-			hSumTmp->Add(hvBinnedHistos_imass[n]); // sum //////
+			hMassSumTmp->Add(hvBinnedHistos_imass[n]); // sum //////
 			hResTmp->Add(hvBinnedHistos_imassRes[n]); // sum ///
 			////////////////////////////////////////////////////
 			
 			file->Close();
 		}
 		
-		if(model==Z0) hReconZ0         = (TH1D*)hSumTmp->Clone("");
-		if(model==ZP) hReconTemplateZP = (TH1D*)hSumTmp->Clone("");
-		if(model==KK) hReconTemplateKK = (TH1D*)hSumTmp->Clone("");
+		if(model==Z0) hMassReconZ0         = (TH1D*)hMassSumTmp->Clone("");
+		if(model==ZP) hMassReconTemplateZP = (TH1D*)hMassSumTmp->Clone("");
+		if(model==KK) hMassReconTemplateKK = (TH1D*)hMassSumTmp->Clone("");
 		
 		if(model==Z0) hResReconZ0 = (TH1D*)hResTmp->Clone("");
 		if(model==ZP) hResTemplateZP = (TH1D*)hResTmp->Clone("");
@@ -646,12 +904,12 @@ int plot_ratio_weights()
 	////////////////////////////
 	// reset all ///////////////
 	clearSamples(); ////////////
-	if(doLogx) hSumTmp->Reset(); //////////
-	else { for(Int_t b=0 ; b<=hSumTmp->GetNbinsX() ; b++) hSumTmp->SetBinContent(b,0.); }
+	if(doLogx) hMassSumTmp->Reset(); //////////
+	else { for(Int_t b=0 ; b<=hMassSumTmp->GetNbinsX() ; b++) hMassSumTmp->SetBinContent(b,0.); }
 	hResTmp->Reset();
 	////////////////////////////
 	
-	addSample("ATLASZP/mcLocalControl_Zprime_mumu_SSM1000",  col2, 18996, 0.00012973*nb2mb, calcSumSigma);
+	addSample("ATLASZP/mcLocalControl_Zprime_mumu_SSM1000",  col2, 18996, 0.00012973*nb2mb);
 	
 	// get the data
 	ymin = 0.;
@@ -716,12 +974,12 @@ int plot_ratio_weights()
 		/////////////////////////////////////////////////////////////
 
 		////////////////////////////////////////////////////
-		hSumTmp->Add(hvBinnedHistos_imass[n]); // sum //////
+		hMassSumTmp->Add(hvBinnedHistos_imass[n]); // sum //////
 		hResTmp->Add(hvBinnedHistos_imassRes[n]); // sum ///
 		////////////////////////////////////////////////////
 
 		file->Close();
-		hReconZP    = (TH1D*)hSumTmp->Clone("");
+		hMassReconZP    = (TH1D*)hMassSumTmp->Clone("");
 		hResReconZP = (TH1D*)hResTmp->Clone("");
 	}
 	cout << "Templates are ready\n" << endl;
@@ -738,41 +996,41 @@ int plot_ratio_weights()
 	
 	pad_sigma->cd();
 	pad_sigma->Draw();
-	ymin = 0.5*getYmin(hSumZ0);
-	hSumZ0->SetMinimum(ymin);
-	hSumZ0->SetMaximum(1.5*hSumZ0->GetMaximum());
-	hSumZ0->SetLineColor(col0);
-	hSumZ0->SetLineWidth(2);
-	hSumZ0->SetTitle("");
-	hSumZ0->SetXTitle("#hat{m}_{#mu#mu} GeV");
-	hSumZ0->SetYTitle("Events");
-	if(doLogx) hSumZ0->GetXaxis()->SetMoreLogLabels(); 
-	if(doLogx) hSumZ0->GetXaxis()->SetMoreLogLabels(); 
-	hSumZ0->Draw();
-	//leg_mass->AddEntry(hSumZ0, "SM #gamma/Z^{0}", "l");
-	leg_mass->AddEntry(hSumZ0, "SM #gamma/Z^{0} (#it{ATLAS} MC10 truth)", "l");
+	ymin = 0.5*getYmin(hMassSumZ0);
+	hMassSumZ0->SetMinimum(ymin);
+	hMassSumZ0->SetMaximum(1.5*hMassSumZ0->GetMaximum());
+	hMassSumZ0->SetLineColor(col0);
+	hMassSumZ0->SetLineWidth(2);
+	hMassSumZ0->SetTitle("");
+	hMassSumZ0->SetXTitle("#hat{m}_{#mu#mu} GeV");
+	hMassSumZ0->SetYTitle("Events");
+	if(doLogx) hMassSumZ0->GetXaxis()->SetMoreLogLabels(); 
+	if(doLogx) hMassSumZ0->GetXaxis()->SetMoreLogLabels(); 
+	hMassSumZ0->Draw();
+	//leg_mass->AddEntry(hMassSumZ0, "SM #gamma/Z^{0}", "l");
+	leg_mass->AddEntry(hMassSumZ0, "SM #gamma/Z^{0} (#it{ATLAS} MC10 truth)", "l");
 	
 	sName = sMass + " GeV S^{1}/Z_{2} KK (#scale[1.1]{P}#scale[0.9]{YTHIA8})";
-	hSumKK->SetLineColor(col1);
-	hSumKK->SetLineWidth(2);
-	hSumKK->SetTitle("");
-	hSumKK->SetXTitle("#hat{m}_{#mu#mu} GeV");
-	hSumKK->SetYTitle("Events");
-	if(doLogx) hSumKK->GetXaxis()->SetMoreLogLabels(); 
-	if(doLogx) hSumKK->GetXaxis()->SetMoreLogLabels();
-	hSumKK->Draw("SAMES");
-	leg_mass->AddEntry(hSumKK, sName.c_str(), "l");
+	hMassSumKK->SetLineColor(col1);
+	hMassSumKK->SetLineWidth(2);
+	hMassSumKK->SetTitle("");
+	hMassSumKK->SetXTitle("#hat{m}_{#mu#mu} GeV");
+	hMassSumKK->SetYTitle("Events");
+	if(doLogx) hMassSumKK->GetXaxis()->SetMoreLogLabels(); 
+	if(doLogx) hMassSumKK->GetXaxis()->SetMoreLogLabels();
+	hMassSumKK->Draw("SAMES");
+	leg_mass->AddEntry(hMassSumKK, sName.c_str(), "l");
 	
 	sName = sMass + " GeV Z' SSM (#scale[1.1]{P}#scale[0.9]{YTHIA8})";
-	hSumZP->SetLineColor(col2);
-	hSumZP->SetLineWidth(2);
-	hSumZP->SetTitle("");
-	hSumZP->SetXTitle("#hat{m}_{#mu#mu} GeV");
-	hSumZP->SetYTitle("Events");
-	if(doLogx) hSumZP->GetXaxis()->SetMoreLogLabels(); 
-	if(doLogx) hSumZP->GetXaxis()->SetMoreLogLabels(); 
-	hSumZP->Draw("SAMES");
-	leg_mass->AddEntry(hSumZP, sName.c_str(), "l");
+	hMassSumZP->SetLineColor(col2);
+	hMassSumZP->SetLineWidth(2);
+	hMassSumZP->SetTitle("");
+	hMassSumZP->SetXTitle("#hat{m}_{#mu#mu} GeV");
+	hMassSumZP->SetYTitle("Events");
+	if(doLogx) hMassSumZP->GetXaxis()->SetMoreLogLabels(); 
+	if(doLogx) hMassSumZP->GetXaxis()->SetMoreLogLabels(); 
+	hMassSumZP->Draw("SAMES");
+	leg_mass->AddEntry(hMassSumZP, sName.c_str(), "l");
 	
 	leg_mass->Draw("SAMES");
 	pvtxt->Draw("SAMES");
@@ -827,40 +1085,40 @@ int plot_ratio_weights()
 	pad_recon_template->cd();
 	pad_recon_template->Draw();
 	
-	ymin = 0.5*getYmin(hReconZ0);
-	hReconZ0->SetMinimum(ymin);
-	hReconZ0->SetMaximum(1.5*hReconTemplateKK->GetMaximum()); // !!!
-	hReconZ0->SetLineColor(col0);
-	hReconZ0->SetLineWidth(2);
-	hReconZ0->SetTitle("");
-	hReconZ0->SetXTitle("#hat{m}_{#mu#mu} GeV");
-	hReconZ0->SetYTitle(sYTitle.c_str());
-	if(doLogx) hReconZ0->GetXaxis()->SetMoreLogLabels(); 
-	if(doLogx) hReconZ0->GetXaxis()->SetMoreLogLabels(); 
-	hReconZ0->Draw();
-	leg_mass_recon->AddEntry(hReconZ0, "SM #gamma/Z^{0} (#it{ATLAS} MC10 reconstructed)", "l");
+	ymin = 0.5*getYmin(hMassReconZ0);
+	hMassReconZ0->SetMinimum(ymin);
+	hMassReconZ0->SetMaximum(1.5*hMassReconTemplateKK->GetMaximum()); // !!!
+	hMassReconZ0->SetLineColor(col0);
+	hMassReconZ0->SetLineWidth(2);
+	hMassReconZ0->SetTitle("");
+	hMassReconZ0->SetXTitle("#hat{m}_{#mu#mu} GeV");
+	hMassReconZ0->SetYTitle(sYTitle.c_str());
+	if(doLogx) hMassReconZ0->GetXaxis()->SetMoreLogLabels(); 
+	if(doLogx) hMassReconZ0->GetXaxis()->SetMoreLogLabels(); 
+	hMassReconZ0->Draw();
+	leg_mass_recon->AddEntry(hMassReconZ0, "SM #gamma/Z^{0} (#it{ATLAS} MC10 reconstructed)", "l");
 	
 	sName = sMass + " GeV S^{1}/Z_{2} KK Template";
-	hReconTemplateKK->SetLineColor(col1);
-	hReconTemplateKK->SetLineWidth(2);
-	hReconTemplateKK->SetTitle("");
-	hReconTemplateKK->SetXTitle("#hat{m}_{#mu#mu} GeV");
-	hReconTemplateKK->SetYTitle(sYTitle.c_str());
-	if(doLogx) hReconTemplateKK->GetXaxis()->SetMoreLogLabels(); 
-	if(doLogx) hReconTemplateKK->GetXaxis()->SetMoreLogLabels();
-	hReconTemplateKK->Draw("SAMES");
-	leg_mass_recon->AddEntry(hReconTemplateKK, sName.c_str(), "l");
+	hMassReconTemplateKK->SetLineColor(col1);
+	hMassReconTemplateKK->SetLineWidth(2);
+	hMassReconTemplateKK->SetTitle("");
+	hMassReconTemplateKK->SetXTitle("#hat{m}_{#mu#mu} GeV");
+	hMassReconTemplateKK->SetYTitle(sYTitle.c_str());
+	if(doLogx) hMassReconTemplateKK->GetXaxis()->SetMoreLogLabels(); 
+	if(doLogx) hMassReconTemplateKK->GetXaxis()->SetMoreLogLabels();
+	hMassReconTemplateKK->Draw("SAMES");
+	leg_mass_recon->AddEntry(hMassReconTemplateKK, sName.c_str(), "l");
 	
 	sName = sMass + " GeV Z' SSM Template";
-	hReconTemplateZP->SetLineColor(col2);
-	hReconTemplateZP->SetLineWidth(2);
-	hReconTemplateZP->SetTitle("");
-	hReconTemplateZP->SetXTitle("#hat{m}_{#mu#mu} GeV");
-	hReconTemplateZP->SetYTitle(sYTitle.c_str());
-	if(doLogx) hReconTemplateZP->GetXaxis()->SetMoreLogLabels(); 
-	if(doLogx) hReconTemplateZP->GetXaxis()->SetMoreLogLabels(); 
-	hReconTemplateZP->Draw("SAMES");
-	leg_mass_recon->AddEntry(hReconTemplateZP, sName.c_str(), "l");
+	hMassReconTemplateZP->SetLineColor(col2);
+	hMassReconTemplateZP->SetLineWidth(2);
+	hMassReconTemplateZP->SetTitle("");
+	hMassReconTemplateZP->SetXTitle("#hat{m}_{#mu#mu} GeV");
+	hMassReconTemplateZP->SetYTitle(sYTitle.c_str());
+	if(doLogx) hMassReconTemplateZP->GetXaxis()->SetMoreLogLabels(); 
+	if(doLogx) hMassReconTemplateZP->GetXaxis()->SetMoreLogLabels(); 
+	hMassReconTemplateZP->Draw("SAMES");
+	leg_mass_recon->AddEntry(hMassReconTemplateZP, sName.c_str(), "l");
 	
 	leg_mass_recon->Draw("SAMES");
 	pvtxt_recon->Draw("SAMES");
@@ -878,31 +1136,31 @@ int plot_ratio_weights()
 	pad_compare->Draw();
 	
 	sName = sMass + " GeV Z' SSM Template";
-	ymin = 0.5*getYmin(hReconTemplateZP);
-	hReconTemplateZP->SetMinimum(ymin);
-	hReconTemplateZP->SetMaximum(1.5*hReconTemplateZP->GetMaximum()); // !!!
-	hReconTemplateZP->SetLineColor(col2);
-	hReconTemplateZP->SetLineWidth(2);
-	hReconTemplateZP->SetTitle("");
-	hReconTemplateZP->SetXTitle("#hat{m}_{#mu#mu} GeV");
-	hReconTemplateZP->SetYTitle(sYTitle.c_str());
-	if(doLogx) hReconTemplateZP->GetXaxis()->SetMoreLogLabels(); 
-	if(doLogx) hReconTemplateZP->GetXaxis()->SetMoreLogLabels(); 
-	hReconTemplateZP->Draw();
-	leg_compare->AddEntry(hReconTemplateZP, sName.c_str(), "l");
+	ymin = 0.5*getYmin(hMassReconTemplateZP);
+	hMassReconTemplateZP->SetMinimum(ymin);
+	hMassReconTemplateZP->SetMaximum(1.5*hMassReconTemplateZP->GetMaximum()); // !!!
+	hMassReconTemplateZP->SetLineColor(col2);
+	hMassReconTemplateZP->SetLineWidth(2);
+	hMassReconTemplateZP->SetTitle("");
+	hMassReconTemplateZP->SetXTitle("#hat{m}_{#mu#mu} GeV");
+	hMassReconTemplateZP->SetYTitle(sYTitle.c_str());
+	if(doLogx) hMassReconTemplateZP->GetXaxis()->SetMoreLogLabels(); 
+	if(doLogx) hMassReconTemplateZP->GetXaxis()->SetMoreLogLabels(); 
+	hMassReconTemplateZP->Draw();
+	leg_compare->AddEntry(hMassReconTemplateZP, sName.c_str(), "l");
 	
 	
 	sName = sMass + " GeV Z' SSM (#it{ATLAS} MC10 reconstructed)";
-	hReconZP->SetLineColor(col5);
-	//hReconZP->SetLineStyle(2);
-	hReconZP->SetLineWidth(2);
-	hReconZP->SetTitle("");
-	hReconZP->SetXTitle("#hat{m}_{#mu#mu} GeV");
-	hReconZP->SetYTitle(sYTitle.c_str());
-	if(doLogx) hReconZP->GetXaxis()->SetMoreLogLabels(); 
-	if(doLogx) hReconZP->GetXaxis()->SetMoreLogLabels(); 
-	hReconZP->Draw("SAMES");
-	leg_compare->AddEntry(hReconZP, sName.c_str(), "l");
+	hMassReconZP->SetLineColor(col5);
+	//hMassReconZP->SetLineStyle(2);
+	hMassReconZP->SetLineWidth(2);
+	hMassReconZP->SetTitle("");
+	hMassReconZP->SetXTitle("#hat{m}_{#mu#mu} GeV");
+	hMassReconZP->SetYTitle(sYTitle.c_str());
+	if(doLogx) hMassReconZP->GetXaxis()->SetMoreLogLabels(); 
+	if(doLogx) hMassReconZP->GetXaxis()->SetMoreLogLabels(); 
+	hMassReconZP->Draw("SAMES");
+	leg_compare->AddEntry(hMassReconZP, sName.c_str(), "l");
 	
 	leg_compare->Draw("SAMES");
 	pvtxt_compare->Draw("SAMES");

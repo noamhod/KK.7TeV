@@ -27,6 +27,8 @@ public:
 	int counter;
 	int ai;
 	int bi;
+	int ai_truth;
+	int bi_truth;
 	int iVtx;
 	string sRunType;
 	int currentRun;
@@ -36,6 +38,7 @@ public:
 	vector<bool> muQAflags;
 	int nMusPassed;
 	TMapdi pTtoIndexMap;
+	TMapdi pTtoIndexMapTruth;
 	TVectorP2VL	pmu;
 	TVectorP2VL pmuTruth;
 	TMapsd values2fill;
@@ -536,6 +539,7 @@ public:
 	void resetMuQAflags(int nMus);
 	int  countQAflags();
 	void pTSort();
+	void pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b);
 	void imassSort();
 	bool assignPairIndices();
 	

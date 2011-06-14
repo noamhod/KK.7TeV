@@ -635,6 +635,41 @@ class graphicObjects// : public utilities
 		vector<int>*   truth_all_mothertype;
 		vector<int>*   truth_all_motherbarcode;
 		vector<int>*   truth_all_matched;
+		
+		// muonTruth
+		vector<float>*   truth_all_muonTruth_pt;
+		vector<float>*   truth_all_muonTruth_m;
+		vector<float>*   truth_all_muonTruth_eta;
+		vector<float>*   truth_all_muonTruth_phi;
+		vector<float>*   truth_all_muonTruth_charge;
+		vector<int>*     truth_all_muonTruth_PDGID;
+		vector<int>*     truth_all_muonTruth_barcode;
+		vector<int>*     truth_all_muonTruth_type;
+		vector<int>*     truth_all_muonTruth_origin;
+		// MC event
+		vector<int>*     truth_all_mcevt_signal_process_id;
+		vector<int>*     truth_all_mcevt_event_number;
+		vector<double>*  truth_all_mcevt_event_scale;
+		vector<double>*  truth_all_mcevt_alphaQCD;
+		vector<double>*  truth_all_mcevt_alphaQED;
+		vector<int>*     truth_all_mcevt_pdf_id1;
+		vector<int>*     truth_all_mcevt_pdf_id2;
+		vector<double>*  truth_all_mcevt_pdf_x1;
+		vector<double>*  truth_all_mcevt_pdf_x2;
+		vector<double>*  truth_all_mcevt_pdf_scale;
+		vector<double>*  truth_all_mcevt_pdf1;
+		vector<double>*  truth_all_mcevt_pdf2;
+		vector<double>*  truth_all_mcevt_weight;
+		//MC
+		vector<float>* truth_all_mc_pt;
+		vector<float>* truth_all_mc_m;
+		vector<float>* truth_all_mc_eta;
+		vector<float>* truth_all_mc_phi;
+		vector<int>*   truth_all_mc_status;
+		vector<int>*   truth_all_mc_barcode;
+		vector<int>*   truth_all_mc_pdgId;
+		vector<float>* truth_all_mc_charge;
+		
 		float truth_all_Mhat;
 		float truth_all_CosThetaCS;
 		float truth_all_CosThetaHE;

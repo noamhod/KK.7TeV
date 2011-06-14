@@ -56,7 +56,7 @@ public:
 			 TFile* treeFile,
 			 string sCutFlowFilePath,
 			 string sPeriodsFilePath,
-			 string sEventDumpFilePath) :
+	string sEventDumpFilePath) :
 	analysisSkeleton(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
 	{
 		sRunType       = runtype;  // grid OR local

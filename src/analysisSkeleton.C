@@ -2090,76 +2090,6 @@ void analysisSkeleton::fillTruth()
 {
 	//mu_truth_matched    : True if muon is matched to the truth
 	//mu_truth_status     : Status oMC status = 1 final particle, status = 3 intermediate particle (documentary)
-	//mu_truth_mothertype : description: True mother PDG type
-	
-	if(mu_truth_pt==0)         return;
-	if(mu_truth_status==0)     return;
-	if(mu_truth_mothertype==0) return;
-	
-	//////////////////////////////////////
-	if(mu_truth_pt->size()<2) return;  ///
-	//////////////////////////////////////
-	
-	int mu_tru_ai=-1, mu_tru_bi=-1;
-	for(int t=0 ; t<(int)mu_truth_pt->size() ; t++)
-	{	
-		if(!mu_truth_status->at(t))                                                    continue; // has to be final particle
-		if(mu_truth_mothertype->at(t)!=PDTZ  &&  mu_truth_mothertype->at(t)!=PDTGAMMA) continue; // has to come out of Z^0
-		if(mu_tru_ai<0) mu_tru_ai = t;
-		if(mu_tru_bi<0  &&  mu_tru_ai>=0  &&  mu_tru_ai!=t) mu_tru_bi = t;
-		if(mu_tru_ai>=0  &&  mu_tru_bi>=0) break;
-	}
-	
-	if(mu_tru_ai>=0  &&  mu_tru_bi>=0)
-	{
-		truth_all_dr->push_back( mu_truth_dr->at(mu_tru_ai) );
-		truth_all_dr->push_back( mu_truth_dr->at(mu_tru_bi) );
-		truth_all_E->push_back( mu_truth_E->at(mu_tru_ai)*MeV2GeV );
-		truth_all_E->push_back( mu_truth_E->at(mu_tru_bi)*MeV2GeV );
-		truth_all_pt->push_back( mu_truth_pt->at(mu_tru_ai)*MeV2GeV );
-		truth_all_pt->push_back( mu_truth_pt->at(mu_tru_bi)*MeV2GeV );
-		truth_all_eta->push_back( mu_truth_eta->at(mu_tru_ai) );
-		truth_all_eta->push_back( mu_truth_eta->at(mu_tru_bi) );
-		truth_all_phi->push_back( mu_truth_phi->at(mu_tru_ai) );
-		truth_all_phi->push_back( mu_truth_phi->at(mu_tru_bi) );
-		truth_all_type->push_back( mu_truth_type->at(mu_tru_ai) );
-		truth_all_type->push_back( mu_truth_type->at(mu_tru_bi) );
-		truth_all_status->push_back( mu_truth_status->at(mu_tru_ai) );
-		truth_all_status->push_back( mu_truth_status->at(mu_tru_bi) );
-		truth_all_barcode->push_back( mu_truth_barcode->at(mu_tru_ai) );
-		truth_all_barcode->push_back( mu_truth_barcode->at(mu_tru_bi) );
-		truth_all_mothertype->push_back( mu_truth_mothertype->at(mu_tru_ai) );
-		truth_all_mothertype->push_back( mu_truth_mothertype->at(mu_tru_bi) );
-		truth_all_motherbarcode->push_back( mu_truth_motherbarcode->at(mu_tru_ai) );
-		truth_all_motherbarcode->push_back( mu_truth_motherbarcode->at(mu_tru_bi) );
-		truth_all_matched->push_back( mu_truth_matched->at(mu_tru_ai) );
-		truth_all_matched->push_back( mu_truth_matched->at(mu_tru_bi) );
-	
-		float c1 = (mu_truth_type->at(mu_tru_ai)<0) ? -1. : +1.;
-		float c2 = (mu_truth_type->at(mu_tru_bi)<0) ? -1. : +1.;
-		
-		truth_all_isValid = true;
-		
-		TLorentzVector* p1 = new TLorentzVector();
-		TLorentzVector* p2 = new TLorentzVector();
-		p1->SetPtEtaPhiE( mu_truth_pt->at(mu_tru_ai)*MeV2GeV, mu_truth_eta->at(mu_tru_ai), mu_truth_phi->at(mu_tru_ai), mu_truth_E->at(mu_tru_ai)*MeV2GeV);
-		p2->SetPtEtaPhiE( mu_truth_pt->at(mu_tru_bi)*MeV2GeV, mu_truth_eta->at(mu_tru_bi), mu_truth_phi->at(mu_tru_bi), mu_truth_E->at(mu_tru_bi)*MeV2GeV);
-		truth_all_Mhat       = imass(p1,p2);
-		truth_all_CosThetaCS = cosThetaCollinsSoper(p1,c1, p2,c2);
-		truth_all_CosThetaHE = cosThetaBoost(p1,c1, p2,c2);
-		truth_all_ySystem    = ySystem(p1,p2);
-		truth_all_QT         = QT(p1,p2);
-		delete p1;
-		delete p2;
-	}
-}
-*/
-
-
-void analysisSkeleton::fillTruth()
-{
-	//mu_truth_matched    : True if muon is matched to the truth
-	//mu_truth_status     : Status oMC status = 1 final particle, status = 3 intermediate particle (documentary)
 	
 	if(mu_truth_pt==0)         return;
 	if(mu_truth_status==0)     return;
@@ -2226,6 +2156,136 @@ void analysisSkeleton::fillTruth()
 		TLorentzVector* p2 = new TLorentzVector();
 		p1->SetPtEtaPhiE( truth_all_pt->at(ai_truth), truth_all_eta->at(ai_truth), truth_all_phi->at(ai_truth), truth_all_E->at(ai_truth));
 		p2->SetPtEtaPhiE( truth_all_pt->at(bi_truth), truth_all_eta->at(bi_truth), truth_all_phi->at(bi_truth), truth_all_E->at(bi_truth));
+		truth_all_Mhat       = imass(p1,p2);
+		truth_all_CosThetaCS = cosThetaCollinsSoper(p1,c1, p2,c2);
+		truth_all_CosThetaHE = cosThetaBoost(p1,c1, p2,c2);
+		truth_all_ySystem    = ySystem(p1,p2);
+		truth_all_QT         = QT(p1,p2);
+		delete p1;
+		delete p2;
+	}
+}
+*/
+
+void analysisSkeleton::fillTruth()
+{
+	/*
+	// muonTruth
+	vector<float>*   truth_all_muonTruth_pt;
+	vector<float>*   truth_all_muonTruth_m;
+	vector<float>*   truth_all_muonTruth_eta;
+	vector<float>*   truth_all_muonTruth_phi;
+	vector<float>*   truth_all_muonTruth_charge;
+	vector<int>*     truth_all_muonTruth_PDGID;
+	vector<int>*     truth_all_muonTruth_barcode;
+	vector<int>*     truth_all_muonTruth_type;
+	vector<int>*     truth_all_muonTruth_origin;
+	// MC event
+	vector<int>*     truth_all_mcevt_signal_process_id;
+	vector<int>*     truth_all_mcevt_event_number;
+	vector<double>*  truth_all_mcevt_event_scale;
+	vector<double>*  truth_all_mcevt_alphaQCD;
+	vector<double>*  truth_all_mcevt_alphaQED;
+	vector<int>*     truth_all_mcevt_pdf_id1;
+	vector<int>*     truth_all_mcevt_pdf_id2;
+	vector<double>*  truth_all_mcevt_pdf_x1;
+	vector<double>*  truth_all_mcevt_pdf_x2;
+	vector<double>*  truth_all_mcevt_pdf_scale;
+	vector<double>*  truth_all_mcevt_pdf1;
+	vector<double>*  truth_all_mcevt_pdf2;
+	vector<double>*  truth_all_mcevt_weight;
+	//MC
+	vector<float>* truth_all_mc_pt;
+	vector<float>* truth_all_mc_m;
+	vector<float>* truth_all_mc_eta;
+	vector<float>* truth_all_mc_phi;
+	vector<int>*   truth_all_mc_status;
+	vector<int>*   truth_all_mc_barcode;
+	vector<int>*   truth_all_mc_pdgId;
+	vector<float>* truth_all_mc_charge;
+	*/
+	
+	
+	////////////////////////////////////
+	if(mc_pt==0)        return; ////
+	if(mc_pt->size()<2) return; ////
+	////////////////////////////////////
+	
+	
+	int truth_valid_index = 0;
+	//////////////////////////////////////
+	pTtoIndexMapTruth.clear(); ///////////
+	//////////////////////////////////////
+	for(int t=0 ; t<(int)mc_pt->size() ; t++)
+	{
+		if(!mc_status->at(t))                  continue; // has to be final particle
+		if((int)fabs(mc_pdgId->at(t))!=PDTMU)  continue; // has to be a muon
+		
+		bool isZ     = false; 
+		bool isGamma = false;
+		for(int mom=0 ; mom<(int)mc_parent_index->at(t).size() ; mom++) // has to come out of Z^0 (since the cuts on the reconstructed muons are Z^0-oriented) ?????
+		{
+			int imom = mc_parent_index->at(t)[mom];
+			if(mc_pdgId->at(imom)==PDTZ)
+			{
+				isZ = true;
+				break;
+			}
+			if(mc_pdgId->at(imom)==PDTGAMMA)
+			{
+				isGamma = true;
+				break;
+			}
+		}
+		if(!isZ && !isGamma) continue;
+		
+		truth_all_mc_m->push_back( mc_m->at(t)*MeV2GeV );
+		truth_all_mc_pt->push_back( mc_pt->at(t)*MeV2GeV );
+		truth_all_mc_eta->push_back( mc_eta->at(t) );
+		truth_all_mc_phi->push_back( mc_phi->at(t) );
+		truth_all_mc_pdgId->push_back( mc_pdgId->at(t) );
+		truth_all_mc_status->push_back( mc_status->at(t) );
+		truth_all_mc_barcode->push_back( mc_barcode->at(t) );
+		truth_all_mc_charge->push_back( mc_charge->at(t) );
+		truth_all_isValid = true;
+		
+		/////////////////////////////////////////////////////////////////////////////////
+		// FILL THE pTtoIndexMapTruth MAP WITH THE PT(KEY) AND INDEX(VALUE) /////////////
+		pTtoIndexMapTruth.insert(make_pair(mc_pt->at(t)*MeV2GeV,truth_valid_index)); ////
+		/////////////////////////////////////////////////////////////////////////////////
+		
+		truth_valid_index++;
+	}
+	
+	
+	// SORT BY PT AND FIND THE INDICES OF THE FIRST 2 MUONS (HIGHEST PT).
+	ai_truth = -1;
+	bi_truth = -1;
+	if(truth_valid_index>=2  &&  pTtoIndexMapTruth.size()>=2  &&  truth_all_isValid) pTSort(pTtoIndexMapTruth, ai_truth, bi_truth);
+	else
+	{
+		truth_valid_index = 0;
+		truth_all_isValid = false;
+		return;
+	}
+	
+	// CALCULATE ALL THE 'EVENT-LEVEL' VARIABLES (DI-MUON VARIABLES)
+	if( truth_valid_index>=2  &&  ai_truth>=0  &&  bi_truth>=0  &&  ai_truth!=bi_truth )
+	{
+		if( truth_all_mc_charge->at(ai_truth)*truth_all_mc_charge->at(bi_truth) >= 0. ) // now require opposite charge
+		{
+			truth_valid_index = 0;
+			truth_all_isValid = false;
+			return;
+		}
+	
+		float c1 = truth_all_mc_charge->at(ai_truth);
+		float c2 = truth_all_mc_charge->at(bi_truth);
+		
+		TLorentzVector* p1 = new TLorentzVector();
+		TLorentzVector* p2 = new TLorentzVector();
+		p1->SetPtEtaPhiM( truth_all_mc_pt->at(ai_truth), truth_all_mc_eta->at(ai_truth), truth_all_mc_phi->at(ai_truth), truth_all_mc_m->at(ai_truth));
+		p2->SetPtEtaPhiM( truth_all_mc_pt->at(bi_truth), truth_all_mc_eta->at(bi_truth), truth_all_mc_phi->at(bi_truth), truth_all_mc_m->at(bi_truth));
 		truth_all_Mhat       = imass(p1,p2);
 		truth_all_CosThetaCS = cosThetaCollinsSoper(p1,c1, p2,c2);
 		truth_all_CosThetaHE = cosThetaBoost(p1,c1, p2,c2);

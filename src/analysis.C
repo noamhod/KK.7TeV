@@ -225,6 +225,24 @@ void analysis::setEventVariables()
 		analysisSkeleton::mcevt_pdf1 = m_WZphysD3PD->mcevt_pdf1;
 		analysisSkeleton::mcevt_pdf2 = m_WZphysD3PD->mcevt_pdf2;
 		analysisSkeleton::mcevt_weight = m_WZphysD3PD->mcevt_weight;
+		
+		// MC
+		analysisSkeleton::mc_n = m_WZphysD3PD->mc_n;
+		analysisSkeleton::mc_pt = m_WZphysD3PD->mc_pt;
+		analysisSkeleton::mc_m = m_WZphysD3PD->mc_m;
+		analysisSkeleton::mc_eta = m_WZphysD3PD->mc_eta;
+		analysisSkeleton::mc_phi = m_WZphysD3PD->mc_phi;
+		analysisSkeleton::mc_status = m_WZphysD3PD->mc_status;
+		analysisSkeleton::mc_barcode = m_WZphysD3PD->mc_barcode;
+		analysisSkeleton::mc_parents = m_WZphysD3PD->mc_parents;
+		analysisSkeleton::mc_children = m_WZphysD3PD->mc_children;
+		analysisSkeleton::mc_pdgId = m_WZphysD3PD->mc_pdgId;
+		analysisSkeleton::mc_charge = m_WZphysD3PD->mc_charge;
+		analysisSkeleton::mc_vx_x = m_WZphysD3PD->mc_vx_x;
+		analysisSkeleton::mc_vx_y = m_WZphysD3PD->mc_vx_y;
+		analysisSkeleton::mc_vx_z = m_WZphysD3PD->mc_vx_z;
+		analysisSkeleton::mc_child_index = m_WZphysD3PD->mc_child_index;
+		analysisSkeleton::mc_parent_index = m_WZphysD3PD->mc_parent_index;
 	}
 }
 

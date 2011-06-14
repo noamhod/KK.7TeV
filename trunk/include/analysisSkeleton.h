@@ -436,6 +436,24 @@ public:
 	vector<double>*  mcevt_pdf2;
 	vector<double>*  mcevt_weight;
 	
+	//MC
+	int            mc_n;
+	vector<float>* mc_pt;
+	vector<float>* mc_m;
+	vector<float>* mc_eta;
+	vector<float>* mc_phi;
+	vector<int>*   mc_status;
+	vector<int>*   mc_barcode;
+	vector<vector<int> >* mc_parents;
+	vector<vector<int> >* mc_children;
+	vector<int>*   mc_pdgId;
+	vector<float>* mc_charge;
+	vector<float>* mc_vx_x;
+	vector<float>* mc_vx_y;
+	vector<float>* mc_vx_z;
+	vector<vector<int> >* mc_child_index;
+	vector<vector<int> >* mc_parent_index;
+	
 	// triggers
 	Int_t           trig_L1_mu_n;
 	vector<float>   *trig_L1_mu_pt;

@@ -1924,22 +1924,22 @@ void analysisLocalControl::GetEntryMinimal(Long64_t entry)
 		m_WZphysD3PD->b_mcevt_pdf2->GetEntry(entry);
 		m_WZphysD3PD->b_mcevt_weight->GetEntry(entry);
 
-		//m_WZphysD3PD->b_mc_n->GetEntry(entry);
-		//m_WZphysD3PD->b_mc_pt->GetEntry(entry);
-		//m_WZphysD3PD->b_mc_m->GetEntry(entry);
-		//m_WZphysD3PD->b_mc_eta->GetEntry(entry);
-		//m_WZphysD3PD->b_mc_phi->GetEntry(entry);
-		//m_WZphysD3PD->b_mc_status->GetEntry(entry);
-		//m_WZphysD3PD->b_mc_barcode->GetEntry(entry);
-		//m_WZphysD3PD->b_mc_parents->GetEntry(entry);
-		//m_WZphysD3PD->b_mc_children->GetEntry(entry);
-		//m_WZphysD3PD->b_mc_pdgId->GetEntry(entry);
-		//m_WZphysD3PD->b_mc_charge->GetEntry(entry);
-		//m_WZphysD3PD->b_mc_vx_x->GetEntry(entry);
-		//m_WZphysD3PD->b_mc_vx_y->GetEntry(entry);
-		//m_WZphysD3PD->b_mc_vx_z->GetEntry(entry);
-		//m_WZphysD3PD->b_mc_child_index->GetEntry(entry);
-		//m_WZphysD3PD->b_mc_parent_index->GetEntry(entry);
+		m_WZphysD3PD->b_mc_n->GetEntry(entry);
+		m_WZphysD3PD->b_mc_pt->GetEntry(entry);
+		m_WZphysD3PD->b_mc_m->GetEntry(entry);
+		m_WZphysD3PD->b_mc_eta->GetEntry(entry);
+		m_WZphysD3PD->b_mc_phi->GetEntry(entry);
+		m_WZphysD3PD->b_mc_status->GetEntry(entry);
+		m_WZphysD3PD->b_mc_barcode->GetEntry(entry);
+		m_WZphysD3PD->b_mc_parents->GetEntry(entry);
+		m_WZphysD3PD->b_mc_children->GetEntry(entry);
+		m_WZphysD3PD->b_mc_pdgId->GetEntry(entry);
+		m_WZphysD3PD->b_mc_charge->GetEntry(entry);
+		m_WZphysD3PD->b_mc_vx_x->GetEntry(entry);
+		m_WZphysD3PD->b_mc_vx_y->GetEntry(entry);
+		m_WZphysD3PD->b_mc_vx_z->GetEntry(entry);
+		m_WZphysD3PD->b_mc_child_index->GetEntry(entry);
+		m_WZphysD3PD->b_mc_parent_index->GetEntry(entry);
 	}
 	
 	//m_WZphysD3PD->b_trig_L1_TAV->GetEntry(entry);

@@ -401,6 +401,41 @@ void graphicObjects::clearTreeVars()
 	truth_all_motherbarcode->clear();
 	truth_all_matched->clear();
 	truth_all_isValid    = false;
+	
+	// muonTruth
+	truth_all_muonTruth_pt->clear();
+	truth_all_muonTruth_m->clear();
+	truth_all_muonTruth_eta->clear();
+	truth_all_muonTruth_phi->clear();
+	truth_all_muonTruth_charge->clear();
+	truth_all_muonTruth_PDGID->clear();
+	truth_all_muonTruth_barcode->clear();
+	truth_all_muonTruth_type->clear();
+	truth_all_muonTruth_origin->clear();
+	// MC event
+	truth_all_mcevt_signal_process_id->clear();
+	truth_all_mcevt_event_number->clear();
+	truth_all_mcevt_event_scale->clear();
+	truth_all_mcevt_alphaQCD->clear();
+	truth_all_mcevt_alphaQED->clear();
+	truth_all_mcevt_pdf_id1->clear();
+	truth_all_mcevt_pdf_id2->clear();
+	truth_all_mcevt_pdf_x1->clear();
+	truth_all_mcevt_pdf_x2->clear();
+	truth_all_mcevt_pdf_scale->clear();
+	truth_all_mcevt_pdf1->clear();
+	truth_all_mcevt_pdf2->clear();
+	truth_all_mcevt_weight->clear();
+	//MC
+	truth_all_mc_pt->clear();
+	truth_all_mc_m->clear();
+	truth_all_mc_eta->clear();
+	truth_all_mc_phi->clear();
+	truth_all_mc_status->clear();
+	truth_all_mc_barcode->clear();
+	truth_all_mc_pdgId->clear();
+	truth_all_mc_charge->clear();
+	
 	truth_all_Mhat       = 0.;
 	truth_all_CosThetaCS = 0.;
 	truth_all_CosThetaHE = 0.;
@@ -428,8 +463,8 @@ void graphicObjects::clearTreeVars()
 }
 
 void graphicObjects::writeTrees(TDirectory* tDir_allCuts,
-								TDirectory* tDir_cutsProfile,
-								TDirectory* tDir_efficiency)
+TDirectory* tDir_cutsProfile,
+TDirectory* tDir_efficiency)
 {
 	TFile* f = NULL;
 
@@ -459,9 +494,9 @@ void graphicObjects::writeTrees(TDirectory* tDir_allCuts,
 }
 
 void graphicObjects::writeTrees(TDirectory* tDir_allCuts,
-								TDirectory* tDir_cutsProfile,
-								TDirectory* tDir_efficiency,
-								TDirectory* tDir_truth)
+TDirectory* tDir_cutsProfile,
+TDirectory* tDir_efficiency,
+TDirectory* tDir_truth)
 {
 	TFile* f = NULL;
 	
@@ -476,8 +511,8 @@ void graphicObjects::writeTrees(TDirectory* tDir_allCuts,
 }
 
 void graphicObjects::setTrees(TDirectory* tDir_allCuts,
-							  TDirectory* tDir_cutsProfile,
-							  TDirectory* tDir_efficiency)
+TDirectory* tDir_cutsProfile,
+TDirectory* tDir_efficiency)
 {
 	// all cuts - vectors
 	vxp_nTracks = new vector<int>;
@@ -849,7 +884,7 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_allCuts->Branch( "timestamp_ns", &timestamp_ns );
 	tree_allCuts->Branch( "lbn",          &lbn );
 	tree_allCuts->Branch( "bcid",         &bcid );
-		
+	
 	tree_allCuts->Branch( "vxp_n",       &vxp_n );
 	tree_allCuts->Branch( "vxp_nTracks", &vxp_nTracks );
 	tree_allCuts->Branch( "vxp_type",    &vxp_type );
@@ -1208,9 +1243,9 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 }
 
 void graphicObjects::setTrees(TDirectory* tDir_allCuts,
-							  TDirectory* tDir_cutsProfile,
-							  TDirectory* tDir_efficiency,
-							  TDirectory* tDir_truth)
+TDirectory* tDir_cutsProfile,
+TDirectory* tDir_efficiency,
+TDirectory* tDir_truth)
 {
 	setTrees(tDir_allCuts, tDir_cutsProfile, tDir_efficiency);
 	
@@ -1239,6 +1274,41 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	recon_all_id = new vector<int>;
 	recon_all_theta = new vector<float>;
 	
+	
+	// muonTruth
+	truth_all_muonTruth_pt = new vector<float>;
+	truth_all_muonTruth_m = new vector<float>;
+	truth_all_muonTruth_eta = new vector<float>;
+	truth_all_muonTruth_phi = new vector<float>;
+	truth_all_muonTruth_charge = new vector<float>;
+	truth_all_muonTruth_PDGID = new vector<int>;
+	truth_all_muonTruth_barcode = new vector<int>;
+	truth_all_muonTruth_type = new vector<int>;
+	truth_all_muonTruth_origin = new vector<int>;
+	// MC event
+	truth_all_mcevt_signal_process_id = new vector<int>;
+	truth_all_mcevt_event_number = new vector<int>;
+	truth_all_mcevt_event_scale = new vector<double>;
+	truth_all_mcevt_alphaQCD = new vector<double>;
+	truth_all_mcevt_alphaQED = new vector<double>;
+	truth_all_mcevt_pdf_id1 = new vector<int>;
+	truth_all_mcevt_pdf_id2 = new vector<int>;
+	truth_all_mcevt_pdf_x1 = new vector<double>;
+	truth_all_mcevt_pdf_x2 = new vector<double>;
+	truth_all_mcevt_pdf_scale = new vector<double>;
+	truth_all_mcevt_pdf1 = new vector<double>;
+	truth_all_mcevt_pdf2 = new vector<double>;
+	truth_all_mcevt_weight = new vector<double>;
+	//MC
+	truth_all_mc_pt = new vector<float>;
+	truth_all_mc_m = new vector<float>;
+	truth_all_mc_eta = new vector<float>;
+	truth_all_mc_phi = new vector<float>;
+	truth_all_mc_status = new vector<int>;
+	truth_all_mc_barcode = new vector<int>;
+	truth_all_mc_pdgId = new vector<int>;
+	truth_all_mc_charge = new vector<float>;
+	
 	if(tDir_truth!=NULL) tDir_truth->cd();
 	tree_truth = new TTree("truth_tree","truth_tree");
 	tree_truth->SetDirectory(tDir_truth);
@@ -1254,6 +1324,42 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_truth->Branch( "truth_all_mothertype",  &truth_all_mothertype );
 	tree_truth->Branch( "truth_all_motherbarcode",  &truth_all_motherbarcode );
 	tree_truth->Branch( "truth_all_matched", &truth_all_matched );
+	
+	
+	// muonTruth
+	tree_truth->Branch( "truth_all_muonTruth_pt", &truth_all_muonTruth_pt );
+	tree_truth->Branch( "truth_all_muonTruth_m", &truth_all_muonTruth_m );
+	tree_truth->Branch( "truth_all_muonTruth_eta", &truth_all_muonTruth_eta );
+	tree_truth->Branch( "truth_all_muonTruth_phi", &truth_all_muonTruth_phi );
+	tree_truth->Branch( "truth_all_muonTruth_charge", &truth_all_muonTruth_charge );
+	tree_truth->Branch( "truth_all_muonTruth_PDGID", &truth_all_muonTruth_PDGID );
+	tree_truth->Branch( "truth_all_muonTruth_barcode", &truth_all_muonTruth_barcode );
+	tree_truth->Branch( "truth_all_muonTruth_type", &truth_all_muonTruth_type );
+	tree_truth->Branch( "truth_all_muonTruth_origin", &truth_all_muonTruth_origin );
+	// MC event
+	tree_truth->Branch( "truth_all_mcevt_signal_process_id", &truth_all_mcevt_signal_process_id );
+	tree_truth->Branch( "truth_all_mcevt_event_number", &truth_all_mcevt_event_number );
+	tree_truth->Branch( "truth_all_mcevt_event_scale", &truth_all_mcevt_event_scale );
+	tree_truth->Branch( "truth_all_mcevt_alphaQCD", &truth_all_mcevt_alphaQCD );
+	tree_truth->Branch( "truth_all_mcevt_alphaQED", &truth_all_mcevt_alphaQED );
+	tree_truth->Branch( "truth_all_mcevt_pdf_id1", &truth_all_mcevt_pdf_id1 );
+	tree_truth->Branch( "truth_all_mcevt_pdf_id2", &truth_all_mcevt_pdf_id2 );
+	tree_truth->Branch( "truth_all_mcevt_pdf_x1", &truth_all_mcevt_pdf_x1 );
+	tree_truth->Branch( "truth_all_mcevt_pdf_x2", &truth_all_mcevt_pdf_x2 );
+	tree_truth->Branch( "truth_all_mcevt_pdf_scale", &truth_all_mcevt_pdf_scale );
+	tree_truth->Branch( "truth_all_mcevt_pdf1", &truth_all_mcevt_pdf1 );
+	tree_truth->Branch( "truth_all_mcevt_pdf2", &truth_all_mcevt_pdf2 );
+	tree_truth->Branch( "truth_all_mcevt_weight", &truth_all_mcevt_weight );
+	//MC
+	tree_truth->Branch( "truth_all_mc_pt", &truth_all_mc_pt );
+	tree_truth->Branch( "truth_all_mc_m", &truth_all_mc_m );
+	tree_truth->Branch( "truth_all_mc_eta", &truth_all_mc_eta );
+	tree_truth->Branch( "truth_all_mc_phi", &truth_all_mc_phi );
+	tree_truth->Branch( "truth_all_mc_status", &truth_all_mc_status );
+	tree_truth->Branch( "truth_all_mc_barcode", &truth_all_mc_barcode );
+	tree_truth->Branch( "truth_all_mc_pdgId", &truth_all_mc_pdgId );
+	tree_truth->Branch( "truth_all_mc_charge", &truth_all_mc_charge );
+	
 	tree_truth->Branch( "truth_all_Mhat", &truth_all_Mhat );
 	tree_truth->Branch( "truth_all_CosThetaCS", &truth_all_CosThetaCS );
 	tree_truth->Branch( "truth_all_CosThetaHE", &truth_all_CosThetaHE );
@@ -1505,17 +1611,17 @@ void graphicObjects::drawPerformance(vector<int>& vEntries, vector<double>& vRes
 	gVirMemoryMonitor = new TGraph (nentries, entryArray, virMemoryArray);
 	gVirMemoryMonitor->SetTitle("");
 	gVirMemoryMonitor->SetLineStyle(3);
-    gVirMemoryMonitor->SetLineColor(kBlue);
+	gVirMemoryMonitor->SetLineColor(kBlue);
 	gVirMemoryMonitor->GetXaxis()->SetTitle("entry");
-    gVirMemoryMonitor->GetYaxis()->SetTitle("memory");
-    gVirMemoryMonitor->SetMinimum(0.);
-    gVirMemoryMonitor->Draw("AC");
+	gVirMemoryMonitor->GetYaxis()->SetTitle("memory");
+	gVirMemoryMonitor->SetMinimum(0.);
+	gVirMemoryMonitor->Draw("AC");
 	
 	gResMemoryMonitor = new TGraph (nentries, entryArray, resMemoryArray);
 	gResMemoryMonitor->SetTitle("");
 	gResMemoryMonitor->SetLineStyle(1);
-    gResMemoryMonitor->SetLineColor(kRed); 
-    gResMemoryMonitor->Draw("C");
+	gResMemoryMonitor->SetLineColor(kRed); 
+	gResMemoryMonitor->Draw("C");
 	
 	leg_memory = new TLegend(leg_x1, leg_y1, leg_x2, leg_y2*2./3.);
 	leg_memory->AddEntry( gVirMemoryMonitor, "VIRT", "L");
@@ -1537,7 +1643,7 @@ void graphicObjects::drawBareHistos(TDirectory* tdir)
 	cnv_d0exPV->cd();
 	h1_d0exPV->Draw();
 	cnv_d0exPV->Update();
-    cnv_d0exPV->Write();
+	cnv_d0exPV->Write();
 
 	cnv_z0exPV = new TCanvas("z0exPV","z0exPV",canv_x,canv_y);
 	cnv_z0exPV->SetLogy();
@@ -1545,7 +1651,7 @@ void graphicObjects::drawBareHistos(TDirectory* tdir)
 	cnv_z0exPV->cd();
 	h1_z0exPV->Draw();
 	cnv_z0exPV->Update();
-    cnv_z0exPV->Write();
+	cnv_z0exPV->Write();
 
 	cnv_cosmicCosth = new TCanvas("cosThetaDimu","cosThetaDimu",canv_x,canv_y);
 	cnv_cosmicCosth->Divide(1,2);
@@ -1558,14 +1664,14 @@ void graphicObjects::drawBareHistos(TDirectory* tdir)
 	pad_cosmicCosthAllCuts->cd();
 	h1_cosmicCosthAllCuts->Draw();
 	cnv_cosmicCosth->Update();
-    cnv_cosmicCosth->Write();
+	cnv_cosmicCosth->Write();
 
 	cnv_xyVertex = new TCanvas("xyVertex","xyVertex",canv_x,canv_y);
 	cnv_xyVertex->Draw();
 	cnv_xyVertex->cd();
 	h2_xyVertex->Draw("BOX");
 	cnv_xyVertex->Update();
-    cnv_xyVertex->Write();
+	cnv_xyVertex->Write();
 }
 
 void graphicObjects::drawHistos(TDirectory* tdir)
@@ -1578,7 +1684,7 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	cnv_imass->cd();
 	h1_imass->Draw();
 	cnv_imass->Update();
-    cnv_imass->Write();
+	cnv_imass->Write();
 
 	cnv_pT = new TCanvas("pT","pT",canv_x,canv_y);
 	cnv_pT->Divide(1,2);
@@ -1593,7 +1699,7 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	pad_pT_muplus->cd();
 	h1_pT_muplus->Draw();
 	cnv_pT->Update();
-    cnv_pT->Write();
+	cnv_pT->Write();
 
 	cnv_eta = new TCanvas("eta","eta",canv_x,canv_y);
 	cnv_eta->Divide(1,2);
@@ -1605,14 +1711,14 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	pad_eta_muplus->cd();
 	h1_eta_muplus->Draw();
 	cnv_eta->Update();
-    cnv_eta->Write();
+	cnv_eta->Write();
 
 	cnv_costh = new TCanvas("costh","costh",canv_x,canv_y);
 	cnv_costh->Draw();
 	cnv_costh->cd();
 	h1_costh->Draw();
 	cnv_costh->Update();
-    cnv_costh->Write();
+	cnv_costh->Write();
 	
 	cnv_ipTdiff = new TCanvas("ipTdiff","ipTdiff",canv_x,canv_y);
 	cnv_ipTdiff->Draw();
@@ -1642,14 +1748,14 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	leg_ipTdiff->Draw("sames");
 	//-------------------------------------------------------------------------
 	cnv_ipTdiff->Update();
-    cnv_ipTdiff->Write();
+	cnv_ipTdiff->Write();
 	
 	cnv_etaSum = new TCanvas("etaSum","etaSum",canv_x,canv_y);
 	cnv_etaSum->Draw();
 	cnv_etaSum->cd();
 	h1_etaSum->Draw();
 	cnv_etaSum->Update();
-    cnv_etaSum->Write();
+	cnv_etaSum->Write();
 	
 	cnv_pTdiff = new TCanvas("pTdiff","pTdiff",canv_x,canv_y);
 	cnv_pTdiff->Divide(1,2);
@@ -1661,7 +1767,7 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	pad_pTdiff_muplus->cd();
 	h1_pTdiff_muplus->Draw();
 	cnv_pTdiff->Update();
-    cnv_pTdiff->Write();
+	cnv_pTdiff->Write();
 	
 	cnv_pTratio = new TCanvas("pTratio","pTratio",canv_x,canv_y);
 	cnv_pTratio->Divide(1,2);
@@ -1673,7 +1779,7 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	pad_pTratio_muplus->cd();
 	h1_pTratio_muplus->Draw();
 	cnv_pTratio->Update();
-    cnv_pTratio->Write();
+	cnv_pTratio->Write();
 	
 	cnv_pTres = new TCanvas("pTres","pTres",canv_x,canv_y);
 	cnv_pTres->Divide(1,2);
@@ -1685,7 +1791,7 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	pad_pTres_muplus->cd();
 	h1_pTres_muplus->Draw();
 	cnv_pTres->Update();
-    cnv_pTres->Write();
+	cnv_pTres->Write();
 	
 	cnv_pTmevspTid = new TCanvas("pTmevspTid","pTmevspTid",canv_x,canv_y);
 	cnv_pTmevspTid->Divide(1,2);
@@ -1697,7 +1803,7 @@ void graphicObjects::drawHistos(TDirectory* tdir)
 	pad_pTmevspTid_muplus->cd();
 	h2_pTmevspTid_muplus->Draw("BOX");
 	cnv_pTmevspTid->Update();
-    cnv_pTmevspTid->Write();
+	cnv_pTmevspTid->Write();
 	
 	cnv_Afb = new TCanvas("Afb","Afb",canv_x,canv_y);
 	cnv_Afb->Draw();
@@ -2063,7 +2169,7 @@ void graphicObjects::drawEfficiencyHistosMap(TDirectory* tdir)
 		(*cnv_tNp_eff_phi)[strigperiod]->Write();
 	}
 }
-	
+
 void graphicObjects::drawHistosMap(TMapds* cutFlowOrdered, TMapds* cutFlowTypeOrdered, TDirectory* tdir)
 {
 	if(tdir==NULL) return;
@@ -2096,7 +2202,7 @@ void graphicObjects::drawHistosMap(TMapds* cutFlowOrdered, TMapds* cutFlowTypeOr
 		// ignore preselection: ///////////////////////////////////////
 		if(cutFlowTypeOrdered->operator[](num)=="preselection") continue; /////////
 		///////////////////////////////////////////////////////////////
-	
+		
 		//if(ii == cutFlowOrdered->begin()) bfirst = true;
 		//else bfirst = false;
 		
@@ -2137,10 +2243,10 @@ void graphicObjects::drawHistosMap(TMapds* cutFlowOrdered, TMapds* cutFlowTypeOr
 		// ignore preselection: ///////////////////////////////////////
 		if(cutFlowTypeOrdered->operator[](num)=="preselection") continue; /////////
 		///////////////////////////////////////////////////////////////
-	
+		
 		//if(ii == cutFlowOrdered->begin()) bfirst = true;
 		//else bfirst = false;
-	
+		
 		string str = ii->second;
 		it=hmap_cutFlow_pT->find("pT."+str);
 		string sname = it->first;

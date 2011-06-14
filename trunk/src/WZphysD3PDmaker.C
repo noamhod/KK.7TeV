@@ -4944,7 +4944,6 @@ void WZphysD3PDmaker::fill()
 		vxp_type->push_back( m_WZphysD3PD->vxp_type->at(i) );
 		vxp_trk_n->push_back( m_WZphysD3PD->vxp_trk_n->at(i) );
 		
-		//vxp_trk_index->push_back( m_WZphysD3PD->vxp_trk_index->at(i) );
 		assign2Dvector(vxp_trk_index, m_WZphysD3PD->vxp_trk_index->at(i) );
 	}
 	
@@ -4995,8 +4994,6 @@ void WZphysD3PDmaker::fill()
 			mc_status->push_back( m_WZphysD3PD->mc_status->at(i) );
 			mc_barcode->push_back( m_WZphysD3PD->mc_barcode->at(i) );
 			
-			//mc_parents->push_back( m_WZphysD3PD->mc_parents->at(i) );
-			//mc_children->push_back( m_WZphysD3PD->mc_children->at(i) );
 			assign2Dvector(mc_parents,  m_WZphysD3PD->mc_parents->at(i) );
 			assign2Dvector(mc_children, m_WZphysD3PD->mc_children->at(i) );
 			
@@ -5006,11 +5003,8 @@ void WZphysD3PDmaker::fill()
 			mc_vx_y->push_back( m_WZphysD3PD->mc_vx_y->at(i) );
 			mc_vx_z->push_back( m_WZphysD3PD->mc_vx_z->at(i) );
 			
-			//mc_child_index->push_back( m_WZphysD3PD->mc_child_index->at(i) );
-			//mc_parent_index->push_back( m_WZphysD3PD->mc_parent_index->at(i) );
 			assign2Dvector(mc_child_index,  m_WZphysD3PD->mc_child_index->at(i) );
 			assign2Dvector(mc_parent_index, m_WZphysD3PD->mc_parent_index->at(i) );
-			
 		}
 	}
 		

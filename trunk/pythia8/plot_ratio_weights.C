@@ -223,18 +223,17 @@ int plot_ratio_weights()
 	vector<double>* phi    = new vector<double>;
 	vector<double>* theta  = new vector<double>;	
 	
-	bool truth_all_isValid;
-	vector<float>* truth_all_dr = new vector<float>;
-	vector<float>* truth_all_E = new vector<float>;
-	vector<float>* truth_all_pt = new vector<float>;
-	vector<float>* truth_all_eta = new vector<float>;
-	vector<float>* truth_all_phi = new vector<float>;
-	vector<int>*   truth_all_type = new vector<int>;
-	vector<int>*   truth_all_status = new vector<int>;
-	vector<int>*   truth_all_barcode = new vector<int>;
-	vector<int>*   truth_all_mothertype = new vector<int>;
-	vector<int>*   truth_all_motherbarcode = new vector<int>;
-	vector<int>*   truth_all_matched = new vector<int>;
+	
+	vector<float>* truth_all_mc_pt      = new vector<float>;
+	vector<float>* truth_all_mc_m       = new vector<float>;
+	vector<float>* truth_all_mc_eta     = new vector<float>;
+	vector<float>* truth_all_mc_phi     = new vector<float>;
+	vector<int>*   truth_all_mc_status  = new vector<int>;
+	vector<int>*   truth_all_mc_barcode = new vector<int>;
+	vector<int>*   truth_all_mc_pdgId   = new vector<int>;
+	vector<float>* truth_all_mc_charge  = new vector<float>;
+	
+	bool  truth_all_isValid;
 	float truth_all_Mhat;
 	float truth_all_CosThetaCS;
 	float truth_all_CosThetaHE;
@@ -512,23 +511,20 @@ int plot_ratio_weights()
 			if(model==Z0)
 			{
 				tree = (TTree*)file->Get("truth/truth_tree");
-				tree->SetBranchAddress("truth_all_isValid", &truth_all_isValid);
-				tree->SetBranchAddress("truth_all_dr", &truth_all_dr);
-				tree->SetBranchAddress("truth_all_E", &truth_all_E);
-				tree->SetBranchAddress("truth_all_pt", &truth_all_pt);
-				tree->SetBranchAddress("truth_all_eta", &truth_all_eta);
-				tree->SetBranchAddress("truth_all_phi", &truth_all_phi);
-				tree->SetBranchAddress("truth_all_type", &truth_all_type);
-				tree->SetBranchAddress("truth_all_status", &truth_all_status);
-				tree->SetBranchAddress("truth_all_barcode", &truth_all_barcode);
-				tree->SetBranchAddress("truth_all_mothertype", &truth_all_mothertype);
-				tree->SetBranchAddress("truth_all_motherbarcode", &truth_all_motherbarcode);
-				tree->SetBranchAddress("truth_all_matched", &truth_all_matched);
+				tree->Branch( "truth_all_mc_pt", &truth_all_mc_pt );
+				tree->Branch( "truth_all_mc_m", &truth_all_mc_m );
+				tree->Branch( "truth_all_mc_eta", &truth_all_mc_eta );
+				tree->Branch( "truth_all_mc_phi", &truth_all_mc_phi );
+				tree->Branch( "truth_all_mc_status", &truth_all_mc_status );
+				tree->Branch( "truth_all_mc_barcode", &truth_all_mc_barcode );
+				tree->Branch( "truth_all_mc_pdgId", &truth_all_mc_pdgId );
+				tree->Branch( "truth_all_mc_charge", &truth_all_mc_charge );
 				tree->SetBranchAddress("truth_all_Mhat", &truth_all_Mhat);
 				tree->SetBranchAddress("truth_all_CosThetaCS", &truth_all_CosThetaCS);
 				tree->SetBranchAddress("truth_all_CosThetaHE", &truth_all_CosThetaHE);
 				tree->SetBranchAddress("truth_all_ySystem",&truth_all_ySystem);
 				tree->SetBranchAddress("truth_all_QT", &truth_all_QT);
+				tree->SetBranchAddress("truth_all_isValid", &truth_all_isValid);
 				
 				int valids = 0;
 
@@ -804,23 +800,20 @@ int plot_ratio_weights()
 			file = TFile::Open(svPaths[n].c_str(),"READ");	
 			tree = (TTree*)file->Get("truth/truth_tree");
 			
-			tree->SetBranchAddress("truth_all_isValid", &truth_all_isValid);
-			tree->SetBranchAddress("truth_all_dr", &truth_all_dr);
-			tree->SetBranchAddress("truth_all_E", &truth_all_E);
-			tree->SetBranchAddress("truth_all_pt", &truth_all_pt);
-			tree->SetBranchAddress("truth_all_eta", &truth_all_eta);
-			tree->SetBranchAddress("truth_all_phi", &truth_all_phi);
-			tree->SetBranchAddress("truth_all_type", &truth_all_type);
-			tree->SetBranchAddress("truth_all_status", &truth_all_status);
-			tree->SetBranchAddress("truth_all_barcode", &truth_all_barcode);
-			tree->SetBranchAddress("truth_all_mothertype", &truth_all_mothertype);
-			tree->SetBranchAddress("truth_all_motherbarcode", &truth_all_motherbarcode);
-			tree->SetBranchAddress("truth_all_matched", &truth_all_matched);
+			tree->Branch( "truth_all_mc_pt", &truth_all_mc_pt );
+			tree->Branch( "truth_all_mc_m", &truth_all_mc_m );
+			tree->Branch( "truth_all_mc_eta", &truth_all_mc_eta );
+			tree->Branch( "truth_all_mc_phi", &truth_all_mc_phi );
+			tree->Branch( "truth_all_mc_status", &truth_all_mc_status );
+			tree->Branch( "truth_all_mc_barcode", &truth_all_mc_barcode );
+			tree->Branch( "truth_all_mc_pdgId", &truth_all_mc_pdgId );
+			tree->Branch( "truth_all_mc_charge", &truth_all_mc_charge );
 			tree->SetBranchAddress("truth_all_Mhat", &truth_all_Mhat);
 			tree->SetBranchAddress("truth_all_CosThetaCS", &truth_all_CosThetaCS);
 			tree->SetBranchAddress("truth_all_CosThetaHE", &truth_all_CosThetaHE);
 			tree->SetBranchAddress("truth_all_ySystem",&truth_all_ySystem);
 			tree->SetBranchAddress("truth_all_QT", &truth_all_QT);
+			tree->SetBranchAddress("truth_all_isValid", &truth_all_isValid);
 				
 			tree->SetBranchAddress("recon_all_isValid", &recon_all_isValid);
 			tree->SetBranchAddress("recon_all_E", &recon_all_E);
@@ -921,23 +914,20 @@ int plot_ratio_weights()
 		file = TFile::Open(svPaths[n].c_str(),"READ");	
 		tree = (TTree*)file->Get("truth/truth_tree");
 		
-		tree->SetBranchAddress("truth_all_isValid", &truth_all_isValid);
-		tree->SetBranchAddress("truth_all_dr", &truth_all_dr);
-		tree->SetBranchAddress("truth_all_E", &truth_all_E);
-		tree->SetBranchAddress("truth_all_pt", &truth_all_pt);
-		tree->SetBranchAddress("truth_all_eta", &truth_all_eta);
-		tree->SetBranchAddress("truth_all_phi", &truth_all_phi);
-		tree->SetBranchAddress("truth_all_type", &truth_all_type);
-		tree->SetBranchAddress("truth_all_status", &truth_all_status);
-		tree->SetBranchAddress("truth_all_barcode", &truth_all_barcode);
-		tree->SetBranchAddress("truth_all_mothertype", &truth_all_mothertype);
-		tree->SetBranchAddress("truth_all_motherbarcode", &truth_all_motherbarcode);
-		tree->SetBranchAddress("truth_all_matched", &truth_all_matched);
+		tree->Branch( "truth_all_mc_pt", &truth_all_mc_pt );
+		tree->Branch( "truth_all_mc_m", &truth_all_mc_m );
+		tree->Branch( "truth_all_mc_eta", &truth_all_mc_eta );
+		tree->Branch( "truth_all_mc_phi", &truth_all_mc_phi );
+		tree->Branch( "truth_all_mc_status", &truth_all_mc_status );
+		tree->Branch( "truth_all_mc_barcode", &truth_all_mc_barcode );
+		tree->Branch( "truth_all_mc_pdgId", &truth_all_mc_pdgId );
+		tree->Branch( "truth_all_mc_charge", &truth_all_mc_charge );
 		tree->SetBranchAddress("truth_all_Mhat", &truth_all_Mhat);
 		tree->SetBranchAddress("truth_all_CosThetaCS", &truth_all_CosThetaCS);
 		tree->SetBranchAddress("truth_all_CosThetaHE", &truth_all_CosThetaHE);
 		tree->SetBranchAddress("truth_all_ySystem",&truth_all_ySystem);
 		tree->SetBranchAddress("truth_all_QT", &truth_all_QT);
+		tree->SetBranchAddress("truth_all_isValid", &truth_all_isValid);
 				
 		tree->SetBranchAddress("recon_all_isValid", &recon_all_isValid);
 		tree->SetBranchAddress("recon_all_E", &recon_all_E);

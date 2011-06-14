@@ -2330,7 +2330,7 @@ void analysisSkeleton::applyTruth()
 	
 	/////////////////////////////////////////////
 	// fill the recon vars only if passed ///////
-	// but fill the tree anyway, also if ////////
+	// but fill the *tree* anyway, also if //////
 	// these vars are empty so the matching /////
 	// to truth will be easy ////////////////////
 	if(didItPass) fillRecon(ai,bi); /////////////

@@ -693,7 +693,7 @@ int plot_ratio_weights()
 		vhCosThSumZ0[i]->SetLineWidth(2);
 		vhCosThSumZ0[i]->SetXTitle("cos#theta*");
 		vhCosThSumZ0[i]->SetYTitle("Events");
-		/*if(2.*max<1.e2)*/ vhCosThSumZ0[i]->GetYaxis()->SetMoreLogLabels();
+		//if(2.*max<1.e2) vhCosThSumZ0[i]->GetYaxis()->SetMoreLogLabels();
 		vhCosThSumZ0[i]->Draw();
 		vL1[i]->AddEntry(vhCosThSumZ0[i], "SM #gamma/Z^{0} (#it{ATLAS} MC10 truth)", "l");
 		vhCosThSumZP[i]->SetMinimum(1.e-2);
@@ -703,7 +703,7 @@ int plot_ratio_weights()
 		vhCosThSumZP[i]->SetLineWidth(2);
 		vhCosThSumZP[i]->SetXTitle("cos#theta*");
 		vhCosThSumZP[i]->SetYTitle("Events");
-		/*if(2.*max<1.e2)*/ vhCosThSumZP[i]->GetYaxis()->SetMoreLogLabels();
+		//if(2.*max<1.e2) vhCosThSumZP[i]->GetYaxis()->SetMoreLogLabels();
 		vhCosThSumZP[i]->Draw("SAMES");
 		sName = sMass + " GeV Z' SSM (#scale[1.1]{P}#scale[0.9]{YTHIA8})";
 		vL1[i]->AddEntry(vhCosThSumZP[i], sName.c_str(), "l");
@@ -714,7 +714,7 @@ int plot_ratio_weights()
 		vhCosThSumKK[i]->SetLineWidth(2);
 		vhCosThSumKK[i]->SetXTitle("cos#theta*");
 		vhCosThSumKK[i]->SetYTitle("Events");
-		/*if(2.*max<1.e2)*/ vhCosThSumKK[i]->GetYaxis()->SetMoreLogLabels();
+		//if(2.*max<1.e2) vhCosThSumKK[i]->GetYaxis()->SetMoreLogLabels();
 		vhCosThSumKK[i]->Draw("SAMES");
 		sName = sMass + " GeV S^{1}/Z_{2} KK (#scale[1.1]{P}#scale[0.9]{YTHIA8})"; 
 		vL1[i]->AddEntry(vhCosThSumKK[i], sName.c_str(), "l");
@@ -740,7 +740,7 @@ int plot_ratio_weights()
 		vhCosThSumZPweights[i]->SetLineWidth(2);
 		vhCosThSumZPweights[i]->SetXTitle("cos#theta*");
 		vhCosThSumZPweights[i]->SetYTitle(sYTitle.c_str());
-		/*if(2.*max<1.e2)*/ vhCosThSumZPweights[i]->GetYaxis()->SetMoreLogLabels(); 
+		//if(2.*max<1.e2) vhCosThSumZPweights[i]->GetYaxis()->SetMoreLogLabels(); 
 		vhCosThSumZPweights[i]->Draw();
 		vL2[i]->AddEntry(vhCosThSumZPweights[i], sName.c_str(), "l");
 		sName   = sMass + " GeV S^{1}/Z_{2} KK";
@@ -751,7 +751,7 @@ int plot_ratio_weights()
 		vhCosThSumKKweights[i]->SetLineWidth(2);
 		vhCosThSumKKweights[i]->SetXTitle("cos#theta*");
 		vhCosThSumKKweights[i]->SetYTitle(sYTitle.c_str());
-		/*if(2.*max<1.e2)*/ vhCosThSumKKweights[i]->GetYaxis()->SetMoreLogLabels(); 
+		//if(2.*max<1.e2) vhCosThSumKKweights[i]->GetYaxis()->SetMoreLogLabels(); 
 		vhCosThSumKKweights[i]->Draw("SAMES");
 		vL2[i]->AddEntry(vhCosThSumKKweights[i], sName.c_str(), "l");
 		vL2[i]->Draw("SAMES");

@@ -18,6 +18,13 @@ class analysisSkeleton : public analysisModules
 public:
 	//////////////////////
 	// basic local vars
+
+	int tmp_counter_1;
+	int tmp_counter_2;
+	int tmp_counter_3;
+	int tmp_counter_4;
+	int tmp_counter_5;
+
 	TMapii muPairMap;
 	bool passCutFlow;
 	bool passCurrentCut;
@@ -543,6 +550,12 @@ public:
 	analysisSkeleton(string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath) :
 	analysisModules(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
 	{
+		tmp_counter_1 = 0;
+		tmp_counter_2 = 0;
+		tmp_counter_3 = 0;
+		tmp_counter_4 = 0;
+		tmp_counter_5 = 0;
+
 		currentRun = 0;
 		sCurrentPeriod = "";
 		nMultiMuonEvents = 0;

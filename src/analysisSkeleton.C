@@ -2218,8 +2218,8 @@ void analysisSkeleton::fillTruth()
 	//////////////////////////////////////
 	for(int t=0 ; t<(int)mc_pt->size() ; t++)
 	{
-		if(!mc_status->at(t))                  continue; // has to be final particle
-		if((int)fabs(mc_pdgId->at(t))!=PDTMU)  continue; // has to be a muon
+		if(mc_status->at(t)!=1) {tmp_counter_1++; continue;} // has to be final particle
+		if(mc_pdgId->at(t)!=PDTMU  &&  mc_pdgId->at(t)!=-1*PDTMU) {tmp_counter_2++; continue;} // has to be a muon
 		
 		bool isZ     = false; 
 		bool isGamma = false;
@@ -2237,7 +2237,7 @@ void analysisSkeleton::fillTruth()
 				break;
 			}
 		}
-		if(!isZ && !isGamma) continue;
+		if(!isZ && !isGamma) {tmp_counter_3++; continue;}
 		
 		truth_all_mc_m->push_back( mc_m->at(t)*MeV2GeV );
 		truth_all_mc_pt->push_back( mc_pt->at(t)*MeV2GeV );
@@ -2247,7 +2247,6 @@ void analysisSkeleton::fillTruth()
 		truth_all_mc_status->push_back( mc_status->at(t) );
 		truth_all_mc_barcode->push_back( mc_barcode->at(t) );
 		truth_all_mc_charge->push_back( mc_charge->at(t) );
-		truth_all_isValid = true;
 		
 		/////////////////////////////////////////////////////////////////////////////////
 		// FILL THE pTtoIndexMapTruth MAP WITH THE PT(KEY) AND INDEX(VALUE) /////////////
@@ -2261,11 +2260,12 @@ void analysisSkeleton::fillTruth()
 	// SORT BY PT AND FIND THE INDICES OF THE FIRST 2 MUONS (HIGHEST PT).
 	ai_truth = -1;
 	bi_truth = -1;
-	if(truth_valid_index>=2  &&  pTtoIndexMapTruth.size()>=2  &&  truth_all_isValid) pTSort(pTtoIndexMapTruth, ai_truth, bi_truth);
+	if(truth_valid_index>=2  &&  pTtoIndexMapTruth.size()>=2) pTSort(pTtoIndexMapTruth, ai_truth, bi_truth);
 	else
 	{
 		truth_valid_index = 0;
 		truth_all_isValid = false;
+		tmp_counter_4++;
 		return;
 	}
 	
@@ -2276,24 +2276,30 @@ void analysisSkeleton::fillTruth()
 		{
 			truth_valid_index = 0;
 			truth_all_isValid = false;
+			tmp_counter_5++;
 			return;
 		}
-	
+
+		truth_all_isValid = true;
+		tmp_counter_5++;
+
 		float c1 = truth_all_mc_charge->at(ai_truth);
 		float c2 = truth_all_mc_charge->at(bi_truth);
-		
 		TLorentzVector* p1 = new TLorentzVector();
 		TLorentzVector* p2 = new TLorentzVector();
 		p1->SetPtEtaPhiM( truth_all_mc_pt->at(ai_truth), truth_all_mc_eta->at(ai_truth), truth_all_mc_phi->at(ai_truth), truth_all_mc_m->at(ai_truth));
 		p2->SetPtEtaPhiM( truth_all_mc_pt->at(bi_truth), truth_all_mc_eta->at(bi_truth), truth_all_mc_phi->at(bi_truth), truth_all_mc_m->at(bi_truth));
+		
 		truth_all_Mhat       = imass(p1,p2);
 		truth_all_CosThetaCS = cosThetaCollinsSoper(p1,c1, p2,c2);
 		truth_all_CosThetaHE = cosThetaBoost(p1,c1, p2,c2);
 		truth_all_ySystem    = ySystem(p1,p2);
 		truth_all_QT         = QT(p1,p2);
+
 		delete p1;
 		delete p2;
 	}
+	cout << "tmp_counter_1=" << tmp_counter_1 << ", tmp_counter_2=" << tmp_counter_2 << ", tmp_counter_3=" << tmp_counter_3 << ", tmp_counter_4=" << tmp_counter_4 << ", tmp_counter_5=" << tmp_counter_5 << endl;	
 }
 
 

@@ -2299,7 +2299,7 @@ void analysisSkeleton::fillTruth()
 		delete p1;
 		delete p2;
 	}
-	cout << "tmp_counter_1=" << tmp_counter_1 << ", tmp_counter_2=" << tmp_counter_2 << ", tmp_counter_3=" << tmp_counter_3 << ", tmp_counter_4=" << tmp_counter_4 << ", tmp_counter_5=" << tmp_counter_5 << endl;	
+	//cout << "tmp_counter_1=" << tmp_counter_1 << ", tmp_counter_2=" << tmp_counter_2 << ", tmp_counter_3=" << tmp_counter_3 << ", tmp_counter_4=" << tmp_counter_4 << ", tmp_counter_5=" << tmp_counter_5 << endl;	
 }
 
 

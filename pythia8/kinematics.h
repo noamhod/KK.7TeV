@@ -1,5 +1,4 @@
-#include "TLorentzVector.h"
-#include "TVector3.h"
+#include "basics.h"
 
 #ifndef KINEMATICS_H
 #define KINEMATICS_H

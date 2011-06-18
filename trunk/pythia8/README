@@ -1,0 +1,19 @@
+to setup the env:
+	source setup.sh
+	(note that for compilation this is done automatically)
+
+to compile the local MC generation programs:
+	[1] source compile.sh Z0
+	[2] source compile.sh ZP
+	[3] source compile.sh KK
+
+to run the template production:
+	root -b plot_ratio_weights.C++
+	this will produce a file called weights.root
+	with all the templates and the histograms
+
+to read the templates via an example:
+	root read_templates_example.C++
+	this will display an exampe canvas with the
+	imass histograms of the templates
+

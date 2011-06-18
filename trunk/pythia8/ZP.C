@@ -1,3 +1,4 @@
+#include "pythiaROOT.h"
 #include "all.h"
 
 int main() {
@@ -15,13 +16,6 @@ int main() {
 	pythia.readString("Zprime:gmZmode = 0"); // full gamma/Z0/Z' interference
 	//Zprime:gmZmode = 0 ---> 6
 	//0 = full gamma/Z0/Z' interference
-	// rule out all gamma/Z decays except for muons
-	//pythia.readString("22:onMode = off"); // switch off all of the gamma decay modes
-	//pythia.readString("22:onIfAny = 13"); // switch on the gamma->mu-mu+ decay mode only
-	pythia.readString("32:onMode = off");
-	pythia.readString("32:onIfAny = 13");
-	pythia.readString("23:onMode = off"); // switch off all of the Z0 decay modes
-	pythia.readString("23:onIfAny = 13"); // switch on the Z0->mu-mu+ decay mode only
 
 	readParameters();
 
@@ -30,7 +24,7 @@ int main() {
 	cout << "| Z' mass is: " << prm.newMass << endl;
 	cout << "|-------------------------" << endl;
 	stringstream strm;
-	string sNewMass, sNewWidth, sNewLowBound, sNewHighBound;
+	string sNewMass, sNewWidth, sNewLowBound, sNewHighBound, sId;
 
 	// Manually set the mass and therefore the width 
 	// and the phase space for the sampling
@@ -49,6 +43,9 @@ int main() {
 	strm << prm.mMax; //prm.newMass*1.5; // prm.newMass*2.;
 	strm >> sNewHighBound;
 
+	strm.clear();
+        strm << prm.idF;
+        strm >> sId;
 
 	// Feed in KK state information and other generation specifics.
 	pythia.readString("32:m0 = " + sNewMass);
@@ -57,6 +54,12 @@ int main() {
 	pythia.readString("32:mMax = " + sNewHighBound);
 	pythia.readString("PhaseSpace:mHatMin = " + sNewLowBound);
 	pythia.readString("PhaseSpace:mHatMax = " + sNewHighBound);
+
+
+	pythia.readString("32:onMode = off");
+        pythia.readString("32:onIfAny = " + sId);
+        pythia.readString("23:onMode = off"); // switch off all of the Z0 decay modes
+        pythia.readString("23:onIfAny = " + sId); // switch on the Z0->mu-mu+ decay mode only
 
 
 	// Initialize.

@@ -1,3 +1,4 @@
+#include "pythiaROOT.h"
 #include "all.h"
 
 int main() {
@@ -50,6 +51,7 @@ int main() {
 	pythia.readString("ExtraDimensionsTEV:mStar = " + sNewMass);
 	pythia.readString("PhaseSpace:mHatMin = " + sNewLowBound);
 	pythia.readString("PhaseSpace:mHatMax = " + sNewHighBound);
+	
 
 
 	// Initialize.
@@ -59,7 +61,7 @@ int main() {
 	//ROOT
 	TLorentzVector* pa = new TLorentzVector();
 	TLorentzVector* pb = new TLorentzVector();
-	string sDir   = "/data/hod/pythia8_ntuples/tmp/";
+	string sDir   = "/data/hod/pythia8_ntuples/";
 	string sTitle = prm.sName + sNewMass + prm.sFFbar + "_" + sNewLowBound + "M" + sNewHighBound;
 	string sFileName = sDir + sTitle + ".root";
 	TFile *file = TFile::Open(sFileName.c_str(),"recreate");

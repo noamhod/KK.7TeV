@@ -1,14 +1,4 @@
-#include <iostream>
-#include <stdlib.h>
-#include <stdio.h>      // for the sprintf call
-#include <string>
-#include <sstream>      // for the int to string operation (stringstream call)
-#include <cstring>      // for the string functions
-#include <fstream>
-#include <vector>
-#include <map>
-#include <pthread.h>
-
+#include "basics.h"
 
 #ifndef READ_H
 #define READ_H

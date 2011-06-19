@@ -22,11 +22,16 @@ static double lumi = 5.;
 static double mb2fb = 1.e12;
 static double nb2mb = 1.e-6;
 
+TFile* fWeights;
+TDirectory* dirHistograms;
+
 vector<string> svNames;
 vector<string> svPaths;
 vector<TH1D*>  hvBinnedHistos_imass;
+vector<TH1D*>  hvBinnedHistos_imass_unscaled;
 vector<TH1D*>  hvBinnedHistos_imassRes;
 vector<vector<TH1D*> > hvvBinnedHistos_cosTh;
+vector<vector<TH1D*> > hvvBinnedHistos_cosTh_unscaled;
 vector<TTree*> vtBinnedNtuples_KK;
 vector<TTree*> vtBinnedNtuples_ZP;
 TTree* tMassBins;
@@ -50,16 +55,20 @@ void clearSamples()
 	for(int n=0 ; n<(int)hvBinnedHistos_imass.size() ; n++)
 	{
 		if(hvBinnedHistos_imass[n]!=NULL) delete hvBinnedHistos_imass[n];
+		if(hvBinnedHistos_imass_unscaled[n]!=NULL) delete hvBinnedHistos_imass_unscaled[n];
 		if(hvBinnedHistos_imassRes[n]!=NULL) delete hvBinnedHistos_imassRes[n];
 		for(int m=0 ; m<(int)hvvBinnedHistos_cosTh[n].size() ; m++)
 		{
 			if(hvvBinnedHistos_cosTh[n][m]!=NULL) delete hvvBinnedHistos_cosTh[n][m];
+			if(hvvBinnedHistos_cosTh_unscaled[n][m]!=NULL) delete hvvBinnedHistos_cosTh_unscaled[n][m];
 		}
 		hvvBinnedHistos_cosTh[n].clear();
 	}
 	hvBinnedHistos_imass.clear();
+	hvBinnedHistos_imass_unscaled.clear();
 	hvBinnedHistos_imassRes.clear();
 	hvvBinnedHistos_cosTh.clear();
+	hvvBinnedHistos_cosTh_unscaled.clear();
 	dvWeights.clear();
 	cvColors.clear();
 }
@@ -72,12 +81,21 @@ void addSample(string name, Color_t color, double events, double sigma)
 
 	svPaths.push_back(sDir+sName+".root");
 	
-	if(doLogx) hvBinnedHistos_imass.push_back(new TH1D(sName.c_str(),sName.c_str(),nxbins,xbins));
-	else       hvBinnedHistos_imass.push_back(new TH1D(sName.c_str(),sName.c_str(),nxbins,xmin,xmax));
+	if(doLogx)
+	{
+		hvBinnedHistos_imass.push_back(new TH1D(sName.c_str(),sName.c_str(),nxbins,xbins));
+		hvBinnedHistos_imass_unscaled.push_back(new TH1D((sName+"_unscaled").c_str(),(sName+"_unscaled").c_str(),nxbins,xbins));
+	}
+	else
+	{
+		hvBinnedHistos_imass.push_back(new TH1D(sName.c_str(),sName.c_str(),nxbins,xmin,xmax));
+		hvBinnedHistos_imass_unscaled.push_back(new TH1D((sName+"_unscaled").c_str(),(sName+"_unscaled").c_str(),nxbins,xmin,xmax));
+	}
 
 	hvBinnedHistos_imassRes.push_back(new TH1D((sName+"Res").c_str(),(sName+"Res").c_str(),nxbins,-0.2,+0.2));
 
 	vector<TH1D*> vTmp;
+	vector<TH1D*> vTmp_unscaled;
 	stringstream strm;
 	string s;
 	for(int b=0 ; b<imass_afb_nbins ; b++)
@@ -87,8 +105,10 @@ void addSample(string name, Color_t color, double events, double sigma)
 		strm << b;
 		strm >> s;
 		vTmp.push_back( new TH1D((sName+"_massbin_"+s).c_str(),(sName+"_massbin_"+s).c_str(),40,-1.,+1.) );
+		vTmp_unscaled.push_back( new TH1D((sName+"unscaled_massbin_"+s).c_str(),(sName+"unscaled_massbin_"+s).c_str(),40,-1.,+1.) );
 	}
 	hvvBinnedHistos_cosTh.push_back( vTmp );
+	hvvBinnedHistos_cosTh_unscaled.push_back( vTmp_unscaled );
 	
 	dvWeights.push_back(lumi/(events/(sigma*mb2fb)));
 	cvColors.push_back(color);
@@ -99,8 +119,6 @@ void addSample(string name, Color_t color, double events, double sigma)
 // initialize the trees that will be handed to RooFit
 void initOutNtuples()
 {
-	TFile* f = new TFile("weights.root", "RECREATE");
-	
 	stringstream strm;
 	string str;
 	string name;
@@ -135,24 +153,25 @@ void initOutNtuples()
 
 void writeOutNtuples()
 {
-	TFile* f;
 	for(int t=0 ; t<imass_afb_nbins ; t++)
 	{
-		f = vtBinnedNtuples_ZP[t]->GetCurrentFile();
-		f->cd();
+		fWeights = vtBinnedNtuples_ZP[t]->GetCurrentFile();
+		fWeights->cd();
 		vtBinnedNtuples_ZP[t]->Write("", TObject::kOverwrite);
 		
-		f = vtBinnedNtuples_KK[t]->GetCurrentFile();
-		f->cd();
+		fWeights = vtBinnedNtuples_KK[t]->GetCurrentFile();
+		fWeights->cd();
 		vtBinnedNtuples_KK[t]->Write("", TObject::kOverwrite);
 	}
 	
 	tMassBins->Write();
 	tAfbMassBins->Write();
 	
-	f->Write();
-	f->Close();
+	fWeights->Write();
+	fWeights->Close();
 }
+
+
 
 void fillNtuple(TTree* t, int counter, int mod)
 {
@@ -165,9 +184,16 @@ void fillNtuple(TTree* t, int counter, int mod)
 	counter++;
 }
 
+
+
 int plot_ratio_weights()
 {
 	style();
+	
+	fWeights = new TFile("weights.root", "RECREATE");
+	//fWeights->cd();
+	dirHistograms = fWeights->mkdir("histograms");
+	dirHistograms->cd();
 	
 	initOutNtuples();
 	
@@ -321,9 +347,12 @@ int plot_ratio_weights()
 	TH1D* hDummy_afb = new TH1D("dummy","dummy",imass_afb_nbins,imass_afb_bins);
 	
 	vector<TH1D*> vhCosThSumTmp;
+	vector<TH1D*> vhCosThSumTmp_unscaled;
+	vector<TH1D*> vhCosThSumZ0_unscaled;
 	vector<TH1D*> vhCosThSumZ0;
 	vector<TH1D*> vhCosThSumKK;
 	vector<TH1D*> vhCosThSumZP;
+	vector<TH1D*> vhCosThSumXSweights;
 	vector<TH1D*> vhCosThSumKKweights;
 	vector<TH1D*> vhCosThSumZPweights;
 	stringstream strm;
@@ -344,22 +373,29 @@ int plot_ratio_weights()
 		range += str + " GeV";
 		
 		vhCosThSumTmp.push_back( new TH1D((""+range).c_str(),(""+range).c_str(), 40,-1.,+1.) );
+		vhCosThSumTmp_unscaled.push_back( new TH1D(("xs"+range).c_str(),("xs"+range).c_str(), 40,-1.,+1.) );
 		
 		vhCosThSumZ0.push_back( new TH1D(("sumZ0_"+range).c_str(),("sumZ0_"+range).c_str(), 40,-1.,+1.) );
+		vhCosThSumZ0_unscaled.push_back( new TH1D(("sumZ0_unscaled_"+range).c_str(),("sumZ0_unscaled_"+range).c_str(), 40,-1.,+1.) );
 		vhCosThSumZP.push_back( new TH1D(("sumZP_"+range).c_str(),("sumZP_"+range).c_str(), 40,-1.,+1.) );
 		vhCosThSumKK.push_back( new TH1D(("sumKK_"+range).c_str(),("sumKK_"+range).c_str(), 40,-1.,+1.) );
 		
+		vhCosThSumXSweights.push_back( new TH1D(("wgtXS_"+range).c_str(),("wgtXS_"+range).c_str(), 40,-1.,+1.) );
 		vhCosThSumZPweights.push_back( new TH1D(("wgtZP_"+range).c_str(),("wgtZP_"+range).c_str(), 40,-1.,+1.) );
 		vhCosThSumKKweights.push_back( new TH1D(("wgtKK_"+range).c_str(),("wgtKK_"+range).c_str(), 40,-1.,+1.) );
 	}
 	
 	
 	// combined histos
+	dirHistograms->cd();
 	TH1D* hMassSumTmp;
+	TH1D* hMassSumTmp_unscaled;
 	TH1D* hResTmp;
 	TH1D* hMassSumZ0;
+	TH1D* hMassSumZ0_unscaled;
 	TH1D* hMassSumZP;
 	TH1D* hMassSumKK;
+	TH1D* hWeightsXS;
 	TH1D* hWeightsZP;
 	TH1D* hWeightsKK;
 	TH1D* hMassReconZ0;
@@ -373,9 +409,12 @@ int plot_ratio_weights()
 	if(doLogx)
 	{
 		hMassSumTmp = new TH1D("sumTmp","sumTmp",nxbins,xbins);
+		hMassSumTmp_unscaled = new TH1D("sumTmp_unscaled","sumTmp_unscaled",nxbins,xbins);
+		hMassSumZ0_unscaled = new TH1D("sumZ0_unscaled","sumZ0_unscaled",nxbins,xbins);
 		hMassSumZ0 = new TH1D("sumZ0","sumZ0",nxbins,xbins);
 		hMassSumZP = new TH1D("sumZP","sumZP",nxbins,xbins);
 		hMassSumKK = new TH1D("sumKK","sumKK",nxbins,xbins);
+		hWeightsXS = new TH1D("weightsXS","weightsXS",nxbins,xbins);
 		hWeightsZP = new TH1D("weightsZP","weightsZP",nxbins,xbins);
 		hWeightsKK = new TH1D("weightsKK","weightsKK",nxbins,xbins);
 		
@@ -387,9 +426,12 @@ int plot_ratio_weights()
 	else
 	{
 		hMassSumTmp = new TH1D("sumTmp","sumTmp",nxbins,xmin,xmax);
+		hMassSumTmp_unscaled = new TH1D("sumTmp_unscaled","sumTmp_unscaled",nxbins,xmin,xmax);
+		hMassSumZ0_unscaled = new TH1D("sumZ0_unscaled","sumZ0_unscaled",nxbins,xmin,xmax);
 		hMassSumZ0 = new TH1D("sumZ0","sumZ0",nxbins,xmin,xmax);
 		hMassSumZP = new TH1D("sumZP","sumZP",nxbins,xmin,xmax);
 		hMassSumKK = new TH1D("sumKK","sumKK",nxbins,xmin,xmax);
+		hWeightsXS = new TH1D("weightsXS","weightsXS",nxbins,xmin,xmax);
 		hWeightsZP = new TH1D("weightsZP","weightsZP",nxbins,xmin,xmax);
 		hWeightsKK = new TH1D("weightsKK","weightsKK",nxbins,xmin,xmax);
 		
@@ -398,7 +440,7 @@ int plot_ratio_weights()
 		hMassReconTemplateZP = new TH1D("ReconTemplateZP","ReconTemplateZP",nxbins,xmin,xmax);
 		hMassReconTemplateKK = new TH1D("ReconTemplateKK","ReconTemplateKK",nxbins,xmin,xmax);
 	}
-	
+	dirHistograms->cd();
 	hResTmp = new TH1D("ResTmp","ResTmp",nxbins,-0.2,+0.2);
 	hResReconZ0 = new TH1D("ResReconZ0","ResReconZ0",nxbins,-0.2,+0.2);
 	hResReconZP = new TH1D("ResReconZP","ResReconZP",nxbins,-0.2,+0.2);
@@ -422,7 +464,10 @@ int plot_ratio_weights()
 		clearSamples(); ////////////
 		if(doLogx) hMassSumTmp->Reset(); //////////
 		else { for(Int_t b=0 ; b<=hMassSumTmp->GetNbinsX() ; b++) hMassSumTmp->SetBinContent(b,0.); }
+		if(doLogx) hMassSumTmp_unscaled->Reset(); //////////
+		else { for(Int_t b=0 ; b<=hMassSumTmp_unscaled->GetNbinsX() ; b++) hMassSumTmp_unscaled->SetBinContent(b,0.); }
 		for(int i=0 ; i<imass_afb_nbins ; i++) vhCosThSumTmp[i]->Reset();
+		for(int i=0 ; i<imass_afb_nbins ; i++) vhCosThSumTmp_unscaled[i]->Reset();
 		////////////////////////////
 	
 		if(model==Z0)
@@ -514,9 +559,11 @@ int plot_ratio_weights()
 					{
 						valids++;
 						hvBinnedHistos_imass[n]->Fill(truth_all_Mhat);
+						hvBinnedHistos_imass_unscaled[n]->Fill(truth_all_Mhat);
 						int bin = hDummy_afb->FindBin(truth_all_Mhat);
 						if(bin<=0 || bin>imass_afb_nbins) continue;
 						hvvBinnedHistos_cosTh[n][bin-1]->Fill(truth_all_CosThetaCS);
+						hvvBinnedHistos_cosTh_unscaled[n][bin-1]->Fill(truth_all_CosThetaCS);
 					}
 				}
 				cout << "n=" << n << ", valids=" << valids << endl;
@@ -563,20 +610,23 @@ int plot_ratio_weights()
 			
 			////////////////////////////////////////////////////////
 			hMassSumTmp->Add(hvBinnedHistos_imass[n]); // sum //////
+			if(model==Z0) hMassSumTmp_unscaled->Add(hvBinnedHistos_imass_unscaled[n]); // sum //////
 			for(Int_t i=0 ; i<imass_afb_nbins ; i++)   // sum //////
 			{
 				vhCosThSumTmp[i]->Add(hvvBinnedHistos_cosTh[n][i]);
+				if(model==Z0) vhCosThSumTmp_unscaled[i]->Add(hvvBinnedHistos_cosTh_unscaled[n][i]);
 			}
 			////////////////////////////////////////////////////////
 			
 			file->Close();
 		}
 		
-		
 		if(model==Z0)
 		{
 			hMassSumZ0 = (TH1D*)hMassSumTmp->Clone("");
+			hMassSumZ0_unscaled = (TH1D*)hMassSumTmp_unscaled->Clone("");
 			for(Int_t i=0 ; i<imass_afb_nbins ; i++) vhCosThSumZ0[i] = (TH1D*)vhCosThSumTmp[i]->Clone("");
+			for(Int_t i=0 ; i<imass_afb_nbins ; i++) vhCosThSumZ0_unscaled[i] = (TH1D*)vhCosThSumTmp_unscaled[i]->Clone("");
 		}
 		if(model==ZP)
 		{
@@ -590,32 +640,64 @@ int plot_ratio_weights()
 		}
 	}
 	
-	
+
 	////////////////////////////////////////////////////////////////
 	// The ratios //////////////////////////////////////////////////
+	hWeightsXS = (TH1D*)hMassSumZ0->Clone("");
+	hWeightsXS->Divide(hMassSumZ0_unscaled); ////////////////////////////////
+	for(Int_t i=0 ; i<imass_afb_nbins ; i++) 
+	{
+		vhCosThSumXSweights[i] = (TH1D*)vhCosThSumZ0[i]->Clone(""); 
+		vhCosThSumXSweights[i]->Divide(vhCosThSumZ0_unscaled[i]); 
+	}
+	//--------------------------------------------------------------
 	hWeightsZP = (TH1D*)hMassSumZP->Clone(""); /////////////////////
 	hWeightsZP->Divide(hMassSumZ0); ////////////////////////////////
 	for(Int_t i=0 ; i<imass_afb_nbins ; i++) 
 	{
-		vhCosThSumZPweights[i] = (TH1D*)vhCosThSumZP[i]->Clone(""); //////////
-		vhCosThSumZPweights[i]->Divide(vhCosThSumZ0[i]); /////////////////////
+		vhCosThSumZPweights[i] = (TH1D*)vhCosThSumZP[i]->Clone(""); 
+		vhCosThSumZPweights[i]->Divide(vhCosThSumZ0[i]); 
 	}
 	//--------------------------------------------------------------
 	hWeightsKK = (TH1D*)hMassSumKK->Clone(""); /////////////////////
 	hWeightsKK->Divide(hMassSumZ0); ////////////////////////////////
 	for(Int_t i=0 ; i<imass_afb_nbins ; i++) 
 	{
-		vhCosThSumKKweights[i] = (TH1D*)vhCosThSumKK[i]->Clone(""); //////////
-		vhCosThSumKKweights[i]->Divide(vhCosThSumZ0[i]); /////////////////////
+		vhCosThSumKKweights[i] = (TH1D*)vhCosThSumKK[i]->Clone(""); 
+		vhCosThSumKKweights[i]->Divide(vhCosThSumZ0[i]); 
 	}
 	////////////////////////////////////////////////////////////////
 	
 	
+	////////////////////////
+	// Write weights ///////
+	dirHistograms->cd(); ///
+	hWeightsZP->SetName("mass_wgt_ZP");
+	hWeightsZP->Write(); ///
+	dirHistograms->cd(); ///
+	hWeightsXS->SetName("mass_wgt_XS");
+	hWeightsXS->Write(); ///
+	dirHistograms->cd(); ///
+	hWeightsKK->SetName("mass_wgt_KK");
+	hWeightsKK->Write(); ///
+	////////////////////////
+
+	
+	
+	// Rename cosTheta weights:
 	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
 	{
 		// WEIGHTS ....
+		strm.clear();
+		str.clear();
+		strm << i;
+		strm >> str;
+		vhCosThSumXSweights[i]->SetTitle((TString)"weights_XS: " + (TString)vhCosThSumXSweights[i]->GetTitle());
+		vhCosThSumXSweights[i]->SetName( ("cost_wgt_XS_"+str).c_str() );
 		vhCosThSumZPweights[i]->SetTitle((TString)"weights: " + (TString)vhCosThSumZPweights[i]->GetTitle());
+		vhCosThSumZPweights[i]->SetName( ("cost_wgt_ZP_"+str).c_str() );
 		vhCosThSumKKweights[i]->SetTitle((TString)"weights: " + (TString)vhCosThSumKKweights[i]->GetTitle());
+		vhCosThSumKKweights[i]->SetName( ("cost_wgt_KK_"+str).c_str() );
 	}
 	////////////////////////////////////////////////////////////////////////////
 	
@@ -738,7 +820,20 @@ int plot_ratio_weights()
 	}
 	
 	
-	cout << "Weights are calculated\n" << endl;
+	/////////////////////////////////////////////////////
+	// Write all to the weights.root file ///////////////
+	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
+	{
+		dirHistograms->cd();
+		vhCosThSumXSweights[i]->Write();
+		dirHistograms->cd();
+		vhCosThSumZPweights[i]->Write();
+		dirHistograms->cd();
+		vhCosThSumKKweights[i]->Write();
+	}
+	///////////////////////////////////////////////////////
+	
+	cout << "Weights are calculated and written\n" << endl;
 	//-------------------------------------------------------------------------------------
 	
 	
@@ -858,9 +953,7 @@ int plot_ratio_weights()
 						xscn_wgt = dvWeights[n]/lumi; // in units of fb
 						fillNtuple(vtBinnedNtuples_KK[afb_bin-1],counter,mod);
 					}
-					
 					counter++;
-					
 				}
 			}
 			
@@ -964,15 +1057,57 @@ int plot_ratio_weights()
 		////////////////////////////////////////////////////
 
 		file->Close();
-		hMassReconZP    = (TH1D*)hMassSumTmp->Clone("");
+		hMassReconZP = (TH1D*)hMassSumTmp->Clone("");
 		hResReconZP = (TH1D*)hResTmp->Clone("");
 	}
 	cout << "Templates are ready\n" << endl;
 	//-----------------------------------------------------------------------------
 	
+	dirHistograms->cd();
+	hMassSumZ0->SetName("hMassSumZ0");
+	hMassSumZ0->Write();
+	dirHistograms->cd();
+	hMassSumKK->SetName("hMassSumKK");
+	hMassSumKK->Write();
+	dirHistograms->cd();
+	hMassSumZP->SetName("hMassSumZP");
+	hMassSumZP->Write();
+	dirHistograms->cd();
+	hMassReconZ0->SetName("hMassReconZ0");
+	hMassReconZ0->Write();
+	dirHistograms->cd();
+	hMassReconTemplateZP->SetName("hMassReconTemplateZP");
+	hMassReconTemplateZP->Write();
+	dirHistograms->cd();
+	hMassReconTemplateKK->SetName("hMassReconTemplateKK");
+	hMassReconTemplateKK->Write();
+	dirHistograms->cd();
+	hMassReconZP->SetName("hMassReconZP");
+	hMassReconZP->Write();
+	dirHistograms->cd();
+	hDummy_afb->SetName("hDummy_afb");
+	hDummy_afb->Write();
+	dirHistograms->cd();
+	hMassSumTmp->SetName("hMassSumTmp");
+	hMassSumTmp->Write();
+	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
+	{
+		strm.clear();
+		str.clear();
+		strm << i;
+		strm >> str;
+		
+		dirHistograms->cd();
+		vhCosThSumZ0[i]->SetName(("vhCosThSumZ0_"+str).c_str());
+		vhCosThSumZ0[i]->Write();
+		dirHistograms->cd();
+		vhCosThSumZP[i]->SetName(("vhCosThSumZP_"+str).c_str());
+		vhCosThSumZP[i]->Write();
+		dirHistograms->cd();
+		vhCosThSumKK[i]->SetName(("vhCosThSumKK_"+str).c_str());
+		vhCosThSumKK[i]->Write();
+	}
 	
-
-
 	
 	
 	

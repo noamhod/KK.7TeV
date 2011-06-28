@@ -1,23 +1,23 @@
 #include "all.h"
 
 // bins fore the cosTheta histos
-static double   costmin = -1.;
-static double   costmax = +1.;
-const  int      ncostbins = 30;
+double   costmin = minCosTheta;
+double   costmax = maxCosTheta;
+int      ncostbins = nCosThetaBins;
 
 // bins for the mHat histos
-static double   xmin  = 120.;
-static double   xmax  = 4000.;
-const  int      nxbins = 200;
+double   xmin  = minMassBin; //120.;
+double   xmax  = maxMassBin; //4000.;
+const int        nxbins = 200;       //200;
 static Double_t logMmin;
 static Double_t logMmax;
 static Double_t logMbinwidth;
 static Double_t xbins[nxbins+1];
 
 // bins for the afb (the binning is in mHat)
-static double   imass_afb_min   = 120.;
-static double   imass_afb_max   = 4000.;
-const  int      imass_afb_nbins = 10;
+static double   imass_afb_min   = minMassBin; //120.;
+static double   imass_afb_max   = maxMassBin; //4000.;
+const int       imass_afb_nbins = nMassBins;  // const int nMassBins is defined in constants.h
 static Double_t logMmin_afb;
 static Double_t logMmax_afb;
 static Double_t logMbinwidth_afb;
@@ -28,7 +28,10 @@ static double mb2fb = 1.e12;
 static double nb2mb = 1.e-6;
 
 TFile* fWeights;
-TDirectory* dirHistograms;
+TDirectory* dirAllHistograms;
+TDirectory* dirCostHistograms;
+TDirectory* dirMassHistograms;
+TDirectory* dirNtuples;
 
 vector<string> svNames;
 vector<string> svPaths;
@@ -122,8 +125,10 @@ void addSample(string name, Color_t color, double events, double sigma)
 }
 
 // initialize the trees that will be handed to RooFit
-void initOutNtuples()
+void initOutNtuples(TDirectory* tDir)
 {
+	tDir->cd();
+	
 	stringstream strm;
 	string str;
 	string name;
@@ -156,16 +161,20 @@ void initOutNtuples()
 	}
 }
 
-void writeOutNtuples()
+void writeOutNtuples(TDirectory* tDir)
 {
+	tDir->cd();
+
 	for(int t=0 ; t<imass_afb_nbins ; t++)
 	{
 		fWeights = vtBinnedNtuples_ZP[t]->GetCurrentFile();
 		fWeights->cd();
+		tDir->cd();
 		vtBinnedNtuples_ZP[t]->Write("", TObject::kOverwrite);
 		
 		fWeights = vtBinnedNtuples_KK[t]->GetCurrentFile();
 		fWeights->cd();
+		tDir->cd();
 		vtBinnedNtuples_KK[t]->Write("", TObject::kOverwrite);
 	}
 	
@@ -196,11 +205,15 @@ int plot_ratio_weights()
 	style();
 	
 	fWeights = new TFile("weights.root", "RECREATE");
-	//fWeights->cd();
-	dirHistograms = fWeights->mkdir("histograms");
-	dirHistograms->cd();
+
+	dirNtuples = fWeights->mkdir("ntuples");
+	dirCostHistograms = fWeights->mkdir("cosTheta_histograms");
+	dirMassHistograms = fWeights->mkdir("iMass_histograms");
+	dirAllHistograms = fWeights->mkdir("all_histograms");
 	
-	initOutNtuples();
+	dirAllHistograms->cd();
+	
+	initOutNtuples(dirNtuples);
 	
 	int counter = 0;
 	int mod = 1000;
@@ -348,7 +361,7 @@ int plot_ratio_weights()
 		tAfbMassBins->Fill();
 	}
 	
-	
+	dirCostHistograms->cd();
 	TH1D* hDummy_afb = new TH1D("dummy","dummy",imass_afb_nbins,imass_afb_bins);
 	
 	vector<TH1D*> vhCosThSumTmp;
@@ -404,7 +417,7 @@ int plot_ratio_weights()
 	
 	
 	// combined histos
-	dirHistograms->cd();
+	dirMassHistograms->cd();
 	TH1D* hMassSumTmp;
 	TH1D* hMassSumTmp_unscaled;
 	TH1D* hResTmp;
@@ -468,7 +481,7 @@ int plot_ratio_weights()
 		hMassReconTemplateZP = new TH1D("ReconTemplateZP","ReconTemplateZP",nxbins,xmin,xmax);
 		hMassReconTemplateKK = new TH1D("ReconTemplateKK","ReconTemplateKK",nxbins,xmin,xmax);
 	}
-	dirHistograms->cd();
+	dirAllHistograms->cd();
 	hResTmp = new TH1D("ResTmp","ResTmp",nxbins,-0.2,+0.2);
 	hResReconZ0 = new TH1D("ResReconZ0","ResReconZ0",nxbins,-0.2,+0.2);
 	hResReconZP = new TH1D("ResReconZP","ResReconZP",nxbins,-0.2,+0.2);
@@ -699,13 +712,13 @@ int plot_ratio_weights()
 	
 	////////////////////////
 	// Write weights ///////
-	dirHistograms->cd(); ///
+	dirMassHistograms->cd(); ///
 	hWeightsZP->SetName("hMassZP_wgt");
 	hWeightsZP->Write(); ///
-	dirHistograms->cd(); ///
+	dirMassHistograms->cd(); ///
 	hWeightsXS->SetName("hMassXS_wgt");
 	hWeightsXS->Write(); ///
-	dirHistograms->cd(); ///
+	dirMassHistograms->cd(); ///
 	hWeightsKK->SetName("hMassKK_wgt");
 	hWeightsKK->Write(); ///
 	////////////////////////
@@ -713,24 +726,26 @@ int plot_ratio_weights()
 	
 	
 	// Rename cosTheta weights:
+	dirCostHistograms->cd();
 	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
 	{
 		// WEIGHTS ....
 		strm.clear();
 		str.clear();
-		strm << i;
+		strm << i+1;
 		strm >> str;
 		vhCosThSumXSweights[i]->SetTitle((TString)"weights_XS: " + (TString)vhCosThSumXSweights[i]->GetTitle());
 		vhCosThSumXSweights[i]->SetName( ("hCosThXS_wgt_"+str).c_str() );
 		vhCosThSumZPweights[i]->SetTitle((TString)"weights: " + (TString)vhCosThSumZPweights[i]->GetTitle());
 		vhCosThSumZPweights[i]->SetName( ("hCosThZP_wgt_"+str).c_str() );
 		vhCosThSumKKweights[i]->SetTitle((TString)"weights: " + (TString)vhCosThSumKKweights[i]->GetTitle());
-		vhCosThSumKKweights[i]->SetName( ("hCosThKK_wgt"+str).c_str() );
+		vhCosThSumKKweights[i]->SetName( ("hCosThKK_wgt_"+str).c_str() );
 	}
 	////////////////////////////////////////////////////////////////////////////
 	
 	
 	// test draw
+	dirCostHistograms->cd();
 	vector<TCanvas*> vC;
 	vector<TVirtualPad*> vP1;
 	vector<TVirtualPad*> vP2;
@@ -852,11 +867,11 @@ int plot_ratio_weights()
 	// Write all to the weights.root file ///////////////
 	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
 	{
-		dirHistograms->cd();
+		dirCostHistograms->cd();
 		vhCosThSumXSweights[i]->Write();
-		dirHistograms->cd();
+		dirCostHistograms->cd();
 		vhCosThSumZPweights[i]->Write();
-		dirHistograms->cd();
+		dirCostHistograms->cd();
 		vhCosThSumKKweights[i]->Write();
 	}
 	///////////////////////////////////////////////////////
@@ -1064,17 +1079,17 @@ int plot_ratio_weights()
 	
 	
 	// now do the acceptance calculations in every bin of imass and for the whole range
-	dirHistograms->cd();
+	dirMassHistograms->cd();
 	hMassSumZ0_acceptance = (TH1D*)hMassReconZ0->Clone("");
 	hMassSumZ0_acceptance->Divide(hMassSumZ0);
 	hMassSumZ0_acceptance->SetName("hMassZ0_acceptance");
 	hMassSumZ0_acceptance->Write();
-	dirHistograms->cd();
+	dirMassHistograms->cd();
 	hMassSumZP_acceptance = (TH1D*)hMassReconTemplateZP->Clone("");
 	hMassSumZP_acceptance->Divide(hMassSumZP);
 	hMassSumZP_acceptance->SetName("hMassZP_acceptance");
 	hMassSumZP_acceptance->Write();
-	dirHistograms->cd();
+	dirMassHistograms->cd();
 	hMassSumKK_acceptance = (TH1D*)hMassReconTemplateKK->Clone("");
 	hMassSumKK_acceptance->Divide(hMassSumKK);
 	hMassSumKK_acceptance->SetName("hMassKK_acceptance");
@@ -1084,24 +1099,24 @@ int plot_ratio_weights()
 	{
 		strm.clear();
 		str.clear();
-		strm << i;
+		strm << i+1;
 		strm >> str;
 		
-		dirHistograms->cd();
+		dirCostHistograms->cd();
 		vhCosThSumZ0_acceptance[i] = (TH1D*)vhCosThSumReconZ0[i]->Clone("");
 		vhCosThSumZ0_acceptance[i]->Divide(vhCosThSumZ0[i]);
 		vhCosThSumZ0_acceptance[i]->SetName(("hCosThZ0_acceptance_"+str).c_str());
 		vhCosThSumZ0_acceptance[i]->Write();
 		vhCosThSumReconZ0[i]->SetName(("hCosThRecZ0_"+str).c_str());
 		vhCosThSumReconZ0[i]->Write();
-		dirHistograms->cd();
+		dirCostHistograms->cd();
 		vhCosThSumZP_acceptance[i] = (TH1D*)vhCosThSumReconTemplateZP[i]->Clone("");
 		vhCosThSumZP_acceptance[i]->Divide(vhCosThSumZP[i]);
 		vhCosThSumZP_acceptance[i]->SetName(("hCosThZP_acceptance_"+str).c_str());
 		vhCosThSumZP_acceptance[i]->Write();
 		vhCosThSumReconTemplateZP[i]->SetName(("hCosThRecZP_"+str).c_str());
 		vhCosThSumReconTemplateZP[i]->Write();
-		dirHistograms->cd();
+		dirCostHistograms->cd();
 		vhCosThSumKK_acceptance[i] = (TH1D*)vhCosThSumReconTemplateKK[i]->Clone("");
 		vhCosThSumKK_acceptance[i]->Divide(vhCosThSumKK[i]);
 		vhCosThSumKK_acceptance[i]->SetName(("hCosThKK_acceptance_"+str).c_str());
@@ -1195,47 +1210,47 @@ int plot_ratio_weights()
 	cout << "Templates are ready\n" << endl;
 	//-----------------------------------------------------------------------------
 	
-	dirHistograms->cd();
+	dirMassHistograms->cd();
 	hMassSumZ0->SetName("hMassZ0");
 	hMassSumZ0->Write();
-	dirHistograms->cd();
+	dirMassHistograms->cd();
 	hMassSumKK->SetName("hMassKK");
 	hMassSumKK->Write();
-	dirHistograms->cd();
+	dirMassHistograms->cd();
 	hMassSumZP->SetName("hMassZP");
 	hMassSumZP->Write();
-	dirHistograms->cd();
+	dirMassHistograms->cd();
 	hMassReconZ0->SetName("hMassReconZ0");
 	hMassReconZ0->Write();
-	dirHistograms->cd();
+	dirMassHistograms->cd();
 	hMassReconTemplateZP->SetName("hMassReconTemplateZP");
 	hMassReconTemplateZP->Write();
-	dirHistograms->cd();
+	dirMassHistograms->cd();
 	hMassReconTemplateKK->SetName("hMassReconTemplateKK");
 	hMassReconTemplateKK->Write();
-	dirHistograms->cd();
+	dirMassHistograms->cd();
 	hMassReconZP->SetName("hMassReconZP");
 	hMassReconZP->Write();
-	dirHistograms->cd();
+	dirAllHistograms->cd();
 	hDummy_afb->SetName("hDummy_afb");
 	hDummy_afb->Write();
-	dirHistograms->cd();
+	dirAllHistograms->cd();
 	hMassSumTmp->SetName("hMassTmp");
 	hMassSumTmp->Write();
 	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
 	{
 		strm.clear();
 		str.clear();
-		strm << i;
+		strm << i+1;
 		strm >> str;
 		
-		dirHistograms->cd();
+		dirCostHistograms->cd();
 		vhCosThSumZ0[i]->SetName(("hCosThTruZ0_"+str).c_str());
 		vhCosThSumZ0[i]->Write();
-		dirHistograms->cd();
+		dirCostHistograms->cd();
 		vhCosThSumZP[i]->SetName(("hCosThTruZP_"+str).c_str());
 		vhCosThSumZP[i]->Write();
-		dirHistograms->cd();
+		dirCostHistograms->cd();
 		vhCosThSumKK[i]->SetName(("hCosThTruKK_"+str).c_str());
 		vhCosThSumKK[i]->Write();
 	}
@@ -1245,7 +1260,7 @@ int plot_ratio_weights()
 	
 	string sYTitle = "";
 	
-	
+	dirMassHistograms->cd();
 	pad_sigma->cd();
 	pad_sigma->Draw();
 	ymin = 0.5*getYmin(hMassSumZ0);
@@ -1431,7 +1446,7 @@ int plot_ratio_weights()
 	cnv->SaveAs(name+".png");
 	
 	
-	writeOutNtuples();
+	writeOutNtuples(dirNtuples);
 	
 	return 0;
 }

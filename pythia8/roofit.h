@@ -28,6 +28,13 @@
 #include <RooChi2Var.h>
 #include <RooMinuit.h>
 #include <RooHistPdf.h>
+#include <RooProdPdf.h>
+#include <RooAbsData.h>
+#include <RooFitResult.h>
+#include "RooArgSet.h"
+#include <RooMinuit.h>
+#include "RooAbsCategory.h"
 
+#include "FitResultWrapper.h"
 
 using namespace RooFit;

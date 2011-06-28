@@ -6,211 +6,407 @@
 		a. cross section weight, wXS, because the samples are binned in mass - relevant for the three models
 		b. model weight, xR, the ratio between ZP or KK and Z0 - relevant for the ZP and KK models only
 	2. There is the acceptance binned weight (trigger efficiency is ignored currently)
-	3. The truth PDF is (3/8)*(1+x^2+A4*x)
+	3. The truth PDF is (3/8)*(1+x^2+Afb*x)
 	4. The PDF should be corrected for the acceptance by a simple multiplication:      PDF(x) = PDFtru(x)*Acc(x)
 	5. Each event should be weighted (unbinned) according to the non-detector weights: w = wXS*wR
 */
 
+// bins for the mHat histos
+const  int      nxbins = 30;
+static Double_t logXmin;
+static Double_t logXmax;
+static Double_t logXbinwidth;
+static Double_t xbins[nxbins+1];
+Int_t  iMassNbins = 30; // for non log bins
 
-TTree* tTemplate;
-TH1D*  hRatioWeights;
-TH1D*  hXsWeights;
 
-TF1* fitFCN;
-TF1* guess;
-TF1* fScaled;
+double   costmin = minCosTheta;
+double   costmax = maxCosTheta;
+int      ncostbins = nCosThetaBins;
 
-double m_imass;
-vector<double>* m_xVecPtr;
+double _Afb = 0.;
 
-void minimize(TH1D* h, double* yields)
-{	
-	//////////////////////////////////////////////////////////
-	// NOTE: the branch name has to be exactly the same as ///
-	// the observable name (RooRealVar) //////////////////////
-	//////////////////////////////////////////////////////////
-	TFile* f = new TFile("weights.root", "READ");
-	Float_t m,w,x;
-	TTree* t;
-	Int_t N;
-	tTemplate = (TTree*)f->Get("tree_ZP_1");
-	hRatioWeights  = (TH1D*)f->Get("histograms/cost_wgt_ZP_1");
-	hXsWeights     = (TH1D*)f->Get("histograms/cost_wgt_ZP_1"); /////////////////////// ????????????????????????????????????
-	
-	Double_t ratio_wgt_min = hRatioWeights->GetMinimum();
-	Double_t ratio_wgt_max = hRatioWeights->GetMaximum();
-	
-	Double_t xs_wgt_min = hXsWeights->GetMinimum();
-	Double_t xs_wgt_max = hXsWeights->GetMaximum();
-	
-	
-	// Observable
-	// RooRealVar(const char* name, const char* title, Double_t value, Double_t minValue, Double_t maxValue, const char* unit = "")
-	RooRealVar rrvCosTheta("cost_rec", "cos#theta*", -1., +1.);
-	cosTheta.setRange("fitRange",-1.,+1.);
-	
-	// Weights
-	RooRealVar rrvRatioWeights("ratio_wgt","ratio_wgt",ratio_wgt_min,ratio_wgt_max);
-	RooRealVar rrvXsWeights("xs_wgt","xs_wgt",xs_wgt_min,xs_wgt_max);
-	
-	// Represent the weights histo as a PDF
-	RooDataHist rdhRatioWgt("rdhRatioWgt","", rrvCosTheta, hRatioWeights);
-	RooHistPdf hRatioWeightsPDF("hRatioWgtPDF","hRatioWgtPDF",RooArgSet(rrvCosTheta),rdhRatioWgt) ;
-	
-	// Represent the cross section weights histo as a PDF
-	RooDataHist rdhXsWgt("rdhXsWgt","", rrvCosTheta, hXsWeights);
-	RooHistPdf hXsWeightsPDF("hXsWgtPDF","hXsWgtPDF",RooArgSet(rrvCosTheta),rdhXsWgt) ;
-	
-	
-	
-	// CS PDF variables
-	RooRealVar rrvA4("A4","A4",0.0,-1.,+1.);
-	// Generic CS PDF
-	RooGenericPdf rgpCSPDF("CSPDF","CSPDF","(3./8.)*(1. + cost_rec*cost_rec + A4*cost_rec)",RooArgSet(rrvCosTheta,rrvA4));
-	
-	
-	
-	/*
-	// --- Signal Parameters
-	RooRealVar gaussMean("mean", "m_{Z^{0}}", 91.*GeV2TeV, XFITMIN, XFITMAX);
-	RooRealVar gaussSigma("sigma", "Resolution", 3.*GeV2TeV, 1.*GeV2TeV, 10.*GeV2TeV);
-	RooRealVar breitWignerMean("mean", "m_{Z^{0}}", 91.*GeV2TeV, XFITMIN, XFITMAX);
-	RooRealVar breitWignerGamma("gamma", "#Gamma", 2.4952*GeV2TeV);
-	////////////////////////////////////////////////////////
-	// fix the BW width parameter to the known value (PDG)
-	breitWignerGamma.setConstant(kTRUE);////////////////////
-	////////////////////////////////////////////////////////
-	*/
-	
-	
-	// --- Build the convolution of the Gauss and Breit-Wigner PDFs ---
-	RooVoigtian BreitGaussSignal("BreitGauss", "Breit-Wigner #otimes Gauss PDF", imass, breitWignerMean, breitWignerGamma, gaussSigma);
-	
+TFile* file = new TFile("weights.root", "READ");
 
-	
-	
-	// --- BACKGROUND
-	//RooExponential(const char* name, const char* title, RooAbsReal& _x, RooAbsReal& _c)
-	// --- Background Parameters
-	RooRealVar expMeasure("exp", "Exponent measure", -1.e-6, -1.e-4, -1.e-8);
-	//RooRealVar expConstant("expConstant", "Exponent constant", 2., 1.e-3, 100.);
-	// --- Build the background exponential PDFs ---
-	RooExponential ExponentBG("ExponentBG", "Exponential BG", imass, expMeasure);
-	//RooExtendedExponent ExponentBG("ExponentBG", "Exponential BG", imass, expMeasure, expConstant);
-	
+vector<TTree*> vtData;
+float mass_tru, mass_rec, mass_wgt;
+float cost_tru, cost_rec, cost_wgt;
+float xscn_wgt;
 
-	
-	
+vector<TH1D*>  vhAcc;
+vector<TH1D*>  vhMass;
+vector<TString> vModelName;
+TLegend* leg;
+TPaveText* pvtxt;
+TText* txt;
 
-	// shape: model(x) = nsig/(nsig+nbkg)*sig(x) + nbkg/(nsig+nbkg)*bkg(x) 
-	// norm:  Nexpect  = nsig + nbkg
-	// Combined: Nexpect*model(x) = nsig*sig(*x) + nbkg*bkg(x)
-	RooAddPdf model("model", "BreitGaussSignal #oplus ExponentBG", RooArgList(BreitGaussSignal,ExponentBG), RooArgList(nsig,nbkg));
-	
-	// redefine the generic PDFs in the fit range
-	//RooExtendPdf sigE("sigE", "signalExtended",     BreitGaussSignal, nsig, "fitRange");
-	//RooExtendPdf bkgE("bkgE", "backgroundExtended", ExponentBG,       nbkg, "fitRange");
-	//RooAddPdf model("model", "BreitGaussSignal #oplus ExponentBG", RooArgList(sigE,bkgE));
-	
+RooRealVar* cosThe; // the variable 
+RooRealVar* weight; // the weight
+RooRealVar* Afb;     // the parameter to find
 
-	
-	
-	// model(x) = fsig*sig(x) + (1-fsig)*bkg(x)
-	//RooRealVar fsig("fsig","signal fraction",0.9,0.,1.);
-	//RooAddPdf model("model", "BreitGaussSignal #oplus ExponentBG", RooArgList(BreitGaussSignal,ExponentBG), fsig);
-	
-	// --- get the data set ---
-	RooDataSet* data = new RooDataSet("data", "data", m_imassTree, imass, );
-	//RooRealVar boundaries("boundaries","boundaries",XFITMIN,XFITMAX);
-	//RooDataSet* data = new RooDataSet("data", "data", m_imassTree, RooArgSet(imass, boundaries));
-	
 
-	
-	
-	// --- Perform extended ML fit of composite PDF to data ---
-	model.fitTo(*data, Range("fitRange"), Extended(kTRUE));
-	
+vector<RooAbsData*> vDataSet; // Roo Data holder
+vector<RooFitResult*> vFitResult;
 
-	
-	
-	// --- Perform a regular ML fit of composite PFD to data
-	//model.fitTo(*data, Range("fitRange"));
-		
-	// --- Plot toy data and composite PDF overlaid ---
-	TCanvas* canv_imass_roofit = new TCanvas("imass_roofit","imass_roofit",602,400);
-	canv_imass_roofit->Draw();
-	canv_imass_roofit->cd();
-	RooPlot* frame = imass.frame();
-	RooBinning b((int)h->GetNbinsX(),XFULLMIN,XFULLMAX,"imassBins");
-	data->plotOn(frame, Binning(b), XErrorSize(0) /*, Invisible()*/);
-	model.plotOn(frame,Range("fitRange"));
-	model.plotOn(frame,Range("fitRange"),Components(BreitGaussSignal),LineColor(kRed),LineWidth(1));
-	model.plotOn(frame,Range("fitRange"),Components(ExponentBG),LineStyle(kDashed),LineWidth(1));
-	model.paramOn(frame,data,"",1,"NELU", 0.15, 0.48, 0.922);
-	
-	
-	double leg_x1 = 0.705;
-	double leg_x2 = 0.919;
-	double leg_y1 = 0.336;
-	double leg_y2 = 0.922;
-	TLegend* leg_roofit = new TLegend(leg_x1, leg_y1*2., leg_x2, leg_y2);
-	TGraph* tgraph_dat = new TGraph();
-	TLine* tline_sig = new TLine();
-	tline_sig->SetLineWidth(1); tline_sig->SetLineColor(kRed); tline_sig->SetLineStyle(1);
-	TLine* tline_bg = new TLine();
-	tline_bg->SetLineWidth(1); tline_bg->SetLineColor(kBlue); tline_bg->SetLineStyle(kDashed);
-	TLine* tline_fit = new TLine();
-	tline_fit->SetLineWidth(2); tline_fit->SetLineColor(kBlue); tline_fit->SetLineStyle(1);
-	leg_roofit->AddEntry( tgraph_dat, "Data", "lep");
-	leg_roofit->AddEntry( tline_sig, "S = BW #otimes Gauss", "L");
-	leg_roofit->AddEntry( tline_bg, "BG = Exp", "L");
-	leg_roofit->AddEntry( tline_fit, "ML fit = S #oplus BG", "L");
-	frame->addObject(leg_roofit);
-	
-	frame->SetMinimum(1.e-5);
-	
-	frame->Draw();
-	canv_imass_roofit->Update();
-	canv_imass_roofit->Write();
-	
-	
-	/*
-	the error bars for entries at low statistics are not 
-	symmetric: RooFit by default shows the 68% confidence interval for Poisson statistics (To be more precise
-	the intervals shown are ‘classic central ’ intervals as described in Table I of Cousins, Am. J. Phys. 63, 398 (1995)),
-	which are  generally asymmetric, especially at low statistics, and a more accurate reflection of the statistical 
-	uncertainty in each bin if the histogram contents arose from a Poisson process. You can choose to have the usual sqrt(N)
-	error shown by adding DataError(RooAbsData::SumW2) to the  data.plotOn() line. This option only affects the visualization
-	of the dataset.
-	*/
-	
-	cout << "breitWignerMean = " << breitWignerMean.getVal() << " +- " << breitWignerMean.getError() << endl;
-	cout << "breitWignerGamma = " << breitWignerGamma.getVal() << " +- " << breitWignerGamma.getError() << endl;
-	cout << "gaussSigma = " << gaussSigma.getVal() << " +- " << gaussSigma.getError() << endl;
-	cout << "expMeasure = " << expMeasure.getVal() << " +- " << expMeasure.getError() << endl;
-	//cout << "expConstant = " << expConstant.getVal() << " +- " << expConstant.getError() << endl;
-	
-	// For extended ML fit:
-	cout << "nsig = " << nsig.getVal() << " +- " << nsig.getError() << endl;
-	cout << "nbkg = " << nbkg.getVal() << " +- " << nbkg.getError() << endl;
-	yields[0] = nsig.getVal();
-    yields[1] = nbkg.getVal();
-	cout << "\nyields[0] = " <<  yields[0] << " +- " << nsig.getError() << endl;
-	cout << "yields[1] = " <<  yields[1] << " +- " << nbkg.getError() << "\n" << endl;
-	
-	
-	// For regular ML fit
-	//double fs = fsig.getVal();
-	//double fb = 1.-fsig.getVal();
-	//yields[0] = fs*eventsInFitRange;
-    //yields[1] = fb*eventsInFitRange;
-	//cout << "\nyields[0] = " <<  yields[0] << " +- " << fs*fb*eventsInFitRange << endl;
-	//cout << "yields[1] = " <<  yields[1]   << " +- " << fs*fb*eventsInFitRange << "\n" << endl;
-	
-	RooArgSet* params = model.getVariables();
-	params->Print("v");
-	cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << endl;
+
+vector<RooAbsPdf*> vModel;   // the final model pdf
+vector<RooAbsPdf*> vDetAcc;  // will be taken from the acceptance histogram
+vector<RooAbsPdf*> vRecEff;  // will be taken from the reconstruction efficiency histogram
+vector<RooAbsPdf*> vTrigEff; // will be taken from the trigger efficiency histogram
+vector<RooAbsPdf*> vEffPdf;  // will be the product of all the eff-like pdf's (=rec*trig*acc)
+RooAbsPdf* sigPdf;  // will be the truth pdf
+
+vector<RooDataHist*> vrdhAcc;
+vector<RooHistPdf*>  vrhpdfAcc;
+
+
+void setBranches(int mod)
+{
+	vtData[mod]->SetBranchAddress( "mass_tru", &mass_tru );
+	vtData[mod]->SetBranchAddress( "mass_rec", &mass_rec );
+	vtData[mod]->SetBranchAddress( "mass_wgt", &mass_wgt );
+	vtData[mod]->SetBranchAddress( "cost_tru", &cost_tru );
+	vtData[mod]->SetBranchAddress( "cost_rec", &cost_rec );
+	vtData[mod]->SetBranchAddress( "cost_wgt", &cost_wgt );
+	vtData[mod]->SetBranchAddress( "xscn_wgt", &xscn_wgt );
 }
 
-#endif
+void setLogMassBins(Double_t xmin, Double_t xmax)
+{
+	logXmin  = log10(xmin);
+	logXmax  = log10(xmax);
+	logXbinwidth = (Double_t)( (logXmax-logXmin)/(Double_t)nxbins );
+	xbins[0] = xmin;
+	for(Int_t i=1 ; i<=nxbins ; i++) xbins[i] = TMath::Power( 10,(logXmin + i*logXbinwidth) );
+}
+
+void init(int massBin, int mod)
+{
+	TH1D* hMassBinsDummy = (TH1D*)file->Get("all_histograms/hDummy_afb")->Clone("");
+	Double_t iMassMin = hMassBinsDummy->GetBinLowEdge(massBin);
+	Double_t iMassMax = iMassMin + hMassBinsDummy->GetBinWidth(massBin);
+	
+	TString sMassBin = (TString)tostring(massBin);
+	string sMassMin = tostring((double)iMassMin);
+	string sMassMax = tostring((double)iMassMax);
+	TString sTitle = "Mass-bin[" + sMassBin + "] " + sMassMin + "#rightarrow" + sMassMax + " GeV";
+	
+	setLogMassBins(iMassMin, iMassMax);
+
+	cosThe = new RooRealVar("cosTheta","cos#theta*",costmin,costmax);
+    cosThe->setRange("range_cosThe",costmin,costmax);
+	cosThe->setBins(ncostbins);
+	
+	weight = new RooRealVar("weight","weight",0.,1e10);
+    //weight->setRange("range_weight",costmin,costmax);
+	//weight->setBins(ncostbins);
+
+	Afb = new RooRealVar("Afb","A_{fb}",_Afb,-10.,+10.);
+
+	sigPdf = new RooGenericPdf("CSPDF","CSPDF","(3./8.)*(1. + cosTheta*cosTheta + (8./3.)*Afb*cosTheta)",RooArgSet(*cosThe,*Afb));
+	//sigPdf = new RooGenericPdf("CSPDF","CSPDF","(1. + cosTheta*cosTheta + (8./3.)*Afb*cosTheta)",RooArgSet(*cosThe,*Afb));
+
+	TString sName, sId;
+	Color_t col; 
+	
+	switch(mod)
+	{
+		case Z0:
+			sName = "Z^{0}";
+			sId = "Z0";
+			col = cGammaZ;
+			break;
+		case ZP:
+			sName = "Z'_{SSM}";
+			sId = "ZP";
+			col = cWJets;
+			break;
+		case KK:
+			sName = "S^{1}/Z_{2} KK";
+			sId = "KK";
+			col = cDiboson;
+			break;
+	}
+	
+	vModelName.push_back( sName );
+	
+	//vhMass.push_back( new TH1D("hMass_"+sId,"",iMassNbins, iMassMin, iMassMax) );
+	vhMass.push_back( new TH1D("hMass_"+sId,"",nxbins,xbins) );
+	vhMass[mod]->Reset();
+	vhMass[mod]->SetLineColor(col);
+	vhMass[mod]->SetTitle(sTitle);
+	vhMass[mod]->SetXTitle("m_{#mu#mu} GeV");
+	vhMass[mod]->SetYTitle("Events");
+	vhMass[mod]->GetXaxis()->SetMoreLogLabels(); 
+	vhMass[mod]->GetXaxis()->SetMoreLogLabels(); 
+	
+	if(mod==Z0) vtData.push_back( (TTree*)file->Get("ntuples/tree_ZP_"+sMassBin) );
+	else        vtData.push_back( (TTree*)file->Get("ntuples/tree_"+sId+"_"+sMassBin) );
+	
+	vhAcc.push_back( (TH1D*)file->Get("cosTheta_histograms/hCosTh"+sId+"_acceptance_"+sMassBin)->Clone("") );
+	
+	vrdhAcc.push_back( new RooDataHist("rdhAcc"+sId,"rdhAcc"+sId,RooArgSet(*cosThe),vhAcc[mod]) );
+	vrhpdfAcc.push_back( new RooHistPdf("rhpdfAcc"+sId,"rhpdfAcc"+sId,RooArgSet(*cosThe),*vrdhAcc[mod],1) );
+	vDetAcc.push_back( vrhpdfAcc[mod] );
+	vModel.push_back( new RooProdPdf("model_"+sId,"truPdf*effP",*sigPdf,*vDetAcc[mod]) );
+	vDataSet.push_back( new RooDataSet("data_"+sId,"data_"+sId,RooArgSet(*cosThe,*weight),WeightVar(weight->GetName())) );
+}
+
+
+
+void reset()
+{
+	for(int i=0 ; i<(int)vModelName.size() ; i++)
+	{
+		delete vhMass[i];
+		delete vrdhAcc[i];
+		delete vrhpdfAcc[i];
+		delete vModel[i];
+		delete vDataSet[i];
+	}
+
+	vModelName.clear();
+	vhMass.clear();
+	vtData.clear();
+	vhAcc.clear();
+	vrdhAcc.clear();
+	vrhpdfAcc.clear();
+	vDetAcc.clear();
+	vModel.clear();
+	vDataSet.clear();
+	
+	delete cosThe;
+	delete weight;
+	delete Afb;
+	delete sigPdf;
+}
+
+
+void loop(int mod)
+{
+	Int_t N;
+	
+	setBranches(mod);
+	N = vtData[mod]->GetEntries();
+	for(Int_t i=0 ; i<N ; i++)
+	{
+		vtData[mod]->GetEntry(i);
+		*cosThe = cost_rec;
+		float w;
+		if(mod==Z0)
+		{
+			//*weight = 1.; // !!!
+			w = 1.;
+			vhMass[mod]->Fill(mass_rec,xscn_wgt);
+		}
+		else
+		{
+			//*weight = xscn_wgt*cost_wgt;
+			w = xscn_wgt*cost_wgt;
+			vhMass[mod]->Fill(mass_rec,xscn_wgt*mass_wgt);
+		}
+		
+		vDataSet[mod]->add(RooArgSet(*cosThe),w);
+	}
+}
+
+bool minuitStatus( TMinuit * m) 
+{
+	if (!m) return false;
+
+	TString stat = gMinuit->fCstatu;
+	cout << "Minuit: " << stat << ". " << endl;
+	if ( stat.Contains("SUCCESSFUL")  || stat.Contains("CONVERGED")  ||stat.Contains("OK") ) return true;
+
+	return false;
+}
+
+RooFitResult* fit(int mod)
+{
+	TMinuit* gFit(0);
+	
+	_Afb = 0.;
+	
+	const RooArgSet* fitParsInital = vModel[mod]->getParameters(vDataSet[mod],false);
+	RooRealVar* x = (RooRealVar*)fitParsInital->find("Afb");
+	if(x) *x = 0.;
+	delete fitParsInital;
+	
+	RooFitResult* fitresult = vModel[mod]->fitTo( *vDataSet[mod],Minos(true),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),SumW2Error(true),NumCPU(8));
+	gFit = gMinuit;
+	return fitresult;
+}
+
+void plot(int mod, TVirtualPad* pad)
+{
+	pad->cd();
+	
+	RooPlot* plotCosTheta = cosThe->frame(Name("plotCosTheta"), Title( vModelName[mod] ));
+	vDataSet[mod]->plotOn(plotCosTheta,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins));
+	vDetAcc[mod]->plotOn(plotCosTheta,LineWidth(1),LineColor(kBlue));
+	//vDetAcc[mod]->plotOn(plotCosTheta,LineWidth(1),LineColor(kGreen),NormRange("rangeX"));
+
+	vModel[mod]->plotOn(plotCosTheta,LineWidth(1),LineColor(kRed),NormRange("range_cosThe"));
+	//vModel[mod]->paramOn(plotCosTheta,Layout(0.7,1.,0.4),Format("NEU",AutoPrecision(1)));
+	//vModel[mod]->paramOn(plotCosTheta,Layout(0.8,0.95,0.2));
+	vModel[mod]->paramOn(plotCosTheta);
+	plotCosTheta->getAttText()->SetTextSize(0.05);
+	plotCosTheta->getAttLine()->SetLineWidth(0.05);
+		
+	pad->SetLeftMargin(0.2);
+	plotCosTheta->SetTitleOffset(2,"Y");
+	plotCosTheta->Draw();
+}
+
+void getFit(int mod)
+{
+	vFitResult.push_back( fit(mod) );
+}
+
+void Afb_RooFit_weighted()
+{
+	style();
+	
+	int nColumns = 5;
+	
+	TCanvas* cnv = new TCanvas("fit", "fit", 1024,1280);
+	cnv->Draw();
+	cnv->Divide(nColumns,nMassBins); // const int nMassBins is defined in constants.h
+	
+	vector<vector<TVirtualPad*> > vPad;
+	vector<vector<TVirtualPad*> > vPadBin;
+	vector<vector<double> >       vAfbResult;
+	vector<vector<double> >       vAfbError;
+	
+	vector<TVirtualPad*> vPadTmp;
+	vector<double>       vAfbResultTmp;
+	vector<double>       vAfbErrorTmp;
+	
+	vector<TString>      vTitles;
+	vector<TCanvas*>     vCanvases;
+	vector<TH1D*>        vhMassTmp;
+	
+	leg = new TLegend(0.006269594,0.03457447,0.9902473,0.4069149,NULL,"brNDC");
+	leg->SetFillColor(kWhite);
+	
+	pvtxt = new TPaveText(0.006269594,0.5531915,0.9902473,0.9255319,"brNDC");
+	pvtxt->SetFillColor(kWhite);
+	
+	int padCounter = 1;
+	
+	for(int massBin=1 ; massBin<=nMassBins ; massBin++)
+	{
+		TString sMassBin = (TString)tostring(massBin);
+		
+		vPadTmp.clear();
+		vAfbResultTmp.clear();
+		vAfbErrorTmp.clear();
+		vhMassTmp.clear();
+		
+		vPad.push_back(vPadTmp);
+		vPadBin.push_back(vPadTmp);
+		vAfbResult.push_back(vAfbResultTmp);
+		vAfbError.push_back(vAfbErrorTmp);
+		
+		vCanvases.push_back( new TCanvas("tmp", "", 604,400) );
+		vCanvases[massBin-1]->SetName( sMassBin );
+		vCanvases[massBin-1]->Divide(2,2);
+		
+		
+		for(int mod=Z0 ; mod<=KK ; mod++)
+		{
+			////////////////////////
+			init(massBin, mod); ////
+			loop(mod); /////////////
+			getFit(mod); ///////////
+			////////////////////////
+			
+			vAfbResult[massBin-1].push_back( Afb->getVal() );
+			vAfbError[massBin-1].push_back( Afb->getError() );
+			//cout << vModelName[mod] << " --> Afb = " << vAfbResult[mod] << " +- " << vAfbError[mod] << endl;
+			
+			vPad[massBin-1].push_back( cnv->cd( padCounter ) );
+			padCounter++;
+			plot(mod,vPad[massBin-1][mod]);
+			
+			vPadBin[massBin-1].push_back( vCanvases[massBin-1]->cd(mod+1) );
+			plot(mod,vPadBin[massBin-1][mod]);
+		}
+		
+		vTitles.push_back( vhMass[Z0]->GetTitle() );
+		
+		vPad[massBin-1].push_back( cnv->cd( padCounter ) );
+		padCounter++;
+		vPad[massBin-1][KK+1]->SetLogy();
+		vPad[massBin-1][KK+1]->SetLogx();
+		
+		Double_t hMin = getYmin(vhMass[Z0]);
+		hMin = (getYmin(vhMass[ZP]) < hMin) ? getYmin(vhMass[ZP]) : hMin;
+		hMin = (getYmin(vhMass[KK]) < hMin) ? getYmin(vhMass[KK]) : hMin;
+		Double_t hMax = vhMass[Z0]->GetMaximum();
+		hMax = (vhMass[ZP]->GetMaximum() > hMax) ? vhMass[ZP]->GetMaximum() : hMax;
+		hMax = (vhMass[KK]->GetMaximum() > hMax) ? vhMass[KK]->GetMaximum() : hMax;
+		
+		vhMass[Z0]->SetMinimum(0.5*hMin);
+		vhMass[Z0]->SetMaximum(1.5*hMax);
+		
+		vhMassTmp.push_back( (TH1D*)vhMass[Z0]->Clone("") );
+		vhMassTmp.push_back( (TH1D*)vhMass[ZP]->Clone("") );
+		vhMassTmp.push_back( (TH1D*)vhMass[KK]->Clone("") );
+		
+		if(massBin==1) leg->AddEntry((TH1D*)vhMass[Z0]->Clone(""), "SM #gamma/Z^{0} (#it{ATLAS} MC10 rec')", "l");
+		vhMassTmp[Z0]->Clone("")->Draw();
+		if(massBin==1) leg->AddEntry((TH1D*)vhMass[ZP]->Clone(""), "1000 GeV Z' SSM Template", "l");
+		vhMassTmp[ZP]->Clone("")->Draw("SAMES");
+		if(massBin==1) leg->AddEntry((TH1D*)vhMass[KK]->Clone(""), "1000 GeV S^{1}/Z_{2} KK Template", "l");
+		vhMassTmp[KK]->Clone("")->Draw("SAMES");
+		vPad[massBin-1][KK+1]->RedrawAxis();
+		
+		pvtxt->Clear();
+		txt = pvtxt->AddText( vTitles[massBin-1] );
+		//pvtxt->InseretTxt( vTitles[massBin-1] );
+		vPad[massBin-1].push_back( cnv->cd( padCounter ) );
+		padCounter++;
+		pvtxt->Clone("")->Draw();
+		leg->Draw("SAMES");
+		
+		
+		//------------------------------------------------------------
+		// for the binned canvases
+		vPadBin[massBin-1].push_back( vCanvases[massBin-1]->cd( KK+2 ) );
+		vPadBin[massBin-1][KK+1]->Draw();
+		vPadBin[massBin-1][KK+1]->SetLogy();
+		vPadBin[massBin-1][KK+1]->SetLogx();
+		vhMassTmp[Z0]->Clone("")->Draw();
+		vhMassTmp[ZP]->Clone("")->Draw("SAMES");
+		vhMassTmp[KK]->Clone("")->Draw("SAMES");
+		vPadBin[massBin-1][KK+1]->RedrawAxis();
+		
+		vCanvases[massBin-1]->Update();
+		vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".root");
+		vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".C");
+		vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".eps");
+		vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".ps");
+		vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".pdf");
+		vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".png");
+		//------------------------------------------------------------
+		
+		
+		cout << "### completted massBin=" << massBin << " ###" << endl;
+		/////////////
+		reset(); ////
+		/////////////
+		cout << "### reset massBin=" << massBin << " ###" << endl;
+	}
+	
+	cnv->Update();
+	
+	cnv->SaveAs("fitplots/FitAllMassBins.root");
+	cnv->SaveAs("fitplots/FitAllMassBins.C");
+	cnv->SaveAs("fitplots/FitAllMassBins.eps");
+	cnv->SaveAs("fitplots/FitAllMassBins.ps");
+	cnv->SaveAs("fitplots/FitAllMassBins.pdf");
+	cnv->SaveAs("fitplots/FitAllMassBins.png");
+}
+
 

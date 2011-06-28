@@ -3,6 +3,14 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+const double minMassBin = 120;  // for the asymmetry fit
+const double maxMassBin = 1620; // for the asymmetry fit
+const int nMassBins = 8;        // for the asymmetry fit
+
+static double   minCosTheta = -1.;  // for the acceptance binning
+static double   maxCosTheta = +1.;  // for the acceptance binning
+const  int      nCosThetaBins = 25; // for the acceptance binning
+
 enum models
 {
 	Z0,ZP,KK

@@ -3,9 +3,11 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+const double luminosity = 5.; // 1/fb
+
 const double minMassBin = 120;  // for the asymmetry fit
 const double maxMassBin = 1620; // for the asymmetry fit
-const int nMassBins = 8;        // for the asymmetry fit
+const int nMassBins = 12;        // for the asymmetry fit
 
 static double   minCosTheta = -1.;  // for the acceptance binning
 static double   maxCosTheta = +1.;  // for the acceptance binning

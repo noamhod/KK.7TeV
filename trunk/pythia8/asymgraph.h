@@ -41,4 +41,33 @@ TGraphAsymmErrors* GetPoissonizedGraph(TH1D* histo, bool isXerr)
 	return graph;
 }
 
+TGraphAsymmErrors* GetSqrtErrorsGraph(TH1D* histo, bool isXerr)
+{
+	TGraphAsymmErrors* graph = new TGraphAsymmErrors();
+	
+	int j=0;
+	for (int i=1;i<=histo->GetNbinsX();++i)
+	{
+		if (histo->GetBinContent(i)!=0)
+		{ 
+			graph->SetPoint(j,histo->GetBinCenter(i),histo->GetBinContent(i));
+			graph->SetPointError(j,
+			(isXerr) ? histo->GetBinWidth(i)/2. : 0.,
+			(isXerr) ? histo->GetBinWidth(i)/2. : 0.,
+			TMath::Sqrt(histo->GetBinContent(i)),
+			TMath::Sqrt(histo->GetBinContent(i))
+			);
+			++j;
+		}
+	}
+	return graph;
+}
+
+void resetHistogramErrors(TH1D* histo)
+{
+	Int_t N = histo->GetNbinsX();
+	for(Int_t b=0 ; b<=N ; b++) histo->SetBinError(b,0.);
+}
+
+
 #endif

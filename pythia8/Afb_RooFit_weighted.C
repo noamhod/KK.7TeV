@@ -25,6 +25,8 @@ double   costmax = maxCosTheta;
 int      ncostbins = nCosThetaBins;
 
 double _Afb = 0.;
+TRandom* randGen;
+vector<vector<double> > vvdInitialGuess;
 
 TFile* file = new TFile("weights.root", "READ");
 vector<TH1D*> vhMassBins;
@@ -48,11 +50,12 @@ TPaveText* pvtxt_lumi;
 TPaveText* pvtxt_atlas;
 TCanvas* cnvAfb;
 TPad *pad_mHat;
-TPad *pad_Afb; 
+TPad *pad_Afb;
+TPad *pad_compare;
 
 RooRealVar* cosThe; // the variable 
 RooRealVar* weight; // the weight
-RooRealVar* Afb;     // the parameter to find
+RooRealVar* Afb;    // the parameter to find
 
 
 vector<RooAbsData*> vDataSet; // Roo Data holder
@@ -68,6 +71,14 @@ RooAbsPdf* sigPdf;  // will be the truth pdf
 
 vector<RooDataHist*> vrdhAcc;
 vector<RooHistPdf*>  vrhpdfAcc;
+
+
+bool drawAfbErrArea = false;
+
+double randomizeItialGuess(double min, double max)
+{
+	return min + (max-min)*randGen->Uniform(); // Uniform(x1=0) returns a uniform deviate on the interval [0,x1].
+}
 
 
 void setBranches(int mod)
@@ -104,14 +115,18 @@ void init(int massBin, int mod)
 	setLogMassBins(iMassMin, iMassMax);
 
 	cosThe = new RooRealVar("cosTheta","cos#theta*",costmin,costmax);
-    cosThe->setRange("range_cosThe",costmin,costmax);
+	cosThe->setRange("range_cosThe",costmin,costmax);
 	cosThe->setBins(ncostbins);
 	
 	weight = new RooRealVar("weight","weight",0.,1e10);
-    //weight->setRange("range_weight",costmin,costmax);
+	//weight->setRange("range_weight",costmin,costmax);
 	//weight->setBins(ncostbins);
 
-	Afb = new RooRealVar("Afb","A_{fb}",_Afb,-10.,+10.);
+	//Afb = new RooRealVar("Afb","A_{fb}",_Afb,-10.,+10.);
+	_Afb = randomizeItialGuess(-1.,+1.);
+	vvdInitialGuess[massBin-1].push_back(_Afb);
+	
+	Afb = new RooRealVar("Afb","A_{fb}",_Afb,-1.,+1.);
 
 	sigPdf = new RooGenericPdf("CSPDF","CSPDF","(3./8.)*(1. + cosTheta*cosTheta + (8./3.)*Afb*cosTheta)",RooArgSet(*cosThe,*Afb));
 	//sigPdf = new RooGenericPdf("CSPDF","CSPDF","(1. + cosTheta*cosTheta + (8./3.)*Afb*cosTheta)",RooArgSet(*cosThe,*Afb));
@@ -119,6 +134,7 @@ void init(int massBin, int mod)
 	TString sName, sId, sChannelFit, sChannelMass;
 	Int_t fillStyle = 0;
 	Int_t lineStyle = 0;
+	Int_t markerStyle = 0;
 	Color_t colbin = 0; 
 	Color_t col = 0; 
 	
@@ -133,6 +149,7 @@ void init(int massBin, int mod)
 			sChannelMass = "#gamma/Z^{0}: Events";
 			fillStyle = 3003;
 			lineStyle = 2;
+			markerStyle = 20;
 			break;
 		case ZP:
 			sName = "Z'_{SSM}";
@@ -143,6 +160,7 @@ void init(int massBin, int mod)
 			sChannelMass = "1 TeV Z'_{SSM}: Events";
 			fillStyle = 3017;
 			lineStyle = 3;
+			markerStyle = 22;
 			break;
 		case KK:
 			sName = "S^{1}/Z_{2} KK";
@@ -153,6 +171,7 @@ void init(int massBin, int mod)
 			sChannelMass = "1 TeV #gamma_{KK}/Z_{KK}: Events";
 			fillStyle = 3018;
 			lineStyle = 1;
+			markerStyle = 23;
 			break;
 	}
 	
@@ -160,6 +179,7 @@ void init(int massBin, int mod)
 	{
 		vhMassBins.push_back( (TH1D*)file->Get("iMass_histograms/hMassTmp")->Clone("") );
 		vhMassBins[mod]->Reset();
+		vhMassBins[mod]->SetDefaultSumw2(); // The error per bin will be computed as sqrt(sum of squares of weight) for each bin. 
 		vhMassBins[mod]->SetTitle("");
 		vhMassBins[mod]->SetYTitle("Events");
 		vhMassBins[mod]->SetLineColor(col);
@@ -169,34 +189,27 @@ void init(int massBin, int mod)
 		
 		vhAfbBins.push_back( (TH1D*)file->Get("all_histograms/hDummy_afb")->Clone("") );
 		vhAfbBins[mod]->Reset();
-		if(mod==Z0)
+		vhAfbBins[mod]->SetTitle("");
+		vhAfbBins[mod]->SetXTitle( "m_{#mu#mu} GeV" );
+		vhAfbBins[mod]->SetYTitle( "A_{FB}" );
+		vhAfbBins[mod]->SetLineColor(col);
+		if(drawAfbErrArea)
 		{
-			vhAfbBins[mod]->SetLineColor(col);
 			vhAfbBins[mod]->SetFillColor(col);
 			vhAfbBins[mod]->SetFillStyle(fillStyle);
 			vhAfbBins[mod]->SetLineWidth(1);
 			vhAfbBins[mod]->SetMarkerSize(0);
 			vhAfbBins[mod]->SetMarkerColor(0);
+			leg_mHat->AddEntry( vhAfbBins[mod], sChannelFit, "f");
 		}
 		else
-		{
-			//vhAfbBins[mod]->SetLineColor(col);
-			//vhAfbBins[mod]->SetFillColor(col);
-			//vhAfbBins[mod]->SetFillStyle(fillStyle);
-			//vhAfbBins[mod]->SetLineWidth(1);
-			//vhAfbBins[mod]->SetMarkerSize(0);
-			//vhAfbBins[mod]->SetMarkerColor(0);
+		{	
+			vhAfbBins[mod]->SetLineWidth(2);
 			vhAfbBins[mod]->SetMarkerSize(2);
-			if(mod==ZP) vhAfbBins[mod]->SetMarkerStyle(20);
-			if(mod==KK) vhAfbBins[mod]->SetMarkerStyle(23);
+			vhAfbBins[mod]->SetMarkerStyle(markerStyle);
 			vhAfbBins[mod]->SetMarkerColor(col);
-		}
-		vhAfbBins[mod]->SetTitle("");
-		vhAfbBins[mod]->SetXTitle( "m_{#mu#mu} GeV" );
-		vhAfbBins[mod]->SetYTitle( "A_{FB}" );
-		//leg_mHat->AddEntry( vhAfbBins[mod], sChannelFit, "f");
-		if(mod==Z0) leg_mHat->AddEntry( vhAfbBins[mod], sChannelFit, "f");
-		else        leg_mHat->AddEntry( vhAfbBins[mod], sChannelFit, "p");
+			leg_mHat->AddEntry( vhAfbBins[mod], sChannelFit, "lep");
+		}             
 	}
 	
 	vModelName.push_back( sName );
@@ -204,6 +217,7 @@ void init(int massBin, int mod)
 	//vhMass.push_back( new TH1D("hMass_"+sId,"",iMassNbins, iMassMin, iMassMax) );
 	vhMass.push_back( new TH1D("hMass_"+sId,"",nxbins,xbins) );
 	vhMass[mod]->Reset();
+	vhMass[mod]->SetDefaultSumw2(); // The error per bin will be computed as sqrt(sum of squares of weight) for each bin.
 	vhMass[mod]->SetLineColor(colbin);
 	vhMass[mod]->SetTitle(sTitle);
 	vhMass[mod]->SetXTitle("m_{#mu#mu} GeV");
@@ -217,7 +231,7 @@ void init(int massBin, int mod)
 	vhAcc.push_back( (TH1D*)file->Get("cosTheta_histograms/hCosTh"+sId+"_acceptance_"+sMassBin)->Clone("") );
 	
 	vrdhAcc.push_back( new RooDataHist("rdhAcc"+sId,"rdhAcc"+sId,RooArgSet(*cosThe),vhAcc[mod]) );
-	vrhpdfAcc.push_back( new RooHistPdf("rhpdfAcc"+sId,"rhpdfAcc"+sId,RooArgSet(*cosThe),*vrdhAcc[mod],1) );
+	vrhpdfAcc.push_back( new RooHistPdf("rhpdfAcc"+sId,"rhpdfAcc"+sId,RooArgSet(*cosThe),*vrdhAcc[mod],4) ); // last argument is the order of polinomial interpulation
 	vDetAcc.push_back( vrhpdfAcc[mod] );
 	vModel.push_back( new RooProdPdf("model_"+sId,"truPdf*effP",*sigPdf,*vDetAcc[mod]) );
 	vDataSet.push_back( new RooDataSet("data_"+sId,"data_"+sId,RooArgSet(*cosThe,*weight),WeightVar(weight->GetName())) );
@@ -266,8 +280,8 @@ void loop(int mod)
 		float w;
 		if(mod==Z0)
 		{
-			//*weight = 1.*luminosity; // !!!
-			w = 1.;
+			//*weight = xscn_wgt*luminosity*1.; // !!!
+			w = xscn_wgt*luminosity*1.;
 			vhMass[mod]->Fill(mass_rec,xscn_wgt*luminosity);
 			vhMassBins[mod]->Fill(mass_rec,xscn_wgt*luminosity);
 		}
@@ -305,7 +319,7 @@ RooFitResult* fit(int mod)
 	if(x) *x = 0.;
 	delete fitParsInital;
 	
-	RooFitResult* fitresult = vModel[mod]->fitTo( *vDataSet[mod],Minos(true),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),SumW2Error(true),NumCPU(8));
+	RooFitResult* fitresult = vModel[mod]->fitTo( *vDataSet[mod],Minos(true),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),SumW2Error(kTRUE),NumCPU(8));
 	gFit = gMinuit;
 	return fitresult;
 }
@@ -314,21 +328,20 @@ void plot(int mod, TVirtualPad* pad)
 {
 	pad->cd();
 	
-	RooPlot* plotCosTheta = cosThe->frame(Name("plotCosTheta"), Title( vModelName[mod] ));
-	vDataSet[mod]->plotOn(plotCosTheta,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins));
-	vDetAcc[mod]->plotOn(plotCosTheta,LineWidth(1),LineColor(kBlue));
-	//vDetAcc[mod]->plotOn(plotCosTheta,LineWidth(1),LineColor(kGreen),NormRange("rangeX"));
+	RooPlot* cosThetaFrame = cosThe->frame(Name("cosThetaFrame"), Title( vModelName[mod] ));
+	vDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2));
+	vDetAcc[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(kBlue));
+	//vDetAcc[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(kGreen),NormRange("range_cosThe"));
 
-	vModel[mod]->plotOn(plotCosTheta,LineWidth(1),LineColor(kRed),NormRange("range_cosThe"));
-	//vModel[mod]->paramOn(plotCosTheta,Layout(0.7,1.,0.4),Format("NEU",AutoPrecision(1)));
-	vModel[mod]->paramOn(plotCosTheta,Layout(0.6,0.9,1));
-	//vModel[mod]->paramOn(plotCosTheta);
-	plotCosTheta->getAttText()->SetTextSize(0.05);
-	plotCosTheta->getAttLine()->SetLineWidth(0.05);
-		
+	vModel[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(kRed),NormRange("range_cosThe"));
+	//vModel[mod]->paramOn(cosThetaFrame,Layout(0.7,1.,0.4),Format("NEU",AutoPrecision(1)));
+	vModel[mod]->paramOn(cosThetaFrame,Layout(0.6,0.9,1));
+	cosThetaFrame->getAttText()->SetTextSize(0.05);
+	cosThetaFrame->getAttLine()->SetLineWidth(0.05);
+	
 	pad->SetLeftMargin(0.2);
-	plotCosTheta->SetTitleOffset(2,"Y");
-	plotCosTheta->Draw();
+	cosThetaFrame->SetTitleOffset(2,"Y");
+	cosThetaFrame->Draw();
 }
 
 void getFit(int mod)
@@ -339,33 +352,39 @@ void getFit(int mod)
 
 void drawAfb()
 {
+
+	/*
 	resetHistogramErrors(vhMassBins[Z0]);
 	resetHistogramErrors(vhMassBins[ZP]);
 	resetHistogramErrors(vhMassBins[KK]);
 
 	bool isXerr = false;
 	//gMpoissonErr.push_back( GetPoissonizedGraph(vhMassBins[Z0], isXerr) );
-	gMpoissonErr.push_back( GetSqrtErrorsGraph(vhMassBins[Z0], isXerr) );
+	//gMpoissonErr.push_back( GetSqrtErrorsGraph(vhMassBins[Z0], isXerr) );
+	gMpoissonErr.push_back( GetDefaultErrorsGraph(vhMassBins[Z0], isXerr) );
 	gMpoissonErr[Z0]->SetMarkerStyle(1);
 	gMpoissonErr[Z0]->SetMarkerSize(1);
 	gMpoissonErr[Z0]->SetLineColor(kBlue);
 	gMpoissonErr[Z0]->SetLineStyle(2);
 
 	//gMpoissonErr.push_back( GetPoissonizedGraph(vhMassBins[ZP], isXerr) );
-	gMpoissonErr.push_back( GetSqrtErrorsGraph(vhMassBins[ZP], isXerr) );
+	//gMpoissonErr.push_back( GetSqrtErrorsGraph(vhMassBins[ZP], isXerr) );
+	gMpoissonErr.push_back( GetDefaultErrorsGraph(vhMassBins[ZP], isXerr) );
 	gMpoissonErr[ZP]->SetMarkerStyle(1);
 	gMpoissonErr[ZP]->SetMarkerSize(1);
 	gMpoissonErr[ZP]->SetLineColor(kRed);	
 	gMpoissonErr[ZP]->SetLineStyle(3);	
 
 	//gMpoissonErr.push_back( GetPoissonizedGraph(vhMassBins[KK], isXerr) );
-	gMpoissonErr.push_back( GetSqrtErrorsGraph(vhMassBins[KK], isXerr) );
+	//gMpoissonErr.push_back( GetSqrtErrorsGraph(vhMassBins[KK], isXerr) );
+	gMpoissonErr.push_back( GetDefaultErrorsGraph(vhMassBins[KK], isXerr) );
 	gMpoissonErr[KK]->SetMarkerStyle(1);
 	gMpoissonErr[KK]->SetMarkerSize(1);
 	gMpoissonErr[KK]->SetLineColor(kBlack);
 	gMpoissonErr[KK]->SetLineStyle(1);
+	*/
 
-
+	
 	cnvAfb->cd();
 	pad_mHat->Draw();
 	pad_mHat->cd();
@@ -374,22 +393,22 @@ void drawAfb()
 	vhMassBins[KK]->GetXaxis()->SetMoreLogLabels();
 	vhMassBins[KK]->GetXaxis()->SetNoExponent();
 	vhMassBins[KK]->Draw();
-	gMpoissonErr[KK]->GetXaxis()->SetMoreLogLabels();
-	gMpoissonErr[KK]->GetXaxis()->SetNoExponent();
+	//gMpoissonErr[KK]->GetXaxis()->SetMoreLogLabels();
+	//gMpoissonErr[KK]->GetXaxis()->SetNoExponent();
 	//gMpoissonErr[KK]->Draw("SAMES");
 	
 	vhMassBins[Z0]->GetXaxis()->SetMoreLogLabels();
 	vhMassBins[Z0]->GetXaxis()->SetNoExponent();
 	vhMassBins[Z0]->Draw("SAMES");
-	gMpoissonErr[Z0]->GetXaxis()->SetMoreLogLabels();
-	gMpoissonErr[Z0]->GetXaxis()->SetNoExponent();
+	//gMpoissonErr[Z0]->GetXaxis()->SetMoreLogLabels();
+	//gMpoissonErr[Z0]->GetXaxis()->SetNoExponent();
 	//gMpoissonErr[Z0]->Draw("SAMES");
 
 	vhMassBins[ZP]->GetXaxis()->SetMoreLogLabels();
 	vhMassBins[ZP]->GetXaxis()->SetNoExponent();
 	vhMassBins[ZP]->Draw("SAMES");
-	gMpoissonErr[ZP]->GetXaxis()->SetMoreLogLabels(); 
-	gMpoissonErr[ZP]->GetXaxis()->SetNoExponent(); 
+	//gMpoissonErr[ZP]->GetXaxis()->SetMoreLogLabels(); 
+	//gMpoissonErr[ZP]->GetXaxis()->SetNoExponent(); 
 	//gMpoissonErr[ZP]->Draw("SAMES");
 
 	cnvAfb->cd();
@@ -397,15 +416,16 @@ void drawAfb()
 	pad_Afb->Draw();
 	pad_Afb->cd();
 	vhAfbBins[KK]->GetYaxis()->SetRangeUser(-1.,+1.);
-	//vhAfbBins[KK]->Draw("E5 Y+");
-	vhAfbBins[KK]->Draw("PY+");
+	if(drawAfbErrArea) vhAfbBins[KK]->Draw("E5 Y+");
+	else               vhAfbBins[KK]->Draw("e1x1 Y+");
 	vhAfbBins[KK]->GetXaxis()->SetMoreLogLabels(); 
 	vhAfbBins[KK]->GetXaxis()->SetNoExponent(); 
-	vhAfbBins[Z0]->Draw("E5 Y+ SAMES");
+	if(drawAfbErrArea) vhAfbBins[Z0]->Draw("E5 Y+ SAMES");
+	else               vhAfbBins[Z0]->Draw("Y+ e1x1 SAMES");
 	vhAfbBins[Z0]->GetXaxis()->SetMoreLogLabels(); 
 	vhAfbBins[Z0]->GetXaxis()->SetMoreLogLabels(); 
-	vhAfbBins[ZP]->Draw("Y+ PSAMES");
-	//vhAfbBins[ZP]->Draw("E5 Y+ SAMES");
+	if(drawAfbErrArea) vhAfbBins[ZP]->Draw("E5 Y+ SAMES");
+	else               vhAfbBins[ZP]->Draw("Y+ e1x1 SAMES");
 	vhAfbBins[ZP]->GetXaxis()->SetMoreLogLabels(); 
 	vhAfbBins[ZP]->GetXaxis()->SetMoreLogLabels(); 
 	pvtxt_lumi->Draw("SAMES");
@@ -432,6 +452,11 @@ void Afb_RooFit_weighted()
 {
 	style();
 	
+	randGen = new TRandom();
+	randGen->SetSeed(0); // Note that the machine clock is returned with a precision of 1 second.
+						 // If one calls SetSeed(0) within a loop and the loop time is less than 1s,
+						 // all generated numbers will be identical!
+	
 	int nCnvColumns = 5;
 	
 	//TCanvas* cnv = new TCanvas("fit", "fit", 1024,1280);
@@ -447,6 +472,7 @@ void Afb_RooFit_weighted()
 	vector<TVirtualPad*> vPadTmp;
 	vector<double>       vAfbResultTmp;
 	vector<double>       vAfbErrorTmp;
+	vector<double>       vGuessTmp;
 	
 	vector<TString>      vTitles;
 	vector<TCanvas*>     vCanvases;
@@ -469,7 +495,7 @@ void Afb_RooFit_weighted()
 	pvtxt_atlas = new TPaveText(0.2533445,0.8367876,0.4172241,0.9313472,"brNDC");
 	pvtxt_atlas->SetFillColor(0);
 	pvtxt_atlas->SetTextFont(42);
-	txt = pvtxt_atlas->AddText("#bf{#splitline{#it{ATLAS}}{templates}}");
+	txt = pvtxt_atlas->AddText("#bf{#splitline{#it{ATLAS}}{#scale[0.68]{Templates}}}");
 	
 	cnvAfb = new TCanvas("cnvAfb", "cnvAfb", 0,0,1200,800);
 	pad_mHat = new TPad("padMhat","",0,0,1,1);
@@ -484,6 +510,8 @@ void Afb_RooFit_weighted()
 	pad_Afb->SetFrameFillStyle(4000); //will be transparent
 	pad_Afb->SetFrameFillColor(0);
 	pad_Afb->SetLogx();
+	
+	//pad_compare = new TPad("padMhat","",0,0,1,1); !!!!!!!!!!!!!!!!!!!!!!!!
 	
 	int padCounter = 1;
 	
@@ -505,6 +533,7 @@ void Afb_RooFit_weighted()
 		vCanvases[massBin-1]->SetName( sMassBin );
 		vCanvases[massBin-1]->Divide(2,2);
 		
+		vvdInitialGuess.push_back(vGuessTmp);
 		
 		for(int mod=Z0 ; mod<=KK ; mod++)
 		{
@@ -519,8 +548,11 @@ void Afb_RooFit_weighted()
 			cout << vModelName[mod] << " --> Afb = " << vAfbResult[massBin-1][mod] << " +- " << vAfbError[massBin-1][mod] << endl;
 			
 			vhAfbBins[mod]->SetBinContent(massBin,vAfbResult[massBin-1][mod]);
+			/*
 			if(mod==Z0) vhAfbBins[mod]->SetBinError(massBin,vAfbError[massBin-1][mod]);
 			else        vhAfbBins[mod]->SetBinError(massBin,0.);
+			*/
+			vhAfbBins[mod]->SetBinError(massBin,vAfbError[massBin-1][mod]);
 			
 			vPad[massBin-1].push_back( cnv->cd( padCounter ) );
 			padCounter++;

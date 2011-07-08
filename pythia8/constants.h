@@ -15,6 +15,7 @@ const  int      nCosThetaBins = 25; // for the acceptance binning
 
 enum models
 {
+	Z0d3pd=-1,
 	Z0,ZP,KK
 };
 

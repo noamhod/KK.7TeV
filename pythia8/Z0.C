@@ -35,6 +35,19 @@ int main() {
 	strm >> sNewHighBound;
 
 
+	/*
+	// PDF initialization
+	pythia.readString("PDF:useLHAPDF = on");
+	pythia.readString("PDF:LHAPDFset = MRST2001lo.LHgrid");
+	pythia.readString("PDF:LHAPDFmember = 0");
+	// Allow extrapolation of PDF's beyond x and Q2 boundaries, at own risk.
+	// Default behaviour is to freeze PDF's at boundaries.
+	pythia.readString("PDF:extrapolateLHAPDF = on");
+	// Need to change pT0Ref depending on choice of PDF.
+	// One possibility: retune to same <n_charged>.
+	//pythia.readString("MultipleInteractions:pT0Ref = 10"); 
+	*/
+
 	// Initialize.
 	pythia.readString("23:mMin = " + sNewLowBound);
 	pythia.readString("23:mMax = " + sNewHighBound);

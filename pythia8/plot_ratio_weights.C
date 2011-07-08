@@ -327,15 +327,15 @@ int plot_ratio_weights()
 	TLegend* leg_compare = new TLegend(0.2840022,0.8211356,0.8361901,0.9290803,NULL,"brNDC");
 	leg_compare->SetFillColor(kWhite);
 	
-	TPaveText* pvtxt = new TPaveText(0.1462841,0.4417869,0.5177747,0.6400528,"brNDC");
+	TPaveText* pvtxt = new TPaveText(0.3345178,0.7347798,0.7072882,0.9317789,"brNDC");
 	pvtxt->SetFillColor(kWhite);
 	TText* txt = pvtxt->AddText( "#splitline{Sum of binned #bf{truth}}{samples normalized to ~5 fb^{-1}}" );
 	
-	TPaveText* pvtxt_recon = new TPaveText(0.1462841,0.4417869,0.5177747,0.6400528,"brNDC");
+	TPaveText* pvtxt_recon = new TPaveText(0.3258082,0.7698618,0.6985786,0.9236831,"brNDC");
 	pvtxt_recon->SetFillColor(kWhite);
 	txt = pvtxt_recon->AddText( "#splitline{Sum of binned #bf{template}}{samples normalized to ~5 fb^{-1}}" );
 	
-	TPaveText* pvtxt_compare = new TPaveText(0.5940635,0.6619171,0.8501254,0.8319301,"brNDC");
+	TPaveText* pvtxt_compare = new TPaveText(0.1688387,0.4001352,0.4258138,0.5691372,"brNDC");
 	pvtxt_compare->SetFillColor(kWhite);
 	txt = pvtxt_compare->AddText( "#splitline{Template vs. #it{ATLAS}}{MC10 reconstructed}" );
 	

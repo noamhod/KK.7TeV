@@ -87,4 +87,15 @@ typedef map<int, const char*> TMapiP2cc;
 #include <TXMLAttr.h>
 ///////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////
+string log(const char* file, int line, string msg)
+{
+	ostringstream os;
+	os << file << " +" << line << ": " << msg;
+	return os.str();
+}
+#define LOG(x) log(__FILE__, __LINE__, (x))
+////////////////////////////////////////////////////////
+
+
 #endif

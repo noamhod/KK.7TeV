@@ -48,6 +48,17 @@ class XML
 
 double XML::validate_double(string str)
 {
+	if(str.substr(0,1)=="0")
+	{
+		size_t pos = str.find('.');
+		if(pos==string::npos)
+		{
+			//cout << "[" << LOG("xxx") << "] " << "ERROR: cannot validate string=" << str << " (didn't find a decimal period). exit now." << endl;
+			cout << LOG("ERROR: cannot validate string=" + str + " (didn't find a decimal period). exit now.") << endl;
+			exit(-1);
+		}
+	}
+
 	double x;
 	try
 	{
@@ -143,6 +154,8 @@ void XML::ParseContext(TXMLNode *node)
 			if(nodeName.find("obj")!=string::npos) cout << node->GetNodeName() << " ";
 			else if(nodeName=="value")             cout << node->GetNodeName() << " ";
 			else if(nodeName=="trigger")           cout << node->GetNodeName() << " ";
+			else if(nodeName=="period")            cout << node->GetNodeName() << " ";
+			else if(nodeName=="kfactor")           cout << node->GetNodeName() << " ";
 			else                                   cout << node->GetNodeName();
 			add2list(node->GetNodeName());
 			if(node->HasAttributes())
@@ -156,6 +169,8 @@ void XML::ParseContext(TXMLNode *node)
 					if(attrName.find("FLAG")!=string::npos)     cout << " ";
 					if(attrName.find("ORDER")!=string::npos)    cout << " ";
 					if(attrName.find("PRIORITY")!=string::npos) cout << " ";
+					if(attrName.find("MINRANGE")!=string::npos) cout << " ";
+					if(attrName.find("MAXRANGE")!=string::npos) cout << " ";
 					cout << attr->GetName() << ":" << attr->GetValue();
 					add2list(attr->GetName());
 					add2list(attr->GetValue());

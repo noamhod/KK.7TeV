@@ -50,5 +50,37 @@
       The values are in GeV and pb^-1.
     </description>
   </obj>
+  
+  
+  <obj NAME="PERIODS" FLAG="on">
+    <nperiods>9</nperiods>
+    <periods>
+      <period NAME="A" FLAG="on">0.0000157154</period>
+      <period NAME="B" FLAG="on">0.00883395</period>
+      <period NAME="C" FLAG="on">0.00871179</period>
+      <period NAME="D" FLAG="on">0.255204</period>
+      <period NAME="E" FLAG="on">1.08162</period>
+      <period NAME="F" FLAG="on">1.95816</period>
+      <period NAME="G" FLAG="on">6.89501</period>
+      <period NAME="H" FLAG="on">8.52076</period>
+      <period NAME="I" FLAG="on">22.9524</period>
+    </periods>
+    <description>
+      The values are in  pb^-1.
+    </description>
+  </obj>
+  
+  <obj NAME="TRIGGERPERIODS" FLAG="on">
+    <ntriggerperiods>4</ntriggerperiods>
+    <triggerperiods>
+      <triggerperiod NAME="L1_MU10" FLAG="on">0.272906894</triggerperiod>
+      <triggerperiod NAME="EF_mu10" FLAG="on">3.03978</triggerperiod>
+      <triggerperiod NAME="EF_mu13" FLAG="on">6.89501</triggerperiod>
+      <triggerperiod NAME="EF_mu13_tight" FLAG="on">31.47316</triggerperiod>
+    </triggerperiods>
+    <description>
+      The values are in pb^-1.
+    </description>
+  </obj>
 
 </objects>

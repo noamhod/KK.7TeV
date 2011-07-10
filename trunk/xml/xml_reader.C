@@ -55,9 +55,9 @@ class cutFlow : public XML
 		string type;
 		string skip;
 		string nvalues;
-		string valname;
-		string valorder;
-		string valflag;
+		string attrname;
+		string attrorder;
+		string attrflag;
 		string val;
 		string description;
 	
@@ -94,20 +94,20 @@ bool cutFlow::mask()
 			if(Next(ii)=="values")
 			{
 				vdtmp.clear();
-				for(int v=1 ; v<=toint(nvalues) ; ++v)
+				for(int v=1 ; v<=validate_int(nvalues) ; ++v)
 				{
 					if(Next(ii)=="value") /* do nothing*/
-					if(Next(ii)=="NAME")  valname  = Next(ii); else return false;
-					if(Next(ii)=="ORDER") valorder = Next(ii); else return false;
-					if(Next(ii)=="FLAG")  valflag  = Next(ii); else return false;
+					if(Next(ii)=="NAME")  attrname  = Next(ii); else return false;
+					if(Next(ii)=="ORDER") attrorder = Next(ii); else return false;
+					if(Next(ii)=="FLAG")  attrflag  = Next(ii); else return false;
 					val = Next(ii);
-					cout << "\tvalue[" << v       << "] NAME=" << valname << ", ORDER=" << valorder
-						 << ", FLAG="  << valflag << ", val="  << val
+					cout << "\tvalue[" << v       << "] NAME=" << attrname << ", ORDER=" << attrorder
+						 << ", FLAG="  << attrflag << ", val="  << validate_double(val)/*val*/
 						 << endl;
 
 					vdtmp.push_back(validate_double(val));
-
 				}
+				if((int)vdtmp.size() != validate_int(nvalues)) {cout << LOG("vector size doesn't match nvalues") << endl; return false;}
 			}
 			else return false;
 			
@@ -151,22 +151,55 @@ class periods : public XML
 			</description>
 		</obj>
 		*/
+		
+		/*
+		<obj NAME="PERIODS" NUMBER="9">
+			<periods>
+				<period NAME="A" FLAG="on">0.0000157154</period>
+				<period NAME="B" FLAG="on">0.00883395</period>
+				<period NAME="C" FLAG="on">0.00871179</period>
+				<period NAME="D" FLAG="on">0.255204</period>
+				<period NAME="E" FLAG="on">1.08162</period>
+				<period NAME="F" FLAG="on">1.95816</period>
+				<period NAME="G" FLAG="on">6.89501</period>
+				<period NAME="H" FLAG="on">8.52076</period>
+				<period NAME="I" FLAG="on">22.9524</period>
+			</periods>
+			<description>
+				The values are in  pb^-1.
+			</description>
+		</obj>
+		*/
+		
+		/*
+		<obj NAME="TRIGGERPERIODS" NUMBER="4">
+			<triggerperiods>
+				<triggerperiod NAME="L1_MU10" FLAG="on">0.272906894</triggerperiod>
+				<triggerperiod NAME="EF_mu10" FLAG="on">3.03978</triggerperiod>
+				<triggerperiod NAME="EF_mu13" FLAG="on">6.89501</triggerperiod>
+				<triggerperiod NAME="EF_mu13_tight" FLAG="on">31.47316</triggerperiod>
+			</triggerperiods>
+			<description>
+				The values are in pb^-1.
+			</description>
+		</obj>
+		*/
 	
-	
-		// specific mask for cuts.xml
+		// specific mask for periods.xml
 		string name;
 		string flag;
 		string start;
 		string end;
 		string pTmin;
 		string ntriggers;
-		string trigname;
+		string attrname;
 		string trigpriority;
-		string trigflag;
+		string attrflag;
 		string trigpT;
 		string nevents;
 		string luminosity;
 		string description;
+		string number;
 	private:
 };
 
@@ -180,38 +213,210 @@ bool periods::mask()
 		
 		if(str=="obj")
 		{
-			if(Next(ii)=="NAME")      name      = Next(ii); else return false;
-			if(Next(ii)=="FLAG")      flag      = Next(ii); else return false;
-			if(Next(ii)=="start")     start     = Next(ii); else return false;
-			if(Next(ii)=="end")       end       = Next(ii); else return false;
-			if(Next(ii)=="pTmin")     pTmin     = Next(ii); else return false;
-			if(Next(ii)=="ntriggers") ntriggers = Next(ii); else return false;
-			cout << "NAME="   << name << ", FLAG=" << flag << ", start="   << start
-				 << ", end=" << end << ", pTmin=" << pTmin << ", ntriggers=" << ntriggers
+			if(Next(ii)=="NAME") name = Next(ii); else return false;
+			if(Next(ii)=="FLAG") flag = Next(ii); else return false;
+			if(name=="PERIODS")
+			{
+				if(Next(ii)=="nperiods") number = Next(ii); else return false;
+				cout << "NAME=" << name << ", nperiods=" << number << endl;
+				if(Next(ii)=="periods")
+				{
+					for(int p=1 ; p<=validate_int(number) ; ++p)
+					{
+						if(Next(ii)=="period")  /* do nothing*/
+						if(Next(ii)=="NAME")     attrname = Next(ii); else return false;
+						if(Next(ii)=="FLAG")     attrflag = Next(ii); else return false;
+						luminosity = Next(ii);
+						cout << "\tperiod[" << p        << "] NAME="        << attrname
+							 << ", FLAG="   << attrflag << ", luminosity="  << luminosity
+							 << endl;
+					}
+					//if((int)vdtmp.size() != validate_int(number)) {cout << LOG("vector size doesn't match number") << endl; return false;}
+				}
+				if(Next(ii)=="description") description = Next(ii); else return false;
+				cout << "description=" << description << endl;
+			}
+			else if(name=="TRIGGERPERIODS")
+			{
+				if(Next(ii)=="ntriggerperiods") number = Next(ii); else return false;
+				cout << "NAME=" << name << ", ntriggerperiods=" << number << endl;
+				if(Next(ii)=="triggerperiods")
+				{
+					for(int tp=1 ; tp<=validate_int(number) ; ++tp)
+					{
+						if(Next(ii)=="triggerperiod")  /* do nothing*/
+						if(Next(ii)=="NAME")     attrname = Next(ii); else return false;
+						if(Next(ii)=="FLAG")     attrflag = Next(ii); else return false;
+						luminosity = Next(ii);
+						cout << "\ttriggerperiod[" << tp       << "] NAME="        << attrname
+							 << ", FLAG="          << attrflag << ", luminosity="  << luminosity
+							 << endl;
+					}
+					//if((int)vdtmp.size() != validate_int(number)) {cout << LOG("vector size doesn't match number") << endl; return false;}
+				}
+				if(Next(ii)=="description") description = Next(ii); else return false;
+				cout << "description=" << description << endl;
+			}
+			else
+			{
+				if(Next(ii)=="start")     start     = Next(ii); else return false;
+				if(Next(ii)=="end")       end       = Next(ii); else return false;
+				if(Next(ii)=="pTmin")     pTmin     = Next(ii); else return false;
+				if(Next(ii)=="ntriggers") ntriggers = Next(ii); else return false;
+				cout << "NAME="   << name << ", FLAG=" << flag << ", start="   << start
+					 << ", end=" << end << ", pTmin=" << pTmin << ", ntriggers=" << ntriggers
+					 << endl;
+
+				if(Next(ii)=="triggers")
+				{
+					for(int t=1 ; t<=validate_int(ntriggers) ; ++t)
+					{
+						if(Next(ii)=="trigger")  /* do nothing*/
+						if(Next(ii)=="NAME")     attrname     = Next(ii); else return false;
+						if(Next(ii)=="PRIORITY") trigpriority = Next(ii); else return false;
+						if(Next(ii)=="FLAG")     attrflag     = Next(ii); else return false;
+						trigpT = Next(ii);
+						cout << "\ttrigger[" << t       << "] NAME=" << attrname << ", PRIORITY=" << trigpriority
+							 << ", FLAG="  << attrflag << ", trigpT="  << trigpT
+							 << endl;
+					}
+					//if((int)vdtmp.size() != validate_int(ntriggers)) {cout << LOG("vector size doesn't match ntriggers") << endl; return false;}
+				}
+				else return false;
+				
+				if(Next(ii)=="nevents")     nevents     = Next(ii); else return false;
+				if(Next(ii)=="luminosity")  luminosity  = Next(ii); else return false;
+				if(Next(ii)=="description") description = Next(ii); else return false;
+				cout << "nevents=" << nevents << ", luminosity=" << luminosity << ", description=" << description << endl;
+
+				// fill the db
+			}
+		}
+	}
+	return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class montecarlo : public XML
+{
+	public:
+		montecarlo(){}
+		virtual ~montecarlo(){}
+		bool mask();
+
+		/*
+		  <obj NAME="DYmumu_57M120" FLAG="on">
+			<number>150000</number>
+			<internalnumber>1</internalnumber>
+			<isbinned>true</isbinned>
+			<nevents>19996</nevents>
+			<crosssection>817.05</crosssection>
+			<crosssectionerr>0.05</crosssectionerr>
+			<br>1</br>
+			<geneff>1</geneff>
+			<nkfactors>2</nkfactors>
+			<kfactors>
+			  <kfactor MINRANGE="0."   MAXRANGE="100.">1.25</kfactor>
+			  <kfactor MINRANGE="100." MAXRANGE="150.">1.25</kfactor>
+			</kfactors>
+			<mcweight>1</mcweight> <!--?????????????-->
+			<pileup>1</pileup>     <!--?????????????-->
+			<smearing>1</smearing> <!--?????????????-->
+			<color>1</color>
+			<linestyle>1</linestyle>
+			<fillstyle>1</fillstyle>
+			<description>
+				The values are in pb
+			</description>
+		  </obj>
+		*/
+	
+		// specific mask for montecarlo.xml
+		string name;
+		string number;
+		string flag;
+		string isbinned;
+		string internalnumber;
+		string crosssection;
+		string crosssectionerr;
+		string br;
+		string geneff;
+		string nkfactors;
+		string minrange;
+		string maxrange;
+		string kfactor;
+		string nevents;
+		string color;
+		string linestyle;
+		string fillstyle;
+		string mcweight;
+		string pileup;
+		string smearing;
+		string description;
+	private:
+};
+
+bool montecarlo::mask()
+{
+	for(TMapiP2cc::iterator ii=list->begin() ; ii!=list->end() ; ++ii)
+	{
+		int num    = ii->first;
+		string str = (string)ii->second;
+		cout << "[" << num << "]=" << str << endl;
+		
+		if(str=="obj")
+		{
+			cout << LOG("here") << endl;
+			if(Next(ii)=="NAME")            name            = Next(ii); else return false;
+			cout << LOG("here") << endl;
+			if(Next(ii)=="FLAG")            flag            = Next(ii); else return false;
+			cout << LOG("here") << endl;
+			if(Next(ii)=="number")          number          = Next(ii); else return false;
+			cout << LOG("here") << endl;
+			if(Next(ii)=="internalnumber")  internalnumber  = Next(ii); else return false;
+			cout << LOG("here") << endl;
+			if(Next(ii)=="isbinned")        isbinned        = Next(ii); else return false;
+			cout << LOG("here") << endl;
+			if(Next(ii)=="nevents")         nevents         = Next(ii); else return false;
+			if(Next(ii)=="crosssection")    crosssection    = Next(ii); else return false;
+			if(Next(ii)=="crosssectionerr") crosssectionerr = Next(ii); else return false;
+			if(Next(ii)=="br")              br              = Next(ii); else return false;
+			if(Next(ii)=="geneff")          geneff          = Next(ii); else return false;
+			if(Next(ii)=="nkfactors")       nkfactors       = Next(ii); else return false;
+			cout << "NAME="   << name << ", NUMBER=" << number << ", ISBINNED="   << isbinned
+				 << ", FLAG=" << flag << ", internalnumber=" << internalnumber << ", nevents=" << nevents
+				 << ", crosssection=" << crosssection << ", crosssectionerr=" << crosssectionerr << ", br=" << br
+				 << ", geneff=" << geneff << ", nkfactors=" << nkfactors
 				 << endl;
 
-			if(Next(ii)=="triggers")
+			if(Next(ii)=="kfactros")
 			{
-				for(int t=1 ; t<=toint(ntriggers) ; ++t)
+				for(int k=1 ; k<=validate_int(nkfactors) ; ++k)
 				{
-					if(Next(ii)=="trigger")  /* do nothing*/
-					if(Next(ii)=="NAME")     trigname     = Next(ii); else return false;
-					if(Next(ii)=="PRIORITY") trigpriority = Next(ii); else return false;
-					if(Next(ii)=="FLAG")     trigflag     = Next(ii); else return false;
-					trigpT = Next(ii);
-					cout << "\ttrigger[" << t       << "] NAME=" << trigname << ", PRIORITY=" << trigpriority
-						 << ", FLAG="  << trigflag << ", trigpT="  << trigpT
+					if(Next(ii)=="kfactor")  /* do nothing*/
+					if(Next(ii)=="MINRANGE") minrange = Next(ii); else return false;
+					if(Next(ii)=="MAXRANGE") maxrange = Next(ii); else return false;
+					kfactor = Next(ii);
+					cout << "\tkfactor[" << k       << "] MINRANGE=" << minrange << ", MAXRANGE=" << maxrange
+						 << ", kfactor="  << kfactor
 						 << endl;
 				}
+				//if((int)vdtmp.size() != validate_int(nkfactors)) {cout << LOG("vector size doesn't match nkfactors") << endl; return false;}
 			}
 			else return false;
 			
-			if(Next(ii)=="nevents")     nevents     = Next(ii); else return false;
-			if(Next(ii)=="luminosity")  luminosity  = Next(ii); else return false;
-			if(Next(ii)=="description") description = Next(ii); else return false;
-			cout << "nevents=" << nevents << ", luminosity=" << luminosity << ", description=" << description << endl;
-
-			//cutFlowOrdered->insert( make_pair(nodeName,nodeContent) );
+			if(Next(ii)=="mcweight")     mcweight     = Next(ii); else return false;
+			if(Next(ii)=="pileup")  pileup  = Next(ii); else return false;
+			if(Next(ii)=="smearing") smearing = Next(ii); else return false;
+			if(Next(ii)=="color") color = Next(ii); else return false;
+			if(Next(ii)=="linestyle") linestyle = Next(ii); else return false;
+			if(Next(ii)=="fillstyle") fillstyle = Next(ii); else return false;
+			cout << "mcweight=" << mcweight << ", pileup=" << pileup << ", smearing=" << smearing
+				 << ", color=" << color << ", linestyle=" << linestyle << ", fillstyle=" << fillstyle
+				 << ", description=" << description << endl;
+			
+			// fill the db
 		}
 	}
 	return true;
@@ -221,16 +426,20 @@ bool periods::mask()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////// NOTE !!! MULTIPLE INHERITANCE !!! /////////////////////////////////////////
-class configure : public cutFlow,
-		  public periods
+class configure : public cutFlow, 
+				  public periods,
+				  public montecarlo
 {
 	public:
+		
 		configure()
 		{
 			domParser = new TDOMParser();
 			domParser->SetValidate(false); // do not validate with DTD
 		}
+		
 		virtual ~configure(){}
+		
 		void read(string readerName, string fileName)
 		{
 			domParser->ParseFile(fileName.c_str());
@@ -240,16 +449,27 @@ class configure : public cutFlow,
 				cutFlow::ParseContext(node);
 				if(!cutFlow::mask())
 				{
-					cout << "failed to mask the xml file. exitting now." << endl;
+					cout << LOG("failed to mask the xml file (" + fileName + "). exitting now.") << endl;
 					exit(-1);
 				}
 			}
+			
 			if(readerName=="periods")
 			{
 				periods::ParseContext(node);
 				if(!periods::mask())
 				{
-					cout << "failed to mask the xml file. exitting now." << endl;
+					cout << LOG("failed to mask the xml file (" + fileName + "). exitting now.") << endl;
+					exit(-1);
+				}
+			}
+			
+			if(readerName=="montecarlo")
+			{
+				periods::ParseContext(node);
+				if(!montecarlo::mask())
+				{
+					cout << LOG("failed to mask the xml file (" + fileName + "). exitting now.") << endl;
 					exit(-1);
 				}
 			}
@@ -272,6 +492,7 @@ void xml_reader()
 
 	config->read("cuts","cuts.xml");
 	config->read("periods","periods.xml");
+	config->read("montecarlo","montecarlo.xml");
 
 
 	cout << "configure::cutFlow::cutFlowOrdered.size()=" << config->cutFlow::cutFlowOrdered->size() << endl;

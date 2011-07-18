@@ -26,6 +26,12 @@ class cutFlow : public XML
 			cutFlowNumbers     = new TMapsi;
 			cutFlowMapSVD      = new TMapsvd;
 			cutsFlowSkipMap    = new TMapsb;
+			
+			ignoreString("obj");
+			ignoreString("NAME");
+			ignoreString("FLAG");
+			ignoreString("ORDER");
+			ignoreString("value");
 		}
 		virtual ~cutFlow(){}
 		bool mask();
@@ -131,7 +137,16 @@ bool cutFlow::mask()
 class periods : public XML
 {
 	public:
-		periods(){}
+		periods()
+		{
+			ignoreString("obj");
+			ignoreString("NAME");
+			ignoreString("FLAG");
+			ignoreString("PRIORITY");
+			ignoreString("trigger");
+			ignoreString("period");
+			ignoreString("triggerperiod");
+		}
 		virtual ~periods(){}
 		bool mask();
 
@@ -301,15 +316,30 @@ bool periods::mask()
 class montecarlo : public XML
 {
 	public:
-		montecarlo(){}
+		montecarlo()
+		{
+			ignoreString("obj");
+			ignoreString("NAME");
+			ignoreString("FLAG");
+			ignoreString("file");
+			ignoreString("kfactor");
+			ignoreString("MINRANGE");
+			ignoreString("MAXRANGE");
+		}
 		virtual ~montecarlo(){}
 		bool mask();
 
 		/*
-		  <obj NAME="DYmumu_57M120" FLAG="on">
+		  <obj NAME="DYmumu_75M120" FLAG="on">
 			<number>150000</number>
 			<internalnumber>1</internalnumber>
 			<isbinned>true</isbinned>
+			<dir>/data/hod/D3PDfin/rel16/DYmumu/muid/</dir>
+			<nfiles>2</nfiles>
+			<files>
+				<file>mcLocalControl_DYmumu_75M120.1.root</file>
+				<file>mcLocalControl_DYmumu_75M120.2.root</file>
+			</files>
 			<nevents>19996</nevents>
 			<crosssection>817.05</crosssection>
 			<crosssectionerr>0.05</crosssectionerr>
@@ -317,7 +347,7 @@ class montecarlo : public XML
 			<geneff>1</geneff>
 			<nkfactors>2</nkfactors>
 			<kfactors>
-			  <kfactor MINRANGE="0."   MAXRANGE="100.">1.25</kfactor>
+			  <kfactor MINRANGE="0." MAXRANGE="100.">1.25</kfactor>
 			  <kfactor MINRANGE="100." MAXRANGE="150.">1.25</kfactor>
 			</kfactors>
 			<mcweight>1</mcweight> <!--?????????????-->
@@ -336,6 +366,9 @@ class montecarlo : public XML
 		string name;
 		string number;
 		string flag;
+		string dir;
+		string nfiles;
+		string file;
 		string isbinned;
 		string internalnumber;
 		string crosssection;
@@ -367,30 +400,42 @@ bool montecarlo::mask()
 		
 		if(str=="obj")
 		{
-			cout << LOG("here") << endl;
 			if(Next(ii)=="NAME")            name            = Next(ii); else return false;
-			cout << LOG("here") << endl;
 			if(Next(ii)=="FLAG")            flag            = Next(ii); else return false;
-			cout << LOG("here") << endl;
 			if(Next(ii)=="number")          number          = Next(ii); else return false;
-			cout << LOG("here") << endl;
 			if(Next(ii)=="internalnumber")  internalnumber  = Next(ii); else return false;
-			cout << LOG("here") << endl;
 			if(Next(ii)=="isbinned")        isbinned        = Next(ii); else return false;
-			cout << LOG("here") << endl;
+			if(Next(ii)=="dir")             dir             = Next(ii); else return false;
+			if(Next(ii)=="nfiles")          nfiles          = Next(ii); else return false;
+			cout << "NAME="   << name << ", NUMBER=" << number << ", ISBINNED="   << isbinned
+				 << ", FLAG=" << flag << ", internalnumber=" << internalnumber
+				 << ", dir="  << dir  << ", nfiles=" << nfiles
+				 << endl;
+			if(Next(ii)=="files")
+			{
+				for(int f=1 ; f<=validate_int(nfiles) ; ++f)
+				{
+					if(Next(ii)=="file")  /* do nothing*/
+					file = Next(ii);
+					cout << "\tfile[" << f << "] filename="  << file
+						 << endl;
+				}
+				//if((int)vdtmp.size() != validate_int(nfiles)) {cout << LOG("vector size doesn't match nfiles") << endl; return false;}
+			}
+			else return false;
+			
 			if(Next(ii)=="nevents")         nevents         = Next(ii); else return false;
 			if(Next(ii)=="crosssection")    crosssection    = Next(ii); else return false;
 			if(Next(ii)=="crosssectionerr") crosssectionerr = Next(ii); else return false;
 			if(Next(ii)=="br")              br              = Next(ii); else return false;
 			if(Next(ii)=="geneff")          geneff          = Next(ii); else return false;
 			if(Next(ii)=="nkfactors")       nkfactors       = Next(ii); else return false;
-			cout << "NAME="   << name << ", NUMBER=" << number << ", ISBINNED="   << isbinned
-				 << ", FLAG=" << flag << ", internalnumber=" << internalnumber << ", nevents=" << nevents
-				 << ", crosssection=" << crosssection << ", crosssectionerr=" << crosssectionerr << ", br=" << br
+			cout << "nevents=" << nevents << ", crosssection=" << crosssection
+				 << ", crosssectionerr=" << crosssectionerr << ", br=" << br
 				 << ", geneff=" << geneff << ", nkfactors=" << nkfactors
 				 << endl;
 
-			if(Next(ii)=="kfactros")
+			if(Next(ii)=="kfactors")
 			{
 				for(int k=1 ; k<=validate_int(nkfactors) ; ++k)
 				{
@@ -406,12 +451,15 @@ bool montecarlo::mask()
 			}
 			else return false;
 			
-			if(Next(ii)=="mcweight")     mcweight     = Next(ii); else return false;
-			if(Next(ii)=="pileup")  pileup  = Next(ii); else return false;
-			if(Next(ii)=="smearing") smearing = Next(ii); else return false;
-			if(Next(ii)=="color") color = Next(ii); else return false;
-			if(Next(ii)=="linestyle") linestyle = Next(ii); else return false;
-			if(Next(ii)=="fillstyle") fillstyle = Next(ii); else return false;
+			cout << LOG("") << endl;
+			
+			if(Next(ii)=="mcweight")    mcweight    = Next(ii); else return false;
+			if(Next(ii)=="pileup")      pileup      = Next(ii); else return false;
+			if(Next(ii)=="smearing")    smearing    = Next(ii); else return false;
+			if(Next(ii)=="color")       color       = Next(ii); else return false;
+			if(Next(ii)=="linestyle")   linestyle   = Next(ii); else return false;
+			if(Next(ii)=="fillstyle")   fillstyle   = Next(ii); else return false;
+			if(Next(ii)=="description") description = Next(ii); else return false;
 			cout << "mcweight=" << mcweight << ", pileup=" << pileup << ", smearing=" << smearing
 				 << ", color=" << color << ", linestyle=" << linestyle << ", fillstyle=" << fillstyle
 				 << ", description=" << description << endl;
@@ -438,40 +486,75 @@ class configure : public cutFlow,
 			domParser->SetValidate(false); // do not validate with DTD
 		}
 		
-		virtual ~configure(){}
+		virtual ~configure()
+		{
+			delete domParser;
+		}
+		
+		void reset()
+		{
+			if(domParser) delete domParser;
+			domParser = new TDOMParser();
+			domParser->SetValidate(false); // do not validate with DTD
+		}
+		
+		void header(string fileName)
+		{
+			cout << "\n" << endl;
+			cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
+			for(unsigned int i=0 ; i<fileName.length()+4 ; i++) cout << "^";
+			cout << "\n^^^ Start parisng the xml file: " << fileName << " ^^^" << endl;
+		}
+		
+		void footer(string fileName)
+		{
+			cout << "^^^ Successfully parsed the xml file: " << fileName << " ^^^" << endl;
+			cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
+			for(unsigned int i=0 ; i<fileName.length()+4 ; i++) cout << "^";
+			cout << "\n" << endl;
+		}
 		
 		void read(string readerName, string fileName)
 		{
+			reset();
+			
 			domParser->ParseFile(fileName.c_str());
 			node = domParser->GetXMLDocument()->GetRootNode();
+			
 			if(readerName=="cuts")
 			{
+				header(fileName);
 				cutFlow::ParseContext(node);
 				if(!cutFlow::mask())
 				{
 					cout << LOG("failed to mask the xml file (" + fileName + "). exitting now.") << endl;
 					exit(-1);
 				}
+				footer(fileName);
 			}
 			
 			if(readerName=="periods")
 			{
+				header(fileName);
 				periods::ParseContext(node);
 				if(!periods::mask())
 				{
 					cout << LOG("failed to mask the xml file (" + fileName + "). exitting now.") << endl;
 					exit(-1);
 				}
+				footer(fileName);
 			}
 			
 			if(readerName=="montecarlo")
 			{
-				periods::ParseContext(node);
+				header(fileName);
+				montecarlo::ParseContext(node);
 				if(!montecarlo::mask())
 				{
 					cout << LOG("failed to mask the xml file (" + fileName + "). exitting now.") << endl;
 					exit(-1);
 				}
+				footer(fileName);
 			}
 		}
 		

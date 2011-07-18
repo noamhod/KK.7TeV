@@ -16,8 +16,13 @@ class XML
 		{
 			list = new TMapiP2cc;
 			counter = 0;
+			ignoredStrings.clear();
 		}
-		virtual ~XML() {delete list;}
+		virtual ~XML()
+		{
+			delete list;
+			ignoredStrings.clear();
+		}
 		void ParseContext(TXMLNode *node);
 		bool isEmptyString(string str);
 		virtual bool mask() = 0;
@@ -37,13 +42,20 @@ class XML
 		double todouble(string str);
 		int    toint(const char* cc)    { return toint((string)cc); }
 		double todouble(const char* cc) { return todouble((string)cc); }
+		
+		void ignoreString(string str);
 	
 		string Next(TMapiP2cc::iterator& ii);
 		TMapiP2cc* list;
 	private:
 		void add2list(const char* cc);
-//		TMapiP2cc* list;
+		bool isIgnored(string str);
+		bool isIgnored(bool isfound);
+		
+		//TMapiP2cc* list;
 		int counter;
+		string sTmp;
+		TMapsb ignoredStrings;
 };
 
 double XML::validate_double(string str)
@@ -143,6 +155,22 @@ double XML::todouble(string str)
 	return x;
 }
 
+void XML::ignoreString(string str)
+{
+	ignoredStrings.insert(make_pair(str,true));
+}
+
+bool XML::isIgnored(string str)
+{
+	TMapsb::iterator it = ignoredStrings.find(str);
+	if(it==ignoredStrings.end()) return false;
+	return true;
+}
+
+bool XML::isIgnored(bool isfound)
+{
+	return isfound;
+}
 
 void XML::ParseContext(TXMLNode *node)
 {
@@ -151,12 +179,8 @@ void XML::ParseContext(TXMLNode *node)
 		if(node->GetNodeType()==TXMLNode::kXMLElementNode) // Element Node
 		{
 			string nodeName = node->GetNodeName();
-			if(nodeName.find("obj")!=string::npos) cout << node->GetNodeName() << " ";
-			else if(nodeName=="value")             cout << node->GetNodeName() << " ";
-			else if(nodeName=="trigger")           cout << node->GetNodeName() << " ";
-			else if(nodeName=="period")            cout << node->GetNodeName() << " ";
-			else if(nodeName=="kfactor")           cout << node->GetNodeName() << " ";
-			else                                   cout << node->GetNodeName();
+			if(isIgnored(nodeName)) cout << node->GetNodeName() << " ";
+			else                    cout << node->GetNodeName();
 			add2list(node->GetNodeName());
 			if(node->HasAttributes())
 			{
@@ -166,11 +190,7 @@ void XML::ParseContext(TXMLNode *node)
 				while((attr =(TXMLAttr*)next()))
 				{
 					string attrName = attr->GetName();
-					if(attrName.find("FLAG")!=string::npos)     cout << " ";
-					if(attrName.find("ORDER")!=string::npos)    cout << " ";
-					if(attrName.find("PRIORITY")!=string::npos) cout << " ";
-					if(attrName.find("MINRANGE")!=string::npos) cout << " ";
-					if(attrName.find("MAXRANGE")!=string::npos) cout << " ";
+					if(isIgnored(attrName)) cout << " ";				
 					cout << attr->GetName() << ":" << attr->GetValue();
 					add2list(attr->GetName());
 					add2list(attr->GetValue());

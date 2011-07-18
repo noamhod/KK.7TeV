@@ -41,5 +41,7 @@
 #include <TRandom.h>
 #include <TGraphAsymmErrors.h>
 
+#include "logs.h"
+
 using namespace std;
 

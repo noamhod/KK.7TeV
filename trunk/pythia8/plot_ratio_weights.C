@@ -1,18 +1,19 @@
 #include "all.h"
 
 // bins fore the cosTheta histos
-double   costmin = minCosTheta;
-double   costmax = maxCosTheta;
-int      ncostbins = nCosThetaBins;
+double    costmin   = minCosTheta;
+double    costmax   = maxCosTheta;
+const int ncostbins = nCosThetaBins;
 
 // bins for the mHat histos
-double   xmin  = minMassBin; //120.;
-double   xmax  = maxMassBin; //4000.;
-const int        nxbins = 200;       //200;
+double    imassmin   = minMassBin; //120.;
+double    imassmax   = maxMassBin; //4000.;
+const int nimassbins = niMassBins; // 400;
+
 static Double_t logMmin;
 static Double_t logMmax;
 static Double_t logMbinwidth;
-static Double_t xbins[nxbins+1];
+static Double_t xbins[nimassbins+1];
 
 // bins for the afb (the binning is in mHat)
 static double   imass_afb_min   = minMassBin; //120.;
@@ -23,9 +24,7 @@ static Double_t logMmax_afb;
 static Double_t logMbinwidth_afb;
 static Double_t imass_afb_bins[imass_afb_nbins+1];
 
-static double lumi = 5.;
-static double mb2fb = 1.e12;
-static double nb2mb = 1.e-6;
+
 
 TFile* fWeights;
 TDirectory* dirAllHistograms;
@@ -95,16 +94,16 @@ void addSample(string sname, Color_t color, double events, double sigma /*in [mb
 	
 	if(doLogx)
 	{
-		hvBinnedHistos_imass.push_back(new TH1D(sName.c_str(),sName.c_str(),nxbins,xbins));
-		hvBinnedHistos_imass_unscaled.push_back(new TH1D((sName+"_unscaled").c_str(),(sName+"_unscaled").c_str(),nxbins,xbins));
+		hvBinnedHistos_imass.push_back(new TH1D(sName.c_str(),sName.c_str(),nimassbins,xbins));
+		hvBinnedHistos_imass_unscaled.push_back(new TH1D((sName+"_unscaled").c_str(),(sName+"_unscaled").c_str(),nimassbins,xbins));
 	}
 	else
 	{
-		hvBinnedHistos_imass.push_back(new TH1D(sName.c_str(),sName.c_str(),nxbins,xmin,xmax));
-		hvBinnedHistos_imass_unscaled.push_back(new TH1D((sName+"_unscaled").c_str(),(sName+"_unscaled").c_str(),nxbins,xmin,xmax));
+		hvBinnedHistos_imass.push_back(new TH1D(sName.c_str(),sName.c_str(),nimassbins,imassmin,imassmax));
+		hvBinnedHistos_imass_unscaled.push_back(new TH1D((sName+"_unscaled").c_str(),(sName+"_unscaled").c_str(),nimassbins,imassmin,imassmax));
 	}
 
-	hvBinnedHistos_imassRes.push_back(new TH1D((sName+"Res").c_str(),(sName+"Res").c_str(),nxbins,-0.2,+0.2));
+	hvBinnedHistos_imassRes.push_back(new TH1D((sName+"Res").c_str(),(sName+"Res").c_str(),nimassbins,-0.2,+0.2));
 
 	vector<TH1D*> vTmp;
 	vector<TH1D*> vTmp_unscaled;
@@ -122,10 +121,10 @@ void addSample(string sname, Color_t color, double events, double sigma /*in [mb
 	hvvBinnedHistos_cosTh.push_back( vTmp );
 	hvvBinnedHistos_cosTh_unscaled.push_back( vTmp_unscaled );
 	
-	dvWeights.push_back(lumi/(events/(sigma*mb2fb)));
+	dvWeights.push_back(luminosity/(events/(sigma*mb2fb)));
 	cvColors.push_back(color);
 	
-	sumWeights += lumi/(events/(sigma*mb2fb));
+	sumWeights += luminosity/(events/(sigma*mb2fb));
 }
 
 // initialize the trees that will be handed to RooFit
@@ -217,7 +216,7 @@ int plot_ratio_weights()
 	float ysystem;
 	float cosThetaHE;
 	float cosThetaCS;
-	vector<int>*    index  = new vector<int>;
+	//vector<int>*    index  = new vector<int>;
 	vector<int>*    id     = new vector<int>;
 	vector<double>* charge = new vector<double>;
 	vector<double>* px     = new vector<double>;
@@ -271,15 +270,15 @@ int plot_ratio_weights()
 	cin >> sMass;
 	
 
-	logMmin  = log10(xmin);
-	logMmax  = log10(xmax);
-	logMbinwidth = (Double_t)( (logMmax-logMmin)/(Double_t)nxbins );
-	xbins[0] = xmin;
-	for(Int_t i=1 ; i<=nxbins ; i++) xbins[i] = TMath::Power( 10,(logMmin + i*logMbinwidth) );
+	logMmin  = log10(imassmin);
+	logMmax  = log10(imassmax);
+	logMbinwidth = (Double_t)( (logMmax-logMmin)/(Double_t)nimassbins );
+	xbins[0] = imassmin;
+	for(Int_t i=1 ; i<=nimassbins ; i++) xbins[i] = TMath::Power( 10,(logMmin + i*logMbinwidth) );
 	tMassBins = new TTree("MassBins", "MassBins");
 	Double_t MassBin;
 	tMassBins->Branch( "MassBin", &MassBin );
-	for(int i=0 ; i<nxbins ; i++)
+	for(int i=0 ; i<nimassbins ; i++)
 	{
 		MassBin = xbins[i];
 		tMassBins->Fill();
@@ -430,12 +429,12 @@ int plot_ratio_weights()
 	
 	if(doLogx)
 	{
-		hMassSumTmp = new TH1D("sumTmp","sumTmp",nxbins,xbins);
-		hMassSumTmp_unscaled = new TH1D("sumTmp_unscaled","sumTmp_unscaled",nxbins,xbins);
+		hMassSumTmp = new TH1D("sumTmp","sumTmp",nimassbins,xbins);
+		hMassSumTmp_unscaled = new TH1D("sumTmp_unscaled","sumTmp_unscaled",nimassbins,xbins);
 		
-		hMassSumZ0d3pd_unscaled = new TH1D("sumZ0d3pd_unscaled","sumZ0d3pd_unscaled",nxbins,xbins);
-		hMassSumZ0d3pd = new TH1D("sumZ0d3pd","sumZ0d3pd",nxbins,xbins);
-		hMassSumZ0d3pd_acceptance = new TH1D("sumZ0d3pd_acceptance","sumZ0d3pd_acceptance",nxbins,xbins);
+		hMassSumZ0d3pd_unscaled = new TH1D("sumZ0d3pd_unscaled","sumZ0d3pd_unscaled",nimassbins,xbins);
+		hMassSumZ0d3pd = new TH1D("sumZ0d3pd","sumZ0d3pd",nimassbins,xbins);
+		hMassSumZ0d3pd_acceptance = new TH1D("sumZ0d3pd_acceptance","sumZ0d3pd_acceptance",nimassbins,xbins);
 		
 		for(int mod=Z0 ; mod<=KK ; mod++)
 		{
@@ -443,24 +442,24 @@ int plot_ratio_weights()
 			if(mod==ZP) tsname = "ZP";
 			if(mod==KK) tsname = "KK";
 		
-			vhMassSum.push_back( new TH1D("sum"+tsname,"sum"+tsname,nxbins,xbins) );
-			vhMassAcceptance.push_back( new TH1D("sumAcc"+tsname,"sumAcc"+tsname,nxbins,xbins) );
-			vhMassWeights.push_back( new TH1D("weights"+tsname,"weights"+tsname,nxbins,xbins) );
-			vhMassReconTemplate.push_back( new TH1D("RecTemplate"+tsname,"RecTemplate"+tsname,nxbins,xbins) );
+			vhMassSum.push_back( new TH1D("sum"+tsname,"sum"+tsname,nimassbins,xbins) );
+			vhMassAcceptance.push_back( new TH1D("sumAcc"+tsname,"sumAcc"+tsname,nimassbins,xbins) );
+			vhMassWeights.push_back( new TH1D("weights"+tsname,"weights"+tsname,nimassbins,xbins) );
+			vhMassReconTemplate.push_back( new TH1D("RecTemplate"+tsname,"RecTemplate"+tsname,nimassbins,xbins) );
 		}
-		hWeightsXS = new TH1D("weightsXS","weightsXS",nxbins,xbins);
+		hWeightsXS = new TH1D("weightsXS","weightsXS",nimassbins,xbins);
 		
-		hMassReconZ0d3pd = new TH1D("ReconZ0d3pd","ReconZ0d3pd",nxbins,xbins);
-		hMassReconZPd3pd = new TH1D("ReconZPd3pd","ReconZPd3pd",nxbins,xbins);
+		hMassReconZ0d3pd = new TH1D("ReconZ0d3pd","ReconZ0d3pd",nimassbins,xbins);
+		hMassReconZPd3pd = new TH1D("ReconZPd3pd","ReconZPd3pd",nimassbins,xbins);
 	}
 	else
 	{
-		hMassSumTmp = new TH1D("sumTmp","sumTmp",nxbins,xmin,xmax);
-		hMassSumTmp_unscaled = new TH1D("sumTmp_unscaled","sumTmp_unscaled",nxbins,xmin,xmax);
+		hMassSumTmp = new TH1D("sumTmp","sumTmp",nimassbins,imassmin,imassmax);
+		hMassSumTmp_unscaled = new TH1D("sumTmp_unscaled","sumTmp_unscaled",nimassbins,imassmin,imassmax);
 		
-		hMassSumZ0d3pd_unscaled = new TH1D("sumZ0d3pd_unscaled","sumZ0d3pd_unscaled",nxbins,xmin,xmax);
-		hMassSumZ0d3pd = new TH1D("sumZ0d3pd","sumZ0d3pd",nxbins,xmin,xmax);
-		hMassSumZ0d3pd_acceptance = new TH1D("sumZ0d3pd_acceptance","sumZ0d3pd_acceptance",nxbins,xmin,xmax);
+		hMassSumZ0d3pd_unscaled = new TH1D("sumZ0d3pd_unscaled","sumZ0d3pd_unscaled",nimassbins,imassmin,imassmax);
+		hMassSumZ0d3pd = new TH1D("sumZ0d3pd","sumZ0d3pd",nimassbins,imassmin,imassmax);
+		hMassSumZ0d3pd_acceptance = new TH1D("sumZ0d3pd_acceptance","sumZ0d3pd_acceptance",nimassbins,imassmin,imassmax);
 		
 		for(int mod=Z0 ; mod<=KK ; mod++)
 		{
@@ -468,28 +467,28 @@ int plot_ratio_weights()
 			if(mod==ZP) tsname = "ZP";
 			if(mod==KK) tsname = "KK";
 		
-			vhMassSum.push_back( new TH1D("sum"+tsname,"sum"+tsname,nxbins,xmin,xmax) );
-			vhMassAcceptance.push_back( new TH1D("sumAcc"+tsname,"sumAcc"+tsname,nxbins,xmin,xmax) );
-			vhMassWeights.push_back( new TH1D("weights"+tsname,"weights"+tsname,nxbins,xmin,xmax) );
-			vhMassReconTemplate.push_back( new TH1D("RecTemplate"+tsname,"RecTemplate"+tsname,nxbins,xmin,xmax) );
+			vhMassSum.push_back( new TH1D("sum"+tsname,"sum"+tsname,nimassbins,imassmin,imassmax) );
+			vhMassAcceptance.push_back( new TH1D("sumAcc"+tsname,"sumAcc"+tsname,nimassbins,imassmin,imassmax) );
+			vhMassWeights.push_back( new TH1D("weights"+tsname,"weights"+tsname,nimassbins,imassmin,imassmax) );
+			vhMassReconTemplate.push_back( new TH1D("RecTemplate"+tsname,"RecTemplate"+tsname,nimassbins,imassmin,imassmax) );
 		}
-		hWeightsXS = new TH1D("weightsXS","weightsXS",nxbins,xmin,xmax);
+		hWeightsXS = new TH1D("weightsXS","weightsXS",nimassbins,imassmin,imassmax);
 		
-		hMassReconZ0d3pd = new TH1D("ReconZ0d3pd","ReconZ0d3pd",nxbins,xmin,xmax);
-		hMassReconZPd3pd = new TH1D("ReconZPd3pd","ReconZPd3pd",nxbins,xmin,xmax);
+		hMassReconZ0d3pd = new TH1D("ReconZ0d3pd","ReconZ0d3pd",nimassbins,imassmin,imassmax);
+		hMassReconZPd3pd = new TH1D("ReconZPd3pd","ReconZPd3pd",nimassbins,imassmin,imassmax);
 	}
 	
 	//dirAllHistograms->cd();
-	hResTmp = new TH1D("ResTmp","ResTmp",nxbins,-0.2,+0.2);
-	hResReconZ0d3pd = new TH1D("ResReconZ0d3pd","ResReconZ0d3pd",nxbins,-0.2,+0.2);
-	hResReconZPd3pd = new TH1D("ResReconZPd3pd","ResReconZPd3pd",nxbins,-0.2,+0.2);
+	hResTmp = new TH1D("ResTmp","ResTmp",nimassbins,-0.2,+0.2);
+	hResReconZ0d3pd = new TH1D("ResReconZ0d3pd","ResReconZ0d3pd",nimassbins,-0.2,+0.2);
+	hResReconZPd3pd = new TH1D("ResReconZPd3pd","ResReconZPd3pd",nimassbins,-0.2,+0.2);
 	
 	for(int mod=Z0 ; mod<=KK ; mod++)
 	{
 		if(mod==Z0) tsname = "Z0";
 		if(mod==ZP) tsname = "ZP";
 		if(mod==KK) tsname = "KK";
-		vhResTemplate.push_back( new TH1D("Res"+tsname,"Res"+tsname,nxbins,-0.2,+0.2) );
+		vhResTemplate.push_back( new TH1D("Res"+tsname,"Res"+tsname,nimassbins,-0.2,+0.2) );
 	}
 	
 	
@@ -680,8 +679,11 @@ int plot_ratio_weights()
 		{
 			hMassSumZ0d3pd = (TH1D*)hMassSumTmp->Clone("");
 			hMassSumZ0d3pd_unscaled = (TH1D*)hMassSumTmp_unscaled->Clone("");
-			for(Int_t i=0 ; i<imass_afb_nbins ; i++) vhCosThSumZ0d3pd[i] = (TH1D*)vhCosThSumTmp[i]->Clone("");
-			for(Int_t i=0 ; i<imass_afb_nbins ; i++) vhCosThSumZ0d3pd_unscaled[i] = (TH1D*)vhCosThSumTmp_unscaled[i]->Clone("");
+			for(Int_t i=0 ; i<imass_afb_nbins ; i++)
+			{
+				vhCosThSumZ0d3pd[i] = (TH1D*)vhCosThSumTmp[i]->Clone("");
+				vhCosThSumZ0d3pd_unscaled[i] = (TH1D*)vhCosThSumTmp_unscaled[i]->Clone("");
+			}
 		}
 		else
 		{
@@ -694,7 +696,8 @@ int plot_ratio_weights()
 	////////////////////////////////////////////////////////////////
 	// The ratios //////////////////////////////////////////////////
 	hWeightsXS = (TH1D*)hMassSumZ0d3pd->Clone("");
-	hWeightsXS->Divide(hMassSumZ0d3pd_unscaled);
+	//hWeightsXS->Divide(hMassSumZ0d3pd_unscaled);
+	divide(hWeightsXS,hMassSumZ0d3pd_unscaled);
 	dirMassHistograms->cd();
 	hWeightsXS->SetName("hMassXS_wgt");
 	hWeightsXS->Write("", TObject::kOverwrite);
@@ -705,7 +708,8 @@ int plot_ratio_weights()
 		if(mod==KK) tsname = "KK";
 	
 		vhMassWeights[mod] = (TH1D*)vhMassSum[mod]->Clone(""); 
-		vhMassWeights[mod]->Divide(hMassSumZ0d3pd);
+		//vhMassWeights[mod]->Divide(hMassSumZ0d3pd);
+		divide(vhMassWeights[mod],hMassSumZ0d3pd);
 		dirMassHistograms->cd();
 		vhMassWeights[mod]->SetName("hMass"+tsname+"_wgt");
 		vhMassWeights[mod]->Write("", TObject::kOverwrite);
@@ -721,14 +725,16 @@ int plot_ratio_weights()
 			if(mod==KK) tsname = "KK";
 			
 			vvhCosThSumWeights[i][mod] = (TH1D*)vvhCosThSum[i][mod]->Clone(""); 
-			vvhCosThSumWeights[i][mod]->Divide(vhCosThSumZ0d3pd[i]);
+			//vvhCosThSumWeights[i][mod]->Divide(vhCosThSumZ0d3pd[i]);
+			divide(vvhCosThSumWeights[i][mod],vhCosThSumZ0d3pd[i]);
 			vvhCosThSumWeights[i][mod]->SetTitle((TString)"weights: " + (TString)vvhCosThSumWeights[i][mod]->GetTitle());
 			vvhCosThSumWeights[i][mod]->SetName( "hCosTh"+tsname+"_wgt_"+b );
 			dirCostHistograms->cd();
 			vvhCosThSumWeights[i][mod]->Write("", TObject::kOverwrite);
 		}
 		vhCosThSumXSweights[i] = (TH1D*)vhCosThSumZ0d3pd[i]->Clone(""); 
-		vhCosThSumXSweights[i]->Divide(vhCosThSumZ0d3pd_unscaled[i]); 
+		//vhCosThSumXSweights[i]->Divide(vhCosThSumZ0d3pd_unscaled[i]); 
+		divide(vhCosThSumXSweights[i],vhCosThSumZ0d3pd_unscaled[i]); 
 		vhCosThSumXSweights[i]->SetTitle((TString)"weights_XS: " + (TString)vhCosThSumXSweights[i]->GetTitle());
 		vhCosThSumXSweights[i]->SetName( "hCosThXS_wgt_"+b );
 		dirCostHistograms->cd();
@@ -739,7 +745,7 @@ int plot_ratio_weights()
 	
 	
 	
-	// test draw
+	// draw cost
 	dirCostHistograms->cd();
 	vector<TCanvas*> vC;
 	vector<TVirtualPad*> vP1;
@@ -784,7 +790,7 @@ int plot_ratio_weights()
 		vhCosThSumZ0d3pd[i]->SetYTitle("Events");
 		//if(5.*max<1.e2) vhCosThSumZ0d3pd[i]->GetYaxis()->SetMoreLogLabels();
 		vhCosThSumZ0d3pd[i]->Draw();
-		vL1[i]->AddEntry(vhCosThSumZ0d3pd[i], "SM #gamma/Z^{0} (#it{ATLAS} MC10 truth)", "l");
+		vL1[i]->AddEntry(vhCosThSumZ0d3pd[i], "SM #gamma/Z^{0} (#it{ATLAS} MC10 tru)", "l");
 		
 		for(int mod=Z0 ; mod<=KK ; mod++)
 		{
@@ -954,56 +960,52 @@ int plot_ratio_weights()
 			tree->SetBranchAddress("recon_all_ySystem",&recon_all_ySystem);
 			tree->SetBranchAddress("recon_all_QT", &recon_all_QT);
 
+			double bin_xs_weight = dvWeights[n]/luminosity; // in units of fb
+			
 			for(Int_t i=0 ; i<tree->GetEntries() ; i++)
 			{
 				tree->GetEntry(i);
 				Int_t    bin    = 0;
-				Double_t weight = 0.;
-				
-				
+				Double_t mass_weight = 0.;
+				Double_t cost_weight = 0.;
 				if(recon_all_isValid  &&  truth_all_isValid)
 				{
 					// for all models (practically we read only the Z0 and weight the ZP and KK)
 					afb_bin = hDummy_afb->FindBin(truth_all_Mhat);
 					if(afb_bin<=0 || afb_bin>imass_afb_nbins) continue;
-				
-					if(model==Z0d3pd) hvvBinnedHistos_cosTh[n][afb_bin-1]->Fill(recon_all_CosThetaCS);
 					
-					// for Z0, ZP and KK we need to scale by the weight
-					else
-					{
-						bin    = vvhCosThSumWeights[afb_bin-1][model]->FindBin(truth_all_CosThetaCS);
-						weight = vvhCosThSumWeights[afb_bin-1][model]->GetBinContent(bin);
-						hvvBinnedHistos_cosTh[n][afb_bin-1]->Fill(recon_all_CosThetaCS,weight);
-					}
-				}
-				
-				
-				if(recon_all_isValid  &&  truth_all_isValid)
-				{
-					
+					// fill from d3pd
 					if(model==Z0d3pd)
 					{
+						//------------ imass
 						hvBinnedHistos_imass[n]->Fill(recon_all_Mhat);
 						hvBinnedHistos_imassRes[n]->Fill((recon_all_Mhat-truth_all_Mhat)/truth_all_Mhat); // use all events
-					}
-					else
-					{
-						bin = vhMassWeights[model]->FindBin(truth_all_Mhat);
-						weight = vhMassWeights[model]->GetBinContent(bin);
-						hvBinnedHistos_imass[n]->Fill(recon_all_Mhat,weight);
-						hvBinnedHistos_imassRes[n]->Fill((recon_all_Mhat-truth_all_Mhat)/truth_all_Mhat, weight); // use all events
 						
-						afb_bin = hDummy_afb->FindBin(truth_all_Mhat);
-						if(afb_bin<=0 || afb_bin>imass_afb_nbins) continue;
+						//------------ cosTheta
+						hvvBinnedHistos_cosTh[n][afb_bin-1]->Fill(recon_all_CosThetaCS);
+					}
+					
+					else // for Z0, ZP and KK we need to scale by the weight
+					{
+						//------------ imass
+						bin = vhMassWeights[model]->FindBin(truth_all_Mhat);
+						mass_weight = vhMassWeights[model]->GetBinContent(bin);
+						hvBinnedHistos_imass[n]->Fill(recon_all_Mhat,mass_weight);
+						hvBinnedHistos_imassRes[n]->Fill((recon_all_Mhat-truth_all_Mhat)/truth_all_Mhat, mass_weight); // use all events
+						
+						//------------ cosTheta
+						bin = vvhCosThSumWeights[afb_bin-1][model]->FindBin(truth_all_CosThetaCS);
+						cost_weight = vvhCosThSumWeights[afb_bin-1][model]->GetBinContent(bin);
+						hvvBinnedHistos_cosTh[n][afb_bin-1]->Fill(recon_all_CosThetaCS,cost_weight);
+						
+						//------------ ntuple
 						mass_tru = truth_all_Mhat;
 						mass_rec = recon_all_Mhat;
-						mass_wgt = weight;
+						mass_wgt = mass_weight;
 						cost_tru = truth_all_CosThetaCS;
 						cost_rec = recon_all_CosThetaCS;
-						bin = vvhCosThSumWeights[afb_bin-1][model]->FindBin(truth_all_CosThetaCS);
-						cost_wgt = vvhCosThSumWeights[afb_bin-1][model]->GetBinContent(bin);
-						xscn_wgt = dvWeights[n]/lumi; // in units of fb
+						cost_wgt = cost_weight;
+						xscn_wgt = bin_xs_weight; // in units of fb
 						fillNtuple(vvtBinnedNtuples[afb_bin-1][model],counter,modulu);
 					}
 					counter++;
@@ -1027,7 +1029,7 @@ int plot_ratio_weights()
 			/////////////////////////////////////////////////////////////
 			
 			////////////////////////////////////////////////////
-			hMassSumTmp->Add(hvBinnedHistos_imass[n]); // sum //////
+			hMassSumTmp->Add(hvBinnedHistos_imass[n]); // sum //
 			hResTmp->Add(hvBinnedHistos_imassRes[n]); // sum ///
 			////////////////////////////////////////////////////
 			
@@ -1050,13 +1052,14 @@ int plot_ratio_weights()
 	}
 	cout << "Templates are ready\n" << endl;
 	//-----------------------------------------------------------------------------
-	
+
 	
 	
 	// now do the acceptance calculations in every bin of imass and for the whole tsrange
 	dirMassHistograms->cd();
 	hMassSumZ0d3pd_acceptance = (TH1D*)hMassReconZ0d3pd->Clone("");
-	hMassSumZ0d3pd_acceptance->Divide(hMassSumZ0d3pd);
+	//hMassSumZ0d3pd_acceptance->Divide(hMassSumZ0d3pd);
+	divide(hMassSumZ0d3pd_acceptance,hMassSumZ0d3pd);
 	hMassSumZ0d3pd_acceptance->SetName("hMassZ0d3pd_acceptance");
 	hMassSumZ0d3pd_acceptance->Write("", TObject::kOverwrite);
 	
@@ -1068,7 +1071,8 @@ int plot_ratio_weights()
 	
 		dirMassHistograms->cd();
 		vhMassAcceptance[mod] = (TH1D*)vhMassReconTemplate[mod]->Clone("");
-		vhMassAcceptance[mod]->Divide(vhMassSum[mod]);
+		//vhMassAcceptance[mod]->Divide(vhMassSum[mod]);
+		divide(vhMassAcceptance[mod],vhMassSum[mod]);
 		vhMassAcceptance[mod]->SetName("hMass"+tsname+"_acceptance");
 		vhMassAcceptance[mod]->Write("", TObject::kOverwrite);
 	}
@@ -1079,7 +1083,8 @@ int plot_ratio_weights()
 		
 		dirCostHistograms->cd();
 		vhCosThSumZ0d3pd_acceptance[i] = (TH1D*)vhCosThSumReconZ0d3pd[i]->Clone("");
-		vhCosThSumZ0d3pd_acceptance[i]->Divide(vhCosThSumZ0d3pd[i]);
+		//vhCosThSumZ0d3pd_acceptance[i]->Divide(vhCosThSumZ0d3pd[i]);
+		divide(vhCosThSumZ0d3pd_acceptance[i],vhCosThSumZ0d3pd[i]);
 		vhCosThSumZ0d3pd_acceptance[i]->SetName("hCosThZ0d3pd_acceptance_"+b);
 		vhCosThSumZ0d3pd_acceptance[i]->Write("", TObject::kOverwrite);
 		vhCosThSumReconZ0d3pd[i]->SetName("hCosThRecZ0d3pd_"+b);
@@ -1093,7 +1098,8 @@ int plot_ratio_weights()
 		
 			dirCostHistograms->cd();
 			vvhCosThSumAcceptance[i][mod] = (TH1D*)vvhCosThSumRecTemplate[i][mod]->Clone("");
-			vvhCosThSumAcceptance[i][mod]->Divide(vvhCosThSum[i][mod]);
+			//vvhCosThSumAcceptance[i][mod]->Divide(vvhCosThSum[i][mod]);
+			divide(vvhCosThSumAcceptance[i][mod],vvhCosThSum[i][mod]);
 			vvhCosThSumAcceptance[i][mod]->SetName("hCosTh"+tsname+"_acceptance_"+b);
 			vvhCosThSumAcceptance[i][mod]->Write("", TObject::kOverwrite);
 			dirCostHistograms->cd();
@@ -1256,7 +1262,7 @@ int plot_ratio_weights()
 	if(doLogx) hMassSumZ0d3pd->GetXaxis()->SetMoreLogLabels(); 
 	hMassSumZ0d3pd->Draw();
 	//leg_mass->AddEntry(hMassSumZ0d3pd, "SM #gamma/Z^{0}", "l");
-	leg_mass->AddEntry(hMassSumZ0d3pd, "SM #gamma/Z^{0} (#it{ATLAS} MC10 truth)", "l");
+	leg_mass->AddEntry(hMassSumZ0d3pd, "SM #gamma/Z^{0} (#it{ATLAS} MC10 tru)", "l");
 	
 	for(int mod=Z0 ; mod<=KK ; mod++) 
 	{

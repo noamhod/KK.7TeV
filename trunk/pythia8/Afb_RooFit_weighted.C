@@ -67,7 +67,7 @@ vector<RooAbsPdf*> vDetAcc;  // will be taken from the acceptance histogram
 vector<RooAbsPdf*> vRecEff;  // will be taken from the reconstruction efficiency histogram
 vector<RooAbsPdf*> vTrigEff; // will be taken from the trigger efficiency histogram
 vector<RooAbsPdf*> vEffPdf;  // will be the product of all the eff-like pdf's (=rec*trig*acc)
-RooAbsPdf* sigPdf;  // will be the truth pdf
+RooAbsPdf* sigPdf;           // will be the truth pdf
 
 vector<RooDataHist*> vrdhAcc;
 vector<RooHistPdf*>  vrhpdfAcc;
@@ -123,10 +123,9 @@ void init(int massBin, int mod)
 	//weight->setBins(ncostbins);
 
 	//Afb = new RooRealVar("Afb","A_{fb}",_Afb,-10.,+10.);
-	_Afb = randomizeItialGuess(-1.,+1.);
+	_Afb = randomizeItialGuess(-0.9,+0.9);
 	vvdInitialGuess[massBin-1].push_back(_Afb);
-	
-	Afb = new RooRealVar("Afb","A_{fb}",_Afb,-1.,+1.);
+	Afb = new RooRealVar("Afb","A_{fb}",_Afb,-0.9,+0.9);
 
 	sigPdf = new RooGenericPdf("CSPDF","CSPDF","(3./8.)*(1. + cosTheta*cosTheta + (8./3.)*Afb*cosTheta)",RooArgSet(*cosThe,*Afb));
 	//sigPdf = new RooGenericPdf("CSPDF","CSPDF","(1. + cosTheta*cosTheta + (8./3.)*Afb*cosTheta)",RooArgSet(*cosThe,*Afb));
@@ -142,7 +141,7 @@ void init(int massBin, int mod)
 	{
 		case Z0:
 			sName = "Z^{0}";
-			sId = "Z0";
+			sId = "Z0d3pd";
 			col = kBlue;
 			colbin = cGammaZ;
 			sChannelFit = "#gamma/Z^{0}: A_{FB} fit";
@@ -177,7 +176,7 @@ void init(int massBin, int mod)
 	
 	if(massBin==1) // only one copy of this vector
 	{
-		vhMassBins.push_back( (TH1D*)file->Get("iMass_histograms/hMassTmp")->Clone("") );
+		vhMassBins.push_back( (TH1D*)file->Get("all_histograms/hMassTmp")->Clone("") );
 		vhMassBins[mod]->Reset();
 		vhMassBins[mod]->SetDefaultSumw2(); // The error per bin will be computed as sqrt(sum of squares of weight) for each bin. 
 		vhMassBins[mod]->SetTitle("");
@@ -225,7 +224,7 @@ void init(int massBin, int mod)
 	vhMass[mod]->GetXaxis()->SetMoreLogLabels(); 
 	vhMass[mod]->GetXaxis()->SetMoreLogLabels(); 
 	
-	if(mod==Z0) vtData.push_back( (TTree*)file->Get("ntuples/tree_ZP_"+sMassBin) );
+	if(mod==Z0) vtData.push_back( (TTree*)file->Get("ntuples/tree_ZP_"+sMassBin) ); // for Z0 we take the variables without the weight
 	else        vtData.push_back( (TTree*)file->Get("ntuples/tree_"+sId+"_"+sMassBin) );
 	
 	vhAcc.push_back( (TH1D*)file->Get("cosTheta_histograms/hCosTh"+sId+"_acceptance_"+sMassBin)->Clone("") );
@@ -337,7 +336,7 @@ void plot(int mod, TVirtualPad* pad)
 	//vModel[mod]->paramOn(cosThetaFrame,Layout(0.7,1.,0.4),Format("NEU",AutoPrecision(1)));
 	vModel[mod]->paramOn(cosThetaFrame,Layout(0.6,0.9,1));
 	cosThetaFrame->getAttText()->SetTextSize(0.05);
-	cosThetaFrame->getAttLine()->SetLineWidth(0.05);
+	//cosThetaFrame->getAttLine()->SetLineWidth(0.05);
 	
 	pad->SetLeftMargin(0.2);
 	cosThetaFrame->SetTitleOffset(2,"Y");
@@ -492,7 +491,7 @@ void Afb_RooFit_weighted()
 	TString sLumi = (TString)tostring(luminosity);
 	txt = pvtxt_lumi->AddText( "#intLdt~"+ sLumi +" fb^{-1}" );
 	
-	pvtxt_atlas = new TPaveText(0.2533445,0.8367876,0.4172241,0.9313472,"brNDC");
+	pvtxt_atlas = new TPaveText(0.3277592,0.8056995,0.4916388,0.9002591,"brNDC");
 	pvtxt_atlas->SetFillColor(0);
 	pvtxt_atlas->SetTextFont(42);
 	txt = pvtxt_atlas->AddText("#bf{#splitline{#it{ATLAS}}{#scale[0.68]{Templates}}}");
@@ -640,6 +639,14 @@ void Afb_RooFit_weighted()
 	cnv->SaveAs("fitplots/FitAllMassBins.png");
 	
 	drawAfb();
+	
+	for(unsigned int i=0 ; i<vvdInitialGuess.size() ; i++)
+	{
+		cout << "initial guess: Z0=" << vvdInitialGuess[i][Z0]
+			 << ", ZP=" << vvdInitialGuess[i][ZP]
+			 << ", KK=" << vvdInitialGuess[i][KK]
+			 << endl;
+	}
 }
 
 

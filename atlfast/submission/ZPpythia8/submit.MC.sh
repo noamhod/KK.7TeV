@@ -19,10 +19,12 @@ name=$2
 runnum=$3
 nevts=9999
 ECM=7000
+prefix=00000
 
 if [ ! -d "$dir/$name" ]; then
-	# Control will enter here if DIRECTORY=$name doesn't exist
 	mkdir $dir/$name
+else
+	rm -f $dir/$name/*
 fi
 cd $dir/$name
 
@@ -34,6 +36,22 @@ mv -fv ${name}.py ${name}.py~
 cp -fv ../${name}.py .
 
 
-EvgenCorrAtlfast_trf.py   $ECM   $runnum   1   $nevts   1   ${dir}/${name}/${name}.py   ${dir}/${name}/EVNT_${name}   ${dir}/${name}/${name}.AOD._${runnum}.pool.root   ${dir}/${name}/${name}.NTUP._${runnum}.pool.root
+if [ $runnum -ge 10 ]; then
+	prefix=0000
+elif [ $runnum -ge 100 ]; then
+	prefix=000
+elif [ $runnum -ge 1000 ]; then
+	prefix=00
+elif [ $runnum -ge 10000 ]; then
+	prefix=0
+elif [ $runnum -ge 100000 ]; then
+	prefix=
+else
+	echo "noam error: RUN NUMBER IS > 10K"
+fi
+
+
+
+EvgenCorrAtlfast_trf.py   $ECM   $runnum   1   $nevts   1   ${dir}/${name}/${name}.py   ${dir}/${name}/EVNT_${name}   ${dir}/${name}/${name}.AOD._${prefix}${runnum}.pool.root   ${dir}/${name}/${name}.NTUP._${prefix}${runnum}.pool.root
 
 cd -

@@ -22,19 +22,19 @@ startup_message off
 vbell off
 
 screen		0	bash
-stuff "source setup.sh; source submit.MC.sh   /tmp/hod/KKpythia8   MC11.000001.Pythia8_ExtraDimensionsTEV_m2000_mumu_120M450    1\015"
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/submission/KKpythia8   MC11.000001.Pythia8_ExtraDimensionsTEV_m2000_mumu_120M450    1\015"
 screen 		1	bash
-stuff "source setup.sh; source submit.MC.sh   /tmp/hod/KKpythia8   MC11.000002.Pythia8_ExtraDimensionsTEV_m2000_mumu_450M850    2\015"
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/submission/KKpythia8   MC11.000002.Pythia8_ExtraDimensionsTEV_m2000_mumu_450M850    2\015"
 screen 		2	bash
-stuff "source setup.sh; source submit.MC.sh   /tmp/hod/KKpythia8   MC11.000003.Pythia8_ExtraDimensionsTEV_m2000_mumu_850M1300   3\015"
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/submission/KKpythia8   MC11.000003.Pythia8_ExtraDimensionsTEV_m2000_mumu_850M1300   3\015"
 screen 		3	bash
-stuff "source setup.sh; source submit.MC.sh   /tmp/hod/KKpythia8   MC11.000004.Pythia8_ExtraDimensionsTEV_m2000_mumu_1300M1800  4\015"
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/submission/KKpythia8   MC11.000004.Pythia8_ExtraDimensionsTEV_m2000_mumu_1300M1800  4\015"
 screen		4	bash
-stuff "source setup.sh; source submit.MC.sh   /tmp/hod/KKpythia8   MC11.000005.Pythia8_ExtraDimensionsTEV_m2000_mumu_1800M2300  5\015"
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/submission/KKpythia8   MC11.000005.Pythia8_ExtraDimensionsTEV_m2000_mumu_1800M2300  5\015"
 screen		5	bash
-stuff "source setup.sh; source submit.MC.sh   /tmp/hod/KKpythia8   MC11.000006.Pythia8_ExtraDimensionsTEV_m2000_mumu_2300M2800  6\015"
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/submission/KKpythia8   MC11.000006.Pythia8_ExtraDimensionsTEV_m2000_mumu_2300M2800  6\015"
 screen		6	bash
-stuff "source setup.sh; source submit.MC.sh   /tmp/hod/KKpythia8   MC11.000007.Pythia8_ExtraDimensionsTEV_m2000_mumu_2800M3300  7\015"
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/submission/KKpythia8   MC11.000007.Pythia8_ExtraDimensionsTEV_m2000_mumu_2800M3300  7\015"
 screen		7	bash
-stuff "source setup.sh; source submit.MC.sh   /tmp/hod/KKpythia8   MC11.000008.Pythia8_ExtraDimensionsTEV_m2000_mumu_M3300      8\015"
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/submission/KKpythia8   MC11.000008.Pythia8_ExtraDimensionsTEV_m2000_mumu_M3300      8\015"
 

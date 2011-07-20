@@ -1,0 +1,56 @@
+#.screenrc
+#Changes screen escape character to be `
+#escape ``
+
+#change the hardstatus settings to give an window list at the bottom of the
+#screen, with the time and date and with the current window highlighted
+hardstatus alwayslastline
+
+hardstatus string '%{gk}[ %{G}%H %{g}][%{= kK}%-Lw%{= cb}%50>%n*%f %t%?(%u)%?%{=b kK}%+Lw%< %{= kK}%=%{g}][%{Y}%l%{g}]%{=b kC}[ %d/%m %0c:%s ]%{W}'
+
+termcapinfo xterm|xterms|xs|rxvt ti@:te@
+
+# make bells in other windows audible
+bell "Bell in window % "
+
+# detach on hangup
+autodetach on
+
+# don't display the copyright page
+startup_message off
+
+vbell off
+
+
+
+screen		0	bash
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/Z0pythia6   MC11.000001.Pythia6_DYmumu_75M120     1\015"
+screen 		1	bash
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/Z0pythia6   MC11.000001.Pythia6_DYmumu_120M250    2\015"
+screen 		2	bash
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/Z0pythia6   MC11.000001.Pythia6_DYmumu_250M400    3\015"
+screen 		3	bash
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/Z0pythia6   MC11.000001.Pythia6_DYmumu_400M600    4\015"
+screen		4	bash
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/Z0pythia6   MC11.000001.Pythia6_DYmumu_600M800    5\015"
+screen		5	bash
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/Z0pythia6   MC11.000001.Pythia6_DYmumu_800M1000   6\015"
+screen		6	bash
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/Z0pythia6   MC11.000001.Pythia6_DYmumu_1000M1250  7\015"
+screen		7	bash
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/Z0pythia6   MC11.000001.Pythia6_DYmumu_1250M1500  8\015"
+screen          8       bash
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/Z0pythia6   MC11.000001.Pythia6_DYmumu_1500M1750  9\015"
+screen          9       bash
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/Z0pythia6   MC11.000001.Pythia6_DYmumu_1750M2000  10\015"
+screen          10      bash
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/Z0pythia6   MC11.000001.Pythia6_DYmumu_2000M2250  11\015"
+screen          11       bash
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/Z0pythia6   MC11.000001.Pythia6_DYmumu_2250M2500  12\015"
+screen          12       bash
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/Z0pythia6   MC11.000001.Pythia6_DYmumu_2500M2750  13\015"
+screen          13       bash
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/Z0pythia6   MC11.000001.Pythia6_DYmumu_2750M3000  14\015"
+screen          14       bash
+stuff "source setup.sh; source submit.MC.sh   /tmp/hod/Z0pythia6   MC11.000001.Pythia6_DYmumu_M3000      15\015"
+

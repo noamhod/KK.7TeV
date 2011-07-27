@@ -1,4 +1,7 @@
 #define FastTree_cxx
+#include "all.h"
+
+
 #include "FastTree.h"
 #include <TH2.h>
 #include <TStyle.h>

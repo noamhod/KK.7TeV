@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Mar 23 16:26:36 2011 by ROOT version 5.28/00
+// Wed Jul 20 15:24:14 2011 by ROOT version 5.28/00
 // from TTree FastTree/FastTree
-// found on file: MC10.000000.Pythia8_KK_M1000_mumu.NTUP._00001.pool.root
+// found on file: MC11.000001.Pythia8_ZprimeSSM_m2000_mumu_120M450.NTUP._00001.pool.root
 //////////////////////////////////////////////////////////
 
 #ifndef FastTree_h
@@ -11,6 +11,36 @@
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
+
+
+double xmin  = 0.;
+double xmax  = 4000.;
+int    nbins = 200;
+vector<string> svNames;
+vector<string> svPaths;
+vector<TH1D*>  hvHistos;
+vector<double> dvWeights;
+vector<Color_t> cvColors;
+string sDir  = "/data/hod/newATLFAST/";
+string sSubDir  = "";
+string sSubSubDir  = "";
+string sName = "";
+
+TLorentzVector* pa = new TLorentzVector();
+TLorentzVector* pb = new TLorentzVector();
+
+void addSample(string path, string file, string name, Color_t color, double events, double sigma)
+{	
+	svNames.push_back(name);
+
+	sName = svNames[svNames.size()-1];
+
+	svPaths.push_back(path+file);
+	hvHistos.push_back(new TH1D(sName.c_str(),sName.c_str(),nbins,xmin,xmax));
+	dvWeights.push_back(luminosity/(events/(sigma*nb2fb)));
+	cvColors.push_back(color);
+}
+
 
 class FastTree {
 public :
@@ -240,9 +270,9 @@ FastTree::FastTree(TTree *tree)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("MC10.000000.Pythia8_KK_M1000_mumu.NTUP._00001.pool.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("MC11.000001.Pythia8_ZprimeSSM_m2000_mumu_120M450.NTUP._00001.pool.root");
       if (!f) {
-         f = new TFile("MC10.000000.Pythia8_KK_M1000_mumu.NTUP._00001.pool.root");
+         f = new TFile("MC11.000001.Pythia8_ZprimeSSM_m2000_mumu_120M450.NTUP._00001.pool.root");
       }
       tree = (TTree*)gDirectory->Get("FastTree");
 

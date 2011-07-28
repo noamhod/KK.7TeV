@@ -126,6 +126,8 @@ string utilities::pickMCinputSampe()
 	mcSamplesMap.insert( make_pair( 701,"TTbar_McAtNlo_Jimmy_2mu15_150M300" ) );
 	mcSamplesMap.insert( make_pair( 702,"TTbar_McAtNlo_Jimmy_2mu15_300M450" ) );
 	mcSamplesMap.insert( make_pair( 703,"TTbar_McAtNlo_Jimmy_2mu15_M450" ) );
+
+	mcSamplesMap.insert( make_pair( 800,"DYmumu_75M120_2011" ) );
 	
 	
 	cout << "PICK AN MC CHANNEL FORM THE LIST:" << endl;

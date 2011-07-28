@@ -77,6 +77,8 @@
 using namespace std;
 using namespace RooFit;
 
+static string sRunNumber = "";
+
 typedef multimap<int, int>      TMapii;
 typedef multimap<int, string>   TMapis;
 typedef map<double, double>     TMapdd;
@@ -97,6 +99,8 @@ typedef map<string, vector<string>* > TMapsP2vs;
 typedef map<int, vector<string>* >    TMapiP2vs;
 typedef multimap<float, float > TMultimapff;
 typedef vector<TCanvas*> TVecCanvas;
+
+#include "logs.h"
 
 #define utilities_cxx
 #include "utilities.C"
@@ -165,8 +169,6 @@ enum pdtEnum { // *** note that this is not a complete list of pdt's particles *
 	PDTFIRSTMESON=111, PDTLASTMESON=555,
 	PDTFIRSTBARYON=1103, PDTLASTBARYON=5554
 };
-
-static string sRunNumber = "";
 
 #endif
 

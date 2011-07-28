@@ -86,7 +86,7 @@ void analysisLocalControl::initialize(int runNumber, string localRunControlFile)
 		//////////////////////////////////////////
 		
 		str_list = checkANDsetFilepath("PWD", "/../conf/mc_local_dataset_"+sMCsample+".list");
-		str_dir = checkANDsetFilepath("PWD", "/mc_local_datasetdir/");
+		str_dir = "";//checkANDsetFilepath("PWD", "/mc_local_datasetdir/");
 		str_hist = checkANDsetFilepath("PWD", "/../data/mcLocalControl_"+sMCsample+".root");
 		
 		if(m_RunType!="local_noskim")
@@ -97,8 +97,8 @@ void analysisLocalControl::initialize(int runNumber, string localRunControlFile)
 	}
 	else
 	{
-		str_list = checkANDsetFilepath("PWD", "/../conf/local_dataset.list");
-		str_dir  = checkANDsetFilepath("PWD", "/local_datasetdir/");
+		str_list = checkANDsetFilepath("PWD", "/../conf/NTUP_SMDILEP_dimuon_p591_runs.list");
+		str_dir  = "";//checkANDsetFilepath("PWD", "/local_datasetdir/");
 		str_tree = checkANDsetFilepath("PWD", "/../data/localTree.root");
 		str_hist = checkANDsetFilepath("PWD", "/../data/analysisLocalControl.root");
 		
@@ -274,10 +274,11 @@ void analysisLocalControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		}
 		else
 		{
-			////////////////////////////////////////////
-			// read only the minimal set of branches ///
-			GetEntryMinimal(l64t_ientry); //////////////
-			////////////////////////////////////////////
+			/////////////////////////////////////////////////
+			// read only the minimal set of branches ////////
+			//GetEntryMinimal(l64t_ientry); /////////////////
+			m_WZphysD3PD->GetEntryMinimal(l64t_ientry); /////
+			/////////////////////////////////////////////////
 		}
 		
 		if(l64t_jentry%100000==0)   cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_WZphysD3PD->RunNumber << "\tlumiblock=" << m_WZphysD3PD->lbn << endl;
@@ -339,10 +340,11 @@ void analysisLocalControl::loop(int runNumber)
 		}
 		else
 		{
-			////////////////////////////////////////////
-			// read only the minimal set of branches ///
-			GetEntryMinimal(l64t_ientry); //////////////
-			////////////////////////////////////////////
+			/////////////////////////////////////////////////
+			// read only the minimal set of branches ////////
+			//GetEntryMinimal(l64t_ientry); /////////////////
+			m_WZphysD3PD->GetEntryMinimal(l64t_ientry); /////
+			/////////////////////////////////////////////////
 		}
 		
 		// if (Cut(l64t_ientry) < 0) continue;
@@ -435,10 +437,11 @@ void analysisLocalControl::loop(string sPeriodStart, string sPeriodEnd, Long64_t
 		}
 		else
 		{
-			////////////////////////////////////////////
-			// read only the minimal set of branches ///
-			GetEntryMinimal(l64t_imid); //////////////
-			////////////////////////////////////////////
+			/////////////////////////////////////////////////
+			// read only the minimal set of branches ////////
+			//GetEntryMinimal(l64t_ientry); /////////////////
+			m_WZphysD3PD->GetEntryMinimal(l64t_ientry); /////
+			/////////////////////////////////////////////////
 		}
 		
 		run = m_WZphysD3PD->RunNumber;
@@ -475,20 +478,21 @@ void analysisLocalControl::loop(string sPeriodStart, string sPeriodEnd, Long64_t
 		}
 		else
 		{
-			////////////////////////////////////////////
-			// read only the minimal set of branches ///
-			GetEntryMinimal(l64t_ientry); //////////////
-			////////////////////////////////////////////
+			/////////////////////////////////////////////////
+			// read only the minimal set of branches ////////
+			//GetEntryMinimal(l64t_ientry); /////////////////
+			m_WZphysD3PD->GetEntryMinimal(l64t_ientry); /////
+			/////////////////////////////////////////////////
 		}
 		
 		// if (Cut(l64t_ientry) < 0) continue;
 		
 		if(l64t_jentry%100000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_WZphysD3PD->RunNumber << "\tlumiblock=" << m_WZphysD3PD->lbn << endl;
 		
-		////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////
 		if((int)m_WZphysD3PD->RunNumber < firstRunInRange) continue; ///////
 		if((int)m_WZphysD3PD->RunNumber > lastRunInRange)  break; //////////
-		////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////
 		
 		if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries);
 		
@@ -512,7 +516,7 @@ void analysisLocalControl::loop(string sPeriodStart, string sPeriodEnd, Long64_t
 	stopTimer(true);
 }
 
-
+/*
 void analysisLocalControl::GetEntryMinimal(Long64_t entry)
 {
 	if(m_RunType!="local_noskim") return;
@@ -2167,4 +2171,5 @@ void analysisLocalControl::GetEntryMinimal(Long64_t entry)
 	//m_WZphysD3PD->b_trig_EF_met_usedChannels->GetEntry(entry);
 	//m_WZphysD3PD->b_trig_EF_met_status->GetEntry(entry);
 }
+*/
 

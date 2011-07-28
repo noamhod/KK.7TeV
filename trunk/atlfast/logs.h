@@ -58,11 +58,11 @@ string log(const char* file, int line, int type, int level, string message)
 	return os.str();
 }
 
-#define LOG(x,y,z) log(__FILE__, __LINE__, (x),(y),(z))
-//#define LOG_DEBUG(x)   log(__FILE__, __LINE__, DBG,(x))
-//#define LOG_INFO(x)    log(__FILE__, __LINE__, INF,(x))
-//#define LOG_WARNING(x) log(__FILE__, __LINE__, WRN,(x))
-//#define LOG_ERROR(x)   log(__FILE__, __LINE__, ERR,(x))
+#define LOG(x,y,z) log(__FILE__, __LINE__,  (x), (y),    (z)) // general log
+#define _DEBUG(x)   log(__FILE__, __LINE__, DBG, VISUAL, (x)) // for DEBUG VISUAL
+#define _INFO(x)    log(__FILE__, __LINE__, INF, VISUAL, (x)) // for INFO VISUAL
+#define _WARNING(x) log(__FILE__, __LINE__, WRN, VISUAL, (x)) // for WARNING VISUAL
+#define _ERROR(x)   log(__FILE__, __LINE__, ERR, VISUAL, (x)) // for ERROR VISUAL
 
 
 static inline double validate_double(string str)

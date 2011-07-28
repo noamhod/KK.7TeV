@@ -172,22 +172,22 @@ void analysis::setEventVariables()
 	// EF triggers
 	analysisSkeleton::EF_mu10 = m_WZphysD3PD->EF_mu10;
 	analysisSkeleton::EF_mu10_MG = m_WZphysD3PD->EF_mu10_MG;
-	analysisSkeleton::EF_mu10_MSonly = m_WZphysD3PD->EF_mu10_MSonly;
-	analysisSkeleton::EF_mu10_MSonly_tight = m_WZphysD3PD->EF_mu10_MSonly_tight;
-	analysisSkeleton::EF_mu10_NoAlg = m_WZphysD3PD->EF_mu10_NoAlg;
-	analysisSkeleton::EF_mu10_tight = m_WZphysD3PD->EF_mu10_tight;
-	analysisSkeleton::EF_mu10i_loose = m_WZphysD3PD->EF_mu10i_loose;
+	// analysisSkeleton::EF_mu10_MSonly = m_WZphysD3PD->EF_mu10_MSonly;
+	// analysisSkeleton::EF_mu10_MSonly_tight = m_WZphysD3PD->EF_mu10_MSonly_tight;
+	// analysisSkeleton::EF_mu10_NoAlg = m_WZphysD3PD->EF_mu10_NoAlg;
+	// analysisSkeleton::EF_mu10_tight = m_WZphysD3PD->EF_mu10_tight;
+	// analysisSkeleton::EF_mu10i_loose = m_WZphysD3PD->EF_mu10i_loose;
 	analysisSkeleton::EF_mu13 = m_WZphysD3PD->EF_mu13;
 	analysisSkeleton::EF_mu13_MG = m_WZphysD3PD->EF_mu13_MG;
-	analysisSkeleton::EF_mu13_MG_tight = m_WZphysD3PD->EF_mu13_MG_tight;
-	analysisSkeleton::EF_mu13_tight = m_WZphysD3PD->EF_mu13_tight;
+	// analysisSkeleton::EF_mu13_MG_tight = m_WZphysD3PD->EF_mu13_MG_tight;
+	// analysisSkeleton::EF_mu13_tight = m_WZphysD3PD->EF_mu13_tight;
 	analysisSkeleton::EF_mu15 = m_WZphysD3PD->EF_mu15;
 	analysisSkeleton::EF_mu15_NoAlg = m_WZphysD3PD->EF_mu15_NoAlg;
 	analysisSkeleton::EF_mu20 = m_WZphysD3PD->EF_mu20;
 	analysisSkeleton::EF_mu20_MSonly = m_WZphysD3PD->EF_mu20_MSonly;
 	analysisSkeleton::EF_mu20_NoAlg = m_WZphysD3PD->EF_mu20_NoAlg;
-	analysisSkeleton::EF_mu20_slow = m_WZphysD3PD->EF_mu20_slow;
-	analysisSkeleton::EF_mu30_MSonly = m_WZphysD3PD->EF_mu30_MSonly;
+	// analysisSkeleton::EF_mu20_slow = m_WZphysD3PD->EF_mu20_slow;
+	// analysisSkeleton::EF_mu30_MSonly = m_WZphysD3PD->EF_mu30_MSonly;
 	analysisSkeleton::EF_mu40_MSonly = m_WZphysD3PD->EF_mu40_MSonly;
 	
 	// vertexes (for the PV preselection)
@@ -224,7 +224,7 @@ void analysis::setEventVariables()
 		analysisSkeleton::mcevt_pdf_scale = m_WZphysD3PD->mcevt_pdf_scale;
 		analysisSkeleton::mcevt_pdf1 = m_WZphysD3PD->mcevt_pdf1;
 		analysisSkeleton::mcevt_pdf2 = m_WZphysD3PD->mcevt_pdf2;
-		analysisSkeleton::mcevt_weight = m_WZphysD3PD->mcevt_weight;
+		// analysisSkeleton::mcevt_weight = m_WZphysD3PD->mcevt_weight;
 		
 		// MC
 		analysisSkeleton::mc_n = m_WZphysD3PD->mc_n;

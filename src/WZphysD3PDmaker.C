@@ -1862,7 +1862,7 @@ void WZphysD3PDmaker::setBranches()
 	m_tree->Branch("muonError", &muonError);
 	m_tree->Branch("fwdError", &fwdError);
 	m_tree->Branch("coreError", &coreError);
-	
+/*
 	m_tree->Branch("EF_2mu0_NoAlg", &EF_2mu0_NoAlg);
 	m_tree->Branch("EF_2mu10", &EF_2mu10);
 	m_tree->Branch("EF_2mu10_NoAlg", &EF_2mu10_NoAlg);
@@ -1905,6 +1905,7 @@ void WZphysD3PDmaker::setBranches()
 	m_tree->Branch("EF_mu10_Ecut123", &EF_mu10_Ecut123);
 	m_tree->Branch("EF_mu10_Ecut13", &EF_mu10_Ecut13);
 	m_tree->Branch("EF_mu10_IDTrkNoCut", &EF_mu10_IDTrkNoCut);
+*/
 	m_tree->Branch("EF_mu10_MG", &EF_mu10_MG);
 	m_tree->Branch("EF_mu10_MSonly", &EF_mu10_MSonly);
 	m_tree->Branch("EF_mu10_MSonly_Ecut12", &EF_mu10_MSonly_Ecut12);
@@ -1929,6 +1930,7 @@ void WZphysD3PDmaker::setBranches()
 	m_tree->Branch("EF_mu20_passHLT", &EF_mu20_passHLT);
 	m_tree->Branch("EF_mu20_slow", &EF_mu20_slow);
 	m_tree->Branch("EF_mu30_MSonly", &EF_mu30_MSonly);
+/*
 	m_tree->Branch("EF_mu4", &EF_mu4);
 	m_tree->Branch("EF_mu40_MSonly", &EF_mu40_MSonly);
 	m_tree->Branch("EF_mu4_Bmumu", &EF_mu4_Bmumu);
@@ -2019,7 +2021,7 @@ void WZphysD3PDmaker::setBranches()
 	m_tree->Branch("EF_mu6_Trk_Jpsi", &EF_mu6_Trk_Jpsi);
 	m_tree->Branch("EF_mu6_Upsimumu_FS", &EF_mu6_Upsimumu_FS);
 	m_tree->Branch("EF_mu6_muCombTag", &EF_mu6_muCombTag);
-	
+*/	
 	m_tree->Branch("L1_2MU0", &L1_2MU0);
 	m_tree->Branch("L1_2MU0_FIRSTEMPTY", &L1_2MU0_FIRSTEMPTY);
 	m_tree->Branch("L1_2MU0_MU6", &L1_2MU0_MU6);
@@ -2027,7 +2029,7 @@ void WZphysD3PDmaker::setBranches()
 	m_tree->Branch("L1_2MU20", &L1_2MU20);
 	m_tree->Branch("L1_2MU6", &L1_2MU6);
 	m_tree->Branch("L1_2MU6_EM5", &L1_2MU6_EM5);
-	
+/*	
 	m_tree->Branch("L1_MU0", &L1_MU0);
 	m_tree->Branch("L1_MU0_COMM", &L1_MU0_COMM);
 	m_tree->Branch("L1_MU0_COMM_EMPTY", &L1_MU0_COMM_EMPTY);
@@ -2210,7 +2212,7 @@ void WZphysD3PDmaker::setBranches()
 	m_tree->Branch("L2_mu6_Trk_Jpsi", &L2_mu6_Trk_Jpsi);
 	m_tree->Branch("L2_mu6_Upsimumu_FS", &L2_mu6_Upsimumu_FS);
 	m_tree->Branch("L2_mu6_muCombTag", &L2_mu6_muCombTag);
-	
+*/	
 	m_tree->Branch("mu_muid_n", &mu_muid_n);
 	m_tree->Branch("mu_muid_E", &mu_muid_E);
 	m_tree->Branch("mu_muid_pt", &mu_muid_pt);
@@ -3516,7 +3518,8 @@ void WZphysD3PDmaker::fill()
 	muonError = m_WZphysD3PD->muonError;
 	fwdError = m_WZphysD3PD->fwdError;
 	coreError = m_WZphysD3PD->coreError;
-	
+
+/*	
 	EF_2mu0_NoAlg = m_WZphysD3PD->EF_2mu0_NoAlg;
 	EF_2mu10 = m_WZphysD3PD->EF_2mu10;
 	EF_2mu10_NoAlg = m_WZphysD3PD->EF_2mu10_NoAlg;
@@ -3554,7 +3557,9 @@ void WZphysD3PDmaker::fill()
 	EF_mu0_rpcOnly = m_WZphysD3PD->EF_mu0_rpcOnly;
 	EF_mu0_unpaired_iso_NoAlg = m_WZphysD3PD->EF_mu0_unpaired_iso_NoAlg;
 	EF_mu0_unpaired_noniso_NoAlg = m_WZphysD3PD->EF_mu0_unpaired_noniso_NoAlg;
+*/
 	EF_mu10 = m_WZphysD3PD->EF_mu10;
+/*
 	EF_mu10_Ecut12 = m_WZphysD3PD->EF_mu10_Ecut12;
 	EF_mu10_Ecut123 = m_WZphysD3PD->EF_mu10_Ecut123;
 	EF_mu10_Ecut13 = m_WZphysD3PD->EF_mu10_Ecut13;
@@ -3570,21 +3575,23 @@ void WZphysD3PDmaker::fill()
 	EF_mu10_j30 = m_WZphysD3PD->EF_mu10_j30;
 	EF_mu10_tight = m_WZphysD3PD->EF_mu10_tight;
 	EF_mu10i_loose = m_WZphysD3PD->EF_mu10i_loose;
+*/
 	EF_mu13 = m_WZphysD3PD->EF_mu13;
 	EF_mu13_MG = m_WZphysD3PD->EF_mu13_MG;
-	EF_mu13_MG_tight = m_WZphysD3PD->EF_mu13_MG_tight;
-	EF_mu13_tight = m_WZphysD3PD->EF_mu13_tight;
+	// EF_mu13_MG_tight = m_WZphysD3PD->EF_mu13_MG_tight;
+//	EF_mu13_tight = m_WZphysD3PD->EF_mu13_tight;
 	EF_mu15 = m_WZphysD3PD->EF_mu15;
 	EF_mu15_MG = m_WZphysD3PD->EF_mu15_MG;
-	EF_mu15_NoAlg = m_WZphysD3PD->EF_mu15_NoAlg;
-	EF_mu20 = m_WZphysD3PD->EF_mu20;
-	EF_mu20_MSonly = m_WZphysD3PD->EF_mu20_MSonly;
-	EF_mu20_NoAlg = m_WZphysD3PD->EF_mu20_NoAlg;
-	EF_mu20_passHLT = m_WZphysD3PD->EF_mu20_passHLT;
-	EF_mu20_slow = m_WZphysD3PD->EF_mu20_slow;
-	EF_mu30_MSonly = m_WZphysD3PD->EF_mu30_MSonly;
-	EF_mu4 = m_WZphysD3PD->EF_mu4;
-	EF_mu40_MSonly = m_WZphysD3PD->EF_mu40_MSonly;
+//	EF_mu15_NoAlg = m_WZphysD3PD->EF_mu15_NoAlg;
+//	EF_mu20 = m_WZphysD3PD->EF_mu20;
+//	EF_mu20_MSonly = m_WZphysD3PD->EF_mu20_MSonly;
+//	EF_mu20_NoAlg = m_WZphysD3PD->EF_mu20_NoAlg;
+//	EF_mu20_passHLT = m_WZphysD3PD->EF_mu20_passHLT;
+//	EF_mu20_slow = m_WZphysD3PD->EF_mu20_slow;
+//	EF_mu30_MSonly = m_WZphysD3PD->EF_mu30_MSonly;
+//	EF_mu4 = m_WZphysD3PD->EF_mu4;
+//	EF_mu40_MSonly = m_WZphysD3PD->EF_mu40_MSonly;
+/*
 	EF_mu4_Bmumu = m_WZphysD3PD->EF_mu4_Bmumu;
 	EF_mu4_BmumuX = m_WZphysD3PD->EF_mu4_BmumuX;
 	EF_mu4_DiMu = m_WZphysD3PD->EF_mu4_DiMu;
@@ -3673,15 +3680,15 @@ void WZphysD3PDmaker::fill()
 	EF_mu6_Trk_Jpsi = m_WZphysD3PD->EF_mu6_Trk_Jpsi;
 	EF_mu6_Upsimumu_FS = m_WZphysD3PD->EF_mu6_Upsimumu_FS;
 	EF_mu6_muCombTag = m_WZphysD3PD->EF_mu6_muCombTag;
-		
+*/		
 	L1_2MU0 = m_WZphysD3PD->L1_2MU0;
 	L1_2MU0_FIRSTEMPTY = m_WZphysD3PD->L1_2MU0_FIRSTEMPTY;
 	L1_2MU0_MU6 = m_WZphysD3PD->L1_2MU0_MU6;
 	L1_2MU10 = m_WZphysD3PD->L1_2MU10;
-	L1_2MU20 = m_WZphysD3PD->L1_2MU20;
+	// L1_2MU20 = m_WZphysD3PD->L1_2MU20;
 	L1_2MU6 = m_WZphysD3PD->L1_2MU6;
 	L1_2MU6_EM5 = m_WZphysD3PD->L1_2MU6_EM5;
-		
+/*		
 	L1_MU0 = m_WZphysD3PD->L1_MU0;
 	L1_MU0_COMM = m_WZphysD3PD->L1_MU0_COMM;
 	L1_MU0_COMM_EMPTY = m_WZphysD3PD->L1_MU0_COMM_EMPTY;
@@ -3864,7 +3871,7 @@ void WZphysD3PDmaker::fill()
 	L2_mu6_Trk_Jpsi = m_WZphysD3PD->L2_mu6_Trk_Jpsi;
 	L2_mu6_Upsimumu_FS = m_WZphysD3PD->L2_mu6_Upsimumu_FS;
 	L2_mu6_muCombTag = m_WZphysD3PD->L2_mu6_muCombTag;
-	
+*/	
 	mu_muid_n = m_WZphysD3PD->mu_muid_n;
 	int nMuidInsitu = (int)m_WZphysD3PD->mu_muid_pt->size();
 	for(int i=0 ; i<nMuidInsitu ; i++)
@@ -4929,9 +4936,9 @@ void WZphysD3PDmaker::fill()
 		vxp_x->push_back( m_WZphysD3PD->vxp_x->at(i) );
 		vxp_y->push_back( m_WZphysD3PD->vxp_y->at(i) );
 		vxp_z->push_back( m_WZphysD3PD->vxp_z->at(i) );
-		vxp_cov_x->push_back( m_WZphysD3PD->vxp_cov_x->at(i) );
-		vxp_cov_y->push_back( m_WZphysD3PD->vxp_cov_y->at(i) );
-		vxp_cov_z->push_back( m_WZphysD3PD->vxp_cov_z->at(i) );
+		// vxp_cov_x->push_back( m_WZphysD3PD->vxp_cov_x->at(i) );
+		// vxp_cov_y->push_back( m_WZphysD3PD->vxp_cov_y->at(i) );
+		// vxp_cov_z->push_back( m_WZphysD3PD->vxp_cov_z->at(i) );
 		vxp_chi2->push_back( m_WZphysD3PD->vxp_chi2->at(i) );
 		vxp_ndof->push_back( m_WZphysD3PD->vxp_ndof->at(i) );
 		vxp_px->push_back( m_WZphysD3PD->vxp_px->at(i) );
@@ -4980,7 +4987,7 @@ void WZphysD3PDmaker::fill()
 			mcevt_pdf_scale->push_back( m_WZphysD3PD->mcevt_pdf_scale->at(i) );
 			mcevt_pdf1->push_back( m_WZphysD3PD->mcevt_pdf1->at(i) );
 			mcevt_pdf2->push_back( m_WZphysD3PD->mcevt_pdf2->at(i) );
-			mcevt_weight->push_back( m_WZphysD3PD->mcevt_weight->at(i) );
+			// mcevt_weight->push_back( m_WZphysD3PD->mcevt_weight->at(i) );
 		}
 
 		mc_n = m_WZphysD3PD->mc_n;
@@ -5156,6 +5163,8 @@ void WZphysD3PDmaker::fill()
 
 	}
 
+	
+/*
 	trig_L2_sitrack_muon_n = m_WZphysD3PD->trig_L2_sitrack_muon_n;
 	trigInsitu = (int)m_WZphysD3PD->trig_L2_sitrack_muon_algorithmId->size();
 	for(int i=0 ; i<trigInsitu ; i++)
@@ -5211,7 +5220,7 @@ void WZphysD3PDmaker::fill()
 		trig_L2_idscan_isomuon_eta->push_back( m_WZphysD3PD->trig_L2_idscan_isomuon_eta->at(i) );
 		trig_L2_idscan_isomuon_pt->push_back( m_WZphysD3PD->trig_L2_idscan_isomuon_pt->at(i) );
 	}
-
+*/
 	trig_RoI_L2_mu_n = m_WZphysD3PD->trig_RoI_L2_mu_n;
 	trigInsitu = (int)m_WZphysD3PD->trig_RoI_L2_mu_type->size();
 	for(int i=0 ; i<trigInsitu ; i++)

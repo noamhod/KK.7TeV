@@ -40,6 +40,7 @@ class analysisLocalControl : public chainMaker, public utilities
 		string m_muRecAlgo;
 		string m_RunType;
 		bool   m_isMC;
+		int    m_msglvl;
 
 		// run control
 		Long64_t l64t_nentries;

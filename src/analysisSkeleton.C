@@ -70,6 +70,10 @@ int analysisSkeleton::isTrigger(string trigName)
 	}
 	
 	int isTrig = 0;
+	if     (trigName=="EF_mu22")               isTrig = EF_mu22;
+	else if(trigName=="EF_mu22_MG")            isTrig = EF_mu22_MG;
+	else if(trigName=="EF_mu40_MSonly_barrel") isTrig = EF_mu40_MSonly_barrel;
+	/*
 	if     (trigName=="L1_MU10")          isTrig = L1_MU10;
 	else if(trigName=="EF_mu10")          isTrig = EF_mu10;
 	else if(trigName=="EF_mu10_MG")       isTrig = EF_mu10_MG;
@@ -77,7 +81,9 @@ int analysisSkeleton::isTrigger(string trigName)
 	else if(trigName=="EF_mu13_MG")       isTrig = EF_mu13_MG;
 	else if(trigName=="EF_mu13_tight")    isTrig = EF_mu13_tight;
 	else if(trigName=="EF_mu13_MG_tight") isTrig = EF_mu13_MG_tight;
+	*/
 	else cout << "WARNING:  in analysisSkeleton::isTrigger -> the trigger " << trigName << " was not found and the event is regected by default" << endl;
+	
 	return isTrig;
 }
 
@@ -101,6 +107,44 @@ void analysisSkeleton::matchTrigger(string speriod, string sTrigType)
 		exit(-1);
 	}
 	
+	if
+	(
+		speriod=="A" || speriod=="B" || speriod=="D" || speriod=="E" ||
+		speriod=="F" || speriod=="G" || speriod=="H"
+	)
+	{
+		if(sTrigType=="CB")
+		{
+			mu_HLT_dr = mu_EFCB_dr;
+			mu_HLT_index = mu_EFCB_index;
+			HLT_pt = trig_EF_trigmuonef_track_CB_pt;
+			HLT_phi = trig_EF_trigmuonef_track_CB_phi;
+			HLT_eta = trig_EF_trigmuonef_track_CB_eta;
+			HLT_has = trig_EF_trigmuonef_track_CB_hasCB;
+		}
+		else if(sTrigType=="MSonly"||sTrigType=="MS")
+		{
+			mu_HLT_dr = mu_EFME_dr;
+			mu_HLT_index = mu_EFME_index;
+			HLT_pt = trig_EF_trigmuonef_track_MS_pt;
+			HLT_phi = trig_EF_trigmuonef_track_MS_phi;
+			HLT_eta = trig_EF_trigmuonef_track_MS_eta;
+			HLT_has = trig_EF_trigmuonef_track_MS_hasMS;
+		}
+		else if(sTrigType=="MG")
+		{
+			mu_HLT_dr = mu_EFMG_dr;
+			mu_HLT_index = mu_EFMG_index;
+			HLT_pt = trig_EF_trigmugirl_track_CB_pt;
+			HLT_phi = trig_EF_trigmugirl_track_CB_phi;
+			HLT_eta = trig_EF_trigmugirl_track_CB_eta;
+			HLT_has = trig_EF_trigmugirl_track_CB_hasCB;
+		}
+	}
+	
+	
+	
+	/*
 	if
 	(
 		speriod=="MC" ||
@@ -154,6 +198,7 @@ void analysisSkeleton::matchTrigger(string speriod, string sTrigType)
 		}
 		
 	}
+	*/
 	
 	else cout << "WARNING:  in analysisSkeleton::matchTrigger -> the period name " << speriod << " was not found" << endl;
 }
@@ -219,31 +264,31 @@ void analysisSkeleton::printAllProperties(int ai, int bi, int iv)
 	printProperty("imass", imass(pmu[ai],pmu[bi]));
 	
 	// L1 triggers
-	printProperty("L1_MU10", L1_MU10);
-	printProperty("L1_MU15", L1_MU15);
-	printProperty("L1_MU20", L1_MU20);
+	// printProperty("L1_MU10", L1_MU10);
+	// printProperty("L1_MU15", L1_MU15);
+	// printProperty("L1_MU20", L1_MU20);
 
 	// EF triggers
-	printProperty("EF_mu10", EF_mu10);
-	printProperty("EF_mu10_MG", EF_mu10_MG);
-	printProperty("EF_mu10_MSonly", EF_mu10_MSonly);
-	printProperty("EF_mu10_MSonly_tight", EF_mu10_MSonly_tight);
-	printProperty("EF_mu10_NoAlg", EF_mu10_NoAlg);
-	printProperty("EF_mu10_tight", EF_mu10_tight);
-	printProperty("EF_mu10i_loose", EF_mu10i_loose);
-	printProperty("EF_mu13", EF_mu13);
-	printProperty("EF_mu13_MG", EF_mu13_MG);
-	printProperty("EF_mu13_MG_tight", EF_mu13_MG_tight);
-	printProperty("EF_mu13_tight", EF_mu13_tight);
-	printProperty("EF_mu15", EF_mu15);
-	printProperty("EF_mu15_NoAlg", EF_mu15_NoAlg);
-	printProperty("EF_mu20", EF_mu20);
-	printProperty("EF_mu20_MSonly", EF_mu20_MSonly);
-	printProperty("EF_mu20_NoAlg", EF_mu20_NoAlg);
-	printProperty("EF_mu20_slow", EF_mu20_slow);
-	printProperty("EF_mu30_MSonly", EF_mu30_MSonly);
-	printProperty("EF_mu4", EF_mu4);
-	printProperty("EF_mu40_MSonly", EF_mu40_MSonly);
+	// printProperty("EF_mu10", EF_mu10);
+	// printProperty("EF_mu10_MG", EF_mu10_MG);
+	// printProperty("EF_mu10_MSonly", EF_mu10_MSonly);
+	// printProperty("EF_mu10_MSonly_tight", EF_mu10_MSonly_tight);
+	// printProperty("EF_mu10_NoAlg", EF_mu10_NoAlg);
+	// printProperty("EF_mu10_tight", EF_mu10_tight);
+	// printProperty("EF_mu10i_loose", EF_mu10i_loose);
+	// printProperty("EF_mu13", EF_mu13);
+	// printProperty("EF_mu13_MG", EF_mu13_MG);
+	// printProperty("EF_mu13_MG_tight", EF_mu13_MG_tight);
+	// printProperty("EF_mu13_tight", EF_mu13_tight);
+	// printProperty("EF_mu15", EF_mu15);
+	// printProperty("EF_mu15_NoAlg", EF_mu15_NoAlg);
+	// printProperty("EF_mu20", EF_mu20);
+	// printProperty("EF_mu20_MSonly", EF_mu20_MSonly);
+	// printProperty("EF_mu20_NoAlg", EF_mu20_NoAlg);
+	// printProperty("EF_mu20_slow", EF_mu20_slow);
+	// printProperty("EF_mu30_MSonly", EF_mu30_MSonly);
+	// printProperty("EF_mu4", EF_mu4);
+	// printProperty("EF_mu40_MSonly", EF_mu40_MSonly);
    
 	// vertexes (for the PV preselection)
 	printProperty("vxp_n", vxp_n);

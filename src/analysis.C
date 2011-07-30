@@ -9,7 +9,7 @@
 
 analysis::analysis()
 {
-	
+	_DEBUG("analysis::analysis");
 }
 
 analysis::~analysis()
@@ -19,6 +19,8 @@ analysis::~analysis()
 
 void analysis::execute()
 {
+	_DEBUG("analysis::execute");
+	
 	////////////////////////////////////////////////
 	//set all the graphicObjects trees branches ////
 	clearTreeVars(); ///////////////////////////////
@@ -144,6 +146,8 @@ void analysis::execute()
 
 void analysis::setEventVariables()
 {
+	_DEBUG("analysis::setEventVariables");
+	
 	// event level
 	analysisSkeleton::RunNumber    = m_WZphysD3PD->RunNumber;
 	analysisSkeleton::EventNumber  = m_WZphysD3PD->EventNumber;
@@ -166,10 +170,14 @@ void analysis::setEventVariables()
 
 	// L1 triggers
 	analysisSkeleton::L1_MU10 = m_WZphysD3PD->L1_MU10;
-	analysisSkeleton::L1_MU15 = m_WZphysD3PD->L1_MU15;
-	analysisSkeleton::L1_MU20 = m_WZphysD3PD->L1_MU20;
+	// analysisSkeleton::L1_MU15 = m_WZphysD3PD->L1_MU15;
+	// analysisSkeleton::L1_MU20 = m_WZphysD3PD->L1_MU20;
 	
 	// EF triggers
+	analysisSkeleton::EF_mu22 = m_WZphysD3PD->EF_mu22;
+	analysisSkeleton::EF_mu22_MG = m_WZphysD3PD->EF_mu22_MG;
+	analysisSkeleton::EF_mu40_MSonly_barrel = m_WZphysD3PD->EF_mu40_MSonly_barrel;
+	/*
 	analysisSkeleton::EF_mu10 = m_WZphysD3PD->EF_mu10;
 	analysisSkeleton::EF_mu10_MG = m_WZphysD3PD->EF_mu10_MG;
 	// analysisSkeleton::EF_mu10_MSonly = m_WZphysD3PD->EF_mu10_MSonly;
@@ -189,6 +197,7 @@ void analysis::setEventVariables()
 	// analysisSkeleton::EF_mu20_slow = m_WZphysD3PD->EF_mu20_slow;
 	// analysisSkeleton::EF_mu30_MSonly = m_WZphysD3PD->EF_mu30_MSonly;
 	analysisSkeleton::EF_mu40_MSonly = m_WZphysD3PD->EF_mu40_MSonly;
+	*/
 	
 	// vertexes (for the PV preselection)
 	analysisSkeleton::vxp_n       = m_WZphysD3PD->vxp_n;
@@ -248,6 +257,8 @@ void analysis::setEventVariables()
 
 void analysis::setStacoVariables()
 {
+	_DEBUG("analysis::setStacoVariables");
+
 	analysisSkeleton::mu_n = m_WZphysD3PD->mu_staco_n;
 	analysisSkeleton::mu_E = m_WZphysD3PD->mu_staco_E;
 	analysisSkeleton::mu_pt = m_WZphysD3PD->mu_staco_pt;
@@ -524,6 +535,8 @@ void analysis::setStacoVariables()
 
 void analysis::setMuidVariables()
 {
+	_DEBUG("analysis::setMuidVariables");
+
 	analysisSkeleton::mu_n = m_WZphysD3PD->mu_muid_n;
 	analysisSkeleton::mu_E = m_WZphysD3PD->mu_muid_E;
 	analysisSkeleton::mu_pt = m_WZphysD3PD->mu_muid_pt;
@@ -800,6 +813,8 @@ void analysis::setMuidVariables()
 
 void analysis::setTrigVariables()
 {
+	_DEBUG("analysis::setTrigVariables");
+
 	analysisSkeleton::trig_L1_mu_n = m_WZphysD3PD->trig_L1_mu_n;
 	analysisSkeleton::trig_L1_mu_pt = m_WZphysD3PD->trig_L1_mu_pt;
 	analysisSkeleton::trig_L1_mu_eta = m_WZphysD3PD->trig_L1_mu_eta;
@@ -907,6 +922,8 @@ void analysis::setTrigVariables()
 
 void analysis::write()
 {
+	_DEBUG("analysis::write");
+
 	if(m_treeFile!=NULL)
 	{
 		m_treeFile->cd();

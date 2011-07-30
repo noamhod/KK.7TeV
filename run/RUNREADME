@@ -7,6 +7,14 @@ LOCAL:
 	[6] alc.initialize();    # alc.initialize(int runNumber = 0, string localRunControlFile = "localRunControl_noSkim.txt");
 	[7] if in MC, choose a dataset number
 	[8] alc.loop(0,0);       # there are more options to run this function
+
+GDB: same as above but,
+	[1] gdb root.exe
+	[2] gdb> run
+	[3] root [] .L analysisLocalControlMain.C
+	[4] root [] compile("00-00-91","g");	# to force the use of -g
+	[5] break hello.C:3	# to place a breakpoint in hello.C, right after line 2
+	[5] rest is same as above
 GRID:
 
 

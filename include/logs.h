@@ -36,6 +36,16 @@ enum MSG
 
 static int global_dbg_lvl = VISUAL;
 
+static void setMSGlevel(int lvl=SILENT)
+{
+	global_dbg_lvl = lvl;
+}
+
+static int getMSGlevel()
+{
+	return global_dbg_lvl;
+}
+
 string log(const char* file, int line, int type, int level, string message)
 {
 	ostringstream os;

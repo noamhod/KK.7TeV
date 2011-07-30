@@ -96,6 +96,15 @@ class MakeClass
 		end
 		return nil
 	end
+	
+	def correctmatch(mtcpattern={}, string="")
+		mtcpattern.each {|key,val|
+			if(string.index(key)) then
+				return true
+			end
+		}
+		return false
+	end
 =begin
 	def newfile(filename, lines_to_delete)
 		line_arr = File.readlines(filename)
@@ -113,6 +122,7 @@ class MakeClass
 end
 
 filename = "WZphysD3PD.h"
+
 types    = [
 			"vector<vector<unsigned short> >","vector<vector<short> >","vector<vector<unsigned int> >","vector<vector<int> >",
 			"vector<vector<float> >","vector<vector<double> >",
@@ -132,9 +142,24 @@ typesnospace = [
 				]
 				
 requiredpatterns = [
-					"RunNumber", "EventNumber", "timestamp", "lbn", "bcid", "mu_muid", "mu_staco", "mu_calo", "hr_mu", "_mu_", "muonTruth", "MU", "EF_mu", "met", "MET", "vxp", "mcevt", "mc_"
+					"RunNumber", "EventNumber", "timestamp", "lbn", "bcid", "mu_muid", "mu_staco", "mu_calo", "hr_mu", "_mu_",
+					"muonTruth", "MU", "EF_mu", "met", "MET", "vxp", "mcevt", "mc_", "trigmuonef", "trigmugirl"
 					]
 
+excludedpatterns = [
+					"jet", "_L2_", "vxp_trk", "mu0", "_mu4_", "_mu4", "_mu4mu6_", "_mu6_", "_mu6", "mu7", "mu11", "mu18", "MU0", "MU6", "Jpsi", "Bmumu", "Upsi", "trk_MET", "cl_MET",
+					"ph_MET", "tau_MET", "_2mu4", "_2mu6", "_2mu10", "_2mu13", "2MUL1", "_mu10", "_mu13", "_mu15", "_mu20", "_mu60", "_mu80", "_mu100",
+					"L1_TAU", "MET_RefFinal", "MET_DM", "mu20_MSonly", "mu40_MSonly", "mu60_MSonly", "mu80_MSonly", "mu100_MSonly", "_slow", "_empty", "_NoAlg", "emtau", "MET_CellOut",
+					"EMPTY", "UNPAIRED", "MU11", "MU15", "MU20", "J10", "2MU"
+					]
+					
+matchedpatterns = { # if key is found accept although value should be excluded (key contains value)
+					"EF_mu40_MSonly_barrel" => "EF_mu40_MSonly"
+					}
+					
+truthpatterns     = ["truth", "Truth", "_mc_", "mc_", "mcevt"]
+
+conditionpatterns = ["fChain->SetBranchAddress","fChain->SetBranchStatus", "= 0;"]
 					
 t = Time.now
 puts "\nSTART: is #{t}"
@@ -179,7 +204,16 @@ File.readlines(filename).each do |line|
 				if(type) then
 					propertype = x.propertype(type,typesnospace,types)
 					tmpline = tmpline.gsub(/#{type}/,propertype)
-					minvars[tmpline[propertype.length,tmpline.length]]=propertype
+					isfound = false
+					excludedpatterns.each do |expattern|
+						if(tmpline.index(expattern) and !x.correctmatch(matchedpatterns,tmpline)) then # if one of the excluded patterns were found ==> exclude this variable
+							isfound = true
+							break
+						end
+					end
+					if(!isfound) then
+						minvars[tmpline[propertype.length,tmpline.length]]=propertype
+					end
 				end
 			end
 		end
@@ -208,19 +242,27 @@ File.readlines(filename).each do |line|
 				break
 			end
 		end
-		if(!isfound) then
+		if(!isfound) then # if didn't find one of the required patterns ==> disable the branch
 			tmparray = line.split(/"/) #line='fChain->SetBranchAddress("x",&x,&b_x);' ==> split result ["fChain->SetBranchAddress(", "x", ",&x,&b_x);"]
-			newline = "   fChain->SetBranchStatus(\"#{tmparray[1]}\", kFALSE);\n"
-			#line.gsub!(/line/,"#{newline}")
-			x.freplace(filename,line,newline)
+			#newline = "   fChain->SetBranchStatus(\"#{tmparray[1]}\", kFALSE);\n"
+			#x.freplace(filename,line,newline)
+			x.finsert(filename,line,"//",:BEFORE)
+		else
+			excludedpatterns.each do |pattern|
+				if(line.index(pattern) and !x.correctmatch(matchedpatterns,line)) then # if one of the excluded patterns were found ==> disable the branch
+					tmparray = line.split(/"/) #line='fChain->SetBranchAddress("x",&x,&b_x);' ==> split result ["fChain->SetBranchAddress(", "x", ",&x,&b_x);"]
+					#newline = "   fChain->SetBranchStatus(\"#{tmparray[1]}\", kFALSE);\n"
+					#x.freplace(filename,line,newline)
+					x.finsert(filename,line,"//",:BEFORE)
+					break
+				end
+			end
 		end
 	end
 end
 
 # put if condition on truth initializations (ONLY the initializations)
 File.readlines(filename).each do |line|
-	truthpatterns     = ["truth","Truth"]
-	conditionpatterns = ["fChain->SetBranchAddress","fChain->SetBranchStatus", "= 0;"]
 	truthpatterns.each do |truthpattern|
 		if(line.index(truthpattern)) then
 			conditionpatterns.each do |conditionpattern|
@@ -233,21 +275,29 @@ File.readlines(filename).each do |line|
 	end
 end
 
+=begin
 # add the GetEntryMinimal() method implementation
 previousline = "void WZphysD3PD::GetEntryMinimal(Long64_t entry)\n{"
 minvars.each {|key,val|
 	#puts "#{key} is #{val}"
 	name = key.gsub('*','')
 	newline = ""
-	if(name.index("truth") or name.index("Truth")) then
-		newline = "   if(isMC)   b_#{name}->GetEntry(entry);"
+	isfound = false
+	truthpatterns.each do |truthpattern|
+		if(name.index(truthpattern) and !x.correctmatch(matchedpatterns,name)) then
+			isfound = true
+			break
+		end
+	end
+	if(isfound) then
+		newline = "   if(isMC)   b_#{name}->GetEntry(entry);\n   _DEBUG(\"\");"
 	else
-		newline = "   b_#{name}->GetEntry(entry);"
+		newline = "   b_#{name}->GetEntry(entry);\n   _DEBUG(\"#{name}\");"
 	end
 	x.finsert(filename,previousline,newline,:BELOW)
 	previousline = newline
 }
-
+=end
 t = Time.now
 puts "\nEND: is #{t}"
 

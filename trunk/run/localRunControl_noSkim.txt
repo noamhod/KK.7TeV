@@ -1,3 +1,4 @@
 local_noskim
 muid
-mc
+data
+SILENT

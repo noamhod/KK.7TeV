@@ -7,7 +7,7 @@
 
 #include <TROOT.h>
 
-void prepare(TString sGRLtag) // do not use alone
+void prepare(TString sGRLtag, TString sGdb) // do not use alone
 {
 	gROOT->Reset();
 	
@@ -17,7 +17,7 @@ void prepare(TString sGRLtag) // do not use alone
 
 	gSystem->Load( "libCintex.so" );
 	Cintex::Cintex::Enable();
-	gROOT->ProcessLine(".L Loader.C+");
+	gROOT->ProcessLine(".L Loader.C+"+sGdb);
 	
 	gROOT->ProcessLine(".include ../GoodRunsLists-" + sGRLtag + "/");
 	gROOT->ProcessLine(".include ../GoodRunsLists-" + sGRLtag + "/GoodRunsLists/");
@@ -25,11 +25,11 @@ void prepare(TString sGRLtag) // do not use alone
 	gROOT->ProcessLine(".L ../GoodRunsLists-" + sGRLtag + "/StandAlone/libGoodRunsLists.so");
 }
 
-void compile(TString sGRLtag) // for re-compilation
+void compile(TString sGRLtag, TString sGdb) // for re-compilation
 {
 	prepare(sGRLtag);
 	
-	gROOT->ProcessLine(".L analysisLocalControl.C++");
+	gROOT->ProcessLine(".L analysisLocalControl.C++"+sGdb);
 	gROOT->ProcessLine("analysisLocalControl alc");
 }
 

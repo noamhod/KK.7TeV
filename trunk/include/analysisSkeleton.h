@@ -132,6 +132,10 @@ public:
 	int EF_mu30_MSonly;
 	int EF_mu4;
 	int EF_mu40_MSonly;
+	
+	int EF_mu22;
+	int EF_mu22_MG;
+	int EF_mu40_MSonly_barrel;
 
 	
 	// vertexes (for the PV preselection)

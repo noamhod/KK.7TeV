@@ -1549,10 +1549,11 @@ void graphicObjects::bookBareHistos(TDirectory* tdir)
 
 	h1_d0exPV = new TH1D("d0exPV","d0exPV", d0exPV_nbins, d0exPV_min, d0exPV_max);
 	h1_z0exPV = new TH1D("z0exPV","z0exPV", z0exPV_nbins, z0exPV_min, z0exPV_max);
+	
 	h1_cosmicCosth = new TH1D("cosThetaDimu","cosThetaDimu", cosmicCosth_nbins, cosmicCosth_min, cosmicCosth_max);
 	h1_cosmicCosthAllCuts = new TH1D("cosThetaDimuAllCuts","cosThetaDimuAllCuts", cosmicCosth_nbins, cosmicCosth_min, cosmicCosth_max);
-	h2_xyVertex = new TH2D("xyVertex","xyVertex",   xyVertex_nbins, xyVertex_min, xyVertex_max,
-	xyVertex_nbins, xyVertex_min, xyVertex_max);
+	
+	h2_xyVertex = new TH2D("xyVertex","xyVertex", xyVertex_nbins, xyVertex_min, xyVertex_max, xyVertex_nbins, xyVertex_min, xyVertex_max);
 }
 
 void graphicObjects::bookHistos(TDirectory* tdir)

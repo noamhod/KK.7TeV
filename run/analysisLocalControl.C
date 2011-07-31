@@ -71,13 +71,18 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	///////////////////////////
 }
 
-void analysisLocalControl::initialize(int runNumber, string localRunControlFile)
+void analysisLocalControl::initialize(int runNumber, string runs, string basedir, string localRunControlFile)
 {
 	_DEBUG("analysisLocalControl::initialize");
 	
 	startTimer();
 	
-	setRunControl(localRunControlFile);
+	if(runs=="ALLRUNS")   setRunControl(localRunControlFile);
+	if(runs=="SINGLERUN")
+	{
+		_INFO("reading "+localRunControlFile+" from "+basedir);
+		setRunControl(basedir+"/"+localRunControlFile);
+	}
 
 	// run control
 	l64t_nentries = 0;
@@ -91,7 +96,7 @@ void analysisLocalControl::initialize(int runNumber, string localRunControlFile)
 	string str_tree = "";
 	string str_hist = "";
 	
-	string str = checkANDsetFilepath("PWD", "/../conf/Z_GRL_CURRENT.xml");;
+	string str = basedir+"/../conf/Z_GRL_CURRENT.xml";//checkANDsetFilepath("PWD", "/../conf/Z_GRL_CURRENT.xml");
 	m_GRL = new GRLinterface();
 	m_GRL->glrinitialize( (TString)str );
 	
@@ -115,10 +120,16 @@ void analysisLocalControl::initialize(int runNumber, string localRunControlFile)
 	}
 	else
 	{
-		str_list = checkANDsetFilepath("PWD", "/../conf/NTUP_SMDILEP_dimuon_p591_runs.list");
+		if(runs=="ALLRUNS")   str_list = checkANDsetFilepath("PWD", "/../conf/NTUP_SMDILEP_dimuon_p591_runs.list");
+		if(runs=="SINGLERUN") str_list = basedir+"/../conf/tmp/"+tostring(runNumber)+".list";
+		
 		str_dir  = "";//checkANDsetFilepath("PWD", "/local_datasetdir/");
 		str_tree = checkANDsetFilepath("PWD", "/../data/localTree.root");
-		str_hist = checkANDsetFilepath("PWD", "/../data/analysisLocalControl.root");
+		
+		if(runs=="ALLRUNS")   str_hist = checkANDsetFilepath("PWD", "/../data/analysisLocalControl.root");
+		if(runs=="SINGLERUN") str_hist = basedir+"/../data/tmp/run_"+tostring(runNumber)+".root";
+		
+		
 		
 		// for tests only
 		if(runNumber==-1)
@@ -130,8 +141,16 @@ void analysisLocalControl::initialize(int runNumber, string localRunControlFile)
 	
 	vector<string>* vStr2find = NULL; // all the patterns to be found except for ".root"
 	chainInit(vStr2find);
-	if(runNumber==-1) makeChain(true, str_list, str_dir);
-	else              makeChain(true, str_list, str_dir, runNumber);
+	
+	if(runs=="ALLRUNS")
+	{
+		if(runNumber==-1) makeChain(true, str_list, str_dir);
+		else              makeChain(true, str_list, str_dir, runNumber);
+	}
+	else
+	{
+		makeChain(true, str_list, str_dir);
+	}
 
 	m_WZphysD3PD = new WZphysD3PD( m_chain, m_isMC );
 
@@ -141,13 +160,30 @@ void analysisLocalControl::initialize(int runNumber, string localRunControlFile)
 	
 	m_histfile = new TFile( str_hist.c_str(), "RECREATE");
 	m_histfile->cd();
-
-	string str1 = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
-	string str2 = checkANDsetFilepath("PWD", "/../conf/dataPeriods.data");
 	
+	
+	string str1 = "";
+	string str2 = "";
+	if(runs=="ALLRUNS")
+	{
+		str1 = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
+		str2 = checkANDsetFilepath("PWD", "/../conf/dataPeriods.data");
+	}
+	if(runs=="SINGLERUN")
+	{
+		str1 = basedir+"/../conf/cutFlow.cuts";
+		str2 = basedir+"/../conf/dataPeriods.data";
+		
+		_DEBUG("cutfolw: "+str1);
+		_DEBUG("periods: "+str2);
+	}
+	
+	string str3 = "";
+	if(runs=="ALLRUNS")   str3 = checkANDsetFilepath("PWD", "/interestingEvents.dump");
+	if(runs=="SINGLERUN") str3 = basedir+"/../data/tmp/interestingEvents"+tostring(runNumber)+".dump";
 	m_analysis = new analysis(m_RunType, m_muRecAlgo, m_isMC,
 							  m_WZphysD3PD, m_GRL, m_treefile,
-							  str1, str2, "interestingEvents.dump" );
+							  str1, str2, str3 );
 
 	book();
 

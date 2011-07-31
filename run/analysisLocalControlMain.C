@@ -7,35 +7,35 @@
 
 #include <TROOT.h>
 
-void prepare(TString sGRLtag, TString sGdb) // do not use alone
+void prepare(TString sGRLtag, TString sRunDir, TString sGdb="") // do not use alone
 {
 	gROOT->Reset();
 	
-	gROOT->ProcessLine(".include ../include/");
-	gROOT->ProcessLine(".include ../src/");
-	gROOT->ProcessLine(".include ./");
+	gROOT->ProcessLine(".include "+sRunDir+"/../include/");
+	gROOT->ProcessLine(".include "+sRunDir+"/../src/");
+	gROOT->ProcessLine(".include "+sRunDir+"/.");
 
 	gSystem->Load( "libCintex.so" );
 	Cintex::Cintex::Enable();
-	gROOT->ProcessLine(".L Loader.C+"+sGdb);
+	gROOT->ProcessLine(".L "+sRunDir+"/Loader.C+"+sGdb);
 	
-	gROOT->ProcessLine(".include ../GoodRunsLists-" + sGRLtag + "/");
-	gROOT->ProcessLine(".include ../GoodRunsLists-" + sGRLtag + "/GoodRunsLists/");
+	gROOT->ProcessLine(".include "+sRunDir+"/../GoodRunsLists-" + sGRLtag + "/");
+	gROOT->ProcessLine(".include "+sRunDir+"/../GoodRunsLists-" + sGRLtag + "/GoodRunsLists/");
 
-	gROOT->ProcessLine(".L ../GoodRunsLists-" + sGRLtag + "/StandAlone/libGoodRunsLists.so");
+	gROOT->ProcessLine(".L "+sRunDir+"/../GoodRunsLists-" + sGRLtag + "/StandAlone/libGoodRunsLists.so");
 }
 
-void compile(TString sGRLtag, TString sGdb) // for re-compilation
+void compile(TString sGRLtag, TString sRunDir, TString sGdb="") // for re-compilation
 {
-	prepare(sGRLtag);
+	prepare(sGRLtag,sRunDir);
 	
-	gROOT->ProcessLine(".L analysisLocalControl.C++"+sGdb);
+	gROOT->ProcessLine(".L "+sRunDir+"/analysisLocalControl.C++"+sGdb);
 	gROOT->ProcessLine("analysisLocalControl alc");
 }
 
-void load(TString sGRLtag) // only for loading, if already compiled
+void load(TString sGRLtag, TString sRunDir) // only for loading, if already compiled
 {
-	prepare(sGRLtag);
-	gROOT->ProcessLine(".L analysisLocalControl_C.so");
+	prepare(sGRLtag,sRunDir);
+	gROOT->ProcessLine(".L "+sRunDir+"/analysisLocalControl_C.so");
 	gROOT->ProcessLine("analysisLocalControl alc");
 }

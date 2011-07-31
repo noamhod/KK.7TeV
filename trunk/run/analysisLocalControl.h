@@ -75,7 +75,7 @@ class analysisLocalControl : public chainMaker, public utilities
 		//void GetEntryMinimal(Long64_t entry);
 		
 		void setRunControl(string localRunControlFile);
-		void initialize(int runNumber = 0, string localRunControlFile = "localRunControl_noSkim.txt");
+		void initialize(int runNumber = 0, string runs="ALLRUNS", string basedir="", string localRunControlFile = "localRunControl_noSkim.txt");
 		void finalize();
 		
 		void book();

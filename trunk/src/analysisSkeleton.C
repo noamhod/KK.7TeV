@@ -1249,6 +1249,8 @@ void analysisSkeleton::imassSort()
 
 void analysisSkeleton::buildMU4Vector(int nMus)
 {
+	_DEBUG("analysisSkeleton::buildMU4Vector");
+
 	wipeMU4Vector();
 	for(int n=0 ; n<nMus ; n++)
 	{
@@ -1262,6 +1264,8 @@ void analysisSkeleton::buildMU4Vector(int nMus)
 
 void analysisSkeleton::buildMU4Vector(int nMus, string fromAngles)
 {
+	_DEBUG("analysisSkeleton::buildMU4Vector");
+
 	if(fromAngles=="")
 	{
 		cout << "you should call buildMU4Vector(int nMus) instead" << endl;

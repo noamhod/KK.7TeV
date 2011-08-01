@@ -65,7 +65,7 @@ class Analysis
 		end
 
 		hashmap = hashmap.sort
-		puts hashmap
+		#puts hashmap
 		return hashmap
 	end
 	
@@ -74,13 +74,12 @@ class Analysis
 		
 		files = search_directory(datasetdir,".root",fullprefix)
 		
-		
 		listfilename = targetdir+"/../../conf/tmp/#{runnumber}.list"
 		listfile = File.open(listfilename,'w')
 		files.each {|key,val|
-			#puts "RUN #{runnumber} ==> #{key} is #{val}"
-			listfile.puts "#{val}\n"
+			listfile.puts val
 		}
+		listfile.close
 	end
 	
 	def analyze(sourcedir="",datasetdir="",targetdir="",macrodir="",dataset="",prefix="")
@@ -124,19 +123,15 @@ class Analysis
 					  macrodir="/srv01/tau/hod/z0analysis-tests/z0analysis-dev/run/tmp",
 					  prefix="user.wanghill.data11_7TeV.")
 		# Set the threads going
-		
 		inlist.each{ |dataset|
+			puts "submitted #{dataset}"
 			dataset_thread = Thread.new(dataset) { |set|
 				run = get_run_number(dataset,prefix,6)
-				
 				runnumberslist << run
 				datasetdir = sourcedir+"/"+dataset
-				
 				analyze(sourcedir,datasetdir,targetdir,macrodir,set,prefix)
 			}
 			outlist << dataset_thread
-			
-			puts "------------------------------------------"
 		}
 		puts "SEND THREADS COMPLETE"
 		
@@ -160,8 +155,12 @@ class Analysis
 	def finalize(targetdir="",macrodir="")
 		%x(rm -f #{macrodir}/*.log)
 		%x(rm -f #{macrodir}/*.C)
-		%x(rm -f #{targetdir}/*.list)
+		%x(rm -f #{macrodir}/*.cuts)
+		%x(rm -f #{macrodir}/*.txt)
+		%x(rm -f #{macrodir}/*.png)
+		%x(rm -f #{targetdir}/../../conf/tmp/*.list)
 		%x(rm -f #{targetdir}/*.root)
+		%x(rm -f #{targetdir}/*.dump)
 	end
 end
 

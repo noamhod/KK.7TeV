@@ -563,7 +563,7 @@ public:
 		currentRun = 0;
 		sCurrentPeriod = "";
 		nMultiMuonEvents = 0;
-		setStyle();
+		//setStyle();
 		string fCandName;
 		if(sRunNumber!="") fCandName = "tmp/cand_pT."+sRunNumber+".txt"; // sRunNumber is static string from basicIncludes.h
 		else               fCandName = "cand_pT.txt";

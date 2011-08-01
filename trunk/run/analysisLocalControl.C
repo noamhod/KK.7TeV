@@ -95,8 +95,11 @@ void analysisLocalControl::initialize(int runNumber, string runs, string basedir
 	string str_dir  = "";
 	string str_tree = "";
 	string str_hist = "";
-	
-	string str = basedir+"/../conf/Z_GRL_CURRENT.xml";//checkANDsetFilepath("PWD", "/../conf/Z_GRL_CURRENT.xml");
+
+
+	string str = "";
+	if(runs=="ALLRUNS")   str = checkANDsetFilepath("PWD", "/../conf/Z_GRL_CURRENT.xml");	
+	if(runs=="SINGLERUN") str = basedir+"/../conf/Z_GRL_CURRENT.xml";//checkANDsetFilepath("PWD", "/../conf/Z_GRL_CURRENT.xml");
 	m_GRL = new GRLinterface();
 	m_GRL->glrinitialize( (TString)str );
 	
@@ -180,11 +183,12 @@ void analysisLocalControl::initialize(int runNumber, string runs, string basedir
 	
 	string str3 = "";
 	if(runs=="ALLRUNS")   str3 = checkANDsetFilepath("PWD", "/interestingEvents.dump");
-	if(runs=="SINGLERUN") str3 = basedir+"/../data/tmp/interestingEvents"+tostring(runNumber)+".dump";
+	if(runs=="SINGLERUN") str3 = basedir+"/../data/tmp/interestingEvents_"+tostring(runNumber)+".dump";
 	m_analysis = new analysis(m_RunType, m_muRecAlgo, m_isMC,
 							  m_WZphysD3PD, m_GRL, m_treefile,
 							  str1, str2, str3 );
-
+							  
+	m_analysis->setStyle((TString)basedir+"/../src");
 	book();
 
 	if(m_treefile!=NULL) m_treefile->cd();

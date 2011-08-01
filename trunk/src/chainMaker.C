@@ -36,7 +36,11 @@ void chainMaker::list2chain(string sListFilePath, string sListContentAbsolutePat
 	bool strFound = true;
 	while(!file.eof())
 	{
+		sLine.clear();
+	
 		getline(file,sLine);
+		
+		_DEBUG("sLine = "+sLine);
 		
 		pos = sLine.find(".root");
 		if (pos == string::npos) { nignored++; continue; } // if pattern ".root" is not found
@@ -53,11 +57,7 @@ void chainMaker::list2chain(string sListFilePath, string sListContentAbsolutePat
 		
 		if (runNumber != 0)
 		{
-			stringstream strm;
-			strm << runNumber;
-			string str = "";
-			strm >> str;
-			pos = sLine.find( str.c_str() );
+			pos = sLine.find( tostring(runNumber).c_str() );
 			if (pos == string::npos) { nignored++; continue; } // if pattern ".root" is not found
 		}
 		

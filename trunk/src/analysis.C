@@ -116,6 +116,7 @@ void analysis::execute()
 	
 	_DEBUG("");
 	
+	/*
 	nAll++;
 	if(mu_n==0) n0mu++;
 	int N=0;
@@ -128,7 +129,8 @@ void analysis::execute()
 	if(mu_n==3 && N>0) n3mu++;
 	if(mu_n==4 && N>0) n4mu++;
 	if(mu_n>4  && N>0) nNmu++;
- 	
+ 	*/
+	
 	_DEBUG("");
 	
 	/////////////////////////////////////////////////////

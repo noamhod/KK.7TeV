@@ -703,7 +703,7 @@ class graphicObjects// : public utilities
 		void ginitialize();
 		void gfinalize();
 
-		void setStyle();
+		void setStyle(TString dir="../../src");
 		
 		void setTrees(TDirectory* tDir_allCuts,
 					  TDirectory* tDir_cutsProfile,

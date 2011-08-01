@@ -5,7 +5,7 @@
 #include <string>
 #include <sstream>
 
-
+/*
 #ifndef __CINT__
 #include <boost/lexical_cast.hpp>
 #else
@@ -13,7 +13,7 @@
 template <typename T> class boost_ptr;
 #endif
 //#include <boost/lexical_cast.hpp>
-
+*/
 
 using namespace std;
 
@@ -76,7 +76,7 @@ string log(const char* file, int line, int type, int level, string message)
 #define _WARNING(x) log(__FILE__, __LINE__, WRN, VISUAL, (x)) // for WARNING VISUAL
 #define _ERROR(x)   log(__FILE__, __LINE__, ERR, VISUAL, (x)) // for ERROR VISUAL
 
-
+/*
 static inline double validate_double(string str)
 {
 	if(str.substr(0,1)=="0")
@@ -101,7 +101,7 @@ static inline double validate_double(string str)
 	}
 	return x;
 }
-
+*/
 
 static inline bool validate_bool(string str)
 {
@@ -151,12 +151,14 @@ static inline double todouble(string str)
 	return x;
 }
 
+/*
 static inline double validate_double(const char* cc) { return validate_double((string)cc); }
 static inline int    validate_int(string str)        { return (int)validate_double(str); }
 static inline int    validate_int(const char* cc)    { return validate_int((string)cc); }
 static inline float  validate_float(string str)      { return (float)validate_double(str); }
 static inline float  validate_float(const char* cc)  { return validate_float((string)cc); }
 static inline bool   validate_bool(const char* cc)   { return validate_bool((string)cc); }		
+*/
 static inline int    toint(const char* cc)           { return toint((string)cc); }
 static inline double todouble(const char* cc)        { return todouble((string)cc); }
 

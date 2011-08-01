@@ -1536,9 +1536,9 @@ void graphicObjects::ginitialize()
 	tagNprobe_pT_max   = 100.*MeV2GeV;
 }
 
-void graphicObjects::setStyle()
+void graphicObjects::setStyle(TString dir)
 {
-	gROOT->ProcessLine(".x ../src/rootlogon_atlas.C");
+	gROOT->ProcessLine(".x "+dir+"/rootlogon_atlas.C"); // if in tmp
 	gROOT->SetStyle("ATLAS");
 	gROOT->ForceStyle();
 }

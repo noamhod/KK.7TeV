@@ -106,7 +106,7 @@ class tagNprobe
 		);
 		
 		// probeMask for HLT
-		int tagNprobe::probeMask
+		int probeMask
 		(
 			int iprobeCand,
 			string sTrigName, float pTtrigThreshold,
@@ -124,7 +124,7 @@ class tagNprobe
 		);
 		
 		// probeMask for LLT
-		int tagNprobe::probeMask
+		int probeMask
 		(
 			int iprobeCand,
 			string sTrigName, float pTtrigThreshold,

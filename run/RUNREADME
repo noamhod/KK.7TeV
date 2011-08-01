@@ -3,7 +3,7 @@ LOCAL:
 	[2] see if these files have your desired run properties
 	[3] root -b
 	[4] .L analysisLocalControlMain.C
-	[5] compile("00-00-91","/full/path/to/run"); # OR load("00-00-91","/full/path/to/run");
+	[5] compile("00-00-91"); # OR load("00-00-91");
 	[6] alc.initialize();    # alc.initialize(int runNumber = 0, int runs=ALLRUNS, string localRunControlFile = "localRunControl_noSkim.txt");
 	[7] if in MC, choose a dataset number
 	[8] alc.loop(0,0);       # there are more options to run this function
@@ -12,9 +12,21 @@ GDB: same as above but,
 	[1] gdb root.exe
 	[2] gdb> run
 	[3] root [] .L analysisLocalControlMain.C
-	[4] root [] compile("00-00-91", "/full/path/to/run", "g");	# to force the use of -g
+	[4] root [] compile("00-00-91", "", "g");	# to force the use of -g
 	[5] break hello.C:3	# to place a breakpoint in hello.C, right after line 2
 	[5] rest is same as above
+
+THREADS(Ruby)
+	[0] cd run
+	[1] root -b
+	[2] .L analysisLocalControlMain.C 
+	[3] compile("00-00-91","/srv01/tau/hod/z0analysis-tests/z0analysis-t302/run/")
+	[4] .q
+	[5] cd ../ruby
+	[6] ruby batch_analyze.rb  	   # starts the threads (onlu load is called)
+	[7] source kill_all root.exe hadd  # to kill all the threads
+
+
 GRID:
 
 

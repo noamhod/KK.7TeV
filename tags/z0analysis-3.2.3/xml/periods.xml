@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE objects PUBLIC "" "periods.dtd" []>
+<objects>
+<!--
+  The periods names and values
+-->
+  <obj NAME="MC" FLAG="on">
+    <start>100000</start>
+    <end>150000</end>
+    <pTmin>1.</pTmin>
+    <ntriggers>1</ntriggers>
+    <triggers>
+      <trigger NAME="L1_MU10" PRIORITY="1" FLAG="on">10.</trigger>
+    </triggers>
+    <nevents>-1</nevents>
+    <luminosity>-1</luminosity>
+    <description>
+        The values are in GeV and pb^-1.
+    </description>
+  </obj>
+
+  <obj NAME="A1" FLAG="on">
+    <start>152166</start>
+    <end>153200</end>
+    <pTmin>1.</pTmin>
+    <ntriggers>2</ntriggers>
+    <triggers>
+      <trigger NAME="EF_mu10" PRIORITY="1" FLAG="on">10.</trigger>
+      <trigger NAME="EF_mu10_MG" PRIORITY="2" FLAG="on">10.</trigger>
+    </triggers>
+    <nevents>100</nevents>
+    <luminosity>100</luminosity>
+    <description>
+      The values are in GeV and pb^-1.
+    </description>
+  </obj>
+
+  <obj NAME="I2" FLAG="on">
+    <start>167776</start>
+    <end>167844</end>
+    <pTmin>1.</pTmin>
+    <ntriggers>2</ntriggers>
+    <triggers>
+      <trigger NAME="EF_mu13_tight" PRIORITY="1" FLAG="on">13.</trigger>
+      <trigger NAME="EF_mu13_MG_tight" PRIORITY="2" FLAG="on">13.</trigger>
+    </triggers>
+    <nevents>10000</nevents>
+    <luminosity>10000</luminosity>
+    <description>
+      The values are in GeV and pb^-1.
+    </description>
+  </obj>
+  
+  
+  <obj NAME="PERIODS" FLAG="on">
+    <nperiods>9</nperiods>
+    <periods>
+      <period NAME="A" FLAG="on">0.0000157154</period>
+      <period NAME="B" FLAG="on">0.00883395</period>
+      <period NAME="C" FLAG="on">0.00871179</period>
+      <period NAME="D" FLAG="on">0.255204</period>
+      <period NAME="E" FLAG="on">1.08162</period>
+      <period NAME="F" FLAG="on">1.95816</period>
+      <period NAME="G" FLAG="on">6.89501</period>
+      <period NAME="H" FLAG="on">8.52076</period>
+      <period NAME="I" FLAG="on">22.9524</period>
+    </periods>
+    <description>
+      The values are in  pb^-1.
+    </description>
+  </obj>
+  
+  <obj NAME="TRIGGERPERIODS" FLAG="on">
+    <ntriggerperiods>4</ntriggerperiods>
+    <triggerperiods>
+      <triggerperiod NAME="L1_MU10" FLAG="on">0.272906894</triggerperiod>
+      <triggerperiod NAME="EF_mu10" FLAG="on">3.03978</triggerperiod>
+      <triggerperiod NAME="EF_mu13" FLAG="on">6.89501</triggerperiod>
+      <triggerperiod NAME="EF_mu13_tight" FLAG="on">31.47316</triggerperiod>
+    </triggerperiods>
+    <description>
+      The values are in pb^-1.
+    </description>
+  </obj>
+
+</objects>

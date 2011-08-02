@@ -12,6 +12,7 @@ class QSUB
 	# http://juixe.com/techknow/index.php/2007/01/22/ruby-class-tutorial/
 	attr_accessor :homedir,
 				  :thisdir,
+				  :rootdir,
 				  :targetdir,
 				  :sourcedir,
 				  :macrodir,
@@ -23,7 +24,7 @@ class QSUB
 	
 	def initialize(dosetup=false)
 		if(dosetup) then
-			%x(source $HOME/setROOT530.sh)
+			%x(source $HOME/setROOT528c.sh)
 		end
 		
 		#log = Logger.new(STDOUT)
@@ -44,6 +45,7 @@ class QSUB
 		
 		puts homedir
 		puts thisdir
+		puts rootdir
 		puts targetdir
 		puts sourcedir
 		puts macrodir
@@ -60,6 +62,10 @@ class QSUB
 		if(!thisdir)	then
 			ok=false
 			LOG("ERROR", "thisdir is not set")
+		end
+		if(!rootdir)    then
+			ok=false
+			LOG("ERROR", "rootdir is not set")
 		end
 		if(!targetdir)	then
 			ok=false
@@ -99,6 +105,10 @@ class QSUB
 	
 	def set_thisdir(str="")
 		@thisdir = str
+	end
+
+	def set_rootdir(str="")
+		@rootdir = str
 	end
 	
 	def set_homedir(str="")
@@ -200,7 +210,7 @@ class QSUB
 		jobfile = File.open(jobname, 'w') { |f| 
 			f.puts "#!/bin/bash"
 			f.puts "export PBS_SERVER=tau-ce.hep.tau.ac.il"
-			f.puts "export ROOTSYS=/storage/t3_data/software/root/root_5.30_gcc41"
+			f.puts "export ROOTSYS=#{rootdir}"
 			f.puts "export LD_LIBRARY_PATH=$ROOTSYS/lib:$LD_LIBRARY_PATH"
 			f.puts "export PATH=$ROOTSYS/bin:$PATH"
 			f.puts "export RUBYLIB=$ROOTSYS/lib:$RUBYLIB"
@@ -239,8 +249,14 @@ class QSUB
 		line = String.new
 		inlist.each { |dataset|
 			run = get_run_number(dataset)
-			line += "  #{targetdir}/run_#{run}.root"
+			fname = "#{targetdir}/run_#{run}.root"
+			if(File.exists?(fname)) then
+				line += "  #{fname}"
+			else
+				LOG("WARNING","Missing ROOT file: #{fname}")
+			end
 		}
+		LOG("WARNING","For the missing files (if any) go to ../run/tmp and run the specific macro again:   root.exe -l -b -q macro_XXXXXX.C\n then try to merge again")
 		%x(hadd -f #{targetdir}/../#{mergedfilename}    #{line})
 	end
 	

@@ -9,6 +9,7 @@ include FileUtils
 
 
 class QSUB
+	# http://juixe.com/techknow/index.php/2007/01/22/ruby-class-tutorial/
 	attr_accessor :homedir,
 				  :thisdir,
 				  :targetdir,
@@ -28,6 +29,10 @@ class QSUB
 		#log = Logger.new(STDOUT)
 		#log.level = Logger::WARN
 		
+		#export PBS_SERVER=tau-ce.hep.tau.ac.il
+		ENV['PBS_SERVER'] = "tau-ce.hep.tau.ac.il"
+		puts "PBS_SERVER=#{ENV['PBS_SERVER']} is set."
+
 		# ENV['DATADIR'] = "/data/hod/2011/NTUP_SMDILEP_dimuon_p591"
 		# ENV['RUNDIR'] = "#{thisdir}/../run"
 		# ENV['LD_LIBRARY_PATH'] = "#{ENV['LD_LIBRARY_PATH']}:#{ENV['RUNDIR']}"
@@ -166,6 +171,7 @@ class QSUB
 		files.each {|key,val|
 			listfile.puts "#{val}\n"
 		}
+		listfile.close
 	end
 	
 	def qsub(datasetdir="",dataset="")
@@ -176,7 +182,7 @@ class QSUB
 		macroname = "#{macrodir}/macro_#{runnumber}.C"
 		jobname   = "#{jobdir}/job_#{runnumber}.sh"
 		rundirregular="#{thisdir}/../run"
-		rundir='\"'+"#{thisdir}"+'/../run\"'
+		rundir='\"'+"#{thisdir}"+'/../run/\"'
 		grltag='\"00-00-91\"'
 		singlerun = '\"SINGLERUN\"'
 		
@@ -193,18 +199,26 @@ class QSUB
 		
 		jobfile = File.open(jobname, 'w') { |f| 
 			f.puts "#!/bin/bash"
-			f.puts "source #{homedir}/setROOT530.sh"
+			f.puts "export PBS_SERVER=tau-ce.hep.tau.ac.il"
+			f.puts "export ROOTSYS=/storage/t3_data/software/root/root_5.30_gcc41"
+			f.puts "export LD_LIBRARY_PATH=$ROOTSYS/lib:$LD_LIBRARY_PATH"
+			f.puts "export PATH=$ROOTSYS/bin:$PATH"
+			f.puts "export RUBYLIB=$ROOTSYS/lib:$RUBYLIB"
 			f.puts "export LD_LIBRABY_PATH=$LD_LIBRABY_PATH:#{rundirregular}"
 			f.puts "export LD_LIBRABY_PATH=$LD_LIBRABY_PATH:#{thisdir}/../GoodRunsLists-00-00-91/StandAlone"
-			f.puts "$ROOTSYS/bin/root.exe -l -b -q #{macroname}" #> #{macrodir}/#{runnumber}.log"
+			f.puts "$ROOTSYS/bin/root.exe -l -b -q #{macroname}"
 		}
 		
-		#puts "%x(qsub -q N -e #{rundirregular}/tmp/err -o #{rundirregular}/tmp/out #{jobname})"
+		#puts "%x(qsub -q N -e #{rundirregular}/tmp/err -o #{rundirregular}/tmp/out #{rundirregular}/#{jobname})"
 		%x(qsub -q N -e #{rundirregular}/tmp/err -o #{rundirregular}/tmp/out #{jobname})
 	end
 	
 	def batch_qsub(inlist=[],runnumberslist=[])
-		
+	
+		############ clean before start ##############
+		%x(ruby clean_tmp.rb) ########################
+		##############################################
+	
 		if(!self.check_variables) then
 			LOG("ERROR", "there are uninitialized variables")
 			return
@@ -216,12 +230,16 @@ class QSUB
 			datasetdir = sourcedir+"/"+dataset
 			qsub(datasetdir,dataset)
 		}
+
+		%x(qstat | grep hod)
+		puts "USE \'qstat | grep hod\' to monitor the jobs"
 	end
 	
-	def merge(runnumbers=[], mergedfilename="merged.root")
+	def merge(inlist=[], mergedfilename="merged.root")
 		line = String.new
-		runnumbers.each { |run|
-			line += "  #{sourcedir}/run_#{run}.root"
+		inlist.each { |dataset|
+			run = get_run_number(dataset)
+			line += "  #{targetdir}/run_#{run}.root"
 		}
 		%x(hadd -f #{targetdir}/../#{mergedfilename}    #{line})
 	end

@@ -165,30 +165,38 @@ void analysisLocalControl::initialize(int runNumber, string runs, string basedir
 	m_histfile->cd();
 	
 	
-	string str1 = "";
-	string str2 = "";
+	string str_cutflow = "";
+	string str_periods = "";
 	if(runs=="ALLRUNS")
 	{
-		str1 = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
-		str2 = checkANDsetFilepath("PWD", "/../conf/dataPeriods.data");
+		str_cutflow = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
+		str_periods = checkANDsetFilepath("PWD", "/../conf/dataPeriods.data");
 	}
 	if(runs=="SINGLERUN")
 	{
-		str1 = basedir+"/../conf/cutFlow.cuts";
-		str2 = basedir+"/../conf/dataPeriods.data";
+		str_cutflow = basedir+"/../conf/cutFlow.cuts";
+		str_periods = basedir+"/../conf/dataPeriods.data";
 		
-		_DEBUG("cutfolw: "+str1);
-		_DEBUG("periods: "+str2);
+		_DEBUG("cutfolw: "+str_cutflow);
+		_DEBUG("periods: "+str_periods);
 	}
 	
-	string str3 = "";
-	if(runs=="ALLRUNS")   str3 = checkANDsetFilepath("PWD", "/interestingEvents.dump");
-	if(runs=="SINGLERUN") str3 = basedir+"/../data/tmp/interestingEvents_"+tostring(runNumber)+".dump";
+	string str_events = "";
+	if(runs=="ALLRUNS")   str_events = checkANDsetFilepath("PWD", "/interestingEvents.dump");
+	if(runs=="SINGLERUN") str_events = basedir+"/../run/tmp/interestingEvents_"+tostring(runNumber)+".dump";
 	m_analysis = new analysis(m_RunType, m_muRecAlgo, m_isMC,
 							  m_WZphysD3PD, m_GRL, m_treefile,
-							  str1, str2, str3 );
-							  
+							  str_cutflow, str_periods, str_events );
+	
+	string str_logspath = "";
+	if(runs=="ALLRUNS")   str_logspath = checkANDsetFilepath("PWD", "");
+	if(runs=="SINGLERUN") str_logspath = basedir+"/../run/tmp";
+	m_analysis->setCutFlowFile(str_logspath, tostring(runNumber));
+	m_analysis->setPtCandidatesFile(str_logspath, tostring(runNumber));
+	m_analysis->setAllCandidatesFiles(str_logspath, tostring(runNumber));
+	
 	m_analysis->setStyle((TString)basedir+"/../src");
+	
 	book();
 
 	if(m_treefile!=NULL) m_treefile->cd();

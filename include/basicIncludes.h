@@ -31,6 +31,10 @@
 #include <TPaveText.h>
 #include <TThread.h>
 #include <TList.h>
+#include <Riostream.h>
+#include <TDOMParser.h>
+#include <TXMLNode.h>
+#include <TXMLAttr.h>
 
 #include <RooFit.h>
 #include <RooRealVar.h>
@@ -79,6 +83,7 @@ using namespace RooFit;
 
 static string sRunNumber = "";
 
+typedef map<int, const char*>   TMapiP2cc;
 typedef multimap<int, int>      TMapii;
 typedef multimap<int, string>   TMapis;
 typedef map<double, double>     TMapdd;

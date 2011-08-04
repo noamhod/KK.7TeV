@@ -24,11 +24,7 @@ cutFlowHandler::cutFlowHandler(string sCutFlowFilePath)
 	
 	nAllEvents = 0;
 	
-	file = new ofstream();
-	string sTime;
-	if(sRunNumber!="") sTime = "tmp/RunCutFlow." + sRunNumber + ".cuts"; // sRunNumber is static string from basicIncludes.h
-	else               sTime = "RunCutFlow_" + getDateHour() + ".cuts";
-	file->open( sTime.c_str() );
+	
 	
 	readCutFlow(sCutFlowFilePath);
 }
@@ -40,6 +36,18 @@ cutFlowHandler::~cutFlowHandler()
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+void cutFlowHandler::setCutFlowFile(string sLogFilePath, string srunnumber)
+{
+	// file = new ofstream();
+	// string sTime;
+	// if(sRunNumber!="") sTime = "tmp/RunCutFlow." + sRunNumber + ".cuts"; // sRunNumber is static string from basicIncludes.h
+	// else               sTime = "RunCutFlow_" + getDateHour() + ".cuts";
+	// file->open( sTime.c_str() );
+	
+	string sLogFileName = sLogFilePath+"/RunCutFlow.run_"+srunnumber+".cuts";//".time_"+getDateHour()+".cuts";
+	file = new ofstream( sLogFileName.c_str() );
+}
 
 
 void cutFlowHandler::incrementNallEvents()
@@ -217,13 +225,13 @@ void cutFlowHandler::printCutFlowNumbers(Long64_t chainEntries)
 	cout << "+--------------------------------------------------------------------------" << endl;
 	cout << "|                          print cut flow numbers                          " << endl;
 	cout << "|.........................................................................." << endl;
-	cout << "|    processed:    all\t\t\t" << nAllEvents << endl;
+	cout << "| processed: all " << nAllEvents << endl;
 	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
 	{
 		double num = ii->first;
 		string scutname = ii->second;
-		if(m_cutFlowTypeOrdered->operator[](num)=="preselection") cout << "|    PRESELECTION: " << scutname <<  "\t\t\t" << m_cutFlowNumbers->operator[](scutname) << endl;
-		if(m_cutFlowTypeOrdered->operator[](num)=="selection")    cout << "|    SELECTION:    " << scutname <<  "\t\t\t" << m_cutFlowNumbers->operator[](scutname) << endl;
+		if(m_cutFlowTypeOrdered->operator[](num)=="preselection") cout << "| PRESELECTION: " << scutname <<  " " << m_cutFlowNumbers->operator[](scutname) << endl;
+		if(m_cutFlowTypeOrdered->operator[](num)=="selection")    cout << "| SELECTION: " << scutname <<  " " << m_cutFlowNumbers->operator[](scutname) << endl;
 	}
 	cout << "+--------------------------------------------------------------------------" << endl;
 	
@@ -232,13 +240,13 @@ void cutFlowHandler::printCutFlowNumbers(Long64_t chainEntries)
 	(*file) << "+--------------------------------------------------------------------------" << endl;
 	(*file) << "|                          print cut flow numbers                          " << endl;
 	(*file) << "|.........................................................................." << endl;
-	(*file) << "|    processed:    all\t\t\t" << nAllEvents << endl;
+	(*file) << "| processed: all " << nAllEvents << endl;
 	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
 	{
 		double num = ii->first;
 		string scutname = ii->second;
-		if(m_cutFlowTypeOrdered->operator[](num)=="preselection") (*file) << "|    PRESELECTION: " << scutname <<  "\t\t\t" << m_cutFlowNumbers->operator[](scutname) << endl;
-		if(m_cutFlowTypeOrdered->operator[](num)=="selection")    (*file) << "|    SELECTION:    " << scutname <<  "\t\t\t" << m_cutFlowNumbers->operator[](scutname) << endl;
+		if(m_cutFlowTypeOrdered->operator[](num)=="preselection") (*file) << "| PRESELECTION: " << scutname <<  " " << m_cutFlowNumbers->operator[](scutname) << endl;
+		if(m_cutFlowTypeOrdered->operator[](num)=="selection")    (*file) << "| SELECTION: " << scutname <<  " " << m_cutFlowNumbers->operator[](scutname) << endl;
 	}
 	(*file) << "+--------------------------------------------------------------------------\n" << endl;
 }

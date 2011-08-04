@@ -297,3 +297,105 @@ vector<string>* periodHandler::getTrigs(string sPeriod, TMapsP2vs* period2trigge
 	TMapsP2vs::iterator it = period2triggerMap->find(sPeriod);
 	return it->second;
 }
+
+
+
+///////////////////////////////////////////////////////////////////////
+bool periodsXml::mask()
+{
+	for(TMapiP2cc::iterator ii=list->begin() ; ii!=list->end() ; ++ii)
+	{
+		int num    = ii->first;
+		string str = (string)ii->second;
+		cout << "[" << num << "]=" << str << endl;
+		
+		if(str=="obj")
+		{
+			if(Next(ii)=="NAME") name = Next(ii); else return false;
+			if(Next(ii)=="FLAG") flag = Next(ii); else return false;
+			if(name=="PERIODS")
+			{
+				if(Next(ii)=="nperiods") number = Next(ii); else return false;
+				cout << "NAME=" << name << ", nperiods=" << number << endl;
+				if(Next(ii)=="periods")
+				{
+					for(int p=1 ; p<=validate_int(number) ; ++p)
+					{
+						if(Next(ii)=="period")  /* do nothing*/
+						if(Next(ii)=="NAME")     attrname = Next(ii); else return false;
+						if(Next(ii)=="FLAG")     attrflag = Next(ii); else return false;
+						luminosity = Next(ii);
+						cout << "\tperiod[" << p        << "] NAME="        << attrname
+							 << ", FLAG="   << attrflag << ", luminosity="  << luminosity
+							 << endl;
+					}
+					//if((int)vdtmp.size() != validate_int(number)) {cout << LOG("vector size doesn't match number") << endl; return false;}
+				}
+				if(Next(ii)=="description") description = Next(ii); else return false;
+				cout << "description=" << description << endl;
+			}
+			else if(name=="TRIGGERPERIODS")
+			{
+				if(Next(ii)=="ntriggerperiods") number = Next(ii); else return false;
+				cout << "NAME=" << name << ", ntriggerperiods=" << number << endl;
+				if(Next(ii)=="triggerperiods")
+				{
+					for(int tp=1 ; tp<=validate_int(number) ; ++tp)
+					{
+						if(Next(ii)=="triggerperiod")  /* do nothing*/
+						if(Next(ii)=="NAME")     attrname = Next(ii); else return false;
+						if(Next(ii)=="FLAG")     attrflag = Next(ii); else return false;
+						luminosity = Next(ii);
+						cout << "\ttriggerperiod[" << tp       << "] NAME="        << attrname
+							 << ", FLAG="          << attrflag << ", luminosity="  << luminosity
+							 << endl;
+					}
+					//if((int)vdtmp.size() != validate_int(number)) {cout << LOG("vector size doesn't match number") << endl; return false;}
+				}
+				if(Next(ii)=="description") description = Next(ii); else return false;
+				cout << "description=" << description << endl;
+			}
+			else
+			{
+				if(Next(ii)=="start")     start     = Next(ii); else return false;
+				if(Next(ii)=="end")       end       = Next(ii); else return false;
+				if(Next(ii)=="pTmin")     pTmin     = Next(ii); else return false;
+				if(Next(ii)=="ntriggers") ntriggers = Next(ii); else return false;
+				cout << "NAME="   << name << ", FLAG=" << flag << ", start="   << start
+					 << ", end=" << end << ", pTmin=" << pTmin << ", ntriggers=" << ntriggers
+					 << endl;
+
+				if(Next(ii)=="triggers")
+				{
+					for(int t=1 ; t<=validate_int(ntriggers) ; ++t)
+					{
+						if(Next(ii)=="trigger")  /* do nothing*/
+						if(Next(ii)=="NAME")     attrname     = Next(ii); else return false;
+						if(Next(ii)=="PRIORITY") trigpriority = Next(ii); else return false;
+						if(Next(ii)=="FLAG")     attrflag     = Next(ii); else return false;
+						trigpT = Next(ii);
+						cout << "\ttrigger[" << t       << "] NAME=" << attrname << ", PRIORITY=" << trigpriority
+							 << ", FLAG="  << attrflag << ", trigpT="  << trigpT
+							 << endl;
+					}
+					//if((int)vdtmp.size() != validate_int(ntriggers)) {cout << LOG("vector size doesn't match ntriggers") << endl; return false;}
+				}
+				else return false;
+				
+				if(Next(ii)=="nevents")     nevents     = Next(ii); else return false;
+				if(Next(ii)=="luminosity")  luminosity  = Next(ii); else return false;
+				if(Next(ii)=="description") description = Next(ii); else return false;
+				cout << "nevents=" << nevents << ", luminosity=" << luminosity << ", description=" << description << endl;
+
+				// fill the db
+			}
+		}
+	}
+	return true;
+}
+
+
+
+
+
+

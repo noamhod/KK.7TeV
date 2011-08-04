@@ -59,5 +59,94 @@ class periodHandler
 		int getTrigsSize();
 
 };
+
+
+////////////////////////////////////////////////////////////
+class periodsXml : public XML
+{
+	public:
+		periodsXml()
+		{
+			ignoreString("obj");
+			ignoreString("NAME");
+			ignoreString("FLAG");
+			ignoreString("PRIORITY");
+			ignoreString("trigger");
+			ignoreString("period");
+			ignoreString("triggerperiod");
+		}
+		virtual ~periodsXml(){}
+		bool mask();
+
+		/*
+		<obj NAME="MC" FLAG="on">
+			<start>100000</start>
+			<end>150000</end>
+			<pTmin>1.</pTmin>
+			<ntriggers>1</ntriggers>
+			<triggers>
+				<trigger NAME="L1_MU10" PRIORITY="1" FLAG="on">10.</trigger>
+			</triggers>
+			<nevents>-1</nevents>
+			<luminosity>-1</luminosity>
+			<description>
+				The values are in GeV and pb^-1.
+			</description>
+		</obj>
+		*/
+		
+		/*
+		<obj NAME="PERIODS" NUMBER="9">
+			<periodsXml>
+				<period NAME="A" FLAG="on">0.0000157154</period>
+				<period NAME="B" FLAG="on">0.00883395</period>
+				<period NAME="C" FLAG="on">0.00871179</period>
+				<period NAME="D" FLAG="on">0.255204</period>
+				<period NAME="E" FLAG="on">1.08162</period>
+				<period NAME="F" FLAG="on">1.95816</period>
+				<period NAME="G" FLAG="on">6.89501</period>
+				<period NAME="H" FLAG="on">8.52076</period>
+				<period NAME="I" FLAG="on">22.9524</period>
+			</periodsXml>
+			<description>
+				The values are in  pb^-1.
+			</description>
+		</obj>
+		*/
+		
+		/*
+		<obj NAME="TRIGGERPERIODS" NUMBER="4">
+			<triggerperiods>
+				<triggerperiod NAME="L1_MU10" FLAG="on">0.272906894</triggerperiod>
+				<triggerperiod NAME="EF_mu10" FLAG="on">3.03978</triggerperiod>
+				<triggerperiod NAME="EF_mu13" FLAG="on">6.89501</triggerperiod>
+				<triggerperiod NAME="EF_mu13_tight" FLAG="on">31.47316</triggerperiod>
+			</triggerperiods>
+			<description>
+				The values are in pb^-1.
+			</description>
+		</obj>
+		*/
+	
+		// specific mask for periodsXml.xml
+		string name;
+		string flag;
+		string start;
+		string end;
+		string pTmin;
+		string ntriggers;
+		string attrname;
+		string trigpriority;
+		string attrflag;
+		string trigpT;
+		string nevents;
+		string luminosity;
+		string description;
+		string number;
+	private:
+};
+
+
+
 #endif
 

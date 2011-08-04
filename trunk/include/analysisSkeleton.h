@@ -563,13 +563,15 @@ public:
 		currentRun = 0;
 		sCurrentPeriod = "";
 		nMultiMuonEvents = 0;
-		//setStyle();
-		string fCandName;
-		if(sRunNumber!="") fCandName = "tmp/cand_pT."+sRunNumber+".txt"; // sRunNumber is static string from basicIncludes.h
-		else               fCandName = "cand_pT.txt";
-		fCand = new ofstream(fCandName.c_str());
+
+		// string fCandName;
+		// if(sRunNumber!="") fCandName = "tmp/cand_pT."+sRunNumber+".txt"; // sRunNumber is static string from basicIncludes.h
+		// else               fCandName = "cand_pT.txt";
+		// fCand = new ofstream(fCandName.c_str());
 	}
 	~analysisSkeleton();
+	
+	void setPtCandidatesFile(string sCandFilePath = "", string srunnumber = "");
 	
 	void resetMuQAflags(int nMus);
 	int  countQAflags();

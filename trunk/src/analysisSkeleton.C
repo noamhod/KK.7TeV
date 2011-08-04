@@ -20,6 +20,18 @@ analysisSkeleton::~analysisSkeleton()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
+
+void analysisSkeleton::setPtCandidatesFile(string sCandFilePath, string srunnumber)
+{
+	// string fCandName;
+	// if(sRunNumber!="") fCandName = "tmp/cand_pT."+sRunNumber+".txt"; // sRunNumber is static string from basicIncludes.h
+	// else               fCandName = "cand_pT.txt";
+	// fCand = new ofstream(fCandName.c_str());
+	
+	string sLogFileName = sCandFilePath+"/candidates_pT.run_"+srunnumber+".cnd";//".time_"+getDateHour()+".cnd";
+	fCand = new ofstream( sLogFileName.c_str() );
+}
+
 void analysisSkeleton::resetMuQAflags(int nMus)
 {
 	if(muQAflags.size()>0)      muQAflags.clear();

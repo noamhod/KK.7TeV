@@ -35,6 +35,8 @@ class cutFlowHandler : public utilities
 		cutFlowHandler(string sCutFlowFilePath);
 		~cutFlowHandler();
 		
+		void setCutFlowFile(string sLogFilePath = "", string srunnumber = "");
+		
 		void   parseKeyValLine(string sLine);
 		int    getNVals();
         string getType();

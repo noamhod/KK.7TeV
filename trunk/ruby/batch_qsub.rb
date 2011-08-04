@@ -107,6 +107,9 @@ x.set_jobdir("/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/scripts/tmp")
 x.set_prefix("user.wanghill.data11_7TeV.00",6)
 x.set_secondprefix("._",5)
 
+x.check_variables
 #x.batch_qsub(insets,runnumbers)
-x.merge(insets,"merged.root")
+#x.merge_root(insets,"merged.root")
+#x.merge_cutflow(insets,"merged.cutflow")
+x.waitNmerge(5,insets,"merged")
 x.finalize()

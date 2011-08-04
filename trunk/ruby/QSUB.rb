@@ -4,13 +4,16 @@ require 'pathname'
 require 'fileutils'
 require 'ftools'
 require 'find'
+require 'LoggerDecorator'
 include FileUtils
 
 
 
 class QSUB
 	# http://juixe.com/techknow/index.php/2007/01/22/ruby-class-tutorial/
-	attr_accessor :homedir,
+	attr_accessor :logger,
+				  :logd,
+				  :homedir,
 				  :thisdir,
 				  :rootdir,
 				  :targetdir,
@@ -27,77 +30,76 @@ class QSUB
 			%x(source $HOME/setROOT528c.sh)
 		end
 		
-		#log = Logger.new(STDOUT)
-		#log.level = Logger::WARN
+		set_loggerdec("")
+		# set_loglvl(Logger::INFO)
+		# set_loglvl(Logger::DEBUG)
+		# set_loglvl(Logger::WARN)
+		# set_loglvl(Logger::ERROR)
+		# set_loglvl(Logger::FATAL)
 		
 		#export PBS_SERVER=tau-ce.hep.tau.ac.il
 		ENV['PBS_SERVER'] = "tau-ce.hep.tau.ac.il"
-		puts "PBS_SERVER=#{ENV['PBS_SERVER']} is set."
-
-		# ENV['DATADIR'] = "/data/hod/2011/NTUP_SMDILEP_dimuon_p591"
-		# ENV['RUNDIR'] = "#{thisdir}/../run"
-		# ENV['LD_LIBRARY_PATH'] = "#{ENV['LD_LIBRARY_PATH']}:#{ENV['RUNDIR']}"
-		# ENV['LD_LIBRARY_PATH'] = "#{ENV['LD_LIBRARY_PATH']}:#{ENV['RUNDIR']}/../GoodRunsLists-00-00-91/StandAlone"
+		logd.info "PBS_SERVER=#{ENV['PBS_SERVER']} is set."
 	end
 	
 	def check_variables
 		ok=true
 		
-		puts homedir
-		puts thisdir
-		puts rootdir
-		puts targetdir
-		puts sourcedir
-		puts macrodir
-		puts jobdir
-		puts prefix
-		puts nchars
-		puts secondprefix
-		puts nsubchars
+		logd.info homedir
+		logd.info thisdir
+		logd.info rootdir
+		logd.info targetdir
+		logd.info sourcedir
+		logd.info macrodir
+		logd.info jobdir
+		logd.info prefix
+		logd.info nchars
+		logd.info secondprefix
+		logd.info nsubchars
 		
 		if(!homedir)	then
 			ok=false
-			LOG("ERROR", "homedir is not set")
+			logd.error "homedir is not set"
 		end
 		if(!thisdir)	then
 			ok=false
-			LOG("ERROR", "thisdir is not set")
+			logd.error "thisdir is not set"
 		end
 		if(!rootdir)    then
 			ok=false
-			LOG("ERROR", "rootdir is not set")
+			logd.error "rootdir is not set"
 		end
 		if(!targetdir)	then
 			ok=false
-			LOG("ERROR", "targetdir is not set")
+			logd.error "targetdir is not set"
 		end
 		if(!sourcedir)	then
 			ok=false
-			LOG("ERROR", "sourcedir is not set")
+			logd.error "sourcedir is not set"
 		end
 		if(!macrodir)	then
 			ok=false
-			LOG("ERROR", "macrodir is not set")
+			logd.error "macrodir is not set"
 		end
 		if(!jobdir)	then
 			ok=false
-			LOG("ERROR", "jobdir is not set")
+			logd.error "jobdir is not set"
 		end
 		if(!prefix)	then
 			ok=false
-			LOG("ERROR", "prefix is not set")
+			logd.error "prefix is not set"
 		end
 		if(!nchars)	then
 			ok=false
-			LOG("ERROR", "nchars is not set")
+			logd.error "nchars is not set"
 		end
 		if(!secondprefix)	then
 			ok=false
-			LOG("ERROR", "secondprefix is not set")
+			logd.error "secondprefix is not set"
 		end
 		if(!nsubchars)	then
 			ok=false
-			LOG("ERROR", "nsubchars is not set")
+			logd.error "nsubchars is not set"
 		end
 		
 		return ok
@@ -141,6 +143,19 @@ class QSUB
 		@nsubchars    = nsubcr
 	end
 	
+	def set_loggerdec(logfilename="")
+		@logger = Logger.new(STDERR)
+		logger = Logger.new(STDOUT)
+		if(logfilename!="") then
+			@logger = Logger.new(logfilename)
+		end
+		@logd = LoggerDecorator.new(logger)
+	end
+	
+	def set_loglvl(lvl=Logger::INFO)
+		logger.level = lvl
+	end
+	
 	def get_run_number(dataset="",fullprefix="")
 		if(fullprefix=="") then
 			substring = prefix
@@ -169,7 +184,7 @@ class QSUB
 		end
 
 		hashmap = hashmap.sort
-		puts hashmap
+		#puts hashmap
 		return hashmap
 	end
 	
@@ -185,7 +200,6 @@ class QSUB
 	end
 	
 	def qsub(datasetdir="",dataset="")
-		#puts dataset
 		runnumber = get_run_number(dataset)
 		fullprefix = sourcedir+"/"+prefix
 		make_list(datasetdir,fullprefix,runnumber)
@@ -210,6 +224,7 @@ class QSUB
 		jobfile = File.open(jobname, 'w') { |f| 
 			f.puts "#!/bin/bash"
 			f.puts "export PBS_SERVER=tau-ce.hep.tau.ac.il"
+			f.puts "echo   \"host = $HOSTNAME\""
 			f.puts "export ROOTSYS=#{rootdir}"
 			f.puts "export LD_LIBRARY_PATH=$ROOTSYS/lib:$LD_LIBRARY_PATH"
 			f.puts "export PATH=$ROOTSYS/bin:$PATH"
@@ -217,10 +232,37 @@ class QSUB
 			f.puts "export LD_LIBRABY_PATH=$LD_LIBRABY_PATH:#{rundirregular}"
 			f.puts "export LD_LIBRABY_PATH=$LD_LIBRABY_PATH:#{thisdir}/../GoodRunsLists-00-00-91/StandAlone"
 			f.puts "$ROOTSYS/bin/root.exe -l -b -q #{macroname}"
+			f.puts "echo   \"host = $HOSTNAME\""
 		}
 		
-		#puts "%x(qsub -q N -e #{rundirregular}/tmp/err -o #{rundirregular}/tmp/out #{rundirregular}/#{jobname})"
+		# nodes = "nodes="
+		# nNodes=1
+		# for i in 1..nNodes
+			# if(i==5)  then next end
+			# if(i==17) then next end
+			# if(i==24) then next end
+			# if(i==29) then next end
+			# if(i==32) then next end
+			# if(i<nNodes) then
+				# if(i<10) then
+					# nodes += "tau-wn0#{i.to_s()}+" 
+				# else
+					# nodes += "tau-wn#{i.to_s()}+" 
+				# end
+			# else
+				# if(i<10) then
+					# nodes += "tau-wn0#{i.to_s()}"
+				# else
+					# nodes += "tau-wn#{i.to_s()}"
+				# end
+			# end
+		# end
+
+		# puts nodes
+		# %x(qsub -l #{nodes} -q N -e #{rundirregular}/tmp/err -o #{rundirregular}/tmp/out #{jobname})
+
 		%x(qsub -q N -e #{rundirregular}/tmp/err -o #{rundirregular}/tmp/out #{jobname})
+		logd.info "sent --> #{dataset}"
 	end
 	
 	def batch_qsub(inlist=[],runnumberslist=[])
@@ -230,7 +272,7 @@ class QSUB
 		##############################################
 	
 		if(!self.check_variables) then
-			LOG("ERROR", "there are uninitialized variables")
+			logd.error "there are uninitialized variables"
 			return
 		end
 		
@@ -242,10 +284,136 @@ class QSUB
 		}
 
 		%x(qstat | grep hod)
-		puts "USE \'qstat | grep hod\' to monitor the jobs"
+		logd.info "USE \'qstat | grep hod\' to monitor the jobs"
 	end
 	
-	def merge(inlist=[], mergedfilename="merged.root")
+	def get_txtlogfiles(inlist=[], sPrefix="", sSuffix="")
+		txtlogfiles = Array.new
+		txtlogdir = macrodir
+		inlist.each{ |dataset|
+			run = get_run_number(dataset)
+			txtlogfiles << "#{txtlogdir}/#{sPrefix}#{run}#{sSuffix}"
+		}
+		txtlogfiles.sort
+		return txtlogfiles
+	end
+	
+	def parse_line(line="")
+		if(line=="") then return end
+		if(line.index("SELECTION")  or  line.index("PRESELECTION")  or  line.index("processed")) then
+			line = line.gsub(/\t/," ")
+			line = line.gsub("  "," ")
+			line = line.gsub("   "," ")
+			words = line.split(" ")
+			size = words.length
+			count = 0
+			words.each do |word|
+				if(word.index("|")) then next end
+				if(word.index(":")) then word = word.gsub(":","") end
+				# puts "word[#{count}/#{size}] = #{word}"
+				count += 1
+			end
+			# puts ""
+		else
+			return
+		end
+		return words
+	end
+	
+	def add_cut(types=[],names=[],evnts=[], type="",name="",evts=0)
+		types << type
+		names << name
+		evnts << evts
+	end
+
+	def add_evts(cutindex=0,evnts=[],evts=0)
+		evnts[cutindex] += Integer(evts)
+	end
+	
+	def merge_cutflow(inlist=[], filename="merged.cutflow")
+		lastline=-1
+		firstline=-17
+		types = Array.new
+		names = Array.new
+		evnts = Array.new
+		filescount=0
+		files = get_txtlogfiles(inlist,"RunCutFlow.run_",".cuts")
+		files.each{|file|
+			lines = IO.readlines(file)[firstline..lastline]
+			#puts lines
+			cutindex = 0
+			lines.each do |line|
+				words = parse_line(line)
+				if(!words) then next end
+				if(words.length>0) then
+					if(filescount==0) then
+						add_cut(types,names,evnts, words[1],words[2],Integer(words[3]))
+					else
+						add_evts(cutindex,evnts,Integer(words[3]))
+					end
+				end
+				cutindex += 1
+			end
+			filescount += 1
+		}
+	
+		file = File.open("#{targetdir}/../#{filename}", 'w') do |f|
+			f.puts "<? This is a summary of the cutflow from run #{Time.now} ?>"
+			names.each do |name|
+				string = "#{types[names.index(name)]} \t #{name} \t\t #{evnts[names.index(name)]}"
+				logd.info string
+				f.puts string
+			end
+		end
+	end
+	
+	
+	def merge_candidates(inlist=[], filename="merged.candidates")
+		candidates_all = Array.new
+		candidates_pT  = Array.new
+		
+		# all candidates
+		files = get_txtlogfiles(inlist,"candidates_all.run_",".cnd")
+		files.each{|file|
+			lines = IO.readlines(file)
+			lines = lines.sort
+			logd.info "There are #{lines.length} candidates in #{file}"
+			lines.each do |line|
+				candidates_all << line
+			end
+			#puts lines
+		}
+		filename_all = filename.gsub(".","_all.")
+		file = File.open("#{targetdir}/../#{filename_all}", 'w') do |f|
+			f.puts "<? This is a summary of all the passing candidates from run #{Time.now} ?>"
+			candidates_all.each do |cand|
+				f.puts cand
+			end
+		end
+		
+		# pT candidates
+		files = get_txtlogfiles(inlist,"candidates_pT.run_",".cnd")
+		files.each{|file|
+			lines = IO.readlines(file)
+			lines = lines.sort
+			logd.info "There are #{lines.length} candidates in #{file}"
+			lines.each do |line|
+				candidates_pT << line
+			end
+			#puts lines
+		}
+		candidates_pT.sort
+		filename_pT = filename.gsub(".","_pT.")
+		file = File.open("#{targetdir}/../#{filename_pT}", 'w') do |f|
+			f.puts "<? This is a summary of all the pTcut-passing candidates from run #{Time.now} ?>"
+			candidates_pT.each do |cand|
+				f.puts cand
+			end
+		end
+	end
+	
+	
+	def merge_root(inlist=[], mergedfilename="merged.root")
 		line = String.new
 		inlist.each { |dataset|
 			run = get_run_number(dataset)
@@ -253,22 +421,43 @@ class QSUB
 			if(File.exists?(fname)) then
 				line += "  #{fname}"
 			else
-				LOG("WARNING","Missing ROOT file: #{fname}")
+				logd.warn "Missing ROOT file: #{fname}"
 			end
 		}
-		LOG("WARNING","For the missing files (if any) go to ../run/tmp and run the specific macro again:   root.exe -l -b -q macro_XXXXXX.C\n then try to merge again")
+		logd.warn "For the missing files (if any) go to ../run/tmp and run the specific macro again:   root.exe -l -b -q macro_XXXXXX.C\n then try to merge again"
 		%x(hadd -f #{targetdir}/../#{mergedfilename}    #{line})
 	end
 	
-	def finalize()
-		# %x(rm -f #{macrodir}/*.#log)
-		# %x(rm -f #{macrodir}/*.C)
-		# %x(rm -f #{targetdir}/*.list)
-		# %x(rm -f #{targetdir}/*.root)
+	def repeat_every(interval)
+		# http://stackoverflow.com/questions/2279210/timer-in-ruby-performance
+		loop do
+			start_time = Time.now
+			yield
+			elapsed = Time.now - start_time
+			sleep([interval - elapsed, 0].max)
+		end
+	end
+
+	def waitNmerge(interval=5,inlist=[], mergedfilename="merged")
+		# http://stackoverflow.com/questions/2279210/timer-in-ruby-performance
+		iteration=0
+		repeat_every(interval) do
+			logd.info "... waiting[#{iteration}]"
+			%x(qstat | grep hod > /dev/null)
+			if($?!=0) then
+				break
+			end
+			iteration += 1
+		end
+		seconds = interval*iteration
+		logd.info "!!!---merging (after #{iteration} iterations [#{seconds} seconds])---!!!"
+		#merge_root(inlist,"#{mergedfilename}.root")
+		merge_candidates(inlist,"#{mergedfilename}.candidates")
+		merge_cutflow(inlist,"#{mergedfilename}.cutflow")
 	end
 	
-	def LOG(msgtype="DEBUG",msg="")
-		puts "[#{__FILE__} +#{__LINE__}] #{msgtype}: #{msg}"
+	def finalize()
+		logger.close
 	end
 end
 

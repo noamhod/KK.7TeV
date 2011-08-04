@@ -7,6 +7,9 @@
 
 #include "basicIncludes.h"
 
+#define XML_cxx
+#include "XML.C"
+
 #define fit_cxx
 #include "fit.C"
 

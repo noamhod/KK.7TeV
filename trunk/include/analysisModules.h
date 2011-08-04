@@ -25,11 +25,8 @@
 #define graphicObjects_cxx
 #include "graphicObjects.C"
 
-#define cutFlowHandler_cxx
-#include "cutFlowHandler.C"
-
-#define periodHandler_cxx
-#include "periodHandler.C"
+#define xmlconfig_cxx
+#include "xmlconfig.C"
 
 #define eventDumper_cxx
 #include "eventDumper.C"
@@ -41,6 +38,7 @@
 class analysisModules : public selection,
 						public cutFlowHandler,
 						public periodHandler,
+						//public monteCarloHandler,
 						public eventDumper,
 						public graphicObjects,
 						public fit,
@@ -48,7 +46,7 @@ class analysisModules : public selection,
 						public Afb
 {
 	public:
-
+		xmlconfig* xmls;
 		
 	public:
 		analysisModules();
@@ -64,6 +62,10 @@ class analysisModules : public selection,
 			
 			setCutFlowMapSVDPtr( cutFlowHandler::m_cutFlowMapSVD );
 			ginitialize();
+			
+			xmls = new xmlconfig();
+			// xmls = xmlconfig::getInstance();
+			xmls->get("/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/xml");
 		}
 		~analysisModules();
 		

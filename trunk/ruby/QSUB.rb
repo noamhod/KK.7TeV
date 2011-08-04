@@ -383,7 +383,7 @@ class QSUB
 			end
 			#puts lines
 		}
-		filename_all = filename.gsub(".","_all.")
+		filename_all = filename.gsub(".",".all.")
 		file = File.open("#{targetdir}/../#{filename_all}", 'w') do |f|
 			f.puts "<? This is a summary of all the passing candidates from run #{Time.now} ?>"
 			candidates_all.each do |cand|
@@ -403,7 +403,7 @@ class QSUB
 			#puts lines
 		}
 		candidates_pT.sort
-		filename_pT = filename.gsub(".","_pT.")
+		filename_pT = filename.gsub(".",".pT.")
 		file = File.open("#{targetdir}/../#{filename_pT}", 'w') do |f|
 			f.puts "<? This is a summary of all the pTcut-passing candidates from run #{Time.now} ?>"
 			candidates_pT.each do |cand|
@@ -451,7 +451,7 @@ class QSUB
 		end
 		seconds = interval*iteration
 		logd.info "!!!---merging (after #{iteration} iterations [#{seconds} seconds])---!!!"
-		#merge_root(inlist,"#{mergedfilename}.root")
+		merge_root(inlist,"#{mergedfilename}.root")
 		merge_candidates(inlist,"#{mergedfilename}.candidates")
 		merge_cutflow(inlist,"#{mergedfilename}.cutflow")
 	end

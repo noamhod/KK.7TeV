@@ -280,3 +280,63 @@ TMapsb*	cutFlowHandler::getCutFlowToSkipMapPtr()
 	return m_cutsFlowSkipMap;
 }
 
+
+
+
+
+////////////////////////////////////////////////////////////////////////////
+bool cutflowXml::mask()
+{
+	for(TMapiP2cc::iterator ii=list->begin() ; ii!=list->end() ; ++ii)
+	{
+		int num    = ii->first;
+		string str = (string)ii->second;
+		cout << "[" << num << "]=" << str << endl;
+		
+		if(str=="obj")
+		{
+			if(Next(ii)=="NAME")    name    = Next(ii); else return false;
+			if(Next(ii)=="FLAG")    flag    = Next(ii); else return false;
+			if(Next(ii)=="order")   order   = Next(ii); else return false;
+			if(Next(ii)=="type")    type    = Next(ii); else return false;
+			if(Next(ii)=="skip")    skip    = Next(ii); else return false;
+			if(Next(ii)=="nvalues") nvalues = Next(ii); else return false;
+			cout << "NAME="   << name << ", FLAG=" << flag << ", order="   << order
+				 << ", type=" << type << ", skip=" << skip << ", nvalues=" << nvalues
+				 << endl;
+
+			if(Next(ii)=="values")
+			{
+				vdtmp.clear();
+				for(int v=1 ; v<=validate_int(nvalues) ; ++v)
+				{
+					if(Next(ii)=="value") /* do nothing*/
+					if(Next(ii)=="NAME")  attrname  = Next(ii); else return false;
+					if(Next(ii)=="ORDER") attrorder = Next(ii); else return false;
+					if(Next(ii)=="FLAG")  attrflag  = Next(ii); else return false;
+					val = Next(ii);
+					cout << "\tvalue[" << v       << "] NAME=" << attrname << ", ORDER=" << attrorder
+						 << ", FLAG="  << attrflag << ", val="  << validate_double(val)/*val*/
+						 << endl;
+
+					vdtmp.push_back(validate_double(val));
+				}
+				if((int)vdtmp.size() != validate_int(nvalues)) {_ERROR("vector size doesn't match nvalues"); return false;}
+			}
+			else return false;
+			
+			if(Next(ii)=="description") description = Next(ii); else return false;
+			cout << "description=" << description << endl;
+
+			cutFlowOrdered->insert(     make_pair(validate_double(order),name) );
+			cutFlowTypeOrdered->insert( make_pair(validate_double(order),type) );
+			cutFlowNumbers->insert(     make_pair(name,0) );
+			cutFlowMapSVD->insert(      make_pair(name,vdtmp) );
+			cutsFlowSkipMap->insert(    make_pair(name,validate_bool(skip)) );
+
+		}
+	}
+	return true;
+}
+
+

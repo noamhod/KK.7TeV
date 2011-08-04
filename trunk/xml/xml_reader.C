@@ -573,7 +573,7 @@ void xml_reader()
 {
 	configure* config = new configure;
 
-	config->read("cuts","cuts.xml");
+	config->read("cuts","cutflow.xml");
 	config->read("periods","periods.xml");
 	config->read("montecarlo","montecarlo.xml");
 

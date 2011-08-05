@@ -27,7 +27,7 @@ class cutFlowHandler : public utilities
 		TMapds*         m_cutFlowOrdered;     // the map between the order of the cut and its name
 		TMapds*         m_cutFlowTypeOrdered; // the map between the order of the cut and its type
 		TMapsi*         m_cutFlowNumbers;     // the map between the name of the cut and the events surviving it
-		TMapsvd*		m_cutFlowMapSVD;      // the actual cut flow map between the cut's name and the vector of its values
+		TMapsvd*		m_cutFlowMapSVD;      // the actual cut flow map between the cut's name and the vector of its parameters
 		TMapsb*			m_cutsFlowSkipMap;    // cuts to skip in tag&probe analysis
 		
 	public:
@@ -75,8 +75,9 @@ class cutflowXml : public XML
 			ignoreString("obj");
 			ignoreString("NAME");
 			ignoreString("FLAG");
+			ignoreString("TYPE");
 			ignoreString("ORDER");
-			ignoreString("value");
+			ignoreString("parameter");
 		}
 		virtual ~cutflowXml(){}
 		bool mask();
@@ -86,15 +87,15 @@ class cutflowXml : public XML
 			<order>3</order>
 			<type>selection</type>
 			<skip>false</skip>
-			<nvalues>2</nvalues>
-			<values>
-				<value NAME="imass_min" ORDER="1" FLAG="on">0.07</value>
-				<value NAME="imass_max" ORDER="2" FLAG="on">0.4</value>
-			</values>
+			<nparameters>2</nparameters>
+			<parameters>
+				<parameter NAME="imass_min" ORDER="1" FLAG="on">0.07</parameter>
+				<parameter NAME="imass_max" ORDER="2" FLAG="on">0.4</parameter>
+			</parameters>
 			<description>
 				This is the invariant mass cut.
 				The upper boundary is for the blinded analysis.
-				The values are in TeV.
+				The parameters are in TeV.
 			</description>
 		</obj>
 		*/
@@ -103,19 +104,20 @@ class cutflowXml : public XML
 		string name;
 		string flag;
 		string order;
-		string type;
+		string phase;
 		string skip;
-		string nvalues;
+		string nparameters;
 		string attrname;
 		string attrorder;
 		string attrflag;
+		string attrtype;
 		string val;
 		string description;
 	
 		TMapds*         cutFlowOrdered;     // the map between the order of the cut and its name
-		TMapds*         cutFlowTypeOrdered; // the map between the order of the cut and its type
+		TMapds*         cutFlowTypeOrdered; // the map between the order of the cut and its phase
 		TMapsi*         cutFlowNumbers;     // the map between the name of the cut and the events surviving it
-		TMapsvd*        cutFlowMapSVD;      // the actual cut flow map between the cut's name and the vector of its values
+		TMapsvd*        cutFlowMapSVD;      // the actual cut flow map between the cut's name and the vector of its parameters
 		TMapsb*         cutsFlowSkipMap;    // cuts to skip in tag&probe analysis
 		vector<double>  vdtmp;
 	

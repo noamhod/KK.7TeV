@@ -1,0 +1,12 @@
+#PERIODRANGE		#RUNNUMBERSTART		#RUNNUMBEREND	#PTMIN	#PTTHREHS	#NTRIGS		#TRIGGERS
+# see periods from: https://twiki.cern.ch/twiki/bin/view/AtlasProtected/SMWZD3PD
+#--- monte carlo
+MC					100000				150000			1		10			1			L1_MU10
+
+#--- data
+B					178044				178109			1		22			3			EF_mu22			EF_mu22_MG		EF_mu40_MSonly_barrel
+D					179710				180481			1		22			3			EF_mu22			EF_mu22_MG		EF_mu40_MSonly_barrel
+E					180614				180776			1		22			3			EF_mu22			EF_mu22_MG		EF_mu40_MSonly_barrel
+F					182013				182519			1		22			3			EF_mu22			EF_mu22_MG		EF_mu40_MSonly_barrel
+G					182726				183462			1		22			3			EF_mu22			EF_mu22_MG		EF_mu40_MSonly_barrel
+H					183544				184169			1		22			3			EF_mu22			EF_mu22_MG		EF_mu40_MSonly_barrel

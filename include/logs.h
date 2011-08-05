@@ -29,7 +29,8 @@ enum MSG
 	DBG,
 	INF,
 	WRN,
-	ERR
+	ERR,
+	FAT
 };
 
 static int global_dbg_lvl = VISUAL;
@@ -51,16 +52,22 @@ string log(const char* file, int line, int type, int level, string message)
 	string stype = "";
 	switch(type)
 	{
-		case DBG: stype = "[DEBUG] ";   break;
-		case INF: stype = "[INFO] ";    break;
+		case DBG: stype = "[DEBUG]   "; break;
+		case INF: stype = "[INFO]    "; break;
 		case WRN: stype = "[WARNING] "; break;
-		case ERR: stype = "[ERROR] ";   break;
-		default:  stype = "[???] ";     break;
+		case ERR: stype = "[ERROR]   "; break;
+		case FAT: stype = "[FATAL]   "; break;
+		default:  stype = "[???]     "; break;
 	}
 	
 	os << stype << file << " +" << line << ": " << message;
 	
-	if(global_dbg_lvl!=SILENT)
+	if(type==ERR || type==FAT) // ERRORS & FATALS are always shown !
+	{
+		cout << os.str() << endl;
+	}
+	
+	if(global_dbg_lvl==VISUAL) // All the rest can be shown only if the static dbg_lvl is on
 	{
 		if(level==VISUAL) cout << os.str() << endl;
 	}
@@ -76,7 +83,7 @@ string log(const char* file, int line, int type, int level, string message)
 
 static inline double validate_double(string str)
 {
-	if(str.substr(0,1)=="0")
+	if(str.substr(0,2)=="00")
 	{
 		size_t pos = str.find('.');
 		if(pos==string::npos)

@@ -307,85 +307,58 @@ bool periodsXml::mask()
 	{
 		int num    = ii->first;
 		string str = (string)ii->second;
-		cout << "[" << num << "]=" << str << endl;
+		_INFO("["+tostring(num)+"]="+str);
 		
 		if(str=="obj")
 		{
-			if(Next(ii)=="NAME") name = Next(ii); else return false;
-			if(Next(ii)=="FLAG") flag = Next(ii); else return false;
-			if(name=="PERIODS")
+			if(Next(ii)=="NAME") name = Next(ii); else {_ERROR("obj: failed to read NAME->"+PreviousStay(ii)); return false;}
+			if(Next(ii)=="FLAG") flag = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read FLAG->"+PreviousStay(ii)); return false;}
+			if(name=="TRIGGERPERIODS")
 			{
-				if(Next(ii)=="nperiods") number = Next(ii); else return false;
-				cout << "NAME=" << name << ", nperiods=" << number << endl;
-				if(Next(ii)=="periods")
-				{
-					for(int p=1 ; p<=validate_int(number) ; ++p)
-					{
-						if(Next(ii)=="period")  /* do nothing*/
-						if(Next(ii)=="NAME")     attrname = Next(ii); else return false;
-						if(Next(ii)=="FLAG")     attrflag = Next(ii); else return false;
-						luminosity = Next(ii);
-						cout << "\tperiod[" << p        << "] NAME="        << attrname
-							 << ", FLAG="   << attrflag << ", luminosity="  << luminosity
-							 << endl;
-					}
-					//if((int)vdtmp.size() != validate_int(number)) {cout << LOG("vector size doesn't match number") << endl; return false;}
-				}
-				if(Next(ii)=="description") description = Next(ii); else return false;
-				cout << "description=" << description << endl;
-			}
-			else if(name=="TRIGGERPERIODS")
-			{
-				if(Next(ii)=="ntriggerperiods") number = Next(ii); else return false;
-				cout << "NAME=" << name << ", ntriggerperiods=" << number << endl;
+				if(Next(ii)=="ntriggerperiods") number = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read ntriggerperiods->"+PreviousStay(ii)); return false;}
+				_INFO("NAME="+name+", ntriggerperiods="+number);
 				if(Next(ii)=="triggerperiods")
 				{
 					for(int tp=1 ; tp<=validate_int(number) ; ++tp)
 					{
 						if(Next(ii)=="triggerperiod")  /* do nothing*/
-						if(Next(ii)=="NAME")     attrname = Next(ii); else return false;
-						if(Next(ii)=="FLAG")     attrflag = Next(ii); else return false;
+						if(Next(ii)=="NAME")     attrname = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read NAME->"+PreviousStay(ii)); return false;}
+						if(Next(ii)=="FLAG")     attrflag = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read FLAG->"+PreviousStay(ii)); return false;}
 						luminosity = Next(ii);
-						cout << "\ttriggerperiod[" << tp       << "] NAME="        << attrname
-							 << ", FLAG="          << attrflag << ", luminosity="  << luminosity
-							 << endl;
+						_INFO("\ttriggerperiod["+tostring(tp)+"] NAME="+attrname+", FLAG="+attrflag+", luminosity="+luminosity);
 					}
-					//if((int)vdtmp.size() != validate_int(number)) {cout << LOG("vector size doesn't match number") << endl; return false;}
+					//if((int)vdtmp.size() != validate_int(number)) {_ERROR("vector size doesn't match number"); return false;}
 				}
-				if(Next(ii)=="description") description = Next(ii); else return false;
-				cout << "description=" << description << endl;
+				if(Next(ii)=="description") description = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read description->"+PreviousStay(ii)); return false;}
+				_INFO("description="+description);
 			}
 			else
 			{
-				if(Next(ii)=="start")     start     = Next(ii); else return false;
-				if(Next(ii)=="end")       end       = Next(ii); else return false;
-				if(Next(ii)=="pTmin")     pTmin     = Next(ii); else return false;
-				if(Next(ii)=="ntriggers") ntriggers = Next(ii); else return false;
-				cout << "NAME="   << name << ", FLAG=" << flag << ", start="   << start
-					 << ", end=" << end << ", pTmin=" << pTmin << ", ntriggers=" << ntriggers
-					 << endl;
+				if(Next(ii)=="start")     start     = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read start->"+PreviousStay(ii)); return false;}
+				if(Next(ii)=="end")       end       = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read end->"+PreviousStay(ii)); return false;}
+				if(Next(ii)=="pTmin")     pTmin     = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read pTmin->"+PreviousStay(ii)); return false;}
+				if(Next(ii)=="ntriggers") ntriggers = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read ntriggers->"+PreviousStay(ii)); return false;}
+				_INFO("NAME="+name+", FLAG="+flag+", start="+start+", end="+end+", pTmin="+pTmin+", ntriggers="+ntriggers);
 
 				if(Next(ii)=="triggers")
 				{
 					for(int t=1 ; t<=validate_int(ntriggers) ; ++t)
 					{
 						if(Next(ii)=="trigger")  /* do nothing*/
-						if(Next(ii)=="NAME")     attrname     = Next(ii); else return false;
-						if(Next(ii)=="PRIORITY") trigpriority = Next(ii); else return false;
-						if(Next(ii)=="FLAG")     attrflag     = Next(ii); else return false;
+						if(Next(ii)=="NAME")     attrname     = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read NAME->"+PreviousStay(ii)); return false;}
+						if(Next(ii)=="PRIORITY") trigpriority = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read PRIORITY->"+PreviousStay(ii)); return false;}
+						if(Next(ii)=="FLAG")     attrflag     = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read FLAG->"+PreviousStay(ii)); return false;}
 						trigpT = Next(ii);
-						cout << "\ttrigger[" << t       << "] NAME=" << attrname << ", PRIORITY=" << trigpriority
-							 << ", FLAG="  << attrflag << ", trigpT="  << trigpT
-							 << endl;
+						_INFO("\ttrigger["+tostring(t)+"] NAME="+attrname+", PRIORITY="+trigpriority+", FLAG="+attrflag+", trigpT="+trigpT);
 					}
-					//if((int)vdtmp.size() != validate_int(ntriggers)) {cout << LOG("vector size doesn't match ntriggers") << endl; return false;}
+					//if((int)vdtmp.size() != validate_int(ntriggers)) {_ERROR("vector size doesn't match ntriggers"); return false;}
 				}
-				else return false;
+				else {_ERROR("obj NAME:"+name+" -> failed to read triggers->"+PreviousStay(ii)); return false;}
 				
-				if(Next(ii)=="nevents")     nevents     = Next(ii); else return false;
-				if(Next(ii)=="luminosity")  luminosity  = Next(ii); else return false;
-				if(Next(ii)=="description") description = Next(ii); else return false;
-				cout << "nevents=" << nevents << ", luminosity=" << luminosity << ", description=" << description << endl;
+				if(Next(ii)=="nevents")     nevents     = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read nevents->"+PreviousStay(ii)); return false;}
+				if(Next(ii)=="luminosity")  luminosity  = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read luminosity->"+PreviousStay(ii)); return false;}
+				if(Next(ii)=="description") description = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read description->"+PreviousStay(ii)); return false;}
+				_INFO("nevents="+nevents+", luminosity="+luminosity+", description="+description);
 
 				// fill the db
 			}

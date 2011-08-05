@@ -96,25 +96,6 @@ class periodsXml : public XML
 		*/
 		
 		/*
-		<obj NAME="PERIODS" NUMBER="9">
-			<periodsXml>
-				<period NAME="A" FLAG="on">0.0000157154</period>
-				<period NAME="B" FLAG="on">0.00883395</period>
-				<period NAME="C" FLAG="on">0.00871179</period>
-				<period NAME="D" FLAG="on">0.255204</period>
-				<period NAME="E" FLAG="on">1.08162</period>
-				<period NAME="F" FLAG="on">1.95816</period>
-				<period NAME="G" FLAG="on">6.89501</period>
-				<period NAME="H" FLAG="on">8.52076</period>
-				<period NAME="I" FLAG="on">22.9524</period>
-			</periodsXml>
-			<description>
-				The values are in  pb^-1.
-			</description>
-		</obj>
-		*/
-		
-		/*
 		<obj NAME="TRIGGERPERIODS" NUMBER="4">
 			<triggerperiods>
 				<triggerperiod NAME="L1_MU10" FLAG="on">0.272906894</triggerperiod>

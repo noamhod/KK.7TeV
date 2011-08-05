@@ -32,6 +32,29 @@ string XML::Next(TMapiP2cc::iterator& ii)
 	return str;
 }
 
+string XML::NextStay(TMapiP2cc::iterator& ii)
+{
+	++ii;
+	string str = ii->second;
+	--ii;
+	return str;
+}
+
+string XML::Previous(TMapiP2cc::iterator& ii)
+{
+	--ii;
+	string str = ii->second;
+	return str;
+}
+
+string XML::PreviousStay(TMapiP2cc::iterator& ii)
+{
+	--ii;
+	string str = ii->second;
+	++ii;
+	return str;
+}
+
 void XML::ignoreString(string str)
 {
 	ignoredStrings.insert(make_pair(str,true));

@@ -88,10 +88,10 @@ void cutFlowHandler::parseKeyValLine(string sLine)
 	// get the name of the cut:
 	strm >> m_skey;
 	
-	// get the number of the cut values:
+	// get the number of the cut parameters:
 	strm >> m_nvals;
 	
-	// get the value(s) of the cut:
+	// get the parameter(s) of the cut:
 	while(!strm.eof())
 	{
 		strm >> tmpVal;
@@ -191,10 +191,10 @@ void cutFlowHandler::readCutFlow(string sCutFlowFilePath)
 		// get the key = cut name (ownership utilitis):
 		skey = getKey();
 		
-		// get the number of values
+		// get the number of parameters
 		nvals = getNVals();
 		
-		// get the cut values
+		// get the cut parameters
 		dval.clear();
 		for(int i=0 ; i<(int)getNVals() ; i++) { dval.push_back( getVal(i) ); }
 
@@ -291,49 +291,44 @@ bool cutflowXml::mask()
 	{
 		int num    = ii->first;
 		string str = (string)ii->second;
-		cout << "[" << num << "]=" << str << endl;
+		_INFO("["+tostring(num)+"]="+str);
 		
 		if(str=="obj")
 		{
-			if(Next(ii)=="NAME")    name    = Next(ii); else return false;
-			if(Next(ii)=="FLAG")    flag    = Next(ii); else return false;
-			if(Next(ii)=="order")   order   = Next(ii); else return false;
-			if(Next(ii)=="type")    type    = Next(ii); else return false;
-			if(Next(ii)=="skip")    skip    = Next(ii); else return false;
-			if(Next(ii)=="nvalues") nvalues = Next(ii); else return false;
-			cout << "NAME="   << name << ", FLAG=" << flag << ", order="   << order
-				 << ", type=" << type << ", skip=" << skip << ", nvalues=" << nvalues
-				 << endl;
+			if(Next(ii)=="NAME")    name    = Next(ii); else {_ERROR("obj: failed to read NAME->"+PreviousStay(ii)); return false;}
+			if(Next(ii)=="FLAG")    flag    = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read FLAG->"+PreviousStay(ii)); return false;}
+			if(Next(ii)=="order")   order   = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read order->"+PreviousStay(ii)); return false;}
+			if(Next(ii)=="phase")   phase   = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read phase->"+PreviousStay(ii)); return false;}
+			if(Next(ii)=="skip")    skip    = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read skip->"+PreviousStay(ii)); return false;}
+			if(Next(ii)=="nparameters") nparameters = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read nparameters->"+PreviousStay(ii)); return false;}
+			_INFO("NAME="+name+", FLAG="+flag+", order="+order+", phase="+phase+", skip="+skip+", nparameters="+nparameters);
 
-			if(Next(ii)=="values")
+			if(Next(ii)=="parameters")
 			{
 				vdtmp.clear();
-				for(int v=1 ; v<=validate_int(nvalues) ; ++v)
+				for(int v=1 ; v<=validate_int(nparameters) ; ++v)
 				{
-					if(Next(ii)=="value") /* do nothing*/
-					if(Next(ii)=="NAME")  attrname  = Next(ii); else return false;
-					if(Next(ii)=="ORDER") attrorder = Next(ii); else return false;
-					if(Next(ii)=="FLAG")  attrflag  = Next(ii); else return false;
+					if(Next(ii)=="parameter") /* do nothing*/
+					if(Next(ii)=="NAME")  attrname  = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read NAME->"+PreviousStay(ii)); return false;}
+					if(Next(ii)=="ORDER") attrorder = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read ORDER->"+PreviousStay(ii)); return false;}
+					if(Next(ii)=="TYPE")  attrtype  = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read TYPE->"+PreviousStay(ii)); return false;}
 					val = Next(ii);
-					cout << "\tvalue[" << v       << "] NAME=" << attrname << ", ORDER=" << attrorder
-						 << ", FLAG="  << attrflag << ", val="  << validate_double(val)/*val*/
-						 << endl;
-
+					_INFO("\tparameter["+tostring(v)+"] NAME="+attrname+", ORDER="+attrorder+", TYPE="+attrtype+", val="+val);
+					// HAVE TO CHECK THE TYPE !!!!!
 					vdtmp.push_back(validate_double(val));
 				}
-				if((int)vdtmp.size() != validate_int(nvalues)) {_ERROR("vector size doesn't match nvalues"); return false;}
+				if((int)vdtmp.size() != validate_int(nparameters)) {_ERROR("vector size doesn't match nparameters"); return false;}
 			}
-			else return false;
+			else {_ERROR("obj NAME:"+name+" -> failed to read parameters->"+PreviousStay(ii)); return false;}
 			
-			if(Next(ii)=="description") description = Next(ii); else return false;
-			cout << "description=" << description << endl;
+			if(Next(ii)=="description") description = Next(ii); else {_ERROR("obj NAME:"+name+" -> failed to read description->"+PreviousStay(ii)); return false;}
+			_INFO("description="+description);
 
 			cutFlowOrdered->insert(     make_pair(validate_double(order),name) );
-			cutFlowTypeOrdered->insert( make_pair(validate_double(order),type) );
+			cutFlowTypeOrdered->insert( make_pair(validate_double(order),phase) );
 			cutFlowNumbers->insert(     make_pair(name,0) );
 			cutFlowMapSVD->insert(      make_pair(name,vdtmp) );
 			cutsFlowSkipMap->insert(    make_pair(name,validate_bool(skip)) );
-
 		}
 	}
 	return true;

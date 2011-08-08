@@ -22,12 +22,7 @@ analysisSkeleton::~analysisSkeleton()
 
 
 void analysisSkeleton::setPtCandidatesFile(string sCandFilePath, string srunnumber)
-{
-	// string fCandName;
-	// if(sRunNumber!="") fCandName = "tmp/cand_pT."+sRunNumber+".txt"; // sRunNumber is static string from basicIncludes.h
-	// else               fCandName = "cand_pT.txt";
-	// fCand = new ofstream(fCandName.c_str());
-	
+{	
 	string sLogFileName = sCandFilePath+"/candidates_pT.run_"+srunnumber+".cnd";//".time_"+getDateHour()+".cnd";
 	fCand = new ofstream( sLogFileName.c_str() );
 }
@@ -66,7 +61,7 @@ vector<string>* analysisSkeleton::getPeriodTriggers()
 {
 	if(sPeriod==""  ||  m_period2triggerMap==NULL)
 	{
-		cout << "ERROR: in analysisSkeleton::getPeriodTriggers -> (sPeriod=="" || m_period2triggerMap==NULL), exitting now" << endl;
+		_ERROR("sPeriod==null || m_period2triggerMap==NULL, exitting now");
 		exit(-1);
 	}
 	
@@ -77,24 +72,16 @@ int analysisSkeleton::isTrigger(string trigName)
 {
 	if(trigName=="")
 	{
-		cout << "ERROR: in analysisSkeleton::isTrigger -> (trigName==""), exitting now" << endl;
+		_ERROR("trigName==null, exitting now");
 		exit(-1);
 	}
 	
 	int isTrig = 0;
-	if     (trigName=="EF_mu22")               isTrig = EF_mu22;
+	if     (trigName=="L1_MU10")               isTrig = L1_MU10;
+	else if(trigName=="EF_mu22")               isTrig = EF_mu22;
 	else if(trigName=="EF_mu22_MG")            isTrig = EF_mu22_MG;
 	else if(trigName=="EF_mu40_MSonly_barrel") isTrig = EF_mu40_MSonly_barrel;
-	/*
-	if     (trigName=="L1_MU10")          isTrig = L1_MU10;
-	else if(trigName=="EF_mu10")          isTrig = EF_mu10;
-	else if(trigName=="EF_mu10_MG")       isTrig = EF_mu10_MG;
-	else if(trigName=="EF_mu13")          isTrig = EF_mu13;
-	else if(trigName=="EF_mu13_MG")       isTrig = EF_mu13_MG;
-	else if(trigName=="EF_mu13_tight")    isTrig = EF_mu13_tight;
-	else if(trigName=="EF_mu13_MG_tight") isTrig = EF_mu13_MG_tight;
-	*/
-	else cout << "WARNING:  in analysisSkeleton::isTrigger -> the trigger " << trigName << " was not found and the event is regected by default" << endl;
+	else _WARNING("in analysisSkeleton::isTrigger -> the trigger "+trigName+" was not found and the event is regected by default");
 	
 	return isTrig;
 }
@@ -115,14 +102,22 @@ void analysisSkeleton::matchTrigger(string speriod, string sTrigType)
 
 	if(speriod=="")
 	{
-		cout << "ERROR: in analysisSkeleton::matchTrigger -> (speriod==""), exitting now" << endl;
+		_ERROR("speriod==null, exitting now");
 		exit(-1);
 	}
 	
-	if
+	if(speriod=="MC")
+	{
+		mu_LLT_index = mu_L1_index;
+		mu_LLT_dr    = mu_L1_dr;
+		LLT_pt       = trig_L1_mu_pt;
+		LLT_phi      = trig_L1_mu_phi;
+		LLT_eta      = trig_L1_mu_eta;
+	}
+	else if
 	(
-		speriod=="A" || speriod=="B" || speriod=="D" || speriod=="E" ||
-		speriod=="F" || speriod=="G" || speriod=="H"
+		speriod=="A"  || speriod=="B" || speriod=="D" || speriod=="E" ||
+		speriod=="F"  || speriod=="G" || speriod=="H"
 	)
 	{
 		if(sTrigType=="CB")
@@ -154,65 +149,7 @@ void analysisSkeleton::matchTrigger(string speriod, string sTrigType)
 		}
 	}
 	
-	
-	
-	/*
-	if
-	(
-		speriod=="MC" ||
-		speriod=="A"  || speriod=="B1-B2" || speriod=="C1" || speriod=="C2" || speriod=="D1-D6" ||
-		speriod=="E1" || speriod=="E2"    || speriod=="E3"
-	)
-	{
-		mu_LLT_index = mu_L1_index;
-		mu_LLT_dr    = mu_L1_dr;
-		LLT_pt       = trig_L1_mu_pt;
-		LLT_phi      = trig_L1_mu_phi;
-		LLT_eta      = trig_L1_mu_eta;
-	}
-	
-	else if
-	(
-		speriod=="E4" || speriod=="E5" || speriod=="E6" || speriod=="E7" ||
-		speriod=="F1" || speriod=="F2" ||
-		speriod=="G1" || speriod=="G2" || speriod=="G3" || speriod=="G4" ||
-		speriod=="G5" || speriod=="G6" ||
-		speriod=="H1" || speriod=="H2" ||
-		speriod=="I1" || speriod=="I2"
-	)
-	{
-		if(sTrigType=="CB")
-		{
-			mu_HLT_dr = mu_EFCB_dr;
-			mu_HLT_index = mu_EFCB_index;
-			HLT_pt = trig_EF_trigmuonef_track_CB_pt;
-			HLT_phi = trig_EF_trigmuonef_track_CB_phi;
-			HLT_eta = trig_EF_trigmuonef_track_CB_eta;
-			HLT_has = trig_EF_trigmuonef_track_CB_hasCB;
-		}
-		else if(sTrigType=="MS")
-		{
-			mu_HLT_dr = mu_EFME_dr;
-			mu_HLT_index = mu_EFME_index;
-			HLT_pt = trig_EF_trigmuonef_track_MS_pt;
-			HLT_phi = trig_EF_trigmuonef_track_MS_phi;
-			HLT_eta = trig_EF_trigmuonef_track_MS_eta;
-			HLT_has = trig_EF_trigmuonef_track_MS_hasMS;
-		}
-		else if(sTrigType=="MG")
-		{
-			mu_HLT_dr = mu_EFMG_dr;
-			mu_HLT_index = mu_EFMG_index;
-			HLT_pt = trig_EF_trigmugirl_track_CB_pt;
-			HLT_phi = trig_EF_trigmugirl_track_CB_phi;
-			HLT_eta = trig_EF_trigmugirl_track_CB_eta;
-			HLT_has = trig_EF_trigmugirl_track_CB_hasCB;
-		}
-		
-	}
-	*/
-	
-	else cout << "WARNING:  in analysisSkeleton::matchTrigger -> the period name " << speriod << " was not found" << endl;
+	else _WARNING("the period name "+speriod+" was not found");
 }
 
 void analysisSkeleton::runEventDumper()
@@ -1476,41 +1413,6 @@ void analysisSkeleton::fillCutProfile1D()
 				(*h1map_cutProfile)[sname]->Fill( mu_pt->at(bi)*MeV2TeV );
 				pT_profile->push_back( mu_pt->at(bi)*MeV2TeV );
 			}
-			
-			else if(sname=="pT_loose_1")
-			{ 
-				(*h1map_cutProfile)[sname]->Fill( mu_pt->at(ai)*MeV2TeV );
-				pT_loose_profile->push_back( mu_pt->at(ai)*MeV2TeV );
-			}
-			else if(sname=="pT_loose_2")
-			{
-				(*h1map_cutProfile)[sname]->Fill( mu_pt->at(bi)*MeV2TeV );
-				pT_loose_profile->push_back( mu_pt->at(bi)*MeV2TeV );
-			}
-			else if(sname=="pT_qOp+theta_1")
-			{
-				float tmp = pT(mu_me_qoverp->at(ai)/MeV2TeV, mu_me_theta->at(ai));
-				(*h1map_cutProfile)[sname]->Fill( tmp );
-				pT_qOp_and_theta_profile->push_back( tmp );
-			}
-			else if(sname=="pT_qOp+theta_2")
-			{
-				float tmp = pT(mu_me_qoverp->at(bi)/MeV2TeV, mu_me_theta->at(bi));
-				(*h1map_cutProfile)[sname]->Fill( tmp );
-				pT_qOp_and_theta_profile->push_back( tmp );
-			}
-			else if(sname=="pT_qOp+theta_loose_1")
-			{
-				float tmp = pT(mu_me_qoverp->at(ai)/MeV2TeV, mu_me_theta->at(ai));
-				(*h1map_cutProfile)[sname]->Fill( tmp );
-				pT_qOp_and_theta_loose_profile->push_back( tmp );
-			}
-			else if(sname=="pT_qOp+theta_loose_2")
-			{
-				float tmp = pT(mu_me_qoverp->at(bi)/MeV2TeV, mu_me_theta->at(bi));
-				(*h1map_cutProfile)[sname]->Fill( tmp );
-				pT_qOp_and_theta_loose_profile->push_back( tmp );
-			}
 			else if(sname=="eta_1")
 			{
 				(*h1map_cutProfile)[sname]->Fill( mu_eta->at(ai) );
@@ -1520,46 +1422,6 @@ void analysisSkeleton::fillCutProfile1D()
 			{
 				(*h1map_cutProfile)[sname]->Fill( mu_eta->at(bi) );
 				eta_profile->push_back( mu_eta->at(bi) );
-			}
-			else if(sname=="etaTight_1")
-			{
-				(*h1map_cutProfile)[sname]->Fill( mu_eta->at(ai) );
-				etaTight_profile->push_back( mu_eta->at(ai) );
-			}
-			else if(sname=="etaTight_2") 
-			{
-				(*h1map_cutProfile)[sname]->Fill( mu_eta->at(bi) );
-				etaTight_profile->push_back( mu_eta->at(bi) );
-			}
-			else if(sname=="etaBarrel_1")
-			{
-				(*h1map_cutProfile)[sname]->Fill( mu_eta->at(ai) );
-				etaBarrel_profile->push_back( mu_eta->at(ai) );
-			}
-			else if(sname=="etaBarrel_2")
-			{
-				(*h1map_cutProfile)[sname]->Fill( mu_eta->at(bi) );
-				etaBarrel_profile->push_back( mu_eta->at(bi) );
-			}
-			else if(sname=="etaFwd_1")
-			{
-				(*h1map_cutProfile)[sname]->Fill( mu_eta->at(ai) );
-				etaFwd_profile->push_back( mu_eta->at(ai) );
-			}
-			else if(sname=="etaFwd_2")
-			{
-				(*h1map_cutProfile)[sname]->Fill( mu_eta->at(bi) );
-				etaFwd_profile->push_back( mu_eta->at(bi) );
-			}
-			else if(sname=="etaFull_1")
-			{
-				(*h1map_cutProfile)[sname]->Fill( mu_eta->at(ai) );
-				etaFull_profile->push_back( mu_eta->at(ai) );
-			}
-			else if(sname=="etaFull_2")
-			{
-				(*h1map_cutProfile)[sname]->Fill( mu_eta->at(bi) );
-				etaFull_profile->push_back( mu_eta->at(bi) );
 			}
 			else if(sname=="pTmatchingRatio_1")
 			{
@@ -1652,7 +1514,7 @@ void analysisSkeleton::fillCutProfile1D()
 				isolation40_profile->push_back( iso );
 			}
 			
-			else if(sname=="msHitsRel16")
+			else if(sname=="MShits")
 			{
 				(*h1map_cutProfile)["nMDTBI_1"]->Fill( mu_nMDTBIHits->at(ai) );
 				nMDTBI_profile->push_back( mu_nMDTBIHits->at(ai) );
@@ -1728,7 +1590,7 @@ void analysisSkeleton::fillCutProfile1D()
 				nCSCPhi_profile->push_back( mu_nCSCPhiHits->at(bi) );
 			}
 			
-			else if(sname=="idHitsRel16")
+			else if(sname=="IDhits")
 			{
 				(*h1map_cutProfile)["expectBLayerHit_1"]->Fill( mu_expectBLayerHit->at(ai) );
 				expectBLayerHit_profile->push_back( mu_expectBLayerHit->at(ai) );
@@ -1839,61 +1701,8 @@ void analysisSkeleton::fillCutProfile2D()
 					vxp_nTracks_profile->push_back( vxp_nTracks->at(v) );
 				}
 			}
-			else if(sname=="pTandEta_1")
-			{
-				float tmp = mu_pt->at(ai)*MeV2TeV;//pT(mu_me_qoverp->at(ai)/MeV2TeV, mu_me_theta->at(ai));
-				(*h2map_cutProfile)[sname]->Fill( tmp, mu_eta->at(ai) );
-				pT_profile->push_back( tmp ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				eta_profile->push_back( mu_eta->at(ai) ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			}
-			else if(sname=="pTandEta_2")
-			{
-				float tmp = mu_pt->at(bi)*MeV2TeV;//pT(mu_me_qoverp->at(bi)/MeV2TeV, mu_me_theta->at(bi));
-				(*h2map_cutProfile)[sname]->Fill( tmp, mu_eta->at(bi) );
-				pT_profile->push_back( tmp ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				eta_profile->push_back( mu_eta->at(bi) ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			}
-			else if(sname=="pTandEtaTight_1")
-			{
-				float tmp = mu_pt->at(ai)*MeV2TeV;//pT(mu_me_qoverp->at(ai)/MeV2TeV, mu_me_theta->at(ai));
-				(*h2map_cutProfile)[sname]->Fill( tmp, mu_eta->at(ai) );
-				pT_profile->push_back( tmp ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				etaTight_profile->push_back( mu_eta->at(ai) ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			}
-			else if(sname=="pTandEtaTight_2") 
-			{
-				float tmp = mu_pt->at(bi)*MeV2TeV;//pT(mu_me_qoverp->at(bi)/MeV2TeV, mu_me_theta->at(bi));
-				(*h2map_cutProfile)[sname]->Fill( tmp, mu_eta->at(bi) );
-				pT_profile->push_back( tmp ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				etaTight_profile->push_back( mu_eta->at(bi) ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			}
-			else if(sname=="pTandEtaBarrel_1")
-			{
-				float tmp = mu_pt->at(ai)*MeV2TeV;//pT(mu_me_qoverp->at(ai)/MeV2TeV, mu_me_theta->at(ai));
-				(*h2map_cutProfile)[sname]->Fill( tmp, mu_eta->at(ai) );
-				pT_profile->push_back( tmp ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				etaBarrel_profile->push_back( mu_eta->at(ai) ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			}
-			else if(sname=="pTandEtaBarrel_2")
-			{
-				float tmp = mu_pt->at(bi)*MeV2TeV;//pT(mu_me_qoverp->at(bi)/MeV2TeV, mu_me_theta->at(bi));
-				(*h2map_cutProfile)[sname]->Fill( tmp, mu_eta->at(bi) );
-				pT_profile->push_back( tmp ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				etaBarrel_profile->push_back( mu_eta->at(bi) ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			}
-			else if(sname=="idHits_1")
-			{
-				(*h2map_cutProfile)[sname]->Fill( mu_nSCTHits->at(ai), mu_nPixHits->at(ai) );
-				nSCTHits_profile->push_back( mu_nSCTHits->at(ai) ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				nPixHits_profile->push_back( mu_nPixHits->at(ai) ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			}
-			else if(sname=="idHits_2")
-			{
-				(*h2map_cutProfile)[sname]->Fill( mu_nSCTHits->at(bi), mu_nPixHits->at(bi) );
-				nSCTHits_profile->push_back( mu_nSCTHits->at(bi) ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				nPixHits_profile->push_back( mu_nPixHits->at(bi) ); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			}
-			else if(sname=="idHitsRel16")
+			
+			else if(sname=="IDhits")
 			{
 				(*h2map_cutProfile)["nTRTHitsVSeta_1"]->Fill( mu_eta->at(ai), mu_nTRTHits->at(ai) );
 				(*h2map_cutProfile)["nTRTHitsVSeta_2"]->Fill( mu_eta->at(bi), mu_nTRTHits->at(bi) );
@@ -2547,6 +2356,7 @@ inline bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 				trigName  = vTriggers->at(t);
 				trigVal   = isTrigger( trigName );
 				pass1Trig = ( triggerCut((*m_cutFlowMapSVD)[sorderedcutname][0], trigVal, trigName) ) ? true : false;
+				//pass1Trig = (bool)isTrigger( vTriggers->at(t) );
 				if(pass1Trig) break;
 			}
 			passCurrentCut = pass1Trig;
@@ -2558,7 +2368,7 @@ inline bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 			float cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
 			float cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
 			passCurrentCut = ( findBestVertex((int)cutval1, (int)cutval2, cutval3,
-			(int)vxp_type->size(), vxp_nTracks, vxp_type, vxp_z) ) ? true : false;
+							   (int)vxp_type->size(), vxp_nTracks, vxp_type, vxp_z) ) ? true : false;
 			iVtx = getPVindex();
 		}
 		
@@ -2660,7 +2470,7 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 			}
 		}
 		
-		else if(sorderedcutname=="idHitsRel16"  &&  !bSkipCut)
+		else if(sorderedcutname=="IDhits"  &&  !bSkipCut)
 		{
 			float cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 			float cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
@@ -2672,7 +2482,7 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 			float cutval8 = (*m_cutFlowMapSVD)[sorderedcutname][7];
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
-				thisMuPass = ( nIDhitsRel16Cut(cutval1,cutval2,cutval3,cutval4,cutval5,cutval6,cutval7,cutval8,
+				thisMuPass = ( nIDhitsCut(cutval1,cutval2,cutval3,cutval4,cutval5,cutval6,cutval7,cutval8,
 											   mu_expectBLayerHit->at(mu),mu_nBLHits->at(mu),
 											   mu_nPixHits->at(mu),mu_nPixelDeadSensors->at(mu),mu_nPixHoles->at(mu),
 											   mu_nSCTHits->at(mu),mu_nSCTDeadSensors->at(mu),mu_nSCTHoles->at(mu),
@@ -2683,7 +2493,7 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 			}
 		}
 		
-		else if(sorderedcutname=="msHitsRel16"  &&  !bSkipCut)
+		else if(sorderedcutname=="MShits"  &&  !bSkipCut)
 		{
 			float cutval1  = (*m_cutFlowMapSVD)[sorderedcutname][0];
 			float cutval2  = (*m_cutFlowMapSVD)[sorderedcutname][1];
@@ -2693,10 +2503,13 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 			float cutval6  = (*m_cutFlowMapSVD)[sorderedcutname][5];
 			float cutval7  = (*m_cutFlowMapSVD)[sorderedcutname][6];
 			float cutval8  = (*m_cutFlowMapSVD)[sorderedcutname][7];
-			float cutval9 = (*m_cutFlowMapSVD)[sorderedcutname][8];
+			float cutval9  = (*m_cutFlowMapSVD)[sorderedcutname][8];
+			float cutval10 = (*m_cutFlowMapSVD)[sorderedcutname][9];
+			float cutval11 = (*m_cutFlowMapSVD)[sorderedcutname][10];
+			float cutval12 = (*m_cutFlowMapSVD)[sorderedcutname][11];
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
-				thisMuPass = ( nMShitsRel16Cut( cutval1,cutval2,cutval3,cutval4,cutval5,cutval6,cutval7,cutval8,cutval9,
+				thisMuPass = ( nMShitsCut( cutval1,cutval2,cutval3,cutval4,cutval5,cutval6,cutval7,cutval8,cutval9,cutval10,cutval11,cutval12,
 											 mu_nMDTBIHits->at(mu), mu_nMDTBMHits->at(mu), mu_nMDTBOHits->at(mu),
 											 mu_nMDTEIHits->at(mu), mu_nMDTEMHits->at(mu), mu_nMDTEOHits->at(mu),
 											 mu_nMDTBEEHits->at(mu), mu_nMDTEEHits->at(mu), mu_nMDTBIS78Hits->at(mu),

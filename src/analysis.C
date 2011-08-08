@@ -205,34 +205,13 @@ void analysis::setEventVariables()
 
 	// L1 triggers
 	analysisSkeleton::L1_MU10 = m_WZphysD3PD->L1_MU10;
-	// analysisSkeleton::L1_MU15 = m_WZphysD3PD->L1_MU15;
-	// analysisSkeleton::L1_MU20 = m_WZphysD3PD->L1_MU20;
+
 	
 	// EF triggers
 	analysisSkeleton::EF_mu22 = m_WZphysD3PD->EF_mu22;
 	analysisSkeleton::EF_mu22_MG = m_WZphysD3PD->EF_mu22_MG;
 	analysisSkeleton::EF_mu40_MSonly_barrel = m_WZphysD3PD->EF_mu40_MSonly_barrel;
-	/*
-	analysisSkeleton::EF_mu10 = m_WZphysD3PD->EF_mu10;
-	analysisSkeleton::EF_mu10_MG = m_WZphysD3PD->EF_mu10_MG;
-	// analysisSkeleton::EF_mu10_MSonly = m_WZphysD3PD->EF_mu10_MSonly;
-	// analysisSkeleton::EF_mu10_MSonly_tight = m_WZphysD3PD->EF_mu10_MSonly_tight;
-	// analysisSkeleton::EF_mu10_NoAlg = m_WZphysD3PD->EF_mu10_NoAlg;
-	// analysisSkeleton::EF_mu10_tight = m_WZphysD3PD->EF_mu10_tight;
-	// analysisSkeleton::EF_mu10i_loose = m_WZphysD3PD->EF_mu10i_loose;
-	analysisSkeleton::EF_mu13 = m_WZphysD3PD->EF_mu13;
-	analysisSkeleton::EF_mu13_MG = m_WZphysD3PD->EF_mu13_MG;
-	// analysisSkeleton::EF_mu13_MG_tight = m_WZphysD3PD->EF_mu13_MG_tight;
-	// analysisSkeleton::EF_mu13_tight = m_WZphysD3PD->EF_mu13_tight;
-	analysisSkeleton::EF_mu15 = m_WZphysD3PD->EF_mu15;
-	analysisSkeleton::EF_mu15_NoAlg = m_WZphysD3PD->EF_mu15_NoAlg;
-	analysisSkeleton::EF_mu20 = m_WZphysD3PD->EF_mu20;
-	analysisSkeleton::EF_mu20_MSonly = m_WZphysD3PD->EF_mu20_MSonly;
-	analysisSkeleton::EF_mu20_NoAlg = m_WZphysD3PD->EF_mu20_NoAlg;
-	// analysisSkeleton::EF_mu20_slow = m_WZphysD3PD->EF_mu20_slow;
-	// analysisSkeleton::EF_mu30_MSonly = m_WZphysD3PD->EF_mu30_MSonly;
-	analysisSkeleton::EF_mu40_MSonly = m_WZphysD3PD->EF_mu40_MSonly;
-	*/
+
 	
 	// vertexes (for the PV preselection)
 	analysisSkeleton::vxp_n       = m_WZphysD3PD->vxp_n;

@@ -54,11 +54,11 @@ void xmlconfig::read(string readerName, string fileName)
 	domParser->ParseFile(fileName.c_str());
 	node = domParser->GetXMLDocument()->GetRootNode();
 	
-	if(readerName=="cutflowXml")
+	if(readerName=="cutflow")
 	{
 		header(fileName);
-		cutflowXml::ParseContext(node);
-		if(!cutflowXml::mask())
+		cutFlowHandler::ParseContext(node);
+		if(!cutFlowHandler::mask())
 		{
 			_ERROR("failed to mask the xml file (" + fileName + "). exitting now.");
 			exit(-1);
@@ -66,7 +66,7 @@ void xmlconfig::read(string readerName, string fileName)
 		footer(fileName);
 	}
 
-	if(readerName=="periodsXml")
+	if(readerName=="periods")
 	{
 		header(fileName);
 		periodsXml::ParseContext(node);
@@ -78,7 +78,7 @@ void xmlconfig::read(string readerName, string fileName)
 		footer(fileName);
 	}
 
-	if(readerName=="montecarloXml")
+	if(readerName=="montecarlo")
 	{
 		header(fileName);
 		montecarloXml::ParseContext(node);
@@ -93,16 +93,9 @@ void xmlconfig::read(string readerName, string fileName)
 
 void xmlconfig::get(string xmldir)
 {
-	read("cutflowXml",xmldir+"/cutflow.xml");
-	read("periodsXml",xmldir+"/periods.xml");
-	read("montecarloXml",xmldir+"/montecarlo.xml");
-
-	cout << "cutflowXml::cutFlowOrdered.size()=" << cutflowXml::cutFlowOrdered->size() << endl;
-	cout << "cutflowXml::cutFlowTypeOrdered.size()=" << cutflowXml::cutFlowTypeOrdered->size() << endl;
-	cout << "cutflowXml::cutFlowNumbers.size()=" << cutflowXml::cutFlowNumbers->size() << endl;
-	cout << "cutflowXml::cutFlowMapSVD.size()=" << cutflowXml::cutFlowMapSVD->size() << endl;
-	cout << "cutflowXml::cutFlowMapSVD.size()=" << cutflowXml::cutFlowMapSVD->size() << endl;
-	cout << "cutflowXml::cutsFlowSkipMap.size()=" << cutflowXml::cutsFlowSkipMap->size() << endl;
+	read("cutflow",xmldir+"/cutflow.xml");
+	read("periods",xmldir+"/periods.xml");
+	read("montecarlo",xmldir+"/montecarlo.xml");
 }
 
 

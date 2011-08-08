@@ -551,8 +551,8 @@ public:
 
 public:
 	analysisSkeleton();
-	analysisSkeleton(string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath) :
-	analysisModules(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
+	analysisSkeleton(string sPeriodsFilePath, string sEventDumpFilePath) :
+	analysisModules(sPeriodsFilePath,sEventDumpFilePath)
 	{
 		tmp_counter_1 = 0;
 		tmp_counter_2 = 0;
@@ -563,11 +563,6 @@ public:
 		currentRun = 0;
 		sCurrentPeriod = "";
 		nMultiMuonEvents = 0;
-
-		// string fCandName;
-		// if(sRunNumber!="") fCandName = "tmp/cand_pT."+sRunNumber+".txt"; // sRunNumber is static string from basicIncludes.h
-		// else               fCandName = "cand_pT.txt";
-		// fCand = new ofstream(fCandName.c_str());
 	}
 	~analysisSkeleton();
 	

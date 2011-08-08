@@ -37,9 +37,7 @@ inline bool selection::findBestVertex(int nTracksCut, int nTypeCut, float z0cut,
 									  vector<int>* v_vxp_nTracks, vector<int>* v_vxp_type, vector<float>* v_vxp_z)
 {
 	bool found = false;
-
 	m_iVtx = -1;
-	
 	int   nPVtracks;
 	int   nPVtype;
 	float dPVz0;
@@ -48,19 +46,15 @@ inline bool selection::findBestVertex(int nTracksCut, int nTypeCut, float z0cut,
 		nPVtracks = v_vxp_nTracks->at(i);
 		nPVtype   = v_vxp_type->at(i);
 		dPVz0     = fabs( v_vxp_z->at(i) );
-		
+		_INFO("["+tostring(i)+"] "+"nPVtracks="+tostring(nPVtracks)+", nPVtype="+tostring(nPVtype)+", dPVz0="+tostring(dPVz0));
 		if(nPVtracks>nTracksCut  &&  nPVtype==nTypeCut  &&  dPVz0<z0cut)
 		{
 			found = true;
 			m_iVtx = i;
+			break;
 		}
 	}
-	
-	if(!found)
-	{
-		if(b_print) cout << "WARNING:  in selection::findBestVertex:  didn't find any good vertex" << endl;
-	}
-	
+	if(!found) _WARNING("didn't find any good vertex\n");
 	return found;
 }
 
@@ -215,14 +209,19 @@ inline bool selection::isolationXXCut( float isolationCutVal, string sIsoValName
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
 
-inline bool selection::nIDhitsRel16Cut(float expectBLayerHitCutVal, float nBLHitsCutVal, 
-									   float nPIXhitsCutVal,        float nSCThitsCutVal,     float nPIXSCTHolesCutVal,
-									   float nTRThitsCutVal,        float nTRTratioThreshold, float etaAbsThreshold,
-									   int   expectBLayerHit,       int nBLHits,
-									   int   nPIXhits,              int nPixelDeadSensors,    int nPixHoles,
-									   int   nSCThits,              int nSCTDeadSensors,      int nSCTHoles,   
-									   int   nTRTHits,              int nTRTOutliers,
-									   float Eta)
+inline bool selection::nIDhitsCut(float expectBLayerHitCutVal,
+								  float nBLHitsCutVal, 
+							      float sumPIXhitsAndPixelDeadSensorsCutVal,
+							      float sumSCThitsAndSCTDeadSensorsCutVal,
+							      float sumPIXandSCTHolesCutVal,
+							      float sumTRThitsAndTRTOutliersCutVal,
+							      float etaAbsThreshold,
+							      float nTRToutlierRatioThreshold,
+							      int   expectBLayerHit,       int nBLHits,
+							      int   nPIXhits,              int nPixelDeadSensors,    int nPixHoles,
+							      int   nSCThits,              int nSCTDeadSensors,      int nSCTHoles,   
+							      int   nTRTHits,              int nTRTOutliers,
+							      float Eta)
 {
 	// !expectBLayerHit OR numberOfBLayerHits >= 1,
 	// number of pixel hits + number of crossed dead pixel sensors >=2,
@@ -236,28 +235,28 @@ inline bool selection::nIDhitsRel16Cut(float expectBLayerHitCutVal, float nBLHit
 	bool passedBL    = (nBLHits>=nBLHitsCutVal)                 ? true : false;
 	if(!(passedEXPBL||passedBL)) return false;
 	
-	bool passedPIX = ((nPIXhits+nPixelDeadSensors) >= nPIXhitsCutVal) ? true : false;
+	bool passedPIX = ((nPIXhits+nPixelDeadSensors) >= sumPIXhitsAndPixelDeadSensorsCutVal) ? true : false;
 	if(!passedPIX) return false;
 	
-	bool passedSCT = ((nSCThits+nSCTDeadSensors) >= nSCThitsCutVal) ? true : false;
+	bool passedSCT = ((nSCThits+nSCTDeadSensors) >= sumSCThitsAndSCTDeadSensorsCutVal) ? true : false;
 	if(!passedSCT) return false;
 	
-	bool passedHOL = ((nPixHoles+nSCTHoles) <= nPIXSCTHolesCutVal) ? true : false;
+	bool passedHOL = ((nPixHoles+nSCTHoles) <= sumPIXandSCTHolesCutVal) ? true : false;
 	if(!passedHOL) return false;
 	
 	int nTRT = nTRTHits+nTRTOutliers;
 	if(fabs(Eta)<etaAbsThreshold)
 	{
-		bool passedTRTsum = (nTRT >= nTRThitsCutVal) ? true : false;
-		bool passedTRTrat = ((float)nTRTOutliers < nTRTratioThreshold*(float)nTRT) ? true : false;
+		bool passedTRTsum = (nTRT >= sumTRThitsAndTRTOutliersCutVal) ? true : false;
+		bool passedTRTrat = ((float)nTRTOutliers < nTRToutlierRatioThreshold*(float)nTRT) ? true : false;
 		bool passedTRT = (passedTRTsum && passedTRTrat) ? true : false;
 		if(!passedTRT) return false;
 	}
 	else if(fabs(Eta)>=etaAbsThreshold)
 	{
-		if(nTRT>nTRThitsCutVal)
+		if(nTRT>sumTRThitsAndTRTOutliersCutVal)
 		{
-			bool passedTRTrat = ((float)nTRTOutliers < nTRTratioThreshold*(float)nTRT) ? true : false;
+			bool passedTRTrat = ((float)nTRTOutliers < nTRToutlierRatioThreshold*(float)nTRT) ? true : false;
 			if(!passedTRTrat) return false;
 		}
 	}
@@ -265,36 +264,22 @@ inline bool selection::nIDhitsRel16Cut(float expectBLayerHitCutVal, float nBLHit
 	return true;
 }
 
-inline bool selection::nMShitsRel16Cut(float nMDTB_IMO_HitsCutVal, float nMDTE_IMO_HitsCutVal,
-									float nMDTBEEHitsCutVal, float nMDTEEHitsCutVal, float nMDTBIS78HitsCutVal, 
-									float nCSCEtaHitsCutVal,
-									float nPhiHitsCutVal,
-									float nMDTCSCsumCutVal, float nRPCTGCCSCsumsCutVal,
-									int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,
-									int nMDTEIHits, int nMDTEMHits, int nMDTEOHits,
-									int nMDTBEEHits, int nMDTEEHits, int nMDTBIS78Hits,
-									int nRPCLayer1PhiHits, int nRPCLayer2PhiHits, int nRPCLayer3PhiHits,
-									int nTGCLayer1PhiHits, int nTGCLayer2PhiHits, int nTGCLayer3PhiHits, int nTGCLayer4PhiHits,
-									int nCSCEtaHits, int nCSCPhiHits)
+inline bool selection::nMShitsCut(float nMDTBIMOHitsCutVal, float nMDTEIMOHitsCutVal, float nCSCEtaHitsCutVal,
+								  float nMDTBarrel_LogicSum, float nMDTorCSCEndcap_LogicSum,
+								  float nMDTBEEHitsCutVal, float nMDTEEHitsCutVal, float nMDTBIS78HitsCutVal, 
+								  float nRPCLayerPhiHitsCutsVal, float nTGCLayerPhiHitsCutsVal, float nCSCLayerPhiHitsCutVal,
+								  float nRPCTGCCSC_LogicSum,
+								  int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,
+								  int nMDTEIHits, int nMDTEMHits, int nMDTEOHits,
+								  int nMDTBEEHits, int nMDTEEHits, int nMDTBIS78Hits,
+								  int nRPCLayer1PhiHits, int nRPCLayer2PhiHits, int nRPCLayer3PhiHits,
+								  int nTGCLayer1PhiHits, int nTGCLayer2PhiHits, int nTGCLayer3PhiHits, int nTGCLayer4PhiHits,
+								  int nCSCEtaHits, int nCSCPhiHits)
 {
 	// At least 3 hits in all of Barrel or Endcap Inner,
 	// Middle and Outer MDT/CSC precision layers,
 	// at least one phi hit, and no BEE, EE or BIS78 hits
 	
-	/*
-	(
-		(nRPCLayer1PhiHits>=1) + (nRPCLayer2PhiHits>=1) + (nRPCLayer3PhiHits>=1) +
-		(nTGCLayer1PhiHits>=1) + (nTGCLayer2PhiHits>=1) + (nTGCLayer3PhiHits>=1) + (nTGCLayer4PhiHits>=1) +
-		(nCSCPhiHits>=1)
-	) >=1
-	&& 
-	(
-		((nMDTBIHits>=3) + (nMDTBMHits>=3) + (nMDTBOHits>=3)) >= 3
-		||
-		(((nMDTEIHits>=3) || (nCSCEtaHits>=3)) + (nMDTEMHits>=3) + (nMDTEOHits>=3)) >= 3
-	)
-	&& (nMDTBEEHits==0) && (nMDTEEHits==0) && (nMDTBIS78Hits==0);
-	*/
 	
 	//1) at least one phi hit on the MS track
 	//2.1) MS track has at least 3 hits in each of Inner, Middle, Outer of Barrel
@@ -307,23 +292,16 @@ inline bool selection::nMShitsRel16Cut(float nMDTB_IMO_HitsCutVal, float nMDTE_I
 	//may be sensitive to relative misalignments between barrel and endcap, and is not considered
 	//robust enough for the first Zprime publication. There are not many such tracks anyway. 
 	
-	bool passedMDTBI = (nMDTBIHits >= nMDTB_IMO_HitsCutVal) ? true : false;
-	bool passedMDTBM = (nMDTBMHits >= nMDTB_IMO_HitsCutVal) ? true : false;
-	bool passedMDTBO = (nMDTBOHits >= nMDTB_IMO_HitsCutVal) ? true : false;
-	bool passedMDTEI = (nMDTEIHits >= nMDTE_IMO_HitsCutVal) ? true : false;
-	bool passedMDTEM = (nMDTEMHits >= nMDTE_IMO_HitsCutVal) ? true : false;
-	bool passedMDTEO = (nMDTEOHits >= nMDTE_IMO_HitsCutVal) ? true : false;
+	bool passedMDTBI = (nMDTBIHits >= nMDTBIMOHitsCutVal) ? true : false;
+	bool passedMDTBM = (nMDTBMHits >= nMDTBIMOHitsCutVal) ? true : false;
+	bool passedMDTBO = (nMDTBOHits >= nMDTBIMOHitsCutVal) ? true : false;
+	bool passedMDTEI = (nMDTEIHits >= nMDTEIMOHitsCutVal) ? true : false;
+	bool passedMDTEM = (nMDTEMHits >= nMDTEIMOHitsCutVal) ? true : false;
+	bool passedMDTEO = (nMDTEOHits >= nMDTEIMOHitsCutVal) ? true : false;
 	bool passedCSC   = (nCSCEtaHits >= nCSCEtaHitsCutVal)   ? true : false;
-	/*
-	bool passedMDTCSC = ((passedMDTBI +
-						  passedMDTBM +
-						  passedMDTBO +
-						  (passedMDTEI||passedCSC) +
-						  passedMDTEM +
-						  passedMDTEO) >= nMDTCSCsumCutVal) ? true : false;
-	*/
-	bool passedMDTBarrel = ((passedMDTBI + passedMDTBM + passedMDTBO)              >= nMDTCSCsumCutVal) ? true : false;
-	bool passedMDTEndcap = (((passedMDTEI||passedCSC) + passedMDTEM + passedMDTEO) >= nMDTCSCsumCutVal) ? true : false;
+
+	bool passedMDTBarrel = ((passedMDTBI + passedMDTBM + passedMDTBO)              >= nMDTBarrel_LogicSum)      ? true : false;
+	bool passedMDTEndcap = (((passedMDTEI||passedCSC) + passedMDTEM + passedMDTEO) >= nMDTorCSCEndcap_LogicSum) ? true : false;
 	bool passedMDTCSC = (passedMDTBarrel || passedMDTEndcap) ? true : false;
 	if(!passedMDTCSC) return false;
 	 
@@ -334,15 +312,15 @@ inline bool selection::nMShitsRel16Cut(float nMDTB_IMO_HitsCutVal, float nMDTE_I
 	bool passedMDTBIS78 = (nMDTBIS78Hits==nMDTBIS78HitsCutVal) ? true : false;
 	if(!passedMDTBIS78) return false;
 	
-	int nRPCTGCCSCsum = (nRPCLayer1PhiHits>=nPhiHitsCutVal) +
-						(nRPCLayer2PhiHits>=nPhiHitsCutVal) +
-						(nRPCLayer3PhiHits>=nPhiHitsCutVal) + 
-						(nTGCLayer1PhiHits>=nPhiHitsCutVal) +
-						(nTGCLayer2PhiHits>=nPhiHitsCutVal) +
-						(nTGCLayer3PhiHits>=nPhiHitsCutVal) +
-						(nTGCLayer4PhiHits>=nPhiHitsCutVal) +
-						(nCSCPhiHits>=nPhiHitsCutVal);
-	bool passedRPCTGCCSC = (nRPCTGCCSCsum >= nRPCTGCCSCsumsCutVal) ? true : false;
+	int nRPCTGCCSCsum = (nRPCLayer1PhiHits>=nRPCLayerPhiHitsCutsVal) +
+						(nRPCLayer2PhiHits>=nRPCLayerPhiHitsCutsVal) +
+						(nRPCLayer3PhiHits>=nRPCLayerPhiHitsCutsVal) + 
+						(nTGCLayer1PhiHits>=nTGCLayerPhiHitsCutsVal) +
+						(nTGCLayer2PhiHits>=nTGCLayerPhiHitsCutsVal) +
+						(nTGCLayer3PhiHits>=nTGCLayerPhiHitsCutsVal) +
+						(nTGCLayer4PhiHits>=nTGCLayerPhiHitsCutsVal) +
+						(nCSCPhiHits>=nCSCLayerPhiHitsCutVal);
+	bool passedRPCTGCCSC = (nRPCTGCCSCsum >= nRPCTGCCSC_LogicSum) ? true : false;
 	if(!passedRPCTGCCSC) return false;
 	
 	return true;

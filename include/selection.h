@@ -70,26 +70,31 @@ public:
 								  vector<float>* pvfPVz0err,
 								  int& bestVtxIndex);
 						   
-	inline bool nIDhitsRel16Cut(float expectBLayerHitCutVal, float nBLHitsCutVal, 
-								float nPIXhitsCutVal,        float nSCThitsCutVal,     float nPIXSCTHolesCutVal,
-								float nTRThitsCutVal,        float nTRTratioThreshold, float etaAbsThreshold,
-								int   expectBLayerHit,       int nBLHits,
-								int   nPIXhits,              int nPixelDeadSensors,    int nPixHoles,
-								int   nSCThits,              int nSCTDeadSensors,      int nSCTHoles,   
-								int   nTRTHits,              int nTRTOutliers,
-								float Eta);
+	inline bool nIDhitsCut(float expectBLayerHitCutVal,
+						   float nBLHitsCutVal, 
+						   float sumPIXhitsAndPixelDeadSensorsCutVal,
+						   float sumSCThitsAndSCTDeadSensorsCutVal,
+						   float sumPIXandSCTHolesCutVal,
+						   float sumTRThitsAndTRTOutliersCutVal,
+						   float etaAbsThreshold,
+						   float nTRToutlierRatioThreshold,
+						   int   expectBLayerHit,       int nBLHits,
+						   int   nPIXhits,              int nPixelDeadSensors,    int nPixHoles,
+						   int   nSCThits,              int nSCTDeadSensors,      int nSCTHoles,   
+						   int   nTRTHits,              int nTRTOutliers,
+						   float Eta);
 						 
-	inline bool nMShitsRel16Cut(float nMDTB_IMO_HitsCutVal, float nMDTE_IMO_HitsCutVal,
-							 float nMDTBEEHitsCutVal, float nMDTEEHitsCutVal, float nMDTBIS78HitsCutVal, 
-							 float nCSCEtaHitsCutVal,
-							 float nPhiHitsCutVal,
-							 float nMDTCSCsumCutVal, float nRPCTGCCSCsumsCutVal,
-							 int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,
-							 int nMDTEIHits, int nMDTEMHits, int nMDTEOHits,
-							 int nMDTBEEHits, int nMDTEEHits, int nMDTBIS78Hits,
-							 int nRPCLayer1PhiHits, int nRPCLayer2PhiHits, int nRPCLayer3PhiHits,
-							 int nTGCLayer1PhiHits, int nTGCLayer2PhiHits, int nTGCLayer3PhiHits, int nTGCLayer4PhiHits,
-							 int nCSCEtaHits, int nCSCPhiHits);
+	inline bool nMShitsCut(float nMDTBIMOHitsCutVal, float nMDTEIMOHitsCutVal, float nCSCEtaHitsCutVal,
+						   float nMDTBarrel_LogicSum, float nMDTorCSCEndcap_LogicSum,
+						   float nMDTBEEHitsCutVal, float nMDTEEHitsCutVal, float nMDTBIS78HitsCutVal, 
+						   float nRPCLayerPhiHitsCutsVal, float nTGCLayerPhiHitsCutsVal, float nCSCLayerPhiHitsCutVal,
+						   float nRPCTGCCSC_LogicSum,
+						   int nMDTBIHits, int nMDTBMHits, int nMDTBOHits,
+						   int nMDTEIHits, int nMDTEMHits, int nMDTEOHits,
+						   int nMDTBEEHits, int nMDTEEHits, int nMDTBIS78Hits,
+						   int nRPCLayer1PhiHits, int nRPCLayer2PhiHits, int nRPCLayer3PhiHits,
+						   int nTGCLayer1PhiHits, int nTGCLayer2PhiHits, int nTGCLayer3PhiHits, int nTGCLayer4PhiHits,
+						   int nCSCEtaHits, int nCSCPhiHits);
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
 private:

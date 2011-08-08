@@ -54,10 +54,9 @@ public:
 			 WZphysD3PD* wzphysd3pd,
 			 GRLinterface* grl,
 			 TFile* treeFile,
-			 string sCutFlowFilePath,
 			 string sPeriodsFilePath,
 			 string sEventDumpFilePath) :
-	analysisSkeleton(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
+	analysisSkeleton(sPeriodsFilePath,sEventDumpFilePath)
 	{
 		sRunType       = runtype;  // grid OR local
 		sMuonRecoAlgo  = murecalg; // staco OR muid
@@ -83,14 +82,6 @@ public:
 		n3mu = 0;
 		n4mu = 0;
 		nNmu = 0;
-		
-		if(!m_isMC)
-		{
-			// string fCandidatesName;
-			// if(sRunNumber!="") fCandidatesName = "tmp/candidates."+sRunNumber+".txt"; // sRunNumber is static string from basicIncludes.h
-			// else               fCandidatesName = "candidates.txt";
-			// fCandidates = new ofstream(fCandidatesName.c_str());
-		}
 	}
 	~analysis();
 	

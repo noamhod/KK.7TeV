@@ -1,4 +1,6 @@
 local_noskim
 muid
-data
-SILENT
+mc
+DBG SILENT
+INF SILENT
+WRN VISUAL

@@ -33,12 +33,16 @@ enum MSG
 	FAT
 };
 
-static int global_dbg_lvl = VISUAL;
+static vector<int> msglvl (5,SILENT);
 
-static void setMSGlevel(int lvl=SILENT)
-{
-	global_dbg_lvl = lvl;
-}
+// static void setMSGlevel(int dbg, int inf, int wrn)
+// {
+	// msglvl[DBG] = dbg;
+	// msglvl[INF] = inf;
+	// msglvl[WRN] = wrn;
+	// msglvl[ERR] = VISUAL;
+	// msglvl[FAT] = VISUAL;
+// }
 
 // static int getMSGlevel()
 // {
@@ -66,8 +70,7 @@ string log(const char* file, int line, int type, int level, string message)
 	{
 		cout << os.str() << endl;
 	}
-	
-	if(global_dbg_lvl==VISUAL) // All the rest can be shown only if the static dbg_lvl is on
+	else if(msglvl[type]==VISUAL)
 	{
 		if(level==VISUAL) cout << os.str() << endl;
 	}

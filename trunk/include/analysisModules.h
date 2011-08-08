@@ -38,7 +38,8 @@ using namespace fitparameters;
 #define ANALYSISMUDULES_H
 
 class analysisModules : public selection,
-						public cutFlowHandler,
+						//public cutFlowHandler,
+						public xmlconfig,
 						public periodHandler,
 						//public monteCarloHandler,
 						public eventDumper,
@@ -48,26 +49,23 @@ class analysisModules : public selection,
 						public Afb
 {
 	public:
-		xmlconfig* xmls;
+		//xmlconfig* xmls;
 		
 	public:
 		analysisModules();
-		analysisModules(string sCutFlowFilePath, string sPeriodsFilePath, string sEventDumpFilePath) :
-		cutFlowHandler(sCutFlowFilePath),
+		analysisModules(string sPeriodsFilePath, string sEventDumpFilePath) :
 		periodHandler(sPeriodsFilePath),
 		eventDumper(sEventDumpFilePath)
-		{	
-			if(sEventDumpFilePath != "")
-			{
-				setInterestingThreshold( 250.*GeV2TeV );
-			}
+		{
+			//xmls = new xmlconfig();
+			// xmls = xmlconfig::getInstance();
+			//xmls->get("/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/xml");
+			xmlconfig::get("/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/xml");
+			
+			if(sEventDumpFilePath != "") setInterestingThreshold( 250.*GeV2TeV );
 			
 			setCutFlowMapSVDPtr( cutFlowHandler::m_cutFlowMapSVD );
 			ginitialize();
-			
-			xmls = new xmlconfig();
-			// xmls = xmlconfig::getInstance();
-			xmls->get("/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/xml");
 		}
 		~analysisModules();
 		

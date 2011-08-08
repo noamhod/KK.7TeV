@@ -26,12 +26,13 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	string sRec;
 	string sMCorData;
 	bool   isMC;
+	string sMsgTyp;
 	string sMsgLvl;
-	int    msgLvl;
+	//int    msgLvl;
 	
 	ifstream ifsel( localRunControlFile.c_str() );
-	ifsel >> sRun >> sRec >> sMCorData >> sMsgLvl;
-	ifsel.close();
+	ifsel >> sRun >> sRec >> sMCorData;
+	
 	
 	if(sRun!="local"  &&  sRun!="local_noskim")
 	{
@@ -49,26 +50,35 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 		exit(-1);
 	}
 	isMC = (sMCorData=="mc") ? true : false;
-	if(sMsgLvl!="VISUAL" && sMsgLvl!="SILENT")
+	for(int i=0 ; i<(int)msglvl.size()-2 ; i++)
 	{
-		_ERROR("ERROR: YOU CHOSE MSGLVL ["+sMsgLvl+"], exitting now");
-		exit(-1);
+		ifsel >> sMsgTyp >> sMsgLvl;
+		if(sMsgTyp!="DBG" && sMsgTyp!="INF" && sMsgTyp!="WRN") _ERROR("ERROR: YOU CHOSE MSGTYP ["+sMsgTyp+"], exitting now");
+		else
+		{
+			if(sMsgLvl!="VISUAL" && sMsgLvl!="SILENT")
+			{
+				_ERROR("ERROR: YOU CHOSE MSGLVL ["+sMsgLvl+"], exitting now");
+				exit(-1);
+			}
+		}
+		msglvl[i] = (sMsgLvl=="SILENT") ? SILENT : VISUAL;
+		_INFO("msglvl["+tostring(i)+"]="+sMsgLvl);
 	}
-	msgLvl = (sMsgLvl=="SILENT") ? SILENT : VISUAL;
 	
 	m_RunType   = sRun; // "grid" OR "local"
 	m_muRecAlgo = sRec; // "staco" OR "muid"
 	m_isMC      = isMC;
-	m_msglvl    = msgLvl;
 	
 	_INFO("m_RunType="+m_RunType);
 	_INFO("m_muRecAlgo="+m_muRecAlgo);
 	_INFO("m_isMC="+sMCorData);
-	_INFO("m_msglvl="+sMsgLvl);
 	
 	///////////////////////////
-	setMSGlevel(m_msglvl); ////
+	//setMSGlevel(m_msglvl); ////
 	///////////////////////////
+	
+	ifsel.close();
 }
 
 void analysisLocalControl::initialize(int RunNumber, string runs, string basedir, string localRunControlFile)
@@ -169,7 +179,7 @@ void analysisLocalControl::initialize(int RunNumber, string runs, string basedir
 	string str_periods = "";
 	if(runs=="ALLRUNS")
 	{
-		str_cutflow = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
+		//str_cutflow = checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
 		str_periods = checkANDsetFilepath("PWD", "/../conf/dataPeriods.data");
 	}
 	if(runs=="SINGLERUN")
@@ -177,7 +187,7 @@ void analysisLocalControl::initialize(int RunNumber, string runs, string basedir
 		str_cutflow = basedir+"/../conf/cutFlow.cuts";
 		str_periods = basedir+"/../conf/dataPeriods.data";
 		
-		_DEBUG("cutfolw: "+str_cutflow);
+		//_DEBUG("cutfolw: "+str_cutflow);
 		_DEBUG("periods: "+str_periods);
 	}
 	
@@ -186,7 +196,7 @@ void analysisLocalControl::initialize(int RunNumber, string runs, string basedir
 	if(runs=="SINGLERUN") str_events = basedir+"/../run/tmp/interestingEvents_"+tostring(RunNumber)+".dump";
 	m_analysis = new analysis(m_RunType, m_muRecAlgo, m_isMC,
 							  m_WZphysD3PD, m_GRL, m_treefile,
-							  str_cutflow, str_periods, str_events );
+							  str_periods, str_events );
 	
 	string str_logspath = "";
 	if(runs=="ALLRUNS")   str_logspath = checkANDsetFilepath("PWD", "");
@@ -381,15 +391,15 @@ void analysisLocalControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	
 	finalize();
 	
-	cout << "nAll           = " << m_analysis->nAll << endl;
-	cout << "n0mu           = " << m_analysis->n0mu << endl;
-	cout << "n1mu(pT>10GeV) = " << m_analysis->n1mu << endl;
-	cout << "n2mu(pT>10GeV) = " << m_analysis->n2mu << endl;
-	cout << "n3mu(pT>10GeV) = " << m_analysis->n3mu << endl;
-	cout << "n4mu(pT>10GeV) = " << m_analysis->n4mu << endl;
-	cout << "nNmu(pT>10GeV) = " << m_analysis->nNmu << endl;
-	cout << "nSkim          = " << m_analysis->nSkim << endl;
-	cout << "nSkim%         = " << (double)m_analysis->nSkim/(double)m_analysis->nAll << endl;
+	// cout << "nAll           = " << m_analysis->nAll << endl;
+	// cout << "n0mu           = " << m_analysis->n0mu << endl;
+	// cout << "n1mu(pT>10GeV) = " << m_analysis->n1mu << endl;
+	// cout << "n2mu(pT>10GeV) = " << m_analysis->n2mu << endl;
+	// cout << "n3mu(pT>10GeV) = " << m_analysis->n3mu << endl;
+	// cout << "n4mu(pT>10GeV) = " << m_analysis->n4mu << endl;
+	// cout << "nNmu(pT>10GeV) = " << m_analysis->nNmu << endl;
+	// cout << "nSkim          = " << m_analysis->nSkim << endl;
+	// cout << "nSkim%         = " << (double)m_analysis->nSkim/(double)m_analysis->nAll << endl;
 	
 	cout << "################" << endl;
 	cout << "##### " << m_analysis->sMuonRecoAlgo << " #####" << endl;

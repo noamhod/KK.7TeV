@@ -61,9 +61,21 @@ insets = {
 outsets = []
 
 
-targetdir  = "MC10b"
-nameprefix = "mc10_7TeV."
-x = DQ2.new(false,"MC")
+
+x = DQ2.new(true)
+x.set_thisdir(pwd())
+x.set_basedir("/data/hod/2011")
+x.set_type("MC")
+x.set_targetdir("/data/hod/2011/MC10b")
+x.set_summary_file("summary.log")
+x.set_list_file("MC10b.list")
+x.set_prefix("mc10_7TeV.",6)
+x.set_secondprefix("._",5)
+x.check_variables
+
+x.check_variables
+
+
 x.batch_dq2get_mc(insets,outsets,targetdir,nameprefix)
 outsets = []
 x.batch_dq2validate_mc(insets,outsets,targetdir,nameprefix)

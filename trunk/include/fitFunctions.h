@@ -5,6 +5,8 @@
 /* on 23/07/2010 11:24 */
 /* * * * * * * * * * * */
 
+using namespace fitparameters;
+
 #ifndef FITFUNCTIONS_H
 #define FITFUNCTIONS_H
 

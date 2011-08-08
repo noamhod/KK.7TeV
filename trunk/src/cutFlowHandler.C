@@ -144,8 +144,8 @@ int cutFlowHandler::getNVals()
 
 void cutFlowHandler::readCutFlow(string sCutFlowFilePath)
 {
-	fstream file;
-	file.open( sCutFlowFilePath.c_str() );
+	fstream f;
+	f.open( sCutFlowFilePath.c_str() );
 
 	string sLine = "";
 	
@@ -161,15 +161,15 @@ void cutFlowHandler::readCutFlow(string sCutFlowFilePath)
 
 	int nLinesRead = 0;
 
-	if (!file)
+	if (!f)
 	{
 		cerr << "Unable to open file: " << sCutFlowFilePath << endl;
 		exit(1);   // call system to stop
 	}
 
-	while(!file.eof())
+	while(!f.eof())
 	{
-		getline(file,sLine);
+		getline(f,sLine);
 
 		// skip empty lines and lines that begin with "#"
 		if(sLine == "")              continue;
@@ -216,7 +216,7 @@ void cutFlowHandler::readCutFlow(string sCutFlowFilePath)
 	}
 	cout << "\nread " << nLinesRead << " lines from " << sCutFlowFilePath << endl;
 	
-	file.close();
+	f.close();
 }
 
 void cutFlowHandler::printCutFlowNumbers(Long64_t chainEntries)

@@ -2183,7 +2183,7 @@ void graphicObjects::drawHistosMap(TMapds* cutFlowOrdered, TMapds* cutFlowTypeOr
 	Color_t colorOffset = 1;
 	Color_t colorAccumulate = colorStart;
 	TMapSP2TH1D::iterator it;
-	TMapds::iterator ii;
+	//TMapds::iterator ii;
 	string sname = "";
 
 	leg_cutFlow_imass = new TLegend(leg_x1, leg_y1, leg_x2, leg_y2);
@@ -2209,7 +2209,7 @@ void graphicObjects::drawHistosMap(TMapds* cutFlowOrdered, TMapds* cutFlowTypeOr
 		
 		string str = ii->second; 
 		it=hmap_cutFlow_imass->find("imass."+str);
-		string sname = it->first;
+		sname = it->first;
 		(*hmap_cutFlow_imass)[sname]->SetFillColor(colorAccumulate);
 		(*hmap_cutFlow_imass)[sname]->SetLineColor(colorAccumulate);
 		leg_cutFlow_imass->AddEntry( (*hmap_cutFlow_imass)[sname], str.c_str(), "f");
@@ -2250,7 +2250,7 @@ void graphicObjects::drawHistosMap(TMapds* cutFlowOrdered, TMapds* cutFlowTypeOr
 		
 		string str = ii->second;
 		it=hmap_cutFlow_pT->find("pT."+str);
-		string sname = it->first;
+		sname = it->first;
 		(*hmap_cutFlow_pT)[sname]->SetFillColor(colorAccumulate);
 		(*hmap_cutFlow_pT)[sname]->SetLineColor(colorAccumulate);
 		leg_cutFlow_pT->AddEntry( (*hmap_cutFlow_pT)[sname], str.c_str(), "f");

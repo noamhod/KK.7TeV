@@ -7,6 +7,8 @@
 
 #include "basicIncludes.h"
 
+using namespace fitparameters;
+
 #ifndef FITROOFIT_H
 #define FITROOFIT_H
 

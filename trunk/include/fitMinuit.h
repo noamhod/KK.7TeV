@@ -7,6 +7,8 @@
 
 #include "basicIncludes.h"
 
+using namespace fitparameters;
+
 #ifndef FITMINUIT_H
 #define FITMINUIT_H
 

@@ -2360,6 +2360,13 @@ inline bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 				if(pass1Trig) break;
 			}
 			passCurrentCut = pass1Trig;
+			if(!passCurrentCut)
+			{
+				_INFO("\nfail: lbn="+tostring(lbn)+", evt="+tostring(EventNumber));
+				_INFO("   EF_mu22 = "+tostring(EF_mu22));
+				_INFO("   EF_mu22_MG = "+tostring(EF_mu22_MG));
+				_INFO("   EF_mu40_MSonly_barrel = "+tostring(EF_mu40_MSonly_barrel));
+			}
 		}
 		
 		else if(sorderedcutname=="PV"  &&  !bSkipCut)
@@ -2367,9 +2374,11 @@ inline bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 			float cutval1 = (*m_cutFlowMapSVD)[sorderedcutname][0];
 			float cutval2 = (*m_cutFlowMapSVD)[sorderedcutname][1];
 			float cutval3 = (*m_cutFlowMapSVD)[sorderedcutname][2];
-			passCurrentCut = ( findBestVertex((int)cutval1, (int)cutval2, cutval3,
-							   (int)vxp_type->size(), vxp_nTracks, vxp_type, vxp_z) ) ? true : false;
-			iVtx = getPVindex();
+			iVtx = getPVindex((int)cutval1, (int)cutval2, cutval3, vxp_type, vxp_nTracks, vxp_z);
+			// passCurrentCut = ( findBestVertex((int)cutval1, (int)cutval2, cutval3,
+							   // vxp_type, vxp_nTracks, vxp_z) ) ? true : false;
+			passCurrentCut = (iVtx>=0) ? true : false;
+			if(!passCurrentCut) iVtx = 0;
 		}
 		
 		else continue;

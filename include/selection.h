@@ -28,10 +28,10 @@ public:
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 	// * * * preselection simple methods * * *
 	
-	inline bool findBestVertex(int nTracksCut, int nTypeCut, float z0cut, int nvxp,
+	inline bool findBestVertex(int nTypeCut, int nTracksCut, float z0cut,
 						vector<int>* v_vxp_nTracks, vector<int>* v_vxp_type, vector<float>* v_vxp_z);
 	inline int getPVindex();
-	inline int getPVindex(int nTracksCut, int nTypeCut, float z0Cut, int nvxp,
+	inline int getPVindex(int nTypeCut, int nTracksCut, float z0cut,
 						  vector<int>* v_vxp_nTracks, vector<int>* v_vxp_type, vector<float>* v_vxp_z);
 	
 	

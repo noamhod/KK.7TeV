@@ -604,7 +604,7 @@ public:
 	inline void fillTruthEfficiency();
 	
 	inline void fillTruth();
-	inline void fillRecon(int a, int b);
+	inline void fillRecon();
 	
 	void applyTagNProbe(TMapsb& cutsToSkip, bool isMC);
 	

@@ -71,7 +71,7 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	///////////////////////////
 }
 
-void analysisLocalControl::initialize(int runNumber, string runs, string basedir, string localRunControlFile)
+void analysisLocalControl::initialize(int RunNumber, string runs, string basedir, string localRunControlFile)
 {
 	_DEBUG("analysisLocalControl::initialize");
 	
@@ -124,18 +124,18 @@ void analysisLocalControl::initialize(int runNumber, string runs, string basedir
 	else
 	{
 		if(runs=="ALLRUNS")   str_list = checkANDsetFilepath("PWD", "/../conf/NTUP_SMDILEP_dimuon_p591_runs.list");
-		if(runs=="SINGLERUN") str_list = basedir+"/../conf/tmp/"+tostring(runNumber)+".list";
+		if(runs=="SINGLERUN") str_list = basedir+"/../conf/tmp/"+tostring(RunNumber)+".list";
 		
 		str_dir  = "";//checkANDsetFilepath("PWD", "/local_datasetdir/");
 		str_tree = checkANDsetFilepath("PWD", "/../data/localTree.root");
 		
 		if(runs=="ALLRUNS")   str_hist = checkANDsetFilepath("PWD", "/../data/analysisLocalControl.root");
-		if(runs=="SINGLERUN") str_hist = basedir+"/../data/tmp/run_"+tostring(runNumber)+".root";
+		if(runs=="SINGLERUN") str_hist = basedir+"/../data/tmp/run_"+tostring(RunNumber)+".root";
 		
 		
 		
 		// for tests only
-		if(runNumber==-1)
+		if(RunNumber==-1)
 		{
 			str_dir  = checkANDsetFilepath("PWD", "/");
 			str_list = checkANDsetFilepath("PWD", "/../conf/local_dataset_WZphys_localTests.list");
@@ -147,8 +147,8 @@ void analysisLocalControl::initialize(int runNumber, string runs, string basedir
 	
 	if(runs=="ALLRUNS")
 	{
-		if(runNumber==-1) makeChain(true, str_list, str_dir);
-		else              makeChain(true, str_list, str_dir, runNumber);
+		if(RunNumber==-1) makeChain(true, str_list, str_dir);
+		else              makeChain(true, str_list, str_dir, RunNumber);
 	}
 	else
 	{
@@ -183,7 +183,7 @@ void analysisLocalControl::initialize(int runNumber, string runs, string basedir
 	
 	string str_events = "";
 	if(runs=="ALLRUNS")   str_events = checkANDsetFilepath("PWD", "/interestingEvents.dump");
-	if(runs=="SINGLERUN") str_events = basedir+"/../run/tmp/interestingEvents_"+tostring(runNumber)+".dump";
+	if(runs=="SINGLERUN") str_events = basedir+"/../run/tmp/interestingEvents_"+tostring(RunNumber)+".dump";
 	m_analysis = new analysis(m_RunType, m_muRecAlgo, m_isMC,
 							  m_WZphysD3PD, m_GRL, m_treefile,
 							  str_cutflow, str_periods, str_events );
@@ -191,9 +191,9 @@ void analysisLocalControl::initialize(int runNumber, string runs, string basedir
 	string str_logspath = "";
 	if(runs=="ALLRUNS")   str_logspath = checkANDsetFilepath("PWD", "");
 	if(runs=="SINGLERUN") str_logspath = basedir+"/../run/tmp";
-	m_analysis->setCutFlowFile(str_logspath, tostring(runNumber));
-	m_analysis->setPtCandidatesFile(str_logspath, tostring(runNumber));
-	m_analysis->setAllCandidatesFiles(str_logspath, tostring(runNumber));
+	m_analysis->setCutFlowFile(str_logspath, tostring(RunNumber));
+	m_analysis->setPtCandidatesFile(str_logspath, tostring(RunNumber));
+	m_analysis->setAllCandidatesFiles(str_logspath, tostring(RunNumber));
 	
 	m_analysis->setStyle((TString)basedir+"/../src");
 	
@@ -398,9 +398,9 @@ void analysisLocalControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	stopTimer(true);
 }
 
-void analysisLocalControl::loop(int runNumber)
+void analysisLocalControl::loop(int RunNumber)
 {
-	_DEBUG("analysisLocalControl::loop(int runNumber)");
+	_DEBUG("analysisLocalControl::loop(int RunNumber)");
 
 	if (m_WZphysD3PD->fChain == 0)  return;
 
@@ -436,8 +436,8 @@ void analysisLocalControl::loop(int runNumber)
 		if(l64t_jentry%100000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_WZphysD3PD->RunNumber << "\tlumiblock=" << m_WZphysD3PD->lbn << endl;
 		
 		//////////////////////////////////////////////////////
-		if((int)m_WZphysD3PD->RunNumber < runNumber) continue; ///////
-		if((int)m_WZphysD3PD->RunNumber > runNumber) break; //////////
+		if((int)m_WZphysD3PD->RunNumber < RunNumber) continue; ///////
+		if((int)m_WZphysD3PD->RunNumber > RunNumber) break; //////////
 		//////////////////////////////////////////////////////
 		
 		if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries);

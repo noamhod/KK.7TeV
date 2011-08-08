@@ -50,18 +50,18 @@ public:
 	analysis();
 	analysis(string runtype,
 			 string murecalg,
-			 bool isMC,
+			 bool ismc,
 			 WZphysD3PD* wzphysd3pd,
 			 GRLinterface* grl,
 			 TFile* treeFile,
 			 string sCutFlowFilePath,
 			 string sPeriodsFilePath,
-	string sEventDumpFilePath) :
+			 string sEventDumpFilePath) :
 	analysisSkeleton(sCutFlowFilePath,sPeriodsFilePath,sEventDumpFilePath)
 	{
 		sRunType       = runtype;  // grid OR local
 		sMuonRecoAlgo  = murecalg; // staco OR muid
-		m_isMC         = isMC;     // ...
+		m_isMC         = ismc;     // ...
 		
 		m_WZphysD3PD   = wzphysd3pd;
 		m_analysis_grl = grl;	

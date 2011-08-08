@@ -149,11 +149,13 @@ class DQ2
 		Find.find(targetdir) do |entry|
 			if File.file?(entry) and entry[pattern]
 				filepath = entry.to_s()
-				number   = find_substring(filepath,prefix+"00",6)
+				number    = ""
 				subnumber = ""
 				if(type=="MC") then
+					number    = find_substring(filepath,prefix,6)
 					subnumber = find_substring(filepath,"._",6)
 				else
+					number    = find_substring(filepath,prefix+"00",6)
 					subnumber = find_substring(filepath,"._",5)
 				end
 				fullnumber = "#{number}.#{subnumber}"

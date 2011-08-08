@@ -18,8 +18,8 @@ x.set_prefix("mc10_7TeV.",6) # irrelevant but needs to be specified
 x.set_secondprefix("._",5)
 x.check_variables
 
-x.batch_dq2get_mc(insets,outsets)
-outsets = []
+#x.batch_dq2get_mc(insets,outsets)
+#outsets = []
 x.batch_dq2validate_mc(insets,outsets)
 x.make_list(insets)
 x.finalize()

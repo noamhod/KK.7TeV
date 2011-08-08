@@ -518,11 +518,13 @@ int tagNprobe::probeMask
 	for(int j=0 ; j<(int)trig_has->at(iROI).size() ; j++)
 	{
 		//if(j==trigTrkTag)            continue; // trigTrk_probe!=trigTrk_tag...
+		if(j==trigTrkTag) {}
 		if( !trig_has->at(iROI)[j] ) continue;
 		nROIs++;
 		float dphi = trig_phi->at(iROI)[j] - mu_phi->at(iprobeCand);
 		float deta = trig_eta->at(iROI)[j] - mu_eta->at(iprobeCand);
-		float dr = sqrt(dphi*dphi + deta*deta);
+		//float dr = sqrt(dphi*dphi + deta*deta);
+		dr = sqrt(dphi*dphi + deta*deta);
 		if(dr>dRmax_muTrk_trigTrk) continue;
 		if(dr>dRmax)               continue;
 		dRmax    = dr;

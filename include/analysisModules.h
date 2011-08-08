@@ -31,6 +31,8 @@
 #define eventDumper_cxx
 #include "eventDumper.C"
 
+using namespace cuts;
+using namespace fitparameters;
 
 #ifndef ANALYSISMUDULES_H
 #define ANALYSISMUDULES_H

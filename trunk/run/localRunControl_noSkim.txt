@@ -1,6 +1,6 @@
 local_noskim
 muid
-mc
+data
 DBG SILENT
-INF SILENT
+INF VISUAL
 WRN VISUAL

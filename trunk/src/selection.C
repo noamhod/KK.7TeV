@@ -33,29 +33,21 @@ void selection::sfinalize()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
-inline bool selection::findBestVertex(int nTracksCut, int nTypeCut, float z0cut, int nvxp,
-									  vector<int>* v_vxp_nTracks, vector<int>* v_vxp_type, vector<float>* v_vxp_z)
+inline bool selection::findBestVertex(int nTypeCut, int nTracksCut, float z0cut,
+									  vector<int>* v_vxp_type, vector<int>* v_vxp_nTracks, vector<float>* v_vxp_z)
 {
-	bool found = false;
 	m_iVtx = -1;
-	int   nPVtracks;
-	int   nPVtype;
-	float dPVz0;
-	for(int i=0 ; i<nvxp ; i++)
+	for(int i=0 ; i<(int)v_vxp_nTracks->size() ; i++)
 	{
-		nPVtracks = v_vxp_nTracks->at(i);
-		nPVtype   = v_vxp_type->at(i);
-		dPVz0     = fabs( v_vxp_z->at(i) );
-		_INFO("["+tostring(i)+"] "+"nPVtracks="+tostring(nPVtracks)+", nPVtype="+tostring(nPVtype)+", dPVz0="+tostring(dPVz0));
-		if(nPVtracks>nTracksCut  &&  nPVtype==nTypeCut  &&  dPVz0<z0cut)
-		{
-			found = true;
-			m_iVtx = i;
-			break;
-		}
+		if(v_vxp_type->at(i)!=nTypeCut)      continue;
+		if(v_vxp_nTracks->at(i)<=nTracksCut) continue;
+		if(fabs( v_vxp_z->at(i) )>=z0cut)    continue;
+		
+		m_iVtx = i;
+		return true;
 	}
-	if(!found) _WARNING("didn't find any good vertex\n");
-	return found;
+	//_WARNING("didn't find any good vertex\n");
+	return false;
 }
 
 inline int selection::getPVindex()
@@ -63,15 +55,15 @@ inline int selection::getPVindex()
 	return m_iVtx;
 }
 
-inline int selection::getPVindex(int nTracksCut, int nTypeCut, float z0cut, int nvxp,
-								 vector<int>* v_vxp_nTracks, vector<int>* v_vxp_type, vector<float>* v_vxp_z)
+inline int selection::getPVindex(int nTypeCut, int nTracksCut, float z0cut,
+								 vector<int>* v_vxp_type, vector<int>* v_vxp_nTracks, vector<float>* v_vxp_z)
 {
 	int   nPVtracks;
 	int   nPVtype;
 	float dPVz0;
 	float z0min = 9999;
-	int   index = 0;
-	for(int i=0 ; i<(int)nvxp ; i++)
+	int   index = -1;
+	for(int i=0 ; i<(int)v_vxp_nTracks->size() ; i++)
 	{
 		nPVtracks = v_vxp_nTracks->at(i);
 		nPVtype   = v_vxp_type->at(i);

@@ -6,7 +6,7 @@ require 'DQ2'
 #x.dq2get("NTUP_SMDILEP_dimuon_p591",00178109,"user.wanghill.data11_7TeV.00178109.physics_Muons.merge.NTUP_SMDILEP.r2276_p516_p523_p591_dimuon_p591/")
 #x.dq2get("","")
 
-x = DQ2.new(false)
+
 insets  = [
 			'user.wanghill.data11_7TeV.00178109.physics_Muons.merge.NTUP_SMDILEP.r2276_p516_p523_p591_dimuon_p591/',
 			'user.wanghill.data11_7TeV.00178047.physics_Muons.merge.NTUP_SMDILEP.r2276_p516_p523_p591_dimuon_p591/',
@@ -98,9 +98,18 @@ insets  = [
 		  ]
 outsets = []
 
+x = DQ2.new(true)
+x.set_thisdir(pwd())
+x.set_basedir("/data/hod/2011")
+x.set_type("data")
+x.set_targetdir("/data/hod/2011/NTUP_SMDILEP_dimuon_p591")
+x.set_summary_file("summary.log")
+x.set_list_file("NTUP_SMDILEP_dimuon_p591_runs.list")
+x.set_prefix("user.wanghill.data11_7TeV.",8)
+x.set_secondprefix("._",5)
+x.check_variables
 
-targetdir  = "NTUP_SMDILEP_dimuon_p591"
-nameprefix = "user.wanghill.data11_7TeV."
+
 #x.batch_dq2get(insets,outsets,targetdir,nameprefix)
 #outsets = []
 #x.batch_dq2validate(insets,outsets,targetdir,nameprefix)

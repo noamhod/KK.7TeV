@@ -4,48 +4,136 @@ require 'pathname'
 require 'fileutils'
 require 'ftools'
 require 'find'
+require 'LoggerDecorator'
 include FileUtils
 
 class DQ2
-	attr_accessor :thisdir, :summary_file, :list_file, :type
+	attr_accessor :logger,
+				  :logd,
+				  :targetdir,
+				  :prefix,
+				  :nchars,
+				  :secondprefix,
+				  :nsubchars,
+				  :summary_file,
+				  :list_file,
+				  :type
 	
-	def initialize(dosetup=false,stype="data")
+	def initialize(dosetup=false)
 		if(dosetup) then
-			%x(source $HOME/setupGrid.sh)
+			#%x(source ~hod/setupGrid_t302.sh)
+			%x(source ~hod/setupGrid.sh)
 		end
 		
-		@thisdir=pwd()
-		@type = stype
+		set_loggerdec("")
+		# set_loglvl(Logger::INFO)
+		# set_loglvl(Logger::DEBUG)
+		# set_loglvl(Logger::WARN)
+		# set_loglvl(Logger::ERROR)
+		# set_loglvl(Logger::FATAL)
+	end
+	
+	def check_variables
+		ok=true
 		
-		#puts "TYPE=#{type}"
-		LOG("INFO", "TYPE=#{type}")
-		puts ""
+		logd.info "target dir = #{targetdir}"
+		logd.info "prefix = #{prefix}"
+		logd.info "nchars = #{nchars}"
+		logd.info "secondprefix = #{secondprefix}"
+		logd.info "nsubchars = #{nsubchars}"
+		logd.info "summary_file = #{summary_file}"
+		logd.info "list_file = #{list_file}"
+		logd.info "type = #{type}"
+		
+		if(!type)	then
+			ok=false
+			logd.error "type is not set"
+		end
+		if(!summary_file)	then
+			ok=false
+			logd.error "summary_file is not set"
+		end
+		if(!list_file)	then
+			ok=false
+			logd.error "list_file is not set"
+		end
+		if(!targetdir)	then
+			ok=false
+			logd.error "targetdir is not set"
+		end
+		if(!prefix)	then
+			ok=false
+			logd.error "prefix is not set"
+		end
+		if(!nchars)	then
+			ok=false
+			logd.error "nchars is not set"
+		end
+		if(!secondprefix)	then
+			ok=false
+			logd.error "secondprefix is not set"
+		end
+		if(!nsubchars)	then
+			ok=false
+			logd.error "nsubchars is not set"
+		end
+		
+		return ok
 	end
 	
-	def LOG(msgtype="DEBUG",msg="")
-		puts "[#{__FILE__} +#{__LINE__}] #{msgtype}: #{msg}"
+	def set_summary_file(str="")
+		@summary_file = str
 	end
 	
-	def get_run_number(dataset="",prefix="user.wanghill.data11_7TeV.",nchars=8)
-		substring = prefix
-		#start_ss = dataset.index(substring)
-		#puts dataset[substring.length,nchars]
-		return dataset[substring.length,nchars]
+	def set_list_file(str="")
+		@list_file = str
 	end
 	
-	def find_substring(string="",substring="._",nchars=5)
-		start_ss = string.index(substring)
-		return string[start_ss+substring.length, nchars]
+	def set_type(str="")
+		@type = str
 	end
-
-	def block_compare(a=0,b=0)
-		if a>b then
-			return +1
-		elsif a<b then
-			return -1
+	
+	def set_targetdir(str="")
+		@targetdir = str
+	end
+	
+	def set_prefix(str="",ncr=8)
+		@prefix = str
+		@nchars = ncr
+	end
+	
+	def set_secondprefix(str="",nsubcr=5)
+		@secondprefix = str
+		@nsubchars    = nsubcr
+	end
+	
+	def set_loggerdec(logfilename="")
+		@logger = Logger.new(STDERR)
+		logger = Logger.new(STDOUT)
+		if(logfilename!="") then
+			@logger = Logger.new(logfilename)
+		end
+		@logd = LoggerDecorator.new(logger)
+	end
+	
+	def set_loglvl(lvl=Logger::INFO)
+		logger.level = lvl
+	end
+	
+	def find_substring(string="", sfindthis="", n=0)
+		if(sfindthis==""  and  n==0) then
+			start_ss = string.index(secondprefix)
+			return string[start_ss+secondprefix.length,nsubchars]
+		elsif(sfindthis!=""  and  n>0) then
+			return string[Integer(string.index(sfindthis))+Integer(sfindthis.length), n]
 		else
-			return 0
+			logd.error "in find_substring, sfindthis=#{sfindthis}, n=#{n}"
+			return
 		end
+	end
+	
+	def get_run_number(string="")
+		return find_substring(string,prefix,nchars)
 	end
 	
 	def check_file(file="", run="", string="0 files failed")
@@ -56,109 +144,106 @@ class DQ2
 		lines
 	end
 
-	def search_directory(path="",pattern=".root",prefix="/user.wanghill.data11_7TeV.00",hashmap={})
+	def search_directory(path="",pattern=".root",hashmap={})
 		# see: http://rosettacode.org/wiki/Walk_a_directory/Recursively
-		fullprefix = path+prefix
-		Find.find(path) do |entry|
+		Find.find(targetdir) do |entry|
 			if File.file?(entry) and entry[pattern]
 				filepath = entry.to_s()
-				number    = get_run_number(filepath,fullprefix,6)
-				subnumber = find_substring(filepath,"._",5)
+				number   = find_substring(filepath,prefix+"00",6)
+				subnumber = ""
+				if(type=="MC") then
+					subnumber = find_substring(filepath,"._",6)
+				else
+					subnumber = find_substring(filepath,"._",5)
+				end
 				fullnumber = "#{number}.#{subnumber}"
-				#puts "key=#{fullnumber}: val=#{filepath}"
+				#logd.info "Hash -> key=#{fullnumber}: val=#{filepath}"
 				hashmap[Float(fullnumber)] = filepath
 			end
 		end
 
 		hashmap = hashmap.sort
-		puts hashmap
+		#puts hashmap
 		return hashmap
 	end
 
-	def dq2get(dir="",run="",dataset="",file="",mcdir="")
-		puts dataset
+	def dq2get(run="",dataset="",mcname="")
+		logd.info "getting -> #{dataset}"
 		subdir = dataset[0,dataset.length-1]
-		targetdir = ""
-		logdir    = ""
+		path    = ""
+		logdir  = ""
+		logfile = ""
 		if(type=="data") then
-			targetdir = thisdir+"/"+dir+"/"+subdir
-			logdir    = thisdir+"/"+dir+"/logs"
+			path   = targetdir+"/"+subdir
+			logdir = targetdir+"/logs"
+			logfile = "#{logdir+"/"+run}.log"
 		elsif(type=="MC") then
-			targetdir = thisdir+"/"+dir+"/"+mcdir+"/"+subdir
-			logdir    = thisdir+"/"+dir+"/"+mcdir+"/logs"
+			path   = targetdir+"/"+mcname+"/"+subdir
+			logdir = targetdir+"/"+mcname+"/logs"
+			logfile = "#{logdir+"/"+mcname+"."+run}.log"
 		else
-			LOG("ERROR","unknown type=#{type}")
-			return
-		end
-		%x(mkdir -p #{targetdir})
-		%x(rm -f #{logdir+"/"+run}.log)
-		
-		if(file=="") then
-			#puts "%x(dq2-get -H #{targetdir}            #{dataset} > #{logdir+"/"+mcdir+"."+run}.log 2>&1)"
-			%x(dq2-get -H #{targetdir}            #{dataset} > #{logdir+"/"+mcdir+"."+run}.log 2>&1)
-		else
-			#puts "%x(dq2-get -H #{targetdir} -f #{file} #{dataset} > #{logdir+"/"+mcdir+"."+run}.log 2>&1)"
-			%x(dq2-get -H #{targetdir} -f #{file} #{dataset} > #{logdir+"/"+mcdir+"."+run}.log 2>&1)
-		end
-	end
-
-	def dq2validate(dir="", run="", dataset="", file="", mcdir="")
-		puts dataset
-		subdir = dataset[0,dataset.length-1]
-		targetdir = ""
-		logdir    = ""
-		if(type=="data") then
-			targetdir = thisdir+"/"+dir+"/"+subdir
-			logdir    = thisdir+"/"+dir+"/validation_logs"
-		elsif(type=="MC") then
-			targetdir = thisdir+"/"+dir+"/"+mcdir+"/"+subdir
-			logdir    = thisdir+"/"+dir+"/"+mcdir+"/validation_logs"
-		else
-			LOG("ERROR","uknown type and size of mcdirs")
+			logd.error "unknown type=#{type}"
 			return
 		end
 		
-		%x(rm -f #{logdir+"/"+run}.log)
-		if(file=="") then
-			%x(dq2-get -H #{targetdir} -Z            #{dataset} > #{logdir+"/"+run}.validation.log 2>&1)
-			#puts "%x(dq2-get -H #{targetdir} -Z            #{dataset} > #{logdir+"/"+mcdir+"."+run}.validation.log 2>&1)"
-		else
-			%x(dq2-get -H #{targetdir} -Z -f #{file} #{dataset} > #{logdir+"/"+run}.validation.log 2>&1)
-			#puts "%x(dq2-get -H #{targetdir} -Z -f #{file} #{dataset} > #{logdir+"/"+mcdir+"."+run}.validation.log 2>&1)"
-		end
-		
-		logfile = logdir+"/"+mcdir+"."+run+".validation.log"
-		summary_file = File.open(thisdir+"/"+dir+"/summary.log",'a')
-		summary_file.puts check_file(logfile,run,"0 files failed") # nagation
+		%x(dq2-get -H #{path} #{dataset} > #{logfile} 2>&1)
 	end
 
-	def batch_dq2get(inlist=[],outlist=[],dir="",prefix="",mclist={})
+	def dq2validate(run="",dataset="",mcname="")
+		logd.info "validating -> #{dataset}"
+		subdir = dataset[0,dataset.length-1]
+		path    = ""
+		logdir  = ""
+		logfile = ""
+		if(type=="data") then
+			path    = targetdir+"/"+subdir
+			logdir  = targetdir+"/validation_logs"
+			logfile = logdir+"/"+run+".validation.log"
+		elsif(type=="MC") then
+			path    = targetdir+"/"+mcname+"/"+subdir
+			logdir  = targetdir+"/"+mcname+"/validation_logs"
+			logfile = logdir+"/"+mcname+"."+run+".validation.log"
+		else
+			logd.error "unknown type=#{type}"
+			return
+		end
+		
+		%x(rm -f #{logdir}/*)
+		%x(dq2-get -H #{path} -Z #{dataset} > #{logfile} 2>&1)
+
+		f_summary_file = File.open(targetdir+"/"+summary_file,'a')
+		f_summary_file.puts check_file(logfile,run,"0 files failed") # nagation
+	end
+
+	def batch_dq2get(inlist=[],outlist=[],mclist={})
 		if(mclist.length==0  &&  type=="data") then
-			logdir = thisdir+"/"+dir+"/logs"
+			logdir = targetdir+"/logs"
 			%x(mkdir -p #{logdir})
-			%x(rm -f #{logdir+"/*"})
+			%x(rm -f #{logdir}/*)
 		elsif(mclist.length>0  &&  type=="MC") then
 			mclist.each{|key,val|
-				logdir = thisdir+"/"+dir+"/"+key+"/logs"
+				mcname = key
+				logdir = targetdir+"/"+mcname+"/logs"
 				%x(mkdir -p #{logdir})
-				%x(rm -f #{logdir+"/*"})
+				%x(rm -f #{logdir}/*)
 			}
 		else
-			LOG("ERROR","uknown type and size of mcdirs")
+			logd.error "uknown type and size of mcdirs"
 			return
 		end
 	
 		# Set the threads going
 		inlist.each{ |dataset|
 			dataset_thread = Thread.new(dataset) { |set|
-				run = get_run_number(dataset,prefix,6)
-				mcdir = "#{mclist.index(set)}"
+				run = get_run_number(dataset)
+				#logd.info "dataset = #{dataset}, run = #{run}"
+				mcname = "#{mclist.index(set)}"
 				if(type=="data") then
-					dq2get(dir,run,set)
+					dq2get(run,set)
 				elsif(type=="MC") then
-					dq2get(dir,run,set,"",mcdir)
+					dq2get(run,set,mcname)
 				else
-					LOG("ERROR","uknown type=#{type}")
+					logd.error "uknown type=#{type}"
 					return
 				end
 			}
@@ -171,43 +256,44 @@ class DQ2
 		}
 	end
 
-	def batch_dq2get_mc(inlist={},outlist=[],dir="",prefix="")
+	def batch_dq2get_mc(inlist={},outlist=[])
 		mclist = Array.new
 		inlist.each {|key,val|
-			puts "#{key} is #{val}"
+			#logd.info "Hash -> #{key} is #{val}"
 			mclist << val
 		}
-		batch_dq2get(mclist,outlist,dir,prefix,inlist)
+		batch_dq2get(mclist,outlist,inlist)
 	end
 	
-	def batch_dq2validate(inlist=[],outlist=[],dir="",prefix="",mclist={})
+	def batch_dq2validate(inlist=[],outlist=[],mclist={})
 		if(mclist.length==0  &&  type=="data") then
-			logdir = thisdir+"/"+dir+"/validation_logs"
+			logdir = targetdir+"/validation_logs"
 			%x(mkdir -p #{logdir})
-			%x(rm -f #{logdir+"/*"})
+			%x(rm -f #{logdir}/*)
 		elsif(mclist.length>0  &&  type=="MC") then
 			mclist.each{|key,val|
-				logdir = thisdir+"/"+dir+"/"+key+"/validation_logs"
+				mcname = key
+				logdir = targetdir+"/"+mcname+"/validation_logs"
 				%x(mkdir -p #{logdir})
-				%x(rm -f #{logdir+"/*"})
+				%x(rm -f #{logdir}/*)
 			}
 		else
-			LOG("ERROR","uknown type and size of mcdirs")
+			logd.error "uknown type and size of mcdirs"
 			return
 		end
-		%x(rm -f #{thisdir+"/"+dir+"/summary.log"})
+		%x(rm -f #{targetdir+"/"+summary_file})
 		
 		# Set the threads going
 		inlist.each{ |dataset|
 			dataset_thread = Thread.new(dataset) { |set|
-				run = get_run_number(dataset,prefix,6)
-				mcdir = "#{mclist.index(set)}"
+				run = get_run_number(dataset)
+				mcname = "#{mclist.index(set)}"
 				if(type=="data") then
-					dq2validate(dir,run,set)
+					dq2validate(run,set)
 				elsif(type=="MC") then
-					dq2validate(dir,run,set,"",mcdir)
+					dq2validate(run,set,mcname)
 				else
-					LOG("ERROR","uknown type=#{type}")
+					logd.error "uknown type=#{type}"
 					return
 				end
 			}
@@ -220,50 +306,46 @@ class DQ2
 		}
 	end
 	
-	def batch_dq2validate_mc(inlist={},outlist=[],dir="",prefix="")
+	def batch_dq2validate_mc(inlist={},outlist=[])
 		mclist = Array.new
 		inlist.each {|key,val|
-			puts "#{key} is #{val}"
+			#logd.info "Hash -> #{key} is #{val}"
 			mclist << val
 		}
-		batch_dq2validate(mclist,outlist,dir,prefix,inlist)
+		batch_dq2validate(mclist,outlist,inlist)
 	end
 	
-	def make_list(dir="",prefix="",mclist={})
+	def make_list(mclist={})
 		if(mclist.length==0  &&  type=="data") then
 			files = Hash.new
-			path = thisdir+"/"+dir
-			prefix="/"+prefix
-			files = search_directory(path,".root",prefix,files)
-			listfile = thisdir+"/"+dir+"/"+dir+"_runs.list"
-			list_file = File.open(listfile,'w')
+			files = search_directory(targetdir,".root",files)
+			listfile = targetdir+"/"+list_file
+			f_list_file = File.open(listfile,'w')
 			files.each {|key,val|
-				puts "#{key} is #{val}"
-				list_file.puts val
+				#logd.info "Hash -> #{key} is #{val}"
+				f_list_file.puts val
 			}
-			list_file.close
+			f_list_file.close
 		elsif(mclist.length>0  &&  type=="MC") then
 			mclist.each {|key,val|
 				files = Hash.new
-				mcdir = key
-				path = thisdir+"/"+dir+"/"+mcdir
-				prefix="/"+prefix
-				files = search_directory(path,".root",prefix,files)
-				listfile = thisdir+"/"+dir+"/"+mcdir+"/"+mcdir+"_runs.list"
-				list_file = File.new(listfile,'w')
+				mcname = key
+				files = search_directory(targetdir+"/"+mcname,".root",files)
+				listfile = targetdir+"/"+mcname+"/"+mcname+"_runs.list"
+				f_list_file = File.new(listfile,'w')
 				files.each {|key,val|
-					puts "#{key} is #{val}"
-					list_file.puts val
+					#logd.info "Hash -> #{key} is #{val}"
+					f_list_file.puts val
 				}
-				list_file.close
+				f_list_file.close
 			}
 		else
-			LOG("ERROR","uknown type=#{type}")
+			logd.error "uknown type=#{type}"
 			return
 		end
 	end
 	
-	def finalize(dir="")
-		puts "\nsee summary log in: "+thisdir+"/"+dir+"/summary.log"
+	def finalize()
+		puts "\nsee summary log in: "+targetdir+"/summary.log"
 	end
 end

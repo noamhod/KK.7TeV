@@ -95,7 +95,7 @@ outlist=[]
 runnumbers = Array.new
 
 
-x = QSUB.new(false)
+x = QSUB.new(true)
 
 x.set_thisdir(pwd())
 x.set_homedir("/srv01/tau/hod")
@@ -109,8 +109,8 @@ x.set_secondprefix("._",5)
 
 x.check_variables
 #x.batch_qsub(insets,runnumbers)
-#x.merge_root(insets,"merged.root")
-#x.merge_candidates(insets,"merged.candidates")
-#x.merge_cutflow(insets,"merged.cutflow")
+### x.merge_root(insets,"merged.root")
+### x.merge_candidates(insets,"merged.candidates")
+### x.merge_cutflow(insets,"merged.cutflow")
 x.waitNmerge(5,insets,"merged")
 x.finalize()

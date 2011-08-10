@@ -195,8 +195,7 @@ void analysisLocalControl::initialize(int RunNumber, string runs, string basedir
 	if(runs=="ALLRUNS")   str_events = checkANDsetFilepath("PWD", "/interestingEvents.dump");
 	if(runs=="SINGLERUN") str_events = basedir+"/../run/tmp/interestingEvents_"+tostring(RunNumber)+".dump";
 	m_analysis = new analysis(m_RunType, m_muRecAlgo, m_isMC,
-							  m_WZphysD3PD, m_GRL, m_treefile,
-							  str_periods, str_events );
+							  m_WZphysD3PD, m_GRL, m_treefile, str_events );
 	
 	string str_logspath = "";
 	if(runs=="ALLRUNS")   str_logspath = checkANDsetFilepath("PWD", "");

@@ -551,8 +551,8 @@ public:
 
 public:
 	analysisSkeleton();
-	analysisSkeleton(string sPeriodsFilePath, string sEventDumpFilePath) :
-	analysisModules(sPeriodsFilePath,sEventDumpFilePath)
+	analysisSkeleton(string sEventDumpFilePath) :
+	analysisModules(sEventDumpFilePath)
 	{
 		tmp_counter_1 = 0;
 		tmp_counter_2 = 0;

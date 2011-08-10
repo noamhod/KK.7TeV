@@ -106,16 +106,18 @@ void analysisSkeleton::matchTrigger(string speriod, string sTrigType)
 		exit(-1);
 	}
 	
-	if(speriod=="MC")
-	{
-		mu_LLT_index = mu_L1_index;
-		mu_LLT_dr    = mu_L1_dr;
-		LLT_pt       = trig_L1_mu_pt;
-		LLT_phi      = trig_L1_mu_phi;
-		LLT_eta      = trig_L1_mu_eta;
-	}
-	else if
+	// if(speriod=="MC")
+	// {
+		// mu_LLT_index = mu_L1_index;
+		// mu_LLT_dr    = mu_L1_dr;
+		// LLT_pt       = trig_L1_mu_pt;
+		// LLT_phi      = trig_L1_mu_phi;
+		// LLT_eta      = trig_L1_mu_eta;
+	// }
+	// else if
+	if
 	(
+		speriod=="MC" ||
 		speriod=="A"  || speriod=="B" || speriod=="D" || speriod=="E" ||
 		speriod=="F"  || speriod=="G" || speriod=="H"
 	)
@@ -1751,24 +1753,24 @@ void analysisSkeleton::fill_tNp()
 	bool isHLT = false;
 	bool isCBpT = true;
 	
-	//////////////////////////////////////////////////////////////////////////////////
-	//float trig_pTmin       = (float)m_period2pTminMap->operator[](sPeriod); ////////// //???????????????????????????????????????????????????????????
-	float trig_pTthreshold = (float)m_period2pTthresholdMap->operator[](sPeriod); ////
-	string sTrigPeriod     = (*m_period2triggerperiodMap)[sPeriod]; //////////////////
-	//////////////////////////////////////////////////////////////////////////////////
-	if( (size_t)sTrigPeriod.find("L1")!=string::npos )      sTrigType = "L1"; ////////
-	else if( (size_t)sTrigPeriod.find("MG")!=string::npos ) sTrigType = "MG"; ////////
-	else if( (size_t)sTrigPeriod.find("MS")!=string::npos ) sTrigType = "MS"; ////////
-	else                                                    sTrigType = "CB"; ////////
-	//////////////////////////////////////////////////////////////////////////////////
-	if     ( (size_t)sTrigPeriod.find("L1")!=string::npos ) isLLT = true; ////////////
-	else if( (size_t)sTrigPeriod.find("EF")!=string::npos ) isHLT = true; ////////////
-	//////////////////////////////////////////////////////////////////////////////////
-	if     (sTrigType=="L1" || sTrigType=="MS") isCBpT = false; //////////////////////
-	else if(sTrigType=="MG" || sTrigType=="CB") isCBpT = true;  //////////////////////
-	//////////////////////////////////////////////////////////////////////////////////
-	matchTrigger(sPeriod, sTrigType); ////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
+	//float trig_pTmin       = (float)m_period2pTminMap->operator[](sPeriod)->at(0); ////////  //???????????????????????????????????????????????????????????
+	float trig_pTthreshold = (float)m_period2pTthresholdMap->operator[](sPeriod)->at(0); ////  //???????????????????????????????????????????????????????????
+	string sTrigPeriod     = (*m_period2triggerperiodMap)[sPeriod]; /////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
+	if( (size_t)sTrigPeriod.find("L1")!=string::npos )      sTrigType = "L1"; ///////////////
+	else if( (size_t)sTrigPeriod.find("MG")!=string::npos ) sTrigType = "MG"; ///////////////
+	else if( (size_t)sTrigPeriod.find("MS")!=string::npos ) sTrigType = "MS"; ///////////////
+	else                                                    sTrigType = "CB"; ///////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
+	if     ( (size_t)sTrigPeriod.find("L1")!=string::npos ) isLLT = true; ///////////////////
+	else if( (size_t)sTrigPeriod.find("EF")!=string::npos ) isHLT = true; ///////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
+	if     (sTrigType=="L1" || sTrigType=="MS") isCBpT = false; /////////////////////////////
+	else if(sTrigType=="MG" || sTrigType=="CB") isCBpT = true;  /////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
+	matchTrigger(sPeriod, sTrigType); ///////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
 	
 	float pTtmp;
 	int previousTag;
@@ -1897,13 +1899,13 @@ void analysisSkeleton::fillTruthEfficiency()
 	if(mu_me_qoverp==0)        return;
 	if(mu_me_theta==0)         return;
 	
-	//////////////////////////////////////////////////////////////////////////////////
-	float trig_pTmin       = (float)m_period2pTminMap->operator[](sPeriod); //////////
-	//float trig_pTthreshold = (float)m_period2pTthresholdMap->operator[](sPeriod); ////  // ????????????????????????????????????????????????????????
-	string sTrigPeriod     = (*m_period2triggerperiodMap)[sPeriod]; //////////////////
-	string sTrigType = "L1"; /////////////////////////////////////////////////////////
-	matchTrigger(sPeriod, sTrigType); ////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
+	float trig_pTmin       = (float)m_period2pTminMap->operator[](sPeriod)->at(0); //////////  // ????????????????????????????????????????????????????????
+	//float trig_pTthreshold = (float)m_period2pTthresholdMap->operator[](sPeriod)->at(0); //  // ????????????????????????????????????????????????????????
+	string sTrigPeriod     = (*m_period2triggerperiodMap)[sPeriod]; /////////////////////////
+	string sTrigType = "L1"; ////////////////////////////////////////////////////////////////
+	matchTrigger(sPeriod, sTrigType); ///////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
 	
 	//////////////////////////////////////
 	if(mu_truth_pt->size()!=2) return; ///
@@ -2360,13 +2362,13 @@ inline bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 				if(pass1Trig) break;
 			}
 			passCurrentCut = pass1Trig;
-			if(!passCurrentCut)
-			{
-				_INFO("\nfail: lbn="+tostring(lbn)+", evt="+tostring(EventNumber));
-				_INFO("   EF_mu22 = "+tostring(EF_mu22));
-				_INFO("   EF_mu22_MG = "+tostring(EF_mu22_MG));
-				_INFO("   EF_mu40_MSonly_barrel = "+tostring(EF_mu40_MSonly_barrel));
-			}
+			// if(!passCurrentCut)
+			// {
+				// _INFO("\nfail: lbn="+tostring(lbn)+", evt="+tostring(EventNumber));
+				// _INFO("   EF_mu22 = "+tostring(EF_mu22));
+				// _INFO("   EF_mu22_MG = "+tostring(EF_mu22_MG));
+				// _INFO("   EF_mu40_MSonly_barrel = "+tostring(EF_mu40_MSonly_barrel));
+			// }
 		}
 		
 		else if(sorderedcutname=="PV"  &&  !bSkipCut)

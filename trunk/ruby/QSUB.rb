@@ -170,6 +170,11 @@ class QSUB
 		return string[start_ss+secondprefix.length,nsubchars]
 	end
 	
+	def find_string(string="", substring="", n=0)
+		start_ss = string.index(substring)
+		return string[start_ss+substring.length, n]
+	end
+	
 	def search_directory(path="",pattern=".root",fullprefix="")
 		# see: http://rosettacode.org/wiki/Walk_a_directory/Recursively
 		hashmap = Hash.new
@@ -224,7 +229,9 @@ class QSUB
 		jobfile = File.open(jobname, 'w') { |f| 
 			f.puts "#!/bin/bash"
 			f.puts "export PBS_SERVER=tau-ce.hep.tau.ac.il"
-			f.puts "echo   \"host = $HOSTNAME\""
+			f.puts "export RUNNUMBER=#{runnumber}"
+			f.puts "echo   \"HOST=$HOSTNAME\""
+			f.puts "echo   \"RunNumber=$RUNNUMBER\""
 			f.puts "export ROOTSYS=#{rootdir}"
 			f.puts "export LD_LIBRARY_PATH=$ROOTSYS/lib:$LD_LIBRARY_PATH"
 			f.puts "export PATH=$ROOTSYS/bin:$PATH"
@@ -232,6 +239,7 @@ class QSUB
 			f.puts "export LD_LIBRABY_PATH=$LD_LIBRABY_PATH:#{rundirregular}"
 			f.puts "export LD_LIBRABY_PATH=$LD_LIBRABY_PATH:#{thisdir}/../GoodRunsLists-00-00-91/StandAlone"
 			f.puts "$ROOTSYS/bin/root.exe -l -b -q #{macroname}"
+			f.puts "echo   \"RunNumber=$RUNNUMBER\""
 			f.puts "echo   \"host = $HOSTNAME\""
 		}
 		
@@ -257,7 +265,6 @@ class QSUB
 				# end
 			# end
 		# end
-
 		# puts nodes
 		# %x(qsub -l #{nodes} -q N -e #{rundirregular}/tmp/err -o #{rundirregular}/tmp/out #{jobname})
 
@@ -342,10 +349,30 @@ class QSUB
 			lines = IO.readlines(file)[firstline..lastline]
 			#puts lines
 			cutindex = 0
+			checkrun = 0
 			lines.each do |line|
 				words = parse_line(line)
 				if(!words) then next end
 				if(words.length>0) then
+					# if(Integer(words[3])==0) then
+						# puts "words[1]=#{words[1]}, words[2]=#{words[2]} Integer(words[3])=#{Integer(words[3])}"
+					# end
+					if(words[2]=="all"  and Integer(words[3])==0) then
+						runnumber = find_string(file.to_s(), "RunCutFlow.run_", 6)
+						rundirout = "#{thisdir}/../run/tmp/out"
+						rundirerr = "#{thisdir}/../run/tmp/err"
+						logd.warn "@@@ in file #{file}"
+						logd.warn "@@@ no events were processed, check the following log files:"
+						result1 = %x(ruby findthis.rb #{rundirout} RunNumber=#{runnumber})
+						result1 = result1.gsub("\n","")
+						logd.warn "@@@ #{result1}"
+						result2 = %x(ruby findthis.rb #{rundirerr} #{runnumber})
+						result2 = result2.gsub("\n","")
+						logd.warn "@@@ #{result2}"
+						hostline = IO.readlines(result1)[0..0]
+						logd.warn "@@@ #{hostline}"
+					end
+					
 					if(filescount==0) then
 						add_cut(types,names,evnts, words[1],words[2],Integer(words[3]))
 					else
@@ -361,7 +388,7 @@ class QSUB
 			f.puts "<? This is a summary of the cutflow from run #{Time.now} ?>"
 			names.each do |name|
 				string = "#{types[names.index(name)]} \t #{name} \t\t #{evnts[names.index(name)]}"
-				logd.info string
+				#logd.info string
 				f.puts string
 			end
 		end
@@ -377,7 +404,7 @@ class QSUB
 		files.each{|file|
 			lines = IO.readlines(file)
 			lines = lines.sort
-			logd.info "There are #{lines.length} candidates in #{file}"
+			#logd.info "There are #{lines.length} candidates in #{file}"
 			lines.each do |line|
 				candidates_all << line
 			end
@@ -396,7 +423,7 @@ class QSUB
 		files.each{|file|
 			lines = IO.readlines(file)
 			lines = lines.sort
-			logd.info "There are #{lines.length} candidates in #{file}"
+			#logd.info "There are #{lines.length} candidates in #{file}"
 			lines.each do |line|
 				candidates_pT << line
 			end
@@ -411,7 +438,6 @@ class QSUB
 			end
 		end
 	end
-	
 	
 	def merge_root(inlist=[], mergedfilename="merged.root")
 		line = String.new
@@ -428,6 +454,10 @@ class QSUB
 		%x(hadd -f #{targetdir}/../#{mergedfilename}    #{line})
 	end
 	
+	
+	
+	
+	#####################################################################################
 	def repeat_every(interval)
 		# http://stackoverflow.com/questions/2279210/timer-in-ruby-performance
 		loop do
@@ -451,8 +481,8 @@ class QSUB
 		end
 		seconds = interval*iteration
 		logd.info "!!!---merging (after #{iteration} iterations [#{seconds} seconds])---!!!"
-		merge_root(inlist,"#{mergedfilename}.root")
-		merge_candidates(inlist,"#{mergedfilename}.candidates")
+		#merge_root(inlist,"#{mergedfilename}.root")
+		#merge_candidates(inlist,"#{mergedfilename}.candidates")
 		merge_cutflow(inlist,"#{mergedfilename}.cutflow")
 	end
 	

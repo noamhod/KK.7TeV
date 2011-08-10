@@ -69,8 +69,8 @@ void xmlconfig::read(string readerName, string fileName)
 	if(readerName=="periods")
 	{
 		header(fileName);
-		periodsXml::ParseContext(node);
-		if(!periodsXml::mask())
+		periodHandler::ParseContext(node);
+		if(!periodHandler::mask())
 		{
 			_ERROR("failed to mask the xml file (" + fileName + "). exitting now.");
 			exit(-1);

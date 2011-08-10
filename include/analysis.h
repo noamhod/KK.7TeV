@@ -54,9 +54,8 @@ public:
 			 WZphysD3PD* wzphysd3pd,
 			 GRLinterface* grl,
 			 TFile* treeFile,
-			 string sPeriodsFilePath,
 			 string sEventDumpFilePath) :
-	analysisSkeleton(sPeriodsFilePath,sEventDumpFilePath)
+	analysisSkeleton(sEventDumpFilePath)
 	{
 		sRunType       = runtype;  // grid OR local
 		sMuonRecoAlgo  = murecalg; // staco OR muid

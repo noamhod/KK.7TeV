@@ -177,10 +177,9 @@ inline bool selection::isCombMuCut( float isCombMuCutVal, int isCombMu )
 
 inline bool selection::isolationXXCut( float isolationCutVal, string sIsoValName, float pTmu, float pTcone )
 {
-	/*mu_staco_ptcone20, mu_staco_pt*/
-	// track sum pT in 0.2 cone relative to muon pT less than 0.05
-	pTmu   *= MeV2TeV;
-	pTcone *= MeV2TeV;
+	// track sum pT in 0.XX cone relative to muon pT less than YYY
+	//pTmu   *= MeV2TeV;
+	//pTcone *= MeV2TeV;
 	float isolation = (pTmu==0) ? 999 : pTcone/pTmu;
 	
 	if(b_print) cout << "in isolationXXCut: isolation(" << sIsoValName << ")=" << isolation << endl;
@@ -190,8 +189,9 @@ inline bool selection::isolationXXCut( float isolationCutVal, string sIsoValName
 
 inline bool selection::isolationXXCut( float isolationCutVal, string sIsoValName, float qOp, float theta, float pTcone )
 {
-	pTcone *= MeV2TeV;
-	float pTmu = pT(qOp, theta)*MeV2TeV;
+	// pTcone *= MeV2TeV;
+	// float pTmu = pT(qOp, theta)*MeV2TeV;
+	float pTmu = pT(qOp,theta);
 	float isolation = (pTmu==0) ? 999 : pTcone/pTmu;
 	
 	if(b_print) cout << "in isolationXXCut: isolation(" << sIsoValName << ")=" << isolation << endl;
@@ -268,21 +268,11 @@ inline bool selection::nMShitsCut(float nMDTBIMOHitsCutVal, float nMDTEIMOHitsCu
 								  int nTGCLayer1PhiHits, int nTGCLayer2PhiHits, int nTGCLayer3PhiHits, int nTGCLayer4PhiHits,
 								  int nCSCEtaHits, int nCSCPhiHits)
 {
-	// At least 3 hits in all of Barrel or Endcap Inner,
-	// Middle and Outer MDT/CSC precision layers,
-	// at least one phi hit, and no BEE, EE or BIS78 hits
-	
-	
-	//1) at least one phi hit on the MS track
-	//2.1) MS track has at least 3 hits in each of Inner, Middle, Outer of Barrel
-	//OR
-	//2.2) MS track has at least 3 hits in each of Inner, Middle, Outer of Endcap
-	//3) BEE is vetoed & EE is vetoed & BIS78 is vetoed
-	//The motivation to implement component (2) is this way is that the 3hits x 3stations
-	//requirement should be satisfied by the barrel MS on its own or the endcap MS on its own.
-	//An MS track where the barrel alone (or endcap alone) cannot satisfy these quality requirements,
-	//may be sensitive to relative misalignments between barrel and endcap, and is not considered
-	//robust enough for the first Zprime publication. There are not many such tracks anyway. 
+	// REJECT ANYWAY IF THIS FAILS:
+	if(nMDTBEEHits!=nMDTBEEHitsCutVal)     return false;
+	if(nMDTEEHits!=nMDTEEHitsCutVal)       return false;
+	if(nMDTBIS78Hits!=nMDTBIS78HitsCutVal) return false;
+
 	
 	bool passedMDTBI = (nMDTBIHits >= nMDTBIMOHitsCutVal) ? true : false;
 	bool passedMDTBM = (nMDTBMHits >= nMDTBIMOHitsCutVal) ? true : false;
@@ -290,32 +280,41 @@ inline bool selection::nMShitsCut(float nMDTBIMOHitsCutVal, float nMDTEIMOHitsCu
 	bool passedMDTEI = (nMDTEIHits >= nMDTEIMOHitsCutVal) ? true : false;
 	bool passedMDTEM = (nMDTEMHits >= nMDTEIMOHitsCutVal) ? true : false;
 	bool passedMDTEO = (nMDTEOHits >= nMDTEIMOHitsCutVal) ? true : false;
-	bool passedCSC   = (nCSCEtaHits >= nCSCEtaHitsCutVal)   ? true : false;
+	bool passedCSC   = (nCSCEtaHits >= nCSCEtaHitsCutVal) ? true : false;
 
-	bool passedMDTBarrel = ((passedMDTBI + passedMDTBM + passedMDTBO)              >= nMDTBarrel_LogicSum)      ? true : false;
-	bool passedMDTEndcap = (((passedMDTEI||passedCSC) + passedMDTEM + passedMDTEO) >= nMDTorCSCEndcap_LogicSum) ? true : false;
-	bool passedMDTCSC = (passedMDTBarrel || passedMDTEndcap) ? true : false;
-	if(!passedMDTCSC) return false;
-	 
-	bool passedMDTBEE   = (nMDTBEEHits==nMDTBEEHitsCutVal) ? true : false;
-	if(!passedMDTBEE)   return false;
-	bool passedMDTEE    = (nMDTEEHits==nMDTEEHitsCutVal) ? true : false;
-	if(!passedMDTEE)    return false;
-	bool passedMDTBIS78 = (nMDTBIS78Hits==nMDTBIS78HitsCutVal) ? true : false;
-	if(!passedMDTBIS78) return false;
 	
-	int nRPCTGCCSCsum = (nRPCLayer1PhiHits>=nRPCLayerPhiHitsCutsVal) +
-						(nRPCLayer2PhiHits>=nRPCLayerPhiHitsCutsVal) +
-						(nRPCLayer3PhiHits>=nRPCLayerPhiHitsCutsVal) + 
-						(nTGCLayer1PhiHits>=nTGCLayerPhiHitsCutsVal) +
-						(nTGCLayer2PhiHits>=nTGCLayerPhiHitsCutsVal) +
-						(nTGCLayer3PhiHits>=nTGCLayerPhiHitsCutsVal) +
-						(nTGCLayer4PhiHits>=nTGCLayerPhiHitsCutsVal) +
-						(nCSCPhiHits>=nCSCLayerPhiHitsCutVal);
-	bool passedRPCTGCCSC = (nRPCTGCCSCsum >= nRPCTGCCSC_LogicSum) ? true : false;
-	if(!passedRPCTGCCSC) return false;
+	// CHECK BARREL !!!
+	int nRPCsum = (nRPCLayer1PhiHits>=nRPCLayerPhiHitsCutsVal) +
+				  (nRPCLayer2PhiHits>=nRPCLayerPhiHitsCutsVal) +
+				  (nRPCLayer3PhiHits>=nRPCLayerPhiHitsCutsVal);
+	bool passedRPC = (nRPCsum >= nRPCTGCCSC_LogicSum) ? true : false;
 	
-	return true;
+	bool passedBarrel = (
+							(passedMDTBI+passedMDTBM+passedMDTBO)>=nMDTBarrel_LogicSum &&
+							(nMDTEIHits)+(nMDTEMHits)+(nMDTEOHits)==0 && // endcap overlap removal
+							passedRPC
+						) ? true : false;
+	if(passedBarrel) return true;
+	
+	
+	// CHECK ENDCAP !!!
+	int nTGCCSCsum = (nTGCLayer1PhiHits>=nTGCLayerPhiHitsCutsVal) +
+					 (nTGCLayer2PhiHits>=nTGCLayerPhiHitsCutsVal) +
+					 (nTGCLayer3PhiHits>=nTGCLayerPhiHitsCutsVal) +
+					 (nTGCLayer4PhiHits>=nTGCLayerPhiHitsCutsVal) +
+					 (nCSCPhiHits>=nCSCLayerPhiHitsCutVal);
+	bool passedTGCCSC = (nTGCCSCsum >= nRPCTGCCSC_LogicSum) ? true : false;
+	
+	bool passedEndcap = (
+							((passedMDTEI||passedCSC)+passedMDTEM+passedMDTEO)>=nMDTorCSCEndcap_LogicSum &&
+							(nMDTBIHits)+(nMDTBMHits)+(nMDTBOHits)==0 && // barrel overlap removal
+							passedTGCCSC
+						) ? true : false;
+	if(passedEndcap) return true;
+	
+	
+	// DIDN'T PASS BARREL OR ENDCAP !!!
+	return false;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 

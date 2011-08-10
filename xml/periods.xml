@@ -7,10 +7,11 @@
   <obj NAME="MC" FLAG="on">
     <start>100000</start>
     <end>150000</end>
-    <pTmin>1.</pTmin>
-    <ntriggers>1</ntriggers>
+    <ntriggers>3</ntriggers>
     <triggers>
-      <trigger NAME="L1_MU10" PRIORITY="1" FLAG="on">10.</trigger>
+      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
     </triggers>
     <nevents>0</nevents>
     <luminosity>0.</luminosity>
@@ -22,12 +23,11 @@
   <obj NAME="B" FLAG="on">
     <start>178044</start>
     <end>178109</end>
-    <pTmin>1.</pTmin>
     <ntriggers>3</ntriggers>
     <triggers>
-      <trigger NAME="EF_mu22" PRIORITY="1" FLAG="on">22.</trigger>
-      <trigger NAME="EF_mu22_MG" PRIORITY="2" FLAG="on">22.</trigger>
-      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" FLAG="on">40.</trigger>
+      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
     </triggers>
     <nevents>0</nevents>
     <luminosity>0.012957144</luminosity>
@@ -39,12 +39,11 @@
   <obj NAME="D" FLAG="on">
     <start>179710</start>
     <end>180481</end>
-    <pTmin>1.</pTmin>
     <ntriggers>3</ntriggers>
     <triggers>
-      <trigger NAME="EF_mu22" PRIORITY="1" FLAG="on">22.</trigger>
-      <trigger NAME="EF_mu22_MG" PRIORITY="2" FLAG="on">22.</trigger>
-      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" FLAG="on">40.</trigger>
+      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
     </triggers>
     <nevents>0</nevents>
     <luminosity>0.182463874</luminosity>
@@ -56,12 +55,11 @@
   <obj NAME="E" FLAG="on">
     <start>180614</start>
     <end>180776</end>
-    <pTmin>1.</pTmin>
     <ntriggers>3</ntriggers>
     <triggers>
-      <trigger NAME="EF_mu22" PRIORITY="1" FLAG="on">22.</trigger>
-      <trigger NAME="EF_mu22_MG" PRIORITY="2" FLAG="on">22.</trigger>
-      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" FLAG="on">40.</trigger>
+      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
     </triggers>
     <nevents>0</nevents>
     <luminosity>0.052197972</luminosity>
@@ -73,12 +71,11 @@
   <obj NAME="F" FLAG="on">
     <start>182013</start>
     <end>182519</end>
-    <pTmin>1.</pTmin>
     <ntriggers>3</ntriggers>
     <triggers>
-      <trigger NAME="EF_mu22" PRIORITY="1" FLAG="on">22.</trigger>
-      <trigger NAME="EF_mu22_MG" PRIORITY="2" FLAG="on">22.</trigger>
-      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" FLAG="on">40.</trigger>
+      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
     </triggers>
     <nevents>0</nevents>
     <luminosity>0.154251603</luminosity>
@@ -90,12 +87,11 @@
   <obj NAME="G" FLAG="on">
     <start>182726</start>
     <end>183462</end>
-    <pTmin>1.</pTmin>
     <ntriggers>3</ntriggers>
     <triggers>
-      <trigger NAME="EF_mu22" PRIORITY="1" FLAG="on">22.</trigger>
-      <trigger NAME="EF_mu22_MG" PRIORITY="2" FLAG="on">22.</trigger>
-      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" FLAG="on">40.</trigger>
+      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
     </triggers>
     <nevents>0</nevents>
     <luminosity>0.560371997</luminosity>
@@ -107,12 +103,11 @@
   <obj NAME="H" FLAG="on">
     <start>183544</start>
     <end>184169</end>
-    <pTmin>1.</pTmin>
     <ntriggers>3</ntriggers>
     <triggers>
-      <trigger NAME="EF_mu22" PRIORITY="1" FLAG="on">22.</trigger>
-      <trigger NAME="EF_mu22_MG" PRIORITY="2" FLAG="on">22.</trigger>
-      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" FLAG="on">40.</trigger>
+      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
     </triggers>
     <nevents>0</nevents>
     <luminosity>0.276517533</luminosity>

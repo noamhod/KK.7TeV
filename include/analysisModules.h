@@ -40,7 +40,7 @@ using namespace fitparameters;
 class analysisModules : public selection,
 						//public cutFlowHandler,
 						public xmlconfig,
-						public periodHandler,
+						//public periodHandler,
 						//public monteCarloHandler,
 						public eventDumper,
 						public graphicObjects,
@@ -49,17 +49,10 @@ class analysisModules : public selection,
 						public Afb
 {
 	public:
-		//xmlconfig* xmls;
-		
-	public:
 		analysisModules();
-		analysisModules(string sPeriodsFilePath, string sEventDumpFilePath) :
-		periodHandler(sPeriodsFilePath),
+		analysisModules(string sEventDumpFilePath) :
 		eventDumper(sEventDumpFilePath)
 		{
-			//xmls = new xmlconfig();
-			// xmls = xmlconfig::getInstance();
-			//xmls->get("/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/xml");
 			xmlconfig::get("/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/xml");
 			
 			if(sEventDumpFilePath != "") setInterestingThreshold( 250.*GeV2TeV );

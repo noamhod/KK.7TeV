@@ -22,7 +22,7 @@
 //////////////////////////////////////////////////////////////////
 ////////////// NOTE !!! MULTIPLE INHERITANCE !!! /////////////////
 class xmlconfig : public cutFlowHandler, 
-				  public periodsXml,
+				  public periodHandler,
 				  public montecarloXml
 {
 	public:

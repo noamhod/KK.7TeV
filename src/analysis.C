@@ -21,10 +21,6 @@ void analysis::setAllCandidatesFiles(string sCandFilePath, string srunnumber)
 {
 	if(!m_isMC)
 	{
-		// string fCandidatesName;
-		// if(sRunNumber!="") fCandidatesName = "tmp/candidates."+sRunNumber+".txt"; // sRunNumber is static string from basicIncludes.h
-		// else               fCandidatesName = "candidates.txt";
-		// fCandidates = new ofstream(fCandidatesName.c_str());
 		string sLogFileName = sCandFilePath+"/candidates_all.run_"+srunnumber+".cnd";//".time_"+getDateHour()+".cnd";
 		fCandidates = new ofstream( sLogFileName.c_str() );
 	}

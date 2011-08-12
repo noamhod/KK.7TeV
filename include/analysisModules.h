@@ -61,11 +61,6 @@ class analysisModules : public selection,
 			ginitialize();
 		}
 		~analysisModules();
-		
-		
-	private:
-
-
 };
 #endif
 

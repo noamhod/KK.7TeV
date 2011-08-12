@@ -41,7 +41,7 @@ class GRLinterface
 		~GRLinterface();
 	
 		void glrinitialize(TString sxmlfile);
-                void glrfinalize();
+        void glrfinalize();
 	
 	private:
 

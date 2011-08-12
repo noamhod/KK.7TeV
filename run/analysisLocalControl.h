@@ -38,6 +38,8 @@ class analysisLocalControl : public chainMaker, public utilities
 		
 		// locals
 		string m_muRecAlgo;
+		string m_pTsmearingType;
+		string m_MCPtag;
 		string m_RunType;
 		bool   m_isMC;
 		int    m_msglvl;

@@ -21,8 +21,16 @@ void prepare(TString sGRLtag, TString sRunDir="", TString sGdb="") // do not use
 	
 	gROOT->ProcessLine(".include "+sRunDir+"../GoodRunsLists-" + sGRLtag + "/");
 	gROOT->ProcessLine(".include "+sRunDir+"../GoodRunsLists-" + sGRLtag + "/GoodRunsLists/");
-
 	gROOT->ProcessLine(".L "+sRunDir+"../GoodRunsLists-" + sGRLtag + "/StandAlone/libGoodRunsLists.so");
+	
+	gROOT->ProcessLine(".include "+sRunDir+"../MuonMomentumCorrections-00-03-02/");
+	gROOT->ProcessLine(".include "+sRunDir+"../MuonMomentumCorrections-00-03-02/MuonMomentumCorrections/");
+	gROOT->ProcessLine(".include "+sRunDir+"../MuonMomentumCorrections-00-03-02/Root/");
+	gROOT->ProcessLine(".L "+sRunDir+"../MuonMomentumCorrections-00-03-02/StandAlone/libMuonMomentumCorrections.so");
+	
+	// gROOT->ProcessLine(".include "+sRunDir+"../MuonMomentumCorrections-00-02-04/root/");
+	
+	// gROOT->ProcessLine(".include "+sRunDir+"../MuonMomentumCorrections-00-02-06/root/");
 }
 
 void compile(TString sGRLtag, TString sRunDir="", TString sGdb="") // for re-compilation

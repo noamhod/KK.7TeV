@@ -1,9 +1,19 @@
-Compile & run  (partially manual, full description)
+###############################################
+########### HOW TO USE THIS PACKAGE ###########
+###### Noam Tal Hod, naom.com@gmail.com #######
+###############################################
+
+setup your ROOT, Ruby and qsub env
+	export ROOTSYS=$HOME/root528c/root     # root
+	export LD_LIBRARY_PATH=$ROOTSYS/lib:$LD_LIBRARY_PATH
+	export PATH=$ROOTSYS/bin:$PATH
+	export RUBYLIB=$ROOTSYS/lib:$RUBYLIB   # ruby
+	export PBS_SERVER=tau-ce.hep.tau.ac.il # qsub
 
 go to the analysis folder (THIS FOLDER)
 	cd /path/to/here/
 
-compile the GRL lib:
+to get and make the GRL lib:
 	check the latest tag in:
 		https://svnweb.cern.ch/cern/wsvn/atlasoff/DataQuality/GoodRunsLists/tags/
 	cheout the latest tag:
@@ -13,37 +23,43 @@ compile the GRL lib:
 	the GRL lib is in:
 		GoodRunsLists-XX-XX-XX/StandAlone/libGoodRunsLists.so
 
-make the list (dataset.list)
-	*** ONLY WHEN A NEW DATA SET IS TO BE DEFINED AND USED. OTHERWISE, SKIP THIS POINT ***
-	cp makeList.sh /path/to/datasets/
-	cd /path/to/datasets/
-	source makeList.sh
-	cd -
-	cp /path/to/datasets/dataset.list .
+to get and make the MCP smearing class:L
+	check the latest tag in:
+		https://svnweb.cern.ch/trac/atlasoff/browser/PhysicsAnalysis/MuonID/MuonIDAnalysis/MuonMomentumCorrections/tags
+		https://twiki.cern.ch/twiki/bin/view/AtlasProtected/MCPAnalysisGuidelinesRel16#AnchorResolutions
+	cheout the latest tag:
+		svn co svn+ssh://svn.cern.ch/reps/atlasoff/PhysicsAnalysis/MuonID/MuonIDAnalysis/MuonMomentumCorrections/tags/MuonMomentumCorrections-XX-YY-ZZ
+	cd MuonMomentumCorrections-XX-YY-ZZ/cmt
+	make -f Makefile.Standalone
+	the library is:
+		MuonMomentumCorrections-XX-YY-ZZ/StandAlone/libMuonMomentumCorrections.so
 
-make the chain and the corresponding class (physics.h, physics.C):
-	*** ONLY WHEN A NEW DATA SET IS TO BE DEFINED AND USED. OTHERWISE, SKIP THIS POINT ***
-	root
-	.L MakeClassFromChain.C++
-	MakeClassFromChain fcnc
-	makeChain(true, "dataset.list", "/path/to/datasets/");
-	chain2list();
+################################
+###### SEE run/RUNREADME #######
+################################
 
-to fit your architecture, change some hard coded paths in
-	src/analysisControl.C
+to compile the analysis code:
+	cd ruby
+	ruby compile.rb
 
-in the "run/" dir, create a soft link to the dataset dir, e.g.,
-	*** ONLY IF THE SOFT LINK DOES NOT EXIST ALREADY. OTHERWISE, SKIP THIS POINT ***
-	cd run/
-	ln -s  /data/hod/D3PDs/group10.phys-sm.data10_7TeV_physics_MuonswBeam_WZphys_D3PD  datasetdir
+to run the analysis code locally (all data / MC):
+	cd run
+	change this configuration file:
+		localRunControl_noSkim.txt
+	start the run with:
+		root -b -l -q macro_run.C
 
-recompile everything and run, with the new (physics) class
-	root
-	.L main.C
-	to compile:   compile("XX-XX-XX");
-	or, to load:  load("XX-XX-XX");
-	where the "XX-XX-XX" argument is the tag of the GoodRunList xml
-	ac.loop(0,0); // loop(startEvent, events2process) ==> if events2process=0 then do all
+to run the analysis code in qsub
+	cd ruby
+	ruby batch_qsub.rb (for data)
+	?????????????????? (for mc)
+	watch that there are no errors / warnings from one or more of the working nodes
+	see the output:
+		ls -lrt ../data/
+
+AFTER A SUCCESSFUL qsub RUN, to run over a specific data-run locally (with run number XXXXXX):
+	cd run/tmp
+	root -b -q -l macro_XXXXXX.C
 
 svn co:
 	to co the trunk:

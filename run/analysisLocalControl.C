@@ -24,6 +24,8 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 
 	string sRun;
 	string sRec;
+	string spTtype;
+	string sMCPtag;
 	string sMCorData;
 	bool   isMC;
 	string sMsgTyp;
@@ -31,7 +33,7 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	//int    msgLvl;
 	
 	ifstream ifsel( localRunControlFile.c_str() );
-	ifsel >> sRun >> sRec >> sMCorData;
+	ifsel >> sRun >> sRec >> spTtype >> sMCPtag >> sMCorData;
 	
 	
 	if(sRun!="local"  &&  sRun!="local_noskim")
@@ -42,6 +44,17 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	if(sRec!="staco"  &&  sRec!="muid")
 	{
 		_ERROR("YOU CHOSE REC ALG ["+sRec+"], exitting now");
+		exit(-1);
+	}
+	if(spTtype!="pT"  &&  spTtype!="q_pT")
+	{
+		_ERROR("YOU CHOSE SMEARING TYPE ["+spTtype+"], exitting now");
+		exit(-1);
+	}
+	size_t found = sMCPtag.find("MuonMomentumCorrections");
+	if (found==string::npos)
+	{
+		_ERROR("YOU CHOSE MCP TAG ["+sMCPtag+"], exitting now");
 		exit(-1);
 	}
 	if(sMCorData!="mc"  &&  sMCorData!="data")
@@ -68,10 +81,14 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	
 	m_RunType   = sRun; // "grid" OR "local"
 	m_muRecAlgo = sRec; // "staco" OR "muid"
+	m_pTsmearingType = spTtype; // "pT" OR "q_pT"
+	m_MCPtag = sMCPtag; // "MuonMomentumCorrections-XX-YY-ZZ"
 	m_isMC      = isMC;
 	
 	_INFO("m_RunType="+m_RunType);
 	_INFO("m_muRecAlgo="+m_muRecAlgo);
+	_INFO("m_pTsmearingType="+m_pTsmearingType);
+	_INFO("m_MCPtag="+m_MCPtag);
 	_INFO("m_isMC="+sMCorData);
 	
 	///////////////////////////
@@ -105,6 +122,7 @@ void analysisLocalControl::initialize(int RunNumber, string runs, string basedir
 	string str_dir  = "";
 	string str_tree = "";
 	string str_hist = "";
+	string str_mcp  = "";
 
 
 	string str = "";
@@ -122,8 +140,9 @@ void analysisLocalControl::initialize(int RunNumber, string runs, string basedir
 		//////////////////////////////////////////
 		
 		str_list = checkANDsetFilepath("PWD", "/../conf/mc_local_dataset_"+sMCsample+".list");
-		str_dir = "";//checkANDsetFilepath("PWD", "/mc_local_datasetdir/");
+		str_dir  = "";//checkANDsetFilepath("PWD", "/mc_local_datasetdir/");
 		str_hist = checkANDsetFilepath("PWD", "/../data/mcLocalControl_"+sMCsample+".root");
+		str_mcp  = checkANDsetFilepath("PWD", "/../"+m_MCPtag+"/share/");
 		
 		if(m_RunType!="local_noskim")
 		{
@@ -200,6 +219,8 @@ void analysisLocalControl::initialize(int RunNumber, string runs, string basedir
 	string str_logspath = "";
 	if(runs=="ALLRUNS")   str_logspath = checkANDsetFilepath("PWD", "");
 	if(runs=="SINGLERUN") str_logspath = basedir+"/../run/tmp";
+	m_analysis->setMC(m_isMC);
+	if(m_isMC) m_analysis->setMCPpTparameters(m_muRecAlgo, m_pTsmearingType, str_mcp);
 	m_analysis->setCutFlowFile(str_logspath, tostring(RunNumber));
 	m_analysis->setPtCandidatesFile(str_logspath, tostring(RunNumber));
 	m_analysis->setAllCandidatesFiles(str_logspath, tostring(RunNumber));

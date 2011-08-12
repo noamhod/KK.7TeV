@@ -3,11 +3,11 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-static const double luminosity = 5.; // 1/fb
+static const double luminosity = 1.24;//5.; // 1/fb
 
 static const double minMassBin = 120;  // for the asymmetry fit
 static const double maxMassBin = 1500; // for the asymmetry fit
-static const int    nMassBins  = 10;   // for the asymmetry fit
+static const int    nMassBins  = 8;   // for the asymmetry fit
 static const int    niMassBins = 200;  // for the imass histos
 
 static const double minCosTheta = -1.;  // for the acceptance binning
@@ -18,7 +18,8 @@ enum models
 {
 	ZPd3pd=-2,
 	Z0d3pd=-1,
-	Z0,ZP,KK
+	Z0,ZP,KK,
+	DT
 };
 
 static const float MeV2TeV = 1.e-6;

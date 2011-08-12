@@ -354,9 +354,6 @@ class QSUB
 				words = parse_line(line)
 				if(!words) then next end
 				if(words.length>0) then
-					# if(Integer(words[3])==0) then
-						# puts "words[1]=#{words[1]}, words[2]=#{words[2]} Integer(words[3])=#{Integer(words[3])}"
-					# end
 					if(words[2]=="all"  and Integer(words[3])==0) then
 						runnumber = find_string(file.to_s(), "RunCutFlow.run_", 6)
 						rundirout = "#{thisdir}/../run/tmp/out"
@@ -388,7 +385,7 @@ class QSUB
 			f.puts "<? This is a summary of the cutflow from run #{Time.now} ?>"
 			names.each do |name|
 				string = "#{types[names.index(name)]} \t #{name} \t\t #{evnts[names.index(name)]}"
-				#logd.info string
+				logd.info string
 				f.puts string
 			end
 		end
@@ -481,8 +478,8 @@ class QSUB
 		end
 		seconds = interval*iteration
 		logd.info "!!!---merging (after #{iteration} iterations [#{seconds} seconds])---!!!"
-		#merge_root(inlist,"#{mergedfilename}.root")
-		#merge_candidates(inlist,"#{mergedfilename}.candidates")
+		merge_root(inlist,"#{mergedfilename}.root")
+		merge_candidates(inlist,"#{mergedfilename}.candidates")
 		merge_cutflow(inlist,"#{mergedfilename}.cutflow")
 	end
 	

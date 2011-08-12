@@ -7,6 +7,10 @@
 
 #include "basicIncludes.h"
 
+// #define SmearingClass_cxx
+// #include "SmearingClass.h"
+
+
 #ifndef KINEMATICS_H
 #define KINEMATICS_H
 

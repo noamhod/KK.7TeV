@@ -164,13 +164,24 @@ void init(int massBin, int mod)
 		case KK:
 			sName = "S^{1}/Z_{2} KK";
 			sId = "KK";
-			col = kBlack;
+			col = kOrange;
 			colbin = cWJets-2;
 			sChannelFit = "1 TeV #gamma_{KK}/Z_{KK}: A_{FB} fit";
 			sChannelMass = "1 TeV #gamma_{KK}/Z_{KK}: Events";
 			fillStyle = 3018;
-			lineStyle = 1;
+			lineStyle = 5;
 			markerStyle = 23;
+			break;
+		case DT:
+			sName = "Data";
+			sId = "DT";
+			col = kBlack;
+			colbin = kBlack;
+			sChannelFit = "2011 Data: A_{FB} fit";
+			sChannelMass = "2011 Data: Events";
+			fillStyle = 0;
+			lineStyle = 1;
+			markerStyle = 24;
 			break;
 	}
 	
@@ -226,9 +237,8 @@ void init(int massBin, int mod)
 	
 	if(mod==Z0) vtData.push_back( (TTree*)file->Get("ntuples/tree_ZP_"+sMassBin) ); // for Z0 we take the variables without the weight
 	else        vtData.push_back( (TTree*)file->Get("ntuples/tree_"+sId+"_"+sMassBin) );
-	
+
 	vhAcc.push_back( (TH1D*)file->Get("cosTheta_histograms/hCosTh"+sId+"_acceptance_"+sMassBin)->Clone("") );
-	
 	vrdhAcc.push_back( new RooDataHist("rdhAcc"+sId,"rdhAcc"+sId,RooArgSet(*cosThe),vhAcc[mod]) );
 	vrhpdfAcc.push_back( new RooHistPdf("rhpdfAcc"+sId,"rhpdfAcc"+sId,RooArgSet(*cosThe),*vrdhAcc[mod],4) ); // last argument is the order of polinomial interpulation
 	vDetAcc.push_back( vrhpdfAcc[mod] );

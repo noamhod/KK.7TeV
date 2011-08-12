@@ -3,9 +3,9 @@
 require 'QSUB'
 
 insets  = [
-			'user.wanghill.data11_7TeV.00178109.physics_Muons.merge.NTUP_SMDILEP.r2276_p516_p523_p591_dimuon_p591/',
 			'user.wanghill.data11_7TeV.00178047.physics_Muons.merge.NTUP_SMDILEP.r2276_p516_p523_p591_dimuon_p591/',
 			'user.wanghill.data11_7TeV.00178044.physics_Muons.merge.NTUP_SMDILEP.r2276_p516_p523_p591_dimuon_p591/',
+			'user.wanghill.data11_7TeV.00178109.physics_Muons.merge.NTUP_SMDILEP.r2276_p516_p523_p591_dimuon_p591/',
 			'user.wanghill.data11_7TeV.00179710.physics_Muons.merge.NTUP_SMDILEP.f361_m796_p591_dimuon_p591/',
 			'user.wanghill.data11_7TeV.00179725.physics_Muons.merge.NTUP_SMDILEP.f361_m796_p591_dimuon_p591/',
 			'user.wanghill.data11_7TeV.00179739.physics_Muons.merge.NTUP_SMDILEP.f361_m796_p591_dimuon_p591/',
@@ -108,7 +108,7 @@ x.set_prefix("user.wanghill.data11_7TeV.00",6)
 x.set_secondprefix("._",5)
 
 x.check_variables
-#x.batch_qsub(insets,runnumbers)
+x.batch_qsub(insets,runnumbers)
 ### x.merge_root(insets,"merged.root")
 ### x.merge_candidates(insets,"merged.candidates")
 ### x.merge_cutflow(insets,"merged.cutflow")

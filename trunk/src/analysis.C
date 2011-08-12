@@ -14,16 +14,17 @@ analysis::analysis()
 
 analysis::~analysis()
 {
-	if(!m_isMC) fCandidates->close();
+	//if(!m_isMC) fCandidates->close();
+	fCandidates->close();
 }
 
 void analysis::setAllCandidatesFiles(string sCandFilePath, string srunnumber)
 {
-	if(!m_isMC)
-	{
+	//if(!m_isMC)
+	//{
 		string sLogFileName = sCandFilePath+"/candidates_all.run_"+srunnumber+".cnd";//".time_"+getDateHour()+".cnd";
 		fCandidates = new ofstream( sLogFileName.c_str() );
-	}
+	//}
 }
 
 void analysis::execute()
@@ -73,6 +74,8 @@ void analysis::execute()
 	} /////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////
 	
+	_DEBUG("");
+	
 	////////////////////////////////////////////////////////
 	// set all the muon reco' alg vars /////////////////////
 	if(sMuonRecoAlgo=="staco") /////////////////////////////
@@ -87,6 +90,15 @@ void analysis::execute()
 	}                         //////////////////////////////
 	////////////////////////////////////////////////////////
 	
+	_DEBUG("");
+	
+	/////////////////////////////////////////
+	// SMEAR THE MUON PT FOR MC /////////////
+	if(m_isMC) setSmearedMCPpT(nMus); ///////
+	/////////////////////////////////////////
+	
+	_DEBUG("");
+	
 	///////////////////////////////////
 	// set all the trigger vars ///////
 	setTrigVariables(); ///////////////
@@ -98,15 +110,14 @@ void analysis::execute()
 	// reset the muQAflags vector with "true" flags /////
 	// build the muons TLorentzVector ///////////////////
 	// no need to do this if didn't pass preselection ///
-	buildMU4Vector(nMus, "angles"); /////////////////////
-	//buildMU4Vector(nMus); /////////////////////////////
+	buildMU4Vector(nMus); ///////////////////////////////
 	/////////////////////////////////////////////////////
 	
 	_DEBUG("");
 	
 	//////////////////////////////////////////////////
 	// Do the Tag&Probe analysis /////////////////////
-	applyTagNProbe( (*m_cutsFlowSkipMap), m_isMC ); //
+	applyTagNProbe( (*m_cutsFlowSkipMap) ); //////////
 	//////////////////////////////////////////////////
 	
 	_DEBUG("");
@@ -160,18 +171,19 @@ void analysis::execute()
 	
 	//////////////////////////////////////////////////////////////
 	// the double muon selection /////////////////////////////////
-	bool pass2MUselection = applyDoubleMuonSelection(m_isMC); ////
+	bool pass2MUselection = applyDoubleMuonSelection(); ////
 	if( !pass2MUselection ) return; //////////////////////////////
 	//////////////////////////////////////////////////////////////
 	
 	_DEBUG("");
 	
-	if(!m_isMC) (*fCandidates)	<< "Run-LB-Evt  "
-								<< analysisSkeleton::RunNumber	 << " "
-								<< analysisSkeleton::lbn 		 << " "
-								<< analysisSkeleton::EventNumber
-								<< endl;
-								
+	// if(!m_isMC) (*fCandidates)	<< "Run-LB-Evt  "
+	(*fCandidates)	<< "Run-LB-Evt  "
+					<< analysisSkeleton::RunNumber	 << " "
+					<< analysisSkeleton::lbn 		 << " "
+					<< analysisSkeleton::EventNumber
+					<< endl;
+
 	_DEBUG("");
 }
 

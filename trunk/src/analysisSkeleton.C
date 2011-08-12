@@ -20,6 +20,68 @@ analysisSkeleton::~analysisSkeleton()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
+void analysisSkeleton::setMCPpTparameters(string sAlgo, string spTtype, string sDataPath)
+{
+	MCPpTsmearing = new SmearingClass(sAlgo,spTtype,sDataPath);
+	MCPpTsmearing->UseScale(1);
+}
+
+void analysisSkeleton::setSmearedMCPpT(int nMus)
+{
+	_DEBUG("analysisSkeleton::setSmearedMCPpT");
+
+	if(mu_MCP_ptcb->size()!=0) mu_MCP_ptcb->clear(); // same as mu_pt
+	if(mu_MCP_ptms->size()!=0) mu_MCP_ptms->clear();
+	if(mu_MCP_ptid->size()!=0) mu_MCP_ptid->clear();
+
+	_DEBUG("");
+	
+	for(int j=0 ; j<nMus ; j++)
+	{
+		// Retrieve Eta, PtCB, PtMS and PtID from ntuples 
+		// Use the MC event number to set seed so that the
+		// random numbers are reproducible by different analyzers
+		MCPpTsmearing->SetSeed(EventNumber,j);
+		
+		_DEBUG("");
+		
+		double ptcb  = (double)mu_pt->at(j);
+		double ptid  = (double)pT(mu_id_qoverp->at(j),mu_id_theta->at(j));
+		double ptms  = (double)pT(mu_ms_qoverp->at(j),mu_ms_theta->at(j));
+		// double ptie  = (double)pT(mu_ie_qoverp->at(j),mu_ie_theta->at(j));
+		// double ptme  = (double)pT(mu_me_qoverp->at(j),mu_me_theta->at(j));
+		double etacb = (double)mu_eta->at(j);
+		
+		_DEBUG("");
+		
+		MCPpTsmearing->Event(ptms, ptid, ptcb, etacb);
+		// MCPpTsmearing->Event(ptme, ptie, ptcb, etacb);
+		// MCPpTsmearing->Event(ptcb, etacb);
+		
+		_DEBUG("");
+		
+		// Set Smeared Pts
+		///////////////////////////////////////////////////////
+		// First, have to modify the original CB pT ///////////
+		mu_pt->at(j) = MCPpTsmearing->pTCB(); //////////////////
+		///////////////////////////////////////////////////////
+		mu_MCP_ptcb->push_back( MCPpTsmearing->pTCB() ); ///////
+		mu_MCP_ptid->push_back( MCPpTsmearing->pTID() ); ///////
+		mu_MCP_ptms->push_back( MCPpTsmearing->pTMS() ); ///////
+		///////////////////////////////////////////////////////
+		
+		_DEBUG("");
+		
+		// double pTCB_smeared = MCPpTsmearing->pTCB(); 
+		// double pTMS_smeared = MCPpTsmearing->pTMS(); 
+		// double pTID_smeared = MCPpTsmearing->pTID();
+		
+		// For Systematic Uncertainty studies:
+		// Change the Pts UP or DOWN (ID or MS) 
+		// MCPpTsmearing->PTVar(pTMS_smeared, pTID_smeared, pTCB_smeared, THESTRING); 
+		// Valid values for "THESTRING": {"MSLOW", "MSUP", "IDLOW", "IDUP"}
+	}
+}
 
 void analysisSkeleton::setPtCandidatesFile(string sCandFilePath, string srunnumber)
 {	
@@ -164,6 +226,7 @@ void analysisSkeleton::runEventDumper()
 		//int sublead_mu  = (mu_charge->at(ai)>0) ? ai : bi;
 		int lead_mu     = ai;
 		int sublead_mu  = bi;
+
 		if( mu_pt->at(ai) < mu_pt->at(bi) )
 		{
 			lead_mu     = bi;
@@ -368,7 +431,7 @@ void analysisSkeleton::printAllProperties(int aii, int bii, int iv)
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 
-void analysisSkeleton::fillAfterCuts(bool isMC)
+void analysisSkeleton::fillAfterCuts()
 {
 	///////////////////////////////////////////////////////////
 	// fill the "allCuts" histograms only after the last cut 
@@ -715,7 +778,7 @@ void analysisSkeleton::fillAfterCuts(bool isMC)
 	graphicObjects::trackfitchi2->push_back(mu_trackfitchi2->at(lead_mu));
 	graphicObjects::trackfitndof->push_back(mu_trackfitndof->at(lead_mu));
 	graphicObjects::hastrack->push_back(mu_hastrack->at(lead_mu));
-	if(isMC)
+	if(AS_isMC)
 	{
 		graphicObjects::truth_dr->push_back(mu_truth_dr->at(lead_mu));
 		graphicObjects::truth_E->push_back(mu_truth_E->at(lead_mu));
@@ -986,7 +1049,7 @@ void analysisSkeleton::fillAfterCuts(bool isMC)
 	graphicObjects::trackfitchi2->push_back(mu_trackfitchi2->at(sublead_mu));
 	graphicObjects::trackfitndof->push_back(mu_trackfitndof->at(sublead_mu));
 	graphicObjects::hastrack->push_back(mu_hastrack->at(sublead_mu));
-	if(isMC)
+	if(AS_isMC)
 	{
 		graphicObjects::truth_dr->push_back(mu_truth_dr->at(sublead_mu));
 		graphicObjects::truth_E->push_back(mu_truth_E->at(sublead_mu));
@@ -1198,6 +1261,22 @@ void analysisSkeleton::imassSort()
 	}
 }
 
+// void analysisSkeleton::buildMU4Vector(int nMus)
+// {
+	// _DEBUG("analysisSkeleton::buildMU4Vector");
+
+	// wipeMU4Vector();
+	// for(int j=0 ; j<nMus ; j++)
+	// {
+		// pmu.push_back( new TLorentzVector() );
+		// pmu[j]->SetPx( mu_px->at(j)*MeV2TeV );
+		// pmu[j]->SetPy( mu_py->at(j)*MeV2TeV );
+		// pmu[j]->SetPz( mu_pz->at(j)*MeV2TeV );
+		// pmu[j]->SetE(  mu_E->at(j)*MeV2TeV );
+	// }
+// }
+
+
 void analysisSkeleton::buildMU4Vector(int nMus)
 {
 	_DEBUG("analysisSkeleton::buildMU4Vector");
@@ -1206,29 +1285,7 @@ void analysisSkeleton::buildMU4Vector(int nMus)
 	for(int j=0 ; j<nMus ; j++)
 	{
 		pmu.push_back( new TLorentzVector() );
-		pmu[j]->SetPx( mu_px->at(j)*MeV2TeV );
-		pmu[j]->SetPy( mu_py->at(j)*MeV2TeV );
-		pmu[j]->SetPz( mu_pz->at(j)*MeV2TeV );
-		pmu[j]->SetE(  mu_E->at(j)*MeV2TeV );
-	}
-}
-
-void analysisSkeleton::buildMU4Vector(int nMus, string fromAngles)
-{
-	_DEBUG("analysisSkeleton::buildMU4Vector");
-
-	if(fromAngles=="")
-	{
-		cout << "you should call buildMU4Vector(int nMus) instead" << endl;
-	}
-	else
-	{
-		wipeMU4Vector();
-		for(int j=0 ; j<nMus ; j++)
-		{
-			pmu.push_back( new TLorentzVector() );
-			pmu[j]->SetPtEtaPhiM( mu_pt->at(j)*MeV2TeV, mu_eta->at(j), mu_phi->at(j), muonMass*GeV2TeV);
-		}
+		pmu[j]->SetPtEtaPhiM( mu_pt->at(j)*MeV2TeV, mu_eta->at(j), mu_phi->at(j), muonMass*GeV2TeV);
 	}
 }
 
@@ -1302,7 +1359,7 @@ bool analysisSkeleton::applySingleMuonSelection()
 	return passCutFlow;
 }
 
-bool analysisSkeleton::applyDoubleMuonSelection(bool isMC)
+bool analysisSkeleton::applyDoubleMuonSelection()
 {
 	TMapsb cutsToSkip; // dummy (empty)
 	passCutFlow = doubleSelection(cutsToSkip);
@@ -1311,7 +1368,7 @@ bool analysisSkeleton::applyDoubleMuonSelection(bool isMC)
 	{
 		///////////////////////////////////////////////
 		// fill the cutFlow and the allCuts items /////
-		fillAfterCuts(isMC); //////////////////////////////
+		fillAfterCuts(); //////////////////////////////
 		///////////////////////////////////////////////
 		
 		////////////////////////////////////////////////////
@@ -1406,7 +1463,7 @@ void analysisSkeleton::fillCutProfile1D()
 				(*h1map_cutProfile)[sname]->Fill( trigDecision );
 			}
 			else if(sname=="pT_1")
-			{ 
+			{
 				(*h1map_cutProfile)[sname]->Fill( mu_pt->at(ai)*MeV2TeV );
 				pT_profile->push_back( mu_pt->at(ai)*MeV2TeV );
 			}
@@ -1496,7 +1553,7 @@ void analysisSkeleton::fillCutProfile1D()
 			}
 			else if(sname=="isolation30_2")
 			{
-				//float iso = mu_ptcone30->at(ai)/pT(mu_me_qoverp->at(bi),mu_me_theta->at(bi));
+				//float iso = mu_ptcone30->at(bi)/pT(mu_me_qoverp->at(bi),mu_me_theta->at(bi));
 				float iso = mu_ptcone30->at(bi)/mu_pt->at(bi);
 				(*h1map_cutProfile)[sname]->Fill( iso );
 				isolation30_profile->push_back( iso );
@@ -1788,6 +1845,7 @@ void analysisSkeleton::fill_tNp()
 	
 		if(isHLT)
 		{
+		
 			mask = tagMask
 			(
 				sTrigPeriod, sTrigType, trig_pTthreshold,
@@ -1827,7 +1885,10 @@ void analysisSkeleton::fill_tNp()
 		{
 			int iprobeCand = m_viProbes[probs];
 			if(!isCBpT) pTtmp = fabs(pT(mu_me_qoverp->at(iprobeCand)/MeV2TeV, mu_me_theta->at(iprobeCand)));
-			else        pTtmp = mu_pt->at(iprobeCand)*MeV2TeV;
+			else
+			{
+				pTtmp = mu_pt->at(iprobeCand)*MeV2TeV;
+			}
 			
 			if(isHLT)
 			{
@@ -2219,7 +2280,7 @@ void analysisSkeleton::fillRecon()
 	recon_all_isValid = true;
 }
 
-void analysisSkeleton::applyTagNProbe(TMapsb& cutsToSkip, bool isMC)
+void analysisSkeleton::applyTagNProbe(TMapsb& cutsToSkip)
 {
 	bool pass;
 	
@@ -2236,7 +2297,7 @@ void analysisSkeleton::applyTagNProbe(TMapsb& cutsToSkip, bool isMC)
 		
 		/////////////////////////////////////////
 		// Truth efficiency mask ////////////////
-		if(isMC) fillTruthEfficiency(); /////////
+		if(AS_isMC) fillTruthEfficiency(); /////////
 		/////////////////////////////////////////
 		
 		////////////////////////////////////////////////////////
@@ -2362,13 +2423,6 @@ inline bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 				if(pass1Trig) break;
 			}
 			passCurrentCut = pass1Trig;
-			// if(!passCurrentCut)
-			// {
-				// _INFO("\nfail: lbn="+tostring(lbn)+", evt="+tostring(EventNumber));
-				// _INFO("   EF_mu22 = "+tostring(EF_mu22));
-				// _INFO("   EF_mu22_MG = "+tostring(EF_mu22_MG));
-				// _INFO("   EF_mu40_MSonly_barrel = "+tostring(EF_mu40_MSonly_barrel));
-			// }
 		}
 		
 		else if(sorderedcutname=="PV"  &&  !bSkipCut)
@@ -2435,6 +2489,7 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
+
 				thisMuPass = ( pTCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_pt->at(mu)) ) ? true : false;
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;

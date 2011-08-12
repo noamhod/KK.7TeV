@@ -10,6 +10,11 @@
 #define analysisModules_cxx
 #include "analysisModules.C"
 
+// #define SmearingClass_cxx
+// #include "SmearingClass.cxx"
+
+#include "SmearingClass.h"
+
 #ifndef ANALYSISSKELETON_H
 #define ANALYSISSKELETON_H
 
@@ -19,6 +24,9 @@ public:
 	//////////////////////
 	// basic local vars
 
+	bool AS_isMC;
+	SmearingClass* MCPpTsmearing;
+	
 	int tmp_counter_1;
 	int tmp_counter_2;
 	int tmp_counter_3;
@@ -75,6 +83,10 @@ public:
 	int m_efficiency_counter;
 	int m_truth_counter;
 	
+	// MCP smeared muon pT for MC only
+	vector<double>* mu_MCP_ptcb; // same as mu_pt
+	vector<double>* mu_MCP_ptms;
+	vector<double>* mu_MCP_ptid;
 	
 
 	// event level
@@ -563,8 +575,16 @@ public:
 		currentRun = 0;
 		sCurrentPeriod = "";
 		nMultiMuonEvents = 0;
+		
+		mu_MCP_ptcb = new vector<double>; // same as mu_pt (after smearing)
+		mu_MCP_ptms = new vector<double>;
+		mu_MCP_ptid = new vector<double>;
 	}
 	~analysisSkeleton();
+	
+	void setMC(bool isMC) { AS_isMC = isMC; }
+	void setSmearedMCPpT(int nMus);
+	void setMCPpTparameters(string sAlgo, string spTtype, string sDataPath);
 	
 	void setPtCandidatesFile(string sCandFilePath = "", string srunnumber = "");
 	
@@ -582,13 +602,13 @@ public:
 	void            matchTrigger(string speriod, string sTrigType);
 	void 			printAllProperties(int ai, int bi, int iv);
 	
+	//void buildMU4Vector(int nMus);
 	void buildMU4Vector(int nMus);
-	void buildMU4Vector(int nMus, string fromAngles = "");
 	void wipeMU4Vector();
 	
 	bool applyPreselection();
 	bool applySingleMuonSelection();
-	bool applyDoubleMuonSelection(bool isMC);
+	bool applyDoubleMuonSelection();
 	
 	void fillCutProfile1D();
 	void fillCutProfile2D();
@@ -601,7 +621,7 @@ public:
 	inline void fillTruth();
 	inline void fillRecon();
 	
-	void applyTagNProbe(TMapsb& cutsToSkip, bool isMC);
+	void applyTagNProbe(TMapsb& cutsToSkip);
 	
 	void applyTruth();
 
@@ -616,7 +636,7 @@ private:
 	inline bool singleSelection(TMapsb& cutsToSkip);
 	inline bool doubleSelection(TMapsb& cutsToSkip);
 	
-	void fillAfterCuts(bool isMC);
+	void fillAfterCuts();
 	void fillBeforeCuts();
 	void fillCutFlow(string sorderedcutname, string sIsPreselection = "");
 

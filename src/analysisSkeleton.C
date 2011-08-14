@@ -46,16 +46,16 @@ void analysisSkeleton::setSmearedMCPpT(int nMus)
 		_DEBUG("");
 		
 		double ptcb  = (double)mu_pt->at(j);
-		double ptid  = (double)pT(mu_id_qoverp->at(j),mu_id_theta->at(j));
-		double ptms  = (double)pT(mu_ms_qoverp->at(j),mu_ms_theta->at(j));
-		// double ptie  = (double)pT(mu_ie_qoverp->at(j),mu_ie_theta->at(j));
-		// double ptme  = (double)pT(mu_me_qoverp->at(j),mu_me_theta->at(j));
+		//double ptid  = (double)pT(mu_id_qoverp->at(j),mu_id_theta->at(j));
+		//double ptms  = (double)pT(mu_ms_qoverp->at(j),mu_ms_theta->at(j));
+		double ptie  = (double)pT(mu_ie_qoverp->at(j),mu_ie_theta->at(j));
+		double ptme  = (double)pT(mu_me_qoverp->at(j),mu_me_theta->at(j));
 		double etacb = (double)mu_eta->at(j);
 		
 		_DEBUG("");
 		
-		MCPpTsmearing->Event(ptms, ptid, ptcb, etacb);
-		// MCPpTsmearing->Event(ptme, ptie, ptcb, etacb);
+		// MCPpTsmearing->Event(ptms, ptid, ptcb, etacb);
+		MCPpTsmearing->Event(ptme, ptie, ptcb, etacb);
 		// MCPpTsmearing->Event(ptcb, etacb);
 		
 		_DEBUG("");

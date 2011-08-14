@@ -138,10 +138,15 @@ class DQ2
 	
 	def check_file(file="", run="", string="0 files failed")
 		lines=[]
+		
+		if(!File.exist? file) then
+			return "File -> #{file} does not exist"
+		end
+		
 		File.open( file ) do |io|
 			io.each {|line| line.chomp! ; lines << "run "+run+": "+line if(!line.include? string  and  line.length==14)}
 		end
-		lines
+		return lines
 	end
 
 	def search_directory(path="",pattern=".root",hashmap={})

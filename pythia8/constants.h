@@ -3,12 +3,12 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-static const double luminosity = 1.24;//5.; // 1/fb
+static const double luminosity = 1.238760124;//5.; // 1/fb
 
 static const double minMassBin = 120;  // for the asymmetry fit
 static const double maxMassBin = 1500; // for the asymmetry fit
 static const int    nMassBins  = 8;   // for the asymmetry fit
-static const int    niMassBins = 200;  // for the imass histos
+static const int    niMassBins = 50;  // for the imass histos
 
 static const double minCosTheta = -1.;  // for the acceptance binning
 static const double maxCosTheta = +1.;  // for the acceptance binning
@@ -45,5 +45,18 @@ static const Color_t col2 = kRed+1;
 static const Color_t col3 = kOrange+7;
 static const Color_t col4 = kYellow-9;
 static const Color_t col5 = kGreen-3;
+
+static const Color_t cAcceptance = kGray+2;
+static const Color_t cPdf        = kGreen+2;
+
+static vector<Color_t> vModelColor;
+
+void colors()
+{
+	vModelColor.push_back(kAzure+7);  // Z0
+	vModelColor.push_back(kRed+1);    // ZP
+	vModelColor.push_back(kViolet+7); // KK
+	vModelColor.push_back(kBlack);    // DT
+}
 
 #endif

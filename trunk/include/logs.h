@@ -139,6 +139,15 @@ static inline string tostring(double x)
 	return str;
 }
 
+static inline string tostring(double x, int prcn)
+{
+	stringstream strm;
+	string str;
+	strm << setprecision(prcn) << fixed << x; 
+	strm >> str;
+	return str;
+}
+
 static inline int toint(string str)
 {
 	stringstream strm;

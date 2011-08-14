@@ -33,7 +33,7 @@ enum MSG
 	FAT
 };
 
-static vector<int> msglvl (5,SILENT);
+static vector<int> msglvl (5,VISUAL);
 
 static void setMSGlevel(int dbg, int inf, int wrn)
 {
@@ -134,6 +134,15 @@ static inline string tostring(double x)
 	return str;
 }
 
+static inline string tostring(double x, int prcn)
+{
+	stringstream strm;
+	string str;
+	strm << setprecision(prcn) << fixed << x; 
+	strm >> str;
+	return str;
+}
+
 static inline int toint(string str)
 {
 	stringstream strm;
@@ -160,6 +169,7 @@ static inline float  validate_float(const char* cc)  { return validate_float((st
 static inline bool   validate_bool(const char* cc)   { return validate_bool((string)cc); }		
 static inline int    toint(const char* cc)           { return toint((string)cc); }
 static inline double todouble(const char* cc)        { return todouble((string)cc); }
+
 
 #endif
 

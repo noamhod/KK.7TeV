@@ -35,6 +35,6 @@
 #include <RooMinuit.h>
 #include "RooAbsCategory.h"
 
-#include "FitResultWrapper.h"
+//#include "FitResultWrapper.h"
 
 using namespace RooFit;

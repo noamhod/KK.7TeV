@@ -199,6 +199,7 @@ int plot_ratio_weights()
 	setMSGlevel(VISUAL,VISUAL,VISUAL);
 
 	style();
+	colors();
 	
 	fWeights = new TFile("weights.root", "RECREATE");
 
@@ -331,11 +332,11 @@ int plot_ratio_weights()
 	
 	TPaveText* pvtxt = new TPaveText(0.3345178,0.7347798,0.7072882,0.9317789,"brNDC");
 	pvtxt->SetFillColor(kWhite);
-	TText* txt = pvtxt->AddText( "#splitline{Sum of binned #bf{truth}}{samples normalized to ~"+(TString)tostring(luminosity)+"/fb}" );
+	TText* txt = pvtxt->AddText( "#splitline{Sum of binned #bf{truth}}{samples normalized to ~"+(TString)tostring(luminosity,2)+"/fb}" );
 	
 	TPaveText* pvtxt_recon = new TPaveText(0.3258082,0.7698618,0.6985786,0.9236831,"brNDC");
 	pvtxt_recon->SetFillColor(kWhite);
-	txt = pvtxt_recon->AddText( "#splitline{Sum of binned #bf{template}}{samples normalized to ~"+(TString)tostring(luminosity)+"/fb}" );
+	txt = pvtxt_recon->AddText( "#splitline{Sum of binned #bf{template}}{samples normalized to ~"+(TString)tostring(luminosity,2)+"/fb}" );
 	
 	TPaveText* pvtxt_compare = new TPaveText(0.1688387,0.4001352,0.4258138,0.5691372,"brNDC");
 	pvtxt_compare->SetFillColor(kWhite);
@@ -727,6 +728,8 @@ int plot_ratio_weights()
 		vhMassWeights[mod]->SetName("hMass"+tsname+"_wgt");
 		vhMassWeights[mod]->Write("", TObject::kOverwrite);
 	}
+	
+	dirCostHistograms->cd();
 	for(Int_t i=0 ; i<imass_afb_nbins ; i++) 
 	{
 		TString b = (TString)tostring(i+1);
@@ -740,17 +743,20 @@ int plot_ratio_weights()
 			vvhCosThSumWeights[i][mod] = (TH1D*)vvhCosThSum[i][mod]->Clone(""); 
 			//vvhCosThSumWeights[i][mod]->Divide(vhCosThSumZ0d3pd[i]);
 			divide(vvhCosThSumWeights[i][mod],vhCosThSumZ0d3pd[i]);
+			
+			dirCostHistograms->cd();
 			vvhCosThSumWeights[i][mod]->SetTitle((TString)"weights: " + (TString)vvhCosThSumWeights[i][mod]->GetTitle());
 			vvhCosThSumWeights[i][mod]->SetName( "hCosTh"+tsname+"_wgt_"+b );
-			dirCostHistograms->cd();
 			vvhCosThSumWeights[i][mod]->Write("", TObject::kOverwrite);
 		}
+		
 		vhCosThSumXSweights[i] = (TH1D*)vhCosThSumZ0d3pd[i]->Clone(""); 
 		//vhCosThSumXSweights[i]->Divide(vhCosThSumZ0d3pd_unscaled[i]); 
 		divide(vhCosThSumXSweights[i],vhCosThSumZ0d3pd_unscaled[i]); 
+		
+		dirCostHistograms->cd();
 		vhCosThSumXSweights[i]->SetTitle((TString)"weights_XS: " + (TString)vhCosThSumXSweights[i]->GetTitle());
 		vhCosThSumXSweights[i]->SetName( "hCosThXS_wgt_"+b );
-		dirCostHistograms->cd();
 		vhCosThSumXSweights[i]->Write("", TObject::kOverwrite);
 	}
 	////////////////////////////////////////////////////////////////
@@ -934,7 +940,7 @@ int plot_ratio_weights()
 		
 		if(model==DT)
 		{
-			addSample("DATA/merged", kBlack, luminosity, 1.);
+			addSample("DATA/analysisLocalControl", kBlack, luminosity, 1.);
 		}
 		
 		// get the data
@@ -1114,7 +1120,6 @@ int plot_ratio_weights()
 			
 			////////////////////////////////////////////////////
 			hMassSumTmp->Add(hvBinnedHistos_imass[n]); // sum //
-			_INFO("model: "+tostring(model)+", hMassSumTmp->GetMaximum() = "+tostring(hMassSumTmp->GetMaximum()));
 			if(model!=DT) hResTmp->Add(hvBinnedHistos_imassRes[n]); // sum ///
 			////////////////////////////////////////////////////
 			
@@ -1139,7 +1144,6 @@ int plot_ratio_weights()
 		else
 		{	
 			vhMassReconTemplate[model] = (TH1D*)hMassSumTmp->Clone("");
-			_INFO("vhMassReconTemplate["+tostring(model)+"]->GetMaximum() = "+tostring(vhMassReconTemplate[model]->GetMaximum()));
 			vhResTemplate[model] = (TH1D*)hResTmp->Clone("");
 			for(Int_t i=0 ; i<imass_afb_nbins ; i++) vvhCosThSumRecTemplate[i][model] = (TH1D*)vhCosThSumTmp[i]->Clone("");
 		}
@@ -1180,10 +1184,14 @@ int plot_ratio_weights()
 		vhCosThSumZ0d3pd_acceptance[i] = (TH1D*)vhCosThSumReconZ0d3pd[i]->Clone("");
 		//vhCosThSumZ0d3pd_acceptance[i]->Divide(vhCosThSumZ0d3pd[i]);
 		divide(vhCosThSumZ0d3pd_acceptance[i],vhCosThSumZ0d3pd[i]);
+		
+		dirCostHistograms->cd();
 		vhCosThSumZ0d3pd_acceptance[i]->SetName("hCosThZ0d3pd_acceptance_"+b);
 		vhCosThSumZ0d3pd_acceptance[i]->Write("", TObject::kOverwrite);
+		dirCostHistograms->cd();
 		vhCosThSumReconZ0d3pd[i]->SetName("hCosThRecZ0d3pd_"+b);
 		vhCosThSumReconZ0d3pd[i]->Write("", TObject::kOverwrite);
+		dirCostHistograms->cd();
 		vhCosThSumReconDTd3pd[i]->SetName("hCosThRecDTd3pd_"+b);
 		vhCosThSumReconDTd3pd[i]->Write("", TObject::kOverwrite);
 		
@@ -1197,6 +1205,8 @@ int plot_ratio_weights()
 			vvhCosThSumAcceptance[i][mod] = (TH1D*)vvhCosThSumRecTemplate[i][mod]->Clone("");
 			//vvhCosThSumAcceptance[i][mod]->Divide(vvhCosThSum[i][mod]);
 			divide(vvhCosThSumAcceptance[i][mod],vvhCosThSum[i][mod]);
+			
+			dirCostHistograms->cd();
 			vvhCosThSumAcceptance[i][mod]->SetName("hCosTh"+tsname+"_acceptance_"+b);
 			vvhCosThSumAcceptance[i][mod]->Write("", TObject::kOverwrite);
 			dirCostHistograms->cd();
@@ -1303,6 +1313,7 @@ int plot_ratio_weights()
 		dirMassHistograms->cd();
 		vhMassSum[mod]->SetName("hMass"+tsname);
 		vhMassSum[mod]->Write("", TObject::kOverwrite);
+		
 		dirMassHistograms->cd();
 		vhMassReconTemplate[mod]->SetName("hMassReconTemplate"+tsname);
 		vhMassReconTemplate[mod]->Write("", TObject::kOverwrite);
@@ -1311,15 +1322,19 @@ int plot_ratio_weights()
 	dirMassHistograms->cd();
 	hMassReconZ0d3pd->SetName("hMassReconZ0d3pd");
 	hMassReconZ0d3pd->Write("", TObject::kOverwrite);
+	
 	dirMassHistograms->cd();
-	hMassReconDTd3pd->SetName("hMassReconZ0d3pd");
+	hMassReconDTd3pd->SetName("hMassReconDTd3pd");
 	hMassReconDTd3pd->Write("", TObject::kOverwrite);
+	
 	dirMassHistograms->cd();
 	hMassReconZPd3pd->SetName("hMassReconZPd3pd");
 	hMassReconZPd3pd->Write("", TObject::kOverwrite);
+	
 	dirAllHistograms->cd();
 	hDummy_afb->SetName("hDummy_afb");
 	hDummy_afb->Write("", TObject::kOverwrite);
+	
 	dirAllHistograms->cd();
 	hMassSumTmp->SetName("hMassTmp");
 	hMassSumTmp->Write("", TObject::kOverwrite);
@@ -1337,6 +1352,7 @@ int plot_ratio_weights()
 			if(mod==Z0) tsname = "Z0";
 			if(mod==ZP) tsname = "ZP";
 			if(mod==KK) tsname = "KK";
+			
 			dirCostHistograms->cd();
 			vvhCosThSum[i][mod]->SetName("hCosThTru"+tsname+"_"+b);
 			vvhCosThSum[i][mod]->Write("", TObject::kOverwrite);
@@ -1502,15 +1518,15 @@ int plot_ratio_weights()
 		leg_mass_recon->AddEntry(vhMassReconTemplate[mod], sName.c_str(), "l");
 	}
 	
-	// hMassReconDTd3pd->SetLineColor(kBlack);
-	// hMassReconDTd3pd->SetLineWidth(2);
-	// hMassReconDTd3pd->SetTitle("");
-	// hMassReconDTd3pd->SetXTitle("#hat{m}_{#mu#mu} GeV");
-	// hMassReconDTd3pd->SetYTitle(sYTitle.c_str());
-	// if(doLogx) hMassReconDTd3pd->GetXaxis()->SetMoreLogLabels(); 
-	// if(doLogx) hMassReconDTd3pd->GetXaxis()->SetMoreLogLabels(); 
-	// hMassReconDTd3pd->Draw("e1x0 SAMES");
-	// leg_mass_recon->AddEntry(hMassReconDTd3pd, "2011 Data (#it{ATLAS} rec)", "lep");
+	hMassReconDTd3pd->SetLineColor(kBlack);
+	hMassReconDTd3pd->SetLineWidth(2);
+	hMassReconDTd3pd->SetTitle("");
+	hMassReconDTd3pd->SetXTitle("#hat{m}_{#mu#mu} GeV");
+	hMassReconDTd3pd->SetYTitle(sYTitle.c_str());
+	if(doLogx) hMassReconDTd3pd->GetXaxis()->SetMoreLogLabels(); 
+	if(doLogx) hMassReconDTd3pd->GetXaxis()->SetMoreLogLabels(); 
+	hMassReconDTd3pd->Draw("e1x0 SAMES");
+	leg_mass_recon->AddEntry(hMassReconDTd3pd, "2011 Data (#it{ATLAS} rec)", "lep");
 	
 	leg_mass_recon->Draw("SAMES");
 	pvtxt_recon->Draw("SAMES");

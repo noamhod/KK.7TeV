@@ -77,6 +77,7 @@
 #include <ctime>
 #include <time.h>
 #include <pthread.h>
+#include <iomanip>
 
 using namespace std;
 using namespace RooFit;

@@ -215,7 +215,7 @@ class DQ2
 			return
 		end
 		
-		%x(rm -f #{logdir}/*)
+		#%x(rm -f #{logdir}/*)
 		%x(dq2-get -H #{path} -Z #{dataset} > #{logfile} 2>&1)
 
 		f_summary_file = File.open(targetdir+"/"+summary_file,'a')

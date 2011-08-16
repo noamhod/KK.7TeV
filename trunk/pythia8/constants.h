@@ -3,12 +3,12 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-static const double luminosity = 1.238760124;//5.; // 1/fb
+static const double luminosity = 1.60708;//5.; // 1/fb
 
 static const double minMassBin = 120;  // for the asymmetry fit
 static const double maxMassBin = 1500; // for the asymmetry fit
-static const int    nMassBins  = 8;   // for the asymmetry fit
-static const int    niMassBins = 50;  // for the imass histos
+static const int    nMassBins  = 7;   // for the asymmetry fit
+static const int    niMassBins = 40;  // for the imass histos
 
 static const double minCosTheta = -1.;  // for the acceptance binning
 static const double maxCosTheta = +1.;  // for the acceptance binning

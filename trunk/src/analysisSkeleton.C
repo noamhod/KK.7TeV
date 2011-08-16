@@ -84,19 +84,22 @@ void analysisSkeleton::setSmearedMCPpT(int nMus)
 }
 
 void analysisSkeleton::setPtCandidatesFile(string sCandFilePath, string srunnumber)
-{	
+{
+	_DEBUG("analysisSkeleton::setPtCandidatesFile");
 	string sLogFileName = sCandFilePath+"/candidates_pT.run_"+srunnumber+".cnd";//".time_"+getDateHour()+".cnd";
 	fCand = new ofstream( sLogFileName.c_str() );
 }
 
 void analysisSkeleton::resetMuQAflags(int nMus)
 {
+	_DEBUG("analysisSkeleton::resetMuQAflags");
 	if(muQAflags.size()>0)      muQAflags.clear();
 	for(int j=0 ; j<nMus ; j++) muQAflags.push_back(true);
 }
 
 string analysisSkeleton::getPeriodName()
 {
+	_DEBUG("analysisSkeleton::getPeriodName");
 	string speriod = sCurrentPeriod;
 	if(RunNumber != currentRun)
 	{
@@ -116,11 +119,13 @@ string analysisSkeleton::getPeriodName()
 
 string analysisSkeleton::getPeriodName(int run)
 {
+	_DEBUG("analysisSkeleton::getPeriodName(int run)");
 	return getPeriod( run, m_firstrun2periodMap, m_lastrun2periodMap );
 }
 
 vector<string>* analysisSkeleton::getPeriodTriggers()
 {
+	_DEBUG("analysisSkeleton::getPeriodTriggers");
 	if(sPeriod==""  ||  m_period2triggerMap==NULL)
 	{
 		_ERROR("sPeriod==null || m_period2triggerMap==NULL, exitting now");
@@ -132,6 +137,7 @@ vector<string>* analysisSkeleton::getPeriodTriggers()
 
 int analysisSkeleton::isTrigger(string trigName)
 {
+	_DEBUG("analysisSkeleton::isTrigger");
 	if(trigName=="")
 	{
 		_ERROR("trigName==null, exitting now");
@@ -150,6 +156,7 @@ int analysisSkeleton::isTrigger(string trigName)
 
 void analysisSkeleton::matchTrigger(string speriod, string sTrigType)
 {
+	_DEBUG("analysisSkeleton::matchTrigger");
 	/*
 	EFCB: the trig muon for the regular EF trigger
 	EFME: the MSonly trig muons
@@ -168,6 +175,8 @@ void analysisSkeleton::matchTrigger(string speriod, string sTrigType)
 		exit(-1);
 	}
 	
+	_DEBUG("speriod = "+speriod);
+	
 	// if(speriod=="MC")
 	// {
 		// mu_LLT_index = mu_L1_index;
@@ -184,32 +193,44 @@ void analysisSkeleton::matchTrigger(string speriod, string sTrigType)
 		speriod=="F"  || speriod=="G" || speriod=="H"
 	)
 	{
+		_DEBUG("sTrigType = "+sTrigType);
 		if(sTrigType=="CB")
 		{
+			_DEBUG("");
 			mu_HLT_dr = mu_EFCB_dr;
 			mu_HLT_index = mu_EFCB_index;
 			HLT_pt = trig_EF_trigmuonef_track_CB_pt;
 			HLT_phi = trig_EF_trigmuonef_track_CB_phi;
 			HLT_eta = trig_EF_trigmuonef_track_CB_eta;
 			HLT_has = trig_EF_trigmuonef_track_CB_hasCB;
+			_DEBUG("");
 		}
 		else if(sTrigType=="MSonly"||sTrigType=="MS")
 		{
+			_DEBUG("");
 			mu_HLT_dr = mu_EFME_dr;
 			mu_HLT_index = mu_EFME_index;
 			HLT_pt = trig_EF_trigmuonef_track_MS_pt;
 			HLT_phi = trig_EF_trigmuonef_track_MS_phi;
 			HLT_eta = trig_EF_trigmuonef_track_MS_eta;
 			HLT_has = trig_EF_trigmuonef_track_MS_hasMS;
+			_DEBUG("");
 		}
 		else if(sTrigType=="MG")
 		{
+			_DEBUG("");
 			mu_HLT_dr = mu_EFMG_dr;
 			mu_HLT_index = mu_EFMG_index;
 			HLT_pt = trig_EF_trigmugirl_track_CB_pt;
 			HLT_phi = trig_EF_trigmugirl_track_CB_phi;
 			HLT_eta = trig_EF_trigmugirl_track_CB_eta;
 			HLT_has = trig_EF_trigmugirl_track_CB_hasCB;
+			_DEBUG("");
+		}
+		else
+		{
+			_ERROR("unknown sTrigType="+sTrigType+", exitting now");
+			exit(-1);
 		}
 	}
 	
@@ -218,6 +239,7 @@ void analysisSkeleton::matchTrigger(string speriod, string sTrigType)
 
 void analysisSkeleton::runEventDumper()
 {
+	_DEBUG("analysisSkeleton::runEventDumper");
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	// write the interesting events to a flat file ///////////////////////////////////////////////
 	if(doEventDump)
@@ -270,6 +292,7 @@ void analysisSkeleton::runEventDumper()
 
 void analysisSkeleton::printAllProperties(int aii, int bii, int iv)
 {
+	_DEBUG("analysisSkeleton::printAllProperties");
 	// event
 	printProperty("RunNumber", RunNumber);
 	printProperty("lbn", lbn);
@@ -433,6 +456,7 @@ void analysisSkeleton::printAllProperties(int aii, int bii, int iv)
 
 void analysisSkeleton::fillAfterCuts()
 {
+	_DEBUG("analysisSkeleton::fillAfterCuts");
 	///////////////////////////////////////////////////////////
 	// fill the "allCuts" histograms only after the last cut 
 	// for the final histograms:
@@ -1098,6 +1122,7 @@ void analysisSkeleton::fillAfterCuts()
 
 void analysisSkeleton::fillBeforeCuts()
 {
+	_DEBUG("analysisSkeleton::fillBeforeCuts");
 	int muSize = (int)mu_pt->size();
 
 	if(muSize==2)
@@ -1127,6 +1152,7 @@ void analysisSkeleton::fillBeforeCuts()
 
 void analysisSkeleton::fillCutFlow(string sorderedcutname, string sIsPreselection)
 {
+	_DEBUG("analysisSkeleton::fillCutFlow");
 	/////////////////////////////////////////////////////////
 	// count the cut flow numbers ///////////////////////////
 	m_cutFlowNumbers->operator[](sorderedcutname)++; ////////
@@ -1174,6 +1200,7 @@ void analysisSkeleton::fillCutFlow(string sorderedcutname, string sIsPreselectio
 
 int analysisSkeleton::countQAflags()
 {
+	_DEBUG("analysisSkeleton::countQAflags");
 	int nGoodQAflags = 0;
 	int muSize = (int)mu_pt->size();
 	if(pTtoIndexMap.size()>0) pTtoIndexMap.clear();
@@ -1192,6 +1219,7 @@ int analysisSkeleton::countQAflags()
 
 void analysisSkeleton::pTSort()
 {
+	_DEBUG("analysisSkeleton::pTSort");
 	// the map is already sorted by the pT size but,
 	// from the lowest to the highest, so there's
 	// no need to convert values.
@@ -1216,6 +1244,7 @@ void analysisSkeleton::pTSort()
 
 void analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b)
 {
+	_DEBUG("analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b)");
 	// the map is already sorted by the pT size but,
 	// from the lowest to the highest, so there's
 	// no need to convert values.
@@ -1240,6 +1269,7 @@ void analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b)
 
 void analysisSkeleton::imassSort()
 {
+	_DEBUG("analysisSkeleton::imassSort");
 	float im   = 0.;
 	float max  = 0.;
 	int muSize = (int)mu_pt->size();
@@ -1291,6 +1321,7 @@ void analysisSkeleton::buildMU4Vector(int nMus)
 
 void analysisSkeleton::wipeMU4Vector()
 {
+	_DEBUG("analysisSkeleton::wipeMU4Vector");
 	int nMus = (int)pmu.size();
 	if(nMus>0)
 	{
@@ -1304,6 +1335,7 @@ void analysisSkeleton::wipeMU4Vector()
 
 bool analysisSkeleton::assignPairIndices()
 {
+	_DEBUG("analysisSkeleton::assignPairIndices");
 	// select the final muon pair
 	if(pTtoIndexMap.size()==2) pTSort();
 	else if(pTtoIndexMap.size()>2)
@@ -1331,6 +1363,7 @@ bool analysisSkeleton::assignPairIndices()
 
 bool analysisSkeleton::applyPreselection()
 {
+	_DEBUG("analysisSkeleton::applyPreselection");
 	///////////////////////////////////////////
 	// do not skip this for correct counting //
 	incrementNallEvents(); ////////////////////
@@ -1344,6 +1377,7 @@ bool analysisSkeleton::applyPreselection()
 
 bool analysisSkeleton::applySingleMuonSelection()
 {
+	_DEBUG("analysisSkeleton::applySingleMuonSelection");
 	////////////////////////////////////////
 	// fill the NO CUTS items //////////////
 	fillBeforeCuts(); //////////////////////
@@ -1361,6 +1395,7 @@ bool analysisSkeleton::applySingleMuonSelection()
 
 bool analysisSkeleton::applyDoubleMuonSelection()
 {
+	_DEBUG("analysisSkeleton::applyDoubleMuonSelection");
 	TMapsb cutsToSkip; // dummy (empty)
 	passCutFlow = doubleSelection(cutsToSkip);
 	
@@ -1386,6 +1421,7 @@ bool analysisSkeleton::applyDoubleMuonSelection()
 
 void analysisSkeleton::fillCutProfile1D()
 {
+	_DEBUG("analysisSkeleton::fillCutProfile1D");
 	bool pass;
 	
 	for(TMapSP2TH1D::iterator it=h1map_cutProfile->begin() ; it!=h1map_cutProfile->end() ; it++)
@@ -1726,6 +1762,7 @@ void analysisSkeleton::fillCutProfile1D()
 
 void analysisSkeleton::fillCutProfile2D()
 {
+	_DEBUG("analysisSkeleton::fillCutProfile2D");
 	bool pass;
 	for(TMapSP2TH2D::iterator it=h2map_cutProfile->begin() ; it!=h2map_cutProfile->end() ; it++)
 	{
@@ -1786,6 +1823,7 @@ void analysisSkeleton::fillCutProfile2D()
 
 void analysisSkeleton::fillCutProfile()
 {
+	_DEBUG("analysisSkeleton::fillCutProfile");
 	fillCutProfile1D();
 	
 	fillCutProfile2D();
@@ -1804,6 +1842,7 @@ void analysisSkeleton::fillCutProfile()
 
 void analysisSkeleton::fill_tNp()
 {
+	_DEBUG("analysisSkeleton::fill_tNp");
 	int mask = -1;
 	string sTrigType = "";
 	bool isLLT = false;
@@ -1815,7 +1854,7 @@ void analysisSkeleton::fill_tNp()
 	float trig_pTthreshold = (float)m_period2pTthresholdMap->operator[](sPeriod)->at(0); ////  //???????????????????????????????????????????????????????????
 	string sTrigPeriod     = (*m_period2triggerperiodMap)[sPeriod]; /////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
-	if( (size_t)sTrigPeriod.find("L1")!=string::npos )      sTrigType = "L1"; ///////////////
+	if(      (size_t)sTrigPeriod.find("L1")!=string::npos ) sTrigType = "L1"; ///////////////
 	else if( (size_t)sTrigPeriod.find("MG")!=string::npos ) sTrigType = "MG"; ///////////////
 	else if( (size_t)sTrigPeriod.find("MS")!=string::npos ) sTrigType = "MS"; ///////////////
 	else                                                    sTrigType = "CB"; ///////////////
@@ -1950,9 +1989,14 @@ void analysisSkeleton::fill_tNp()
 
 void analysisSkeleton::fillTruthEfficiency()
 {
+	_DEBUG("analysisSkeleton::fillTruthEfficiency");
 	//mu_truth_matched    : True if muon is matched to the truth
 	//mu_truth_status     : Status oMC status = 1 final particle, status = 3 intermediate particle (documentary)
 	//mu_truth_mothertype : description: True mother PDG type
+	
+	bool isLLT  = false;
+	bool isHLT  = false;
+	bool isCBpT = true;
 	
 	if(mu_truth_pt==0)         return;
 	if(mu_truth_status==0)     return;
@@ -1964,20 +2008,36 @@ void analysisSkeleton::fillTruthEfficiency()
 	float trig_pTmin       = (float)m_period2pTminMap->operator[](sPeriod)->at(0); //////////  // ????????????????????????????????????????????????????????
 	//float trig_pTthreshold = (float)m_period2pTthresholdMap->operator[](sPeriod)->at(0); //  // ????????????????????????????????????????????????????????
 	string sTrigPeriod     = (*m_period2triggerperiodMap)[sPeriod]; /////////////////////////
-	string sTrigType = "L1"; ////////////////////////////////////////////////////////////////
+	string sTrigType = ""; //////////////////////////////////////////////////////////////////
+	if(      (size_t)sTrigPeriod.find("L1")!=string::npos ) sTrigType = "L1"; ///////////////
+	else if( (size_t)sTrigPeriod.find("MG")!=string::npos ) sTrigType = "MG"; ///////////////
+	else if( (size_t)sTrigPeriod.find("MS")!=string::npos ) sTrigType = "MS"; ///////////////
+	else                                                    sTrigType = "CB"; ///////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
+	if     ( (size_t)sTrigPeriod.find("L1")!=string::npos ) isLLT = true; ///////////////////
+	else if( (size_t)sTrigPeriod.find("EF")!=string::npos ) isHLT = true; ///////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
+	if     (sTrigType=="L1" || sTrigType=="MS") isCBpT = false; /////////////////////////////
+	else if(sTrigType=="MG" || sTrigType=="CB") isCBpT = true;  /////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
 	matchTrigger(sPeriod, sTrigType); ///////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
+	
+	_DEBUG("");
 	
 	//////////////////////////////////////
 	if(mu_truth_pt->size()!=2) return; ///
 	//////////////////////////////////////
 	
+	_DEBUG("");
+	
 	float pTreconstructed = 0.;
 	for(int t=0 ; t<(int)mu_truth_pt->size() ; t++)
 	{
-		//if(sTrigType!="CB") pTreconstructed = fabs(pT(mu_me_qoverp->at(t), mu_me_theta->at(t))*MeV2GeV); ??????????????????????
-		//else                pTreconstructed = mu_pt->at(t)*MeV2GeV; // ????????????????????????????????????????????????????????
-		pTreconstructed = fabs(pT(mu_me_qoverp->at(t), mu_me_theta->at(t))*MeV2GeV); // L1 doesn't do CB measurement ????????????
+		_DEBUG("Start: t="+tostring(t));
+	
+		if(!isCBpT) pTreconstructed = fabs(pT(mu_me_qoverp->at(t), mu_me_theta->at(t))*MeV2GeV); 
+		else        pTreconstructed = mu_pt->at(t)*MeV2GeV;
 	
 		if(!mu_truth_status->at(t))          continue; // has to be final particle
 		if(mu_truth_mothertype->at(t)!=PDTZ) continue; // has to come out of Z^0
@@ -1992,21 +2052,54 @@ void analysisSkeleton::fillTruthEfficiency()
 		tru_cand_eta->push_back( mu_eta->at(t) );
 		tru_cand_phi->push_back( mu_phi->at(t) );
 		
-		// for monte carlo, use L1_MU10
-		float dr = mu_LLT_dr->at(t);
-		int iROI = mu_LLT_index->at(t); 
-		if(dr<0.)          continue;
-		if(dr>dRmax_mu_L1) continue;
-		if(iROI<0)         continue;
-	
-		float dphi = LLT_phi->at(iROI) - mu_phi->at(t);
-		float deta = LLT_eta->at(iROI) - mu_eta->at(t);
-		dr = sqrt(dphi*dphi + deta*deta);
-		if(dr>dRmax_mu_L1) continue;
+		if(isLLT)
+		{
+			float dr = mu_LLT_dr->at(t);
+			int iROI = mu_LLT_index->at(t); 
+			if(dr<0.)          continue;
+			if(dr>dRmax_mu_L1) continue;
+			if(iROI<0)         continue;
 		
-		float pTprobTrig = LLT_pt->at(iROI)*MeV2GeV;
-		float pTtrigThreshold = 10.; // in GeV
-		if(pTprobTrig<pTtrigThreshold) continue;
+			float dphi = LLT_phi->at(iROI) - mu_phi->at(t);
+			float deta = LLT_eta->at(iROI) - mu_eta->at(t);
+			dr = sqrt(dphi*dphi + deta*deta);
+			if(dr>dRmax_mu_L1) continue;
+			
+			float pTprobTrig = LLT_pt->at(iROI)*MeV2GeV;
+			float pTtrigThreshold = 10.; // in GeV
+			if(pTprobTrig<pTtrigThreshold) continue;
+		}
+		else if(isHLT)
+		{
+			float dr = mu_HLT_dr->at(t);
+			int iROI = mu_HLT_index->at(t); 
+			if(dr<0.)          continue;
+			if(dr>dRmax_mu_EF) continue;
+			if(iROI<0)         continue;
+		
+			float dRmax = -1.;
+			int iTrigTrk = 0;
+			for(int j=0 ; j<(int)HLT_has->at(iROI).size() ; j++)
+			{
+				if( !HLT_has->at(iROI)[j] ) continue;
+				float dphi = HLT_phi->at(iROI)[j] - mu_phi->at(t);
+				float deta = HLT_eta->at(iROI)[j] - mu_eta->at(t);
+				dr = sqrt(dphi*dphi + deta*deta);
+				if(dr>dRmax_mu_EF) continue;
+				if(dr>dRmax)       continue;
+				dRmax    = dr;
+				iTrigTrk = j;
+			}
+		
+			// float dphi = HLT_phi->at(iROI) - mu_phi->at(t);
+			// float deta = HLT_eta->at(iROI) - mu_eta->at(t);
+			// dr = sqrt(dphi*dphi + deta*deta);
+			// if(dr>dRmax_mu_EF) continue;
+			
+			float pTprobTrig = HLT_pt->at(iROI)[iTrigTrk]*MeV2GeV;
+			float pTtrigThreshold = 10.; // in GeV
+			if(pTprobTrig<pTtrigThreshold) continue;
+		}
 		
 		// fill the probe histos
 		(*h1map_truth_succeeded_pT)[sTrigPeriod]->Fill( pTreconstructed*GeV2TeV );
@@ -2015,7 +2108,11 @@ void analysisSkeleton::fillTruthEfficiency()
 		tru_succ_pT->push_back( pTreconstructed*GeV2TeV );
 		tru_succ_eta->push_back( mu_eta->at(t) );
 		tru_succ_phi->push_back( mu_phi->at(t) );
+		
+		_DEBUG("End: t="+tostring(t));
 	}
+	
+	_DEBUG("");
 }
 
 /*
@@ -2102,6 +2199,7 @@ void analysisSkeleton::fillTruth()
 
 void analysisSkeleton::fillTruth()
 {
+	_DEBUG("analysisSkeleton::fillTruth");
 	/*
 	// muonTruth
 	vector<float>*   truth_all_muonTruth_pt;
@@ -2238,6 +2336,7 @@ void analysisSkeleton::fillTruth()
 
 void analysisSkeleton::fillRecon()
 {
+	_DEBUG("analysisSkeleton::fillRecon");
 	recon_all_E->push_back(mu_E->at(ai)*MeV2GeV);
 	recon_all_E->push_back(mu_E->at(bi)*MeV2GeV);
 	recon_all_pt->push_back(mu_pt->at(ai)*MeV2GeV);
@@ -2282,6 +2381,7 @@ void analysisSkeleton::fillRecon()
 
 void analysisSkeleton::applyTagNProbe(TMapsb& cutsToSkip)
 {
+	_DEBUG("analysisSkeleton::applyTagNProbe");
 	bool pass;
 	
 	pass = true;
@@ -2315,6 +2415,7 @@ void analysisSkeleton::applyTagNProbe(TMapsb& cutsToSkip)
 
 void analysisSkeleton::applyTruth()
 {
+	_DEBUG("analysisSkeleton::applyTruth");
 	///////////////////////////
 	// fill all events ////////
 	fillTruth(); //////////////
@@ -2351,6 +2452,7 @@ void analysisSkeleton::applyTruth()
 
 bool analysisSkeleton::preselection(string sSkipCut)
 {
+	_DEBUG("analysisSkeleton::preselection(string sSkipCut)");
 	TMapsb cutsToSkip;
 	cutsToSkip.insert(make_pair(sSkipCut,true));
 	return preselection(cutsToSkip);
@@ -2358,6 +2460,7 @@ bool analysisSkeleton::preselection(string sSkipCut)
 
 bool analysisSkeleton::singleSelection(string sSkipCut)
 {
+	_DEBUG("analysisSkeleton::singleSelection(string sSkipCut)");
 	TMapsb cutsToSkip;
 	cutsToSkip.insert(make_pair(sSkipCut,true));
 	return singleSelection(cutsToSkip);
@@ -2365,6 +2468,7 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 
 bool analysisSkeleton::doubleSelection(string sSkipCut)
 {
+	_DEBUG("analysisSkeleton::doubleSelection(string sSkipCut)");
 	TMapsb cutsToSkip;
 	cutsToSkip.insert(make_pair(sSkipCut,true));
 	return doubleSelection(cutsToSkip);
@@ -2372,6 +2476,7 @@ bool analysisSkeleton::doubleSelection(string sSkipCut)
 
 inline bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 {
+	_DEBUG("analysisSkeleton::preselection(TMapsb& cutsToSkip)");
 	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;
 	TMapsb::iterator itrEnd = cutsToSkip.end();
 	TMapsb::iterator itr;
@@ -2452,6 +2557,7 @@ inline bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 
 inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 {
+	_DEBUG("analysisSkeleton::singleSelection(TMapsb& cutsToSkip)");
 	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;
 	TMapsb::iterator itrEnd = cutsToSkip.end();
 	TMapsb::iterator itr;
@@ -2630,7 +2736,8 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 }
 
 inline bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
-{	
+{
+	_DEBUG("analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)");
 	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;
 	TMapsb::iterator itrEnd = cutsToSkip.end();
 	TMapsb::iterator itr;

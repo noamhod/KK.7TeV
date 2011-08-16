@@ -66,10 +66,16 @@ string periodHandler::getPeriod(int runNumber, TMapis* firstrun2periodMap, TMapi
 	// check the period name
 	if(ifst->second != ilst->second)
 	{
-		cout << "Error: didn't find a period, exitting now..." << endl;
+		_ERROR("[1] didn't find a period, exitting now...");
 		exit(-1);
 	}
-		
+	
+	if(ifst==firstrun2periodMap->end())
+	{
+		_ERROR("[2] didn't find a period, exitting now...");
+		exit(-1);
+	}
+	
 	// get the period name
 	string sPeriod = ifst->second;
 		
@@ -79,6 +85,11 @@ string periodHandler::getPeriod(int runNumber, TMapis* firstrun2periodMap, TMapi
 vector<string>* periodHandler::getTrigs(string sPeriod, TMapsP2vs* period2triggerMap)
 {
 	TMapsP2vs::iterator it = period2triggerMap->find(sPeriod);
+	if(it==period2triggerMap->end())
+	{
+		_ERROR("didn't find a period, exitting now...");
+		exit(-1);
+	}
 	return it->second;
 }
 

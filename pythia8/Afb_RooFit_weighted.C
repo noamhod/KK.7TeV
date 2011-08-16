@@ -73,7 +73,7 @@ vector<RooDataHist*> vrdhAcc;
 vector<RooHistPdf*>  vrhpdfAcc;
 
 
-bool drawAfbErrArea = false;
+bool drawAfbErrArea = true;
 
 double randomizeItialGuess(double min, double max)
 {
@@ -198,7 +198,7 @@ void init(int massBin, int mod)
 		vhAfbBins[mod]->SetXTitle( "m_{#mu#mu} GeV" );
 		vhAfbBins[mod]->SetYTitle( "A_{FB}" );
 		vhAfbBins[mod]->SetLineColor(vModelColor[mod]);
-		if(drawAfbErrArea)
+		if(drawAfbErrArea  &&  mod!=DT)
 		{
 			vhAfbBins[mod]->SetFillColor(vModelColor[mod]);
 			vhAfbBins[mod]->SetFillStyle(fillStyle);
@@ -278,13 +278,14 @@ void reset()
 }
 
 
-void loop(int mod)
+Int_t loop(int mod)
 {
 	_DEBUG("loop");
 	Int_t N;
 	
 	setBranches(mod);
 	N = vtData[mod]->GetEntries();
+	_DEBUG("N = "+tostring(N));
 	for(Int_t i=0 ; i<N ; i++)
 	{
 		vtData[mod]->GetEntry(i);
@@ -295,7 +296,6 @@ void loop(int mod)
 			w = 1.;
 			vhMass[mod]->Fill(mass_rec);
 			vhMassBins[mod]->Fill(mass_rec);
-			_DEBUG("mass_rec = " + tostring(mass_rec,2));
 		}
 		else if(mod==Z0)
 		{
@@ -314,6 +314,7 @@ void loop(int mod)
 		
 		vDataSet[mod]->add(RooArgSet(*cosThe),w);
 	}
+	return N;
 }
 
 bool minuitStatus( TMinuit * m) 
@@ -364,6 +365,19 @@ void plot(int mod, TVirtualPad* pad)
 	pad->SetLeftMargin(0.2);
 	cosThetaFrame->SetTitleOffset(2,"Y");
 	cosThetaFrame->Draw();
+}
+
+void plotempty(int mod, TVirtualPad* pad)
+{
+	_DEBUG("plotempty");
+	pad->cd();
+	
+	// RooPlot* cosThetaFrame = cosThe->frame(Name("cosThetaFrame"), Title( vModelName[mod] ));
+	// cosThetaFrame->getAttText()->SetTextSize(0.05);
+	
+	pad->SetLeftMargin(0.2);
+	// cosThetaFrame->SetTitleOffset(2,"Y");
+	// cosThetaFrame->Draw();
 }
 
 void getFit(int mod)
@@ -461,8 +475,9 @@ void drawAfb()
 	else               vhAfbBins[ZP]->Draw("Y+ e1x1 SAMES");
 	vhAfbBins[ZP]->GetXaxis()->SetMoreLogLabels(); 
 	vhAfbBins[ZP]->GetXaxis()->SetMoreLogLabels(); 
-	if(drawAfbErrArea) vhAfbBins[DT]->Draw("E5 Y+ SAMES");
-	else               vhAfbBins[DT]->Draw("Y+ e1x1 SAMES");
+	// if(drawAfbErrArea) vhAfbBins[DT]->Draw("E5 Y+ SAMES");
+	// else               vhAfbBins[DT]->Draw("Y+ e1x1 SAMES");
+	vhAfbBins[DT]->Draw("Y+ e1x1 SAMES");
 	vhAfbBins[DT]->GetXaxis()->SetMoreLogLabels(); 
 	vhAfbBins[DT]->GetXaxis()->SetMoreLogLabels(); 
 	
@@ -535,7 +550,7 @@ void Afb_RooFit_weighted()
 	pvtxt_atlas = new TPaveText(0.3277592,0.8056995,0.4916388,0.9002591,"brNDC");
 	pvtxt_atlas->SetFillColor(0);
 	pvtxt_atlas->SetTextFont(42);
-	txt = pvtxt_atlas->AddText("#bf{#splitline{#it{ATLAS}}{#scale[0.68]{Templates}}}");
+	txt = pvtxt_atlas->AddText("#bf{#splitline{#it{ATLAS}}{#scale[0.42]{work in progress}}}");
 	
 	cnvAfb = new TCanvas("cnvAfb", "cnvAfb", 0,0,1200,800);
 	pad_mHat = new TPad("padMhat","",0,0,1,1);
@@ -577,15 +592,34 @@ void Afb_RooFit_weighted()
 		
 		for(int mod=Z0 ; mod<=DT ; mod++)
 		{
-			////////////////////////
-			init(massBin, mod); ////
-			loop(mod); /////////////
-			getFit(mod); ///////////
-			////////////////////////
+			bool skip = false;
+			//////////////////////////
+			init(massBin, mod); //////
+			Int_t N = loop(mod); /////
+			if(N<1) skip=true; ///////
+			if(!skip) getFit(mod); ///
+			//////////////////////////
 			
-			vAfbResult[massBin-1].push_back( Afb->getVal() );
-			vAfbError[massBin-1].push_back( Afb->getError() );
-			_INFO((string)vModelName[mod]+" --> Afb = "+tostring(vAfbResult[massBin-1][mod],2)+" +- "+tostring(vAfbError[massBin-1][mod],2));
+			vPad[massBin-1].push_back( cnv->cd( padCounter ) );
+			padCounter++;
+			vPadBin[massBin-1].push_back( vCanvases[massBin-1]->cd(mod+1) );
+			
+			if(!skip)
+			{
+				vAfbResult[massBin-1].push_back( Afb->getVal() );
+				vAfbError[massBin-1].push_back( Afb->getError() );
+				plot(mod,vPad[massBin-1][mod]);
+				plot(mod,vPadBin[massBin-1][mod]);
+				_INFO((string)vModelName[mod]+"(N="+tostring(N)+") --> Afb = "+tostring(vAfbResult[massBin-1][mod],2)+" +- "+tostring(vAfbError[massBin-1][mod],2));
+			}
+			else
+			{
+				vAfbResult[massBin-1].push_back( -999. );
+				vAfbError[massBin-1].push_back( -999. );
+				plotempty(mod,vPad[massBin-1][mod]);
+				plotempty(mod,vPadBin[massBin-1][mod]);
+				_INFO((string)vModelName[mod]+" --> 0 entries, skipping.");
+			}
 			
 			vhAfbBins[mod]->SetBinContent(massBin,vAfbResult[massBin-1][mod]);
 			/*
@@ -593,13 +627,6 @@ void Afb_RooFit_weighted()
 			else        vhAfbBins[mod]->SetBinError(massBin,0.);
 			*/
 			vhAfbBins[mod]->SetBinError(massBin,vAfbError[massBin-1][mod]);
-			
-			vPad[massBin-1].push_back( cnv->cd( padCounter ) );
-			padCounter++;
-			plot(mod,vPad[massBin-1][mod]);
-			
-			vPadBin[massBin-1].push_back( vCanvases[massBin-1]->cd(mod+1) );
-			plot(mod,vPadBin[massBin-1][mod]);
 		}
 		
 		vTitles.push_back( vhMass[Z0]->GetTitle() );

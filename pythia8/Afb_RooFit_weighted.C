@@ -1,12 +1,13 @@
 #include "all.h"
 #include "roofit.h"
+#include "RooAngular.h"
 
 /*
 	1. There are 2 kinds of unbinned, non-detector weights:
 		a. cross section weight, wXS, because the samples are binned in mass - relevant for the three models
 		b. model weight, xR, the ratio between ZP or KK and Z0 - relevant for the ZP and KK models only
 	2. There is the acceptance binned weight (trigger efficiency is ignored currently)
-	3. The truth PDF is (3/8)*(1+x^2+Afb*x)
+	3. The truth PDF is A*(1+x^2)+B*x   ==>  Afb = 3B/8A
 	4. The PDF should be corrected for the acceptance by a simple multiplication:      PDF(x) = PDFtru(x)*Acc(x)
 	5. Each event should be weighted (unbinned) according to the non-detector weights: w = wXS*wR
 */
@@ -20,13 +21,25 @@ static Double_t xbins[nxbins+1];
 Int_t  iMassNbins = 30; // for non log bins
 
 
-double   costmin = minCosTheta;
-double   costmax = maxCosTheta;
+double   costmin   = minCosTheta;
+double   costmax   = maxCosTheta;
 int      ncostbins = nCosThetaBins;
 
-double _Afb = 0.;
+double minA = +0.;
+double maxA = +20.;
+// double minB = -10.;
+// double maxB = +10.;
+double minB = -1.;
+double maxB = +1.;
+double _A = 0.;
+double _B = 0.;
+struct fitpars
+{
+	double A;
+	double B;
+};
 TRandom* randGen;
-vector<vector<double> > vvdInitialGuess;
+vector<vector<fitpars> > vvInitialGuess;
 
 TFile* file = new TFile("weights.root", "READ");
 vector<TH1D*> vhMassBins;
@@ -55,11 +68,16 @@ TPad *pad_compare;
 
 RooRealVar* cosThe; // the variable 
 RooRealVar* weight; // the weight
-RooRealVar* Afb;    // the parameter to find
+RooRealVar* A;    // the parameter to find
+RooRealVar* B;    // the parameter to find
 
 
-vector<RooAbsData*> vDataSet; // Roo Data holder
+vector<RooAbsData*>   vUnbinnedDataSet; // Roo Data holder
+vector<RooDataHist*>  vBinnedDataSet;
 vector<RooFitResult*> vFitResult;
+
+vector<bool>          vbFitStatus;
+vector<vector<bool> > vvbFitStatus;
 
 
 vector<RooAbsPdf*> vModel;   // the final model pdf
@@ -73,12 +91,45 @@ vector<RooDataHist*> vrdhAcc;
 vector<RooHistPdf*>  vrhpdfAcc;
 
 
+///////////////////
+// for generation
+RooRealVar*  A_gen[4];
+RooRealVar*  B_gen[4];
+RooAbsPdf*   sigPdf_gen[4];
+TH1D*        hAcc[4];
+RooDataHist* rdhAcc[4];
+RooHistPdf*  rhpdfAcc[4];
+RooProdPdf*  model[4];
+RooAbsData*  rad[4];
+///////////////////
+
+
 bool drawAfbErrArea = true;
+bool doWeights      = true;
+bool doBinned       = false;
+bool doGeneration   = true;
+Int_t Ngen = 1000;
 
 double randomizeItialGuess(double min, double max)
 {
 	_DEBUG("randomizeItialGuess");
 	return min + (max-min)*randGen->Uniform(); // Uniform(x1=0) returns a uniform deviate on the interval [0,x1].
+}
+
+double getAfb(double a, double b, bool validate=false)
+{
+	if(validate)
+	{
+		return (a>0.) ? 3.*b/(8.*a) : -999;
+	}
+	else return 3.*b/(8.*a);
+	
+	return -999.;
+}
+
+double getAfbErr(double Afb, int N)
+{
+	return (N>0.) ? sqrt((1-Afb*Afb)/N) : -999;
 }
 
 void setBranches(int mod)
@@ -103,6 +154,64 @@ void setLogMassBins(Double_t xmin, Double_t xmax)
 	for(Int_t i=1 ; i<=nxbins ; i++) xbins[i] = TMath::Power( 10,(logXmin + i*logXbinwidth) );
 }
 
+fitpars getTheory(int massBin, int mod)
+{
+	_DEBUG("getTheory");
+	double imass = xbins[massBin-1]+(xbins[massBin]-xbins[massBin-1])/2.;
+	fitpars fp;
+	fp.A = 3./8.;
+	if(mod==Z0 || mod==KK) fp.B = 0.5*(1.-TMath::Exp(-5.*imass/1000.));
+	else if(mod==ZP)       fp.B = 0.5*(1.-TMath::Exp(-5.*imass/1000.)) - 0.7*TMath::Gaus(imass,550,50);
+	else                   fp.B = 0.5*(1.-TMath::Exp(-5.*imass/1000.)) + 0.9*TMath::Gaus(imass,800,50);
+	_INFO("A="+tostring(fp.A)+", B="+tostring(fp.B));
+	return fp;
+}
+
+void generateToy(int massBin, int mod, int N)
+{
+	_DEBUG("generateToy");
+	
+	TString sMassBin = (TString)tostring(massBin);
+
+	fitpars fp = getTheory(massBin,mod);
+	A_gen[mod] = new RooRealVar(("A_gen"+tostring(massBin)+"_mod"+tostring(mod)).c_str(),"A_gen",fp.A);
+	B_gen[mod] = new RooRealVar(("B_gen"+tostring(massBin)+"_mod"+tostring(mod)).c_str(),"B_gen",fp.B);
+
+	sigPdf_gen[mod] = new RooAngular(("SignalPdf_bin"+tostring(massBin)+"_mod"+tostring(mod)).c_str(), "SignalPdf_gen", *cosThe, *A_gen[mod], *B_gen[mod]);
+	
+	TString sName, sId;
+	
+	switch(mod)
+	{
+		case Z0:
+			sName = "Z^{0}";
+			sId = "Z0d3pd";
+			break;
+		case ZP:
+			sName = "Z'_{SSM}";
+			sId = "ZP";
+			break;
+		case KK:
+			sName = "S^{1}/Z_{2} KK";
+			sId = "KK";
+			break;
+		case DT:
+			sName = "Data";
+			sId = "DT";
+			break;
+	}
+
+	_DEBUG("");
+	
+	if(mod==DT) hAcc[mod] = (TH1D*)file->Get("cosTheta_histograms/hCosThZ0d3pd_acceptance_"+sMassBin)->Clone("");      // !!!!!!!!!!!!!!!!!!!!!!!! TO CHANGE
+	else        hAcc[mod] = (TH1D*)file->Get("cosTheta_histograms/hCosTh"+sId+"_acceptance_"+sMassBin)->Clone("");
+	rdhAcc[mod]   = new RooDataHist("rdhAcc_gen"+sId,"rdhAcc_gen"+sId,RooArgSet(*cosThe),hAcc[mod]);
+	rhpdfAcc[mod] = new RooHistPdf("rhpdfAcc_gen"+sId,"rhpdfAcc_gen"+sId,RooArgSet(*cosThe),*rdhAcc[mod],4); // last argument is the order of polinomial interpulation
+	model[mod]    = new RooProdPdf("model_"+sId+"_gen","truPdf*accPdf_gen",*sigPdf_gen[mod],*rhpdfAcc[mod]);
+	rad[mod]      = model[mod]->generate(*cosThe,N);
+	_INFO("Data entries = "+tostring(rad[mod]->numEntries()));
+}
+
 void init(int massBin, int mod)
 {
 	_DEBUG("init");
@@ -125,16 +234,25 @@ void init(int massBin, int mod)
 	weight = new RooRealVar("weight","weight",0.,1e10);
 	//weight->setRange("range_weight",costmin,costmax);
 	//weight->setBins(ncostbins);
+	
 
-	//Afb = new RooRealVar("Afb","A_{fb}",_Afb,-10.,+10.);
-	_Afb = randomizeItialGuess(-0.9,+0.9);
-	vvdInitialGuess[massBin-1].push_back(_Afb);
-	Afb = new RooRealVar("Afb","A_{fb}",_Afb,-0.9,+0.9);
+	_A = randomizeItialGuess(minA,maxA);
+	_B = randomizeItialGuess(minB,maxB);
+	fitpars fp;
+	fp.A = _A;
+	fp.B = _B;
+		
+	vvInitialGuess[massBin-1].push_back(fp);
 	
-	sigPdf = new RooGenericPdf("CSPDF","CSPDF","(3./8.)*(1. + cosTheta*cosTheta + (8./3.)*Afb*cosTheta)",RooArgSet(*cosThe,*Afb));
-	//sigPdf = new RooGenericPdf("CSPDF","CSPDF","(1. + cosTheta*cosTheta + (8./3.)*Afb*cosTheta)",RooArgSet(*cosThe,*Afb));
+	A = new RooRealVar("A","A",_A,minA,maxA);
+	B = new RooRealVar("B","B",_B,minB,maxB);
+	// A = new RooRealVar("A","A",_A);
+	// B = new RooRealVar("B","B",_B);
 	
-	TString sName, sId, sChannelFit, sChannelMass;
+	// sigPdf = new RooGenericPdf("CSPDF","CSPDF","(3./8.)*(1. + cosTheta*cosTheta + (8./3.)*Afb*cosTheta)",RooArgSet(*cosThe,*Afb));
+	sigPdf = new RooAngular("SignalPdf", "SignalPdf", *cosThe, *A, *B);
+	
+	TString sName, sId, sIdShort, sChannelFit, sChannelMass;
 	Int_t fillStyle = 0;
 	Int_t lineStyle = 0;
 	Int_t markerStyle = 0;
@@ -176,9 +294,11 @@ void init(int massBin, int mod)
 			fillStyle = 0;
 			lineStyle = 1;
 			markerStyle = 24;
-			_DEBUG("");
 			break;
 	}
+	
+	if(mod==Z0) sIdShort = "Z0";
+	else        sIdShort = sId;
 	
 	if(massBin==1) // only one copy of this vector
 	{
@@ -219,7 +339,6 @@ void init(int massBin, int mod)
 	
 	vModelName.push_back( sName );
 	
-	
 	//vhMass.push_back( new TH1D("hMass_"+sId,"",iMassNbins, iMassMin, iMassMax) );
 	vhMass.push_back( new TH1D("hMass_"+sId,"",nxbins,xbins) );
 	vhMass[mod]->Reset();
@@ -231,36 +350,44 @@ void init(int massBin, int mod)
 	vhMass[mod]->GetXaxis()->SetMoreLogLabels(); 
 	vhMass[mod]->GetXaxis()->SetMoreLogLabels(); 
 	
-	_DEBUG("");
-	
-	if(mod==Z0) vtData.push_back( (TTree*)file->Get("ntuples/tree_ZP_"+sMassBin) ); // for Z0 we take the variables without the weight
-	else        vtData.push_back( (TTree*)file->Get("ntuples/tree_"+sId+"_"+sMassBin) );
-
-	_DEBUG("");
-	
-	if(mod!=DT) vhAcc.push_back( (TH1D*)file->Get("cosTheta_histograms/hCosTh"+sId+"_acceptance_"+sMassBin)->Clone("") );
-	else        vhAcc.push_back( (TH1D*)file->Get("cosTheta_histograms/hCosThZ0_acceptance_"+sMassBin)->Clone("") );      // !!!!!!!!!!!!!!!!!!!!!!!! TO CHANGE
+	vtData.push_back( (TTree*)file->Get("ntuples/tree_"+sIdShort+"_"+sMassBin) );
+	if(mod==DT) vhAcc.push_back( (TH1D*)file->Get("cosTheta_histograms/hCosThZ0d3pd_acceptance_"+sMassBin)->Clone("") ); // !!!!!!!!!!!!!!!!!!!!!!!! TO CHANGE 
+	else        vhAcc.push_back( (TH1D*)file->Get("cosTheta_histograms/hCosTh"+sId+"_acceptance_"+sMassBin)->Clone("") );
 	vrdhAcc.push_back( new RooDataHist("rdhAcc"+sId,"rdhAcc"+sId,RooArgSet(*cosThe),vhAcc[mod]) );
 	vrhpdfAcc.push_back( new RooHistPdf("rhpdfAcc"+sId,"rhpdfAcc"+sId,RooArgSet(*cosThe),*vrdhAcc[mod],4) ); // last argument is the order of polinomial interpulation
 	vDetAcc.push_back( vrhpdfAcc[mod] );
-	vModel.push_back( new RooProdPdf("model_"+sId,"truPdf*effP",*sigPdf,*vDetAcc[mod]) );
-	vDataSet.push_back( new RooDataSet("data_"+sId,"data_"+sId,RooArgSet(*cosThe,*weight),WeightVar(weight->GetName())) );
+	vModel.push_back( new RooProdPdf("model_"+sId,"truPdf*accPdf",*sigPdf,*vDetAcc[mod]) );
+	if(doGeneration)
+	{
+		generateToy(massBin, mod, Ngen);
+		RooAbsData* r = (RooAbsData*)rad[mod]->Clone("");
+		Int_t N = r->numEntries();
+		vUnbinnedDataSet.push_back( r );
+		_INFO("Data entries = "+tostring(N));
+	}
+	else
+	{
+		if(mod==DT) vUnbinnedDataSet.push_back( new RooDataSet("data_"+sId,"data_"+sId,RooArgSet(*cosThe)) );
+		else        vUnbinnedDataSet.push_back( new RooDataSet("data_"+sId,"data_"+sId,RooArgSet(*cosThe,*weight),WeightVar(weight->GetName())) );
+	}
 }
-
-
 
 void reset()
 {
 	_DEBUG("reset");
+	
 	for(int i=0 ; i<(int)vModelName.size() ; i++)
 	{
-		delete vhMass[i];
-		delete vrdhAcc[i];
-		delete vrhpdfAcc[i];
-		delete vModel[i];
-		delete vDataSet[i];
+		if(vhMass[i]!=NULL) delete vhMass[i];
+		if(vrdhAcc[i]!=NULL) delete vrdhAcc[i];
+		if(vrhpdfAcc[i]!=NULL) delete vrhpdfAcc[i];
+		if(vModel[i]!=NULL) delete vModel[i];
+		if(vUnbinnedDataSet[i]!=NULL) delete vUnbinnedDataSet[i];
+		if(doBinned && vBinnedDataSet.size()>0 && vBinnedDataSet[i]!=NULL) delete vBinnedDataSet[i];
 	}
 
+	_DEBUG("");
+	
 	vModelName.clear();
 	vhMass.clear();
 	vtData.clear();
@@ -269,62 +396,106 @@ void reset()
 	vrhpdfAcc.clear();
 	vDetAcc.clear();
 	vModel.clear();
-	vDataSet.clear();
+	vUnbinnedDataSet.clear();
+	if(doBinned) vBinnedDataSet.clear();
+	
+	_DEBUG("");
 	
 	delete cosThe;
 	delete weight;
-	delete Afb;
+	delete A;
+	delete B;
 	delete sigPdf;
+	
+	_DEBUG("");
+	
+	// if(doGeneration)
+	// {
+		// for(int i=0 ; i<4 ; i++)
+		// {
+			// _DEBUG("");
+			// if(hAcc[i]!=NULL)       delete hAcc[i];
+			// _DEBUG("");
+			// if(rdhAcc[i]!=NULL)     delete rdhAcc[i];
+			// _DEBUG("");
+			// if(rhpdfAcc[i]!=NULL)   delete rhpdfAcc[i];
+			// _DEBUG("");
+			// if(model[i]!=NULL)      delete model[i];
+			// _DEBUG("");
+			// if(rad[i]!=NULL)        delete rad[i];
+			// _DEBUG("");
+			// if(sigPdf_gen[i]!=NULL) delete sigPdf_gen[i];
+			// _DEBUG("");
+			// if(A_gen[i]!=NULL)      delete A_gen[i];
+			// _DEBUG("");
+			// if(B_gen[i]!=NULL)      delete B_gen[i];
+			// _DEBUG("");
+		// }
+	// }
 }
-
 
 Int_t loop(int mod)
 {
 	_DEBUG("loop");
-	Int_t N;
+	Int_t N = 0;
 	
-	setBranches(mod);
-	N = vtData[mod]->GetEntries();
-	_DEBUG("N = "+tostring(N));
-	for(Int_t i=0 ; i<N ; i++)
+	if(doGeneration)
 	{
-		vtData[mod]->GetEntry(i);
-		*cosThe = cost_rec;
-		float w;
-		if(mod==DT)
-		{
-			w = 1.;
-			vhMass[mod]->Fill(mass_rec);
-			vhMassBins[mod]->Fill(mass_rec);
-		}
-		else if(mod==Z0)
-		{
-			//w = xscn_wgt*luminosity*1.; // THIS IS CORRECT !!!!!
-			w = 1.; //!!!!!!!!!!!!!!!!!!!!!!! NOTE !!!!!!!!!!!!!!!!!!!!!!!
-			vhMass[mod]->Fill(mass_rec,xscn_wgt*luminosity);
-			vhMassBins[mod]->Fill(mass_rec,xscn_wgt*luminosity);
-		}
-		else
-		{
-			//w = (xscn_wgt*luminosity)*cost_wgt; // THIS IS CORRECT !!!!!
-			w = cost_wgt; //!!!!!!!!!!!!!!!!!!!!!!! NOTE !!!!!!!!!!!!!!!!!!!!!!!
-			vhMass[mod]->Fill(mass_rec,xscn_wgt*mass_wgt*luminosity);
-			vhMassBins[mod]->Fill(mass_rec,xscn_wgt*mass_wgt*luminosity);
-		}
-		
-		vDataSet[mod]->add(RooArgSet(*cosThe),w);
+		N = rad[mod]->numEntries();
 	}
+	else
+	{
+		setBranches(mod);
+		N = vtData[mod]->GetEntries();
+		_DEBUG("N = "+tostring(N));
+		for(Int_t i=0 ; i<N ; i++)
+		{
+			vtData[mod]->GetEntry(i);
+			*cosThe = cost_rec;
+			float w;
+			if(mod==DT)
+			{
+				w = 1.;
+				vhMass[mod]->Fill(mass_rec);
+				vhMassBins[mod]->Fill(mass_rec);
+			}
+			else if(mod==Z0)
+			{
+				if(doWeights) w = (xscn_wgt*luminosity)*1.; // THIS IS CORRECT (cost_wgt=1) !!!!!
+				else          w = 1.;
+				vhMass[mod]->Fill(mass_rec,xscn_wgt*luminosity);
+				vhMassBins[mod]->Fill(mass_rec,xscn_wgt*luminosity);
+			}
+			else
+			{
+				if(doWeights) w = (xscn_wgt*luminosity)*cost_wgt; // THIS IS CORRECT !!!!!
+				else          w = cost_wgt;
+				vhMass[mod]->Fill(mass_rec,xscn_wgt*mass_wgt*luminosity);
+				vhMassBins[mod]->Fill(mass_rec,xscn_wgt*mass_wgt*luminosity);
+			}
+			
+			if(mod!=DT) vUnbinnedDataSet[mod]->add(RooArgSet(*cosThe),w);
+			else        vUnbinnedDataSet[mod]->add(RooArgSet(*cosThe));
+		}
+	}
+	
+	if(doBinned)
+	{
+		RooDataSet* rds = (RooDataSet*)vUnbinnedDataSet[mod];
+		vBinnedDataSet.push_back( rds->binnedClone() );
+	}
+	
 	return N;
 }
 
-bool minuitStatus( TMinuit * m) 
+bool minuitStatus(TMinuit* m) 
 {
 	_DEBUG("minuitStatus");
 	if (!m) return false;
 
 	TString stat = gMinuit->fCstatu;
-	cout << "Minuit: " << stat << ". " << endl;
-	if ( stat.Contains("SUCCESSFUL")  || stat.Contains("CONVERGED")  ||stat.Contains("OK") ) return true;
+	_INFO("Minuit: "+(string)stat+". ");
+	if ( stat.Contains("SUCCESSFUL")  || stat.Contains("CONVERGED")  ||  stat.Contains("OK") ) return true;
 
 	return false;
 }
@@ -334,15 +505,27 @@ RooFitResult* fit(int mod)
 	_DEBUG("fit");
 	TMinuit* gFit(0);
 	
-	_Afb = 0.;
+	_A = 0.;
+	_B = 0.;
 	
-	const RooArgSet* fitParsInital = vModel[mod]->getParameters(vDataSet[mod],false);
-	RooRealVar* x = (RooRealVar*)fitParsInital->find("Afb");
+	const RooArgSet* fitParsInital;
+	if(doBinned) fitParsInital = vModel[mod]->getParameters(vBinnedDataSet[mod],false);
+	else         fitParsInital = vModel[mod]->getParameters(vUnbinnedDataSet[mod],false);
+	RooRealVar* x = (RooRealVar*)fitParsInital->find("A");
+	RooRealVar* y = (RooRealVar*)fitParsInital->find("B");
 	if(x) *x = 0.;
+	if(y) *y = 0.;
 	delete fitParsInital;
 	
-	RooFitResult* fitresult = vModel[mod]->fitTo( *vDataSet[mod],Minos(true),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),SumW2Error(kTRUE),NumCPU(8));
+	RooFitResult* fitresult;
+	if(doBinned) fitresult = vModel[mod]->fitTo( *vBinnedDataSet[mod],Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),NumCPU(8));
+	else         fitresult = vModel[mod]->fitTo( *vUnbinnedDataSet[mod],Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),SumW2Error(vUnbinnedDataSet[mod]->isWeighted() ? kTRUE:kFALSE),NumCPU(8));
 	gFit = gMinuit;
+	
+	vbFitStatus.push_back( minuitStatus(gFit) );
+	
+	fitresult->Print();
+	
 	return fitresult;
 }
 
@@ -352,13 +535,19 @@ void plot(int mod, TVirtualPad* pad)
 	pad->cd();
 	
 	RooPlot* cosThetaFrame = cosThe->frame(Name("cosThetaFrame"), Title( vModelName[mod] ));
-	vDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2));
+	if(doBinned) vBinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins));
+	else
+	{
+		// if(doGeneration) vUnbinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins));
+		// else             vUnbinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2));
+		vUnbinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2));
+	}
 	vDetAcc[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(cAcceptance));
 	//vDetAcc[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(cAcceptance),NormRange("range_cosThe"));
 
 	vModel[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(cPdf),NormRange("range_cosThe"));
 	//vModel[mod]->paramOn(cosThetaFrame,Layout(0.7,1.,0.4),Format("NEU",AutoPrecision(1)));
-	vModel[mod]->paramOn(cosThetaFrame,Layout(0.6,0.9,1));
+	vModel[mod]->paramOn(cosThetaFrame,Layout(0.4,0.88,1), Format("NEU", AutoPrecision(1)));
 	cosThetaFrame->getAttText()->SetTextSize(0.05);
 	//cosThetaFrame->getAttLine()->SetLineWidth(0.05);
 	
@@ -367,7 +556,7 @@ void plot(int mod, TVirtualPad* pad)
 	cosThetaFrame->Draw();
 }
 
-void plotempty(int mod, TVirtualPad* pad)
+void plotempty(TVirtualPad* pad)
 {
 	_DEBUG("plotempty");
 	pad->cd();
@@ -389,8 +578,6 @@ void getFit(int mod)
 
 void drawAfb()
 {
-	setMSGlevel(VISUAL,VISUAL,VISUAL);
-
 	_DEBUG("drawAfb");
 	/*
 	resetHistogramErrors(vhMassBins[Z0]);
@@ -503,6 +690,8 @@ void drawAfb()
 
 void Afb_RooFit_weighted()
 {
+	setMSGlevel(VISUAL,VISUAL,VISUAL);
+
 	_DEBUG("Afb_RooFit_weighted");
 	style();
 	colors();
@@ -514,6 +703,12 @@ void Afb_RooFit_weighted()
 	
 	int nCnvColumns = 6;
 	
+	
+	TCanvas* cnvTmp;
+	TVirtualPad* padTmp_cosTheta;
+	TVirtualPad* padTmp_imass;
+	
+	
 	//TCanvas* cnv = new TCanvas("fit", "fit", 1024,1280);
 	TCanvas* cnv = new TCanvas("fit", "fit", 1200,800);
 	cnv->Draw();
@@ -521,16 +716,21 @@ void Afb_RooFit_weighted()
 	
 	vector<vector<TVirtualPad*> > vPad;
 	vector<vector<TVirtualPad*> > vPadBin;
-	vector<vector<double> >       vAfbResult;
-	vector<vector<double> >       vAfbError;
+	vector<vector<fitpars> >      vvFitParsResult;
+	vector<vector<fitpars> >      vvFitParsResultErr;
+	vector<vector<double> >       vvAfbResult;
+	vector<vector<double> >       vvAfbError;
 	
 	vector<TVirtualPad*> vPadTmp;
 	vector<double>       vAfbResultTmp;
 	vector<double>       vAfbErrorTmp;
-	vector<double>       vGuessTmp;
+	vector<fitpars>      vGuessTmp;
+	vector<fitpars>      vResultTmp;
+	vector<fitpars>      vResultErrTmp;
 	
 	vector<TString>      vTitles;
-	vector<TCanvas*>     vCanvases;
+	//vector<TCanvas*>   vCanvases;
+	vector<TVirtualPad*> vCanvases;
 	vector<TH1D*>        vhMassTmp;
 	
 	leg = new TLegend(0.006269594,0.03457447,0.9902473,0.4069149,NULL,"brNDC");
@@ -573,25 +773,46 @@ void Afb_RooFit_weighted()
 	for(int massBin=1 ; massBin<=nMassBins ; massBin++)
 	{
 		TString sMassBin = (TString)tostring(massBin);
-		
+	
 		vPadTmp.clear();
 		vAfbResultTmp.clear();
 		vAfbErrorTmp.clear();
 		vhMassTmp.clear();
+		vbFitStatus.clear();
+		vResultTmp.clear();
+		vResultErrTmp.clear();
 		
 		vPad.push_back(vPadTmp);
 		vPadBin.push_back(vPadTmp);
-		vAfbResult.push_back(vAfbResultTmp);
-		vAfbError.push_back(vAfbErrorTmp);
+		vvAfbResult.push_back(vAfbResultTmp);
+		vvAfbError.push_back(vAfbErrorTmp);
+		vvFitParsResult.push_back(vResultTmp);
+		vvFitParsResultErr.push_back(vResultErrTmp);
 		
-		vCanvases.push_back( new TCanvas("tmp", "", 604,400) );
+		_DEBUG("");
+		
+		//if(cnvTmp!=NULL) delete cnvTmp;
+		cnvTmp = new TCanvas("tmp_"+sMassBin, "", 800,400);
+		cnvTmp->Divide(2,1);
+		padTmp_cosTheta = cnvTmp->cd(1);
+		padTmp_cosTheta->SetPad(0, 0.1, 0.65, 0.9);
+		padTmp_imass = cnvTmp->cd(2);
+		padTmp_imass->SetPad(0.65, 0.1, 1, 0.9);
+		
+		_DEBUG("");
+		
+		// vCanvases.push_back( new TCanvas("tmp", "", 604,400) );
+		vCanvases.push_back( cnvTmp->cd(1) );
 		vCanvases[massBin-1]->SetName( sMassBin );
 		vCanvases[massBin-1]->Divide(2,2);
 		
-		vvdInitialGuess.push_back(vGuessTmp);
+		vvInitialGuess.push_back(vGuessTmp);
+		
+		_DEBUG("");
 		
 		for(int mod=Z0 ; mod<=DT ; mod++)
 		{
+			_INFO("\n\n\n~~~~~~~~~~~~~~~~~~~~~~~~mass bin "+tostring(massBin)+", model "+tostring(mod)+"~~~~~~~~~~~~~~~~~~~~~~~~");
 			bool skip = false;
 			//////////////////////////
 			init(massBin, mod); //////
@@ -606,28 +827,42 @@ void Afb_RooFit_weighted()
 			
 			if(!skip)
 			{
-				vAfbResult[massBin-1].push_back( Afb->getVal() );
-				vAfbError[massBin-1].push_back( Afb->getError() );
+				fitpars fp;
+				fp.A = A->getVal();
+				fp.B = B->getVal();
+				vvFitParsResult[massBin-1].push_back( fp );
+				vvFitParsResult[massBin-1].push_back( fp );
+				fitpars dfp;
+				dfp.A = A->getError();
+				dfp.B = B->getError();
+				vvFitParsResultErr[massBin-1].push_back( dfp );
+				vvFitParsResultErr[massBin-1].push_back( dfp );
+				double Afb  = getAfb(A->getVal(),B->getVal(),true);
+				double dAfb = getAfbErr(Afb,N);
+				vvAfbResult[massBin-1].push_back( Afb );
+				vvAfbError[massBin-1].push_back( dAfb );
 				plot(mod,vPad[massBin-1][mod]);
 				plot(mod,vPadBin[massBin-1][mod]);
-				_INFO((string)vModelName[mod]+"(N="+tostring(N)+") --> Afb = "+tostring(vAfbResult[massBin-1][mod],2)+" +- "+tostring(vAfbError[massBin-1][mod],2));
+				_INFO((string)vModelName[mod]+"(N="+tostring(N)+") --> Afb = "+tostring(vvAfbResult[massBin-1][mod])+" +- "+tostring(vvAfbError[massBin-1][mod]));
 			}
 			else
 			{
-				vAfbResult[massBin-1].push_back( -999. );
-				vAfbError[massBin-1].push_back( -999. );
-				plotempty(mod,vPad[massBin-1][mod]);
-				plotempty(mod,vPadBin[massBin-1][mod]);
+				vvAfbResult[massBin-1].push_back( -999. );
+				vvAfbError[massBin-1].push_back( -999. );
+				plotempty(vPad[massBin-1][mod]);
+				plotempty(vPadBin[massBin-1][mod]);
 				_INFO((string)vModelName[mod]+" --> 0 entries, skipping.");
 			}
 			
-			vhAfbBins[mod]->SetBinContent(massBin,vAfbResult[massBin-1][mod]);
+			vhAfbBins[mod]->SetBinContent(massBin,vvAfbResult[massBin-1][mod]);
 			/*
-			if(mod==Z0) vhAfbBins[mod]->SetBinError(massBin,vAfbError[massBin-1][mod]);
+			if(mod==Z0) vhAfbBins[mod]->SetBinError(massBin,vvAfbError[massBin-1][mod]);
 			else        vhAfbBins[mod]->SetBinError(massBin,0.);
 			*/
-			vhAfbBins[mod]->SetBinError(massBin,vAfbError[massBin-1][mod]);
+			vhAfbBins[mod]->SetBinError(massBin,vvAfbError[massBin-1][mod]);
 		}
+		
+		vvbFitStatus.push_back(vbFitStatus);
 		
 		vTitles.push_back( vhMass[Z0]->GetTitle() );
 		
@@ -674,8 +909,13 @@ void Afb_RooFit_weighted()
 		
 		//------------------------------------------------------------
 		// for the binned canvases
-		vCanvases[massBin-1]->cd();
-		vPadBin[massBin-1].push_back( vCanvases[massBin-1]->cd( DT+2 ) );
+		// vCanvases[massBin-1]->cd();
+		// vPadBin[massBin-1].push_back( vCanvases[massBin-1]->cd( DT+2 ) );
+		// vPadBin[massBin-1][DT+1]->Draw();
+		// vPadBin[massBin-1][DT+1]->SetLogy();
+		// vPadBin[massBin-1][DT+1]->SetLogx();
+		
+		vPadBin[massBin-1].push_back( padTmp_imass->cd()/*cnvTmp->cd(2)*/ );
 		vPadBin[massBin-1][DT+1]->Draw();
 		vPadBin[massBin-1][DT+1]->SetLogy();
 		vPadBin[massBin-1][DT+1]->SetLogx();
@@ -685,13 +925,21 @@ void Afb_RooFit_weighted()
 		vhMassTmp[DT]->Clone("")->Draw("SAMES");
 		vPadBin[massBin-1][DT+1]->RedrawAxis();
 		
-		vCanvases[massBin-1]->Update();
-		vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".root");
-		vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".C");
-		vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".eps");
-		vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".ps");
-		vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".pdf");
-		vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".png");
+		// vCanvases[massBin-1]->Update();
+		// vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".root");
+		// vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".C");
+		// vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".eps");
+		// vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".ps");
+		// vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".pdf");
+		// vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".png");
+		
+		cnvTmp->Update();
+		cnvTmp->SaveAs("fitplots/FitMassBin_" + sMassBin + ".root");
+		cnvTmp->SaveAs("fitplots/FitMassBin_" + sMassBin + ".C");
+		cnvTmp->SaveAs("fitplots/FitMassBin_" + sMassBin + ".eps");
+		cnvTmp->SaveAs("fitplots/FitMassBin_" + sMassBin + ".ps");
+		cnvTmp->SaveAs("fitplots/FitMassBin_" + sMassBin + ".pdf");
+		cnvTmp->SaveAs("fitplots/FitMassBin_" + sMassBin + ".png");
 		//------------------------------------------------------------
 		
 		
@@ -715,14 +963,36 @@ void Afb_RooFit_weighted()
 	
 	drawAfb();
 	
-	for(unsigned int i=0 ; i<vvdInitialGuess.size() ; i++)
+	for(unsigned int i=0 ; i<vvInitialGuess.size() ; i++)
 	{
-		cout << "initial guess:"
-			 << "  Z0=" << vvdInitialGuess[i][Z0]
-			 << ", ZP=" << vvdInitialGuess[i][ZP]
-			 << ", KK=" << vvdInitialGuess[i][KK]
-			 << ", DT=" << vvdInitialGuess[i][DT]
-			 << endl;
+		cout << "\nmass bin " << i << ":" << endl; 
+		cout << "   Z0:  STATUS=" << vvbFitStatus[i][Z0]
+			 << "\t[A,B](guess)=[" << vvInitialGuess[i][Z0].A << "," << vvInitialGuess[i][Z0].B
+			 << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][Z0].A,vvInitialGuess[i][Z0].B,false)
+			 << "\t-> \tA(fit)=" << vvFitParsResult[i][Z0].A << "+-" << vvFitParsResultErr[i][Z0].A
+			 << "\t-> \tB(fit)=" << vvFitParsResult[i][Z0].B << "+-" << vvFitParsResultErr[i][Z0].B
+			 << ",\tAfb(fit)=" << vvAfbResult[i][Z0] << "+-" << vvAfbError[i][Z0] << endl;
+		
+		cout << "   ZP:  STATUS=" << vvbFitStatus[i][ZP]
+			 << "\t[A,B](guess)=[" << vvInitialGuess[i][ZP].A << "," << vvInitialGuess[i][ZP].B
+			 << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][ZP].A,vvInitialGuess[i][ZP].B,false)
+			 << "\t-> \tA(fit)=" << vvFitParsResult[i][ZP].A << "+-" << vvFitParsResultErr[i][ZP].A
+			 << "\t-> \tB(fit)=" << vvFitParsResult[i][ZP].B << "+-" << vvFitParsResultErr[i][ZP].B
+			 << ",\tAfb(fit)=" << vvAfbResult[i][ZP] << "+-" << vvAfbError[i][ZP] << endl;
+		
+		cout << "   KK:  STATUS=" << vvbFitStatus[i][KK]
+			 << "\t[A,B](guess)=[" << vvInitialGuess[i][KK].A << "," << vvInitialGuess[i][KK].B
+			 << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][KK].A,vvInitialGuess[i][KK].B,false)
+			 << "\t-> \tA(fit)=" << vvFitParsResult[i][KK].A << "+-" << vvFitParsResultErr[i][KK].A
+			 << "\t-> \tB(fit)=" << vvFitParsResult[i][KK].B << "+-" << vvFitParsResultErr[i][KK].B
+			 << ",\tAfb(fit)=" << vvAfbResult[i][KK] << "+-" << vvAfbError[i][KK] << endl;
+			 
+		cout << "   DT:  STATUS=" << vvbFitStatus[i][DT]
+			 << "\t[A,B](guess)=[" << vvInitialGuess[i][DT].A << "," << vvInitialGuess[i][DT].B
+			 << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][DT].A,vvInitialGuess[i][DT].B,false)
+			 << "\t-> \tA(fit)=" << vvFitParsResult[i][DT].A << "+-" << vvFitParsResultErr[i][DT].A
+			 << "\t-> \tB(fit)=" << vvFitParsResult[i][DT].B << "+-" << vvFitParsResultErr[i][DT].B
+			 << ",\tAfb(fit)=" << vvAfbResult[i][DT] << "+-" << vvAfbError[i][DT] << endl;
 	}
 }
 

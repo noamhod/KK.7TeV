@@ -1,0 +1,9 @@
+1. copy the "submission" folder to wher you want to work in lxplus, e.g. /tmp/hod:
+	scp -r hod@t301.hep.tau.ac.il:z0analysis-tests/z0analysis-dev/atlfast/submission .
+2. cd to one of the models folders (/tmp/hod/submission/KKpythia8)
+3. source startscreen.sh --> everything will be done automatically
+4. when done, look in EvgenCorrAtlfast.log for a string=="cross-section" or "Sigma" (near the end)
+5. to find it do either:
+	grep cross-section * -r
+	grep Sigma * -r
+

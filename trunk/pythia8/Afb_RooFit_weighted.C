@@ -1,13 +1,14 @@
 #include "all.h"
 #include "roofit.h"
 #include "RooAngular.h"
+#include "RooCollinsSoper.h"
 
 /*
 	1. There are 2 kinds of unbinned, non-detector weights:
 		a. cross section weight, wXS, because the samples are binned in mass - relevant for the three models
 		b. model weight, xR, the ratio between ZP or KK and Z0 - relevant for the ZP and KK models only
 	2. There is the acceptance binned weight (trigger efficiency is ignored currently)
-	3. The truth PDF is A*(1+x^2)+B*x   ==>  Afb = 3B/8A
+	3. The truth PDF is A0*(1+x^2)+A4*x   ==>  Afb = 3B/8A
 	4. The PDF should be corrected for the acceptance by a simple multiplication:      PDF(x) = PDFtru(x)*Acc(x)
 	5. Each event should be weighted (unbinned) according to the non-detector weights: w = wXS*wR
 */
@@ -20,23 +21,22 @@ static Double_t logXbinwidth;
 static Double_t xbins[nxbins+1];
 Int_t  iMassNbins = 30; // for non log bins
 
-
 double   costmin   = minCosTheta;
 double   costmax   = maxCosTheta;
 int      ncostbins = nCosThetaBins;
 
-double minA = +0.;
-double maxA = +20.;
-// double minB = -10.;
-// double maxB = +10.;
-double minB = -1.;
-double maxB = +1.;
-double _A = 0.;
-double _B = 0.;
+double minA0 = -10.;
+double maxA0 = +10.;
+// double minA4 = -10.;
+// double maxA4 = +10.;
+double minA4 = -2.666;
+double maxA4 = +2.666;
+double _A0 = 0.;
+double _A4 = 0.;
 struct fitpars
 {
-	double A;
-	double B;
+	double A0;
+	double A4;
 };
 TRandom* randGen;
 vector<vector<fitpars> > vvInitialGuess;
@@ -68,8 +68,8 @@ TPad *pad_compare;
 
 RooRealVar* cosThe; // the variable 
 RooRealVar* weight; // the weight
-RooRealVar* A;    // the parameter to find
-RooRealVar* B;    // the parameter to find
+RooRealVar* A0;    // the parameter to find
+RooRealVar* A4;    // the parameter to find
 
 
 vector<RooAbsData*>   vUnbinnedDataSet; // Roo Data holder
@@ -90,11 +90,10 @@ RooAbsPdf* sigPdf;           // will be the truth pdf
 vector<RooDataHist*> vrdhAcc;
 vector<RooHistPdf*>  vrhpdfAcc;
 
-
 ///////////////////
 // for generation
-RooRealVar*  A_gen[4];
-RooRealVar*  B_gen[4];
+RooRealVar*  A0_gen[4];
+RooRealVar*  A4_gen[4];
 RooAbsPdf*   sigPdf_gen[4];
 TH1D*        hAcc[4];
 RooDataHist* rdhAcc[4];
@@ -103,12 +102,15 @@ RooProdPdf*  model[4];
 RooAbsData*  rad[4];
 ///////////////////
 
-
+//////////////////////////////////
+// flags to config the run
 bool drawAfbErrArea = true;
 bool doWeights      = true;
 bool doBinned       = false;
-bool doGeneration   = true;
-Int_t Ngen = 1000;
+bool doGeneration   = false;
+Int_t Ngen = 10000;
+Int_t minEntries2Fit = 5;
+//////////////////////////////////
 
 double randomizeItialGuess(double min, double max)
 {
@@ -116,7 +118,7 @@ double randomizeItialGuess(double min, double max)
 	return min + (max-min)*randGen->Uniform(); // Uniform(x1=0) returns a uniform deviate on the interval [0,x1].
 }
 
-double getAfb(double a, double b, bool validate=false)
+double getAfb(double a, double b, bool validate)
 {
 	if(validate)
 	{
@@ -125,6 +127,11 @@ double getAfb(double a, double b, bool validate=false)
 	else return 3.*b/(8.*a);
 	
 	return -999.;
+}
+
+double getAfb(double a4)
+{
+	return 3./8.*a4;
 }
 
 double getAfbErr(double Afb, int N)
@@ -154,16 +161,28 @@ void setLogMassBins(Double_t xmin, Double_t xmax)
 	for(Int_t i=1 ; i<=nxbins ; i++) xbins[i] = TMath::Power( 10,(logXmin + i*logXbinwidth) );
 }
 
-fitpars getTheory(int massBin, int mod)
+double getMassBinCenter(int massBin)
 {
-	_DEBUG("getTheory");
-	double imass = xbins[massBin-1]+(xbins[massBin]-xbins[massBin-1])/2.;
+	return xbins[massBin-1]+(xbins[massBin]-xbins[massBin-1])/2.;
+}
+
+fitpars getTheoryAfb(int massBin, int mod)
+{
+	_DEBUG("getTheoryAfb");
+	double imass = getMassBinCenter(massBin);
 	fitpars fp;
-	fp.A = 3./8.;
-	if(mod==Z0 || mod==KK) fp.B = 0.5*(1.-TMath::Exp(-5.*imass/1000.));
-	else if(mod==ZP)       fp.B = 0.5*(1.-TMath::Exp(-5.*imass/1000.)) - 0.7*TMath::Gaus(imass,550,50);
-	else                   fp.B = 0.5*(1.-TMath::Exp(-5.*imass/1000.)) + 0.9*TMath::Gaus(imass,800,50);
-	_INFO("A="+tostring(fp.A)+", B="+tostring(fp.B));
+	fp.A0 = 3./8.;
+	double normflat = 1.;
+	double normgausup = 0.8;
+	double normgausdwn = 1.;
+	double expscale = 10.;
+	double expunits = 1000.;
+	if(mod==Z0 || mod==KK) fp.A4 = normflat*(1.-TMath::Exp(-expscale*imass/expunits));
+	// else if(mod==ZP)       fp.A4 = normflat*(1.-TMath::Exp(-expscale*imass/expunits)) - normgausdwn*TMath::Gaus(imass,520,50);
+	else if(mod==ZP)       fp.A4 = normflat*(1.-TMath::Exp(-expscale*imass/expunits)) - normgausdwn*TMath::Gaus(imass,800,100);
+	// else                   fp.A4 = normflat*(1.-TMath::Exp(-expscale*imass/expunits)) + normgausup*TMath::Gaus(imass,800,100);
+	else                   fp.A4 = normflat*(1.-TMath::Exp(-expscale*imass/expunits));
+	_INFO("A0="+tostring(fp.A0)+", A4="+tostring(fp.A4));
 	return fp;
 }
 
@@ -173,30 +192,31 @@ void generateToy(int massBin, int mod, int N)
 	
 	TString sMassBin = (TString)tostring(massBin);
 
-	fitpars fp = getTheory(massBin,mod);
-	A_gen[mod] = new RooRealVar(("A_gen"+tostring(massBin)+"_mod"+tostring(mod)).c_str(),"A_gen",fp.A);
-	B_gen[mod] = new RooRealVar(("B_gen"+tostring(massBin)+"_mod"+tostring(mod)).c_str(),"B_gen",fp.B);
+	fitpars fp = getTheoryAfb(massBin,mod);
+	A0_gen[mod] = new RooRealVar(("A0_gen"+tostring(massBin)+"_mod"+tostring(mod)).c_str(),"A0_gen",fp.A0);
+	A4_gen[mod] = new RooRealVar(("A4_gen"+tostring(massBin)+"_mod"+tostring(mod)).c_str(),"A4_gen",fp.A4);
 
-	sigPdf_gen[mod] = new RooAngular(("SignalPdf_bin"+tostring(massBin)+"_mod"+tostring(mod)).c_str(), "SignalPdf_gen", *cosThe, *A_gen[mod], *B_gen[mod]);
+	// sigPdf_gen[mod] = new RooAngular(("SignalPdf_bin"+tostring(massBin)+"_mod"+tostring(mod)).c_str(), "SignalPdf_gen", *cosThe, *A0_gen[mod], *A4_gen[mod]);
+	sigPdf_gen[mod] = new RooCollinsSoper(("SignalPdf_bin"+tostring(massBin)+"_mod"+tostring(mod)).c_str(), "SignalPdf_gen", *cosThe, *A0_gen[mod], *A4_gen[mod]);
 	
 	TString sName, sId;
 	
 	switch(mod)
 	{
 		case Z0:
-			sName = "Z^{0}";
+			sName = "Z^{0}[toyMC]";
 			sId = "Z0d3pd";
 			break;
 		case ZP:
-			sName = "Z'_{SSM}";
+			sName = "Z'_{SSM}[toyMC]";
 			sId = "ZP";
 			break;
 		case KK:
-			sName = "S^{1}/Z_{2} KK";
+			sName = "S^{1}/Z_{2} KK[toyMC]";
 			sId = "KK";
 			break;
 		case DT:
-			sName = "Data";
+			sName = "Data[toyMC]";
 			sId = "DT";
 			break;
 	}
@@ -236,21 +256,26 @@ void init(int massBin, int mod)
 	//weight->setBins(ncostbins);
 	
 
-	_A = randomizeItialGuess(minA,maxA);
-	_B = randomizeItialGuess(minB,maxB);
+	_A0 = randomizeItialGuess(minA0,maxA0);
+	_A4 = randomizeItialGuess(minA4,maxA4);
 	fitpars fp;
-	fp.A = _A;
-	fp.B = _B;
+	fp.A0 = _A0;
+	fp.A4 = _A4;
 		
 	vvInitialGuess[massBin-1].push_back(fp);
 	
-	A = new RooRealVar("A","A",_A,minA,maxA);
-	B = new RooRealVar("B","B",_B,minB,maxB);
-	// A = new RooRealVar("A","A",_A);
-	// B = new RooRealVar("B","B",_B);
+	// A0 = new RooRealVar("A0","A0",_A0);
+	// A4 = new RooRealVar("A4","A4",_A4);
+	A0 = new RooRealVar("A0","A0",_A0,minA0,maxA0);
+	A4 = new RooRealVar("A4","A4",_A4,minA4,maxA4);
+	A0->setError(0.001);
+	A4->setError(0.001);
+	// A0 = new RooRealVar("A0","A0",_A0);
+	// A4 = new RooRealVar("A4","A4",_A4);
 	
 	// sigPdf = new RooGenericPdf("CSPDF","CSPDF","(3./8.)*(1. + cosTheta*cosTheta + (8./3.)*Afb*cosTheta)",RooArgSet(*cosThe,*Afb));
-	sigPdf = new RooAngular("SignalPdf", "SignalPdf", *cosThe, *A, *B);
+	// sigPdf = new RooAngular("SignalPdf", "SignalPdf", *cosThe, *A0, *A4);
+	sigPdf = new RooCollinsSoper("SignalPdf", "SignalPdf", *cosThe, *A0, *A4);
 	
 	TString sName, sId, sIdShort, sChannelFit, sChannelMass;
 	Int_t fillStyle = 0;
@@ -262,8 +287,8 @@ void init(int massBin, int mod)
 		case Z0:
 			sName = "Z^{0}";
 			sId = "Z0d3pd";
-			sChannelFit = "#gamma/Z^{0}: A_{FB} fit";
-			sChannelMass = "#gamma/Z^{0}: Events";
+			sChannelFit = "#gamma/Z^{0} [MC10b]: A_{FB} fit";
+			sChannelMass = "#gamma/Z^{0} [MC10b]: Events";
 			fillStyle = 3003;
 			lineStyle = 2;
 			markerStyle = 20;
@@ -271,8 +296,8 @@ void init(int massBin, int mod)
 		case ZP:
 			sName = "Z'_{SSM}";
 			sId = "ZP";
-			sChannelFit = "1 TeV Z'_{SSM}: A_{FB} fit";
-			sChannelMass = "1 TeV Z'_{SSM}: Events";
+			sChannelFit = "1 TeV Z'_{SSM} [Template MC10b]: A_{FB} fit";
+			sChannelMass = "1 TeV Z'_{SSM} [Template MC10b]: Events";
 			fillStyle = 3017;
 			lineStyle = 3;
 			markerStyle = 22;
@@ -280,8 +305,8 @@ void init(int massBin, int mod)
 		case KK:
 			sName = "S^{1}/Z_{2} KK";
 			sId = "KK";
-			sChannelFit = "1 TeV #gamma_{KK}/Z_{KK}: A_{FB} fit";
-			sChannelMass = "1 TeV #gamma_{KK}/Z_{KK}: Events";
+			sChannelFit = "1 TeV #gamma_{KK}/Z_{KK} [Template MC10b]: A_{FB} fit";
+			sChannelMass = "1 TeV #gamma_{KK}/Z_{KK} [Template MC10b]: Events";
 			fillStyle = 3018;
 			lineStyle = 5;
 			markerStyle = 23;
@@ -359,7 +384,10 @@ void init(int massBin, int mod)
 	vModel.push_back( new RooProdPdf("model_"+sId,"truPdf*accPdf",*sigPdf,*vDetAcc[mod]) );
 	if(doGeneration)
 	{
-		generateToy(massBin, mod, Ngen);
+		Int_t nGen = Ngen;
+		// if(mod==DT) nGen = (Int_t)(Ngen/TMath::Exp(10.*getMassBinCenter(massBin)/1000.));
+		if(mod==DT) nGen = (Int_t)(Ngen/TMath::Power(10.,massBin-2)); // for 6 bins: Ngen/0.1, Ngen/1, Ngen/10, Ngen/100, Ngen/1000, Ngen/10000
+		generateToy(massBin, mod, nGen);
 		RooAbsData* r = (RooAbsData*)rad[mod]->Clone("");
 		Int_t N = r->numEntries();
 		vUnbinnedDataSet.push_back( r );
@@ -367,7 +395,7 @@ void init(int massBin, int mod)
 	}
 	else
 	{
-		if(mod==DT) vUnbinnedDataSet.push_back( new RooDataSet("data_"+sId,"data_"+sId,RooArgSet(*cosThe)) );
+		if(mod==DT) vUnbinnedDataSet.push_back( new RooDataSet("data_"+sId,"data_"+sId,RooArgSet(*cosThe)) ); // no weights
 		else        vUnbinnedDataSet.push_back( new RooDataSet("data_"+sId,"data_"+sId,RooArgSet(*cosThe,*weight),WeightVar(weight->GetName())) );
 	}
 }
@@ -403,8 +431,8 @@ void reset()
 	
 	delete cosThe;
 	delete weight;
-	delete A;
-	delete B;
+	delete A0;
+	delete A4;
 	delete sigPdf;
 	
 	_DEBUG("");
@@ -426,9 +454,9 @@ void reset()
 			// _DEBUG("");
 			// if(sigPdf_gen[i]!=NULL) delete sigPdf_gen[i];
 			// _DEBUG("");
-			// if(A_gen[i]!=NULL)      delete A_gen[i];
+			// if(A0_gen[i]!=NULL)      delete A0_gen[i];
 			// _DEBUG("");
-			// if(B_gen[i]!=NULL)      delete B_gen[i];
+			// if(A4_gen[i]!=NULL)      delete A4_gen[i];
 			// _DEBUG("");
 		// }
 	// }
@@ -474,8 +502,8 @@ Int_t loop(int mod)
 				vhMassBins[mod]->Fill(mass_rec,xscn_wgt*mass_wgt*luminosity);
 			}
 			
-			if(mod!=DT) vUnbinnedDataSet[mod]->add(RooArgSet(*cosThe),w);
-			else        vUnbinnedDataSet[mod]->add(RooArgSet(*cosThe));
+			if(mod==DT) vUnbinnedDataSet[mod]->add(RooArgSet(*cosThe));   // UNWEIGHTED
+			else        vUnbinnedDataSet[mod]->add(RooArgSet(*cosThe),w); // WEIGHTED   
 		}
 	}
 	
@@ -505,14 +533,14 @@ RooFitResult* fit(int mod)
 	_DEBUG("fit");
 	TMinuit* gFit(0);
 	
-	_A = 0.;
-	_B = 0.;
+	_A0 = 0.;
+	_A4 = 0.;
 	
 	const RooArgSet* fitParsInital;
 	if(doBinned) fitParsInital = vModel[mod]->getParameters(vBinnedDataSet[mod],false);
 	else         fitParsInital = vModel[mod]->getParameters(vUnbinnedDataSet[mod],false);
-	RooRealVar* x = (RooRealVar*)fitParsInital->find("A");
-	RooRealVar* y = (RooRealVar*)fitParsInital->find("B");
+	RooRealVar* x = (RooRealVar*)fitParsInital->find("A0");
+	RooRealVar* y = (RooRealVar*)fitParsInital->find("A4");
 	if(x) *x = 0.;
 	if(y) *y = 0.;
 	delete fitParsInital;
@@ -814,12 +842,12 @@ void Afb_RooFit_weighted()
 		{
 			_INFO("\n\n\n~~~~~~~~~~~~~~~~~~~~~~~~mass bin "+tostring(massBin)+", model "+tostring(mod)+"~~~~~~~~~~~~~~~~~~~~~~~~");
 			bool skip = false;
-			//////////////////////////
-			init(massBin, mod); //////
-			Int_t N = loop(mod); /////
-			if(N<1) skip=true; ///////
-			if(!skip) getFit(mod); ///
-			//////////////////////////
+			/////////////////////////////////////////
+			init(massBin, mod); /////////////////////
+			Int_t N = loop(mod); ////////////////////
+			if(N<=minEntries2Fit) skip=true; ////////
+			if(!skip) getFit(mod); //////////////////
+			/////////////////////////////////////////
 			
 			vPad[massBin-1].push_back( cnv->cd( padCounter ) );
 			padCounter++;
@@ -828,16 +856,17 @@ void Afb_RooFit_weighted()
 			if(!skip)
 			{
 				fitpars fp;
-				fp.A = A->getVal();
-				fp.B = B->getVal();
+				fp.A0 = A0->getVal();
+				fp.A4 = A4->getVal();
 				vvFitParsResult[massBin-1].push_back( fp );
 				vvFitParsResult[massBin-1].push_back( fp );
 				fitpars dfp;
-				dfp.A = A->getError();
-				dfp.B = B->getError();
+				dfp.A0 = A0->getError();
+				dfp.A4 = A4->getError();
 				vvFitParsResultErr[massBin-1].push_back( dfp );
 				vvFitParsResultErr[massBin-1].push_back( dfp );
-				double Afb  = getAfb(A->getVal(),B->getVal(),true);
+				// double Afb  = getAfb(A0->getVal(),A4->getVal(),true);
+				double Afb  = getAfb(A4->getVal());
 				double dAfb = getAfbErr(Afb,N);
 				vvAfbResult[massBin-1].push_back( Afb );
 				vvAfbError[massBin-1].push_back( dAfb );
@@ -967,31 +996,35 @@ void Afb_RooFit_weighted()
 	{
 		cout << "\nmass bin " << i << ":" << endl; 
 		cout << "   Z0:  STATUS=" << vvbFitStatus[i][Z0]
-			 << "\t[A,B](guess)=[" << vvInitialGuess[i][Z0].A << "," << vvInitialGuess[i][Z0].B
-			 << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][Z0].A,vvInitialGuess[i][Z0].B,false)
-			 << "\t-> \tA(fit)=" << vvFitParsResult[i][Z0].A << "+-" << vvFitParsResultErr[i][Z0].A
-			 << "\t-> \tB(fit)=" << vvFitParsResult[i][Z0].B << "+-" << vvFitParsResultErr[i][Z0].B
+			 << "\t[A0,A4](guess)=[" << vvInitialGuess[i][Z0].A0 << "," << vvInitialGuess[i][Z0].A4
+			 // << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][Z0].A0,vvInitialGuess[i][Z0].A4,false)
+			 << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][Z0].A4)
+			 << "\t-> \tA(fit)=" << vvFitParsResult[i][Z0].A0 << "+-" << vvFitParsResultErr[i][Z0].A0
+			 << "\t-> \tB(fit)=" << vvFitParsResult[i][Z0].A4 << "+-" << vvFitParsResultErr[i][Z0].A4
 			 << ",\tAfb(fit)=" << vvAfbResult[i][Z0] << "+-" << vvAfbError[i][Z0] << endl;
 		
 		cout << "   ZP:  STATUS=" << vvbFitStatus[i][ZP]
-			 << "\t[A,B](guess)=[" << vvInitialGuess[i][ZP].A << "," << vvInitialGuess[i][ZP].B
-			 << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][ZP].A,vvInitialGuess[i][ZP].B,false)
-			 << "\t-> \tA(fit)=" << vvFitParsResult[i][ZP].A << "+-" << vvFitParsResultErr[i][ZP].A
-			 << "\t-> \tB(fit)=" << vvFitParsResult[i][ZP].B << "+-" << vvFitParsResultErr[i][ZP].B
+			 << "\t[A0,A4](guess)=[" << vvInitialGuess[i][ZP].A0 << "," << vvInitialGuess[i][ZP].A4
+			 // << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][ZP].A0,vvInitialGuess[i][ZP].A4,false)
+			 << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][ZP].A4)
+			 << "\t-> \tA(fit)=" << vvFitParsResult[i][ZP].A0 << "+-" << vvFitParsResultErr[i][ZP].A0
+			 << "\t-> \tB(fit)=" << vvFitParsResult[i][ZP].A4 << "+-" << vvFitParsResultErr[i][ZP].A4
 			 << ",\tAfb(fit)=" << vvAfbResult[i][ZP] << "+-" << vvAfbError[i][ZP] << endl;
 		
 		cout << "   KK:  STATUS=" << vvbFitStatus[i][KK]
-			 << "\t[A,B](guess)=[" << vvInitialGuess[i][KK].A << "," << vvInitialGuess[i][KK].B
-			 << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][KK].A,vvInitialGuess[i][KK].B,false)
-			 << "\t-> \tA(fit)=" << vvFitParsResult[i][KK].A << "+-" << vvFitParsResultErr[i][KK].A
-			 << "\t-> \tB(fit)=" << vvFitParsResult[i][KK].B << "+-" << vvFitParsResultErr[i][KK].B
+			 << "\t[A0,A4](guess)=[" << vvInitialGuess[i][KK].A0 << "," << vvInitialGuess[i][KK].A4
+			 // << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][KK].A0,vvInitialGuess[i][KK].A4,false)
+			 << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][KK].A4)
+			 << "\t-> \tA(fit)=" << vvFitParsResult[i][KK].A0 << "+-" << vvFitParsResultErr[i][KK].A0
+			 << "\t-> \tB(fit)=" << vvFitParsResult[i][KK].A4 << "+-" << vvFitParsResultErr[i][KK].A4
 			 << ",\tAfb(fit)=" << vvAfbResult[i][KK] << "+-" << vvAfbError[i][KK] << endl;
 			 
 		cout << "   DT:  STATUS=" << vvbFitStatus[i][DT]
-			 << "\t[A,B](guess)=[" << vvInitialGuess[i][DT].A << "," << vvInitialGuess[i][DT].B
-			 << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][DT].A,vvInitialGuess[i][DT].B,false)
-			 << "\t-> \tA(fit)=" << vvFitParsResult[i][DT].A << "+-" << vvFitParsResultErr[i][DT].A
-			 << "\t-> \tB(fit)=" << vvFitParsResult[i][DT].B << "+-" << vvFitParsResultErr[i][DT].B
+			 << "\t[A0,A4](guess)=[" << vvInitialGuess[i][DT].A0 << "," << vvInitialGuess[i][DT].A4
+			 // << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][DT].A0,vvInitialGuess[i][DT].A4,false)
+			 << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][DT].A4)
+			 << "\t-> \tA(fit)=" << vvFitParsResult[i][DT].A0 << "+-" << vvFitParsResultErr[i][DT].A0
+			 << "\t-> \tB(fit)=" << vvFitParsResult[i][DT].A4 << "+-" << vvFitParsResultErr[i][DT].A4
 			 << ",\tAfb(fit)=" << vvAfbResult[i][DT] << "+-" << vvAfbError[i][DT] << endl;
 	}
 }

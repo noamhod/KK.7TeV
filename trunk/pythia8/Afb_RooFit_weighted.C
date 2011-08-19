@@ -29,8 +29,8 @@ double minA0 = -10.;
 double maxA0 = +10.;
 // double minA4 = -10.;
 // double maxA4 = +10.;
-double minA4 = -2.666;
-double maxA4 = +2.666;
+double minA4 = -5.; //-2.666;
+double maxA4 = +5.; //+2.666;
 double _A0 = 0.;
 double _A4 = 0.;
 struct fitpars
@@ -104,10 +104,11 @@ RooAbsData*  rad[4];
 
 //////////////////////////////////
 // flags to config the run
-bool drawAfbErrArea = true;
-bool doWeights      = true;
-bool doBinned       = false;
-bool doGeneration   = false;
+bool drawAfbErrArea  = true;
+bool doLumiXSweights = false; // true if want to scale binned samples to 1 smooth sample and to scale MC to data luminosity. This affects mostly the errors
+bool doBinned        = false;
+bool doGeneration    = false;
+bool doBinomialError = false;
 Int_t Ngen = 10000;
 Int_t minEntries2Fit = 5;
 //////////////////////////////////
@@ -137,6 +138,11 @@ double getAfb(double a4)
 double getAfbErr(double Afb, int N)
 {
 	return (N>0.) ? sqrt((1-Afb*Afb)/N) : -999;
+}
+
+double getAfbErr(double dA4)
+{
+	return (3./8.)*dA4;
 }
 
 void setBranches(int mod)
@@ -254,26 +260,18 @@ void init(int massBin, int mod)
 	weight = new RooRealVar("weight","weight",0.,1e10);
 	//weight->setRange("range_weight",costmin,costmax);
 	//weight->setBins(ncostbins);
-	
 
 	_A0 = randomizeItialGuess(minA0,maxA0);
 	_A4 = randomizeItialGuess(minA4,maxA4);
 	fitpars fp;
 	fp.A0 = _A0;
 	fp.A4 = _A4;
-		
 	vvInitialGuess[massBin-1].push_back(fp);
-	
-	// A0 = new RooRealVar("A0","A0",_A0);
-	// A4 = new RooRealVar("A4","A4",_A4);
 	A0 = new RooRealVar("A0","A0",_A0,minA0,maxA0);
 	A4 = new RooRealVar("A4","A4",_A4,minA4,maxA4);
 	A0->setError(0.001);
 	A4->setError(0.001);
-	// A0 = new RooRealVar("A0","A0",_A0);
-	// A4 = new RooRealVar("A4","A4",_A4);
 	
-	// sigPdf = new RooGenericPdf("CSPDF","CSPDF","(3./8.)*(1. + cosTheta*cosTheta + (8./3.)*Afb*cosTheta)",RooArgSet(*cosThe,*Afb));
 	// sigPdf = new RooAngular("SignalPdf", "SignalPdf", *cosThe, *A0, *A4);
 	sigPdf = new RooCollinsSoper("SignalPdf", "SignalPdf", *cosThe, *A0, *A4);
 	
@@ -395,8 +393,8 @@ void init(int massBin, int mod)
 	}
 	else
 	{
-		if(mod==DT) vUnbinnedDataSet.push_back( new RooDataSet("data_"+sId,"data_"+sId,RooArgSet(*cosThe)) ); // no weights
-		else        vUnbinnedDataSet.push_back( new RooDataSet("data_"+sId,"data_"+sId,RooArgSet(*cosThe,*weight),WeightVar(weight->GetName())) );
+		if(mod==DT || doGeneration) vUnbinnedDataSet.push_back( new RooDataSet("data_"+sId,"data_"+sId,RooArgSet(*cosThe)) ); // no weights
+		else                        vUnbinnedDataSet.push_back( new RooDataSet("data_"+sId,"data_"+sId,RooArgSet(*cosThe,*weight),WeightVar(weight->GetName())) );
 	}
 }
 
@@ -467,7 +465,7 @@ Int_t loop(int mod)
 	_DEBUG("loop");
 	Int_t N = 0;
 	
-	if(doGeneration)
+	if(doGeneration) // this is unweighted
 	{
 		N = rad[mod]->numEntries();
 	}
@@ -489,14 +487,14 @@ Int_t loop(int mod)
 			}
 			else if(mod==Z0)
 			{
-				if(doWeights) w = (xscn_wgt*luminosity)*1.; // THIS IS CORRECT (cost_wgt=1) !!!!!
+				if(doLumiXSweights) w = (xscn_wgt*luminosity)*1.; // THIS IS CORRECT (cost_wgt=1) !!!!!
 				else          w = 1.;
 				vhMass[mod]->Fill(mass_rec,xscn_wgt*luminosity);
 				vhMassBins[mod]->Fill(mass_rec,xscn_wgt*luminosity);
 			}
 			else
 			{
-				if(doWeights) w = (xscn_wgt*luminosity)*cost_wgt; // THIS IS CORRECT !!!!!
+				if(doLumiXSweights) w = (xscn_wgt*luminosity)*cost_wgt; // THIS IS CORRECT !!!!!
 				else          w = cost_wgt;
 				vhMass[mod]->Fill(mass_rec,xscn_wgt*mass_wgt*luminosity);
 				vhMassBins[mod]->Fill(mass_rec,xscn_wgt*mass_wgt*luminosity);
@@ -546,8 +544,32 @@ RooFitResult* fit(int mod)
 	delete fitParsInital;
 	
 	RooFitResult* fitresult;
-	if(doBinned) fitresult = vModel[mod]->fitTo( *vBinnedDataSet[mod],Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),NumCPU(8));
-	else         fitresult = vModel[mod]->fitTo( *vUnbinnedDataSet[mod],Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),SumW2Error(vUnbinnedDataSet[mod]->isWeighted() ? kTRUE:kFALSE),NumCPU(8));
+	if(doBinned)
+	{
+		if(mod==DT || doGeneration)
+		{
+			if(vBinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is weighted $$$$$$$$$$$");
+			fitresult = vModel[mod]->fitTo( *vBinnedDataSet[mod],Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),NumCPU(8));
+		}
+		else 
+		{
+			if(!vBinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is unweighted $$$$$$$$$$$");
+			fitresult = vModel[mod]->fitTo( *vUnbinnedDataSet[mod],Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),SumW2Error(kTRUE),NumCPU(8));		
+		}
+	}
+	else
+	{
+		if(mod==DT || doGeneration)
+		{
+			if(vUnbinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is weighted $$$$$$$$$$$");
+			fitresult = vModel[mod]->fitTo( *vUnbinnedDataSet[mod],Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),NumCPU(8));
+		}
+		else
+		{
+			if(!vUnbinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is unweighted $$$$$$$$$$$");
+			fitresult = vModel[mod]->fitTo( *vUnbinnedDataSet[mod],Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),SumW2Error(kTRUE),NumCPU(8));
+		}
+	}
 	gFit = gMinuit;
 	
 	vbFitStatus.push_back( minuitStatus(gFit) );
@@ -563,12 +585,31 @@ void plot(int mod, TVirtualPad* pad)
 	pad->cd();
 	
 	RooPlot* cosThetaFrame = cosThe->frame(Name("cosThetaFrame"), Title( vModelName[mod] ));
-	if(doBinned) vBinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins));
+	if(doBinned)
+	{
+		if(mod==DT || doGeneration)
+		{
+			if(vBinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is weighted $$$$$$$$$$$");
+			vBinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins));
+		}
+		else
+		{
+			if(!vBinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is unweighted $$$$$$$$$$$");
+			vBinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2));
+		}
+	}
 	else
 	{
-		// if(doGeneration) vUnbinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins));
-		// else             vUnbinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2));
-		vUnbinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2));
+		if(mod==DT || doGeneration)
+		{
+			if(vUnbinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is weighted $$$$$$$$$$$");
+			vUnbinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins));
+		}
+		else
+		{
+			if(!vUnbinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is unweighted $$$$$$$$$$$");
+			vUnbinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2));
+		}
 	}
 	vDetAcc[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(cAcceptance));
 	//vDetAcc[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(cAcceptance),NormRange("range_cosThe"));
@@ -856,18 +897,18 @@ void Afb_RooFit_weighted()
 			if(!skip)
 			{
 				fitpars fp;
+				fitpars dfp;
+				double Afb;
+				double dAfb;
 				fp.A0 = A0->getVal();
 				fp.A4 = A4->getVal();
-				vvFitParsResult[massBin-1].push_back( fp );
-				vvFitParsResult[massBin-1].push_back( fp );
-				fitpars dfp;
 				dfp.A0 = A0->getError();
 				dfp.A4 = A4->getError();
+				vvFitParsResult[massBin-1].push_back( fp );
 				vvFitParsResultErr[massBin-1].push_back( dfp );
-				vvFitParsResultErr[massBin-1].push_back( dfp );
-				// double Afb  = getAfb(A0->getVal(),A4->getVal(),true);
-				double Afb  = getAfb(A4->getVal());
-				double dAfb = getAfbErr(Afb,N);
+				Afb  = getAfb(A4->getVal());
+				if(doBinomialError) dAfb = getAfbErr(Afb,N);
+				else                dAfb = getAfbErr(dfp.A4);
 				vvAfbResult[massBin-1].push_back( Afb );
 				vvAfbError[massBin-1].push_back( dAfb );
 				plot(mod,vPad[massBin-1][mod]);
@@ -884,10 +925,6 @@ void Afb_RooFit_weighted()
 			}
 			
 			vhAfbBins[mod]->SetBinContent(massBin,vvAfbResult[massBin-1][mod]);
-			/*
-			if(mod==Z0) vhAfbBins[mod]->SetBinError(massBin,vvAfbError[massBin-1][mod]);
-			else        vhAfbBins[mod]->SetBinError(massBin,0.);
-			*/
 			vhAfbBins[mod]->SetBinError(massBin,vvAfbError[massBin-1][mod]);
 		}
 		
@@ -999,32 +1036,32 @@ void Afb_RooFit_weighted()
 			 << "\t[A0,A4](guess)=[" << vvInitialGuess[i][Z0].A0 << "," << vvInitialGuess[i][Z0].A4
 			 // << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][Z0].A0,vvInitialGuess[i][Z0].A4,false)
 			 << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][Z0].A4)
-			 << "\t-> \tA(fit)=" << vvFitParsResult[i][Z0].A0 << "+-" << vvFitParsResultErr[i][Z0].A0
-			 << "\t-> \tB(fit)=" << vvFitParsResult[i][Z0].A4 << "+-" << vvFitParsResultErr[i][Z0].A4
+			 << "\t-> \tA0(fit)=" << vvFitParsResult[i][Z0].A0 << "+-" << vvFitParsResultErr[i][Z0].A0
+			 << "\t-> \tA4(fit)=" << vvFitParsResult[i][Z0].A4 << "+-" << vvFitParsResultErr[i][Z0].A4
 			 << ",\tAfb(fit)=" << vvAfbResult[i][Z0] << "+-" << vvAfbError[i][Z0] << endl;
 		
 		cout << "   ZP:  STATUS=" << vvbFitStatus[i][ZP]
 			 << "\t[A0,A4](guess)=[" << vvInitialGuess[i][ZP].A0 << "," << vvInitialGuess[i][ZP].A4
 			 // << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][ZP].A0,vvInitialGuess[i][ZP].A4,false)
 			 << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][ZP].A4)
-			 << "\t-> \tA(fit)=" << vvFitParsResult[i][ZP].A0 << "+-" << vvFitParsResultErr[i][ZP].A0
-			 << "\t-> \tB(fit)=" << vvFitParsResult[i][ZP].A4 << "+-" << vvFitParsResultErr[i][ZP].A4
+			 << "\t-> \tA0(fit)=" << vvFitParsResult[i][ZP].A0 << "+-" << vvFitParsResultErr[i][ZP].A0
+			 << "\t-> \tA4(fit)=" << vvFitParsResult[i][ZP].A4 << "+-" << vvFitParsResultErr[i][ZP].A4
 			 << ",\tAfb(fit)=" << vvAfbResult[i][ZP] << "+-" << vvAfbError[i][ZP] << endl;
 		
 		cout << "   KK:  STATUS=" << vvbFitStatus[i][KK]
 			 << "\t[A0,A4](guess)=[" << vvInitialGuess[i][KK].A0 << "," << vvInitialGuess[i][KK].A4
 			 // << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][KK].A0,vvInitialGuess[i][KK].A4,false)
 			 << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][KK].A4)
-			 << "\t-> \tA(fit)=" << vvFitParsResult[i][KK].A0 << "+-" << vvFitParsResultErr[i][KK].A0
-			 << "\t-> \tB(fit)=" << vvFitParsResult[i][KK].A4 << "+-" << vvFitParsResultErr[i][KK].A4
+			 << "\t-> \tA0(fit)=" << vvFitParsResult[i][KK].A0 << "+-" << vvFitParsResultErr[i][KK].A0
+			 << "\t-> \tA4(fit)=" << vvFitParsResult[i][KK].A4 << "+-" << vvFitParsResultErr[i][KK].A4
 			 << ",\tAfb(fit)=" << vvAfbResult[i][KK] << "+-" << vvAfbError[i][KK] << endl;
 			 
 		cout << "   DT:  STATUS=" << vvbFitStatus[i][DT]
 			 << "\t[A0,A4](guess)=[" << vvInitialGuess[i][DT].A0 << "," << vvInitialGuess[i][DT].A4
 			 // << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][DT].A0,vvInitialGuess[i][DT].A4,false)
 			 << "]\t->  Afb(guess)=" << getAfb(vvInitialGuess[i][DT].A4)
-			 << "\t-> \tA(fit)=" << vvFitParsResult[i][DT].A0 << "+-" << vvFitParsResultErr[i][DT].A0
-			 << "\t-> \tB(fit)=" << vvFitParsResult[i][DT].A4 << "+-" << vvFitParsResultErr[i][DT].A4
+			 << "\t-> \tA0(fit)=" << vvFitParsResult[i][DT].A0 << "+-" << vvFitParsResultErr[i][DT].A0
+			 << "\t-> \tA4(fit)=" << vvFitParsResult[i][DT].A4 << "+-" << vvFitParsResultErr[i][DT].A4
 			 << ",\tAfb(fit)=" << vvAfbResult[i][DT] << "+-" << vvAfbError[i][DT] << endl;
 	}
 }

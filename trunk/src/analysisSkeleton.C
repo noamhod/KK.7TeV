@@ -104,13 +104,13 @@ string analysisSkeleton::getPeriodName()
 	if(RunNumber != currentRun)
 	{
 		speriod = getPeriod( RunNumber, m_firstrun2periodMap, m_lastrun2periodMap );
-		cout << "switching to period: " << speriod << endl;
+		_INFO("switching to period: "+speriod+" (run "+tostring(RunNumber)+")");
 		currentRun     = RunNumber;
 		sCurrentPeriod = speriod;
 	}
 	if(speriod=="")
 	{
-		cout << "ERROR: in analysisSkeleton::getPeriodName -> (speriod==""), exitting now" << endl;
+		_ERROR("in analysisSkeleton::getPeriodName -> (speriod==""), exitting now");
 		exit(-1);
 	}
 	
@@ -135,7 +135,7 @@ vector<string>* analysisSkeleton::getPeriodTriggers()
 	return getTrigs(sPeriod, m_period2triggerMap);
 }
 
-int analysisSkeleton::isTrigger(string trigName)
+bool analysisSkeleton::isTrigger(string trigName)
 {
 	_DEBUG("analysisSkeleton::isTrigger");
 	if(trigName=="")
@@ -144,11 +144,14 @@ int analysisSkeleton::isTrigger(string trigName)
 		exit(-1);
 	}
 	
-	int isTrig = 0;
-	if     (trigName=="L1_MU10")               isTrig = L1_MU10;
-	else if(trigName=="EF_mu22")               isTrig = EF_mu22;
-	else if(trigName=="EF_mu22_MG")            isTrig = EF_mu22_MG;
-	else if(trigName=="EF_mu40_MSonly_barrel") isTrig = EF_mu40_MSonly_barrel;
+	bool isTrig = false;
+	if     (trigName=="L1_MU10")                      isTrig = L1_MU10;
+	else if(trigName=="EF_mu22")                      isTrig = EF_mu22;
+	else if(trigName=="EF_mu22_MG")                   isTrig = EF_mu22_MG;
+	else if(trigName=="EF_mu40_MSonly_barrel")        isTrig = EF_mu40_MSonly_barrel;
+	else if(trigName=="EF_mu18_MG_medium")            isTrig = EF_mu18_MG_medium;
+	else if(trigName=="EF_mu18_medium")               isTrig = EF_mu18_medium;
+	else if(trigName=="EF_mu40_MSonly_barrel_medium") isTrig = EF_mu40_MSonly_barrel_medium;
 	else _WARNING("in analysisSkeleton::isTrigger -> the trigger "+trigName+" was not found and the event is regected by default");
 	
 	return isTrig;
@@ -236,6 +239,30 @@ void analysisSkeleton::matchTrigger(string speriod, string sTrigType)
 	
 	else _WARNING("the period name "+speriod+" was not found");
 }
+
+bool analysisSkeleton::checkTrigger(float trigThreshold)
+{
+	_DEBUG("analysisSkeleton::checkTrigger");
+	if(trigThreshold<=0)
+	{
+		_ERROR("trigThreshold<=0, exitting now");
+		exit(-1);
+	}
+	
+	for(int iROI=0 ; iROI<(int)HLT_has->size() ; iROI++)
+	{
+		for(int iTrk=0 ; iTrk<(int)HLT_has->at(iROI).size() ; iTrk++)
+		{
+			if( !HLT_has->at(iROI)[iTrk] ) continue;
+			float ptTrk = HLT_pt->at(iROI)[iTrk]*MeV2GeV;
+			if(ptTrk<trigThreshold) continue;
+			return true;
+		}
+	}
+	
+	return false;
+}
+
 
 void analysisSkeleton::runEventDumper()
 {
@@ -2066,7 +2093,14 @@ void analysisSkeleton::fillTruthEfficiency()
 			if(dr>dRmax_mu_L1) continue;
 			
 			float pTprobTrig = LLT_pt->at(iROI)*MeV2GeV;
-			float pTtrigThreshold = 10.; // in GeV
+			//float pTtrigThreshold = 10.; // in GeV
+			TMapsP2vd::iterator it = m_period2pTthresholdMap->find(sPeriod);
+			if(it==m_period2pTthresholdMap->end())
+			{
+				_ERROR("couldn't find the trigger vector in period: "+sPeriod+", exitting now.");
+				exit(-1);
+			}
+			float pTtrigThreshold = it->second->at(0); // take the lowest pT threshold of the possibilities
 			if(pTprobTrig<pTtrigThreshold) continue;
 		}
 		else if(isHLT)
@@ -2090,14 +2124,17 @@ void analysisSkeleton::fillTruthEfficiency()
 				dRmax    = dr;
 				iTrigTrk = j;
 			}
-		
-			// float dphi = HLT_phi->at(iROI) - mu_phi->at(t);
-			// float deta = HLT_eta->at(iROI) - mu_eta->at(t);
-			// dr = sqrt(dphi*dphi + deta*deta);
-			// if(dr>dRmax_mu_EF) continue;
+			if(iTrigTrk<0) continue;
 			
 			float pTprobTrig = HLT_pt->at(iROI)[iTrigTrk]*MeV2GeV;
-			float pTtrigThreshold = 10.; // in GeV
+			// float pTtrigThreshold = 22.; // in GeV
+			TMapsP2vd::iterator it = m_period2pTthresholdMap->find(sPeriod);
+			if(it==m_period2pTthresholdMap->end())
+			{
+				_ERROR("couldn't find the trigger vector in period: "+sPeriod+", exitting now.");
+				exit(-1);
+			}
+			float pTtrigThreshold = it->second->at(0); // take the lowest pT threshold of the possibilities
 			if(pTprobTrig<pTtrigThreshold) continue;
 		}
 		
@@ -2474,6 +2511,34 @@ bool analysisSkeleton::doubleSelection(string sSkipCut)
 	return doubleSelection(cutsToSkip);
 }
 
+inline bool analysisSkeleton::throwInfo(string cutName)
+{
+	bool show = false;  
+	if(RunNumber==180124 && lbn==493 && EventNumber==68526315) show = true;  
+	else if(RunNumber==180225 && lbn==300 && EventNumber==56266053) show = true;
+	else if(RunNumber==180225 && lbn==300 && EventNumber==56286764) show = true;
+	else if(RunNumber==180225 && lbn==300 && EventNumber==56310023) show = true; 
+	else if(RunNumber==180225 && lbn==300 && EventNumber==56415230) show = true;
+	else if(RunNumber==182454 && lbn==335 && EventNumber==35814784)   show = true;
+	else if(RunNumber==182486 && lbn==282 && EventNumber==33852510)   show = true;
+	else if(RunNumber==182766 && lbn==213 && EventNumber==5404925)   show = true;
+	else if(RunNumber==183081 && lbn==634 && EventNumber==121479214)   show = true;
+	else if(RunNumber==183426 && lbn==145 && EventNumber==15925912) show = true;
+	else if(RunNumber==183462 && lbn==1251 && EventNumber==150376226) show = true;
+	else if(RunNumber==183462 && lbn==1251 && EventNumber==150401710) show = true;
+	else if(RunNumber==183462 && lbn==1251 && EventNumber==150474933) show = true;
+	else if(RunNumber==183462 && lbn==1251 && EventNumber==150512192) show = true;
+	else if(RunNumber==183602 && lbn==20 && EventNumber==282919)  show = true;
+	else if(RunNumber==184022 && lbn==575 && EventNumber==68635084)  show = true;
+	else if(RunNumber==184130 && lbn==1331 && EventNumber==198813439)  show = true;  
+	else if(RunNumber==184130 && lbn==1331 && EventNumber==198874411)  show = true;  
+	else if(RunNumber==184130 && lbn==1331 && EventNumber==198888828)  show = true;  
+	else if(RunNumber==184130 && lbn==1331 && EventNumber==198902925)  show = true;  
+	
+	if(show) _INFO("Run-LB-Evt  "+tostring(RunNumber)+" "+tostring(lbn)+" "+tostring(EventNumber)+" failed cut: "+cutName);
+	return show;
+}
+
 inline bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 {
 	_DEBUG("analysisSkeleton::preselection(TMapsb& cutsToSkip)");
@@ -2488,6 +2553,10 @@ inline bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 	passCurrentCut = true;
 	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
 	{
+		////////////////////////////
+		if(!passCutFlow) break; ////
+		////////////////////////////
+	
 		///////////////////////////////////////////////////////////////////////////
 		// ignore selection: //////////////////////////////////////////////////////
 		float num = ii->first; ////////////////////////////////////////////////////
@@ -2517,17 +2586,19 @@ inline bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 		else if(sorderedcutname=="Trigger"  &&  !bSkipCut)
 		{
 			string trigName;
-			int trigVal;
+			bool   trigVal;
 			bool pass1Trig = false;
 			for(int t=0 ; t<(int)vTriggers->size() ; t++)
 			{
 				trigName  = vTriggers->at(t);
 				trigVal   = isTrigger( trigName );
-				pass1Trig = ( triggerCut((*m_cutFlowMapSVD)[sorderedcutname][0], trigVal, trigName) ) ? true : false;
-				//pass1Trig = (bool)isTrigger( vTriggers->at(t) );
+				//pass1Trig = ( triggerCut((*m_cutFlowMapSVD)[sorderedcutname][0], trigVal, trigName) ) ? true : false;
+				pass1Trig = isTrigger( vTriggers->at(t) );
+				//if(throwInfo(sorderedcutname)) _INFO("Trigger="+trigName+":"+tostring(trigVal));
 				if(pass1Trig) break;
 			}
 			passCurrentCut = pass1Trig;
+			//if(!passCurrentCut  &&  throwInfo(sorderedcutname)) _INFO("Trigger decision ="+tostring(passCurrentCut));
 		}
 		
 		else if(sorderedcutname=="PV"  &&  !bSkipCut)
@@ -2542,13 +2613,18 @@ inline bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 			if(!passCurrentCut) iVtx = 0;
 		}
 		
-		else continue;
+		else
+		{
+			//_ERROR("unknown cut: "+sorderedcutname);
+			continue;
+		}
 		
 		passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		// cutFlow /////////////////////////////////////////////////////////////////////////////////////////
 		if(passCutFlow  &&  !isSkippedCut  && bDoFill) fillCutFlow(sorderedcutname, "preselection"); ///////
+		if(!passCutFlow && !isSkippedCut) throwInfo(sorderedcutname); //////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 	}
 	
@@ -2567,7 +2643,11 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 	passCutFlow = true;
 	
 	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
-	{	
+	{
+		////////////////////////////
+		if(!passCutFlow) break; ////
+		////////////////////////////
+	
 		///////////////////////////////////////////////////////////////////////////
 		// ignore preselection: ///////////////////////////////////////////////////
 		float num = ii->first; ///////////////////////////////////////////////////
@@ -2707,12 +2787,17 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 			}
 		}
 		
-		else continue;
+		else
+		{
+			//_ERROR("unknown cut: "+sorderedcutname);
+			continue;
+		}
 		
-		/////////////////////////////////////////////////////////////////////////
-		// increment if passes the cut flow /////////////////////////////////////
-		passCutFlow = (passCutFlow  &&  nMusPassed>1) ? true : false; ///////////
-		/////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		// increment if passes the cut flow //////////////////////////////////////
+		passCutFlow = (passCutFlow  &&  nMusPassed>1) ? true : false; ////////////
+		if(!passCutFlow && inApplySingleSelection) throwInfo(sorderedcutname); ///
+		//////////////////////////////////////////////////////////////////////////
 		
 		////////////////////////////////////////////////////////////////////////////////////////
 		// cutFlow /////////////////////////////////////////////////////////////////////////////
@@ -2764,7 +2849,11 @@ inline bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
 	passCutFlow    = true;
 	passCurrentCut = true;
 	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
-	{	
+	{
+		////////////////////////////
+		if(!passCutFlow) break; ////
+		////////////////////////////
+	
 		///////////////////////////////////////////////////////////////////////////
 		// ignore preselection: ///////////////////////////////////////////////////
 		float num = ii->first; ////////////////////////////////////////////////////
@@ -2808,13 +2897,18 @@ inline bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
 			passCurrentCut = ( etaSumCut((*m_cutFlowMapSVD)[sorderedcutname][0], pmu[ai], pmu[bi]) ) ? true : false;
 		}
 		
-		else continue;
+		else
+		{
+			//_ERROR("unknown cut: "+sorderedcutname);
+			continue;
+		}
 		
 		passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		// cutFlow ///////////////////////////////////////////////////////////////////////
 		if(passCutFlow  &&  !isSkippedCut  &&  bDoFill) fillCutFlow(sorderedcutname); ////
+		if(!passCutFlow && !isSkippedCut) throwInfo(sorderedcutname); ////////////////////
 		//////////////////////////////////////////////////////////////////////////////////
 		
 	} // end for(m_cutFlowOrdered)

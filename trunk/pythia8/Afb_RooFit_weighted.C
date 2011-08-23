@@ -111,6 +111,19 @@ bool doGeneration    = false;
 bool doBinomialError = false;
 Int_t Ngen = 10000;
 Int_t minEntries2Fit = 5;
+void printRunConfig()
+{
+	cout << "//////////////////////////////////" << endl;
+	cout << "// flags to config the run" << endl;
+	cout << "bool drawAfbErrArea  = " << drawAfbErrArea << ";" << endl;
+	cout << "bool doLumiXSweights = " << doLumiXSweights << "; // true if want to scale binned samples to 1 smooth sample and to scale MC to data luminosity. This affects mostly the errors " << endl;
+	cout << "bool doBinned        = " << doBinned << ";" << endl;
+	cout << "bool doGeneration    = " << doGeneration << ";" << endl;
+	cout << "bool doBinomialError = " << doBinomialError << ";" << endl;
+	cout << "Int_t Ngen = " << Ngen << ";" << endl;
+	cout << "Int_t minEntries2Fit = " << minEntries2Fit << ";" << endl;
+	cout << "//////////////////////////////////" << endl;
+}
 //////////////////////////////////
 
 double randomizeItialGuess(double min, double max)
@@ -1064,6 +1077,8 @@ void Afb_RooFit_weighted()
 			 << "\t-> \tA4(fit)=" << vvFitParsResult[i][DT].A4 << "+-" << vvFitParsResultErr[i][DT].A4
 			 << ",\tAfb(fit)=" << vvAfbResult[i][DT] << "+-" << vvAfbError[i][DT] << endl;
 	}
+	
+	printRunConfig();
 }
 
 

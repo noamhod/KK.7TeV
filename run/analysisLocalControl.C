@@ -377,17 +377,18 @@ void analysisLocalControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		
 		if(m_RunType!="local_noskim")
 		{
+			/////////////////////////////////////////////////
 			l64t_nb = m_WZphysD3PD->fChain->GetEntry(l64t_jentry);
 			l64t_nbytes += l64t_nb;
+			// m_WZphysD3PD->GetEntryMinimal(l64t_ientry);
+			/////////////////////////////////////////////////
 		}
 		else
 		{
 			/////////////////////////////////////////////////
-			// read only the minimal set of branches ////////
-			//GetEntryMinimal(l64t_ientry); /////////////////
-			//m_WZphysD3PD->GetEntryMinimal(l64t_ientry); /////
 			l64t_nb = m_WZphysD3PD->fChain->GetEntry(l64t_jentry);
 			l64t_nbytes += l64t_nb;
+			// m_WZphysD3PD->GetEntryMinimal(l64t_ientry); /////
 			/////////////////////////////////////////////////
 		}
 		

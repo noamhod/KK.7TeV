@@ -60,6 +60,7 @@ public:
 	int nMultiMuonEvents;
 	bool inApplySingleSelection;
 	ofstream* fCand;
+	string sTriggerName;
 	
 	// tirg, local
 	vector<int>*   mu_LLT_index;
@@ -117,37 +118,40 @@ public:
 	int coreError;
 	
 	// L1 triggers
-	int L1_MU0;
-	int L1_MU10;
-	int L1_MU15;
-	int L1_MU20;
-	int L1_MU6;
+	// int L1_MU0;
+	bool L1_MU10;
+	// bool L1_MU15;
+	// bool L1_MU20;
+	// int L1_MU6;
 	
 	// EF triggers
-	int EF_mu10;
-	int EF_mu10_MG;
-	int EF_mu10_MSonly;
-	int EF_mu10_MSonly_tight;
-	int EF_mu10_NoAlg;
-	int EF_mu10_tight;
-	int EF_mu10i_loose;
-	int EF_mu13;
-	int EF_mu13_MG;
-	int EF_mu13_MG_tight;
-	int EF_mu13_tight;
-	int EF_mu15;
-	int EF_mu15_NoAlg;
-	int EF_mu20;
-	int EF_mu20_MSonly;
-	int EF_mu20_NoAlg;
-	int EF_mu20_slow;
-	int EF_mu30_MSonly;
-	int EF_mu4;
-	int EF_mu40_MSonly;
+	// int EF_mu10;
+	// int EF_mu10_MG;
+	// int EF_mu10_MSonly;
+	// int EF_mu10_MSonly_tight;
+	// int EF_mu10_NoAlg;
+	// int EF_mu10_tight;
+	// int EF_mu10i_loose;
+	// int EF_mu13;
+	// int EF_mu13_MG;
+	// int EF_mu13_MG_tight;
+	// int EF_mu13_tight;
+	// int EF_mu15;
+	// int EF_mu15_NoAlg;
+	// int EF_mu20;
+	// int EF_mu20_MSonly;
+	// int EF_mu20_NoAlg;
+	// int EF_mu20_slow;
+	// int EF_mu30_MSonly;
+	// int EF_mu4;
+	// int EF_mu40_MSonly;
 	
-	int EF_mu22;
-	int EF_mu22_MG;
-	int EF_mu40_MSonly_barrel;
+	bool EF_mu22;
+	bool EF_mu22_MG;
+	bool EF_mu40_MSonly_barrel;
+	bool EF_mu18_MG_medium;
+	bool EF_mu18_medium;
+	bool EF_mu40_MSonly_barrel_medium;
 
 	
 	// vertexes (for the PV preselection)
@@ -598,8 +602,9 @@ public:
 	string          getPeriodName();
 	string          getPeriodName(int run);
 	vector<string>* getPeriodTriggers();
-	int             isTrigger(string trigName);
+	bool            isTrigger(string trigName);
 	void            matchTrigger(string speriod, string sTrigType);
+	bool            checkTrigger(float trigThreshold);
 	void 			printAllProperties(int ai, int bi, int iv);
 	
 	//void buildMU4Vector(int nMus);
@@ -631,6 +636,8 @@ private:
 	bool preselection(string sSkipCut);
 	bool singleSelection(string sSkipCut);
 	bool doubleSelection(string sSkipCut);
+	
+	inline bool throwInfo(string cutName);
 	
 	inline bool preselection(TMapsb& cutsToSkip);
 	inline bool singleSelection(TMapsb& cutsToSkip);

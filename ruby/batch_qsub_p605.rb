@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'DQ2'
+require 'QSUB'
 
 insets  = [
 			'user.wanghill.data11_7TeV.00178044.physics_Muons.merge.NTUP_SMDILEP.r2276_p516_p523_p605_dimuon_p605/',
@@ -115,40 +115,28 @@ insets  = [
 			'user.wanghill.data11_7TeV.00186396.physics_Muons.merge.NTUP_SMDILEP.f392_m929_p605_dimuon_p605/',
 			'user.wanghill.data11_7TeV.00186399.physics_Muons.merge.NTUP_SMDILEP.f393_m929_p605_dimuon_p605/',
 			'user.wanghill.data11_7TeV.00186456.physics_Muons.merge.NTUP_SMDILEP.f393_m929_p605_dimuon_p605/',
-			'user.wanghill.data11_7TeV.00186493.physics_Muons.merge.NTUP_SMDILEP.f393_m929_p605_dimuon_p605/',
-			'user.wanghill.data11_7TeV.00186516.physics_Muons.merge.NTUP_SMDILEP.f393_m929_p605_dimuon_p605_1/',
-			'user.wanghill.data11_7TeV.00186532.physics_Muons.merge.NTUP_SMDILEP.f393_m929_p605_dimuon_p605_1/',
-			'user.wanghill.data11_7TeV.00186533.physics_Muons.merge.NTUP_SMDILEP.f393_m929_p605_dimuon_p605_1/',
-			'user.wanghill.data11_7TeV.00186669.physics_Muons.merge.NTUP_SMDILEP.f394_m934_p605_dimuon_p605/',
-			'user.wanghill.data11_7TeV.00186673.physics_Muons.merge.NTUP_SMDILEP.f394_m934_p605_dimuon_p605/',
-			'user.wanghill.data11_7TeV.00186721.physics_Muons.merge.NTUP_SMDILEP.f394_m934_p605_dimuon_p605/',
-			'user.wanghill.data11_7TeV.00186729.physics_Muons.merge.NTUP_SMDILEP.f394_m934_p605_dimuon_p605/',
-			'user.wanghill.data11_7TeV.00186753.physics_Muons.merge.NTUP_SMDILEP.f394_m934_p605_dimuon_p605/',
-			'user.wanghill.data11_7TeV.00186755.physics_Muons.merge.NTUP_SMDILEP.f394_m934_p605_dimuon_p605/',
-			'user.wanghill.data11_7TeV.00186873.physics_Muons.merge.NTUP_SMDILEP.f394_m934_p605_dimuon_p605/',
-			'user.wanghill.data11_7TeV.00186877.physics_Muons.merge.NTUP_SMDILEP.f394_m934_p605_dimuon_p605/',
-			'user.wanghill.data11_7TeV.00186878.physics_Muons.merge.NTUP_SMDILEP.f394_m934_p605_dimuon_p605/',
-			'user.wanghill.data11_7TeV.00186923.physics_Muons.merge.NTUP_SMDILEP.f394_m934_p605_dimuon_p605/',
-			'user.wanghill.data11_7TeV.00186933.physics_Muons.merge.NTUP_SMDILEP.f394_m939_p605_dimuon_p605/',
-			'user.wanghill.data11_7TeV.00186934.physics_Muons.merge.NTUP_SMDILEP.f394_m939_p605_dimuon_p605/',
-			'user.wanghill.data11_7TeV.00186965.physics_Muons.merge.NTUP_SMDILEP.f395_m939_p605_dimuon_p605/',
-			'user.wanghill.data11_7TeV.00187014.physics_Muons.merge.NTUP_SMDILEP.f395_m939_p605_dimuon_p605/',
-			'user.wanghill.data11_7TeV.00187196.physics_Muons.merge.NTUP_SMDILEP.f395_m939_p605_dimuon_p605_1/',
-			'user.wanghill.data11_7TeV.00187219.physics_Muons.merge.NTUP_SMDILEP.f395_m939_p605_dimuon_p605/'
+			'user.wanghill.data11_7TeV.00186493.physics_Muons.merge.NTUP_SMDILEP.f393_m929_p605_dimuon_p605/'
 		  ]
-outsets = []
+outlist=[]
+runnumbers = Array.new
 
-x = DQ2.new(true)
-x.set_type("data")
-x.set_targetdir("/data/hod/2011/NTUP_SMDILEP_dimuon_p605")
-x.set_summary_file("summary.log")
-x.set_list_file("NTUP_SMDILEP_dimuon_p605_runs.list")
-x.set_prefix("data11_7TeV.",8)
+
+x = QSUB.new(true)
+
+x.set_thisdir(pwd())
+x.set_homedir("/srv01/tau/hod")
+x.set_rootdir("/srv01/tau/hod/root528c/root")
+x.set_sourcedir("/storage/t3_data/hod/2011/NTUP_SMDILEP_dimuon_p605")
+x.set_targetdir("/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/data/tmp")
+x.set_macrodir("/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/run/tmp")
+x.set_jobdir("/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/scripts/tmp")
+x.set_prefix("user.wanghill.data11_7TeV.00",6)
 x.set_secondprefix("._",5)
-x.check_variables
 
-x.batch_dq2get(insets,outsets)
-outsets = []
-x.batch_dq2validate(insets,outsets)
-x.make_list()
+x.check_variables
+x.batch_qsub(insets,runnumbers)
+### x.merge_root(insets,"merged.root")
+### x.merge_candidates(insets,"merged.candidates")
+### x.merge_cutflow(insets,"merged.cutflow")
+x.waitNmerge(5,insets,"merged")
 x.finalize()

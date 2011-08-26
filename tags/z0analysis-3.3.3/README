@@ -1,0 +1,75 @@
+###############################################
+########### HOW TO USE THIS PACKAGE ###########
+###### Noam Tal Hod, naom.com@gmail.com #######
+###############################################
+
+setup your ROOT, Ruby and qsub env
+	export ROOTSYS=$HOME/root528c/root     # root
+	export LD_LIBRARY_PATH=$ROOTSYS/lib:$LD_LIBRARY_PATH
+	export PATH=$ROOTSYS/bin:$PATH
+	export RUBYLIB=$ROOTSYS/lib:$RUBYLIB   # ruby
+	export PBS_SERVER=tau-ce.hep.tau.ac.il # qsub
+
+go to the analysis folder (THIS FOLDER)
+	cd /path/to/here/
+
+to get and make the GRL lib:
+	check the latest tag in:
+		https://svnweb.cern.ch/cern/wsvn/atlasoff/DataQuality/GoodRunsLists/tags/
+	cheout the latest tag:
+		svn co svn+ssh://svn.cern.ch/reps/atlasoff/DataQuality/GoodRunsLists/tags/GoodRunsLists-XX-XX-XX
+	cd GoodRunsLists-XX-XX-XX/cmt
+	make -f Makefile.Standalone
+	the GRL lib is in:
+		GoodRunsLists-XX-XX-XX/StandAlone/libGoodRunsLists.so
+
+to get and make the MCP smearing class:L
+	check the latest tag in:
+		https://svnweb.cern.ch/trac/atlasoff/browser/PhysicsAnalysis/MuonID/MuonIDAnalysis/MuonMomentumCorrections/tags
+		https://twiki.cern.ch/twiki/bin/view/AtlasProtected/MCPAnalysisGuidelinesRel16#AnchorResolutions
+	cheout the latest tag:
+		svn co svn+ssh://svn.cern.ch/reps/atlasoff/PhysicsAnalysis/MuonID/MuonIDAnalysis/MuonMomentumCorrections/tags/MuonMomentumCorrections-XX-YY-ZZ
+	cd MuonMomentumCorrections-XX-YY-ZZ/cmt
+	make -f Makefile.Standalone
+	the library is:
+		MuonMomentumCorrections-XX-YY-ZZ/StandAlone/libMuonMomentumCorrections.so
+
+################################
+###### SEE run/RUNREADME #######
+################################
+
+to compile the analysis code:
+	cd ruby
+	ruby compile.rb
+
+to run the analysis code locally (all data / MC):
+	cd run
+	change this configuration file:
+		localRunControl_noSkim.txt
+	start the run with:
+		root -b -l -q macro_run.C
+
+to run the analysis code in qsub
+	cd ruby
+	ruby batch_qsub.rb (for data)
+	?????????????????? (for mc)
+	watch that there are no errors / warnings from one or more of the working nodes
+	see the output:
+		ls -lrt ../data/
+
+AFTER A SUCCESSFUL qsub RUN, to run over a specific data-run locally (with run number XXXXXX):
+	cd run/tmp
+	root -b -q -l macro_XXXXXX.C
+
+svn co:
+	to co the trunk:
+	svn checkout https://z0analysis.googlecode.com/svn/trunk/ z0analysis --username noam.com
+	to co a certain tag:
+	svn checkout https://z0analysis.googlecode.com/svn/tags/z0analysis-X.Y.Z --username noam.com
+
+svn ci:
+	cd scripts
+	source cleanGoodRunsLists.sh
+	cd -
+	svn ci -m "some description"
+	svn cp https://z0analysis.googlecode.com/svn/{trunk,tags/z0analysis-X.Y.Z} -m "some description"

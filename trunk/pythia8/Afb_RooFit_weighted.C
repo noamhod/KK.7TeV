@@ -105,10 +105,11 @@ RooAbsData*  rad[4];
 //////////////////////////////////
 // flags to config the run
 bool drawAfbErrArea  = true;
-bool doLumiXSweights = false; // true if want to scale binned samples to 1 smooth sample and to scale MC to data luminosity. This affects mostly the errors
+bool doLumiXSweights = true; //!!! // true if want to scale binned samples to 1 smooth sample and to scale MC to data luminosity. This affects mostly the errors
 bool doBinned        = false;
 bool doGeneration    = false;
 bool doBinomialError = false;
+bool drawKKAfb       = false;
 Int_t Ngen = 10000;
 Int_t minEntries2Fit = 5;
 void printRunConfig()
@@ -346,7 +347,7 @@ void init(int massBin, int mod)
 		vhMassBins[mod]->SetLineColor(vModelColor[mod]);
 		vhMassBins[mod]->SetLineWidth(1);
 		vhMassBins[mod]->SetLineStyle(lineStyle);
-		leg_mHat->AddEntry( vhMassBins[mod], sChannelMass, "l");
+		if((mod==KK && drawKKAfb) || mod!=KK) leg_mHat->AddEntry( vhMassBins[mod], sChannelMass, "l");
 		
 		vhAfbBins.push_back( (TH1D*)file->Get("all_histograms/hDummy_afb")->Clone("") );
 		vhAfbBins[mod]->Reset();
@@ -361,7 +362,7 @@ void init(int massBin, int mod)
 			vhAfbBins[mod]->SetLineWidth(1);
 			vhAfbBins[mod]->SetMarkerSize(0);
 			vhAfbBins[mod]->SetMarkerColor(0);
-			leg_mHat->AddEntry( vhAfbBins[mod], sChannelFit, "f");
+			if((mod==KK && drawKKAfb) || mod!=KK) leg_mHat->AddEntry( vhAfbBins[mod], sChannelFit, "f");
 		}
 		else
 		{	
@@ -369,7 +370,7 @@ void init(int massBin, int mod)
 			vhAfbBins[mod]->SetMarkerSize(2);
 			vhAfbBins[mod]->SetMarkerStyle(markerStyle);
 			vhAfbBins[mod]->SetMarkerColor(vModelColor[mod]);
-			leg_mHat->AddEntry( vhAfbBins[mod], sChannelFit, "lep");
+			if((mod==KK && drawKKAfb) || mod!=KK) leg_mHat->AddEntry( vhAfbBins[mod], sChannelFit, "lep");
 		}             
 	}
 	
@@ -697,33 +698,36 @@ void drawAfb()
 	cnvAfb->cd();
 	pad_mHat->Draw();
 	pad_mHat->cd();
-	vhMassBins[Z0]->SetMaximum(1.5*vhMassBins[Z0]->GetMaximum());
-	vhMassBins[Z0]->SetMinimum((vhMassBins[Z0]->GetMinimum()<=0) ? 1. : 0.5*vhMassBins[Z0]->GetMinimum());
-	vhMassBins[Z0]->GetXaxis()->SetMoreLogLabels();
-	vhMassBins[Z0]->GetXaxis()->SetNoExponent();
-	vhMassBins[Z0]->Draw();
-	/*
-	vhMassBins[KK]->SetMaximum(1.5*vhMassBins[KK]->GetMaximum());
-	vhMassBins[KK]->SetMinimum((vhMassBins[Z0]->GetMinimum()<=0) ? 1. : 0.5*vhMassBins[Z0]->GetMinimum());
-	vhMassBins[KK]->GetXaxis()->SetMoreLogLabels();
-	vhMassBins[KK]->GetXaxis()->SetNoExponent();
-	vhMassBins[KK]->Draw();
-	//gMpoissonErr[KK]->GetXaxis()->SetMoreLogLabels();
-	//gMpoissonErr[KK]->GetXaxis()->SetNoExponent();
-	//gMpoissonErr[KK]->Draw("SAMES");
+	if(!drawKKAfb)
+	{
+		vhMassBins[Z0]->SetMaximum(1.5*vhMassBins[Z0]->GetMaximum());
+		vhMassBins[Z0]->SetMinimum((vhMassBins[Z0]->GetMinimum()<=0) ? 1. : 0.5*vhMassBins[Z0]->GetMinimum());
+		vhMassBins[Z0]->GetXaxis()->SetMoreLogLabels();
+		vhMassBins[Z0]->GetXaxis()->SetNoExponent();
+		vhMassBins[Z0]->Draw();
+	}
+	else
+	{
+		vhMassBins[KK]->SetMaximum(1.5*vhMassBins[KK]->GetMaximum());
+		vhMassBins[KK]->SetMinimum((vhMassBins[Z0]->GetMinimum()<=0) ? 1. : 0.5*vhMassBins[Z0]->GetMinimum());
+		vhMassBins[KK]->GetXaxis()->SetMoreLogLabels();
+		vhMassBins[KK]->GetXaxis()->SetNoExponent();
+		vhMassBins[KK]->Draw();
+		//gMpoissonErr[KK]->GetXaxis()->SetMoreLogLabels();
+		//gMpoissonErr[KK]->GetXaxis()->SetNoExponent();
+		//gMpoissonErr[KK]->Draw("SAMES");
 	
-	vhMassBins[Z0]->GetXaxis()->SetMoreLogLabels();
-	vhMassBins[Z0]->GetXaxis()->SetNoExponent();
-	vhMassBins[Z0]->Draw("SAMES");
-	//gMpoissonErr[Z0]->GetXaxis()->SetMoreLogLabels();
-	//gMpoissonErr[Z0]->GetXaxis()->SetNoExponent();
-	//gMpoissonErr[Z0]->Draw("SAMES");
-	*/
-	/*
+		vhMassBins[Z0]->GetXaxis()->SetMoreLogLabels();
+		vhMassBins[Z0]->GetXaxis()->SetNoExponent();
+		vhMassBins[Z0]->Draw("SAMES");
+		//gMpoissonErr[Z0]->GetXaxis()->SetMoreLogLabels();
+		//gMpoissonErr[Z0]->GetXaxis()->SetNoExponent();
+		//gMpoissonErr[Z0]->Draw("SAMES");
+	}
+
 	vhMassBins[ZP]->GetXaxis()->SetMoreLogLabels();
 	vhMassBins[ZP]->GetXaxis()->SetNoExponent();
 	vhMassBins[ZP]->Draw("SAMES");
-	*/
 	//gMpoissonErr[ZP]->GetXaxis()->SetMoreLogLabels(); 
 	//gMpoissonErr[ZP]->GetXaxis()->SetNoExponent(); 
 	//gMpoissonErr[ZP]->Draw("SAMES");
@@ -739,33 +743,36 @@ void drawAfb()
 
 	pad_Afb->Draw();
 	pad_Afb->cd();
-	vhAfbBins[Z0]->GetYaxis()->SetRangeUser(-1.,+1.);
-	if(drawAfbErrArea) vhAfbBins[Z0]->Draw("E5 Y+");
-	else               vhAfbBins[Z0]->Draw("Y+ e1x1");
-	vhAfbBins[Z0]->GetXaxis()->SetMoreLogLabels(); 
-	vhAfbBins[Z0]->GetXaxis()->SetMoreLogLabels(); 
-	/*
-	vhAfbBins[KK]->GetYaxis()->SetRangeUser(-1.,+1.);
-	if(drawAfbErrArea) vhAfbBins[KK]->Draw("E5 Y+");
-	else               vhAfbBins[KK]->Draw("e1x1 Y+");
-	vhAfbBins[KK]->GetXaxis()->SetMoreLogLabels(); 
-	vhAfbBins[KK]->GetXaxis()->SetNoExponent();
-	*/
-	/*
-	if(drawAfbErrArea) vhAfbBins[Z0]->Draw("E5 Y+ SAMES");
-	else               vhAfbBins[Z0]->Draw("Y+ e1x1 SAMES");
-	vhAfbBins[Z0]->GetXaxis()->SetMoreLogLabels(); 
-	vhAfbBins[Z0]->GetXaxis()->SetMoreLogLabels(); 
+	if(!drawKKAfb)
+	{
+		vhAfbBins[Z0]->GetYaxis()->SetRangeUser(-1.,+1.);
+		if(drawAfbErrArea) vhAfbBins[Z0]->Draw("E5 Y+");
+		else               vhAfbBins[Z0]->Draw("Y+ e1x1");
+		vhAfbBins[Z0]->GetXaxis()->SetMoreLogLabels(); 
+		vhAfbBins[Z0]->GetXaxis()->SetNoExponent();
+	}
+	else
+	{
+		vhAfbBins[KK]->GetYaxis()->SetRangeUser(-1.,+1.);
+		if(drawAfbErrArea) vhAfbBins[KK]->Draw("E5 Y+");
+		else               vhAfbBins[KK]->Draw("e1x1 Y+");
+		vhAfbBins[KK]->GetXaxis()->SetMoreLogLabels(); 
+		vhAfbBins[KK]->GetXaxis()->SetNoExponent();
+
+		if(drawAfbErrArea) vhAfbBins[Z0]->Draw("E5 Y+ SAMES");
+		else               vhAfbBins[Z0]->Draw("Y+ e1x1 SAMES");
+		vhAfbBins[Z0]->GetXaxis()->SetMoreLogLabels(); 
+		vhAfbBins[Z0]->GetXaxis()->SetNoExponent();
+	}
+
 	if(drawAfbErrArea) vhAfbBins[ZP]->Draw("E5 Y+ SAMES");
 	else               vhAfbBins[ZP]->Draw("Y+ e1x1 SAMES");
 	vhAfbBins[ZP]->GetXaxis()->SetMoreLogLabels(); 
-	vhAfbBins[ZP]->GetXaxis()->SetMoreLogLabels(); 
-	*/
-	// if(drawAfbErrArea) vhAfbBins[DT]->Draw("E5 Y+ SAMES");
-	// else               vhAfbBins[DT]->Draw("Y+ e1x1 SAMES");
+	vhAfbBins[ZP]->GetXaxis()->SetNoExponent();
+	
 	vhAfbBins[DT]->Draw("Y+ e1x1 SAMES");
 	vhAfbBins[DT]->GetXaxis()->SetMoreLogLabels(); 
-	vhAfbBins[DT]->GetXaxis()->SetMoreLogLabels(); 
+	vhAfbBins[DT]->GetXaxis()->SetNoExponent(); 
 	
 	pvtxt_lumi->Draw("SAMES");
 	pvtxt_atlas->Draw("SAMES");

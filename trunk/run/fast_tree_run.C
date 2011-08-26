@@ -1,0 +1,385 @@
+#include "../include/basicIncludes.h"
+
+TFile* file;
+TTree* tree;
+TString fName;
+TString tName;
+
+Bool_t isMC=true;
+Bool_t dolog=true;
+kinematics kin;
+TLorentzVector* tlva = new TLorentzVector;
+TLorentzVector* tlvb = new TLorentzVector;
+
+TH1D* hMass;
+TH2D* hMassCosThetaCS;
+TH2D* hMassyQ;
+TH2D* hbetaabsyQabs;
+TH2D* hyQCosThetaCS;
+TH1D* hbetaZ;
+TH1D* hyQ;
+TH1D* hyQabs;
+TH2D* hbetaZyQ;
+TH2D* hbetaZyQtru;
+
+/////////////  MC  /////////////
+bool truth_all_isValid;
+vector<float>* truth_all_mc_pt;
+vector<float>* truth_all_mc_m;
+vector<float>* truth_all_mc_eta;
+vector<float>* truth_all_mc_phi;
+vector<int>*   truth_all_mc_status;
+vector<int>*   truth_all_mc_barcode;
+vector<int>*   truth_all_mc_pdgId;
+vector<float>* truth_all_mc_charge;
+float truth_all_Mhat;
+float truth_all_CosThetaCS;
+float truth_all_CosThetaHE;
+float truth_all_ySystem;
+float truth_all_QT;
+bool recon_all_isValid;
+vector<float>* recon_all_E;
+vector<float>* recon_all_pt;
+vector<float>* recon_all_m;
+vector<float>* recon_all_eta;
+vector<float>* recon_all_phi;
+vector<float>* recon_all_px;
+vector<float>* recon_all_py;
+vector<float>* recon_all_pz;
+vector<float>* recon_all_charge;
+vector<float>* recon_all_y;
+vector<int>*   recon_all_id;
+vector<float>* recon_all_theta;
+float recon_all_Mhat;
+float recon_all_CosThetaCS;
+float recon_all_CosThetaHE;
+float recon_all_ySystem;
+float recon_all_QT;
+////////////////////////////////
+
+///////////// data /////////////
+vector<float>* E;
+vector<float>* pt;
+vector<float>* m;
+vector<float>* eta;
+vector<float>* phi;
+vector<float>* px;
+vector<float>* py;
+vector<float>* pz;
+vector<float>* charge;
+vector<unsigned short>* allauthor;
+vector<int>* author;
+vector<float>* beta;
+vector<float>* me_d0;
+vector<float>* me_z0;
+vector<float>* me_phi;
+vector<float>* me_theta;
+vector<float>* me_qoverp;
+vector<float>* ie_d0;
+vector<float>* ie_z0;
+vector<float>* ie_phi;
+vector<float>* ie_theta;
+vector<float>* ie_qoverp;
+float Mhat;
+float CosThetaCS;
+float CosThetaHE;
+float Ysystem;
+float Q_T;
+float CosThetaDimu;
+float ipTDiff;
+float EtaSum;
+////////////////////////////////
+
+
+
+///////////// admin /////////////
+void setisMC(Bool_t ismc)
+{
+	isMC = ismc;
+}
+
+void hsave(TObject* tobj, TString oDir, TString oName, TString drawopt="", Bool_t logx=!dolog, Bool_t logy=!dolog)
+{
+	TCanvas* cnv = new TCanvas("c"+oName,"c"+oName,600,400);
+	if(logx) cnv->SetLogx();
+	if(logy) cnv->SetLogy();
+	cnv->cd();
+	tobj->Draw(drawopt);
+	cnv->SaveAs(oDir+"/"+oName+".png");
+	cnv->SaveAs(oDir+"/"+oName+".eps");
+	cnv->SaveAs(oDir+"/"+oName+".pdf");
+	cnv->SaveAs(oDir+"/"+oName+".root");
+	cnv->SaveAs(oDir+"/"+oName+".C");
+	delete cnv;
+}
+////////////////////////////////
+
+
+
+void mcbranches()
+{
+	truth_all_mc_pt = 0;
+	truth_all_mc_m = 0;
+	truth_all_mc_eta = 0;
+	truth_all_mc_phi = 0;
+	truth_all_mc_status = 0;
+	truth_all_mc_barcode = 0;
+	truth_all_mc_pdgId = 0;
+	truth_all_mc_charge = 0;
+
+	recon_all_E = 0;
+	recon_all_pt = 0;
+	recon_all_m = 0;
+	recon_all_eta = 0;
+	recon_all_phi = 0;
+	recon_all_px = 0;
+	recon_all_py = 0;
+	recon_all_pz = 0;
+	recon_all_charge = 0;
+	recon_all_y = 0;
+	recon_all_id = 0;
+	recon_all_theta = 0;
+	
+	E = 0;
+	pt = 0;
+	m = 0;
+	eta = 0;
+	phi = 0;
+	px = 0;
+	py = 0;
+	pz = 0;
+	charge = 0;
+	allauthor = 0;
+	author = 0;
+	beta = 0;
+	me_d0 = 0;
+	me_z0 = 0;
+	me_phi = 0;
+	me_theta = 0;
+	me_qoverp = 0;
+	ie_d0 = 0;
+	ie_z0 = 0;
+	ie_phi = 0;
+	ie_theta = 0;
+	ie_qoverp = 0;
+
+	tree->SetBranchAddress("truth_all_isValid", &truth_all_isValid);
+	tree->SetBranchAddress("truth_all_mc_pt", &truth_all_mc_pt);
+	tree->SetBranchAddress("truth_all_mc_m", &truth_all_mc_m);
+	tree->SetBranchAddress("truth_all_mc_eta", &truth_all_mc_eta);
+	tree->SetBranchAddress("truth_all_mc_phi", &truth_all_mc_phi);
+	tree->SetBranchAddress("truth_all_mc_status", &truth_all_mc_status);
+	tree->SetBranchAddress("truth_all_mc_barcode", &truth_all_mc_barcode);
+	tree->SetBranchAddress("truth_all_mc_pdgId", &truth_all_mc_pdgId);
+	tree->SetBranchAddress("truth_all_mc_charge", &truth_all_mc_charge);
+	tree->SetBranchAddress("truth_all_Mhat", &truth_all_Mhat);
+	tree->SetBranchAddress("truth_all_CosThetaCS", &truth_all_CosThetaCS);
+	tree->SetBranchAddress("truth_all_CosThetaHE", &truth_all_CosThetaHE);
+	tree->SetBranchAddress("truth_all_ySystem", &truth_all_ySystem);
+	tree->SetBranchAddress("truth_all_QT", &truth_all_QT);
+
+	tree->SetBranchAddress("recon_all_isValid", &recon_all_isValid);
+	tree->SetBranchAddress("recon_all_E", &recon_all_E);
+	tree->SetBranchAddress("recon_all_pt", &recon_all_pt);
+	tree->SetBranchAddress("recon_all_m", &recon_all_eta);
+	tree->SetBranchAddress("recon_all_eta", &recon_all_eta);
+	tree->SetBranchAddress("recon_all_phi", &recon_all_phi);
+	tree->SetBranchAddress("recon_all_px", &recon_all_px);
+	tree->SetBranchAddress("recon_all_py", &recon_all_py);
+	tree->SetBranchAddress("recon_all_pz", &recon_all_pz);
+	tree->SetBranchAddress("recon_all_charge", &recon_all_charge);
+	tree->SetBranchAddress("recon_all_y", &recon_all_y);
+	tree->SetBranchAddress("recon_all_id", &recon_all_id);
+	tree->SetBranchAddress("recon_all_theta", &recon_all_theta);
+	tree->SetBranchAddress("recon_all_Mhat", &recon_all_Mhat);
+	tree->SetBranchAddress("recon_all_CosThetaCS", &recon_all_CosThetaCS);
+	tree->SetBranchAddress("recon_all_CosThetaHE", &recon_all_CosThetaHE);
+	tree->SetBranchAddress("recon_all_ySystem", &recon_all_ySystem);
+	tree->SetBranchAddress("recon_all_QT", &recon_all_QT);
+	
+	_DEBUG("successfully read mc branches");
+}
+
+void databranches()
+{
+	E = 0;
+	pt = 0;
+	m = 0;
+	eta = 0;
+	phi = 0;
+	px = 0;
+	py = 0;
+	pz = 0;
+	charge = 0;
+	allauthor = 0;
+	author = 0;
+	beta = 0;
+	me_d0 = 0;
+	me_z0 = 0;
+	me_phi = 0;
+	me_theta = 0;
+	me_qoverp = 0;
+	ie_d0 = 0;
+	ie_z0 = 0;
+	ie_phi = 0;
+	ie_theta = 0;
+	ie_qoverp = 0;
+	
+	tree->SetBranchAddress("E", &E);
+	tree->SetBranchAddress("pt", &pt);
+	tree->SetBranchAddress("m", &m);
+	tree->SetBranchAddress("eta", &eta);
+	tree->SetBranchAddress("phi", &phi);
+	tree->SetBranchAddress("px", &px);
+	tree->SetBranchAddress("py", &py);
+	tree->SetBranchAddress("pz", &pz);
+	tree->SetBranchAddress("charge", &charge);
+	tree->SetBranchAddress("allauthor", &allauthor);
+	tree->SetBranchAddress("author", &author);
+	tree->SetBranchAddress("beta", &beta);
+	tree->SetBranchAddress("me_d0", &me_d0);
+	tree->SetBranchAddress("me_z0", &me_z0);
+	tree->SetBranchAddress("me_phi", &me_phi);
+	tree->SetBranchAddress("me_theta", &me_theta);
+	tree->SetBranchAddress("me_qoverp", &me_qoverp);
+	tree->SetBranchAddress("ie_d0", &ie_d0);
+	tree->SetBranchAddress("ie_z0", &ie_z0);
+	tree->SetBranchAddress("ie_phi", &ie_phi);
+	tree->SetBranchAddress("ie_theta", &ie_theta);
+	tree->SetBranchAddress("ie_qoverp", &ie_qoverp);
+	tree->SetBranchAddress("Mhat", &Mhat);
+	tree->SetBranchAddress("CosThetaCS", &CosThetaCS);
+	tree->SetBranchAddress("CosThetaHE", &CosThetaHE);
+	tree->SetBranchAddress("Ysystem", &Ysystem);
+	tree->SetBranchAddress("Q_T", &Q_T);
+	tree->SetBranchAddress("CosThetaDimu", &CosThetaDimu);
+	tree->SetBranchAddress("ipTDiff", &ipTDiff);
+	tree->SetBranchAddress("EtaSum", &EtaSum);
+	
+	_DEBUG("successfully read data branches");
+}
+
+void hbook()
+{
+	//hMass = new TH1D("","",200,0.,2000.);
+	//hMass = new TH1D("","",200,50.,150.);
+	hMass = new TH1D("","",200,50.,2000.);
+	hMassCosThetaCS = new TH2D("","",200,50.,2000., 100,-1.,+1);
+	hMassyQ = new TH2D("","",200,50.,2000., 200,-2.5,+2.5);
+	hbetaabsyQabs = new TH2D("","",100,0.,+1., 250,0.,+2.5);
+	hyQCosThetaCS = new TH2D("","",200,-2.5,+2.5, 100,-1.,+1);
+	hbetaZ = new TH1D("","",100,-1.,+1);
+	hyQ = new TH1D("","",250,-5.,+5);
+	hyQabs = new TH1D("","",125,0.,+5);
+	hbetaZyQ = new TH2D("","",100,-1.,+1, 250,-5.,+5);
+	hbetaZyQtru = new TH2D("","",100,-1.,+1, 250,-5.,+5);
+}
+
+void hdraw()
+{
+	//hMass->Draw();
+	hsave(hMass, "plots", "hMass", "", dolog, dolog);
+	hsave(hMassyQ, "plots", "hMassyQ", "COLZ", dolog);
+	hsave(hbetaabsyQabs, "plots", "hbetaabsyQabs", "COLZ");
+	hsave(hMassCosThetaCS, "plots", "hMassCosThetaCS", "COLZ", dolog);
+	hsave(hyQCosThetaCS, "plots", "hyQCosThetaCS", "COLZ");
+	hsave(hbetaZ, "plots", "hbetaZ");
+	hsave(hyQ, "plots", "hyQ");
+	hsave(hyQabs, "plots", "hyQabs");
+	hsave(hbetaZyQ, "plots", "hbetaZyQ", "COLZ");
+	hsave(hbetaZyQtru, "plots", "hbetaZyQtru", "COLZ");
+}
+
+void hfill()
+{
+	if(isMC)
+	{
+		if(recon_all_isValid)
+		{
+			hMass->Fill(recon_all_Mhat);
+			hMassyQ->Fill(recon_all_Mhat,recon_all_ySystem);
+			hMassCosThetaCS->Fill(recon_all_Mhat,recon_all_CosThetaCS);
+			hyQCosThetaCS->Fill(recon_all_ySystem,recon_all_CosThetaCS);
+			float betax = kin.betaSystem(recon_all_px->at(0), recon_all_px->at(1), recon_all_E->at(0), recon_all_E->at(1));	
+			float betay = kin.betaSystem(recon_all_py->at(0), recon_all_py->at(1), recon_all_E->at(0), recon_all_E->at(1));	
+			float betaz = kin.betaSystem(recon_all_pz->at(0), recon_all_pz->at(1), recon_all_E->at(0), recon_all_E->at(1));
+			float betamag = sqrt(betax*betax+betay*betay+betaz*betaz);
+			hbetaZ->Fill(betaz);
+			hyQ->Fill(recon_all_ySystem);
+			hyQabs->Fill(fabs(recon_all_ySystem));
+			hbetaZyQ->Fill(betaz,recon_all_ySystem);
+			hbetaabsyQabs->Fill(betamag,fabs(recon_all_ySystem));
+		}
+		if(truth_all_isValid)
+		{
+			tlva->SetPtEtaPhiM(truth_all_mc_pt->at(0), truth_all_mc_eta->at(0), truth_all_mc_phi->at(0), truth_all_mc_m->at(0));
+			tlvb->SetPtEtaPhiM(truth_all_mc_pt->at(1), truth_all_mc_eta->at(1), truth_all_mc_phi->at(1), truth_all_mc_m->at(1));
+			float betaztru = kin.betaSystem(tlva->Pz(), tlvb->Pz(), tlva->E(), tlvb->E());
+			hbetaZyQtru->Fill(betaztru,truth_all_ySystem);
+		}
+	}
+	else
+	{
+		hMass->Fill(Mhat*TeV2GeV);
+		hMassyQ->Fill(Mhat*TeV2GeV,Ysystem);
+		hMassCosThetaCS->Fill(Mhat*TeV2GeV,CosThetaCS);
+		hyQCosThetaCS->Fill(Ysystem,CosThetaCS);
+		float betax = kin.betaSystem(px->at(0), px->at(1), E->at(0), E->at(1));	
+		float betay = kin.betaSystem(py->at(0), py->at(1), E->at(0), E->at(1));	
+		float betaz = kin.betaSystem(pz->at(0), pz->at(1), E->at(0), E->at(1));
+		float betamag = sqrt(betax*betax+betay*betay+betaz*betaz);
+		hbetaZ->Fill(betaz);
+		hyQ->Fill(Ysystem);
+		hyQabs->Fill(fabs(Ysystem));
+		hbetaZyQ->Fill(betaz,Ysystem);
+		hbetaabsyQabs->Fill(betamag,fabs(Ysystem));
+	}
+}
+
+void init()
+{
+	msglvl[DBG] = VISUAL;
+	msglvl[INF] = VISUAL;
+	msglvl[WRN] = VISUAL;
+	msglvl[ERR] = VISUAL;
+	msglvl[FAT] = VISUAL;
+
+	style();
+	
+	if(isMC)
+	{
+		fName = "/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_75M120.root";
+		tName = "truth/truth_tree";
+	}
+	else
+	{
+		fName = "../data/merged.root";
+		tName = "allCuts/allCuts_tree";
+	}
+	
+	file = new TFile(fName,"READ");
+	tree = (TTree*)file->Get(tName);
+	if(isMC) mcbranches();
+	else     databranches();
+	_DEBUG("successfully fetched tree");
+	
+	hbook();
+}
+
+void run()
+{
+	init();
+
+	Int_t N = tree->GetEntriesFast();
+	for(Int_t entry=0 ; entry<N ; entry++)
+	{
+		tree->GetEntry(entry);
+		////////////////////////////////////
+		//// blocks of analysis go here ////
+		////////////////////////////////////
+		hfill();
+		////////////////////////////////////
+	}
+	
+	hdraw();
+}

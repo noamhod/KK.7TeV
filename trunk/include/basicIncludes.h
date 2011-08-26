@@ -80,7 +80,7 @@
 #include <iomanip>
 
 using namespace std;
-using namespace RooFit;
+// using namespace RooFit;
 
 static string sRunNumber = "";
 
@@ -107,6 +107,8 @@ typedef multimap<float, float > TMultimapff;
 typedef vector<TCanvas*> TVecCanvas;
 
 #include "logs.h"
+
+#include "style.h"
 
 #define utilities_cxx
 #include "utilities.C"
@@ -160,11 +162,11 @@ template class std::vector<std::vector<unsigned int> >;
 #endif
 */
 
-#define fitParameters_cxx
-#include "fitParameters.C"
+// #define fitParameters_cxx
+// #include "fitParameters.C"
 
-#define fitFunctions_cxx
-#include "fitFunctions.C"
+// #define fitFunctions_cxx
+// #include "fitFunctions.C"
 
 enum pdtEnum { // *** note that this is not a complete list of pdt's particles ***
 	PDTDWN=1, PDTUP=2, PDTSTR=3, PDTCHM=4, PDTBOT=5, PDTTOP=6,

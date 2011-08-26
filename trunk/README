@@ -47,7 +47,7 @@ to run the analysis code locally (all data / MC):
 	change this configuration file:
 		localRunControl_noSkim.txt
 	start the run with:
-		root -b -l -q macro_run.C
+		root -b -l -q full_analysis_run.C
 
 to run the analysis code in qsub
 	cd ruby

@@ -3,7 +3,7 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-static const double luminosity = 1.60708;//5.; // 1/fb
+static const double luminosity = 2.28348; //1.60708;//5.; // 1/fb
 
 static const double minMassBin = 120;  // for the asymmetry fit
 static const double maxMassBin = 1500; // for the asymmetry fit

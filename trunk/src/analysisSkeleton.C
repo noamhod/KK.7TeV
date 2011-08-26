@@ -101,9 +101,12 @@ string analysisSkeleton::getPeriodName()
 {
 	_DEBUG("analysisSkeleton::getPeriodName");
 	string speriod = sCurrentPeriod;
+	_DEBUG("speriod = "+speriod);
 	if(RunNumber != currentRun)
 	{
+		_DEBUG("RunNumber="+tostring(RunNumber));
 		speriod = getPeriod( RunNumber, m_firstrun2periodMap, m_lastrun2periodMap );
+		_DEBUG("");
 		_INFO("switching to period: "+speriod+" (run "+tostring(RunNumber)+")");
 		currentRun     = RunNumber;
 		sCurrentPeriod = speriod;
@@ -193,7 +196,8 @@ void analysisSkeleton::matchTrigger(string speriod, string sTrigType)
 	(
 		speriod=="MC" ||
 		speriod=="A"  || speriod=="B" || speriod=="D" || speriod=="E" ||
-		speriod=="F"  || speriod=="G" || speriod=="H"
+		speriod=="F"  || speriod=="G" || speriod=="H" || speriod=="I" ||
+		speriod=="J"  || speriod=="K"
 	)
 	{
 		_DEBUG("sTrigType = "+sTrigType);

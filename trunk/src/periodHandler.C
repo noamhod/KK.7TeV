@@ -40,25 +40,29 @@ TMapss* periodHandler::getPeriod2triggerperiodMapPtr()
 
 string periodHandler::getPeriod(int runNumber, TMapis* firstrun2periodMap, TMapis* lastrun2periodMap)
 {	
+	_DEBUG("periodHandler::getPeriod");
 	int fst = 0;
 	int lst = 0;
-	
 	TMapis::iterator ifst = firstrun2periodMap->begin();
 	TMapis::iterator ilst = lastrun2periodMap->begin();
-		
+	
+	if(ifst==firstrun2periodMap->end() || ilst==lastrun2periodMap->end())
+	{
+		_ERROR("begin==end  i, exitting now...");
+		exit(-1);
+	}
+	
 	// find the run range
 	while(ifst!=firstrun2periodMap->end()  &&  ilst!=lastrun2periodMap->end())
 	{
 		int tmpfst = ifst->first;
 		int tmplst = ilst->first;
-				
 		if(runNumber>=tmpfst  &&  runNumber<=tmplst)
-		{
+		{	
 			fst = tmpfst;
 			lst = lst;
 			break;
 		}
-		
 		ifst++;
 		ilst++;
 	}
@@ -78,7 +82,7 @@ string periodHandler::getPeriod(int runNumber, TMapis* firstrun2periodMap, TMapi
 	
 	// get the period name
 	string sPeriod = ifst->second;
-		
+	
 	return sPeriod;
 }
 

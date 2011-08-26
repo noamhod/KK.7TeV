@@ -697,6 +697,12 @@ void drawAfb()
 	cnvAfb->cd();
 	pad_mHat->Draw();
 	pad_mHat->cd();
+	vhMassBins[Z0]->SetMaximum(1.5*vhMassBins[Z0]->GetMaximum());
+	vhMassBins[Z0]->SetMinimum((vhMassBins[Z0]->GetMinimum()<=0) ? 1. : 0.5*vhMassBins[Z0]->GetMinimum());
+	vhMassBins[Z0]->GetXaxis()->SetMoreLogLabels();
+	vhMassBins[Z0]->GetXaxis()->SetNoExponent();
+	vhMassBins[Z0]->Draw();
+	/*
 	vhMassBins[KK]->SetMaximum(1.5*vhMassBins[KK]->GetMaximum());
 	vhMassBins[KK]->SetMinimum((vhMassBins[Z0]->GetMinimum()<=0) ? 1. : 0.5*vhMassBins[Z0]->GetMinimum());
 	vhMassBins[KK]->GetXaxis()->SetMoreLogLabels();
@@ -712,10 +718,12 @@ void drawAfb()
 	//gMpoissonErr[Z0]->GetXaxis()->SetMoreLogLabels();
 	//gMpoissonErr[Z0]->GetXaxis()->SetNoExponent();
 	//gMpoissonErr[Z0]->Draw("SAMES");
-
+	*/
+	/*
 	vhMassBins[ZP]->GetXaxis()->SetMoreLogLabels();
 	vhMassBins[ZP]->GetXaxis()->SetNoExponent();
 	vhMassBins[ZP]->Draw("SAMES");
+	*/
 	//gMpoissonErr[ZP]->GetXaxis()->SetMoreLogLabels(); 
 	//gMpoissonErr[ZP]->GetXaxis()->SetNoExponent(); 
 	//gMpoissonErr[ZP]->Draw("SAMES");
@@ -731,11 +739,19 @@ void drawAfb()
 
 	pad_Afb->Draw();
 	pad_Afb->cd();
+	vhAfbBins[Z0]->GetYaxis()->SetRangeUser(-1.,+1.);
+	if(drawAfbErrArea) vhAfbBins[Z0]->Draw("E5 Y+");
+	else               vhAfbBins[Z0]->Draw("Y+ e1x1");
+	vhAfbBins[Z0]->GetXaxis()->SetMoreLogLabels(); 
+	vhAfbBins[Z0]->GetXaxis()->SetMoreLogLabels(); 
+	/*
 	vhAfbBins[KK]->GetYaxis()->SetRangeUser(-1.,+1.);
 	if(drawAfbErrArea) vhAfbBins[KK]->Draw("E5 Y+");
 	else               vhAfbBins[KK]->Draw("e1x1 Y+");
 	vhAfbBins[KK]->GetXaxis()->SetMoreLogLabels(); 
-	vhAfbBins[KK]->GetXaxis()->SetNoExponent(); 
+	vhAfbBins[KK]->GetXaxis()->SetNoExponent();
+	*/
+	/*
 	if(drawAfbErrArea) vhAfbBins[Z0]->Draw("E5 Y+ SAMES");
 	else               vhAfbBins[Z0]->Draw("Y+ e1x1 SAMES");
 	vhAfbBins[Z0]->GetXaxis()->SetMoreLogLabels(); 
@@ -744,6 +760,7 @@ void drawAfb()
 	else               vhAfbBins[ZP]->Draw("Y+ e1x1 SAMES");
 	vhAfbBins[ZP]->GetXaxis()->SetMoreLogLabels(); 
 	vhAfbBins[ZP]->GetXaxis()->SetMoreLogLabels(); 
+	*/
 	// if(drawAfbErrArea) vhAfbBins[DT]->Draw("E5 Y+ SAMES");
 	// else               vhAfbBins[DT]->Draw("Y+ e1x1 SAMES");
 	vhAfbBins[DT]->Draw("Y+ e1x1 SAMES");

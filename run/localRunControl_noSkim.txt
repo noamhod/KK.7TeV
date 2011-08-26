@@ -1,6 +1,6 @@
 local_noskim
 muid	q_pT	MuonMomentumCorrections-00-03-02
-data
+mc
 DBG SILENT
 INF VISUAL
 WRN VISUAL

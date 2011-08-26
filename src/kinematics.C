@@ -71,6 +71,10 @@ inline float kinematics::ySystem( TLorentzVector* pa, TLorentzVector* pb )
 	return m_pTmp.Rapidity();
 }
 
+inline float kinematics::betaSystem( float pa, float pb, float ea, float eb )
+{
+	return ((ea+eb)>0.) ? (pa+pb)/(ea+eb) : -999.;
+}
 
 inline float kinematics::cosThetaBoost( TLorentzVector* pa, float ca,
 								 TLorentzVector* pb, float cb )

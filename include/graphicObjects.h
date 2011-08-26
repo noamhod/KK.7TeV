@@ -669,7 +669,6 @@ class graphicObjects// : public utilities
 		vector<int>*   truth_all_mc_barcode;
 		vector<int>*   truth_all_mc_pdgId;
 		vector<float>* truth_all_mc_charge;
-		
 		float truth_all_Mhat;
 		float truth_all_CosThetaCS;
 		float truth_all_CosThetaHE;

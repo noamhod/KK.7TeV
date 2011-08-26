@@ -7,6 +7,12 @@
 
 #include "basicIncludes.h"
 
+#define fitParameters_cxx
+#include "fitParameters.C"
+
+#define fitFunctions_cxx
+#include "fitFunctions.C"
+
 #define fitROOT_cxx
 #include "fitROOT.C"
 

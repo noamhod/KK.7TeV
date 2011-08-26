@@ -2293,8 +2293,11 @@ void analysisSkeleton::fillTruth()
 		if(mc_status->at(t)!=1) {tmp_counter_1++; continue;} // has to be final particle
 		if(mc_pdgId->at(t)!=PDTMU  &&  mc_pdgId->at(t)!=-1*PDTMU) {tmp_counter_2++; continue;} // has to be a muon
 		
-		bool isZ     = false; 
-		bool isGamma = false;
+		bool isZ      = false; 
+		bool isGamma  = false;
+		bool isW      = false;
+		bool isTop    = false;
+		bool isZprime = false;
 		for(int mom=0 ; mom<(int)mc_parent_index->at(t).size() ; mom++) // has to come out of Z^0 (since the cuts on the reconstructed muons are Z^0-oriented) ?????
 		{
 			int imom = mc_parent_index->at(t)[mom];
@@ -2308,8 +2311,23 @@ void analysisSkeleton::fillTruth()
 				isGamma = true;
 				break;
 			}
+			if(mc_pdgId->at(imom)==PDTWPLUS)
+			{
+				isW = true;
+				break;
+			}
+			if(mc_pdgId->at(imom)==PDTTOP)
+			{
+				isTop = true;
+				break;
+			}
+			if(mc_pdgId->at(imom)==PDTZPRIME0)
+			{
+				isZprime = true;
+				break;
+			}
 		}
-		if(!isZ && !isGamma) {tmp_counter_3++; continue;}
+		if(!isZ && !isGamma && !isW && !isTop && !isZprime) {tmp_counter_3++; continue;}
 		
 		truth_all_mc_m->push_back( mc_m->at(t)*MeV2GeV );
 		truth_all_mc_pt->push_back( mc_pt->at(t)*MeV2GeV );
@@ -2378,6 +2396,7 @@ void analysisSkeleton::fillTruth()
 void analysisSkeleton::fillRecon()
 {
 	_DEBUG("analysisSkeleton::fillRecon");
+	
 	recon_all_E->push_back(mu_E->at(ai)*MeV2GeV);
 	recon_all_E->push_back(mu_E->at(bi)*MeV2GeV);
 	recon_all_pt->push_back(mu_pt->at(ai)*MeV2GeV);

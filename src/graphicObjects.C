@@ -1243,9 +1243,9 @@ TDirectory* tDir_efficiency)
 }
 
 void graphicObjects::setTrees(TDirectory* tDir_allCuts,
-TDirectory* tDir_cutsProfile,
-TDirectory* tDir_efficiency,
-TDirectory* tDir_truth)
+							  TDirectory* tDir_cutsProfile,
+							  TDirectory* tDir_efficiency,
+							  TDirectory* tDir_truth)
 {
 	setTrees(tDir_allCuts, tDir_cutsProfile, tDir_efficiency);
 	

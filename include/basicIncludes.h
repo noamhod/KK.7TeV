@@ -96,6 +96,8 @@ typedef map<string, TH2*>       TMapSP2TH2;
 typedef map<TString, TH1*>      TMapTSP2TH1;
 typedef map<TString, TH2*>      TMapTSP2TH2;
 typedef map<TString, TLine*>    TMapTSP2TLINE;
+typedef map<TString, TTree*>    TMapTSP2TTREE;
+typedef map<TString, double>    TMapTSd;
 typedef map<string, TH1D*>      TMapSP2TH1D;
 typedef map<string, TH2D*>      TMapSP2TH2D;
 typedef map<string, TCanvas*>   TMapSP2TCNV;

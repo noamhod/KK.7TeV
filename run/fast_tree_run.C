@@ -9,6 +9,8 @@ TMapTSP2TOBJ  oMap;
 TMapTSP2TH1   h1Map;
 TMapTSP2TH2   h2Map;
 TMapTSP2TLINE linMap;
+TMapTSP2TTREE treMap;
+TMapTSd       wgtMap;
 
 Bool_t isMC=true;
 Bool_t dolog=true;
@@ -133,9 +135,31 @@ void save(TString oDir)
 		it->second->SaveAs(pName+".C");
 	}
 }
-
 ////////////////////////////////
 
+
+void settree(TString fPath, TString name, Double_t N, Double_t sigma)
+{
+	file = new TFile(fPath,"READ");
+	treMap.insert( make_pair(name, (TTree*)file->Get("truth/truth_tree")->Clone("")) );
+	wgtMap.insert( make_pair(name, luminosity/(N/sigma)) );
+}
+
+///////////////////////////
+void settrees()
+{
+	settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 19999, 0.0086861*nb2fb);
+	settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_250M400.root", "mcLocalControl_DYmumu_250M400", 19996, 0.00041431*nb2fb);
+	settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_400M600.root", "mcLocalControl_DYmumu_400M600", 19993, 0.000067464*nb2fb);
+	settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_600M800.root", "mcLocalControl_DYmumu_600M800", 15994, 0.000011168*nb2fb);
+	settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_800M1000.root", "mcLocalControl_DYmumu_800M1000", 19992, 0.0000027277*nb2fb);
+	settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_1000M1250.root", "mcLocalControl_DYmumu_1000M1250", 19995, 0.00000091646*nb2fb);
+	settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_1250M1500.root", "mcLocalControl_DYmumu_1250M1500", 19993, 0.00000024942*nb2fb);
+	settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_1500M1750.root", "mcLocalControl_DYmumu_1500M1750", 19997, 0.000000076876*nb2fb);
+	settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_1750M2000.root", "mcLocalControl_DYmumu_1750M2000", 19993, 0.000000026003*nb2fb);
+	settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_M2000.root", "mcLocalControl_DYmumu_M2000", 19996, 0.000000015327*nb2fb);
+}
+///////////////////////////
 
 
 void mcbranches()
@@ -303,11 +327,11 @@ void hbook()
 {	
 	h1Map.insert( make_pair("hMass", new TH1D("hMass",";m_{#mu#mu} GeV;Events",200,70.,2000.)) );
 	h1Map.insert( make_pair("hbetaZ", new TH1D("hbetaZ",";#beta_{Q}^{z};Events",200,-1.,1.)) );
-	h1Map.insert( make_pair("hcosalpha", new TH1D("hcosalpha",";#vec{#beta}_{Q}#bullet#vec{p}_{q};Events",25,-1.,1.)) );
+	h1Map.insert( make_pair("hcosalpha", new TH1D("hcosalpha",";#vec{#beta}_{Q}#bullet#vec{p}_{q};Events",50,-1.,1.)) );
 	h1Map.insert( make_pair("hyQ", new TH1D("hyQ",";y_{Q};Events",250,-2.5,+2.5)) );
 	h1Map.insert( make_pair("hyQabs", new TH1D("hyQabs",";|y_{Q}|;Events",125,0.,+2.5)) );
-	h1Map.insert( make_pair("hprobyQ_denominator", new TH1D("hprobyQ_denominator",";y_{Q};P(y_{Q})",25,-2.5,+2.5)) );
-	h1Map.insert( make_pair("hprobyQ_ratio", new TH1D("hprobyQ_ratio",";y_{Q};P(y_{Q})",25,-2.5,+2.5)) );
+	h1Map.insert( make_pair("hprobyQ_denominator", new TH1D("hprobyQ_denominator",";y_{Q};P(y_{Q})",50,-2.5,+2.5)) );
+	h1Map.insert( make_pair("hprobyQ_ratio", new TH1D("hprobyQ_ratio",";y_{Q};P(y_{Q})=#frac{N(#vec{#beta}_{Q}#bullet#vec{p}_{q}<0)}{N(all)}|_{y_{Q}}",50,-2.5,+2.5)) );
 
 	h2Map.insert( make_pair("hbetaZyQ", new TH2D("hbetaZyQ",";#beta_{Q}^{z};y_{Q};Events",200,-1.,+1, 250,-5.,+5)) );
 	h2Map.insert( make_pair("hMassCosThetaCS", new TH2D("hMassCosThetaCS",";m_{#mu#mu} GeV;cos(#theta*);Events",200,70.,2000., 200,-1.,+1)) );
@@ -344,7 +368,7 @@ void hdraw()
 	draw(h2Map["hbetaZyQtru"], "hbetaZyQtru", "COLZ");
 }
 
-void hfill()
+void hfill(Double_t wgt=1.)
 {
 	if(isMC)
 	{
@@ -360,27 +384,27 @@ void hfill()
 			tv3b->SetXYZ(betax, betay, betaz);
 			float cosalpha = tv3a->Dot(*tv3b)/(tv3a->Mag()*tv3b->Mag());
 			//_INFO("cosalpha = "+tostring(cosalpha));
-			if(cosalpha<=0./*0.707106781*/) h1Map["hprobyQ_ratio"]->Fill(recon_all_ySystem); // little than 
-			h1Map["hprobyQ_denominator"]->Fill(recon_all_ySystem);
+			if(cosalpha<=0./*0.707106781*/) h1Map["hprobyQ_ratio"]->Fill(recon_all_ySystem,wgt); // little than 
+			h1Map["hprobyQ_denominator"]->Fill(recon_all_ySystem,wgt);
 			
-			h1Map["hMass"]->Fill(recon_all_Mhat);
-			h1Map["hbetaZ"]->Fill(betaz);
-			h1Map["hcosalpha"]->Fill(cosalpha);
-			h1Map["hyQ"]->Fill(recon_all_ySystem);
-			h1Map["hyQabs"]->Fill(fabs(recon_all_ySystem));
+			h1Map["hMass"]->Fill(recon_all_Mhat,wgt);
+			h1Map["hbetaZ"]->Fill(betaz,wgt);
+			h1Map["hcosalpha"]->Fill(cosalpha,wgt);
+			h1Map["hyQ"]->Fill(recon_all_ySystem,wgt);
+			h1Map["hyQabs"]->Fill(fabs(recon_all_ySystem),wgt);
 			
-			h2Map["hMassyQ"]->Fill(recon_all_Mhat,recon_all_ySystem);
-			h2Map["hMassCosThetaCS"]->Fill(recon_all_Mhat,recon_all_CosThetaCS);
-			h2Map["hyQCosThetaCS"]->Fill(recon_all_ySystem,recon_all_CosThetaCS);
-			h2Map["hbetaZyQ"]->Fill(betaz,recon_all_ySystem);
-			h2Map["hbetaabsyQabs"]->Fill(betamag,fabs(recon_all_ySystem));
+			h2Map["hMassyQ"]->Fill(recon_all_Mhat,recon_all_ySystem,wgt);
+			h2Map["hMassCosThetaCS"]->Fill(recon_all_Mhat,recon_all_CosThetaCS,wgt);
+			h2Map["hyQCosThetaCS"]->Fill(recon_all_ySystem,recon_all_CosThetaCS,wgt);
+			h2Map["hbetaZyQ"]->Fill(betaz,recon_all_ySystem,wgt);
+			h2Map["hbetaabsyQabs"]->Fill(betamag,fabs(recon_all_ySystem),wgt);
 		}
 		if(truth_all_isValid)
 		{
 			tlva->SetPtEtaPhiM(truth_all_mc_pt->at(0), truth_all_mc_eta->at(0), truth_all_mc_phi->at(0), truth_all_mc_m->at(0));
 			tlvb->SetPtEtaPhiM(truth_all_mc_pt->at(1), truth_all_mc_eta->at(1), truth_all_mc_phi->at(1), truth_all_mc_m->at(1));
 			float betaztru = kin.betaSystem(tlva->Pz(), tlvb->Pz(), tlva->E(), tlvb->E());
-			h2Map["hbetaZyQtru"]->Fill(betaztru,truth_all_ySystem);
+			h2Map["hbetaZyQtru"]->Fill(betaztru,truth_all_ySystem,wgt);
 		}
 	}
 	else
@@ -403,7 +427,38 @@ void hfill()
 	}
 }
 
-void init()
+void init(TTree* t=NULL)
+{
+	if(t==NULL)
+	{
+		if(isMC)
+		{
+			// fName = "/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_75M120.root";
+			fName = "/data/hod/pythia8_ntuples/ATLASZP/mcLocalControl_Zprime_mumu_SSM1500.root";
+			tName = "truth/truth_tree";
+		}
+		else
+		{
+			fName = "../data/merged.root";
+			tName = "allCuts/allCuts_tree";
+		}
+		
+		file = new TFile(fName,"READ");
+		tree = (TTree*)file->Get(tName);
+		if(isMC) mcbranches();
+		else     databranches();
+		_DEBUG("successfully fetched tree");
+	}
+	else
+	{
+		tree = t;
+		if(isMC) mcbranches();
+		else     databranches();
+		_DEBUG("successfully fetched tree");
+	}
+}
+
+void run()
 {
 	msglvl[DBG] = VISUAL;
 	msglvl[INF] = VISUAL;
@@ -412,32 +467,10 @@ void init()
 	msglvl[FAT] = VISUAL;
 
 	style();
-	
-	if(isMC)
-	{
-		// fName = "/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_75M120.root";
-		fName = "/data/hod/pythia8_ntuples/ATLASZP/mcLocalControl_Zprime_mumu_SSM1500.root";
-		tName = "truth/truth_tree";
-	}
-	else
-	{
-		fName = "../data/merged.root";
-		tName = "allCuts/allCuts_tree";
-	}
-	
-	file = new TFile(fName,"READ");
-	tree = (TTree*)file->Get(tName);
-	if(isMC) mcbranches();
-	else     databranches();
-	_DEBUG("successfully fetched tree");
-	
 	hbook();
-}
 
-void run()
-{
+	/*
 	init();
-
 	Int_t N = tree->GetEntriesFast();
 	for(Int_t entry=0 ; entry<N ; entry++)
 	{
@@ -445,8 +478,25 @@ void run()
 		////////////////////////////////////
 		//// blocks of analysis go here ////
 		////////////////////////////////////
-		hfill();
+		hfill(); ///////////////////////////
 		////////////////////////////////////
+	}
+	*/
+	
+	settrees();
+	for(TMapTSP2TTREE::iterator it=treMap.begin() ; it!=treMap.end() ; ++it)
+	{
+		init(it->second);
+		Int_t N = tree->GetEntriesFast();
+		for(Int_t entry=0 ; entry<N ; entry++)
+		{
+			tree->GetEntry(entry);
+			////////////////////////////////////
+			//// blocks of analysis go here ////
+			////////////////////////////////////
+			hfill(wgtMap[it->first]); //////////
+			////////////////////////////////////
+		}
 	}
 	
 	hdraw();

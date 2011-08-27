@@ -105,7 +105,7 @@ RooAbsData*  rad[4];
 //////////////////////////////////
 // flags to config the run
 bool drawAfbErrArea  = true;
-bool doLumiXSweights = true; //!!! // true if want to scale binned samples to 1 smooth sample and to scale MC to data luminosity. This affects mostly the errors
+bool doLumiXSweights = false; //!!! // true if want to scale binned samples to 1 smooth sample and to scale MC to data luminosity. This affects mostly the errors
 bool doBinned        = false;
 bool doGeneration    = false;
 bool doBinomialError = false;

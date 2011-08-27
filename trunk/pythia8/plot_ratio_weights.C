@@ -349,6 +349,17 @@ int plot_ratio_weights()
 	logMbinwidth_afb  = (Double_t)( (logMmax_afb-logMmin_afb)/(Double_t)imass_afb_nbins );
 	imass_afb_bins[0] = imass_afb_min;
 	for(Int_t i=1 ; i<=imass_afb_nbins ; i++) imass_afb_bins[i] = TMath::Power( 10,(logMmin_afb + i*logMbinwidth_afb) );
+	
+	///////////////////////////////
+	// imass_afb_bins[0] = imass_afb_min;
+	// imass_afb_bins[1] = 200.;
+	// imass_afb_bins[2] = 300.;
+	// imass_afb_bins[3] = 430.;
+	// imass_afb_bins[4] = 600.;
+	// imass_afb_bins[5] = 1000.;
+	// imass_afb_bins[6] = imass_afb_max;
+	///////////////////////////////
+	
 	tAfbMassBins = new TTree("AfbMassBins", "AfbMassBins");
 	Double_t AfbMassBin;
 	tAfbMassBins->Branch( "AfbMassBin", &AfbMassBin );

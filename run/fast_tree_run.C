@@ -325,23 +325,25 @@ void databranches()
 
 void hbook()
 {	
-	h1Map.insert( make_pair("hMass", new TH1D("hMass",";m_{#mu#mu} GeV;Events",200,70.,2000.)) );
+	h1Map.insert( make_pair("hMass", new TH1D("hMass",";m_{#mu#mu} GeV;Events",250,70.,2500.)) );
 	h1Map.insert( make_pair("hbetaZ", new TH1D("hbetaZ",";#beta_{Q}^{z};Events",200,-1.,1.)) );
-	h1Map.insert( make_pair("hcosalpha", new TH1D("hcosalpha",";#vec{#beta}_{Q}#bullet#vec{p}_{q};Events",50,-1.,1.)) );
+	h1Map.insert( make_pair("hcosalpha", new TH1D("hcosalpha",";#vec{#beta}_{Q}#bullet#vec{p}_{q}/#beta_{Q}p_{q};Events",50,-1.,1.)) );
 	h1Map.insert( make_pair("hyQ", new TH1D("hyQ",";y_{Q};Events",250,-2.5,+2.5)) );
 	h1Map.insert( make_pair("hyQabs", new TH1D("hyQabs",";|y_{Q}|;Events",125,0.,+2.5)) );
-	h1Map.insert( make_pair("hprobyQ_denominator", new TH1D("hprobyQ_denominator",";y_{Q};P(y_{Q})",50,-2.5,+2.5)) );
-	h1Map.insert( make_pair("hprobyQ_ratio", new TH1D("hprobyQ_ratio",";y_{Q};P(y_{Q})=#frac{N(#vec{#beta}_{Q}#bullet#vec{p}_{q}<0)}{N(all)}|_{y_{Q}}",50,-2.5,+2.5)) );
+	h1Map.insert( make_pair("hprobyQ_denominator", new TH1D("hprobyQ_denominator",";y_{Q};P(y_{Q})",30,-2.5,+2.5)) );
+	h1Map.insert( make_pair("hprobyQ_ratio", new TH1D("hprobyQ_ratio",";y_{Q};P(y_{Q})=N(#vec{#beta}_{Q}#bullet#vec{p}_{q}<0)/N(all)",30,-2.5,+2.5)) );
 
 	h2Map.insert( make_pair("hbetaZyQ", new TH2D("hbetaZyQ",";#beta_{Q}^{z};y_{Q};Events",200,-1.,+1, 250,-5.,+5)) );
-	h2Map.insert( make_pair("hMassCosThetaCS", new TH2D("hMassCosThetaCS",";m_{#mu#mu} GeV;cos(#theta*);Events",200,70.,2000., 200,-1.,+1)) );
-	linMap.insert( make_pair("hMassCosThetaCS_horline", new TLine(70.,0.,2000.,0.)) );
+	h2Map.insert( make_pair("hMassCosThetaCS", new TH2D("hMassCosThetaCS",";m_{#mu#mu} GeV;cos(#theta*);Events",250,70.,2500., 200,-1.,+1)) );
+	linMap.insert( make_pair("hMassCosThetaCS_horline", new TLine(70.,0.,2500.,0.)) );
 	linMap.insert( make_pair("hMassCosThetaCS_lonline", new TLine(646.33,-1.,646.33,+1.)) );
-	h2Map.insert( make_pair("hMassyQ", new TH2D("hMassyQ",";m_{#mu#mu} GeV;y_{Q};Events",200,70.,2000., 200,-2.5,+2.5)) );
-	linMap.insert( make_pair("hMassyQ_horline", new TLine(70.,0.,2000.,0.)) );
+	h2Map.insert( make_pair("hMassyQ", new TH2D("hMassyQ",";m_{#mu#mu} GeV;y_{Q};Events",250,70.,2500., 200,-2.5,+2.5)) );
+	linMap.insert( make_pair("hMassyQ_horline", new TLine(70.,0.,2500.,0.)) );
 	linMap.insert( make_pair("hMassyQ_lonline", new TLine(646.33,-2.5,646.33,+2.5)) );
-	h2Map.insert( make_pair("hbetaabsyQabs", new TH2D("hbetaabsyQabs",";#beta_{Q};y_{Q};Events",100,0.,+1., 250,0.,+2.5)) );
+	h2Map.insert( make_pair("hbetaabsyQabs", new TH2D("hbetaabsyQabs",";|#beta_{Q}|;|y_{Q}|;Events",100,0.,+1., 250,0.,+2.5)) );
 	h2Map.insert( make_pair("hyQCosThetaCS", new TH2D("hyQCosThetaCS",";y_{Q};cos(#theta*);Events",200,-2.5,+2.5, 100,-1.,+1)) );
+	h2Map.insert( make_pair("hyQCosThetaCS_tru", new TH2D("hyQCosThetaCS_tru",";y_{Q};cos(#theta*);Events",100,-2.5,+2.5, 50,-1.,+1)) );
+	h2Map.insert( make_pair("hyQCosThetaCS_acc", new TH2D("hyQCosThetaCS_acc",";y_{Q};cos(#theta*);Events",100,-2.5,+2.5, 50,-1.,+1)) );
 	h2Map.insert( make_pair("hbetaZyQtru", new TH2D("hbetaZyQtru","truth;#beta_{Q}^{z};y_{Q};Events",200,-1.,+1, 250,-5.,+5)) );
 }
 
@@ -349,12 +351,18 @@ void hdraw()
 {	
 	draw(h1Map["hMass"], "hMass", "", dolog, dolog);
 	draw(h1Map["hbetaZ"], "hbetaZ");
-	draw(h1Map["hcosalpha"], "hcosalpha");
+	draw(h1Map["hcosalpha"], "hcosalpha", "", !dolog, dolog);
 	draw(h1Map["hyQ"], "hyQ");
 	draw(h1Map["hyQabs"], "hyQabs");
 	
 	h1Map["hprobyQ_ratio"]->Divide(h1Map["hprobyQ_denominator"]);
+	h1Map["hprobyQ_ratio"]->SetMinimum(0.);
+	h1Map["hprobyQ_ratio"]->SetMaximum(1.);
 	draw(h1Map["hprobyQ_ratio"], "hprobyQ_ratio");
+	h2Map["hyQCosThetaCS_acc"]->Divide(h2Map["hyQCosThetaCS_tru"]);
+	h2Map["hyQCosThetaCS_acc"]->SetMinimum(0.);
+	h2Map["hyQCosThetaCS_acc"]->SetMaximum(1.);
+	draw(h2Map["hyQCosThetaCS_acc"], "hyQCosThetaCS_acc", "COLZ");
 	
 	draw(h2Map["hMassyQ"], "hMassyQ", "COLZ", dolog);
 	drawon("hMassyQ", linMap["hMassyQ_horline"]);
@@ -396,6 +404,7 @@ void hfill(Double_t wgt=1.)
 			h2Map["hMassyQ"]->Fill(recon_all_Mhat,recon_all_ySystem,wgt);
 			h2Map["hMassCosThetaCS"]->Fill(recon_all_Mhat,recon_all_CosThetaCS,wgt);
 			h2Map["hyQCosThetaCS"]->Fill(recon_all_ySystem,recon_all_CosThetaCS,wgt);
+			h2Map["hyQCosThetaCS_acc"]->Fill(recon_all_ySystem,recon_all_CosThetaCS,wgt);
 			h2Map["hbetaZyQ"]->Fill(betaz,recon_all_ySystem,wgt);
 			h2Map["hbetaabsyQabs"]->Fill(betamag,fabs(recon_all_ySystem),wgt);
 		}
@@ -405,6 +414,7 @@ void hfill(Double_t wgt=1.)
 			tlvb->SetPtEtaPhiM(truth_all_mc_pt->at(1), truth_all_mc_eta->at(1), truth_all_mc_phi->at(1), truth_all_mc_m->at(1));
 			float betaztru = kin.betaSystem(tlva->Pz(), tlvb->Pz(), tlva->E(), tlvb->E());
 			h2Map["hbetaZyQtru"]->Fill(betaztru,truth_all_ySystem,wgt);
+			h2Map["hyQCosThetaCS_tru"]->Fill(truth_all_ySystem,truth_all_CosThetaCS,wgt);
 		}
 	}
 	else

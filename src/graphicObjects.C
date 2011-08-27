@@ -442,6 +442,15 @@ void graphicObjects::clearTreeVars()
 	truth_all_ySystem    = 0.;
 	truth_all_QT         = 0.;
 	
+	truth_all_partons_mc_pt->clear();
+	truth_all_partons_mc_m->clear();
+	truth_all_partons_mc_eta->clear();
+	truth_all_partons_mc_phi->clear();
+	truth_all_partons_mc_status->clear();
+	truth_all_partons_mc_barcode->clear();
+	truth_all_partons_mc_pdgId->clear();
+	truth_all_partons_mc_charge->clear();
+	
 	recon_all_E->clear();
 	recon_all_pt->clear();
 	recon_all_m->clear();
@@ -1309,6 +1318,16 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	truth_all_mc_pdgId = new vector<int>;
 	truth_all_mc_charge = new vector<float>;
 	
+	// partons
+	truth_all_partons_mc_pt = new vector<float>;
+	truth_all_partons_mc_m = new vector<float>;
+	truth_all_partons_mc_eta = new vector<float>;
+	truth_all_partons_mc_phi = new vector<float>;
+	truth_all_partons_mc_status = new vector<int>;
+	truth_all_partons_mc_barcode = new vector<int>;
+	truth_all_partons_mc_pdgId = new vector<int>;
+	truth_all_partons_mc_charge = new vector<float>;
+	
 	if(tDir_truth!=NULL) tDir_truth->cd();
 	tree_truth = new TTree("truth_tree","truth_tree");
 	tree_truth->SetDirectory(tDir_truth);
@@ -1324,7 +1343,6 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_truth->Branch( "truth_all_mothertype",  &truth_all_mothertype );
 	tree_truth->Branch( "truth_all_motherbarcode",  &truth_all_motherbarcode );
 	tree_truth->Branch( "truth_all_matched", &truth_all_matched );
-	
 	
 	// muonTruth
 	tree_truth->Branch( "truth_all_muonTruth_pt", &truth_all_muonTruth_pt );
@@ -1365,6 +1383,16 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_truth->Branch( "truth_all_CosThetaHE", &truth_all_CosThetaHE );
 	tree_truth->Branch( "truth_all_ySystem", &truth_all_ySystem );
 	tree_truth->Branch( "truth_all_QT", &truth_all_QT );
+	
+	// partons
+	tree_truth->Branch( "truth_all_partons_mc_pt", &truth_all_partons_mc_pt);
+	tree_truth->Branch( "truth_all_partons_mc_m", &truth_all_partons_mc_m);
+	tree_truth->Branch( "truth_all_partons_mc_eta", &truth_all_partons_mc_eta);
+	tree_truth->Branch( "truth_all_partons_mc_phi", &truth_all_partons_mc_phi);
+	tree_truth->Branch( "truth_all_partons_mc_status", &truth_all_partons_mc_status);
+	tree_truth->Branch( "truth_all_partons_mc_barcode", &truth_all_partons_mc_barcode);
+	tree_truth->Branch( "truth_all_partons_mc_pdgId", &truth_all_partons_mc_pdgId);
+	tree_truth->Branch( "truth_all_partons_mc_charge", &truth_all_partons_mc_charge);
 	
 	tree_truth->Branch( "recon_all_isValid",  &recon_all_isValid );
 	tree_truth->Branch( "recon_all_E", &recon_all_E );

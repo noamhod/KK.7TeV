@@ -2275,6 +2275,15 @@ void analysisSkeleton::fillTruth()
 	vector<int>*   truth_all_mc_barcode;
 	vector<int>*   truth_all_mc_pdgId;
 	vector<float>* truth_all_mc_charge;
+	// partons
+	vector<float>* truth_all_partons_mc_pt;
+	vector<float>* truth_all_partons_mc_m;
+	vector<float>* truth_all_partons_mc_eta;
+	vector<float>* truth_all_partons_mc_phi;
+	vector<int>*   truth_all_partons_mc_status;
+	vector<int>*   truth_all_partons_mc_barcode;
+	vector<int>*   truth_all_partons_mc_pdgId;
+	vector<float>* truth_all_partons_mc_charge;
 	*/
 	
 	
@@ -2288,8 +2297,14 @@ void analysisSkeleton::fillTruth()
 	//////////////////////////////////////
 	pTtoIndexMapTruth.clear(); ///////////
 	//////////////////////////////////////
+	
+	vector<int> intermediate_index;
+	
 	for(int t=0 ; t<(int)mc_pt->size() ; t++)
 	{
+		// string sid = (mc_parent_index->at(t).size()>0) ? tostring(mc_pdgId->at(mc_parent_index->at(t)[0])) : "??";
+		// if(t<10) _INFO("mc_pdgId->at("+tostring(t)+")="+tostring(mc_pdgId->at(t))+" -> mc_pdgId->at(mc_parent_index->at(t)[0])="+ sid);
+	
 		if(mc_status->at(t)!=1) {tmp_counter_1++; continue;} // has to be final particle
 		if(mc_pdgId->at(t)!=PDTMU  &&  mc_pdgId->at(t)!=-1*PDTMU) {tmp_counter_2++; continue;} // has to be a muon
 		
@@ -2304,26 +2319,31 @@ void analysisSkeleton::fillTruth()
 			if(mc_pdgId->at(imom)==PDTZ)
 			{
 				isZ = true;
+				intermediate_index.push_back(imom);
 				break;
 			}
 			if(mc_pdgId->at(imom)==PDTGAMMA)
 			{
 				isGamma = true;
+				intermediate_index.push_back(imom);
 				break;
 			}
-			if(mc_pdgId->at(imom)==PDTWPLUS)
+			if(mc_pdgId->at(imom)==PDTWPLUS) // check if this can wppear in the Z / Z' events ?????????????????????????????????????
 			{
 				isW = true;
+				intermediate_index.push_back(imom);
 				break;
 			}
 			if(mc_pdgId->at(imom)==PDTTOP)
 			{
 				isTop = true;
+				intermediate_index.push_back(imom);
 				break;
 			}
 			if(mc_pdgId->at(imom)==PDTZPRIME0)
 			{
 				isZprime = true;
+				intermediate_index.push_back(imom);
 				break;
 			}
 		}
@@ -2346,18 +2366,113 @@ void analysisSkeleton::fillTruth()
 		truth_valid_index++;
 	}
 	
-	
 	// SORT BY PT AND FIND THE INDICES OF THE FIRST 2 MUONS (HIGHEST PT).
 	ai_truth = -1;
 	bi_truth = -1;
-	if(truth_valid_index>=2  &&  pTtoIndexMapTruth.size()>=2) pTSort(pTtoIndexMapTruth, ai_truth, bi_truth);
+	// if(truth_valid_index>=2  &&  pTtoIndexMapTruth.size()>=2) pTSort(pTtoIndexMapTruth, ai_truth, bi_truth);
+	if(truth_valid_index==2  &&  pTtoIndexMapTruth.size()==2) pTSort(pTtoIndexMapTruth, ai_truth, bi_truth);
 	else
 	{
 		truth_valid_index = 0;
 		truth_all_isValid = false;
 		tmp_counter_4++;
+		_WARNING("truth_valid_index!=2 -> "+tostring(truth_valid_index)+"  ||  pTtoIndexMapTruth.size()!=2 -> "+tostring((int)pTtoIndexMapTruth.size())+", skipping event");
 		return;
 	}
+	if(intermediate_index.size()!=2)
+	{
+		_WARNING("intermediate_index.size()!=2  ->  "+tostring((int)intermediate_index.size())+", skipping event");
+		return;
+	}
+	if(intermediate_index[0]!=intermediate_index[1])
+	{
+		_WARNING("intermediate_index[0] -> "+tostring(intermediate_index[0])+"  !=  intermediate_index[1] -> "+tostring(intermediate_index[1])+", skipping event");
+		return;
+	}
+	if(mc_pdgId->at(intermediate_index[0])!=mc_pdgId->at(4)) // the "Z" is always number 4 in the event
+	{
+		_WARNING("mc_pdgId->at(intermediate_index[0]) -> "+tostring(mc_pdgId->at(intermediate_index[0]))+"  !=  mc_pdgId->at(4) -> "+tostring(mc_pdgId->at(4))+", skipping event");
+		return;
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////
+	// write the partons - only if there's one common intermediate mother particle
+	// int current_intermediate_id = mc_pdgId->at(intermediate_index[0]);
+	// int current_intermediate_index = intermediate_index[0];
+	// while(current_intermediate_id==mc_pdgId->at(intermediate_index[0]))
+	// {
+		// int imom  = (mc_parent_index->at(current_intermediate_index).size()>0) ? mc_parent_index->at(current_intermediate_index)[0] : -1;
+		// int idmom = (imom>=0) ? mc_pdgId->at(imom) : -1;
+		// if(idmom>=0)
+		// {
+			// current_intermediate_id = idmom;
+			// current_intermediate_index = imom;
+		// }
+	// }
+	// _INFO("found quark: "+tostring(current_intermediate_id)+" in index: "+tostring(current_intermediate_index));
+	
+	// vector<int> quarks_index;
+	// for(int mom=0 ; mom<(int)mc_parent_index->at(intermediate_index[0]).size() ; mom++) // find the quarks
+	// {
+		// int imom = mc_parent_index->at(intermediate_index[0])[mom];
+		// _INFO("mc_pdgId->at("+tostring(imom)+") = "+tostring(mc_pdgId->at(imom)));
+		// if(mc_pdgId->at(imom)>=0  &&  mc_pdgId->at(imom)<=PDTTOP) quarks_index.push_back(imom);
+	// }
+	// if(quarks_index.size()!=2)
+	// {
+		// _WARNING("quarks_index.size()!=2  ->  "+tostring((int)quarks_index.size())+", skipping event");
+		// return;
+	// }
+	// else
+	// {
+		// truth_all_partons_mc_m->push_back( mc_m->at(quarks_index[0])*MeV2GeV );
+		// truth_all_partons_mc_pt->push_back( mc_pt->at(quarks_index[0])*MeV2GeV );
+		// truth_all_partons_mc_eta->push_back( mc_eta->at(quarks_index[0]) );
+		// truth_all_partons_mc_phi->push_back( mc_phi->at(quarks_index[0]) );
+		// truth_all_partons_mc_pdgId->push_back( mc_pdgId->at(quarks_index[0]) );
+		// truth_all_partons_mc_status->push_back( mc_status->at(quarks_index[0]) );
+		// truth_all_partons_mc_barcode->push_back( mc_barcode->at(quarks_index[0]) );
+		// truth_all_partons_mc_charge->push_back( mc_charge->at(quarks_index[0]) );
+
+		// truth_all_partons_mc_m->push_back( mc_m->at(quarks_index[1])*MeV2GeV );
+		// truth_all_partons_mc_pt->push_back( mc_pt->at(quarks_index[1])*MeV2GeV );
+		// truth_all_partons_mc_eta->push_back( mc_eta->at(quarks_index[1]) );
+		// truth_all_partons_mc_phi->push_back( mc_phi->at(quarks_index[1]) );
+		// truth_all_partons_mc_pdgId->push_back( mc_pdgId->at(quarks_index[1]) );
+		// truth_all_partons_mc_status->push_back( mc_status->at(quarks_index[1]) );
+		// truth_all_partons_mc_barcode->push_back( mc_barcode->at(quarks_index[1]) );
+		// truth_all_partons_mc_charge->push_back( mc_charge->at(quarks_index[1]) );
+	// }
+	
+	// the incoming quarks are always at the 2 and 3 places in the event
+	if(mc_pdgId->at(2) > PDTTOP || mc_pdgId->at(3) > PDTTOP) // both have to be quarks
+	{
+		_WARNING("mc_pdgId->at(2)>PDTTOP -> "+tostring(mc_pdgId->at(2))+" ||  mc_pdgId->at(3)>PDTTOP -> "+tostring(mc_pdgId->at(3))+", skipping event");
+		return;
+	}
+	if(mc_pdgId->at(2)!=(-1*mc_pdgId->at(3))) // to have opposite charge
+	{
+		_WARNING("mc_pdgId->at(2)!=(-1*mc_pdgId->at(3))");
+		return;
+	}
+	truth_all_partons_mc_m->push_back( mc_m->at(2)*MeV2GeV );
+	truth_all_partons_mc_pt->push_back( mc_pt->at(2)*MeV2GeV );
+	truth_all_partons_mc_eta->push_back( mc_eta->at(2) );
+	truth_all_partons_mc_phi->push_back( mc_phi->at(2) );
+	truth_all_partons_mc_pdgId->push_back( mc_pdgId->at(2) );
+	truth_all_partons_mc_status->push_back( mc_status->at(2) );
+	truth_all_partons_mc_barcode->push_back( mc_barcode->at(2) );
+	truth_all_partons_mc_charge->push_back( mc_charge->at(2) );
+
+	truth_all_partons_mc_m->push_back( mc_m->at(3)*MeV2GeV );
+	truth_all_partons_mc_pt->push_back( mc_pt->at(3)*MeV2GeV );
+	truth_all_partons_mc_eta->push_back( mc_eta->at(3) );
+	truth_all_partons_mc_phi->push_back( mc_phi->at(3) );
+	truth_all_partons_mc_pdgId->push_back( mc_pdgId->at(3) );
+	truth_all_partons_mc_status->push_back( mc_status->at(3) );
+	truth_all_partons_mc_barcode->push_back( mc_barcode->at(3) );
+	truth_all_partons_mc_charge->push_back( mc_charge->at(3) );
+	/////////////////////////////////////////////////////////////////////////////////
 	
 	// CALCULATE ALL THE 'EVENT-LEVEL' VARIABLES (DI-MUON VARIABLES)
 	if( truth_valid_index>=2  &&  ai_truth>=0  &&  bi_truth>=0  &&  ai_truth!=bi_truth )

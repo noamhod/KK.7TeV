@@ -4,23 +4,20 @@ TFile* file;
 TTree* tree;
 TString fName;
 TString tName;
+TMapTSP2TCNV  cnvMap;
+TMapTSP2TOBJ  oMap;
+TMapTSP2TH1   h1Map;
+TMapTSP2TH2   h2Map;
+TMapTSP2TLINE linMap;
 
 Bool_t isMC=true;
 Bool_t dolog=true;
 kinematics kin;
 TLorentzVector* tlva = new TLorentzVector;
 TLorentzVector* tlvb = new TLorentzVector;
+TVector3*       tv3a = new TVector3;
+TVector3*       tv3b = new TVector3;
 
-TH1D* hMass;
-TH2D* hMassCosThetaCS;
-TH2D* hMassyQ;
-TH2D* hbetaabsyQabs;
-TH2D* hyQCosThetaCS;
-TH1D* hbetaZ;
-TH1D* hyQ;
-TH1D* hyQabs;
-TH2D* hbetaZyQ;
-TH2D* hbetaZyQtru;
 
 /////////////  MC  /////////////
 bool truth_all_isValid;
@@ -37,6 +34,16 @@ float truth_all_CosThetaCS;
 float truth_all_CosThetaHE;
 float truth_all_ySystem;
 float truth_all_QT;
+
+vector<float>* truth_all_partons_mc_pt;
+vector<float>* truth_all_partons_mc_m;
+vector<float>* truth_all_partons_mc_eta;
+vector<float>* truth_all_partons_mc_phi;
+vector<int>*   truth_all_partons_mc_status;
+vector<int>*   truth_all_partons_mc_barcode;
+vector<int>*   truth_all_partons_mc_pdgId;
+vector<float>* truth_all_partons_mc_charge;
+
 bool recon_all_isValid;
 vector<float>* recon_all_E;
 vector<float>* recon_all_pt;
@@ -98,20 +105,35 @@ void setisMC(Bool_t ismc)
 	isMC = ismc;
 }
 
-void hsave(TObject* tobj, TString oDir, TString oName, TString drawopt="", Bool_t logx=!dolog, Bool_t logy=!dolog)
+void draw(TObject* tobj, TString oName, TString drawopt="", Bool_t logx=!dolog, Bool_t logy=!dolog)
 {
-	TCanvas* cnv = new TCanvas("c"+oName,"c"+oName,600,400);
-	if(logx) cnv->SetLogx();
-	if(logy) cnv->SetLogy();
-	cnv->cd();
+	TString cName = "c"+oName;
+	cnvMap.insert( make_pair(oName, new TCanvas(cName,cName,600,400)) );
+	if(logx) cnvMap[oName]->SetLogx();
+	if(logy) cnvMap[oName]->SetLogy();
+	cnvMap[oName]->cd();
 	tobj->Draw(drawopt);
-	cnv->SaveAs(oDir+"/"+oName+".png");
-	cnv->SaveAs(oDir+"/"+oName+".eps");
-	cnv->SaveAs(oDir+"/"+oName+".pdf");
-	cnv->SaveAs(oDir+"/"+oName+".root");
-	cnv->SaveAs(oDir+"/"+oName+".C");
-	delete cnv;
 }
+
+void drawon(TString existing_oName, TObject* tobj, TString drawopt="")
+{
+	cnvMap[existing_oName]->cd();
+	tobj->Draw(drawopt+" SAMES");
+}
+
+void save(TString oDir)
+{
+	for(TMapTSP2TCNV::iterator it=cnvMap.begin() ; it!=cnvMap.end() ; ++it)
+	{
+		TString pName = oDir+"/"+it->first;
+		it->second->SaveAs(pName+".png");
+		it->second->SaveAs(pName+".eps");
+		it->second->SaveAs(pName+".pdf");
+		it->second->SaveAs(pName+".root");
+		it->second->SaveAs(pName+".C");
+	}
+}
+
 ////////////////////////////////
 
 
@@ -126,6 +148,15 @@ void mcbranches()
 	truth_all_mc_barcode = 0;
 	truth_all_mc_pdgId = 0;
 	truth_all_mc_charge = 0;
+	
+	truth_all_partons_mc_pt = 0;
+	truth_all_partons_mc_m = 0;
+	truth_all_partons_mc_eta = 0;
+	truth_all_partons_mc_phi = 0;
+	truth_all_partons_mc_status = 0;
+	truth_all_partons_mc_barcode = 0;
+	truth_all_partons_mc_pdgId = 0;
+	truth_all_partons_mc_charge = 0;
 
 	recon_all_E = 0;
 	recon_all_pt = 0;
@@ -177,6 +208,15 @@ void mcbranches()
 	tree->SetBranchAddress("truth_all_CosThetaHE", &truth_all_CosThetaHE);
 	tree->SetBranchAddress("truth_all_ySystem", &truth_all_ySystem);
 	tree->SetBranchAddress("truth_all_QT", &truth_all_QT);
+	
+	tree->SetBranchAddress("truth_all_partons_mc_pt", &truth_all_partons_mc_pt);
+	tree->SetBranchAddress("truth_all_partons_mc_m", &truth_all_partons_mc_m);
+	tree->SetBranchAddress("truth_all_partons_mc_eta", &truth_all_partons_mc_eta);
+	tree->SetBranchAddress("truth_all_partons_mc_phi", &truth_all_partons_mc_phi);
+	tree->SetBranchAddress("truth_all_partons_mc_status", &truth_all_partons_mc_status);
+	tree->SetBranchAddress("truth_all_partons_mc_barcode", &truth_all_partons_mc_barcode);
+	tree->SetBranchAddress("truth_all_partons_mc_pdgId", &truth_all_partons_mc_pdgId);
+	tree->SetBranchAddress("truth_all_partons_mc_charge", &truth_all_partons_mc_charge);
 
 	tree->SetBranchAddress("recon_all_isValid", &recon_all_isValid);
 	tree->SetBranchAddress("recon_all_E", &recon_all_E);
@@ -260,34 +300,48 @@ void databranches()
 }
 
 void hbook()
-{
-	//hMass = new TH1D("","",200,0.,2000.);
-	//hMass = new TH1D("","",200,50.,150.);
-	hMass = new TH1D("","",200,50.,2000.);
-	hMassCosThetaCS = new TH2D("","",200,50.,2000., 100,-1.,+1);
-	hMassyQ = new TH2D("","",200,50.,2000., 200,-2.5,+2.5);
-	hbetaabsyQabs = new TH2D("","",100,0.,+1., 250,0.,+2.5);
-	hyQCosThetaCS = new TH2D("","",200,-2.5,+2.5, 100,-1.,+1);
-	hbetaZ = new TH1D("","",100,-1.,+1);
-	hyQ = new TH1D("","",250,-5.,+5);
-	hyQabs = new TH1D("","",125,0.,+5);
-	hbetaZyQ = new TH2D("","",100,-1.,+1, 250,-5.,+5);
-	hbetaZyQtru = new TH2D("","",100,-1.,+1, 250,-5.,+5);
+{	
+	h1Map.insert( make_pair("hMass", new TH1D("hMass",";m_{#mu#mu} GeV;Events",200,70.,2000.)) );
+	h1Map.insert( make_pair("hbetaZ", new TH1D("hbetaZ",";#beta_{Q}^{z};Events",200,-1.,1.)) );
+	h1Map.insert( make_pair("hcosalpha", new TH1D("hcosalpha",";#vec{#beta}_{Q}#bullet#vec{p}_{q};Events",25,-1.,1.)) );
+	h1Map.insert( make_pair("hyQ", new TH1D("hyQ",";y_{Q};Events",250,-2.5,+2.5)) );
+	h1Map.insert( make_pair("hyQabs", new TH1D("hyQabs",";|y_{Q}|;Events",125,0.,+2.5)) );
+	h1Map.insert( make_pair("hprobyQ_denominator", new TH1D("hprobyQ_denominator",";y_{Q};P(y_{Q})",25,-2.5,+2.5)) );
+	h1Map.insert( make_pair("hprobyQ_ratio", new TH1D("hprobyQ_ratio",";y_{Q};P(y_{Q})",25,-2.5,+2.5)) );
+
+	h2Map.insert( make_pair("hbetaZyQ", new TH2D("hbetaZyQ",";#beta_{Q}^{z};y_{Q};Events",200,-1.,+1, 250,-5.,+5)) );
+	h2Map.insert( make_pair("hMassCosThetaCS", new TH2D("hMassCosThetaCS",";m_{#mu#mu} GeV;cos(#theta*);Events",200,70.,2000., 200,-1.,+1)) );
+	linMap.insert( make_pair("hMassCosThetaCS_horline", new TLine(70.,0.,2000.,0.)) );
+	linMap.insert( make_pair("hMassCosThetaCS_lonline", new TLine(646.33,-1.,646.33,+1.)) );
+	h2Map.insert( make_pair("hMassyQ", new TH2D("hMassyQ",";m_{#mu#mu} GeV;y_{Q};Events",200,70.,2000., 200,-2.5,+2.5)) );
+	linMap.insert( make_pair("hMassyQ_horline", new TLine(70.,0.,2000.,0.)) );
+	linMap.insert( make_pair("hMassyQ_lonline", new TLine(646.33,-2.5,646.33,+2.5)) );
+	h2Map.insert( make_pair("hbetaabsyQabs", new TH2D("hbetaabsyQabs",";#beta_{Q};y_{Q};Events",100,0.,+1., 250,0.,+2.5)) );
+	h2Map.insert( make_pair("hyQCosThetaCS", new TH2D("hyQCosThetaCS",";y_{Q};cos(#theta*);Events",200,-2.5,+2.5, 100,-1.,+1)) );
+	h2Map.insert( make_pair("hbetaZyQtru", new TH2D("hbetaZyQtru","truth;#beta_{Q}^{z};y_{Q};Events",200,-1.,+1, 250,-5.,+5)) );
 }
 
 void hdraw()
-{
-	//hMass->Draw();
-	hsave(hMass, "plots", "hMass", "", dolog, dolog);
-	hsave(hMassyQ, "plots", "hMassyQ", "COLZ", dolog);
-	hsave(hbetaabsyQabs, "plots", "hbetaabsyQabs", "COLZ");
-	hsave(hMassCosThetaCS, "plots", "hMassCosThetaCS", "COLZ", dolog);
-	hsave(hyQCosThetaCS, "plots", "hyQCosThetaCS", "COLZ");
-	hsave(hbetaZ, "plots", "hbetaZ");
-	hsave(hyQ, "plots", "hyQ");
-	hsave(hyQabs, "plots", "hyQabs");
-	hsave(hbetaZyQ, "plots", "hbetaZyQ", "COLZ");
-	hsave(hbetaZyQtru, "plots", "hbetaZyQtru", "COLZ");
+{	
+	draw(h1Map["hMass"], "hMass", "", dolog, dolog);
+	draw(h1Map["hbetaZ"], "hbetaZ");
+	draw(h1Map["hcosalpha"], "hcosalpha");
+	draw(h1Map["hyQ"], "hyQ");
+	draw(h1Map["hyQabs"], "hyQabs");
+	
+	h1Map["hprobyQ_ratio"]->Divide(h1Map["hprobyQ_denominator"]);
+	draw(h1Map["hprobyQ_ratio"], "hprobyQ_ratio");
+	
+	draw(h2Map["hMassyQ"], "hMassyQ", "COLZ", dolog);
+	drawon("hMassyQ", linMap["hMassyQ_horline"]);
+	drawon("hMassyQ", linMap["hMassyQ_lonline"]);
+	draw(h2Map["hbetaabsyQabs"], "hbetaabsyQabs", "COLZ");
+	draw(h2Map["hMassCosThetaCS"], "hMassCosThetaCS", "COLZ", dolog);
+	drawon("hMassCosThetaCS", linMap["hMassCosThetaCS_horline"]);
+	drawon("hMassCosThetaCS", linMap["hMassCosThetaCS_lonline"]);
+	draw(h2Map["hyQCosThetaCS"], "hyQCosThetaCS", "COLZ");
+	draw(h2Map["hbetaZyQ"], "hbetaZyQ", "COLZ");
+	draw(h2Map["hbetaZyQtru"], "hbetaZyQtru", "COLZ");
 }
 
 void hfill()
@@ -296,43 +350,56 @@ void hfill()
 	{
 		if(recon_all_isValid)
 		{
-			hMass->Fill(recon_all_Mhat);
-			hMassyQ->Fill(recon_all_Mhat,recon_all_ySystem);
-			hMassCosThetaCS->Fill(recon_all_Mhat,recon_all_CosThetaCS);
-			hyQCosThetaCS->Fill(recon_all_ySystem,recon_all_CosThetaCS);
 			float betax = kin.betaSystem(recon_all_px->at(0), recon_all_px->at(1), recon_all_E->at(0), recon_all_E->at(1));	
 			float betay = kin.betaSystem(recon_all_py->at(0), recon_all_py->at(1), recon_all_E->at(0), recon_all_E->at(1));	
 			float betaz = kin.betaSystem(recon_all_pz->at(0), recon_all_pz->at(1), recon_all_E->at(0), recon_all_E->at(1));
 			float betamag = sqrt(betax*betax+betay*betay+betaz*betaz);
-			hbetaZ->Fill(betaz);
-			hyQ->Fill(recon_all_ySystem);
-			hyQabs->Fill(fabs(recon_all_ySystem));
-			hbetaZyQ->Fill(betaz,recon_all_ySystem);
-			hbetaabsyQabs->Fill(betamag,fabs(recon_all_ySystem));
+			
+			int iquark = (truth_all_partons_mc_pdgId->at(0)>0) ? 0 : 1;
+			tv3a->SetPtEtaPhi(truth_all_partons_mc_pt->at(iquark), truth_all_partons_mc_eta->at(iquark), truth_all_partons_mc_phi->at(iquark));
+			tv3b->SetXYZ(betax, betay, betaz);
+			float cosalpha = tv3a->Dot(*tv3b)/(tv3a->Mag()*tv3b->Mag());
+			//_INFO("cosalpha = "+tostring(cosalpha));
+			if(cosalpha<=0./*0.707106781*/) h1Map["hprobyQ_ratio"]->Fill(recon_all_ySystem); // little than 
+			h1Map["hprobyQ_denominator"]->Fill(recon_all_ySystem);
+			
+			h1Map["hMass"]->Fill(recon_all_Mhat);
+			h1Map["hbetaZ"]->Fill(betaz);
+			h1Map["hcosalpha"]->Fill(cosalpha);
+			h1Map["hyQ"]->Fill(recon_all_ySystem);
+			h1Map["hyQabs"]->Fill(fabs(recon_all_ySystem));
+			
+			h2Map["hMassyQ"]->Fill(recon_all_Mhat,recon_all_ySystem);
+			h2Map["hMassCosThetaCS"]->Fill(recon_all_Mhat,recon_all_CosThetaCS);
+			h2Map["hyQCosThetaCS"]->Fill(recon_all_ySystem,recon_all_CosThetaCS);
+			h2Map["hbetaZyQ"]->Fill(betaz,recon_all_ySystem);
+			h2Map["hbetaabsyQabs"]->Fill(betamag,fabs(recon_all_ySystem));
 		}
 		if(truth_all_isValid)
 		{
 			tlva->SetPtEtaPhiM(truth_all_mc_pt->at(0), truth_all_mc_eta->at(0), truth_all_mc_phi->at(0), truth_all_mc_m->at(0));
 			tlvb->SetPtEtaPhiM(truth_all_mc_pt->at(1), truth_all_mc_eta->at(1), truth_all_mc_phi->at(1), truth_all_mc_m->at(1));
 			float betaztru = kin.betaSystem(tlva->Pz(), tlvb->Pz(), tlva->E(), tlvb->E());
-			hbetaZyQtru->Fill(betaztru,truth_all_ySystem);
+			h2Map["hbetaZyQtru"]->Fill(betaztru,truth_all_ySystem);
 		}
 	}
 	else
 	{
-		hMass->Fill(Mhat*TeV2GeV);
-		hMassyQ->Fill(Mhat*TeV2GeV,Ysystem);
-		hMassCosThetaCS->Fill(Mhat*TeV2GeV,CosThetaCS);
-		hyQCosThetaCS->Fill(Ysystem,CosThetaCS);
 		float betax = kin.betaSystem(px->at(0), px->at(1), E->at(0), E->at(1));	
 		float betay = kin.betaSystem(py->at(0), py->at(1), E->at(0), E->at(1));	
 		float betaz = kin.betaSystem(pz->at(0), pz->at(1), E->at(0), E->at(1));
 		float betamag = sqrt(betax*betax+betay*betay+betaz*betaz);
-		hbetaZ->Fill(betaz);
-		hyQ->Fill(Ysystem);
-		hyQabs->Fill(fabs(Ysystem));
-		hbetaZyQ->Fill(betaz,Ysystem);
-		hbetaabsyQabs->Fill(betamag,fabs(Ysystem));
+		
+		h1Map["hMass"]->Fill(Mhat*TeV2GeV);
+		h1Map["hbetaZ"]->Fill(betaz);
+		h1Map["hyQ"]->Fill(Ysystem);
+		h1Map["hyQabs"]->Fill(fabs(Ysystem));
+		
+		h2Map["hMassyQ"]->Fill(Mhat*TeV2GeV,Ysystem);
+		h2Map["hMassCosThetaCS"]->Fill(Mhat*TeV2GeV,CosThetaCS);
+		h2Map["hyQCosThetaCS"]->Fill(Ysystem,CosThetaCS);
+		h2Map["hbetaZyQ"]->Fill(betaz,Ysystem);
+		h2Map["hbetaabsyQabs"]->Fill(betamag,fabs(Ysystem));
 	}
 }
 
@@ -348,7 +415,8 @@ void init()
 	
 	if(isMC)
 	{
-		fName = "/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_75M120.root";
+		// fName = "/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_75M120.root";
+		fName = "/data/hod/pythia8_ntuples/ATLASZP/mcLocalControl_Zprime_mumu_SSM1500.root";
 		tName = "truth/truth_tree";
 	}
 	else
@@ -382,4 +450,5 @@ void run()
 	}
 	
 	hdraw();
+	save("plots");
 }

@@ -675,6 +675,15 @@ class graphicObjects// : public utilities
 		float truth_all_ySystem;
 		float truth_all_QT;
 		
+		vector<float>* truth_all_partons_mc_pt;
+		vector<float>* truth_all_partons_mc_m;
+		vector<float>* truth_all_partons_mc_eta;
+		vector<float>* truth_all_partons_mc_phi;
+		vector<int>*   truth_all_partons_mc_status;
+		vector<int>*   truth_all_partons_mc_barcode;
+		vector<int>*   truth_all_partons_mc_pdgId;
+		vector<float>* truth_all_partons_mc_charge;
+		
 		bool recon_all_isValid;
 		vector<float>* recon_all_E;
 		vector<float>* recon_all_pt;

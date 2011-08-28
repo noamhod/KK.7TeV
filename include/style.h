@@ -1,8 +1,7 @@
-#include "basics.h"
+#include <TStyle.h>
 
 #ifndef STYLE_H
 #define STYLE_H
-
 
 void style()
 {
@@ -17,9 +16,9 @@ void style()
 	gStyle->SetFrameFillColor(0);
 	gStyle->SetTitleFillColor(0);
 	gStyle->SetPaperSize(20,26);
-	gStyle->SetPadTopMargin(0.05);
+	gStyle->SetPadTopMargin(0.13);
 	gStyle->SetPadRightMargin(0.15);
-	gStyle->SetPadBottomMargin(0.16);
+	gStyle->SetPadBottomMargin(0.14);
 	gStyle->SetPadLeftMargin(0.12);
 	Int_t font=42;
 	Double_t tsize=0.04;
@@ -48,6 +47,12 @@ void style()
 	gStyle->SetStatH(0);
 	gStyle->SetTitleX(0.12);
 	gStyle->SetTitleY(1);
+	
+	gStyle->SetTitleX(0.25); //title X location 
+	gStyle->SetTitleY(0.94); //title Y location 
+	gStyle->SetTitleW(0.5); //title width 
+	gStyle->SetTitleH(0.05); //title height
+	//gStyle->SetTitleBorderSize(1);
 }
 
 #endif

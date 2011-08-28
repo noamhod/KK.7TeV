@@ -63,7 +63,8 @@ AFTER A SUCCESSFUL qsub RUN, to run over a specific data-run locally (with run n
 
 to compile and run some graphics:
 	cd run/
-	edit this fil: fast_tree_run.C
+	edit this files: fast_tree_run.C
+			 fast_tree_compile.C (!!! note the "isMC" flag !!!)
 	root -b -q -l fast_tree_compile.C
 	output is in run/plots/
 

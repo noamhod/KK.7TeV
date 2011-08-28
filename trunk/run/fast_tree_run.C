@@ -134,6 +134,15 @@ void save(TString oDir)
 		it->second->SaveAs(pName+".root");
 		it->second->SaveAs(pName+".C");
 	}
+	
+	TString pName = (isMC) ? oDir+"/mchistograms.root" : oDir+"/datahistograms.root";
+	TFile* f = new TFile(pName,"RECREATE");
+	f->cd();
+	for(TMapTSP2TH1::iterator it=h1Map.begin() ; it!=h1Map.end() ; ++it) it->second->Write();
+	for(TMapTSP2TH2::iterator it=h2Map.begin() ; it!=h2Map.end() ; ++it) it->second->Write();
+	f->Write();
+	f->Close();
+	delete f;
 }
 ////////////////////////////////
 
@@ -148,16 +157,27 @@ void settree(TString fPath, TString name, Double_t N, Double_t sigma)
 ///////////////////////////
 void settrees()
 {
-	settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 19999, 0.0086861*nb2fb);
-	settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_250M400.root", "mcLocalControl_DYmumu_250M400", 19996, 0.00041431*nb2fb);
-	settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_400M600.root", "mcLocalControl_DYmumu_400M600", 19993, 0.000067464*nb2fb);
-	settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_600M800.root", "mcLocalControl_DYmumu_600M800", 15994, 0.000011168*nb2fb);
-	settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_800M1000.root", "mcLocalControl_DYmumu_800M1000", 19992, 0.0000027277*nb2fb);
-	settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_1000M1250.root", "mcLocalControl_DYmumu_1000M1250", 19995, 0.00000091646*nb2fb);
-	settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_1250M1500.root", "mcLocalControl_DYmumu_1250M1500", 19993, 0.00000024942*nb2fb);
-	settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_1500M1750.root", "mcLocalControl_DYmumu_1500M1750", 19997, 0.000000076876*nb2fb);
-	settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_1750M2000.root", "mcLocalControl_DYmumu_1750M2000", 19993, 0.000000026003*nb2fb);
-	settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_M2000.root", "mcLocalControl_DYmumu_M2000", 19996, 0.000000015327*nb2fb);
+	// settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 19999, 0.0086861*nb2fb);
+	// settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_250M400.root", "mcLocalControl_DYmumu_250M400", 19996, 0.00041431*nb2fb);
+	// settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_400M600.root", "mcLocalControl_DYmumu_400M600", 19993, 0.000067464*nb2fb);
+	// settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_600M800.root", "mcLocalControl_DYmumu_600M800", 15994, 0.000011168*nb2fb);
+	// settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_800M1000.root", "mcLocalControl_DYmumu_800M1000", 19992, 0.0000027277*nb2fb);
+	// settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_1000M1250.root", "mcLocalControl_DYmumu_1000M1250", 19995, 0.00000091646*nb2fb);
+	// settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_1250M1500.root", "mcLocalControl_DYmumu_1250M1500", 19993, 0.00000024942*nb2fb);
+	// settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_1500M1750.root", "mcLocalControl_DYmumu_1500M1750", 19997, 0.000000076876*nb2fb);
+	// settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_1750M2000.root", "mcLocalControl_DYmumu_1750M2000", 19993, 0.000000026003*nb2fb);
+	// settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_M2000.root", "mcLocalControl_DYmumu_M2000", 19996, 0.000000015327*nb2fb);
+	
+	settree("/tmp/hod/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 19999, 0.0086861*nb2fb);
+	settree("/tmp/hod/mcLocalControl_DYmumu_250M400.root", "mcLocalControl_DYmumu_250M400", 19996, 0.00041431*nb2fb);
+	settree("/tmp/hod/mcLocalControl_DYmumu_400M600.root", "mcLocalControl_DYmumu_400M600", 19993, 0.000067464*nb2fb);
+	settree("/tmp/hod/mcLocalControl_DYmumu_600M800.root", "mcLocalControl_DYmumu_600M800", 15994, 0.000011168*nb2fb);
+	settree("/tmp/hod/mcLocalControl_DYmumu_800M1000.root", "mcLocalControl_DYmumu_800M1000", 19992, 0.0000027277*nb2fb);
+	settree("/tmp/hod/mcLocalControl_DYmumu_1000M1250.root", "mcLocalControl_DYmumu_1000M1250", 19995, 0.00000091646*nb2fb);
+	settree("/tmp/hod/mcLocalControl_DYmumu_1250M1500.root", "mcLocalControl_DYmumu_1250M1500", 19993, 0.00000024942*nb2fb);
+	settree("/tmp/hod/mcLocalControl_DYmumu_1500M1750.root", "mcLocalControl_DYmumu_1500M1750", 19997, 0.000000076876*nb2fb);
+	settree("/tmp/hod/mcLocalControl_DYmumu_1750M2000.root", "mcLocalControl_DYmumu_1750M2000", 19993, 0.000000026003*nb2fb);
+	settree("/tmp/hod/mcLocalControl_DYmumu_M2000.root", "mcLocalControl_DYmumu_M2000", 19996, 0.000000015327*nb2fb);
 }
 ///////////////////////////
 
@@ -327,38 +347,59 @@ void hbook()
 {	
 	h1Map.insert( make_pair("hMass", new TH1D("hMass",";m_{#mu#mu} GeV;Events",250,70.,2500.)) );
 	h1Map.insert( make_pair("hbetaZ", new TH1D("hbetaZ",";#beta_{Q}^{z};Events",200,-1.,1.)) );
-	h1Map.insert( make_pair("hcosalpha", new TH1D("hcosalpha",";#vec{#beta}_{Q}#bullet#vec{p}_{q}/#beta_{Q}p_{q};Events",50,-1.,1.)) );
+	h1Map.insert( make_pair("hcosalpha_rec", new TH1D("hcosalpha_rec","#vec{#beta}_{Q}^{rec}#bullet#vec{p}_{q};#vec{#beta}_{Q}^{rec}#bullet#vec{p}_{q}/#beta_{Q}^{rec}p_{q};Events",50,-1.,1.)) );
+	h1Map.insert( make_pair("hcosalpha_tru", new TH1D("hcosalpha_tru","#vec{#beta}_{Q}^{tru}#bullet#vec{p}_{q};#vec{#beta}_{Q}^{tru}#bullet#vec{p}_{q}/#beta_{Q}^{tru}p_{q};Events",50,-1.,1.)) );
+	h1Map.insert( make_pair("hcosalpha_quarks", new TH1D("hcosalpha_quarks","#vec{#beta}_{Q}^{tru}#bullet#vec{#beta}_{Q}^{q#bar{q}};#vec{#beta}_{Q}^{tru}#bullet#vec{#beta}_{Q}^{q#bar{q}}/#beta_{Q}^{tru}#beta_{Q}^{q#bar{q}};Events",50,-1.,1.)) );
 	h1Map.insert( make_pair("hyQ", new TH1D("hyQ",";y_{Q};Events",100,-2.5,+2.5)) );
 	h1Map.insert( make_pair("hyQabs", new TH1D("hyQabs",";|y_{Q}|;Events",50,0.,+2.5)) );
-	h1Map.insert( make_pair("hprobyQ_denominator", new TH1D("hprobyQ_denominator",";y_{Q};P(y_{Q})",30,-2.5,+2.5)) );
-	h1Map.insert( make_pair("hprobyQ_ratio", new TH1D("hprobyQ_ratio",";y_{Q};P(y_{Q})=N(#vec{#beta}_{Q}#bullet#vec{p}_{q}<0)/N(all)",30,-2.5,+2.5)) );
-
-	h2Map.insert( make_pair("hbetaZyQ", new TH2D("hbetaZyQ",";#beta_{Q}^{z};y_{Q};Events",50,-1.,+1, 50,-2.5,+2.5)) );
+	h1Map.insert( make_pair("hprobyQ_rec_denominator", new TH1D("hprobyQ_rec_denominator",";y_{Q};P(y_{Q})",30,-2.5,+2.5)) );
+	h1Map.insert( make_pair("hprobyQ_rec_ratio", new TH1D("hprobyQ_rec_ratio","P(y_{Q})=#LT#vec{#beta}_{Q}^{rec}#bullet#vec{p}_{q}<0#GT/All;y_{Q};P",30,-2.5,+2.5)) );
+	h1Map.insert( make_pair("hprobyQ_tru_denominator", new TH1D("hprobyQ_tru_denominator",";y_{Q};P(y_{Q})",30,-2.5,+2.5)) );
+	h1Map.insert( make_pair("hprobyQ_tru_ratio", new TH1D("hprobyQ_tru_ratio","P(y_{Q})=#LT#vec{#beta}_{Q}^{tru}#bullet#vec{p}_{q}<0#GT/All;y_{Q};P",30,-2.5,+2.5)) );
+	h1Map.insert( make_pair("hprobyQ_quarks_denominator", new TH1D("hprobyQ_quarks_denominator",";y_{Q};P(y_{Q})",30,-2.5,+2.5)) );
+	h1Map.insert( make_pair("hprobyQ_quarks_ratio", new TH1D("hprobyQ_quarks_ratio","P(y_{Q})=#LT#vec{#beta}_{Q}^{tru}#bullet#vec{#beta}_{Q}^{q#bar{q}}<0#GT/All;y_{Q};P",30,-2.5,+2.5)) );
+	
 	h2Map.insert( make_pair("hMassCosThetaCS", new TH2D("hMassCosThetaCS",";m_{#mu#mu} GeV;cos(#theta*);Events",250,70.,2500., 50,-1.,+1)) );
 	linMap.insert( make_pair("hMassCosThetaCS_horline", new TLine(70.,0.,2500.,0.)) );
 	linMap.insert( make_pair("hMassCosThetaCS_lonline", new TLine(646.33,-1.,646.33,+1.)) );
+	
 	h2Map.insert( make_pair("hMassyQ", new TH2D("hMassyQ",";m_{#mu#mu} GeV;y_{Q};Events",250,70.,2500., 50,-2.5,+2.5)) );
 	linMap.insert( make_pair("hMassyQ_horline", new TLine(70.,0.,2500.,0.)) );
 	linMap.insert( make_pair("hMassyQ_lonline", new TLine(646.33,-2.5,646.33,+2.5)) );
+
+	h2Map.insert( make_pair("hbetaZyQ", new TH2D("hbetaZyQ",";#beta_{Q}^{z};y_{Q};Events",50,-1.,+1, 50,-2.5,+2.5)) );
 	h2Map.insert( make_pair("hbetaabsyQabs", new TH2D("hbetaabsyQabs",";|#beta_{Q}|;|y_{Q}|;Events",50,0.,+1., 50,0.,+2.5)) );
 	h2Map.insert( make_pair("hyQCosThetaCS", new TH2D("hyQCosThetaCS",";y_{Q};cos(#theta*);Events",50,-2.5,+2.5, 50,-1.,+1)) );
-	h2Map.insert( make_pair("hyQCosThetaCS_tru", new TH2D("hyQCosThetaCS_tru",";y_{Q};cos(#theta*);Events",50,-2.5,+2.5, 50,-1.,+1)) );
-	h2Map.insert( make_pair("hyQCosThetaCS_acc", new TH2D("hyQCosThetaCS_acc",";y_{Q};cos(#theta*);Events",50,-2.5,+2.5, 50,-1.,+1)) );
-	h2Map.insert( make_pair("hbetaZyQtru", new TH2D("hbetaZyQtru","truth;#beta_{Q}^{z};y_{Q};Events",50,-1.,+1, 50,-2.5,+2.5)) );
+	h2Map.insert( make_pair("hyQCosThetaCS_tru", new TH2D("hyQCosThetaCS_tru",";y_{Q};cos(#theta*);Events",40,-2.5,+2.5, 40,-1.,+1)) );
+	h2Map.insert( make_pair("hyQCosThetaCS_acc", new TH2D("hyQCosThetaCS_acc","Acceptance;y_{Q};cos(#theta*)",40,-2.5,+2.5, 40,-1.,+1)) );
+	h2Map.insert( make_pair("hbetaZyQtru", new TH2D("hbetaZyQtru",";#beta_{Q}^{z:tru};y_{Q}^{tru};Events",50,-1.,+1, 50,-2.5,+2.5)) );
 }
 
 void hdraw()
 {	
 	draw(h1Map["hMass"], "hMass", "", dolog, dolog);
 	draw(h1Map["hbetaZ"], "hbetaZ");
-	draw(h1Map["hcosalpha"], "hcosalpha", "", !dolog, dolog);
+	draw(h1Map["hcosalpha_rec"], "hcosalpha_rec", "", !dolog, dolog);
+	draw(h1Map["hcosalpha_tru"], "hcosalpha_tru", "", !dolog, dolog);
+	draw(h1Map["hcosalpha_quarks"], "hcosalpha_quarks", "", !dolog, dolog);
 	draw(h1Map["hyQ"], "hyQ");
 	draw(h1Map["hyQabs"], "hyQabs");
 	
-	h1Map["hprobyQ_ratio"]->Divide(h1Map["hprobyQ_denominator"]);
-	h1Map["hprobyQ_ratio"]->SetMinimum(0.);
-	h1Map["hprobyQ_ratio"]->SetMaximum(1.);
-	draw(h1Map["hprobyQ_ratio"], "hprobyQ_ratio");
+
+	h1Map["hprobyQ_rec_ratio"]->Divide(h1Map["hprobyQ_rec_denominator"]);
+	h1Map["hprobyQ_rec_ratio"]->SetMinimum(0.);
+	h1Map["hprobyQ_rec_ratio"]->SetMaximum(1.);
+	draw(h1Map["hprobyQ_rec_ratio"], "hprobyQ_rec_ratio");
+	h1Map["hprobyQ_tru_ratio"]->Divide(h1Map["hprobyQ_tru_denominator"]);
+	h1Map["hprobyQ_tru_ratio"]->SetMinimum(0.);
+	h1Map["hprobyQ_tru_ratio"]->SetMaximum(1.);
+	draw(h1Map["hprobyQ_tru_ratio"], "hprobyQ_tru_ratio");
+	h1Map["hprobyQ_quarks_ratio"]->Divide(h1Map["hprobyQ_quarks_denominator"]);
+	h1Map["hprobyQ_quarks_ratio"]->SetMinimum(0.);
+	h1Map["hprobyQ_quarks_ratio"]->SetMaximum(1.);
+	draw(h1Map["hprobyQ_quarks_ratio"], "hprobyQ_quarks_ratio");
+	
+	
 	h2Map["hyQCosThetaCS_acc"]->Divide(h2Map["hyQCosThetaCS_tru"]);
 	h2Map["hyQCosThetaCS_acc"]->SetMinimum(0.);
 	h2Map["hyQCosThetaCS_acc"]->SetMaximum(1.);
@@ -378,62 +419,122 @@ void hdraw()
 
 void hfill(Double_t wgt=1.)
 {
+	float betax_rec;	
+	float betay_rec;	
+	float betaz_rec;
+	float betamag_rec;
+			
+	float betax_tru;	
+	float betay_tru;	
+	float betaz_tru;	
+	float betamag_tru;
+		
+	float betax_quarks;	
+	float betay_quarks;	
+	float betaz_quarks;	
+	float betamag_quarks;
+	
+	float cosalpha_rec;
+	float cosalpha_tru;
+	float cosalpha_quarks;
+	float betaztru;
+
 	if(isMC)
 	{
-		if(recon_all_isValid)
+		if(truth_all_isValid)
 		{
-			float betax = kin.betaSystem(recon_all_px->at(0), recon_all_px->at(1), recon_all_E->at(0), recon_all_E->at(1));	
-			float betay = kin.betaSystem(recon_all_py->at(0), recon_all_py->at(1), recon_all_E->at(0), recon_all_E->at(1));	
-			float betaz = kin.betaSystem(recon_all_pz->at(0), recon_all_pz->at(1), recon_all_E->at(0), recon_all_E->at(1));
-			float betamag = sqrt(betax*betax+betay*betay+betaz*betaz);
+			if(recon_all_isValid)
+			{
+				betax_rec = kin.betaSystem(recon_all_px->at(0), recon_all_px->at(1), recon_all_E->at(0), recon_all_E->at(1));	
+				betay_rec = kin.betaSystem(recon_all_py->at(0), recon_all_py->at(1), recon_all_E->at(0), recon_all_E->at(1));	
+				betaz_rec = kin.betaSystem(recon_all_pz->at(0), recon_all_pz->at(1), recon_all_E->at(0), recon_all_E->at(1));
+				betamag_rec = sqrt(betax_rec*betax_rec+betay_rec*betay_rec+betaz_rec*betaz_rec);
+			}
+			
+			tlva->SetPtEtaPhiM(truth_all_mc_pt->at(0), truth_all_mc_eta->at(0), truth_all_mc_phi->at(0), truth_all_mc_m->at(0));
+			tlva->SetPtEtaPhiM(truth_all_mc_pt->at(1), truth_all_mc_eta->at(1), truth_all_mc_phi->at(1), truth_all_mc_m->at(1));
+			betax_tru = kin.betaSystem(tlva->X(), tlvb->X(), tlva->E(), tlvb->E());	
+			betay_tru = kin.betaSystem(tlva->Y(), tlvb->Y(), tlva->E(), tlvb->E());	
+			betaz_tru = kin.betaSystem(tlva->Z(), tlvb->Z(), tlva->E(), tlvb->E());	
+			betamag_tru = sqrt(betax_tru*betax_tru+betay_tru*betay_tru+betaz_tru*betaz_tru);
+			
+			tlva->SetPtEtaPhiM(truth_all_partons_mc_pt->at(0), truth_all_partons_mc_eta->at(0), truth_all_partons_mc_phi->at(0), truth_all_partons_mc_m->at(0));
+			tlva->SetPtEtaPhiM(truth_all_partons_mc_pt->at(1), truth_all_partons_mc_eta->at(1), truth_all_partons_mc_phi->at(1), truth_all_partons_mc_m->at(1));
+			betax_quarks = kin.betaSystem(tlva->X(), tlvb->X(), tlva->E(), tlvb->E());	
+			betay_quarks = kin.betaSystem(tlva->Y(), tlvb->Y(), tlva->E(), tlvb->E());	
+			betaz_quarks = kin.betaSystem(tlva->Z(), tlvb->Z(), tlva->E(), tlvb->E());	
+			betamag_quarks = sqrt(betax_quarks*betax_quarks+betay_quarks*betay_quarks+betaz_quarks*betaz_quarks);
 			
 			int iquark = (truth_all_partons_mc_pdgId->at(0)>0) ? 0 : 1;
 			tv3a->SetPtEtaPhi(truth_all_partons_mc_pt->at(iquark), truth_all_partons_mc_eta->at(iquark), truth_all_partons_mc_phi->at(iquark));
-			tv3b->SetXYZ(betax, betay, betaz);
-			float cosalpha = tv3a->Dot(*tv3b)/(tv3a->Mag()*tv3b->Mag());
-			//_INFO("cosalpha = "+tostring(cosalpha));
-			if(cosalpha<=0./*0.707106781*/) h1Map["hprobyQ_ratio"]->Fill(recon_all_ySystem,wgt); // little than 
-			h1Map["hprobyQ_denominator"]->Fill(recon_all_ySystem,wgt);
 			
-			h1Map["hMass"]->Fill(recon_all_Mhat,wgt);
-			h1Map["hbetaZ"]->Fill(betaz,wgt);
-			h1Map["hcosalpha"]->Fill(cosalpha,wgt);
-			h1Map["hyQ"]->Fill(recon_all_ySystem,wgt);
-			h1Map["hyQabs"]->Fill(fabs(recon_all_ySystem),wgt);
+			if(recon_all_isValid)
+			{
+				tv3b->SetXYZ(betax_rec, betay_rec, betaz_rec);
+				cosalpha_rec = tv3a->Dot(*tv3b)/(tv3a->Mag()*tv3b->Mag());
+				h1Map["hcosalpha_rec"]->Fill(cosalpha_rec,wgt);
+			}
 			
-			h2Map["hMassyQ"]->Fill(recon_all_Mhat,recon_all_ySystem,wgt);
-			h2Map["hMassCosThetaCS"]->Fill(recon_all_Mhat,recon_all_CosThetaCS,wgt);
-			h2Map["hyQCosThetaCS"]->Fill(recon_all_ySystem,recon_all_CosThetaCS,wgt);
-			h2Map["hyQCosThetaCS_acc"]->Fill(recon_all_ySystem,recon_all_CosThetaCS,wgt);
-			h2Map["hbetaZyQ"]->Fill(betaz,recon_all_ySystem,wgt);
-			h2Map["hbetaabsyQabs"]->Fill(betamag,fabs(recon_all_ySystem),wgt);
-		}
-		if(truth_all_isValid)
-		{
+			tv3b->SetXYZ(betax_tru, betay_tru, betaz_tru);
+			cosalpha_tru = tv3a->Dot(*tv3b)/(tv3a->Mag()*tv3b->Mag());
+			h1Map["hcosalpha_tru"]->Fill(cosalpha_tru,wgt);
+			
+			tv3a->SetXYZ(betax_quarks, betay_quarks, betaz_quarks);
+			tv3b->SetXYZ(betax_tru, betay_tru, betaz_tru);
+			cosalpha_quarks = tv3a->Dot(*tv3b)/(tv3a->Mag()*tv3b->Mag());
+			h1Map["hcosalpha_quarks"]->Fill(cosalpha_quarks,wgt);
+			
+			if(recon_all_isValid) 
+			{
+				if(cosalpha_rec<=0.)    h1Map["hprobyQ_rec_ratio"]->Fill(recon_all_ySystem,wgt);
+				h1Map["hprobyQ_rec_denominator"]->Fill(recon_all_ySystem,wgt);
+			}
+			
+			if(cosalpha_tru<=0.)    h1Map["hprobyQ_tru_ratio"]->Fill(truth_all_ySystem,wgt);
+			h1Map["hprobyQ_tru_denominator"]->Fill(truth_all_ySystem,wgt);
+			
+			if(cosalpha_quarks<=0.) h1Map["hprobyQ_quarks_ratio"]->Fill(truth_all_ySystem,wgt);
+			h1Map["hprobyQ_quarks_denominator"]->Fill(truth_all_ySystem,wgt);
+			
+			if(recon_all_isValid) 
+			{
+				h1Map["hMass"]->Fill(recon_all_Mhat,wgt);
+				h1Map["hbetaZ"]->Fill(betaz_rec,wgt);
+				h1Map["hyQ"]->Fill(recon_all_ySystem,wgt);
+				h1Map["hyQabs"]->Fill(fabs(recon_all_ySystem),wgt);
+				
+				h2Map["hMassyQ"]->Fill(recon_all_Mhat,recon_all_ySystem,wgt);
+				h2Map["hMassCosThetaCS"]->Fill(recon_all_Mhat,recon_all_CosThetaCS,wgt);
+				h2Map["hyQCosThetaCS"]->Fill(recon_all_ySystem,recon_all_CosThetaCS,wgt);
+				h2Map["hyQCosThetaCS_acc"]->Fill(recon_all_ySystem,recon_all_CosThetaCS,wgt);
+				h2Map["hbetaZyQ"]->Fill(betaz_rec,recon_all_ySystem,wgt);
+				h2Map["hbetaabsyQabs"]->Fill(betamag_rec,fabs(recon_all_ySystem),wgt);
+			}
+			
 			tlva->SetPtEtaPhiM(truth_all_mc_pt->at(0), truth_all_mc_eta->at(0), truth_all_mc_phi->at(0), truth_all_mc_m->at(0));
 			tlvb->SetPtEtaPhiM(truth_all_mc_pt->at(1), truth_all_mc_eta->at(1), truth_all_mc_phi->at(1), truth_all_mc_m->at(1));
-			float betaztru = kin.betaSystem(tlva->Pz(), tlvb->Pz(), tlva->E(), tlvb->E());
+			betaztru = kin.betaSystem(tlva->Pz(), tlvb->Pz(), tlva->E(), tlvb->E());
 			h2Map["hbetaZyQtru"]->Fill(betaztru,truth_all_ySystem,wgt);
 			h2Map["hyQCosThetaCS_tru"]->Fill(truth_all_ySystem,truth_all_CosThetaCS,wgt);
 		}
 	}
 	else
 	{
-		float betax = kin.betaSystem(px->at(0), px->at(1), E->at(0), E->at(1));	
-		float betay = kin.betaSystem(py->at(0), py->at(1), E->at(0), E->at(1));	
-		float betaz = kin.betaSystem(pz->at(0), pz->at(1), E->at(0), E->at(1));
-		float betamag = sqrt(betax*betax+betay*betay+betaz*betaz);
+		float betax_rec = kin.betaSystem(px->at(0), px->at(1), E->at(0), E->at(1));	
+		float betay_rec = kin.betaSystem(py->at(0), py->at(1), E->at(0), E->at(1));	
+		float betaz_rec = kin.betaSystem(pz->at(0), pz->at(1), E->at(0), E->at(1));
+		float betamag_rec = sqrt(betax_rec*betax_rec+betay_rec*betay_rec+betaz_rec*betaz_rec);
 		
 		h1Map["hMass"]->Fill(Mhat*TeV2GeV);
-		h1Map["hbetaZ"]->Fill(betaz);
+		h1Map["hbetaZ"]->Fill(betaz_rec);
 		h1Map["hyQ"]->Fill(Ysystem);
 		h1Map["hyQabs"]->Fill(fabs(Ysystem));
 		
 		h2Map["hMassyQ"]->Fill(Mhat*TeV2GeV,Ysystem);
 		h2Map["hMassCosThetaCS"]->Fill(Mhat*TeV2GeV,CosThetaCS);
 		h2Map["hyQCosThetaCS"]->Fill(Ysystem,CosThetaCS);
-		h2Map["hbetaZyQ"]->Fill(betaz,Ysystem);
-		h2Map["hbetaabsyQabs"]->Fill(betamag,fabs(Ysystem));
+		h2Map["hbetaZyQ"]->Fill(betaz_rec,Ysystem);
+		h2Map["hbetaabsyQabs"]->Fill(betamag_rec,fabs(Ysystem));
 	}
 }
 
@@ -443,13 +544,14 @@ void init(TTree* t=NULL)
 	{
 		if(isMC)
 		{
-			// fName = "/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_75M120.root";
-			fName = "/data/hod/pythia8_ntuples/ATLASZP/mcLocalControl_Zprime_mumu_SSM1500.root";
+			// fName = "/data/hod/pythia8_ntuples/ATLASZP/mcLocalControl_Zprime_mumu_SSM1500.root";
+			fName = "/tmp/hod/mcLocalControl_Zprime_mumu_SSM1500.root";
 			tName = "truth/truth_tree";
 		}
 		else
 		{
-			fName = "../data/merged.root";
+			// fName = "../data/merged.root";
+			fName = "/tmp/hod/merged.root";
 			tName = "allCuts/allCuts_tree";
 		}
 		
@@ -479,24 +581,9 @@ void run()
 	style();
 	hbook();
 
-	/*
-	init();
-	Int_t N = tree->GetEntriesFast();
-	for(Int_t entry=0 ; entry<N ; entry++)
+	if(!isMC)
 	{
-		tree->GetEntry(entry);
-		////////////////////////////////////
-		//// blocks of analysis go here ////
-		////////////////////////////////////
-		hfill(); ///////////////////////////
-		////////////////////////////////////
-	}
-	*/
-	
-	settrees();
-	for(TMapTSP2TTREE::iterator it=treMap.begin() ; it!=treMap.end() ; ++it)
-	{
-		init(it->second);
+		init();
 		Int_t N = tree->GetEntriesFast();
 		for(Int_t entry=0 ; entry<N ; entry++)
 		{
@@ -504,8 +591,27 @@ void run()
 			////////////////////////////////////
 			//// blocks of analysis go here ////
 			////////////////////////////////////
-			hfill(wgtMap[it->first]); //////////
+			hfill(); ///////////////////////////
 			////////////////////////////////////
+		}
+	}
+	
+	else
+	{
+		settrees();
+		for(TMapTSP2TTREE::iterator it=treMap.begin() ; it!=treMap.end() ; ++it)
+		{
+			init(it->second);
+			Int_t N = tree->GetEntriesFast();
+			for(Int_t entry=0 ; entry<N ; entry++)
+			{
+				tree->GetEntry(entry);
+				////////////////////////////////////
+				//// blocks of analysis go here ////
+				////////////////////////////////////
+				hfill(wgtMap[it->first]); //////////
+				////////////////////////////////////
+			}
 		}
 	}
 	

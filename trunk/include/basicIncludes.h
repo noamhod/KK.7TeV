@@ -26,6 +26,8 @@
 #include <TMinuit.h>
 #include <TApplication.h>
 #include <TF1.h>
+#include <TF2.h>
+#include <TF12.h>
 #include <TAxis.h>
 #include <TLine.h>
 #include <TPaveText.h>
@@ -60,7 +62,6 @@
 #include <RooAddPdf.h>
 #include <RooBinning.h>
 #include <RooExtendPdf.h>
-
 
 #include <iostream>
 #include <stdlib.h>

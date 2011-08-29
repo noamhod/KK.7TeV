@@ -48,11 +48,15 @@ void style()
 	gStyle->SetTitleX(0.12);
 	gStyle->SetTitleY(1);
 	
+	gStyle->SetPalette(1);
+	
 	gStyle->SetTitleX(0.25); //title X location 
 	gStyle->SetTitleY(0.94); //title Y location 
 	gStyle->SetTitleW(0.5); //title width 
 	gStyle->SetTitleH(0.05); //title height
-	//gStyle->SetTitleBorderSize(1);
+	gStyle->SetTitleBorderSize(0);
+	
+	gStyle->cd();
 }
 
 #endif

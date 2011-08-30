@@ -9,8 +9,8 @@
     <end>150000</end>
     <ntriggers>3</ntriggers>
     <triggers>
-      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
-      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu18" PRIORITY="1" MIN="1">18.</trigger>
+      <trigger NAME="EF_mu18_MG" PRIORITY="2" MIN="1">18.</trigger>
       <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
     </triggers>
     <nevents>0</nevents>
@@ -25,8 +25,8 @@
     <end>178109</end>
     <ntriggers>3</ntriggers>
     <triggers>
-      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
-      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu18" PRIORITY="1" MIN="1">18.</trigger>
+      <trigger NAME="EF_mu18_MG" PRIORITY="2" MIN="1">18.</trigger>
       <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
     </triggers>
     <nevents>0</nevents>
@@ -41,8 +41,8 @@
     <end>180481</end>
     <ntriggers>3</ntriggers>
     <triggers>
-      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
-      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu18" PRIORITY="1" MIN="1">18.</trigger>
+      <trigger NAME="EF_mu18_MG" PRIORITY="2" MIN="1">18.</trigger>
       <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
     </triggers>
     <nevents>0</nevents>
@@ -57,8 +57,8 @@
     <end>180776</end>
     <ntriggers>3</ntriggers>
     <triggers>
-      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
-      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu18" PRIORITY="1" MIN="1">18.</trigger>
+      <trigger NAME="EF_mu18_MG" PRIORITY="2" MIN="1">18.</trigger>
       <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
     </triggers>
     <nevents>0</nevents>
@@ -73,8 +73,8 @@
     <end>182519</end>
     <ntriggers>3</ntriggers>
     <triggers>
-      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
-      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu18" PRIORITY="1" MIN="1">18.</trigger>
+      <trigger NAME="EF_mu18_MG" PRIORITY="2" MIN="1">18.</trigger>
       <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
     </triggers>
     <nevents>0</nevents>
@@ -89,8 +89,8 @@
     <end>183462</end>
     <ntriggers>3</ntriggers>
     <triggers>
-      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
-      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu18" PRIORITY="1" MIN="1">18.</trigger>
+      <trigger NAME="EF_mu18_MG" PRIORITY="2" MIN="1">18.</trigger>
       <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
     </triggers>
     <nevents>0</nevents>
@@ -105,8 +105,8 @@
     <end>184169</end>
     <ntriggers>3</ntriggers>
     <triggers>
-      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
-      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu18" PRIORITY="1" MIN="1">18.</trigger>
+      <trigger NAME="EF_mu18_MG" PRIORITY="2" MIN="1">18.</trigger>
       <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
     </triggers>
     <nevents>0</nevents>
@@ -121,8 +121,8 @@
     <end>186493</end>
     <ntriggers>3</ntriggers>
     <triggers>
-      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
-      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu18" PRIORITY="1" MIN="1">18.</trigger>
+      <trigger NAME="EF_mu18_MG" PRIORITY="2" MIN="1">18.</trigger>
       <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
     </triggers>
     <nevents>0</nevents>

@@ -137,8 +137,8 @@
     <end>186755</end>
     <ntriggers>3</ntriggers>
     <triggers>
-      <trigger NAME="EF_mu18_MG_medium" PRIORITY="1" MIN="1">18.</trigger>
-      <trigger NAME="EF_mu18_medium" PRIORITY="2" MIN="1">18.</trigger>
+      <trigger NAME="EF_mu18_medium" PRIORITY="1" MIN="1">18.</trigger>
+      <trigger NAME="EF_mu18_MG_medium" PRIORITY="2" MIN="1">18.</trigger>
       <trigger NAME="EF_mu40_MSonly_barrel_medium" PRIORITY="3" MIN="1">40.</trigger>
     </triggers>
     <nevents>0</nevents>
@@ -153,8 +153,8 @@
     <end>187219</end>
     <ntriggers>3</ntriggers>
     <triggers>
-      <trigger NAME="EF_mu18_MG_medium" PRIORITY="1" MIN="1">18.</trigger>
-      <trigger NAME="EF_mu18_medium" PRIORITY="2" MIN="1">18.</trigger>
+      <trigger NAME="EF_mu18_medium" PRIORITY="1" MIN="1">18.</trigger>
+      <trigger NAME="EF_mu18_MG_medium" PRIORITY="2" MIN="1">18.</trigger>
       <trigger NAME="EF_mu40_MSonly_barrel_medium" PRIORITY="3" MIN="1">40.</trigger>
     </triggers>
     <nevents>0</nevents>

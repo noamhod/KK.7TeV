@@ -80,6 +80,25 @@ inline int selection::getPVindex(int nTypeCut, int nTracksCut, float z0cut,
 	return index;
 }
 
+inline bool selection::oppositeChargeCandidatesCut( vector<float>* v_charge, vector<bool>& v_QAflag)
+{
+	int muPlus  = 0;
+	int muMinus = 0;
+	for(int mu=0 ; mu<(int)v_charge->size() ; mu++)
+	{
+		if     (!v_QAflag[mu])       continue;
+		if     (v_charge->at(mu)>0.) muPlus++;
+		else if(v_charge->at(mu)<0.) muMinus++;
+		else
+		{
+			_ERROR("in selection::oppositeChargeCandidate -> found charge==0, exitting now.");
+			exit(-1);
+		}
+		if(muPlus>0 && muMinus>0) return true;
+	}
+	return false;
+}
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 

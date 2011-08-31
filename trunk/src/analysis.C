@@ -198,6 +198,8 @@ void analysis::setEventVariables()
 	analysisSkeleton::lbn          = m_WZphysD3PD->lbn;
 	analysisSkeleton::bcid         = m_WZphysD3PD->bcid;
 	
+	// EventHash = RunNumber+EventNumber+lbn;
+	
 	//////////////////////////////////////////////////////
 	// do this only if the run number has changed ////////
 	analysisSkeleton::sPeriod   = getPeriodName(); ///////

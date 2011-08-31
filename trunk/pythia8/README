@@ -17,3 +17,13 @@ to read the templates via an example:
 	this will display an exampe canvas with the
 	imass histograms of the templates
 
+to run the weights analysis:
+	[1] root -b -l -q plot_ratio_weights.C++
+	this will produce the weights.root file to be used by the Afb analysis
+	look in the plots/ directory
+
+to run the Afb fit (after weights.root was created):
+	[1] run the previous point
+	[2] root -b -l -q compile.C
+	look in the fitplots/ directory
+

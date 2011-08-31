@@ -89,6 +89,8 @@ typedef map<int, const char*>   TMapiP2cc;
 typedef multimap<int, int>      TMapii;
 typedef multimap<int, string>   TMapis;
 typedef map<double, double>     TMapdd;
+typedef map<double, vector<int> > TMapdvi;
+typedef map<float,  vector<int> > TMapfvi;
 typedef vector<TLorentzVector*> TVectorP2VL;
 typedef map<string, TObject*>   TMapSP2TOBJ;
 typedef map<TString, TObject*>  TMapTSP2TOBJ;

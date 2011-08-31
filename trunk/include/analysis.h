@@ -73,6 +73,8 @@ public:
 		m_efficiency_counter  = 0;
 		m_truth_counter       = 0;
 		
+		EventHash = 0;
+		
 		nSkim = 0;
 		nAll = 0;
 		n0mu = 0;

@@ -32,7 +32,10 @@ public:
 	int tmp_counter_3;
 	int tmp_counter_4;
 	int tmp_counter_5;
-
+	
+	int EventHash;
+	bool isMultiMuonPrint;
+	
 	TMapii muPairMap;
 	bool passCutFlow;
 	bool passCurrentCut;
@@ -52,8 +55,8 @@ public:
 	vector<string>* vTriggers;
 	vector<bool> muQAflags;
 	int nMusPassed;
-	TMapdi pTtoIndexMap;
-	TMapdi pTtoIndexMapTruth;
+	TMapdi  pTtoIndexMap;
+	TMapdi  pTtoIndexMapTruth;
 	TVectorP2VL	pmu;
 	TVectorP2VL pmuTruth;
 	TMapsd values2fill;
@@ -647,7 +650,7 @@ private:
 	
 	void fillAfterCuts();
 	void fillBeforeCuts();
-	void fillCutFlow(string sorderedcutname, string sIsPreselection = "");
+	void fillCutFlow(string sorderedcutname);
 
 };
 #endif

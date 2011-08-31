@@ -149,12 +149,12 @@ bool analysisSkeleton::isTrigger(string trigName)
 	
 	bool isTrig = false;
 	if     (trigName=="L1_MU10")                      isTrig = L1_MU10;
+	else if(trigName=="EF_mu18")                      isTrig = EF_mu18;
+	else if(trigName=="EF_mu18_MG")                   isTrig = EF_mu18_MG;
 	else if(trigName=="EF_mu22")                      isTrig = EF_mu22;
 	else if(trigName=="EF_mu22_MG")                   isTrig = EF_mu22_MG;
 	else if(trigName=="EF_mu40_MSonly_barrel")        isTrig = EF_mu40_MSonly_barrel;
 	else if(trigName=="EF_mu18_MG_medium")            isTrig = EF_mu18_MG_medium;
-	else if(trigName=="EF_mu18")                      isTrig = EF_mu18;
-	else if(trigName=="EF_mu18_MG")                   isTrig = EF_mu18_MG;
 	else if(trigName=="EF_mu18_medium")               isTrig = EF_mu18_medium;
 	else if(trigName=="EF_mu40_MSonly_barrel_medium") isTrig = EF_mu40_MSonly_barrel_medium;
 	else _WARNING("in analysisSkeleton::isTrigger -> the trigger "+trigName+" was not found and the event is regected by default");
@@ -1183,48 +1183,13 @@ void analysisSkeleton::fillBeforeCuts()
 	}
 }
 
-void analysisSkeleton::fillCutFlow(string sorderedcutname, string sIsPreselection)
+void analysisSkeleton::fillCutFlow(string sorderedcutname)
 {
 	_DEBUG("analysisSkeleton::fillCutFlow");
 	/////////////////////////////////////////////////////////
 	// count the cut flow numbers ///////////////////////////
 	m_cutFlowNumbers->operator[](sorderedcutname)++; ////////
 	/////////////////////////////////////////////////////////
-
-	/////////////////////////////////
-	// THIS IS DEPRECATED !!!! //////
-	/////////////////////////////////
-	int muSize = (int)mu_pt->size();
-	if(sIsPreselection != "preselection"  &&  muSize==2)
-	{
-		//int lead_mu = (mu_charge->at(0)<0) ? 0 : 1;
-		//int sublead_mu  = (mu_charge->at(0)>0) ? 0 : 1;
-		int lead_mu     = 0;
-		int sublead_mu  = 1;
-		if( mu_pt->at(0) < mu_pt->at(1) )
-		{
-			lead_mu     = 1;
-			sublead_mu  = 0;
-		}
-
-		if(values2fill.size()>0) values2fill.clear();
-		
-		current_imass    = imass(pmu[lead_mu],pmu[sublead_mu]);
-		current_mu_pT    = mu_pt->at(lead_mu)*MeV2TeV; //pT(mu_me_qoverp->at(lead_mu),mu_me_theta->at(lead_mu))*MeV2TeV;
-		current_cosTheta = cosThetaCollinsSoper( pmu[lead_mu], -1, pmu[sublead_mu], +1 );
-		
-		///////////////////////////////////////////////////////////////////////
-		// these values go in the cutFlow histograms //////////////////////////
-		values2fill.insert( make_pair( "imass",current_imass ) ); /////////////
-		values2fill.insert( make_pair( "pT",   current_mu_pT ) ); /////////////
-		///////////////////////////////////////////////////////////////////////
-		
-		///////////////////////////////////////////////////////////////////////////////////////////////
-		// fill the cut flow histopgrams //////////////////////////////////////////////////////////////
-		hmap_cutFlow_imass->operator[]("imass."+sorderedcutname)->Fill( values2fill["imass"] ); ///////
-		hmap_cutFlow_pT->operator[]("pT."+sorderedcutname)->Fill( values2fill["pT"] ); ////////////////
-		///////////////////////////////////////////////////////////////////////////////////////////////
-	}
 }
 
 
@@ -1262,17 +1227,37 @@ void analysisSkeleton::pTSort()
 	
 	if(pTtoIndexMap.size()<2)
 	{
-		cout << "ERROR: in pTSort(), trying to sort a <2 map. Exitting now !" << endl;
+		_ERROR("in pTSort(), trying to sort a <2 map. Exitting now !");
 		exit(-1);
 	}
 	
-	///////////////////////////////////////////////////////////////////////////////
-	// no matter how many entries in the map, just take the 2 with highest pT: ////
-	TMapdi::reverse_iterator rit=pTtoIndexMap.rbegin(); ///////////////////////////
-	ai = rit->second; /////////////////////////////////////////////////////////////
-	rit++; ////////////////////////////////////////////////////////////////////////
-	bi = rit->second; /////////////////////////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////
+	// no matter how many entries in the map, just take the ////////////////////////////////
+	// two muons with highest pT that satisfy Q1*Q2<0 //////////////////////////////////////
+	TMapdi::reverse_iterator rit=pTtoIndexMap.rbegin(); ////////////////////////////////////
+	ai = rit->second; //////////////////////////////////////////////////////////////////////
+	rit++; /////////////////////////////////////////////////////////////////////////////////
+	bi = rit->second; //////////////////////////////////////////////////////////////////////
+	while(mu_charge->at(ai)*mu_charge->at(bi)>0  &&  rit!=pTtoIndexMap.rend()) /////////////
+	{                                            ///////////////////////////////////////////
+		rit++;                                   ///////////////////////////////////////////
+		bi = rit->second;                        ///////////////////////////////////////////
+	}                                            ///////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////
+	
+	if(pTtoIndexMap.size()>2)
+	{
+		if((RunNumber+EventNumber+lbn)!=EventHash)
+		{
+			_INFO("MultiGoodMuon N{"
+				  +tostring((int)pTtoIndexMap.size())
+				  +"}{run-lb-evt: "+tostring(RunNumber)+"-"+tostring(lbn)+"-"+tostring(EventNumber)
+				  +"} -> ai["+tostring(mu_charge->at(ai))+"]="+tostring(ai)
+				  +", bi["+tostring(mu_charge->at(bi))+"]="+tostring(bi));
+			EventHash = RunNumber+EventNumber+lbn;
+			isMultiMuonPrint = true;
+		}
+	}
 }
 
 void analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b)
@@ -1287,17 +1272,31 @@ void analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b)
 	
 	if(pTtoIndex.size()<2)
 	{
-		cout << "ERROR: in pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b), trying to sort a <2 map. Exitting now !" << endl;
+		_ERROR("in pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b), trying to sort a <2 map. Exitting now !");
 		exit(-1);
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////
 	// no matter how many entries in the map, just take the 2 with highest pT: ////
-	TMapdi::reverse_iterator rit=pTtoIndex.rbegin(); //////////////////////////////
-	index_a = rit->second; ///////////////////////////////////////////////////////
-	rit++; ////////////////////////////////////////////////////////////////////////
-	index_b = rit->second; ///////////////////////////////////////////////////////
+	// TMapdi::reverse_iterator rit=pTtoIndex.rbegin(); //////////////////////////////
+	// index_a = rit->second; ///////////////////////////////////////////////////////
+	// rit++; ////////////////////////////////////////////////////////////////////////
+	// index_b = rit->second; ///////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// no matter how many entries in the map, just take the ///////////////////////////////////////
+	// two muons with highest pT that satisfy Q1*Q2<0 /////////////////////////////////////////////
+	TMapdi::reverse_iterator rit=pTtoIndex.rbegin(); //////////////////////////////////////////////
+	index_a = rit->second; ////////////////////////////////////////////////////////////////////////
+	rit++; ////////////////////////////////////////////////////////////////////////////////////////
+	index_b = rit->second; ////////////////////////////////////////////////////////////////////////
+	while(mu_charge->at(index_a)*mu_charge->at(index_b)>0  &&  rit!=pTtoIndex.rend()) /////////////
+	{                                            //////////////////////////////////////////////////
+		rit++;                                   //////////////////////////////////////////////////
+		index_b = rit->second;                        /////////////////////////////////////////////
+	}                                            //////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////
 }
 
 void analysisSkeleton::imassSort()
@@ -1370,16 +1369,16 @@ bool analysisSkeleton::assignPairIndices()
 {
 	_DEBUG("analysisSkeleton::assignPairIndices");
 	// select the final muon pair
-	if(pTtoIndexMap.size()==2) pTSort();
+	if     (pTtoIndexMap.size()==2) pTSort();
 	else if(pTtoIndexMap.size()>2)
 	{
-		pTSort();
+		pTSort(); // assigns vallues to ai and bi
 		//imassSort();
 		nMultiMuonEvents++;
 	}
 	else
 	{
-		cout << "WARNING: in analysisSkeleton::assignPairIndices, but there are <2 good single-muons" << endl;
+		_WARNING("in analysisSkeleton::assignPairIndices, but there are <2 good single-muons");
 		return false;
 	}
 	
@@ -2653,8 +2652,15 @@ bool analysisSkeleton::doubleSelection(string sSkipCut)
 
 inline bool analysisSkeleton::throwInfo(string cutName)
 {
-	bool show = false;  
+	bool show = false;
 	if(RunNumber==180124 && lbn==493 && EventNumber==68526315) show = true;  
+	else if(RunNumber==183003 && lbn==723 && EventNumber==121099951) show = true;
+	else if(RunNumber==183054 && lbn==198 && EventNumber==21026988) show = true;
+	else if(RunNumber==183780 && lbn==434 && EventNumber==7827222) show = true;
+	else if(RunNumber==184169 && lbn==644 && EventNumber==104197129) show = true;
+	else if(RunNumber==186169 && lbn==386 && EventNumber==47351357) show = true;
+	else if(RunNumber==186721 && lbn==643 && EventNumber==122815161) show = true;
+	else if(RunNumber==187219 && lbn==589 && EventNumber==111010363) show = true;
 	else if(RunNumber==180225 && lbn==300 && EventNumber==56266053) show = true;
 	else if(RunNumber==180225 && lbn==300 && EventNumber==56286764) show = true;
 	else if(RunNumber==180225 && lbn==300 && EventNumber==56310023) show = true; 
@@ -2761,11 +2767,11 @@ inline bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 		
 		passCutFlow = (passCurrentCut  &&  passCutFlow) ? true : false;
 		
-		////////////////////////////////////////////////////////////////////////////////////////////////////
-		// cutFlow /////////////////////////////////////////////////////////////////////////////////////////
-		if(passCutFlow  &&  !isSkippedCut  && bDoFill) fillCutFlow(sorderedcutname, "preselection"); ///////
-		if(!passCutFlow && !isSkippedCut) throwInfo(sorderedcutname); //////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////
+		// cutFlow /////////////////////////////////////////////////////////////////////////
+		if(passCutFlow  &&  !isSkippedCut  && bDoFill) fillCutFlow(sorderedcutname); ///////
+		if(!passCutFlow && !isSkippedCut) throwInfo(sorderedcutname); //////////////////////
+		////////////////////////////////////////////////////////////////////////////////////
 	}
 	
 	return passCutFlow;
@@ -2979,12 +2985,31 @@ inline bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
 	if(nQAflags<2) return false; ////////////////////////
 	/////////////////////////////////////////////////////
 	
-	/////////////////////////////////////////////////////
-	// see if there's a good pair (pT or imass sorted) //
-	// and assign the ai and bi indices /////////////////
-	bool isPair = assignPairIndices(); //////////////////
-	if(!isPair) return false; ///////////////////////////
-	/////////////////////////////////////////////////////
+	TMapsb::iterator jj = m_cutsFlowSkipMap->find("oppositeChargeCandidates");
+	if(jj==m_cutsFlowSkipMap->end())
+	{
+		TMapsb::iterator kk = m_cutsFlowSkipMap->find("oppositeCharge");
+		if(kk!=m_cutsFlowSkipMap->end() && kk->second)
+		{
+			_INFO("didn't find oppositeChargeCandidates, found oppositeCharge and not skipped");
+		
+			// if we want to first do the sort and then do the Q1*Q2<0 requirment
+			// then we have to have the "oppositeCharge" cut in the list wehre it
+			// has to be enabled (i.e. skip=false).
+			// Otherwise, we do the sort afterwards
+			/////////////////////////////////////////////////////
+			// see if there's a good pair (pT or imass sorted) //
+			// and assign the ai and bi indices /////////////////
+			bool isPair = assignPairIndices(); //////////////////
+			if(!isPair) return false; ///////////////////////////
+			/////////////////////////////////////////////////////
+		}
+		else
+		{
+			_ERROR("didn't find oppositeChargeCandidates and also didn't find oppositeCharge OR the oppositeCharge is found but skipped. exitting now");
+			exit(-1);
+		}
+	}
 	
 	passCutFlow    = true;
 	passCurrentCut = true;
@@ -3015,7 +3040,29 @@ inline bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
 			}
 		}
 
-		if(sorderedcutname=="oppositeCharge"  &&  !bSkipCut)
+		if(sorderedcutname=="oppositeChargeCandidates"  &&  !bSkipCut)
+		{
+			passCurrentCut = ( oppositeChargeCandidatesCut(mu_charge, muQAflags) ) ? true : false;
+			if(passCurrentCut)
+			{
+				/////////////////////////////////////////////////////
+				// see if there's a good pair (pT or imass sorted) //
+				// and assign the ai and bi indices /////////////////
+				assignPairIndices(); ////////////////////////////////
+				if(nQAflags>2  &&  isMultiMuonPrint)
+				{
+					_INFO("MultiGoodMuon N{"
+						  +tostring(nQAflags)
+						  +"}{run-lb-evt: "+tostring(RunNumber)+"-"+tostring(lbn)+"-"+tostring(EventNumber)
+						  +"} -> Assigned indices: ai["+tostring(mu_charge->at(ai))+"]="+tostring(ai)
+						  +", bi["+tostring(mu_charge->at(bi))+"]="+tostring(bi));
+					isMultiMuonPrint = false;
+				}
+				/////////////////////////////////////////////////////
+			}
+		}
+		
+		else if(sorderedcutname=="oppositeCharge"  &&  !bSkipCut)
 		{
 			//passCurrentCut = ( oppositeChargeCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_me_qoverp->at(ai), mu_me_qoverp->at(bi)) ) ? true : false;
 			//passCurrentCut = ( oppositeChargeCut(mu_me_qoverp->at(ai), mu_me_qoverp->at(bi)) ) ? true : false;
@@ -3047,8 +3094,8 @@ inline bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		// cutFlow ///////////////////////////////////////////////////////////////////////
-		if(passCutFlow  &&  !isSkippedCut  &&  bDoFill) fillCutFlow(sorderedcutname); ////
-		if(!passCutFlow && !isSkippedCut) throwInfo(sorderedcutname); ////////////////////
+		if(passCutFlow   &&  !isSkippedCut  &&  bDoFill) fillCutFlow(sorderedcutname); ///
+		if(!passCutFlow  &&  !isSkippedCut)              throwInfo(sorderedcutname); /////
 		//////////////////////////////////////////////////////////////////////////////////
 		
 	} // end for(m_cutFlowOrdered)

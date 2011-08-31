@@ -33,6 +33,7 @@ public:
 	inline int getPVindex();
 	inline int getPVindex(int nTypeCut, int nTracksCut, float z0cut,
 						  vector<int>* v_vxp_nTracks, vector<int>* v_vxp_type, vector<float>* v_vxp_z);
+	inline bool oppositeChargeCandidatesCut( vector<float>* v_charge, vector<bool>& v_QAflag);
 	
 	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 

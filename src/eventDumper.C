@@ -125,10 +125,10 @@ inline void eventDumper::setSingleEventFile(int RunNumber, int lbn, int EventNum
 	(*singleEventFile) << "\\pagestyle{plain}" << endl;
 	(*singleEventFile) << "\\usepackage{booktabs,longtable,rotating}" << endl;
 	
-	(*singleEventFile) << "\\addtolength{\oddsidemargin}{-1.5cm}" << endl;
-	(*singleEventFile) << "\\addtolength{\textwidth}{2.5cm}" << endl;
-	(*singleEventFile) << "\\addtolength{\textheight}{5cm}" << endl;
-	(*singleEventFile) << "\\addtolength{\topmargin}{-3cm}" << endl;
+	(*singleEventFile) << "\\addtolength{\\oddsidemargin}{-1.5cm}" << endl;
+	(*singleEventFile) << "\\addtolength{\\textwidth}{2.5cm}" << endl;
+	(*singleEventFile) << "\\addtolength{\\textheight}{3cm}" << endl;
+	(*singleEventFile) << "\\addtolength{\\topmargin}{-1.5cm}" << endl;
 	
 	(*singleEventFile) << "\\begin{document}" << endl;
 	(*singleEventFile) << "\t{\\scriptsize" << endl;

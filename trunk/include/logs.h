@@ -121,6 +121,20 @@ static inline bool validate_bool(string str)
 	return true;
 }
 
+static inline string tostring(short x)
+{
+	stringstream strm;
+	string str;
+	strm << x;
+	strm >> str;
+	return str;
+}
+
+static inline string tostring(unsigned short x)
+{
+	return tostring((short)x);
+}
+
 static inline string tostring(int x)
 {
 	stringstream strm;
@@ -128,6 +142,11 @@ static inline string tostring(int x)
 	strm << x;
 	strm >> str;
 	return str;
+}
+
+static inline string tostring(unsigned int x)
+{
+	return tostring((int)x);
 }
 
 static inline string tostring(double x)
@@ -139,6 +158,11 @@ static inline string tostring(double x)
 	return str;
 }
 
+static inline string tostring(float x)
+{
+	return tostring((double)x);
+}
+
 static inline string tostring(double x, int prcn)
 {
 	stringstream strm;
@@ -146,6 +170,12 @@ static inline string tostring(double x, int prcn)
 	strm << setprecision(prcn) << fixed << x; 
 	strm >> str;
 	return str;
+}
+
+
+static inline string tostring(float x, int prcn)
+{
+	return tostring((double)x, prcn);
 }
 
 static inline int toint(string str)
@@ -174,6 +204,15 @@ static inline float  validate_float(const char* cc)  { return validate_float((st
 static inline bool   validate_bool(const char* cc)   { return validate_bool((string)cc); }		
 static inline int    toint(const char* cc)           { return toint((string)cc); }
 static inline double todouble(const char* cc)        { return todouble((string)cc); }
+
+static inline string _s(unsigned int x)     {return tostring(x);}
+static inline string _s(int x)              {return tostring(x);}
+static inline string _s(double x)           {return tostring(x);}
+static inline string _s(float x)            {return tostring(x);}
+static inline string _s(short x)            {return tostring(x);}
+static inline string _s(unsigned short x)   {return tostring(x);}
+static inline string _s(double x, int prcn) {return tostring(x,prcn);}
+static inline string _s(float x, int prcn)  {return tostring(x,prcn);}
 
 #endif
 

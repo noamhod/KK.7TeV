@@ -45,6 +45,7 @@ public:
 	int counter;
 	int ai;
 	int bi;
+	int vi;
 	int ai_truth;
 	int bi_truth;
 	int iVtx;
@@ -569,6 +570,7 @@ public:
 	float current_muplus_me_theta;
 	float current_mu_id_theta;
 	float current_muplus_id_theta;
+	int   current_ivertex;
 
 public:
 	analysisSkeleton();

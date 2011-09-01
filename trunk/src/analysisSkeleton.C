@@ -270,58 +270,169 @@ bool analysisSkeleton::checkTrigger(float trigThreshold)
 }
 
 
+// void analysisSkeleton::runEventDumper()
+// {
+	// _DEBUG("analysisSkeleton::runEventDumper");
+	// if(doEventDump)
+	// {
+		// int lead_mu     = ai;
+		// int sublead_mu  = bi;
+
+		// if( mu_pt->at(ai) < mu_pt->at(bi) )
+		// {
+			// lead_mu     = bi;
+			// sublead_mu  = ai;
+		// }
+		
+		// current_imass       = imass(pmu[lead_mu],pmu[sublead_mu]);
+		// current_cosTheta    = cosThetaCollinsSoper( pmu[lead_mu], -1, pmu[sublead_mu], +1 );
+		// current_mu_pT       = mu_pt->at(lead_mu)*MeV2TeV;//pT(mu_me_qoverp->at(lead_mu),mu_me_theta->at(lead_mu))*MeV2TeV;
+		// current_muplus_pT   = mu_pt->at(sublead_mu)*MeV2TeV;//pT(mu_me_qoverp->at(sublead_mu),mu_me_theta->at(sublead_mu))*MeV2TeV;
+		// current_mu_eta      = mu_eta->at(lead_mu);
+		// current_muplus_eta  = mu_eta->at(sublead_mu);
+		// current_cosmicCosth = cosThetaDimu(pmu[lead_mu],pmu[sublead_mu]);
+		// current_etaSum      = current_muplus_eta + current_mu_eta;
+		
+		// setCurrentEventMass( imass(pmu[lead_mu],pmu[sublead_mu]) );
+		// writeEventHeader(RunNumber, lbn, EventNumber);
+		
+		// writeProperty("$p_T$", mu_pt->at(lead_mu)*MeV2TeV, mu_pt->at(sublead_mu)*MeV2TeV);
+		// writeProperty("$\\eta$", mu_eta->at(lead_mu), mu_eta->at(sublead_mu));
+		
+		// writeProperty("$\\sum{p_T^{cone20}}/p_T$", mu_ptcone20->at(lead_mu)/mu_pt->at(lead_mu), mu_ptcone20->at(sublead_mu)/mu_pt->at(sublead_mu));
+		// writeProperty("$\\sum{p_T^{cone30}}/p_T$", mu_ptcone30->at(lead_mu)/mu_pt->at(lead_mu), mu_ptcone30->at(sublead_mu)/mu_pt->at(sublead_mu));
+		// writeProperty("$\\sum{p_T^{cone40}}/p_T$", mu_ptcone40->at(lead_mu)/mu_pt->at(lead_mu), mu_ptcone40->at(sublead_mu)/mu_pt->at(sublead_mu));
+		
+		// writeProperty("nSCThits", mu_nSCTHits->at(lead_mu), mu_nSCTHits->at(sublead_mu));
+		// writeProperty("nPIXhits", mu_nPixHits->at(lead_mu), mu_nPixHits->at(sublead_mu));
+		// writeProperty("nIDhits ", mu_nSCTHits->at(lead_mu)+mu_nPixHits->at(lead_mu), mu_nSCTHits->at(sublead_mu)+mu_nPixHits->at(sublead_mu));
+		
+		// writeProperty("$\\hat{m}_{\\mu\\mu}$", "red", imass(pmu[lead_mu],pmu[sublead_mu]));
+		// writeProperty("$\\sum{\\eta_{\\mu}}$", "red", current_muplus_eta + current_mu_eta);
+		// writeProperty("$\\hat{p}_{\\mu^-}\\cdot\\hat{p}_{\\mu^+}$", cosThetaDimu(pmu[lead_mu],pmu[sublead_mu]));
+		// writeProperty("$\\cos\\theta_{\\mu^-}$", cosThetaCollinsSoper( pmu[lead_mu], -1, pmu[sublead_mu], +1 ));
+		
+		// writeEventFooter();
+	// }
+// }
+
 void analysisSkeleton::runEventDumper()
 {
-	_DEBUG("analysisSkeleton::runEventDumper");
-	//////////////////////////////////////////////////////////////////////////////////////////////
-	// write the interesting events to a flat file ///////////////////////////////////////////////
-	if(doEventDump)
-	{
-		//int lead_mu = (mu_charge->at(ai)<0) ? ai : bi;
-		//int sublead_mu  = (mu_charge->at(ai)>0) ? ai : bi;
-		int lead_mu     = ai;
-		int sublead_mu  = bi;
-
-		if( mu_pt->at(ai) < mu_pt->at(bi) )
-		{
-			lead_mu     = bi;
-			sublead_mu  = ai;
-		}
-		
-		current_imass       = imass(pmu[lead_mu],pmu[sublead_mu]);
-		current_cosTheta    = cosThetaCollinsSoper( pmu[lead_mu], -1, pmu[sublead_mu], +1 );
-		current_mu_pT       = mu_pt->at(lead_mu)*MeV2TeV;//pT(mu_me_qoverp->at(lead_mu),mu_me_theta->at(lead_mu))*MeV2TeV;
-		current_muplus_pT   = mu_pt->at(sublead_mu)*MeV2TeV;//pT(mu_me_qoverp->at(sublead_mu),mu_me_theta->at(sublead_mu))*MeV2TeV;
-		current_mu_eta      = mu_eta->at(lead_mu);
-		current_muplus_eta  = mu_eta->at(sublead_mu);
-		current_cosmicCosth = cosThetaDimu(pmu[lead_mu],pmu[sublead_mu]);
-		current_etaSum      = current_muplus_eta + current_mu_eta;
-		
-		setCurrentEventMass( imass(pmu[lead_mu],pmu[sublead_mu]) );
-		writeEventHeader(RunNumber, lbn, EventNumber);
-		
-		//writeProperty("$p_T$", pT(mu_me_qoverp->at(lead_mu),mu_me_theta->at(lead_mu))*MeV2TeV, pT(mu_me_qoverp->at(sublead_mu),mu_me_theta->at(sublead_mu))*MeV2TeV);
-		writeProperty("$p_T$", mu_pt->at(lead_mu)*MeV2TeV, mu_pt->at(sublead_mu)*MeV2TeV);
-		writeProperty("$\\eta$", mu_eta->at(lead_mu), mu_eta->at(sublead_mu));
-		
-		writeProperty("$\\sum{p_T^{cone20}}/p_T$", mu_ptcone20->at(lead_mu)/mu_pt->at(lead_mu), mu_ptcone20->at(sublead_mu)/mu_pt->at(sublead_mu));
-		writeProperty("$\\sum{p_T^{cone30}}/p_T$", mu_ptcone30->at(lead_mu)/mu_pt->at(lead_mu), mu_ptcone30->at(sublead_mu)/mu_pt->at(sublead_mu));
-		writeProperty("$\\sum{p_T^{cone40}}/p_T$", mu_ptcone40->at(lead_mu)/mu_pt->at(lead_mu), mu_ptcone40->at(sublead_mu)/mu_pt->at(sublead_mu));
-		
-		writeProperty("nSCThits", mu_nSCTHits->at(lead_mu), mu_nSCTHits->at(sublead_mu));
-		writeProperty("nPIXhits", mu_nPixHits->at(lead_mu), mu_nPixHits->at(sublead_mu));
-		writeProperty("nIDhits ", mu_nSCTHits->at(lead_mu)+mu_nPixHits->at(lead_mu), mu_nSCTHits->at(sublead_mu)+mu_nPixHits->at(sublead_mu));
-		
-		writeProperty("$\\hat{m}_{\\mu\\mu}$", "red", imass(pmu[lead_mu],pmu[sublead_mu]));
-		writeProperty("$\\sum{\\eta_{\\mu}}$", "red", current_muplus_eta + current_mu_eta);
-		writeProperty("$\\hat{p}_{\\mu^-}\\cdot\\hat{p}_{\\mu^+}$", cosThetaDimu(pmu[lead_mu],pmu[sublead_mu]));
-		writeProperty("$\\cos\\theta_{\\mu^-}$", cosThetaCollinsSoper( pmu[lead_mu], -1, pmu[sublead_mu], +1 ));
-		
-		
-		writeEventFooter();
-	}
-	//////////////////////////////////////////////////////////////////////////////////////////////
+	if(!isInteresting(current_imass)) return;
+	
+	setSingleEventFile(RunNumber,lbn,EventNumber);
+	insertTableLine("$m_{\\mu\\mu}$", _s(current_imass)+"~TeV");
+	insertTableLine("$\\cos\\theta^*_{{\\rm HE}}$", _s(current_cosThetaHE));
+	insertTableLine("$\\cos\\theta^*_{{\\rm CS}}$", _s(current_cosThetaCS));
+	insertTableLine("$Q_T\\left(\\mu\\mu\\right)$", _s(current_QT)+"~TeV");
+	insertTableLine("$y_Q\\left(\\mu\\mu\\right)$", _s(current_ySystem));
+	insertTableLine("charge", _s(mu_charge->at(ai)), _s(mu_charge->at(bi)));
+	insertTableLine("all author", _s(mu_allauthor->at(ai)), _s(mu_allauthor->at(bi)));
+	insertTableLine("$\\mu$ author", _s(mu_author->at(ai)), _s(mu_author->at(bi)));
+	insertTableLine("$\\beta$", _s(mu_beta->at(ai)), _s(mu_beta->at(bi)));
+	insertTableLine("isMuonLikelihood", _s(mu_isMuonLikelihood->at(ai)), _s(mu_isMuonLikelihood->at(bi)));
+	insertTableLine("match $\\chi^2$", _s(mu_matchchi2->at(ai)), _s(mu_matchchi2->at(bi)));
+	insertTableLine("match $N_{{\\rm DOF}}$", _s(mu_matchndof->at(ai)), _s(mu_matchndof->at(bi)));
+	insertTableLine("$\\eta$", _s(mu_eta->at(ai)), _s(mu_eta->at(bi)));
+	insertTableLine("$\\phi$", _s(mu_phi->at(ai)), _s(mu_phi->at(bi)));
+	insertTableLine("$E$", _s(mu_E->at(ai)*MeV2GeV)+"~GeV", _s(mu_E->at(bi)*MeV2GeV)+"~GeV");
+	insertTableLine("$p_x$", _s(mu_px->at(ai)*MeV2GeV)+"~GeV", _s(mu_px->at(bi)*MeV2GeV)+"~GeV");
+	insertTableLine("$p_y$", _s(mu_py->at(ai)*MeV2GeV)+"~GeV", _s(mu_py->at(bi)*MeV2GeV)+"~GeV");
+	insertTableLine("$p_z$", _s(mu_pz->at(ai)*MeV2GeV)+"~GeV", _s(mu_pz->at(bi)*MeV2GeV)+"~GeV");
+	insertTableLine("$p_T{\\rm (CB)}$", _s(mu_pt->at(ai)*MeV2GeV)+"~GeV", _s(mu_pt->at(bi)*MeV2GeV)+"~GeV");
+	insertTableLine("$p_T{\\rm (MS)}$", _s(pT(mu_ms_qoverp->at(ai),mu_ms_theta->at(ai))*MeV2GeV)+"~GeV", _s(pT(mu_ms_qoverp->at(bi),mu_ms_theta->at(bi))*MeV2GeV)+"~GeV");
+	insertTableLine("$p_T{\\rm (ME)}$", _s(pT(mu_me_qoverp->at(ai),mu_me_theta->at(ai))*MeV2GeV)+"~GeV", _s(pT(mu_me_qoverp->at(bi),mu_me_theta->at(bi))*MeV2GeV)+"~GeV");
+	insertTableLine("$p_T{\\rm (ID)}$", _s(pT(mu_id_qoverp->at(ai),mu_id_theta->at(ai))*MeV2GeV)+"~GeV", _s(pT(mu_id_qoverp->at(bi),mu_id_theta->at(bi))*MeV2GeV)+"~GeV");
+	insertTableLine("$p_T{\\rm (IE)}$", _s(pT(mu_ie_qoverp->at(ai),mu_ie_theta->at(ai))*MeV2GeV)+"~GeV", _s(pT(mu_ie_qoverp->at(bi),mu_ie_theta->at(bi))*MeV2GeV)+"~GeV");
+	insertTableLine("$d_0$ exPV", _s(mu_d0_exPV->at(ai))+"~mm", _s(mu_d0_exPV->at(bi))+"~mm");
+	insertTableLine("$z_0$ exPV", _s(mu_z0_exPV->at(ai))+"~mm", _s(mu_z0_exPV->at(bi))+"~mm");
+	insertTableLine("$\\phi$ exPV", _s(mu_phi_exPV->at(ai))+"~mm", _s(mu_phi_exPV->at(bi))+"~mm");
+	insertTableLine("$\\theta$ exPV", _s(mu_theta_exPV->at(ai))+"~mm", _s(mu_theta_exPV->at(bi))+"~mm");
+	insertTableLine("$\\frac{Q}{p}$ exPV", _s(mu_qoverp_exPV->at(ai))+"~mm", _s(mu_qoverp_exPV->at(bi))+"~mm");
+	insertTableLine("$p_T^{dR<0.2}/p_T{\\rm (CB)}$", _s(mu_ptcone20->at(ai)/mu_pt->at(ai)), _s(mu_ptcone20->at(bi)/mu_pt->at(bi)));
+	insertTableLine("$p_T^{dR<0.3}/p_T{\\rm (CB)}$", _s(mu_ptcone30->at(ai)/mu_pt->at(ai)), _s(mu_ptcone30->at(bi)/mu_pt->at(bi)));
+	insertTableLine("$p_T^{dR<0.4}/p_T{\\rm (CB)}$", _s(mu_ptcone40->at(ai)/mu_pt->at(ai)), _s(mu_ptcone40->at(bi)/mu_pt->at(bi)));
+	insertTableLine("energyLossPar",_s(mu_energyLossPar->at(ai)), _s(mu_energyLossPar->at(bi)));
+	insertTableLine("energyLossErr", _s(mu_energyLossErr->at(ai)), _s(mu_energyLossErr->at(bi)));
+	insertTableLine("etCore", _s(mu_etCore->at(ai)), _s(mu_etCore->at(bi)));
+	insertTableLine("energyLossType", _s(mu_energyLossType->at(ai)), _s(mu_energyLossType->at(bi)));
+	insertTableLine("caloMuonIdTag", _s(mu_caloMuonIdTag->at(ai)), _s(mu_caloMuonIdTag->at(bi)));
+	insertTableLine("caloLRLikelihood", _s(mu_caloLRLikelihood->at(ai)), _s(mu_caloLRLikelihood->at(bi)));
+	insertTableLine("bestMatch", _s(mu_bestMatch->at(ai)), _s(mu_bestMatch->at(bi)));
+	insertTableLine("isStandAloneMuon", _s(mu_isStandAloneMuon->at(ai)), _s(mu_isStandAloneMuon->at(bi)));
+	insertTableLine("isCombinedMuon", _s(mu_isCombinedMuon->at(ai)), _s(mu_isCombinedMuon->at(bi)));
+	insertTableLine("isLowPtReconstructedMuon", _s(mu_isLowPtReconstructedMuon->at(ai)), _s(mu_isLowPtReconstructedMuon->at(bi)));
+	insertTableLine("loose", _s(mu_loose->at(ai)), _s(mu_loose->at(bi)));
+	insertTableLine("medium", _s(mu_medium->at(ai)), _s(mu_medium->at(bi)));
+	insertTableLine("tight", _s(mu_tight->at(ai)), _s(mu_tight->at(bi)));
+	insertTableLine("nBLHits", _s(mu_nBLHits->at(ai)), _s(mu_nBLHits->at(bi)));
+	insertTableLine("nPixHits", _s(mu_nPixHits->at(ai)), _s(mu_nPixHits->at(bi)));
+	insertTableLine("nSCTHits", _s(mu_nSCTHits->at(ai)), _s(mu_nSCTHits->at(bi)));
+	insertTableLine("nTRTHits", _s(mu_nTRTHits->at(ai)), _s(mu_nTRTHits->at(bi)));
+	insertTableLine("nTRTHighTHits", _s(mu_nTRTHighTHits->at(ai)), _s(mu_nTRTHighTHits->at(bi)));
+	insertTableLine("nBLSharedHits", _s(mu_nBLSharedHits->at(ai)), _s(mu_nBLSharedHits->at(bi)));
+	insertTableLine("nPixSharedHits", _s(mu_nPixSharedHits->at(ai)), _s(mu_nPixSharedHits->at(bi)));
+	insertTableLine("nPixHoles", _s(mu_nPixHoles->at(ai)), _s(mu_nPixHoles->at(bi)));
+	insertTableLine("nSCTSharedHits", _s(mu_nSCTSharedHits->at(ai)), _s(mu_nSCTSharedHits->at(bi)));
+	insertTableLine("nSCTHoles", _s(mu_nSCTHoles->at(ai)), _s(mu_nSCTHoles->at(bi)));
+	insertTableLine("nTRTOutliers", _s(mu_nTRTOutliers->at(ai)), _s(mu_nTRTOutliers->at(bi)));
+	insertTableLine("nTRTHighTOutliers", _s(mu_nTRTHighTOutliers->at(ai)), _s(mu_nTRTHighTOutliers->at(bi)));
+	insertTableLine("nGangedPixels", _s(mu_nGangedPixels->at(ai)), _s(mu_nGangedPixels->at(bi)));
+	insertTableLine("nPixelDeadSensors", _s(mu_nPixelDeadSensors->at(ai)), _s(mu_nPixelDeadSensors->at(bi)));
+	insertTableLine("nSCTDeadSensors", _s(mu_nSCTDeadSensors->at(ai)), _s(mu_nSCTDeadSensors->at(bi)));
+	insertTableLine("nTRTDeadStraws", _s(mu_nTRTDeadStraws->at(ai)), _s(mu_nTRTDeadStraws->at(bi)));
+	insertTableLine("expectBLayerHit", _s(mu_expectBLayerHit->at(ai)), _s(mu_expectBLayerHit->at(bi)));
+	insertTableLine("nMDTHits", _s(mu_nMDTHits->at(ai)), _s(mu_nMDTHits->at(bi)));
+	insertTableLine("nMDTHoles", _s(mu_nMDTHoles->at(ai)), _s(mu_nMDTHoles->at(bi)));
+	insertTableLine("nCSCEtaHits", _s(mu_nCSCEtaHits->at(ai)), _s(mu_nCSCEtaHits->at(bi)));
+	insertTableLine("nCSCEtaHoles", _s(mu_nCSCEtaHoles->at(ai)), _s(mu_nCSCEtaHoles->at(bi)));
+	insertTableLine("nCSCPhiHits", _s(mu_nCSCPhiHits->at(ai)), _s(mu_nCSCPhiHits->at(bi)));
+	insertTableLine("nCSCPhiHoles", _s(mu_nCSCPhiHoles->at(ai)), _s(mu_nCSCPhiHoles->at(bi)));
+	insertTableLine("nRPCEtaHits", _s(mu_nRPCEtaHits->at(ai)), _s(mu_nRPCEtaHits->at(bi)));
+	insertTableLine("nRPCEtaHoles", _s(mu_nRPCEtaHoles->at(ai)), _s(mu_nRPCEtaHoles->at(bi)));
+	insertTableLine("nRPCPhiHits", _s(mu_nRPCPhiHits->at(ai)), _s(mu_nRPCPhiHits->at(bi)));
+	insertTableLine("nRPCPhiHoles", _s(mu_nRPCPhiHoles->at(ai)), _s(mu_nRPCPhiHoles->at(bi)));
+	insertTableLine("nTGCEtaHits", _s(mu_nTGCEtaHits->at(ai)), _s(mu_nTGCEtaHits->at(bi)));
+	insertTableLine("nTGCEtaHoles", _s(mu_nTGCEtaHoles->at(ai)), _s(mu_nTGCEtaHoles->at(bi)));
+	insertTableLine("nTGCPhiHits", _s(mu_nTGCPhiHits->at(ai)), _s(mu_nTGCPhiHits->at(bi)));
+	insertTableLine("nTGCPhiHoles", _s(mu_nTGCPhiHoles->at(ai)), _s(mu_nTGCPhiHoles->at(bi)));
+	insertTableLine("nMDTBIHits", _s(mu_nMDTBIHits->at(ai)), _s(mu_nMDTBIHits->at(bi)));
+	insertTableLine("nMDTBMHits", _s(mu_nMDTBMHits->at(ai)), _s(mu_nMDTBMHits->at(bi)));
+	insertTableLine("nMDTBOHits", _s(mu_nMDTBOHits->at(ai)), _s(mu_nMDTBOHits->at(bi)));
+	insertTableLine("nMDTBEEHits", _s(mu_nMDTBEEHits->at(ai)), _s(mu_nMDTBEEHits->at(bi)));
+	insertTableLine("nMDTBIS78Hits", _s(mu_nMDTBIS78Hits->at(ai)), _s(mu_nMDTBIS78Hits->at(bi)));
+	insertTableLine("nMDTEIHits", _s(mu_nMDTEIHits->at(ai)), _s(mu_nMDTEIHits->at(bi)));
+	insertTableLine("nMDTEMHits", _s(mu_nMDTEMHits->at(ai)), _s(mu_nMDTEMHits->at(bi)));
+	insertTableLine("nMDTEOHits", _s(mu_nMDTEOHits->at(ai)), _s(mu_nMDTEOHits->at(bi)));
+	insertTableLine("nMDTEEHits", _s(mu_nMDTEEHits->at(ai)), _s(mu_nMDTEEHits->at(bi)));
+	insertTableLine("nRPCLayer1EtaHits", _s(mu_nRPCLayer1EtaHits->at(ai)), _s(mu_nRPCLayer1EtaHits->at(bi)));
+	insertTableLine("nRPCLayer2EtaHits", _s(mu_nRPCLayer2EtaHits->at(ai)), _s(mu_nRPCLayer2EtaHits->at(bi)));
+	insertTableLine("nRPCLayer3EtaHits", _s(mu_nRPCLayer3EtaHits->at(ai)), _s(mu_nRPCLayer3EtaHits->at(bi)));
+	insertTableLine("nRPCLayer1PhiHits", _s(mu_nRPCLayer1PhiHits->at(ai)), _s(mu_nRPCLayer1PhiHits->at(bi)));
+	insertTableLine("nRPCLayer2PhiHits", _s(mu_nRPCLayer2PhiHits->at(ai)), _s(mu_nRPCLayer2PhiHits->at(bi)));
+	insertTableLine("nRPCLayer3PhiHits", _s(mu_nRPCLayer3PhiHits->at(ai)), _s(mu_nRPCLayer3PhiHits->at(bi)));
+	insertTableLine("nTGCLayer1EtaHits", _s(mu_nTGCLayer1EtaHits->at(ai)), _s(mu_nTGCLayer1EtaHits->at(bi)));
+	insertTableLine("nTGCLayer2EtaHits", _s(mu_nTGCLayer2EtaHits->at(ai)), _s(mu_nTGCLayer2EtaHits->at(bi)));
+	insertTableLine("nTGCLayer3EtaHits", _s(mu_nTGCLayer3EtaHits->at(ai)), _s(mu_nTGCLayer3EtaHits->at(bi)));
+	insertTableLine("nTGCLayer4EtaHits", _s(mu_nTGCLayer4EtaHits->at(ai)), _s(mu_nTGCLayer4EtaHits->at(bi)));
+	insertTableLine("nTGCLayer1PhiHits", _s(mu_nTGCLayer1PhiHits->at(ai)), _s(mu_nTGCLayer1PhiHits->at(bi)));
+	insertTableLine("nTGCLayer2PhiHits", _s(mu_nTGCLayer2PhiHits->at(ai)), _s(mu_nTGCLayer2PhiHits->at(bi)));
+	insertTableLine("nTGCLayer3PhiHits", _s(mu_nTGCLayer3PhiHits->at(ai)), _s(mu_nTGCLayer3PhiHits->at(bi)));
+	insertTableLine("nTGCLayer4PhiHits", _s(mu_nTGCLayer4PhiHits->at(ai)), _s(mu_nTGCLayer4PhiHits->at(bi)));
+	insertTableLine("trackfitchi2", _s(mu_trackfitchi2->at(ai)), _s(mu_trackfitchi2->at(bi)));
+	insertTableLine("trackfitndof", _s(mu_trackfitndof->at(ai)), _s(mu_trackfitndof->at(bi)));
+	insertTableLine("hastrack", _s(mu_hastrack->at(ai)), _s(mu_hastrack->at(bi)));
+	insertTableLine("EFCB\\_dr", _s(mu_EFCB_dr->at(ai)), _s(mu_EFCB_dr->at(bi)));
+	insertTableLine("EFMG\\_dr", _s(mu_EFMG_dr->at(ai)), _s(mu_EFMG_dr->at(bi)));
+	insertTableLine("EFME\\_dr", _s(mu_EFME_dr->at(ai)), _s(mu_EFME_dr->at(bi)));
+	insertTableLine("L2CB\\_dr", _s(mu_L2CB_dr->at(ai)), _s(mu_L2CB_dr->at(bi)));
+	insertTableLine("L1\\_dr",_s(mu_L1_dr->at(ai)), _s(mu_L1_dr->at(bi)), false, true);
+	
+	///////////////////////////////////////
+	closeSingleEventFile(); // end ////////
+	///////////////////////////////////////
 }
+
 
 void analysisSkeleton::printAllProperties(int aii, int bii, int iv)
 {
@@ -504,6 +615,7 @@ void analysisSkeleton::fillAfterCuts()
 		lead_mu     = bi;
 		sublead_mu  = ai;
 	}
+	vi = getPVindex();
 
 	current_mu_me_pT     = pT(mu_me_qoverp->at(lead_mu),mu_me_theta->at(lead_mu))*MeV2TeV;
 	current_muplus_me_pT = pT(mu_me_qoverp->at(sublead_mu),mu_me_theta->at(sublead_mu))*MeV2TeV;
@@ -530,6 +642,7 @@ void analysisSkeleton::fillAfterCuts()
 	current_QT          = QT( pmu[lead_mu], pmu[sublead_mu] );
 	current_cosmicCosth = cosThetaDimu(pmu[lead_mu],pmu[sublead_mu]);
 	current_ipTdiff     = (current_muplus_pT!=0.  &&  current_mu_pT!=0.) ? 1./current_muplus_pT-1./current_mu_pT : -999.;
+	current_ivertex     = getPVindex();
 	current_etaSum      = current_muplus_eta + current_mu_eta;
 	current_pTdiff      = current_mu_me_pT - current_mu_id_pT;
 	current_pTdiff_muplus  = current_muplus_me_pT - current_muplus_id_pT;
@@ -568,15 +681,15 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::lbn = lbn;
 	graphicObjects::bcid = bcid;
 
-	graphicObjects::ivxp            = getPVindex();
+	graphicObjects::ivxp            = current_ivertex;
 	graphicObjects::iLeadingMuon    = lead_mu;
 	graphicObjects::iSubLeadingMuon = sublead_mu;
 	
 	// all cuts - vectors
 	graphicObjects::graphicObjects::vxp_n = vxp_n;
-	graphicObjects::vxp_nTracks->push_back(vxp_nTracks->at(getPVindex()));
-	graphicObjects::vxp_type->push_back(vxp_type->at(getPVindex()));
-	graphicObjects::vxp_z->push_back(vxp_z->at(getPVindex()));
+	graphicObjects::vxp_nTracks->push_back(vxp_nTracks->at(current_ivertex));
+	graphicObjects::vxp_type->push_back(vxp_type->at(current_ivertex));
+	graphicObjects::vxp_z->push_back(vxp_z->at(current_ivertex));
 	
 	graphicObjects::Mhat         = current_imass;
 	graphicObjects::CosThetaCS   = current_cosThetaCS;
@@ -1238,11 +1351,14 @@ void analysisSkeleton::pTSort()
 	ai = rit->second; //////////////////////////////////////////////////////////////////////
 	rit++; /////////////////////////////////////////////////////////////////////////////////
 	bi = rit->second; //////////////////////////////////////////////////////////////////////
-	while(mu_charge->at(ai)*mu_charge->at(bi)>0  &&  rit!=pTtoIndexMap.rend()) /////////////
-	{                                            ///////////////////////////////////////////
-		rit++;                                   ///////////////////////////////////////////
-		bi = rit->second;                        ///////////////////////////////////////////
-	}                                            ///////////////////////////////////////////
+	if(pTtoIndexMap.size()>2)                         //////////////////////////////////////
+	{                                                ///////////////////////////////////////
+		while(mu_charge->at(ai)*mu_charge->at(bi)>0  &&  rit!=pTtoIndexMap.rend()) /////////
+		{                                            ///////////////////////////////////////
+			rit++;                                   ///////////////////////////////////////
+			bi = rit->second;                        ///////////////////////////////////////
+		}                                            ///////////////////////////////////////
+	}                                                ///////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////
 	
 	if(pTtoIndexMap.size()>2)
@@ -1291,12 +1407,29 @@ void analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b)
 	index_a = rit->second; ////////////////////////////////////////////////////////////////////////
 	rit++; ////////////////////////////////////////////////////////////////////////////////////////
 	index_b = rit->second; ////////////////////////////////////////////////////////////////////////
-	while(mu_charge->at(index_a)*mu_charge->at(index_b)>0  &&  rit!=pTtoIndex.rend()) /////////////
-	{                                            //////////////////////////////////////////////////
-		rit++;                                   //////////////////////////////////////////////////
-		index_b = rit->second;                        /////////////////////////////////////////////
-	}                                            //////////////////////////////////////////////////
+	if(pTtoIndex.size()>2)                           //////////////////////////////////////////////
+	{                                                //////////////////////////////////////////////
+		while(mu_charge->at(index_a)*mu_charge->at(index_b)>0  &&  rit!=pTtoIndex.rend()) /////////
+		{                                            //////////////////////////////////////////////
+			rit++;                                   //////////////////////////////////////////////
+			index_b = rit->second;                   //////////////////////////////////////////////
+		}                                            //////////////////////////////////////////////
+	}                                                //////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
+	
+	if(pTtoIndex.size()>2)
+	{
+		if((RunNumber+EventNumber+lbn)!=EventHash)
+		{
+			_INFO("MultiGoodMuon N{"
+				  +tostring((int)pTtoIndex.size())
+				  +"}{run-lb-evt: "+tostring(RunNumber)+"-"+tostring(lbn)+"-"+tostring(EventNumber)
+				  +"} -> ai["+tostring(mu_charge->at(ai))+"]="+tostring(ai)
+				  +", bi["+tostring(mu_charge->at(bi))+"]="+tostring(bi));
+			EventHash = RunNumber+EventNumber+lbn;
+			isMultiMuonPrint = true;
+		}
+	}
 }
 
 void analysisSkeleton::imassSort()
@@ -1440,7 +1573,8 @@ bool analysisSkeleton::applyDoubleMuonSelection()
 		
 		////////////////////////////////////////////////////
 		// dump events. only if doEventDump==true //////////
-		runEventDumper(); //////////////////////////////////
+		//runEventDumper(); ////////////////////////////////
+		if(!AS_isMC) runEventDumper(); /////////////////////
 		////////////////////////////////////////////////////
 	}
 	

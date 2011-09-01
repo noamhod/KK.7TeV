@@ -14,6 +14,7 @@ class eventDumper
 {
 	public:
 		ofstream* file;
+		ofstream* singleEventFile;
 	
 		bool b_print;
 		bool doEventDump;
@@ -25,14 +26,19 @@ class eventDumper
 		eventDumper(string sEventDumpFilePath);
 		~eventDumper();
 
-		void setInterestingThreshold(double massThreshold);
-		void setCurrentEventMass(double currentEventMass);
-		void writeEventHeader(int RunNumber, int lbn, int eventNumber);
-		void writeEventFooter();
-		void writeProperty(string sProperty, double dPropertyMua, double dPropertyMub);
-		void writeProperty(string sProperty, string sColor, double dProperty);
-		void writeProperty(string sProperty, double dProperty);
-		void printProperty(string sProperty, double dProperty);
+		inline void setInterestingThreshold(double massThreshold);
+		inline void setCurrentEventMass(double currentEventMass);
+		inline void writeEventHeader(int RunNumber, int lbn, int eventNumber);
+		inline void writeEventFooter();
+		inline void writeProperty(string sProperty, double dPropertyMua, double dPropertyMub);
+		inline void writeProperty(string sProperty, string sColor, double dProperty);
+		inline void writeProperty(string sProperty, double dProperty);
+		inline void printProperty(string sProperty, double dProperty);
+		
+		inline bool isInteresting(double invariantMass);
+		inline void setSingleEventFile(int RunNumber, int lbn, int EventNumber);
+		inline void insertTableLine(string type, string line1, string line2="", bool isbreak=false, bool isLastLine=false);
+		inline void closeSingleEventFile();
 
 	private:
 

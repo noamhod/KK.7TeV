@@ -14,17 +14,15 @@ analysis::analysis()
 
 analysis::~analysis()
 {
-	//if(!m_isMC) fCandidates->close();
 	fCandidates->close();
 }
 
 void analysis::setAllCandidatesFiles(string sCandFilePath, string srunnumber)
 {
-	//if(!m_isMC)
-	//{
-		string sLogFileName = sCandFilePath+"/candidates_all.run_"+srunnumber+".cnd";//".time_"+getDateHour()+".cnd";
-		fCandidates = new ofstream( sLogFileName.c_str() );
-	//}
+
+	string sLogFileName = sCandFilePath+"/candidates_all.run_"+srunnumber+".cnd";//".time_"+getDateHour()+".cnd";
+	fCandidates = new ofstream( sLogFileName.c_str() );
+
 }
 
 void analysis::execute()

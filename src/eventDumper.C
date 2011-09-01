@@ -7,12 +7,12 @@
 
 #include "eventDumper.h"
 
-eventDumper::eventDumper()
+inline eventDumper::eventDumper()
 {
 	
 }
 
-eventDumper::eventDumper(string sEventDumpFilePath)
+inline eventDumper::eventDumper(string sEventDumpFilePath)
 {
 	b_print = false;
 	doEventDump = false;
@@ -29,7 +29,7 @@ eventDumper::eventDumper(string sEventDumpFilePath)
 	}	
 }
 
-eventDumper::~eventDumper()
+inline eventDumper::~eventDumper()
 {
 	file->close();
 }
@@ -37,17 +37,17 @@ eventDumper::~eventDumper()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-void eventDumper::setInterestingThreshold(double massThreshold)
+inline void eventDumper::setInterestingThreshold(double massThreshold)
 {
 	m_massThreshold = massThreshold;
 }
 
-void eventDumper::setCurrentEventMass(double currentEventMass)
+inline void eventDumper::setCurrentEventMass(double currentEventMass)
 {
 	m_currentEventMass = currentEventMass;
 }
 
-void eventDumper::writeEventHeader(int RunNumber, int lbn, int eventNumber)
+inline void eventDumper::writeEventHeader(int RunNumber, int lbn, int eventNumber)
 {
 	if(m_currentEventMass >= m_massThreshold)
 	{
@@ -62,7 +62,7 @@ void eventDumper::writeEventHeader(int RunNumber, int lbn, int eventNumber)
 	}
 }
 
-void eventDumper::writeEventFooter()
+inline void eventDumper::writeEventFooter()
 {
 	if(m_currentEventMass >= m_massThreshold)
 	{
@@ -75,7 +75,7 @@ void eventDumper::writeEventFooter()
 	}
 }
 
-void eventDumper::writeProperty(string sProperty, double dPropertyMua, double dPropertyMub)
+inline void eventDumper::writeProperty(string sProperty, double dPropertyMua, double dPropertyMub)
 {
 	if(m_currentEventMass >= m_massThreshold)
 	{
@@ -84,7 +84,7 @@ void eventDumper::writeProperty(string sProperty, double dPropertyMua, double dP
 	}
 }
 
-void eventDumper::writeProperty(string sProperty, double dProperty)
+inline void eventDumper::writeProperty(string sProperty, double dProperty)
 {
 	if(m_currentEventMass >= m_massThreshold)
 	{
@@ -94,7 +94,7 @@ void eventDumper::writeProperty(string sProperty, double dProperty)
 	}
 }
 
-void eventDumper::writeProperty(string sProperty, string sColor, double dProperty)
+inline void eventDumper::writeProperty(string sProperty, string sColor, double dProperty)
 {
 	if(m_currentEventMass >= m_massThreshold)
 	{
@@ -104,8 +104,66 @@ void eventDumper::writeProperty(string sProperty, string sColor, double dPropert
 	}
 }
 
-void eventDumper::printProperty(string sProperty, double dProperty)
+inline void eventDumper::printProperty(string sProperty, double dProperty)
 {
 	cout << sProperty << "\t" << dProperty << endl;
 }
+
+inline bool eventDumper::isInteresting(double invariantMass)
+{
+	return (invariantMass>=m_massThreshold) ? true : false;
+}
+
+
+inline void eventDumper::setSingleEventFile(int RunNumber, int lbn, int EventNumber)
+{
+	string name = "/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/tex/Event_"+_s(RunNumber)+"_"+_s(lbn)+"_"+_s(EventNumber)+".tex";
+	singleEventFile = new ofstream();
+	singleEventFile->open( name.c_str() );
+	
+	(*singleEventFile) << "\\documentclass[a4paper,12pt]{article}" << endl;
+	(*singleEventFile) << "\\pagestyle{plain}" << endl;
+	(*singleEventFile) << "\\usepackage{booktabs,longtable,rotating}" << endl;
+	
+	(*singleEventFile) << "\\addtolength{\oddsidemargin}{-1.5cm}" << endl;
+	(*singleEventFile) << "\\addtolength{\textwidth}{2.5cm}" << endl;
+	(*singleEventFile) << "\\addtolength{\textheight}{5cm}" << endl;
+	(*singleEventFile) << "\\addtolength{\topmargin}{-3cm}" << endl;
+	
+	(*singleEventFile) << "\\begin{document}" << endl;
+	(*singleEventFile) << "\t{\\scriptsize" << endl;
+	(*singleEventFile) << "\t\t\\begin{longtable}[t]{ccc}" << endl;
+	(*singleEventFile) << "\t\t\t\\toprule[1pt]" << endl;
+	(*singleEventFile) << "\t\t\t\\multicolumn{3}{c}{Run-Lbn-Evt " << RunNumber << "-" << lbn << "-" << EventNumber << "} \\\\" << endl;
+	(*singleEventFile) << "\t\t\t\\midrule[1pt]" << endl;
+}
+
+inline void eventDumper::insertTableLine(string type, string line1, string line2, bool isbreak, bool isLastLine)
+{
+	(*singleEventFile) << "\t\t\t" << type << " &" << line1;
+	if(line2!="")   (*singleEventFile)     << " &" << line2;
+	(*singleEventFile) << " \\\\";
+	if(!isLastLine)
+	{
+		(*singleEventFile) << " \\midrule[0.5pt]";
+		if(isbreak) (*singleEventFile) << "\\pagebreak" << endl;
+		else        (*singleEventFile) << "" << endl;
+	}
+	else
+	{
+		(*singleEventFile) << endl;
+	}	
+}
+
+inline void eventDumper::closeSingleEventFile()
+{
+	(*singleEventFile) << "\t\t\t\\bottomrule[1pt]" << endl;
+	(*singleEventFile) << "\t\t\\end{longtable}" << endl;
+	(*singleEventFile) << "\t}" << endl;
+	(*singleEventFile) << "\\end{document}" << endl;
+
+	singleEventFile->close();
+	delete singleEventFile;
+}
+
 

@@ -1,9 +1,14 @@
 #include "all.h"
 
-// bins fore the cosTheta histos
+// bins for the cosTheta histos
 double    costmin   = minCosTheta;
 double    costmax   = maxCosTheta;
 const int ncostbins = nCosThetaBins;
+
+// bins for the yQ histos 
+double   yqmin   = minyQ;
+double   yqmax   = maxyQ;
+int      nyqbins = nyQbins;
 
 // bins for the mHat histos
 double    imassmin   = minMassBin; //120.;
@@ -30,6 +35,7 @@ TFile* fWeights;
 TDirectory* dirAllHistograms;
 TDirectory* dirCostHistograms;
 TDirectory* dirMassHistograms;
+TDirectory* diryQHistograms;
 TDirectory* dirNtuples;
 
 vector<string> svNames;
@@ -39,6 +45,8 @@ vector<TH1D*>  hvBinnedHistos_imass_unscaled;
 vector<TH1D*>  hvBinnedHistos_imassRes;
 vector<vector<TH1D*> > hvvBinnedHistos_cosTh;
 vector<vector<TH1D*> > hvvBinnedHistos_cosTh_unscaled;
+vector<vector<TH1D*> > hvvBinnedHistos_yQ;
+vector<vector<TH1D*> > hvvBinnedHistos_yQ_unscaled;
 
 vector<vector<TTree*> > vvtBinnedNtuples;
 
@@ -48,7 +56,7 @@ TTree* tAfbMassBins;
 vector<double> dvWeights;
 vector<Color_t> cvColors;
 
-float mass_tru, mass_rec, mass_wgt, cost_tru, cost_rec, cost_wgt, xscn_wgt;
+float mass_tru, mass_rec, mass_wgt, cost_tru, cost_rec, cost_wgt, yQ_tru, yQ_rec, yQ_wgt, xscn_wgt;
 
 string sDir  = "/data/hod/pythia8_ntuples/";
 string sName = "";
@@ -65,21 +73,27 @@ void clearSamples()
 	svPaths.clear();
 	for(int n=0 ; n<(int)hvBinnedHistos_imass.size() ; n++)
 	{
-		if(hvBinnedHistos_imass[n]!=NULL) delete hvBinnedHistos_imass[n];
+		if(hvBinnedHistos_imass[n]!=NULL)          delete hvBinnedHistos_imass[n];
 		if(hvBinnedHistos_imass_unscaled[n]!=NULL) delete hvBinnedHistos_imass_unscaled[n];
-		if(hvBinnedHistos_imassRes[n]!=NULL) delete hvBinnedHistos_imassRes[n];
+		if(hvBinnedHistos_imassRes[n]!=NULL)       delete hvBinnedHistos_imassRes[n];
 		for(int m=0 ; m<(int)hvvBinnedHistos_cosTh[n].size() ; m++)
 		{
-			if(hvvBinnedHistos_cosTh[n][m]!=NULL) delete hvvBinnedHistos_cosTh[n][m];
+			if(hvvBinnedHistos_cosTh[n][m]!=NULL)          delete hvvBinnedHistos_cosTh[n][m];
 			if(hvvBinnedHistos_cosTh_unscaled[n][m]!=NULL) delete hvvBinnedHistos_cosTh_unscaled[n][m];
+			
+			if(hvvBinnedHistos_yQ[n][m]!=NULL)          delete hvvBinnedHistos_yQ[n][m];
+			if(hvvBinnedHistos_yQ_unscaled[n][m]!=NULL) delete hvvBinnedHistos_yQ_unscaled[n][m];
 		}
 		hvvBinnedHistos_cosTh[n].clear();
+		hvvBinnedHistos_yQ[n].clear();
 	}
 	hvBinnedHistos_imass.clear();
 	hvBinnedHistos_imass_unscaled.clear();
 	hvBinnedHistos_imassRes.clear();
 	hvvBinnedHistos_cosTh.clear();
 	hvvBinnedHistos_cosTh_unscaled.clear();
+	hvvBinnedHistos_yQ.clear();
+	hvvBinnedHistos_yQ_unscaled.clear();
 	dvWeights.clear();
 	cvColors.clear();
 }
@@ -107,19 +121,25 @@ void addSample(string sname, Color_t color, double events, double sigma /*in [mb
 
 	vector<TH1D*> vTmp;
 	vector<TH1D*> vTmp_unscaled;
-	stringstream strm;
-	string s;
 	for(int b=0 ; b<imass_afb_nbins ; b++)
 	{
-		strm.clear();
-		s.clear();
-		strm << b;
-		strm >> s;
-		vTmp.push_back( new TH1D((sName+"_massbin_"+s).c_str(),(sName+"_massbin_"+s).c_str(),ncostbins,costmin,costmax) );
-		vTmp_unscaled.push_back( new TH1D((sName+"unscaled_massbin_"+s).c_str(),(sName+"unscaled_massbin_"+s).c_str(),ncostbins,costmin,costmax) );
+		vTmp.push_back( new TH1D((sName+"_massbin_cost_"+_s(b)).c_str(),(sName+"_massbin_cost_"+_s(b)).c_str(),ncostbins,costmin,costmax) );
+		vTmp_unscaled.push_back( new TH1D((sName+"unscaled_cost_massbin_"+_s(b)).c_str(),(sName+"unscaled_cost_massbin_"+_s(b)).c_str(),ncostbins,costmin,costmax) );
 	}
 	hvvBinnedHistos_cosTh.push_back( vTmp );
 	hvvBinnedHistos_cosTh_unscaled.push_back( vTmp_unscaled );
+	
+	
+	vTmp.clear();
+	vTmp_unscaled.clear();
+	for(int b=0 ; b<imass_afb_nbins ; b++)
+	{
+		vTmp.push_back( new TH1D((sName+"_massbin_yQ_"+_s(b)).c_str(),(sName+"_massbin_yQ_"+_s(b)).c_str(),nyqbins,yqmin,yqmax) );
+		vTmp_unscaled.push_back( new TH1D((sName+"unscaled_massbin_yQ_"+_s(b)).c_str(),(sName+"unscaled_massbin_yQ_"+_s(b)).c_str(),nyqbins,yqmin,yqmax) );
+	}
+	hvvBinnedHistos_yQ.push_back( vTmp );
+	hvvBinnedHistos_yQ_unscaled.push_back( vTmp_unscaled );
+	
 	
 	dvWeights.push_back(luminosity/(events/(sigma*mb2fb)));
 	cvColors.push_back(color);
@@ -152,6 +172,9 @@ void initOutNtuples(TDirectory* tDir)
 			vvtBinnedNtuples[t-1][mod]->Branch( "cost_tru", &cost_tru );
 			vvtBinnedNtuples[t-1][mod]->Branch( "cost_rec", &cost_rec );
 			vvtBinnedNtuples[t-1][mod]->Branch( "cost_wgt", &cost_wgt );
+			vvtBinnedNtuples[t-1][mod]->Branch( "yQ_tru",   &yQ_tru );
+			vvtBinnedNtuples[t-1][mod]->Branch( "yQ_rec",   &yQ_rec );
+			vvtBinnedNtuples[t-1][mod]->Branch( "yQ_wgt",   &yQ_wgt );
 			vvtBinnedNtuples[t-1][mod]->Branch( "xscn_wgt", &xscn_wgt );
 		}
 	}
@@ -206,7 +229,8 @@ int plot_ratio_weights()
 	dirNtuples = fWeights->mkdir("ntuples");
 	dirCostHistograms = fWeights->mkdir("cosTheta_histograms");
 	dirMassHistograms = fWeights->mkdir("iMass_histograms");
-	dirAllHistograms = fWeights->mkdir("all_histograms");
+	diryQHistograms   = fWeights->mkdir("yQ_histograms");
+	dirAllHistograms  = fWeights->mkdir("all_histograms");
 	
 	dirAllHistograms->cd();
 	
@@ -375,38 +399,64 @@ int plot_ratio_weights()
 	vector<TH1D*> vhCosThSumTmp;
 	vector<TH1D*> vhCosThSumTmp_unscaled;
 	
+	vector<TH1D*> vhyQSumTmp;
+	vector<TH1D*> vhyQSumTmp_unscaled;
+	
 	vector<TH1D*> vhCosThSumZ0d3pd_unscaled;
 	vector<TH1D*> vhCosThSumZ0d3pd_acceptance;
 	vector<TH1D*> vhCosThSumZ0d3pd;
 	vector<TH1D*> vhCosThSumReconZ0d3pd;
 	vector<TH1D*> vhCosThSumReconDTd3pd;
 	
+	vector<TH1D*> vhyQSumZ0d3pd_unscaled;
+	vector<TH1D*> vhyQSumZ0d3pd;
+	vector<TH1D*> vhyQSumReconZ0d3pd;
+	vector<TH1D*> vhyQSumReconDTd3pd;
+	
 	vector<vector<TH1D*> > vvhCosThSum;
 	vector<vector<TH1D*> > vvhCosThSumRecTemplate;
 	vector<vector<TH1D*> > vvhCosThSumAcceptance;
 	vector<vector<TH1D*> > vvhCosThSumWeights;
+	
+	vector<vector<TH1D*> > vvhyQSum;
+	vector<vector<TH1D*> > vvhyQSumRecTemplate;
+	vector<vector<TH1D*> > vvhyQSumWeights;
+	
 	vector<TH1D*>          vhCosThSumXSweights;
-
+	vector<TH1D*>          vhyQSumXSweights;
 
 	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
 	{	
 		tsrange = (TString)tostring(imass_afb_bins[i]) +  " GeV #rightarrow "  + (TString)tostring(imass_afb_bins[i+1]) + " GeV";
 		
-		vhCosThSumTmp.push_back( new TH1D(tsrange, tsrange, ncostbins,costmin,costmax) );
-		vhCosThSumTmp_unscaled.push_back( new TH1D("xs"+tsrange,"xs"+tsrange, ncostbins,costmin,costmax) );
+		vhCosThSumTmp.push_back( new TH1D("cost_"+tsrange,"cost_"+tsrange, ncostbins,costmin,costmax) );
+		vhCosThSumTmp_unscaled.push_back( new TH1D("cost_xs"+tsrange,"cost_xs"+tsrange, ncostbins,costmin,costmax) );
 		
-		vhCosThSumZ0d3pd.push_back( new TH1D("sumZ0d3pd_"+tsrange, "sumZ0d3pd_"+tsrange, ncostbins,costmin,costmax) );
-		vhCosThSumReconZ0d3pd.push_back( new TH1D("sumRecZ0d3pd_"+tsrange, "sumRecZ0d3pd_"+tsrange, ncostbins,costmin,costmax) );
-		vhCosThSumReconDTd3pd.push_back( new TH1D("sumRecDTd3pd_"+tsrange, "sumRecDTd3pd_"+tsrange, ncostbins,costmin,costmax) );
-		vhCosThSumZ0d3pd_unscaled.push_back( new TH1D("sumZ0d3pd_unscaled_"+tsrange, "sumZ0d3pd_unscaled_"+tsrange, ncostbins,costmin,costmax) );
-		vhCosThSumZ0d3pd_acceptance.push_back( new TH1D("sumZ0d3pd_acceptance_"+tsrange, "sumZ0d3pd_acceptance_"+tsrange, ncostbins,costmin,costmax) );
+		vhyQSumTmp.push_back( new TH1D("yQ_"+tsrange,"yQ_"+tsrange, nyqbins,yqmin,yqmax) );
+		vhyQSumTmp_unscaled.push_back( new TH1D("yQ_xs"+tsrange,"yQ_xs"+tsrange, nyqbins,yqmin,yqmax) );
+		
+		vhCosThSumZ0d3pd.push_back( new TH1D("cost_sumZ0d3pd_"+tsrange, "cost_cost_sumZ0d3pd_"+tsrange, ncostbins,costmin,costmax) );
+		vhCosThSumReconZ0d3pd.push_back( new TH1D("cost_sumRecZ0d3pd_"+tsrange, "cost_sumRecZ0d3pd_"+tsrange, ncostbins,costmin,costmax) );
+		vhCosThSumReconDTd3pd.push_back( new TH1D("cost_sumRecDTd3pd_"+tsrange, "cost_sumRecDTd3pd_"+tsrange, ncostbins,costmin,costmax) );
+		vhCosThSumZ0d3pd_unscaled.push_back( new TH1D("cost_sumZ0d3pd_unscaled_"+tsrange, "cost_sumZ0d3pd_unscaled_"+tsrange, ncostbins,costmin,costmax) );
+		vhCosThSumZ0d3pd_acceptance.push_back( new TH1D("cost_sumZ0d3pd_acceptance_"+tsrange, "cost_sumZ0d3pd_acceptance_"+tsrange, ncostbins,costmin,costmax) );
+		
+		vhyQSumZ0d3pd.push_back( new TH1D("yQ_sumZ0d3pd_"+tsrange, "yQ_sumZ0d3pd_"+tsrange, nyqbins,yqmin,yqmax) );
+		vhyQSumReconZ0d3pd.push_back( new TH1D("yQ_sumRecZ0d3pd_"+tsrange, "yQ_sumRecZ0d3pd_"+tsrange, nyqbins,yqmin,yqmax) );
+		vhyQSumReconDTd3pd.push_back( new TH1D("yQ_sumRecDTd3pd_"+tsrange, "yQ_sumRecDTd3pd_"+tsrange, nyqbins,yqmin,yqmax) );
+		vhyQSumZ0d3pd_unscaled.push_back( new TH1D("yQ_sumZ0d3pd_unscaled_"+tsrange, "yQ_sumZ0d3pd_unscaled_"+tsrange, nyqbins,yqmin,yqmax) );
 		
 		vector<TH1D*> vhTmp;
 		vhTmp.clear();
+		
 		vvhCosThSum.push_back(vhTmp);
 		vvhCosThSumRecTemplate.push_back(vhTmp);
 		vvhCosThSumAcceptance.push_back(vhTmp);
 		vvhCosThSumWeights.push_back(vhTmp);
+		
+		vvhyQSum.push_back(vhTmp);
+		vvhyQSumRecTemplate.push_back(vhTmp);
+		vvhyQSumWeights.push_back(vhTmp);
 		
 		for(int mod=Z0 ; mod<=DT ; mod++)
 		{
@@ -415,12 +465,17 @@ int plot_ratio_weights()
 			if(mod==KK) tsname = "KK_" + tsrange;
 			if(mod==DT) tsname = "DT_" + tsrange;
 		
-			vvhCosThSum[i].push_back( new TH1D("sum"+tsname, "sum"+tsname, ncostbins,costmin,costmax) );
-			vvhCosThSumRecTemplate[i].push_back( new TH1D("sumRec"+tsname, "sumRec"+tsname, ncostbins,costmin,costmax) );
-			vvhCosThSumAcceptance[i].push_back( new TH1D("sumAcc"+tsname, "sumAcc"+tsname, ncostbins,costmin,costmax) );
-			vvhCosThSumWeights[i].push_back( new TH1D("wgt"+tsname, "wgt"+tsname, ncostbins,costmin,costmax) );
+			vvhCosThSum[i].push_back( new TH1D("cost_sum"+tsname, "cost_sum"+tsname, ncostbins,costmin,costmax) );
+			vvhCosThSumRecTemplate[i].push_back( new TH1D("cost_sumRec"+tsname, "cost_sumRec"+tsname, ncostbins,costmin,costmax) );
+			vvhCosThSumAcceptance[i].push_back( new TH1D("cost_sumAcc"+tsname, "cost_sumAcc"+tsname, ncostbins,costmin,costmax) );
+			vvhCosThSumWeights[i].push_back( new TH1D("cost_wgt"+tsname, "cost_wgt"+tsname, ncostbins,costmin,costmax) );
+			
+			vvhyQSum[i].push_back( new TH1D("yQ_sum"+tsname, "yQ_sum"+tsname, nyqbins,yqmin,yqmax) );
+			vvhyQSumRecTemplate[i].push_back( new TH1D("yQ_sumRec"+tsname, "yQ_sumRec"+tsname, nyqbins,yqmin,yqmax) );
+			vvhyQSumWeights[i].push_back( new TH1D("yQ_wgt"+tsname, "yQ_wgt"+tsname, nyqbins,yqmin,yqmax) );
 		}
-		vhCosThSumXSweights.push_back( new TH1D("wgtXS_"+tsrange,"wgtXS_"+tsrange, ncostbins,costmin,costmax) );
+		vhCosThSumXSweights.push_back( new TH1D("cost_wgtXS_"+tsrange,"cost_wgtXS_"+tsrange, ncostbins,costmin,costmax) );
+		vhyQSumXSweights.push_back( new TH1D("yQ_wgtXS_"+tsrange,"yQ_wgtXS_"+tsrange, nyqbins,yqmin,yqmax) );
 	}
 	
 	
@@ -516,11 +571,6 @@ int plot_ratio_weights()
 		vhResTemplate.push_back( new TH1D("Res"+tsname,"Res"+tsname,nimassbins,-0.2,+0.2) );
 	}
 	
-	
-	///////////////////////////////////
-	double nGeneratedEvents = 5e5; ////
-	///////////////////////////////////
-	
 	TFile* file;
 	TTree* tree;
 	double ymin = 0.;
@@ -535,8 +585,14 @@ int plot_ratio_weights()
 		else { for(Int_t b=0 ; b<=hMassSumTmp->GetNbinsX() ; b++) hMassSumTmp->SetBinContent(b,0.); }
 		if(doLogx) hMassSumTmp_unscaled->Reset(); //////////
 		else { for(Int_t b=0 ; b<=hMassSumTmp_unscaled->GetNbinsX() ; b++) hMassSumTmp_unscaled->SetBinContent(b,0.); }
-		for(int i=0 ; i<imass_afb_nbins ; i++) vhCosThSumTmp[i]->Reset();
-		for(int i=0 ; i<imass_afb_nbins ; i++) vhCosThSumTmp_unscaled[i]->Reset();
+		for(int i=0 ; i<imass_afb_nbins ; i++)
+		{
+			vhCosThSumTmp[i]->Reset();
+			vhCosThSumTmp_unscaled[i]->Reset();
+			
+			vhyQSumTmp[i]->Reset();
+			vhyQSumTmp_unscaled[i]->Reset();
+		}
 		////////////////////////////
 	
 		if(model==Z0d3pd)
@@ -639,6 +695,8 @@ int plot_ratio_weights()
 						if(bin<=0 || bin>imass_afb_nbins) continue;
 						hvvBinnedHistos_cosTh[n][bin-1]->Fill(truth_all_CosThetaCS);
 						hvvBinnedHistos_cosTh_unscaled[n][bin-1]->Fill(truth_all_CosThetaCS);
+						hvvBinnedHistos_yQ[n][bin-1]->Fill(truth_all_ySystem);
+						hvvBinnedHistos_yQ_unscaled[n][bin-1]->Fill(truth_all_ySystem);
 					}
 				}
 				cout << "n=" << n << ", valids=" << valids << endl;
@@ -672,6 +730,7 @@ int plot_ratio_weights()
 					int bin = hDummy_afb->FindBin(mHat);
 					if(bin<=0 || bin>imass_afb_nbins) continue;
 					hvvBinnedHistos_cosTh[n][bin-1]->Fill(cosThetaCS); 
+					hvvBinnedHistos_yQ[n][bin-1]->Fill(ysystem); 
 				}
 			}
 			
@@ -681,6 +740,7 @@ int plot_ratio_weights()
 			for(Int_t i=0 ; i<imass_afb_nbins ; i++)
 			{
 				hvvBinnedHistos_cosTh[n][i]->Scale(dvWeights[n]);
+				hvvBinnedHistos_yQ[n][i]->Scale(dvWeights[n]);
 			}
 			/////////////////////////////////////////////////////////////
 			
@@ -691,7 +751,13 @@ int plot_ratio_weights()
 			for(Int_t i=0 ; i<imass_afb_nbins ; i++)
 			{
 				vhCosThSumTmp[i]->Add(hvvBinnedHistos_cosTh[n][i]);
-				if(model==Z0d3pd) vhCosThSumTmp_unscaled[i]->Add(hvvBinnedHistos_cosTh_unscaled[n][i]);
+				vhyQSumTmp[i]->Add(hvvBinnedHistos_yQ[n][i]);
+				
+				if(model==Z0d3pd)
+				{
+					vhCosThSumTmp_unscaled[i]->Add(hvvBinnedHistos_cosTh_unscaled[n][i]);
+					vhyQSumTmp_unscaled[i]->Add(hvvBinnedHistos_yQ_unscaled[n][i]);
+				}
 			}
 			////////////////////////////////////////////////////////
 			
@@ -708,12 +774,19 @@ int plot_ratio_weights()
 			{
 				vhCosThSumZ0d3pd[i] = (TH1D*)vhCosThSumTmp[i]->Clone("");
 				vhCosThSumZ0d3pd_unscaled[i] = (TH1D*)vhCosThSumTmp_unscaled[i]->Clone("");
+				
+				vhyQSumZ0d3pd[i] = (TH1D*)vhyQSumTmp[i]->Clone("");
+				vhyQSumZ0d3pd_unscaled[i] = (TH1D*)vhyQSumTmp_unscaled[i]->Clone("");
 			}
 		}
 		else
 		{
 			vhMassSum[model] = (TH1D*)hMassSumTmp->Clone("");
-			for(Int_t i=0 ; i<imass_afb_nbins ; i++) vvhCosThSum[i][model] = (TH1D*)vhCosThSumTmp[i]->Clone("");
+			for(Int_t i=0 ; i<imass_afb_nbins ; i++)
+			{
+				vvhCosThSum[i][model] = (TH1D*)vhCosThSumTmp[i]->Clone("");
+				vvhyQSum[i][model] = (TH1D*)vhyQSumTmp[i]->Clone("");
+			}
 		}
 	}
 	
@@ -756,7 +829,7 @@ int plot_ratio_weights()
 			divide(vvhCosThSumWeights[i][mod],vhCosThSumZ0d3pd[i]);
 			
 			dirCostHistograms->cd();
-			vvhCosThSumWeights[i][mod]->SetTitle((TString)"weights: " + (TString)vvhCosThSumWeights[i][mod]->GetTitle());
+			vvhCosThSumWeights[i][mod]->SetTitle((TString)"cost weights: " + (TString)vvhCosThSumWeights[i][mod]->GetTitle());
 			vvhCosThSumWeights[i][mod]->SetName( "hCosTh"+tsname+"_wgt_"+b );
 			vvhCosThSumWeights[i][mod]->Write("", TObject::kOverwrite);
 		}
@@ -766,9 +839,40 @@ int plot_ratio_weights()
 		divide(vhCosThSumXSweights[i],vhCosThSumZ0d3pd_unscaled[i]); 
 		
 		dirCostHistograms->cd();
-		vhCosThSumXSweights[i]->SetTitle((TString)"weights_XS: " + (TString)vhCosThSumXSweights[i]->GetTitle());
+		vhCosThSumXSweights[i]->SetTitle((TString)"cost weights_XS: " + (TString)vhCosThSumXSweights[i]->GetTitle());
 		vhCosThSumXSweights[i]->SetName( "hCosThXS_wgt_"+b );
 		vhCosThSumXSweights[i]->Write("", TObject::kOverwrite);
+	}
+	
+	diryQHistograms->cd();
+	for(Int_t i=0 ; i<imass_afb_nbins ; i++) 
+	{
+		TString b = (TString)tostring(i+1);
+	
+		for(int mod=Z0 ; mod<=KK ; mod++) 
+		{
+			if(mod==Z0) tsname = "Z0";
+			if(mod==ZP) tsname = "ZP";
+			if(mod==KK) tsname = "KK";
+			
+			vvhyQSumWeights[i][mod] = (TH1D*)vvhyQSum[i][mod]->Clone(""); 
+			//vvhyQSumWeights[i][mod]->Divide(vhyQSumZ0d3pd[i]);
+			divide(vvhyQSumWeights[i][mod],vhyQSumZ0d3pd[i]);
+			
+			diryQHistograms->cd();
+			vvhyQSumWeights[i][mod]->SetTitle((TString)"yQ weights: " + (TString)vvhyQSumWeights[i][mod]->GetTitle());
+			vvhyQSumWeights[i][mod]->SetName( "hyQ"+tsname+"_wgt_"+b );
+			vvhyQSumWeights[i][mod]->Write("", TObject::kOverwrite);
+		}
+		
+		vhyQSumXSweights[i] = (TH1D*)vhyQSumZ0d3pd[i]->Clone(""); 
+		//vhyQSumXSweights[i]->Divide(vhyQSumZ0d3pd_unscaled[i]); 
+		divide(vhyQSumXSweights[i],vhyQSumZ0d3pd_unscaled[i]); 
+		
+		diryQHistograms->cd();
+		vhyQSumXSweights[i]->SetTitle((TString)"yQ weights_XS: " + (TString)vhyQSumXSweights[i]->GetTitle());
+		vhyQSumXSweights[i]->SetName( "hyQXS_wgt_"+b );
+		vhyQSumXSweights[i]->Write("", TObject::kOverwrite);
 	}
 	////////////////////////////////////////////////////////////////
 
@@ -787,7 +891,7 @@ int plot_ratio_weights()
 		
 		TString b = (TString)tostring(i+1);
 		
-		vC.push_back( new TCanvas("c"+b,"c"+b,0,0,1200,800) );
+		vC.push_back( new TCanvas("cost_c"+b,"cost_c"+b,0,0,1200,800) );
 		vC[i]->Divide(1,2);
 		vC[i]->Draw();
 		
@@ -913,9 +1017,150 @@ int plot_ratio_weights()
 		vC[i]->SaveAs(tsname+".root");
 		vC[i]->SaveAs(tsname+".png");
 	}
-	cout << "Weights are calculated and written\n" << endl;
+	cout << "CosTheta weights are calculated and written\n" << endl;
 	//-------------------------------------------------------------------------------------
 	
+	
+	// draw yQ
+	diryQHistograms->cd();
+	vector<TCanvas*> vCyQ;
+	vector<TVirtualPad*> vP1yQ;
+	vector<TVirtualPad*> vP2yQ;
+	vector<TLegend*> vL1yQ;
+	vector<TLegend*> vL2yQ;
+	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
+	{
+		
+		TString b = (TString)tostring(i+1);
+		
+		vCyQ.push_back( new TCanvas("yQ_c"+b,"yQ_c"+b,0,0,1200,800) );
+		vCyQ[i]->Divide(1,2);
+		vCyQ[i]->Draw();
+		
+		vP1yQ.push_back( vCyQ[i]->cd(1) );
+		vP1yQ[i]->SetLogy();
+		
+		vP2yQ.push_back( vCyQ[i]->cd(2) );
+		vP2yQ[i]->SetLogy();
+		
+		vL1yQ.push_back( new TLegend(0.6928196,0.1761658,0.8771074,0.3353843,NULL,"brNDC") );
+		vL1yQ[i]->SetFillColor(kWhite);
+		
+		vL2yQ.push_back( new TLegend(0.7554766,0.8272493,0.877596,0.947087,NULL,"brNDC") );
+		vL2yQ[i]->SetFillColor(kWhite);
+		
+		
+		vP1yQ[i]->cd();
+		vP1yQ[i]->Draw();
+		
+		float min = 1.e-2;
+		float max = vhyQSumZ0d3pd[i]->GetMaximum();
+		for(int mod=Z0 ; mod<=KK ; mod++) max = (vvhyQSum[i][mod]->GetMaximum() > max) ? vvhyQSum[i][mod]->GetMaximum() : max;
+	
+		vhyQSumZ0d3pd[i]->SetMinimum(1.e-2);
+		vhyQSumZ0d3pd[i]->SetMaximum(5.*max);
+		vhyQSumZ0d3pd[i]->SetLineColor(col0);
+		vhyQSumZ0d3pd[i]->SetLineStyle(1);
+		vhyQSumZ0d3pd[i]->SetLineWidth(2);
+		vhyQSumZ0d3pd[i]->SetXTitle("y_{Q}");
+		vhyQSumZ0d3pd[i]->SetYTitle("Events");
+		//if(5.*max<1.e2) vhyQSumZ0d3pd[i]->GetYaxis()->SetMoreLogLabels();
+		vhyQSumZ0d3pd[i]->Draw();
+		vL1yQ[i]->AddEntry(vhyQSumZ0d3pd[i], "SM #gamma/Z^{0} (#it{ATLAS} MC10 tru)", "l");
+		
+		for(int mod=Z0 ; mod<=KK ; mod++)
+		{
+			Color_t  col = 0;
+			if(mod==Z0)
+			{
+				col = kBlue;
+				sName = "SM #gamma/Z^{0} (#scale[1.1]{P}#scale[0.9]{YTHIA8})";
+			}
+			if(mod==ZP)
+			{
+				col = col2;
+				sName = sMass + " GeV S^{1}/Z_{2} KK (#scale[1.1]{P}#scale[0.9]{YTHIA8})"; 
+			}
+			if(mod==KK)
+			{
+				col = kGreen+3;
+				sName = sMass + " GeV S^{1}/Z_{2} KK (#scale[1.1]{P}#scale[0.9]{YTHIA8})"; 
+			}
+		
+			vvhyQSum[i][mod]->SetMinimum(min);
+			vvhyQSum[i][mod]->SetMaximum(5.*max);
+			vvhyQSum[i][mod]->SetLineColor(col);
+			vvhyQSum[i][mod]->SetLineStyle(1);
+			vvhyQSum[i][mod]->SetLineWidth(2);
+			vvhyQSum[i][mod]->SetXTitle("y_{Q}");
+			vvhyQSum[i][mod]->SetYTitle("Events");
+			//if(5.*max<1.e2) vvhyQSum[i][mod]->GetYaxis()->SetMoreLogLabels();
+			vvhyQSum[i][mod]->Draw("SAMES");
+			vL1yQ[i]->AddEntry(vvhyQSum[i][mod], sName.c_str(), "l");
+		}
+		vL1yQ[i]->Draw("SAMES");
+		
+		vP1yQ[i]->cd();
+		vP1yQ[i]->RedrawAxis();
+		vP1yQ[i]->Update();
+		
+		//--------------------------------------------
+		
+		vP2yQ[i]->cd();
+		vP2yQ[i]->Draw();
+		
+		min = 1.e-1;
+		max = -1.;
+		for(int mod=Z0 ; mod<=KK ; mod++) max = (vvhyQSumWeights[i][mod]->GetMaximum() > max) ? vvhyQSumWeights[i][mod]->GetMaximum() : max;
+		string sYTitle = "Events_{#scale[1.1]{P}#scale[0.9]{YTHIA8}}/Events_{#gamma/Z^{0}}";
+		for(int mod=Z0 ; mod<=KK ; mod++)
+		{
+			Color_t  col = 0;
+			TString drawOpt = "";
+			if(mod==Z0)
+			{
+				col = kBlue;
+				sName = "SM #gamma/Z^{0}";
+				drawOpt = "";
+			}
+			if(mod==ZP)
+			{
+				col = col2;
+				sName = sMass + " GeV Z' SSM";
+				drawOpt = "SAMES";
+			}
+			if(mod==KK)
+			{
+				col = kGreen+3;
+				sName   = sMass + " GeV S^{1}/Z_{2} KK";
+				drawOpt = "SAMES";
+			}
+			vvhyQSumWeights[i][mod]->SetMinimum(min);
+			vvhyQSumWeights[i][mod]->SetMaximum(5.*max);
+			vvhyQSumWeights[i][mod]->SetLineColor(col2);
+			vvhyQSumWeights[i][mod]->SetLineStyle(1);
+			vvhyQSumWeights[i][mod]->SetLineWidth(2);
+			vvhyQSumWeights[i][mod]->SetXTitle("y_{Q}");
+			vvhyQSumWeights[i][mod]->SetYTitle(sYTitle.c_str());
+			//if(5.*max<1.e2) vvhyQSumWeights[i][mod]->GetYaxis()->SetMoreLogLabels(); 
+			vvhyQSumWeights[i][mod]->Draw(drawOpt);
+			vL2yQ[i]->AddEntry(vvhyQSumWeights[i][mod], sName.c_str(), "l");
+		}
+		vL2yQ[i]->Draw("SAMES");
+		
+		vP2yQ[i]->cd();
+		vP2yQ[i]->RedrawAxis();
+		vP2yQ[i]->Update();
+		vCyQ[i]->Update();
+		
+		tsname = "plots/plot_yQ_" + b;
+		vCyQ[i]->SaveAs(tsname+".eps");
+		vCyQ[i]->SaveAs(tsname+".C");
+		vCyQ[i]->SaveAs(tsname+".root");
+		vCyQ[i]->SaveAs(tsname+".png");
+	}
+	cout << "yQ weights are calculated and written\n" << endl;
+	//---------------------------------------------------------------------------
 	
 	
 	
@@ -1037,6 +1282,7 @@ int plot_ratio_weights()
 				Int_t    bin    = 0;
 				Double_t mass_weight = 0.;
 				Double_t cost_weight = 0.;
+				Double_t yQ_weight   = 0.;
 				if(model!=DT)
 				{
 					if(recon_all_isValid  &&  truth_all_isValid)
@@ -1054,6 +1300,9 @@ int plot_ratio_weights()
 							
 							//------------ cosTheta
 							hvvBinnedHistos_cosTh[n][afb_bin-1]->Fill(recon_all_CosThetaCS);
+							
+							//------------ yQ
+							hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(recon_all_ySystem);
 						}
 						
 						else // for Z0, ZP and KK we need to scale by the weight
@@ -1069,6 +1318,11 @@ int plot_ratio_weights()
 							cost_weight = vvhCosThSumWeights[afb_bin-1][model]->GetBinContent(bin);
 							hvvBinnedHistos_cosTh[n][afb_bin-1]->Fill(recon_all_CosThetaCS,cost_weight);
 							
+							//------------ yQ
+							bin = vvhyQSumWeights[afb_bin-1][model]->FindBin(truth_all_ySystem);
+							yQ_weight = vvhyQSumWeights[afb_bin-1][model]->GetBinContent(bin);
+							hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(recon_all_ySystem,yQ_weight);
+							
 							//------------ ntuple
 							mass_tru = truth_all_Mhat;
 							mass_rec = recon_all_Mhat;
@@ -1076,6 +1330,9 @@ int plot_ratio_weights()
 							cost_tru = truth_all_CosThetaCS;
 							cost_rec = recon_all_CosThetaCS;
 							cost_wgt = cost_weight;
+							yQ_tru   = truth_all_ySystem;
+							yQ_rec   = recon_all_ySystem;
+							yQ_wgt   = yQ_weight;
 							xscn_wgt = bin_xs_weight; // in units of fb
 							fillNtuple(vvtBinnedNtuples[afb_bin-1][model],counter,modulu);
 						}
@@ -1095,6 +1352,9 @@ int plot_ratio_weights()
 					//------------ cosTheta
 					hvvBinnedHistos_cosTh[n][afb_bin-1]->Fill(recon_all_CosThetaCS);
 					
+					//------------ yQ
+					hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(recon_all_ySystem);
+					
 					//------------ ntuple
 					mass_tru = -1;
 					mass_rec = recon_all_Mhat*TeV2GeV;
@@ -1102,6 +1362,9 @@ int plot_ratio_weights()
 					cost_tru = -1;
 					cost_rec = recon_all_CosThetaCS;
 					cost_wgt = 1.;
+					yQ_tru   = -1;
+					yQ_rec   = recon_all_ySystem;
+					yQ_wgt   = 1.;
 					xscn_wgt = 1.; // in units of fb
 					fillNtuple(vvtBinnedNtuples[afb_bin-1][model],counter,modulu);
 
@@ -1115,16 +1378,24 @@ int plot_ratio_weights()
 			/////////////////////////////////////////////////////////////
 			for(Int_t i=0 ; i<imass_afb_nbins ; i++)       // scale /////
 			{
-				if(model!=DT) hvvBinnedHistos_cosTh[n][i]->Scale(dvWeights[n]);
+				if(model!=DT)
+				{
+					hvvBinnedHistos_cosTh[n][i]->Scale(dvWeights[n]);
+					hvvBinnedHistos_yQ[n][i]->Scale(dvWeights[n]);
+				}
 				vhCosThSumTmp[i]->Add(hvvBinnedHistos_cosTh[n][i]);
+				vhyQSumTmp[i]->Add(hvvBinnedHistos_yQ[n][i]);
 			}
 			/////////////////////////////////////////////////////////////
 			
 			
 			
 			/////////////////////////////////////////////////////////////
-			if(model!=DT) hvBinnedHistos_imass[n]->Scale(dvWeights[n]); // scale //////
-			if(model!=DT) hvBinnedHistos_imassRes[n]->Scale(dvWeights[n]); // scale ///
+			if(model!=DT)
+			{
+				hvBinnedHistos_imass[n]->Scale(dvWeights[n]); // scale //////
+				hvBinnedHistos_imassRes[n]->Scale(dvWeights[n]); // scale ///
+			}
 			/////////////////////////////////////////////////////////////
 			
 			
@@ -1135,8 +1406,6 @@ int plot_ratio_weights()
 			////////////////////////////////////////////////////
 			
 			file->Close();
-			
-			
 		}
 		
 		
@@ -1144,25 +1413,36 @@ int plot_ratio_weights()
 		if(model==DT)
 		{
 			hMassReconDTd3pd = (TH1D*)hMassSumTmp->Clone("");
-			for(Int_t i=0 ; i<imass_afb_nbins ; i++) vhCosThSumReconDTd3pd[i] = (TH1D*)vhCosThSumTmp[i]->Clone("");
+			for(Int_t i=0 ; i<imass_afb_nbins ; i++)
+			{
+				vhCosThSumReconDTd3pd[i] = (TH1D*)vhCosThSumTmp[i]->Clone("");
+				vhyQSumReconDTd3pd[i] = (TH1D*)vhyQSumTmp[i]->Clone("");
+			}
 		}
 		else if(model==Z0d3pd)
 		{
 			hMassReconZ0d3pd = (TH1D*)hMassSumTmp->Clone("");
 			hResReconZ0d3pd  = (TH1D*)hResTmp->Clone("");
-			for(Int_t i=0 ; i<imass_afb_nbins ; i++) vhCosThSumReconZ0d3pd[i] = (TH1D*)vhCosThSumTmp[i]->Clone("");
+			for(Int_t i=0 ; i<imass_afb_nbins ; i++)
+			{
+				vhCosThSumReconZ0d3pd[i] = (TH1D*)vhCosThSumTmp[i]->Clone("");
+				vhyQSumReconZ0d3pd[i] = (TH1D*)vhyQSumTmp[i]->Clone("");
+			}
 		}
 		else
 		{	
 			vhMassReconTemplate[model] = (TH1D*)hMassSumTmp->Clone("");
 			vhResTemplate[model] = (TH1D*)hResTmp->Clone("");
-			for(Int_t i=0 ; i<imass_afb_nbins ; i++) vvhCosThSumRecTemplate[i][model] = (TH1D*)vhCosThSumTmp[i]->Clone("");
+			for(Int_t i=0 ; i<imass_afb_nbins ; i++)
+			{
+				vvhCosThSumRecTemplate[i][model] = (TH1D*)vhCosThSumTmp[i]->Clone("");
+				vvhyQSumRecTemplate[i][model] = (TH1D*)vhyQSumTmp[i]->Clone("");
+			}
 		}
 		
 	}
 	cout << "Templates + data are ready\n" << endl;
 	//-----------------------------------------------------------------------------
-
 	
 	
 	// now do the acceptance calculations in every bin of imass and for the whole tsrange
@@ -1223,6 +1503,29 @@ int plot_ratio_weights()
 			dirCostHistograms->cd();
 			vvhCosThSumRecTemplate[i][mod]->SetName("hCosThRec"+tsname+"_"+b);
 			vvhCosThSumRecTemplate[i][mod]->Write("", TObject::kOverwrite);
+		}
+	}
+	
+	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
+	{
+		TString b = (TString)tostring(i+1);
+		
+		diryQHistograms->cd();
+		vhyQSumReconZ0d3pd[i]->SetName("hyQRecZ0d3pd_"+b);
+		vhyQSumReconZ0d3pd[i]->Write("", TObject::kOverwrite);
+		diryQHistograms->cd();
+		vhyQSumReconDTd3pd[i]->SetName("hyQRecDTd3pd_"+b);
+		vhyQSumReconDTd3pd[i]->Write("", TObject::kOverwrite);
+		
+		for(int mod=Z0 ; mod<=KK ; mod++) 
+		{
+			if(mod==Z0) tsname = "Z0";
+			if(mod==ZP) tsname = "ZP";
+			if(mod==KK) tsname = "KK";
+			
+			diryQHistograms->cd();
+			vvhyQSumRecTemplate[i][mod]->SetName("hyQRec"+tsname+"_"+b);
+			vvhyQSumRecTemplate[i][mod]->Write("", TObject::kOverwrite);
 		}
 	}
 	
@@ -1367,6 +1670,26 @@ int plot_ratio_weights()
 			dirCostHistograms->cd();
 			vvhCosThSum[i][mod]->SetName("hCosThTru"+tsname+"_"+b);
 			vvhCosThSum[i][mod]->Write("", TObject::kOverwrite);
+		}
+	}
+	
+	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
+	{
+		TString b = (TString)tostring(i+1);
+		
+		diryQHistograms->cd();
+		vhyQSumZ0d3pd[i]->SetName("hyQTruZ0d3pd_"+b);
+		vhyQSumZ0d3pd[i]->Write("", TObject::kOverwrite);
+		
+		for(int mod=Z0 ; mod<=KK ; mod++) 
+		{
+			if(mod==Z0) tsname = "Z0";
+			if(mod==ZP) tsname = "ZP";
+			if(mod==KK) tsname = "KK";
+			
+			diryQHistograms->cd();
+			vvhyQSum[i][mod]->SetName("hyQTru"+tsname+"_"+b);
+			vvhyQSum[i][mod]->Write("", TObject::kOverwrite);
 		}
 	}
 	

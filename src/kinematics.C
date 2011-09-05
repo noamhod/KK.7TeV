@@ -35,10 +35,10 @@ inline float kinematics::eta( TLorentzVector* p )
 
 inline float kinematics::dR( TLorentzVector* pa, TLorentzVector* pb )
 {
-	pa = NULL;
-	pb = NULL;
-	//return pa->DrEtaPhi(pb);
-	return 0.;
+	//pa = NULL;
+	//pb = NULL;
+	return pa->DeltaR(*pb);
+	//return 0.;
 }
 
 inline float kinematics::pAbs( TLorentzVector* p )
@@ -71,13 +71,31 @@ inline float kinematics::ySystem( TLorentzVector* pa, TLorentzVector* pb )
 	return m_pTmp.Rapidity();
 }
 
+inline float kinematics::betaSystem( TLorentzVector* pa, TLorentzVector* pb )
+{
+	m_pTmp = (*pa)+(*pb);
+	return m_pTmp.Beta();
+}
+
+inline float kinematics::betazSystem( TLorentzVector* pa, TLorentzVector* pb )
+{
+	m_pTmp = (*pa)+(*pb);
+	return (m_pTmp.Mag()!=0.) ? m_pTmp.Pz()/m_pTmp.Mag() : -999.;
+}
+
+inline float kinematics::betaTSystem( TLorentzVector* pa, TLorentzVector* pb )
+{
+	m_pTmp = (*pa)+(*pb);
+	return (m_pTmp.Mag()!=0.) ? m_pTmp.Pt()/m_pTmp.Mag() : -999.;
+}
+
 inline float kinematics::betaSystem( float pa, float pb, float ea, float eb )
 {
 	return ((ea+eb)>0.) ? (pa+pb)/(ea+eb) : -999.;
 }
 
 inline float kinematics::cosThetaBoost( TLorentzVector* pa, float ca,
-								 TLorentzVector* pb, float cb )
+										TLorentzVector* pb, float cb )
 {
 	// http://xrootd.slac.stanford.edu/BFROOT/www/doc/workbook_backup_010108/analysis/analysis.html
 	// A useful quantity in many analyses is the helicity angle.

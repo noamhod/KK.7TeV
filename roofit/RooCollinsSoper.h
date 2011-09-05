@@ -17,9 +17,9 @@ class RooCollinsSoper : public RooAbsPdf {
 public:
   RooCollinsSoper() {} ; 
   RooCollinsSoper(const char *name, const char *title,
-	RooAbsReal& _costheta,
-	RooAbsReal& _A0,
-	RooAbsReal& _A4);
+				  RooAbsReal& _costheta,
+				  RooAbsReal& _A0,
+				  RooAbsReal& _A4);
   RooCollinsSoper(const RooCollinsSoper& other, const char* name=0) ;
   virtual TObject* clone(const char* newname) const { return new RooCollinsSoper(*this,newname); }
   inline virtual ~RooCollinsSoper() { }

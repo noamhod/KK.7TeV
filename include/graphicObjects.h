@@ -542,6 +542,9 @@ class graphicObjects// : public utilities
 		float CosThetaHE;
 		float Ysystem;
 		float Q_T;
+		float betaQ;
+		float betazQ;
+		float betaTQ;
 		float CosThetaDimu;
 		float ipTDiff;
 		float EtaSum;
@@ -674,6 +677,9 @@ class graphicObjects// : public utilities
 		float truth_all_CosThetaHE;
 		float truth_all_ySystem;
 		float truth_all_QT;
+		float truth_all_betaQ;
+		float truth_all_betazQ;
+		float truth_all_betaTQ;
 		
 		vector<float>* truth_all_partons_mc_pt;
 		vector<float>* truth_all_partons_mc_m;
@@ -702,6 +708,9 @@ class graphicObjects// : public utilities
 		float recon_all_CosThetaHE;
 		float recon_all_ySystem;
 		float recon_all_QT;
+		float recon_all_betaQ;
+		float recon_all_betazQ;
+		float recon_all_betaTQ;
 		
 	
 	public:

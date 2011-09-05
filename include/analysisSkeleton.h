@@ -545,6 +545,9 @@ public:
 	float current_cosThetaCS;
 	float current_ySystem;
 	float current_QT;
+	float current_betaQ;
+	float current_betazQ;
+	float current_betaTQ;
 	float current_cosmicCosth;
 	float current_ipTdiff;
 	float current_etaSum;

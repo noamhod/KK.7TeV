@@ -33,7 +33,7 @@ enum MSG
 	FAT
 };
 
-static vector<int> msglvl (5,VISUAL);
+static vector<int> msglvl (5,SILENT);
 
 static void setMSGlevel(int dbg, int inf, int wrn)
 {
@@ -43,6 +43,11 @@ static void setMSGlevel(int dbg, int inf, int wrn)
 	msglvl[ERR] = VISUAL;
 	msglvl[FAT] = VISUAL;
 }
+
+// static int getMSGlevel()
+// {
+	// return global_dbg_lvl;
+// }
 
 string log(const char* file, int line, int type, int level, string message)
 {
@@ -73,7 +78,7 @@ string log(const char* file, int line, int type, int level, string message)
 	return os.str();
 }
 
-#define LOG(x,y,z) log(__FILE__, __LINE__,  (x), (y),    (z)) // general log
+#define LOG(x,y,z)  log(__FILE__, __LINE__,  (x), (y),    (z)) // general log
 #define _DEBUG(x)   log(__FILE__, __LINE__, DBG, VISUAL, (x)) // for DEBUG VISUAL
 #define _INFO(x)    log(__FILE__, __LINE__, INF, VISUAL, (x)) // for INFO VISUAL
 #define _WARNING(x) log(__FILE__, __LINE__, WRN, VISUAL, (x)) // for WARNING VISUAL
@@ -116,6 +121,20 @@ static inline bool validate_bool(string str)
 	return true;
 }
 
+static inline string tostring(short x)
+{
+	stringstream strm;
+	string str;
+	strm << x;
+	strm >> str;
+	return str;
+}
+
+static inline string tostring(unsigned short x)
+{
+	return tostring((short)x);
+}
+
 static inline string tostring(int x)
 {
 	stringstream strm;
@@ -123,6 +142,11 @@ static inline string tostring(int x)
 	strm << x;
 	strm >> str;
 	return str;
+}
+
+static inline string tostring(unsigned int x)
+{
+	return tostring((int)x);
 }
 
 static inline string tostring(double x)
@@ -134,6 +158,11 @@ static inline string tostring(double x)
 	return str;
 }
 
+static inline string tostring(float x)
+{
+	return tostring((double)x);
+}
+
 static inline string tostring(double x, int prcn)
 {
 	stringstream strm;
@@ -141,6 +170,12 @@ static inline string tostring(double x, int prcn)
 	strm << setprecision(prcn) << fixed << x; 
 	strm >> str;
 	return str;
+}
+
+
+static inline string tostring(float x, int prcn)
+{
+	return tostring((double)x, prcn);
 }
 
 static inline int toint(string str)
@@ -170,6 +205,14 @@ static inline bool   validate_bool(const char* cc)   { return validate_bool((str
 static inline int    toint(const char* cc)           { return toint((string)cc); }
 static inline double todouble(const char* cc)        { return todouble((string)cc); }
 
+static inline string _s(unsigned int x)     {return tostring(x);}
+static inline string _s(int x)              {return tostring(x);}
+static inline string _s(double x)           {return tostring(x);}
+static inline string _s(float x)            {return tostring(x);}
+static inline string _s(short x)            {return tostring(x);}
+static inline string _s(unsigned short x)   {return tostring(x);}
+static inline string _s(double x, int prcn) {return tostring(x,prcn);}
+static inline string _s(float x, int prcn)  {return tostring(x,prcn);}
 
 #endif
 

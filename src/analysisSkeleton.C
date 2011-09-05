@@ -321,11 +321,14 @@ void analysisSkeleton::runEventDumper()
 	if(!isInteresting(current_imass)) return;
 	
 	setSingleEventFile(RunNumber,lbn,EventNumber);
-	insertTableLine("$m_{\\mu\\mu}$", _s(current_imass)+"~TeV");
+	insertTableLine("$m_{\\mu\\mu}$", _s(current_imass*TeV2GeV)+"~GeV");
 	insertTableLine("$\\cos\\theta^*_{{\\rm HE}}$", _s(current_cosThetaHE));
 	insertTableLine("$\\cos\\theta^*_{{\\rm CS}}$", _s(current_cosThetaCS));
-	insertTableLine("$Q_T\\left(\\mu\\mu\\right)$", _s(current_QT)+"~TeV");
+	insertTableLine("$Q_T\\left(\\mu\\mu\\right)$", _s(current_QT*TeV2GeV)+"~GeV");
 	insertTableLine("$y_Q\\left(\\mu\\mu\\right)$", _s(current_ySystem));
+	insertTableLine("$\\beta_Q\\left(\\mu\\mu\\right)$", _s(current_betaQ));
+	insertTableLine("$\\beta_Q^{z}\\left(\\mu\\mu\\right)$", _s(current_betazQ));
+	insertTableLine("$\\beta_Q^{T}\\left(\\mu\\mu\\right)$", _s(current_betaTQ));
 	insertTableLine("charge", _s(mu_charge->at(ai)), _s(mu_charge->at(bi)));
 	insertTableLine("all author", _s(mu_allauthor->at(ai)), _s(mu_allauthor->at(bi)));
 	insertTableLine("$\\mu$ author", _s(mu_author->at(ai)), _s(mu_author->at(bi)));
@@ -346,12 +349,12 @@ void analysisSkeleton::runEventDumper()
 	insertTableLine("$p_T{\\rm (IE)}$", _s(pT(mu_ie_qoverp->at(ai),mu_ie_theta->at(ai))*MeV2GeV)+"~GeV", _s(pT(mu_ie_qoverp->at(bi),mu_ie_theta->at(bi))*MeV2GeV)+"~GeV");
 	insertTableLine("$d_0$ exPV", _s(mu_d0_exPV->at(ai))+"~mm", _s(mu_d0_exPV->at(bi))+"~mm");
 	insertTableLine("$z_0$ exPV", _s(mu_z0_exPV->at(ai))+"~mm", _s(mu_z0_exPV->at(bi))+"~mm");
-	insertTableLine("$\\phi$ exPV", _s(mu_phi_exPV->at(ai))+"~mm", _s(mu_phi_exPV->at(bi))+"~mm");
-	insertTableLine("$\\theta$ exPV", _s(mu_theta_exPV->at(ai))+"~mm", _s(mu_theta_exPV->at(bi))+"~mm");
-	insertTableLine("$\\frac{Q}{p}$ exPV", _s(mu_qoverp_exPV->at(ai))+"~mm", _s(mu_qoverp_exPV->at(bi))+"~mm");
-	insertTableLine("$p_T^{dR<0.2}/p_T{\\rm (CB)}$", _s(mu_ptcone20->at(ai)/mu_pt->at(ai)), _s(mu_ptcone20->at(bi)/mu_pt->at(bi)));
-	insertTableLine("$p_T^{dR<0.3}/p_T{\\rm (CB)}$", _s(mu_ptcone30->at(ai)/mu_pt->at(ai)), _s(mu_ptcone30->at(bi)/mu_pt->at(bi)));
-	insertTableLine("$p_T^{dR<0.4}/p_T{\\rm (CB)}$", _s(mu_ptcone40->at(ai)/mu_pt->at(ai)), _s(mu_ptcone40->at(bi)/mu_pt->at(bi)));
+	insertTableLine("$\\phi$ exPV", _s(mu_phi_exPV->at(ai)), _s(mu_phi_exPV->at(bi)));
+	insertTableLine("$\\theta$ exPV", _s(mu_theta_exPV->at(ai)), _s(mu_theta_exPV->at(bi)));
+	insertTableLine("$\\frac{Q}{p}$ exPV", _s(mu_qoverp_exPV->at(ai)), _s(mu_qoverp_exPV->at(bi)));
+	insertTableLine("$p_T^{dR<0.2}/p_T{\\rm (CB)}$", _s(mu_ptcone20->at(ai)/mu_pt->at(ai),7), _s(mu_ptcone20->at(bi)/mu_pt->at(bi),7));
+	insertTableLine("$p_T^{dR<0.3}/p_T{\\rm (CB)}$", _s(mu_ptcone30->at(ai)/mu_pt->at(ai),7), _s(mu_ptcone30->at(bi)/mu_pt->at(bi),7));
+	insertTableLine("$p_T^{dR<0.4}/p_T{\\rm (CB)}$", _s(mu_ptcone40->at(ai)/mu_pt->at(ai),7), _s(mu_ptcone40->at(bi)/mu_pt->at(bi),7));
 	insertTableLine("energyLossPar",_s(mu_energyLossPar->at(ai)), _s(mu_energyLossPar->at(bi)));
 	insertTableLine("energyLossErr", _s(mu_energyLossErr->at(ai)), _s(mu_energyLossErr->at(bi)));
 	insertTableLine("etCore", _s(mu_etCore->at(ai)), _s(mu_etCore->at(bi)));
@@ -419,8 +422,8 @@ void analysisSkeleton::runEventDumper()
 	insertTableLine("nTGCLayer2PhiHits", _s(mu_nTGCLayer2PhiHits->at(ai)), _s(mu_nTGCLayer2PhiHits->at(bi)));
 	insertTableLine("nTGCLayer3PhiHits", _s(mu_nTGCLayer3PhiHits->at(ai)), _s(mu_nTGCLayer3PhiHits->at(bi)));
 	insertTableLine("nTGCLayer4PhiHits", _s(mu_nTGCLayer4PhiHits->at(ai)), _s(mu_nTGCLayer4PhiHits->at(bi)));
-	insertTableLine("trackfitchi2", _s(mu_trackfitchi2->at(ai)), _s(mu_trackfitchi2->at(bi)));
-	insertTableLine("trackfitndof", _s(mu_trackfitndof->at(ai)), _s(mu_trackfitndof->at(bi)));
+	insertTableLine("track fit $\\chi^2$", _s(mu_trackfitchi2->at(ai)), _s(mu_trackfitchi2->at(bi)));
+	insertTableLine("track fit $N_{{\\rm DOF}}$", _s(mu_trackfitndof->at(ai)), _s(mu_trackfitndof->at(bi)));
 	insertTableLine("hastrack", _s(mu_hastrack->at(ai)), _s(mu_hastrack->at(bi)));
 	insertTableLine("EFCB\\_dr", _s(mu_EFCB_dr->at(ai)), _s(mu_EFCB_dr->at(bi)));
 	insertTableLine("EFMG\\_dr", _s(mu_EFMG_dr->at(ai)), _s(mu_EFMG_dr->at(bi)));
@@ -642,8 +645,12 @@ void analysisSkeleton::fillAfterCuts()
 	current_QT          = QT( pmu[lead_mu], pmu[sublead_mu] );
 	current_cosmicCosth = cosThetaDimu(pmu[lead_mu],pmu[sublead_mu]);
 	current_ipTdiff     = (current_muplus_pT!=0.  &&  current_mu_pT!=0.) ? 1./current_muplus_pT-1./current_mu_pT : -999.;
-	current_ivertex     = getPVindex();
+	current_ivertex     = vi;
 	current_etaSum      = current_muplus_eta + current_mu_eta;
+	current_betaQ       = betaSystem(pmu[lead_mu],pmu[sublead_mu]);
+	current_betazQ      = betazSystem(pmu[lead_mu],pmu[sublead_mu]);
+	current_betaTQ      = betaTSystem(pmu[lead_mu],pmu[sublead_mu]);
+	
 	current_pTdiff      = current_mu_me_pT - current_mu_id_pT;
 	current_pTdiff_muplus  = current_muplus_me_pT - current_muplus_id_pT;
 	current_pTratio        = (current_mu_id_pT!=0.) ? fabs( current_mu_me_pT / current_mu_id_pT ) : -999.;
@@ -696,6 +703,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::CosThetaHE   = current_cosThetaHE;
 	graphicObjects::Ysystem      = current_ySystem;
 	graphicObjects::Q_T          = current_QT;
+	graphicObjects::betaQ        = current_betaQ;
+	graphicObjects::betazQ       = current_betazQ;
+	graphicObjects::betaTQ       = current_betaTQ;
 	graphicObjects::CosThetaDimu = current_cosmicCosth;
 	graphicObjects::ipTDiff      = current_ipTdiff;
 	graphicObjects::EtaSum       = current_etaSum;
@@ -1277,6 +1287,8 @@ void analysisSkeleton::fillBeforeCuts()
 		TLorentzVector* p2 = new TLorentzVector();
 		p1->SetPtEtaPhiM( mu_pt->at(0)*MeV2TeV, mu_eta->at(0), mu_phi->at(0), muonMass*GeV2TeV);
 		p2->SetPtEtaPhiM( mu_pt->at(1)*MeV2TeV, mu_eta->at(1), mu_phi->at(1), muonMass*GeV2TeV);
+		// p1->SetPtEtaPhiE( mu_pt->at(0)*MeV2TeV, mu_eta->at(0), mu_phi->at(0), mu_E->at(0)*MeV2TeV);
+		// p2->SetPtEtaPhiE( mu_pt->at(1)*MeV2TeV, mu_eta->at(1), mu_phi->at(1), mu_E->at(1)*MeV2TeV);
 		current_cosmicCosth = cosThetaDimu(p1,p2);
 		h1_cosmicCosth->Fill( current_cosmicCosth );
 		delete p1;
@@ -1481,6 +1493,7 @@ void analysisSkeleton::buildMU4Vector(int nMus)
 	{
 		pmu.push_back( new TLorentzVector() );
 		pmu[j]->SetPtEtaPhiM( mu_pt->at(j)*MeV2TeV, mu_eta->at(j), mu_phi->at(j), muonMass*GeV2TeV);
+		// pmu[j]->SetPtEtaPhiE( mu_pt->at(j)*MeV2TeV, mu_eta->at(j), mu_phi->at(j), mu_E->at(j)*MeV2TeV);
 	}
 }
 
@@ -2441,7 +2454,7 @@ void analysisSkeleton::fillTruth()
 		// if(t<10) _INFO("mc_pdgId->at("+tostring(t)+")="+tostring(mc_pdgId->at(t))+" -> mc_pdgId->at(mc_parent_index->at(t)[0])="+ sid);
 	
 		if(mc_status->at(t)!=1) {tmp_counter_1++; continue;} // has to be final particle
-		if(mc_pdgId->at(t)!=PDTMU  &&  mc_pdgId->at(t)!=-1*PDTMU) {tmp_counter_2++; continue;} // has to be a muon
+		if(fabs(mc_pdgId->at(t))!=PDTMU) {tmp_counter_2++; continue;} // has to be a muon
 		
 		bool isZ      = false; 
 		bool isGamma  = false;
@@ -2635,6 +2648,9 @@ void analysisSkeleton::fillTruth()
 		truth_all_CosThetaHE = cosThetaBoost(p1,c1, p2,c2);
 		truth_all_ySystem    = ySystem(p1,p2);
 		truth_all_QT         = QT(p1,p2);
+		truth_all_betaQ      = betaSystem(p1,p2);
+		truth_all_betazQ     = betazSystem(p1,p2);
+		truth_all_betaTQ     = betaTSystem(p1,p2);
 
 		delete p1;
 		delete p2;
@@ -2683,6 +2699,9 @@ void analysisSkeleton::fillRecon()
 	recon_all_CosThetaHE = cosThetaBoost(p1,c1, p2,c2);
 	recon_all_ySystem = ySystem(p1,p2);
 	recon_all_QT = QT(p1,p2);
+	recon_all_betaQ  = betaSystem(p1,p2);
+	recon_all_betazQ = betazSystem(p1,p2);
+	recon_all_betaTQ = betaTSystem(p1,p2);
 	delete p1;
 	delete p2;
 	

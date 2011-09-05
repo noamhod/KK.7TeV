@@ -2,7 +2,6 @@
 #include "roofit.h"
 #include "RooAngular.h"
 #include "RooCollinsSoper.h"
-#include "RooFBfalseIdentifyCS.h"
 
 /*
 	1. There are 2 kinds of unbinned, non-detector weights:
@@ -26,10 +25,6 @@ double   costmin   = minCosTheta;
 double   costmax   = maxCosTheta;
 int      ncostbins = nCosThetaBins;
 
-double   yqmin   = minyQ;
-double   yqmax   = maxyQ;
-int      nyqbins = nyQbins;
-
 double minA0 = -10.;
 double maxA0 = +10.;
 // double minA4 = -10.;
@@ -50,13 +45,9 @@ TFile* file = new TFile("weights.root", "READ");
 vector<TH1D*> vhMassBins;
 vector<TH1D*> vhAfbBins;
 
-TFile* fProb = new TFile("/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/run/plots/mchistograms.root", "READ");
-TH1D*  hProb = (TH1D*)fProb->Get("hprobyQ_quark_ratio");
-
 vector<TTree*> vtData;
 float mass_tru, mass_rec, mass_wgt;
 float cost_tru, cost_rec, cost_wgt;
-float yQ_tru,   yQ_rec,   yQ_wgt;
 float xscn_wgt;
 
 vector<TH1D*>  vhAcc;
@@ -76,10 +67,9 @@ TPad *pad_Afb;
 TPad *pad_compare;
 
 RooRealVar* cosThe; // the variable 
-RooRealVar* yQ;     // the variable 
 RooRealVar* weight; // the weight
-RooRealVar* A0;     // the parameter to find
-RooRealVar* A4;     // the parameter to find
+RooRealVar* A0;    // the parameter to find
+RooRealVar* A4;    // the parameter to find
 
 
 vector<RooAbsData*>   vUnbinnedDataSet; // Roo Data holder
@@ -178,9 +168,6 @@ void setBranches(int mod)
 	vtData[mod]->SetBranchAddress( "cost_tru", &cost_tru );
 	vtData[mod]->SetBranchAddress( "cost_rec", &cost_rec );
 	vtData[mod]->SetBranchAddress( "cost_wgt", &cost_wgt );
-	vtData[mod]->SetBranchAddress( "yQ_tru",   &yQ_tru );
-	vtData[mod]->SetBranchAddress( "yQ_rec",   &yQ_rec );
-	vtData[mod]->SetBranchAddress( "yQ_wgt",   &yQ_wgt );
 	vtData[mod]->SetBranchAddress( "xscn_wgt", &xscn_wgt );
 }
 
@@ -259,7 +246,7 @@ void generateToy(int massBin, int mod, int N)
 	if(mod==DT) hAcc[mod] = (TH1D*)file->Get("cosTheta_histograms/hCosThZ0d3pd_acceptance_"+sMassBin)->Clone("");      // !!!!!!!!!!!!!!!!!!!!!!!! TO CHANGE
 	else        hAcc[mod] = (TH1D*)file->Get("cosTheta_histograms/hCosTh"+sId+"_acceptance_"+sMassBin)->Clone("");
 	rdhAcc[mod]   = new RooDataHist("rdhAcc_gen"+sId,"rdhAcc_gen"+sId,RooArgSet(*cosThe),hAcc[mod]);
-	rhpdfAcc[mod] = new RooHistPdf("rhpdfAcc_gen"+sId,"rhpdfAcc_gen"+sId,RooArgSet(*cosThe),*rdhAcc[mod],4); // last argument is the order of polinomial interpulation
+	rhpdfAcc[mod] = new RooHistPdf("rhpdfAcc_gen"+sId,"rhpdfAcc_gen"+sId,RooArgSet(*cosThe),*rdhAcc[mod],5); // last argument is the order of polinomial interpulation
 	model[mod]    = new RooProdPdf("model_"+sId+"_gen","truPdf*accPdf_gen",*sigPdf_gen[mod],*rhpdfAcc[mod]);
 	rad[mod]      = model[mod]->generate(*cosThe,N);
 	_INFO("Data entries = "+tostring(rad[mod]->numEntries()));
@@ -284,10 +271,6 @@ void init(int massBin, int mod)
 	cosThe->setRange("range_cosThe",costmin,costmax);
 	cosThe->setBins(ncostbins);
 	
-	yQ = new RooRealVar("yQ","y_{Q}",yqmin,yqmax);
-	yQ->setRange("range_yQ",yqmin,yqmax);
-	yQ->setBins(nyqbins);
-	
 	weight = new RooRealVar("weight","weight",0.,1e10);
 	//weight->setRange("range_weight",costmin,costmax);
 	//weight->setBins(ncostbins);
@@ -300,14 +283,11 @@ void init(int massBin, int mod)
 	vvInitialGuess[massBin-1].push_back(fp);
 	A0 = new RooRealVar("A0","A0",_A0,minA0,maxA0);
 	A4 = new RooRealVar("A4","A4",_A4,minA4,maxA4);
-	// A0->setError(0.001);
-	// A4->setError(0.001);
-	A0->setError(0.001);
-	A4->setError(0.001);
+	A0->setError(0.00001);
+	A4->setError(0.00001);
 	
 	// sigPdf = new RooAngular("SignalPdf", "SignalPdf", *cosThe, *A0, *A4);
-	// sigPdf = new RooCollinsSoper("SignalPdf", "SignalPdf", *cosThe, *A0, *A4);
-	sigPdf = new RooFBfalseIdentifyCS("SignalPdf", "SignalPdf", *cosThe,*yQ,*A0,*A4,*hProb);
+	sigPdf = new RooCollinsSoper("SignalPdf", "SignalPdf", *cosThe, *A0, *A4);
 	
 	TString sName, sId, sIdShort, sChannelFit, sChannelMass;
 	Int_t fillStyle = 0;
@@ -411,7 +391,7 @@ void init(int massBin, int mod)
 	if(mod==DT) vhAcc.push_back( (TH1D*)file->Get("cosTheta_histograms/hCosThZ0d3pd_acceptance_"+sMassBin)->Clone("") ); // !!!!!!!!!!!!!!!!!!!!!!!! TO CHANGE 
 	else        vhAcc.push_back( (TH1D*)file->Get("cosTheta_histograms/hCosTh"+sId+"_acceptance_"+sMassBin)->Clone("") );
 	vrdhAcc.push_back( new RooDataHist("rdhAcc"+sId,"rdhAcc"+sId,RooArgSet(*cosThe),vhAcc[mod]) );
-	vrhpdfAcc.push_back( new RooHistPdf("rhpdfAcc"+sId,"rhpdfAcc"+sId,RooArgSet(*cosThe),*vrdhAcc[mod],4) ); // last argument is the order of polinomial interpulation
+	vrhpdfAcc.push_back( new RooHistPdf("rhpdfAcc"+sId,"rhpdfAcc"+sId,RooArgSet(*cosThe),*vrdhAcc[mod],5) ); // last argument is the order of polinomial interpulation
 	vDetAcc.push_back( vrhpdfAcc[mod] );
 	vModel.push_back( new RooProdPdf("model_"+sId,"truPdf*accPdf",*sigPdf,*vDetAcc[mod]) );
 	if(doGeneration)
@@ -427,8 +407,8 @@ void init(int massBin, int mod)
 	}
 	else
 	{
-		if(mod==DT || doGeneration) vUnbinnedDataSet.push_back( new RooDataSet("data_"+sId,"data_"+sId,RooArgSet(*cosThe,*yQ)) ); // no weights
-		else                        vUnbinnedDataSet.push_back( new RooDataSet("data_"+sId,"data_"+sId,RooArgSet(*cosThe,*yQ,*weight),WeightVar(weight->GetName())) );
+		if(mod==DT || doGeneration) vUnbinnedDataSet.push_back( new RooDataSet("data_"+sId,"data_"+sId,RooArgSet(*cosThe)) ); // no weights
+		else                        vUnbinnedDataSet.push_back( new RooDataSet("data_"+sId,"data_"+sId,RooArgSet(*cosThe,*weight),WeightVar(weight->GetName())) );
 	}
 }
 
@@ -462,7 +442,6 @@ void reset()
 	_DEBUG("");
 	
 	delete cosThe;
-	delete yQ;
 	delete weight;
 	delete A0;
 	delete A4;
@@ -513,7 +492,6 @@ Int_t loop(int mod)
 		{
 			vtData[mod]->GetEntry(i);
 			*cosThe = cost_rec;
-			*yQ     = yQ_rec;
 			float w;
 			if(mod==DT)
 			{
@@ -536,8 +514,8 @@ Int_t loop(int mod)
 				vhMassBins[mod]->Fill(mass_rec,xscn_wgt*mass_wgt*luminosity);
 			}
 			
-			if(mod==DT) vUnbinnedDataSet[mod]->add(RooArgSet(*cosThe,*yQ));   // UNWEIGHTED
-			else        vUnbinnedDataSet[mod]->add(RooArgSet(*cosThe,*yQ),w); // WEIGHTED   
+			if(mod==DT) vUnbinnedDataSet[mod]->add(RooArgSet(*cosThe));   // UNWEIGHTED
+			else        vUnbinnedDataSet[mod]->add(RooArgSet(*cosThe),w); // WEIGHTED   
 		}
 	}
 	
@@ -585,12 +563,12 @@ RooFitResult* fit(int mod)
 		if(mod==DT || doGeneration)
 		{
 			if(vBinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is weighted $$$$$$$$$$$");
-			fitresult = vModel[mod]->fitTo( *vBinnedDataSet[mod],Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),NumCPU(8),ConditionalObservables(*yQ));
+			fitresult = vModel[mod]->fitTo( *vBinnedDataSet[mod],Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),NumCPU(8));
 		}
 		else 
 		{
 			if(!vBinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is unweighted $$$$$$$$$$$");
-			fitresult = vModel[mod]->fitTo( *vUnbinnedDataSet[mod],Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),SumW2Error(kTRUE),NumCPU(8),ConditionalObservables(*yQ));		
+			fitresult = vModel[mod]->fitTo( *vUnbinnedDataSet[mod],Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),SumW2Error(kTRUE),NumCPU(8));		
 		}
 	}
 	else
@@ -598,12 +576,12 @@ RooFitResult* fit(int mod)
 		if(mod==DT || doGeneration)
 		{
 			if(vUnbinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is weighted $$$$$$$$$$$");
-			fitresult = vModel[mod]->fitTo( *vUnbinnedDataSet[mod],Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),NumCPU(8),ConditionalObservables(*yQ));
+			fitresult = vModel[mod]->fitTo( *vUnbinnedDataSet[mod],Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),NumCPU(8));
 		}
 		else
 		{
 			if(!vUnbinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is unweighted $$$$$$$$$$$");
-			fitresult = vModel[mod]->fitTo( *vUnbinnedDataSet[mod],Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),SumW2Error(kTRUE),NumCPU(8),ConditionalObservables(*yQ));
+			fitresult = vModel[mod]->fitTo( *vUnbinnedDataSet[mod],Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),SumW2Error(kTRUE),NumCPU(8));
 		}
 	}
 	gFit = gMinuit;
@@ -633,8 +611,6 @@ void plot(int mod, TVirtualPad* pad)
 			if(!vBinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is unweighted $$$$$$$$$$$");
 			vBinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2));
 		}
-		
-		vModel[mod]->plotOn(cosThetaFrame,ProjWData(*yQ,*vBinnedDataSet[mod]),LineWidth(1),LineColor(cPdf),NormRange("range_cosThe"));
 	}
 	else
 	{
@@ -648,14 +624,12 @@ void plot(int mod, TVirtualPad* pad)
 			if(!vUnbinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is unweighted $$$$$$$$$$$");
 			vUnbinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2));
 		}
-		
-		vModel[mod]->plotOn(cosThetaFrame,ProjWData(*yQ,*vUnbinnedDataSet[mod]),LineWidth(1),LineColor(cPdf),NormRange("range_cosThe"));
 	}
 	vDetAcc[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(cAcceptance));
 	//vDetAcc[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(cAcceptance),NormRange("range_cosThe"));
 
-	// vModel[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(cPdf),NormRange("range_cosThe"));
-	// vModel[mod]->paramOn(cosThetaFrame,Layout(0.7,1.,0.4),Format("NEU",AutoPrecision(1)));
+	vModel[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(cPdf),NormRange("range_cosThe"));
+	//vModel[mod]->paramOn(cosThetaFrame,Layout(0.7,1.,0.4),Format("NEU",AutoPrecision(1)));
 	vModel[mod]->paramOn(cosThetaFrame,Layout(0.4,0.88,1), Format("NEU", AutoPrecision(1)));
 	cosThetaFrame->getAttText()->SetTextSize(0.05);
 	//cosThetaFrame->getAttLine()->SetLineWidth(0.05);

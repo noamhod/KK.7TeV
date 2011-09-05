@@ -78,7 +78,7 @@ string log(const char* file, int line, int type, int level, string message)
 	return os.str();
 }
 
-#define LOG(x,y,z) log(__FILE__, __LINE__,  (x), (y),    (z)) // general log
+#define LOG(x,y,z)  log(__FILE__, __LINE__,  (x), (y),    (z)) // general log
 #define _DEBUG(x)   log(__FILE__, __LINE__, DBG, VISUAL, (x)) // for DEBUG VISUAL
 #define _INFO(x)    log(__FILE__, __LINE__, INF, VISUAL, (x)) // for INFO VISUAL
 #define _WARNING(x) log(__FILE__, __LINE__, WRN, VISUAL, (x)) // for WARNING VISUAL

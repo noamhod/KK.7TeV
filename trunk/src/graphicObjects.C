@@ -26,6 +26,9 @@ void graphicObjects::clearTreeVars()
 	CosThetaHE   = -9999;
 	Ysystem      = -9999;
 	Q_T          = -9999;
+	betaQ        = -9999;
+	betazQ       = -9999;
+	betaTQ       = -9999;
 	CosThetaDimu = -9999;
 	ipTDiff      = -9999;
 	EtaSum       = -9999;
@@ -441,6 +444,9 @@ void graphicObjects::clearTreeVars()
 	truth_all_CosThetaHE = 0.;
 	truth_all_ySystem    = 0.;
 	truth_all_QT         = 0.;
+	truth_all_betaQ      = 0.;
+	truth_all_betazQ     = 0.;
+	truth_all_betaTQ     = 0.;
 	
 	truth_all_partons_mc_pt->clear();
 	truth_all_partons_mc_m->clear();
@@ -469,6 +475,9 @@ void graphicObjects::clearTreeVars()
 	recon_all_CosThetaHE = 0.;
 	recon_all_ySystem    = 0.;
 	recon_all_QT         = 0.;
+	recon_all_betaQ      = 0.;
+	recon_all_betazQ     = 0.;
+	recon_all_betaTQ     = 0.;
 }
 
 void graphicObjects::writeTrees(TDirectory* tDir_allCuts,
@@ -879,6 +888,9 @@ TDirectory* tDir_efficiency)
 	tree_allCuts->Branch( "CosThetaHE",   &CosThetaHE );
 	tree_allCuts->Branch( "Ysystem",      &Ysystem );
 	tree_allCuts->Branch( "Q_T",          &Q_T );
+	tree_allCuts->Branch( "betaQ",          &betaQ );
+	tree_allCuts->Branch( "betazQ",          &betazQ );
+	tree_allCuts->Branch( "betaTQ",          &betaTQ );
 	tree_allCuts->Branch( "CosThetaDimu", &CosThetaDimu );
 	tree_allCuts->Branch( "ipTDiff",      &ipTDiff );
 	tree_allCuts->Branch( "EtaSum",       &EtaSum );
@@ -1383,6 +1395,9 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_truth->Branch( "truth_all_CosThetaHE", &truth_all_CosThetaHE );
 	tree_truth->Branch( "truth_all_ySystem", &truth_all_ySystem );
 	tree_truth->Branch( "truth_all_QT", &truth_all_QT );
+	tree_truth->Branch( "truth_all_betaQ", &truth_all_betaQ );
+	tree_truth->Branch( "truth_all_betazQ", &truth_all_betazQ );
+	tree_truth->Branch( "truth_all_betaTQ", &truth_all_betaTQ );
 	
 	// partons
 	tree_truth->Branch( "truth_all_partons_mc_pt", &truth_all_partons_mc_pt);
@@ -1412,6 +1427,9 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_truth->Branch( "recon_all_CosThetaHE", &recon_all_CosThetaHE );
 	tree_truth->Branch( "recon_all_ySystem", &recon_all_ySystem );
 	tree_truth->Branch( "recon_all_QT", &recon_all_QT );
+	tree_truth->Branch( "recon_all_betaQ", &recon_all_betaQ );
+	tree_truth->Branch( "recon_all_betazQ", &recon_all_betazQ );
+	tree_truth->Branch( "recon_all_betaTQ", &recon_all_betaTQ );
 }
 
 

@@ -34,6 +34,9 @@ class kinematics
 		inline float imass(                TLorentzVector* pa, TLorentzVector* pb );
 		inline float QT(                   TLorentzVector* pa, TLorentzVector* pb );
 		inline float ySystem(              TLorentzVector* pa, TLorentzVector* pb );
+		inline float betaSystem(           TLorentzVector* pa, TLorentzVector* pb);
+		inline float betazSystem(          TLorentzVector* pa, TLorentzVector* pb);
+		inline float betaTSystem(          TLorentzVector* pa, TLorentzVector* pb);
 		inline float betaSystem(           float pa, float pb, float ea, float eb);
 		inline float cosThetaCollinsSoper( TLorentzVector* pa, float ca,
 										   TLorentzVector* pb, float cb );

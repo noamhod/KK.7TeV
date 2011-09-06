@@ -604,12 +604,12 @@ void plot(int mod, TVirtualPad* pad)
 		if(mod==DT || doGeneration)
 		{
 			if(vBinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is weighted $$$$$$$$$$$");
-			vBinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins));
+			vBinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),NumCPU(8));
 		}
 		else
 		{
 			if(!vBinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is unweighted $$$$$$$$$$$");
-			vBinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2));
+			vBinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2),NumCPU(8));
 		}
 	}
 	else
@@ -617,12 +617,12 @@ void plot(int mod, TVirtualPad* pad)
 		if(mod==DT || doGeneration)
 		{
 			if(vUnbinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is weighted $$$$$$$$$$$");
-			vUnbinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins));
+			vUnbinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),NumCPU(8));
 		}
 		else
 		{
 			if(!vUnbinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is unweighted $$$$$$$$$$$");
-			vUnbinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2));
+			vUnbinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2),NumCPU(8));
 		}
 	}
 	vDetAcc[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(cAcceptance));

@@ -7,6 +7,9 @@ static const double nGeneratedEvents = 5e5;
 
 static const double luminosity = 2.28348; //1.60708;//5.; // 1/fb
 
+static const double minPossibleImass = 5.; // GeV
+static const double maxPossibleImass = 7000.; // GeV
+
 static const double minMassBin = 120;  // for the asymmetry fit
 static const double maxMassBin = 1500; // for the asymmetry fit
 static const int    nMassBins  = 6;   // for the asymmetry fit

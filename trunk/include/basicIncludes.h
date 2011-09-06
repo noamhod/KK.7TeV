@@ -125,6 +125,8 @@ typedef vector<TCanvas*> TVecCanvas;
 
 #include "style.h"
 
+#include "bins.h"
+
 #define utilities_cxx
 #include "utilities.C"
 

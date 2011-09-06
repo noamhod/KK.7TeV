@@ -27,10 +27,8 @@ int      ncostbins = nCosThetaBins;
 
 double minA0 = -10.;
 double maxA0 = +10.;
-// double minA4 = -10.;
-// double maxA4 = +10.;
-double minA4 = -5.; //-2.666;
-double maxA4 = +5.; //+2.666;
+double minA4 = -10.; //-2.666;
+double maxA4 = +10.; //+2.666;
 double _A0 = 0.;
 double _A4 = 0.;
 struct fitpars
@@ -588,7 +586,7 @@ RooFitResult* fit(int mod)
 	
 	vbFitStatus.push_back( minuitStatus(gFit) );
 	
-	fitresult->Print();
+	fitresult->Print("v");
 	
 	return fitresult;
 }
@@ -625,10 +623,10 @@ void plot(int mod, TVirtualPad* pad)
 			vUnbinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2),NumCPU(8));
 		}
 	}
-	vDetAcc[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(cAcceptance));
+	vDetAcc[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(cAcceptance),NumCPU(8));
 	//vDetAcc[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(cAcceptance),NormRange("range_cosThe"));
 
-	vModel[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(cPdf),NormRange("range_cosThe"));
+	vModel[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(cPdf),NormRange("range_cosThe"),NumCPU(8));
 	//vModel[mod]->paramOn(cosThetaFrame,Layout(0.7,1.,0.4),Format("NEU",AutoPrecision(1)));
 	vModel[mod]->paramOn(cosThetaFrame,Layout(0.4,0.88,1), Format("NEU", AutoPrecision(1)));
 	cosThetaFrame->getAttText()->SetTextSize(0.05);
@@ -745,7 +743,7 @@ void drawAfb()
 	pad_Afb->cd();
 	if(!drawKKAfb)
 	{
-		vhAfbBins[Z0]->GetYaxis()->SetRangeUser(-1.,+1.);
+		vhAfbBins[Z0]->GetYaxis()->SetRangeUser(-1.5,+1.5);
 		if(drawAfbErrArea) vhAfbBins[Z0]->Draw("E5 Y+");
 		else               vhAfbBins[Z0]->Draw("Y+ e1x1");
 		vhAfbBins[Z0]->GetXaxis()->SetMoreLogLabels(); 
@@ -753,7 +751,7 @@ void drawAfb()
 	}
 	else
 	{
-		vhAfbBins[KK]->GetYaxis()->SetRangeUser(-1.,+1.);
+		vhAfbBins[KK]->GetYaxis()->SetRangeUser(-1.5,+1.5);
 		if(drawAfbErrArea) vhAfbBins[KK]->Draw("E5 Y+");
 		else               vhAfbBins[KK]->Draw("e1x1 Y+");
 		vhAfbBins[KK]->GetXaxis()->SetMoreLogLabels(); 

@@ -115,7 +115,7 @@ RooAbsData*  rad[4];
 //////////////////////////////////
 // flags to config the run
 bool drawAfbErrArea  = true;
-bool doLumiXSweights = false; //!!! // true if want to scale binned samples to 1 smooth sample and to scale MC to data luminosity. This affects mostly the errors
+bool doLumiXSweights = true; //!!! // true if want to scale binned samples to 1 smooth sample and to scale MC to data luminosity. This affects mostly the errors
 bool doBinned        = false;
 bool doGeneration    = false;
 bool doBinomialError = false;
@@ -302,8 +302,8 @@ void init(int massBin, int mod)
 	A4 = new RooRealVar("A4","A4",_A4,minA4,maxA4);
 	// A0->setError(0.001);
 	// A4->setError(0.001);
-	A0->setError(0.001);
-	A4->setError(0.001);
+	A0->setError(0.00001);
+	A4->setError(0.00001);
 	
 	// sigPdf = new RooAngular("SignalPdf", "SignalPdf", *cosThe, *A0, *A4);
 	// sigPdf = new RooCollinsSoper("SignalPdf", "SignalPdf", *cosThe, *A0, *A4);
@@ -610,7 +610,7 @@ RooFitResult* fit(int mod)
 	
 	vbFitStatus.push_back( minuitStatus(gFit) );
 	
-	fitresult->Print();
+	fitresult->Print("v");
 	
 	return fitresult;
 }
@@ -649,9 +649,9 @@ void plot(int mod, TVirtualPad* pad)
 			vUnbinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2),NumCPU(8));
 		}
 		
-		vModel[mod]->plotOn(cosThetaFrame,ProjWData(*yQ,*vUnbinnedDataSet[mod]),LineWidth(1),LineColor(cPdf),NormRange("range_cosThe"));
+		vModel[mod]->plotOn(cosThetaFrame,ProjWData(*yQ,*vUnbinnedDataSet[mod]),LineWidth(1),LineColor(cPdf),NormRange("range_cosThe"),NumCPU(8));
 	}
-	vDetAcc[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(cAcceptance));
+	vDetAcc[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(cAcceptance),NumCPU(8));
 	//vDetAcc[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(cAcceptance),NormRange("range_cosThe"));
 
 	// vModel[mod]->plotOn(cosThetaFrame,LineWidth(1),LineColor(cPdf),NormRange("range_cosThe"));
@@ -771,7 +771,7 @@ void drawAfb()
 	pad_Afb->cd();
 	if(!drawKKAfb)
 	{
-		vhAfbBins[Z0]->GetYaxis()->SetRangeUser(-1.,+1.);
+		vhAfbBins[Z0]->GetYaxis()->SetRangeUser(-1.5,+1.5);
 		if(drawAfbErrArea) vhAfbBins[Z0]->Draw("E5 Y+");
 		else               vhAfbBins[Z0]->Draw("Y+ e1x1");
 		vhAfbBins[Z0]->GetXaxis()->SetMoreLogLabels(); 
@@ -779,7 +779,7 @@ void drawAfb()
 	}
 	else
 	{
-		vhAfbBins[KK]->GetYaxis()->SetRangeUser(-1.,+1.);
+		vhAfbBins[KK]->GetYaxis()->SetRangeUser(-1.5,+1.5);
 		if(drawAfbErrArea) vhAfbBins[KK]->Draw("E5 Y+");
 		else               vhAfbBins[KK]->Draw("e1x1 Y+");
 		vhAfbBins[KK]->GetXaxis()->SetMoreLogLabels(); 
@@ -944,7 +944,7 @@ void Afb_RooFit_weighted_2d()
 		
 		for(int mod=Z0 ; mod<=DT ; mod++)
 		{
-			_INFO("\n\n\n~~~~~~~~~~~~~~~~~~~~~~~~mass bin "+tostring(massBin)+", model "+tostring(mod)+"~~~~~~~~~~~~~~~~~~~~~~~~");
+			_INFO("\n\n\n~~~~~~~~~~~~~~~~~~~~~~~~START: mass bin "+tostring(massBin)+", model "+tostring(mod)+"~~~~~~~~~~~~~~~~~~~~~~~~");
 			bool skip = false;
 			/////////////////////////////////////////
 			init(massBin, mod); /////////////////////
@@ -952,6 +952,7 @@ void Afb_RooFit_weighted_2d()
 			if(N<=minEntries2Fit) skip=true; ////////
 			if(!skip) getFit(mod); //////////////////
 			/////////////////////////////////////////
+			_INFO("~~~~~~~~~~~~~~~~~~~~~~~~END:   mass bin "+tostring(massBin)+", model "+tostring(mod)+"~~~~~~~~~~~~~~~~~~~~~~~~");
 			
 			vPad[massBin-1].push_back( cnv->cd( padCounter ) );
 			padCounter++;

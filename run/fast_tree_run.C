@@ -1,4 +1,4 @@
-#include "../include/basicIncludes.h"
+#include "basicIncludes.h"
 
 TFile* file;
 TTree* tree;
@@ -21,21 +21,6 @@ TLorentzVector* tlvb   = new TLorentzVector;
 TLorentzVector* tlvtmp = new TLorentzVector;
 TVector3*       tv3a = new TVector3;
 TVector3*       tv3b = new TVector3;
-
-const Int_t    npbins = 20;
-const Double_t pmin   = 1.;
-const Double_t pmax   = 2000.;
-Double_t       pbins[npbins+1];
-
-const Int_t    nlogmassbins = 6;
-const Double_t logmassmin   = 120.;
-const Double_t logmassmax   = 1500.;
-Double_t       logmassbins[nlogmassbins+1];
-
-const Int_t    netabins = 25;
-const Double_t etamin   = -2.5;
-const Double_t etamax   = +2.5;
-const Double_t etax     = 1.;
 
 
 /////////////  MC  /////////////
@@ -388,18 +373,6 @@ void databranches()
 	_DEBUG("successfully read data branches");
 }
 
-
-void setLogBins(Int_t nbins, Double_t min, Double_t max, Double_t* xpoints)
-{
-	_DEBUG("setLogBins");
-
-	Double_t logmin  = log10(min);
-	Double_t logmax  = log10(max);
-	Double_t logbinwidth = (Double_t)( (logmax-logmin)/(Double_t)nbins );
-	xpoints[0] = min;
-	for(Int_t i=1 ; i<=nbins ; i++) xpoints[i] = TMath::Power( 10,(logmin + i*logbinwidth) );
-}
-
 void hbook()
 {
 	_DEBUG("hbook");
@@ -449,11 +422,16 @@ void hbook()
 	
 	h2Map.insert( make_pair("hMassCosThetaCS", new TH2D("hMassCosThetaCS",";m_{#mu#mu} GeV;cos(#theta*);Events",250,70.,2500., 50,-1.,+1)) );
 	linMap.insert( make_pair("hMassCosThetaCS_horline", new TLine(70.,0.,2500.,0.)) );
-	linMap.insert( make_pair("hMassCosThetaCS_lonline", new TLine(646.33,-1.,646.33,+1.)) );
-	
+	for(int ms=0 ; ms<=nlogmassbins ; ms++)
+	{
+		linMap.insert( make_pair("hMassCosThetaCS_vertline_"+_s(logmassbins[ms]), new TLine(logmassbins[ms],-1.,logmassbins[ms],+1.)) );
+	}
 	h2Map.insert( make_pair("hMassyQ", new TH2D("hMassyQ",";m_{#mu#mu} GeV;y_{Q};Events",250,70.,2500., 50,-2.5,+2.5)) );
 	linMap.insert( make_pair("hMassyQ_horline", new TLine(70.,0.,2500.,0.)) );
-	linMap.insert( make_pair("hMassyQ_lonline", new TLine(646.33,-2.5,646.33,+2.5)) );
+	for(int ms=0 ; ms<=nlogmassbins ; ms++)
+	{
+		linMap.insert( make_pair("hMassyQ_vertline_"+_s(logmassbins[ms]), new TLine(logmassbins[ms],-2.5,logmassbins[ms],+2.5)) );
+	}
 
 	h2Map.insert( make_pair("hbetaZyQ", new TH2D("hbetaZyQ",";#beta_{Q}^{z};y_{Q};Events",50,-1.,+1, 50,-2.5,+2.5)) );
 	h2Map.insert( make_pair("hbetaabsyQabs", new TH2D("hbetaabsyQabs",";|#beta_{Q}|;|y_{Q}|;Events",50,0.,+1., 50,0.,+2.5)) );
@@ -510,11 +488,18 @@ void hdraw()
 	
 	draw(h2Map["hMassyQ"], "hMassyQ", "COLZ", dolog);
 	drawon("hMassyQ", linMap["hMassyQ_horline"]);
-	drawon("hMassyQ", linMap["hMassyQ_lonline"]);
-	draw(h2Map["hbetaabsyQabs"], "hbetaabsyQabs", "COLZ");
+	for(int ms=0 ; ms<=nlogmassbins ; ms++)
+	{
+		drawon("hMassyQ", linMap["hMassyQ_vertline_"+_s(logmassbins[ms])]);
+	}
 	draw(h2Map["hMassCosThetaCS"], "hMassCosThetaCS", "COLZ", dolog);
 	drawon("hMassCosThetaCS", linMap["hMassCosThetaCS_horline"]);
-	drawon("hMassCosThetaCS", linMap["hMassCosThetaCS_lonline"]);
+	for(int ms=0 ; ms<=nlogmassbins ; ms++)
+	{
+		drawon("hMassCosThetaCS", linMap["hMassCosThetaCS_vertline_"+_s(logmassbins[ms])]);
+	}
+	
+	draw(h2Map["hbetaabsyQabs"], "hbetaabsyQabs", "COLZ");
 	draw(h2Map["hyQCosThetaCS"], "hyQCosThetaCS", "COLZ");
 	draw(h2Map["hbetaZyQ"], "hbetaZyQ", "COLZ");
 	draw(h2Map["hbetaZyQtru"], "hbetaZyQtru", "COLZ");
@@ -561,9 +546,21 @@ void hfill(Double_t wgt=1.)
 	float cosalpha_truqqbar = -999.;
 	float betaztru          = -999.;
 	
-	int iquark   = -999;
-	int imuontru = -999;
-	int imuonrec = -999;
+	float dr  = 0.;
+	float dr1 = 0.;
+	float dr2 = 0.;
+	
+	float mass       = 0.;
+	float ca         = 0.;
+	float cb         = 0.;
+	float yQ         = 0.;
+	float costhetaCS = 0.;
+	
+	int iquark    = -999;
+	int imuontru  = -999;
+	int iamuontru = -999;
+	int imuonrec  = -999;
+	int iamuonrec = -999;
 
 	if(isMC)
 	{
@@ -618,11 +615,11 @@ void hfill(Double_t wgt=1.)
 				tlva->SetPtEtaPhiM(truth_all_mc_pt->at(imuontru), truth_all_mc_eta->at(imuontru), truth_all_mc_phi->at(imuontru), muonMass);
 				tlvb->SetPtEtaPhiM(recon_all_pt->at(0), recon_all_eta->at(0), recon_all_phi->at(0), muonMass);
 				tlvtmp->SetPtEtaPhiM(recon_all_pt->at(1), recon_all_eta->at(1), recon_all_phi->at(1), muonMass);
-				float dr1 = kin.dR(tlva,tlvb);
-				float dr2 = kin.dR(tlva,tlvtmp);
+				dr1 = kin.dR(tlva,tlvb);
+				dr2 = kin.dR(tlva,tlvtmp);
 				h2Map["hdRtru1dRtru2"]->Fill(dr1,dr2,wgt);
-				imuonrec = (dr1<0.2) ? 0 : 1;
-				// float dr = (dr1<0.2) ? dr1 : dr2;
+				imuonrec = (dr1<0.1) ? 0 : 1;
+				dr = (dr1<0.2) ? dr1 : dr2;
 				// _INFO("imuontru[qtru="+_s(truth_all_mc_charge->at(imuontru))+"]="+_s(imuontru)+",  imuonrec="+_s(imuonrec)+",  dr="+_s(dr)+",  qrec="+_s(recon_all_charge->at(imuonrec)));
 				if(truth_all_mc_charge->at(imuontru)*recon_all_charge->at(imuonrec)<0.) // muon matched but the charge is flipped
 				{
@@ -634,21 +631,47 @@ void hfill(Double_t wgt=1.)
 					h1Map["hprobChargeFlip_y_ratio"]->Fill(tlva->Rapidity(),wgt);
 				}
 			
-				h1Map["hMass"]->Fill(recon_all_Mhat,wgt);
+				imuonrec  = (recon_all_charge->at(0)<0.) ? 0 : 1;
+				iamuonrec = (imuonrec==0) ? 1 : 0;
+				tlva->SetPtEtaPhiM(recon_all_pt->at(imuonrec),recon_all_eta->at(imuonrec),recon_all_phi->at(imuonrec),recon_all_m->at(imuonrec));
+				tlvb->SetPtEtaPhiM(recon_all_pt->at(iamuonrec),recon_all_eta->at(iamuonrec),recon_all_phi->at(iamuonrec),recon_all_m->at(iamuonrec));
+				ca = recon_all_charge->at(imuonrec);
+				cb = recon_all_charge->at(iamuonrec);
+				if(ca*cb>=0.) _WARNING("ca*cb>=0., skipping event");
+				mass = kin.imass(tlva,tlvb);
+				if(mass<=minPossibleImass || mass>maxPossibleImass) _WARNING("mass<=minPossibleImass || mass>maxPossibleImass  ->  mass="+_s(mass));
+				costhetaCS = kin.cosThetaCollinsSoper(tlva,ca,tlvb,cb);
+				if(fabs(costhetaCS)>1.) _WARNING("|cos(theta)|>1.");
+				yQ = kin.ySystem(tlva,tlvb);
+				if(fabs(yQ)>6.) _WARNING("|yQ|>6.");
+			
+				h1Map["hMass"]->Fill(mass,wgt);
 				h1Map["hbetaZ"]->Fill(betaz_rec,wgt);
-				h1Map["hyQ"]->Fill(recon_all_ySystem,wgt);
-				h1Map["hyQabs"]->Fill(fabs(recon_all_ySystem),wgt);
+				h1Map["hyQ"]->Fill(yQ,wgt);
+				h1Map["hyQabs"]->Fill(fabs(yQ),wgt);
 				
-				h2Map["hMassyQ"]->Fill(recon_all_Mhat,recon_all_ySystem,wgt);
-				h2Map["hMassCosThetaCS"]->Fill(recon_all_Mhat,recon_all_CosThetaCS,wgt);
-				h2Map["hyQCosThetaCS"]->Fill(recon_all_ySystem,recon_all_CosThetaCS,wgt);
-				h2Map["hyQCosThetaCS_acc"]->Fill(recon_all_ySystem,recon_all_CosThetaCS,wgt);
-				h2Map["hbetaZyQ"]->Fill(betaz_rec,recon_all_ySystem,wgt);
-				h2Map["hbetaabsyQabs"]->Fill(betamag_rec,fabs(recon_all_ySystem),wgt);
+				h2Map["hMassyQ"]->Fill(mass,yQ,wgt);
+				h2Map["hMassCosThetaCS"]->Fill(mass,costhetaCS,wgt);
+				h2Map["hyQCosThetaCS"]->Fill(yQ,costhetaCS,wgt);
+				h2Map["hyQCosThetaCS_acc"]->Fill(yQ,costhetaCS,wgt);
+				h2Map["hbetaZyQ"]->Fill(betaz_rec,yQ,wgt);
+				h2Map["hbetaabsyQabs"]->Fill(betamag_rec,fabs(yQ),wgt);
+			
+				// h1Map["hMass"]->Fill(recon_all_Mhat,wgt);
+				// h1Map["hbetaZ"]->Fill(betaz_rec,wgt);
+				// h1Map["hyQ"]->Fill(recon_all_ySystem,wgt);
+				// h1Map["hyQabs"]->Fill(fabs(recon_all_ySystem),wgt);
+				
+				// h2Map["hMassyQ"]->Fill(recon_all_Mhat,recon_all_ySystem,wgt);
+				// h2Map["hMassCosThetaCS"]->Fill(recon_all_Mhat,recon_all_CosThetaCS,wgt);
+				// h2Map["hyQCosThetaCS"]->Fill(recon_all_ySystem,recon_all_CosThetaCS,wgt);
+				// h2Map["hyQCosThetaCS_acc"]->Fill(recon_all_ySystem,recon_all_CosThetaCS,wgt);
+				// h2Map["hbetaZyQ"]->Fill(betaz_rec,recon_all_ySystem,wgt);
+				// h2Map["hbetaabsyQabs"]->Fill(betamag_rec,fabs(recon_all_ySystem),wgt);
 				
 				tlva->SetPtEtaPhiM(recon_all_pt->at(0), recon_all_eta->at(0), recon_all_phi->at(0), muonMass);
 				tlvb->SetPtEtaPhiM(recon_all_pt->at(1), recon_all_eta->at(1), recon_all_phi->at(1), muonMass);
-				float mass = kin.imass(tlva,tlvb);
+				mass = kin.imass(tlva,tlvb);
 				if(mass>=logmassmin && mass<=logmassmax)
 				{
 					int bin = h1Map["hEllipticity"]->FindBin(mass);
@@ -659,16 +682,32 @@ void hfill(Double_t wgt=1.)
 						// _INFO("mass="+_s(mass)+", bin="+_s(bin)+", imuonrec_uncorrected="+_s(imuonrec_uncorrected)+", eta_rec="+_s(eta_rec));
 						string hName = (fabs(eta_rec)<etax) ? "hEllipticity_sides_bin_" : "hEllipticity_central_bin_";
 						hName += _s(bin);
-						_INFO("hName="+hName);
 						if(fabs(eta_rec)<=etamax) h1Map[hName]->Fill(eta_rec,wgt);
-						else _WARNING("Eta exceeds its cut limit");
+						else _WARNING("Eta exceeds its cut limit  ->  "+_s(eta_rec));
 					}
 				}
 			}
 			
-			h1Map["hprobyQ_quark_denominator"]->Fill(truth_all_ySystem,wgt);
-			h1Map["hprobyQ_trumumu_denominator"]->Fill(truth_all_ySystem,wgt);
-			h1Map["hprobyQ_truqqbar_denominator"]->Fill(truth_all_ySystem,wgt);
+			iamuontru = (imuontru==0) ? 1 : 0;
+			tlva->SetPtEtaPhiM(truth_all_mc_pt->at(imuontru),truth_all_mc_eta->at(imuontru),truth_all_mc_phi->at(imuontru),truth_all_mc_m->at(imuontru));
+			tlvb->SetPtEtaPhiM(truth_all_mc_pt->at(iamuontru),truth_all_mc_eta->at(iamuontru),truth_all_mc_phi->at(iamuontru),truth_all_mc_m->at(iamuontru));
+			ca = truth_all_mc_charge->at(imuontru);
+			cb = truth_all_mc_charge->at(iamuontru);
+			if(ca*cb>=0.) _WARNING("ca*cb>=0., skipping event");
+			mass = kin.imass(tlva,tlvb);
+			if(mass<=minPossibleImass || mass>maxPossibleImass) _WARNING("mass<=minPossibleImass || mass>maxPossibleImass  ->  mass="+_s(mass));
+			costhetaCS = kin.cosThetaCollinsSoper(tlva,ca,tlvb,cb);
+			if(fabs(costhetaCS)>1.) _WARNING("|cos(theta)|>1.");
+			yQ = kin.ySystem(tlva,tlvb);
+			if(fabs(yQ)>6.) _WARNING("|yQ|>6.");
+			
+			h1Map["hprobyQ_quark_denominator"]->Fill(yQ,wgt);
+			h1Map["hprobyQ_trumumu_denominator"]->Fill(yQ,wgt);
+			h1Map["hprobyQ_truqqbar_denominator"]->Fill(yQ,wgt);
+			
+			// h1Map["hprobyQ_quark_denominator"]->Fill(truth_all_ySystem,wgt);
+			// h1Map["hprobyQ_trumumu_denominator"]->Fill(truth_all_ySystem,wgt);
+			// h1Map["hprobyQ_truqqbar_denominator"]->Fill(truth_all_ySystem,wgt);
 			
 			tlva->SetPtEtaPhiM(truth_all_mc_pt->at(imuontru), truth_all_mc_eta->at(imuontru), truth_all_mc_phi->at(imuontru), muonMass);
 			h1Map["hprobChargeFlip_p_denominator"]->Fill(tlva->P(),wgt);
@@ -679,8 +718,11 @@ void hfill(Double_t wgt=1.)
 			tlva->SetPtEtaPhiM(truth_all_mc_pt->at(0), truth_all_mc_eta->at(0), truth_all_mc_phi->at(0), muonMass);
 			tlvb->SetPtEtaPhiM(truth_all_mc_pt->at(1), truth_all_mc_eta->at(1), truth_all_mc_phi->at(1), muonMass);
 			betaztru = kin.betaSystem(tlva->Pz(), tlvb->Pz(), tlva->E(), tlvb->E());
-			h2Map["hbetaZyQtru"]->Fill(betaztru,truth_all_ySystem,wgt);
-			h2Map["hyQCosThetaCS_tru"]->Fill(truth_all_ySystem,truth_all_CosThetaCS,wgt);
+			h2Map["hbetaZyQtru"]->Fill(betaztru,yQ,wgt);
+			h2Map["hyQCosThetaCS_tru"]->Fill(yQ,costhetaCS,wgt);
+			
+			// h2Map["hbetaZyQtru"]->Fill(betaztru,truth_all_ySystem,wgt);
+			// h2Map["hyQCosThetaCS_tru"]->Fill(truth_all_ySystem,truth_all_CosThetaCS,wgt);
 		}
 	}
 	else
@@ -690,20 +732,45 @@ void hfill(Double_t wgt=1.)
 		betaz_rec = kin.betaSystem(pz->at(0), pz->at(1), E->at(0), E->at(1));
 		betamag_rec = sqrt(betax_rec*betax_rec+betay_rec*betay_rec+betaz_rec*betaz_rec);
 		
-		h1Map["hMass"]->Fill(Mhat*TeV2GeV);
-		h1Map["hbetaZ"]->Fill(betaz_rec);
-		h1Map["hyQ"]->Fill(Ysystem);
-		h1Map["hyQabs"]->Fill(fabs(Ysystem));
+		imuonrec  = (charge->at(0)<0.) ? 0 : 1;
+		iamuonrec = (imuonrec==0) ? 1 : 0;
+		tlva->SetPtEtaPhiM(pt->at(imuonrec),eta->at(imuonrec),phi->at(imuonrec),m->at(imuonrec));
+		tlvb->SetPtEtaPhiM(pt->at(iamuonrec),eta->at(iamuonrec),phi->at(iamuonrec),m->at(iamuonrec));
+		ca = charge->at(imuonrec);
+		cb = charge->at(iamuonrec);
+		if(ca*cb>=0.) _WARNING("ca*cb>=0., skipping event");
+		mass = kin.imass(tlva,tlvb)*MeV2GeV;
+		if(mass<=minPossibleImass || mass>maxPossibleImass) _WARNING("mass<=minPossibleImass || mass>maxPossibleImass  ->  mass="+_s(mass));
+		costhetaCS = kin.cosThetaCollinsSoper(tlva,ca,tlvb,cb);
+		if(fabs(costhetaCS)>1.) _WARNING("|cos(theta)|>1.");
+		yQ = kin.ySystem(tlva,tlvb);
+		if(fabs(yQ)>6.) _WARNING("|yQ|>6.");
 		
-		h2Map["hMassyQ"]->Fill(Mhat*TeV2GeV,Ysystem);
-		h2Map["hMassCosThetaCS"]->Fill(Mhat*TeV2GeV,CosThetaCS);
-		h2Map["hyQCosThetaCS"]->Fill(Ysystem,CosThetaCS);
-		h2Map["hbetaZyQ"]->Fill(betaz_rec,Ysystem);
-		h2Map["hbetaabsyQabs"]->Fill(betamag_rec,fabs(Ysystem));
+		h1Map["hMass"]->Fill(mass);
+		h1Map["hbetaZ"]->Fill(betaz_rec);
+		h1Map["hyQ"]->Fill(yQ);
+		h1Map["hyQabs"]->Fill(fabs(yQ));
+		
+		h2Map["hMassyQ"]->Fill(mass,yQ);
+		h2Map["hMassCosThetaCS"]->Fill(mass,costhetaCS);
+		h2Map["hyQCosThetaCS"]->Fill(yQ,costhetaCS);
+		h2Map["hbetaZyQ"]->Fill(betaz_rec,yQ);
+		h2Map["hbetaabsyQabs"]->Fill(betamag_rec,fabs(yQ));
+		
+		// h1Map["hMass"]->Fill(Mhat*TeV2GeV);
+		// h1Map["hbetaZ"]->Fill(betaz_rec);
+		// h1Map["hyQ"]->Fill(Ysystem);
+		// h1Map["hyQabs"]->Fill(fabs(Ysystem));
+		
+		// h2Map["hMassyQ"]->Fill(Mhat*TeV2GeV,Ysystem);
+		// h2Map["hMassCosThetaCS"]->Fill(Mhat*TeV2GeV,CosThetaCS);
+		// h2Map["hyQCosThetaCS"]->Fill(Ysystem,CosThetaCS);
+		// h2Map["hbetaZyQ"]->Fill(betaz_rec,Ysystem);
+		// h2Map["hbetaabsyQabs"]->Fill(betamag_rec,fabs(Ysystem));
 		
 		tlva->SetPtEtaPhiM(pt->at(0)*MeV2GeV, eta->at(0), phi->at(0), muonMass);
 		tlvb->SetPtEtaPhiM(pt->at(1)*MeV2GeV, eta->at(1), phi->at(1), muonMass);
-		float mass = kin.imass(tlva,tlvb);
+		mass = kin.imass(tlva,tlvb);
 		if(mass>=logmassmin && mass<=logmassmax)
 		{
 			int bin = h1Map["hEllipticity"]->FindBin(mass);
@@ -714,9 +781,8 @@ void hfill(Double_t wgt=1.)
 				// _INFO("mass="+_s(mass)+", bin="+_s(bin)+", imuonrec_uncorrected="+_s(imuonrec_uncorrected)+", eta_rec="+_s(eta_rec));
 				string hName = (fabs(eta_rec)<etax) ? "hEllipticity_sides_bin_" : "hEllipticity_central_bin_";
 				hName += _s(bin);
-				_INFO("hName="+hName);
 				if(fabs(eta_rec)<=etamax) h1Map[hName]->Fill(eta_rec);
-				else _WARNING("Eta exceeds its cut limit");
+				else _WARNING("Eta exceeds its cut limit  ->  "+_s(eta_rec));
 			}
 		}
 	}

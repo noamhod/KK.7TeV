@@ -1,5 +1,25 @@
 #include "all.h"
 
+TLorentzVector* tlva_tru = new TLorentzVector;
+TLorentzVector* tlvb_tru = new TLorentzVector;
+int imuon_tru  = 0;
+int iamuon_tru = 0;
+float ca_tru = 0.;
+float cb_tru = 0.;
+float M_tru = 0.;
+float YQ_tru = 0.;
+float COSTHETA_tru = 0.;
+
+TLorentzVector* tlva_rec = new TLorentzVector;
+TLorentzVector* tlvb_rec = new TLorentzVector;
+int imuon_rec  = 0;
+int iamuon_rec = 0;
+float ca_rec = 0.;
+float cb_rec = 0.;
+float M_rec = 0.;
+float YQ_rec = 0.;
+float COSTHETA_rec = 0.;
+
 // bins for the cosTheta histos
 double    costmin   = minCosTheta;
 double    costmax   = maxCosTheta;
@@ -657,7 +677,7 @@ int plot_ratio_weights()
 		// get the data
 		ymin = 0.;
 		vsize = (int)svPaths.size();
-		
+				
 		for(int n=vsize-1 ; n>=0 ; n--)
 		{
 			cout << "svPaths[" << n << "]=" << svPaths[n] << endl;
@@ -665,14 +685,14 @@ int plot_ratio_weights()
 			if(model==Z0d3pd)
 			{
 				tree = (TTree*)file->Get("truth/truth_tree");
-				tree->Branch( "truth_all_mc_pt", &truth_all_mc_pt );
-				tree->Branch( "truth_all_mc_m", &truth_all_mc_m );
-				tree->Branch( "truth_all_mc_eta", &truth_all_mc_eta );
-				tree->Branch( "truth_all_mc_phi", &truth_all_mc_phi );
-				tree->Branch( "truth_all_mc_status", &truth_all_mc_status );
-				tree->Branch( "truth_all_mc_barcode", &truth_all_mc_barcode );
-				tree->Branch( "truth_all_mc_pdgId", &truth_all_mc_pdgId );
-				tree->Branch( "truth_all_mc_charge", &truth_all_mc_charge );
+				tree->SetBranchAddress( "truth_all_mc_pt", &truth_all_mc_pt );
+				tree->SetBranchAddress( "truth_all_mc_m", &truth_all_mc_m );
+				tree->SetBranchAddress( "truth_all_mc_eta", &truth_all_mc_eta );
+				tree->SetBranchAddress( "truth_all_mc_phi", &truth_all_mc_phi );
+				tree->SetBranchAddress( "truth_all_mc_status", &truth_all_mc_status );
+				tree->SetBranchAddress( "truth_all_mc_barcode", &truth_all_mc_barcode );
+				tree->SetBranchAddress( "truth_all_mc_pdgId", &truth_all_mc_pdgId );
+				tree->SetBranchAddress( "truth_all_mc_charge", &truth_all_mc_charge );
 				tree->SetBranchAddress("truth_all_Mhat", &truth_all_Mhat);
 				tree->SetBranchAddress("truth_all_CosThetaCS", &truth_all_CosThetaCS);
 				tree->SetBranchAddress("truth_all_CosThetaHE", &truth_all_CosThetaHE);
@@ -689,20 +709,41 @@ int plot_ratio_weights()
 					if(truth_all_isValid)
 					{
 						valids++;
-						hvBinnedHistos_imass[n]->Fill(truth_all_Mhat);
-						hvBinnedHistos_imass_unscaled[n]->Fill(truth_all_Mhat);
-						int bin = hDummy_afb->FindBin(truth_all_Mhat);
+						imuon_tru  = (truth_all_mc_pdgId->at(0)>0) ? 0 : 1;
+						iamuon_tru = (imuon_tru==0) ? 1 : 0;
+						tlva_tru->SetPtEtaPhiM(truth_all_mc_pt->at(imuon_tru),truth_all_mc_eta->at(imuon_tru),truth_all_mc_phi->at(imuon_tru),truth_all_mc_m->at(imuon_tru));
+						tlvb_tru->SetPtEtaPhiM(truth_all_mc_pt->at(iamuon_tru),truth_all_mc_eta->at(iamuon_tru),truth_all_mc_phi->at(iamuon_tru),truth_all_mc_m->at(iamuon_tru));
+						ca_tru = truth_all_mc_charge->at(imuon_tru);
+						cb_tru = truth_all_mc_charge->at(iamuon_tru);
+						if(ca_tru*cb_tru>=0.)       {_WARNING("Truth: ca_tru*cb_tru>=0., skipping event"); continue;};
+						M_tru        = imass(tlva_tru,tlvb_tru);
+						if(M_tru<=5. || M_tru>5000.) {_WARNING("Truth: M_tru<=5. || M_tru>5000.  ->  M_tru="+_s(M_tru)+", skipping event"); continue;}
+						COSTHETA_tru = cosThetaCollinsSoper(tlva_tru,ca_tru,tlvb_tru,cb_tru);
+						if(fabs(COSTHETA_tru)>1.)   _WARNING("Truth: |cos(theta)|>1.");
+						YQ_tru       = ySystem(tlva_tru,tlvb_tru);
+						if(fabs(YQ_tru)>6.)         _WARNING("Truth: |yQ|>6.");
+						// hvBinnedHistos_imass[n]->Fill(truth_all_Mhat);
+						// hvBinnedHistos_imass_unscaled[n]->Fill(truth_all_Mhat);
+						// int bin = hDummy_afb->FindBin(truth_all_Mhat);
+						// if(bin<=0 || bin>imass_afb_nbins) continue;
+						// hvvBinnedHistos_cosTh[n][bin-1]->Fill(truth_all_CosThetaCS);
+						// hvvBinnedHistos_cosTh_unscaled[n][bin-1]->Fill(truth_all_CosThetaCS);
+						// hvvBinnedHistos_yQ[n][bin-1]->Fill(truth_all_ySystem);
+						// hvvBinnedHistos_yQ_unscaled[n][bin-1]->Fill(truth_all_ySystem);
+						hvBinnedHistos_imass[n]->Fill(M_tru);
+						hvBinnedHistos_imass_unscaled[n]->Fill(M_tru);
+						int bin = hDummy_afb->FindBin(M_tru);
 						if(bin<=0 || bin>imass_afb_nbins) continue;
-						hvvBinnedHistos_cosTh[n][bin-1]->Fill(truth_all_CosThetaCS);
-						hvvBinnedHistos_cosTh_unscaled[n][bin-1]->Fill(truth_all_CosThetaCS);
-						hvvBinnedHistos_yQ[n][bin-1]->Fill(truth_all_ySystem);
-						hvvBinnedHistos_yQ_unscaled[n][bin-1]->Fill(truth_all_ySystem);
+						hvvBinnedHistos_cosTh[n][bin-1]->Fill(COSTHETA_tru);
+						hvvBinnedHistos_cosTh_unscaled[n][bin-1]->Fill(COSTHETA_tru);
+						hvvBinnedHistos_yQ[n][bin-1]->Fill(YQ_tru);
+						hvvBinnedHistos_yQ_unscaled[n][bin-1]->Fill(YQ_tru);
 					}
 				}
 				cout << "n=" << n << ", valids=" << valids << endl;
 			}
 			else
-			{ 
+			{
 				tree = (TTree*)file->Get("tree");
 				tree->SetBranchAddress("mHat",&mHat);
 				tree->SetBranchAddress("QT",&qT);
@@ -725,12 +766,31 @@ int plot_ratio_weights()
 				for(Int_t i=0 ; i<tree->GetEntries() ; i++)
 				{
 					tree->GetEntry(i);
-					hvBinnedHistos_imass[n]->Fill(mHat);
 					
-					int bin = hDummy_afb->FindBin(mHat);
+					imuon_tru  = (charge->at(0)<0.) ? 0 : 1;
+					iamuon_tru = (imuon_tru==0) ? 1 : 0;
+					tlva_tru->SetPtEtaPhiM(pT->at(imuon_tru),eta->at(imuon_tru),phi->at(imuon_tru),m->at(imuon_tru));
+					tlvb_tru->SetPtEtaPhiM(pT->at(iamuon_tru),eta->at(iamuon_tru),phi->at(iamuon_tru),m->at(iamuon_tru));
+					ca_tru = charge->at(imuon_tru);
+					cb_tru = charge->at(iamuon_tru);
+					if(ca_tru*cb_tru>=0.)       {_WARNING("Truth: ca_tru*cb_tru>=0., skipping event"); continue;};
+					M_tru        = imass(tlva_tru,tlvb_tru);
+					if(M_tru<=5. || M_tru>5000.) {_WARNING("Truth: M_tru<=5. || M_tru>5000.  ->  M_tru="+_s(M_tru)+", skipping event"); continue;}
+					COSTHETA_tru = cosThetaCollinsSoper(tlva_tru,ca_tru,tlvb_tru,cb_tru);
+					if(fabs(COSTHETA_tru)>1.)   _WARNING("Truth: |cos(theta)|>1.");
+					YQ_tru       = ySystem(tlva_tru,tlvb_tru);
+					if(fabs(YQ_tru)>6.)         _WARNING("Truth: |yQ|>6.");
+					
+					// hvBinnedHistos_imass[n]->Fill(mHat);
+					// int bin = hDummy_afb->FindBin(mHat);
+					// if(bin<=0 || bin>imass_afb_nbins) continue;
+					// hvvBinnedHistos_cosTh[n][bin-1]->Fill(cosThetaCS); 
+					// hvvBinnedHistos_yQ[n][bin-1]->Fill(ysystem); 
+					hvBinnedHistos_imass[n]->Fill(M_tru);
+					int bin = hDummy_afb->FindBin(M_tru);
 					if(bin<=0 || bin>imass_afb_nbins) continue;
-					hvvBinnedHistos_cosTh[n][bin-1]->Fill(cosThetaCS); 
-					hvvBinnedHistos_yQ[n][bin-1]->Fill(ysystem); 
+					hvvBinnedHistos_cosTh[n][bin-1]->Fill(COSTHETA_tru); 
+					hvvBinnedHistos_yQ[n][bin-1]->Fill(YQ_tru); 
 				}
 			}
 			
@@ -1213,14 +1273,14 @@ int plot_ratio_weights()
 			{
 				tree = (TTree*)file->Get("truth/truth_tree");
 				
-				tree->Branch( "truth_all_mc_pt", &truth_all_mc_pt );
-				tree->Branch( "truth_all_mc_m", &truth_all_mc_m );
-				tree->Branch( "truth_all_mc_eta", &truth_all_mc_eta );
-				tree->Branch( "truth_all_mc_phi", &truth_all_mc_phi );
-				tree->Branch( "truth_all_mc_status", &truth_all_mc_status );
-				tree->Branch( "truth_all_mc_barcode", &truth_all_mc_barcode );
-				tree->Branch( "truth_all_mc_pdgId", &truth_all_mc_pdgId );
-				tree->Branch( "truth_all_mc_charge", &truth_all_mc_charge );
+				tree->SetBranchAddress( "truth_all_mc_pt", &truth_all_mc_pt );
+				tree->SetBranchAddress( "truth_all_mc_m", &truth_all_mc_m );
+				tree->SetBranchAddress( "truth_all_mc_eta", &truth_all_mc_eta );
+				tree->SetBranchAddress( "truth_all_mc_phi", &truth_all_mc_phi );
+				tree->SetBranchAddress( "truth_all_mc_status", &truth_all_mc_status );
+				tree->SetBranchAddress( "truth_all_mc_barcode", &truth_all_mc_barcode );
+				tree->SetBranchAddress( "truth_all_mc_pdgId", &truth_all_mc_pdgId );
+				tree->SetBranchAddress( "truth_all_mc_charge", &truth_all_mc_charge );
 				tree->SetBranchAddress("truth_all_Mhat", &truth_all_Mhat);
 				tree->SetBranchAddress("truth_all_CosThetaCS", &truth_all_CosThetaCS);
 				tree->SetBranchAddress("truth_all_CosThetaHE", &truth_all_CosThetaHE);
@@ -1251,7 +1311,6 @@ int plot_ratio_weights()
 			}
 			else
 			{
-				
 				tree = (TTree*)file->Get("allCuts/allCuts_tree");
 				
 				tree->SetBranchAddress("E", &recon_all_E);
@@ -1273,7 +1332,6 @@ int plot_ratio_weights()
 				tree->SetBranchAddress("Q_T", &recon_all_QT);
 				
 				bin_xs_weight = 1.;
-				
 			}
 			
 			for(Int_t i=0 ; i<tree->GetEntries() ; i++)
@@ -1288,50 +1346,105 @@ int plot_ratio_weights()
 					if(recon_all_isValid  &&  truth_all_isValid)
 					{
 						// for all models (practically we read only the Z0 and weight the ZP and KK)
-						afb_bin = hDummy_afb->FindBin(truth_all_Mhat);
+						imuon_tru  = (truth_all_mc_pdgId->at(0)>0) ? 0 : 1;
+						iamuon_tru = (imuon_tru==0) ? 1 : 0;
+						tlva_tru->SetPtEtaPhiM(truth_all_mc_pt->at(imuon_tru),truth_all_mc_eta->at(imuon_tru),truth_all_mc_phi->at(imuon_tru),truth_all_mc_m->at(imuon_tru));
+						tlvb_tru->SetPtEtaPhiM(truth_all_mc_pt->at(iamuon_tru),truth_all_mc_eta->at(iamuon_tru),truth_all_mc_phi->at(iamuon_tru),truth_all_mc_m->at(iamuon_tru));
+						ca_tru = truth_all_mc_charge->at(imuon_tru);
+						cb_tru = truth_all_mc_charge->at(iamuon_tru);
+						if(ca_tru*cb_tru>=0.)       {_WARNING("Truth: ca_tru*cb_tru>=0., skipping event"); continue;};
+						M_tru        = imass(tlva_tru,tlvb_tru);
+						if(M_tru<=5. || M_tru>5000.) {_WARNING("Truth: M_tru<=5. || M_tru>5000.  ->  M_tru="+_s(M_tru)+", skipping event"); continue;}
+						COSTHETA_tru = cosThetaCollinsSoper(tlva_tru,ca_tru,tlvb_tru,cb_tru);
+						if(fabs(COSTHETA_tru)>1.)   _WARNING("Truth: |cos(theta)|>1.");
+						YQ_tru       = ySystem(tlva_tru,tlvb_tru);
+						if(fabs(YQ_tru)>6.)         _WARNING("Truth: |yQ|>6.");
+						
+						imuon_rec  = (recon_all_charge->at(0)<0.) ? 0 : 1;
+						iamuon_rec = (imuon_rec==0) ? 1 : 0;
+						tlva_rec->SetPtEtaPhiM(recon_all_pt->at(imuon_rec),recon_all_eta->at(imuon_rec),recon_all_phi->at(imuon_rec),recon_all_m->at(imuon_rec));
+						tlvb_rec->SetPtEtaPhiM(recon_all_pt->at(iamuon_rec),recon_all_eta->at(iamuon_rec),recon_all_phi->at(iamuon_rec),recon_all_m->at(iamuon_rec));
+						ca_rec = recon_all_charge->at(imuon_rec);
+						cb_rec = recon_all_charge->at(iamuon_rec);
+						if(ca_rec*cb_rec>=0.)       {_WARNING("Reconstructed: ca_rec*cb_rec>=0., skipping event"); continue;};
+						M_rec        = imass(tlva_rec,tlvb_rec);
+						if(M_rec<=5. || M_rec>5000.) {_WARNING("Reconstructed: M_rec<=5. || M_rec>5000.  ->  M_rec="+_s(M_rec)+", skipping event"); continue;}
+						COSTHETA_rec = cosThetaCollinsSoper(tlva_rec,ca_rec,tlvb_rec,cb_rec);
+						if(fabs(COSTHETA_rec)>1.)   _WARNING("Reconstructed: |cos(theta)|>1.");
+						YQ_rec       = ySystem(tlva_rec,tlvb_rec);
+						if(fabs(YQ_rec)>6.)         _WARNING("Reconstructed: |yQ|>6.");
+						
+						
+						// afb_bin = hDummy_afb->FindBin(truth_all_Mhat);
+						afb_bin = hDummy_afb->FindBin(M_tru);
 						if(afb_bin<=0 || afb_bin>imass_afb_nbins) continue;
 						
 						// fill from d3pd
 						if(model==Z0d3pd)
 						{
 							//------------ imass
-							hvBinnedHistos_imass[n]->Fill(recon_all_Mhat);
-							hvBinnedHistos_imassRes[n]->Fill((recon_all_Mhat-truth_all_Mhat)/truth_all_Mhat); // use all events
+							// hvBinnedHistos_imass[n]->Fill(recon_all_Mhat);
+							// hvBinnedHistos_imassRes[n]->Fill((recon_all_Mhat-truth_all_Mhat)/truth_all_Mhat); // use all events
+							
+							hvBinnedHistos_imass[n]->Fill(M_rec);
+							hvBinnedHistos_imassRes[n]->Fill((M_rec-M_tru)/M_tru); // use all events
 							
 							//------------ cosTheta
-							hvvBinnedHistos_cosTh[n][afb_bin-1]->Fill(recon_all_CosThetaCS);
+							// hvvBinnedHistos_cosTh[n][afb_bin-1]->Fill(recon_all_CosThetaCS);
+							hvvBinnedHistos_cosTh[n][afb_bin-1]->Fill(COSTHETA_rec);
 							
 							//------------ yQ
-							hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(recon_all_ySystem);
+							// hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(recon_all_ySystem);
+							hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(YQ_rec);
 						}
 						
 						else // for Z0, ZP and KK we need to scale by the weight
 						{
 							//------------ imass
-							bin = vhMassWeights[model]->FindBin(truth_all_Mhat);
+							// bin = vhMassWeights[model]->FindBin(truth_all_Mhat);
+							// mass_weight = vhMassWeights[model]->GetBinContent(bin);
+							// hvBinnedHistos_imass[n]->Fill(recon_all_Mhat,mass_weight);
+							// hvBinnedHistos_imassRes[n]->Fill((recon_all_Mhat-truth_all_Mhat)/truth_all_Mhat, mass_weight); // use all events
+							bin = vhMassWeights[model]->FindBin(M_tru);
 							mass_weight = vhMassWeights[model]->GetBinContent(bin);
-							hvBinnedHistos_imass[n]->Fill(recon_all_Mhat,mass_weight);
-							hvBinnedHistos_imassRes[n]->Fill((recon_all_Mhat-truth_all_Mhat)/truth_all_Mhat, mass_weight); // use all events
+							hvBinnedHistos_imass[n]->Fill(M_rec,mass_weight);
+							hvBinnedHistos_imassRes[n]->Fill((M_rec-M_tru)/M_tru, mass_weight); // use all events
 							
 							//------------ cosTheta
-							bin = vvhCosThSumWeights[afb_bin-1][model]->FindBin(truth_all_CosThetaCS);
+							// bin = vvhCosThSumWeights[afb_bin-1][model]->FindBin(truth_all_CosThetaCS);
+							// cost_weight = vvhCosThSumWeights[afb_bin-1][model]->GetBinContent(bin);
+							// hvvBinnedHistos_cosTh[n][afb_bin-1]->Fill(recon_all_CosThetaCS,cost_weight);
+							bin = vvhCosThSumWeights[afb_bin-1][model]->FindBin(COSTHETA_tru);
 							cost_weight = vvhCosThSumWeights[afb_bin-1][model]->GetBinContent(bin);
-							hvvBinnedHistos_cosTh[n][afb_bin-1]->Fill(recon_all_CosThetaCS,cost_weight);
+							hvvBinnedHistos_cosTh[n][afb_bin-1]->Fill(COSTHETA_rec,cost_weight);
 							
 							//------------ yQ
-							bin = vvhyQSumWeights[afb_bin-1][model]->FindBin(truth_all_ySystem);
+							// bin = vvhyQSumWeights[afb_bin-1][model]->FindBin(truth_all_ySystem);
+							// yQ_weight = vvhyQSumWeights[afb_bin-1][model]->GetBinContent(bin);
+							// hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(recon_all_ySystem,yQ_weight);
+							bin = vvhyQSumWeights[afb_bin-1][model]->FindBin(YQ_tru);
 							yQ_weight = vvhyQSumWeights[afb_bin-1][model]->GetBinContent(bin);
-							hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(recon_all_ySystem,yQ_weight);
+							hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(YQ_rec,yQ_weight);
 							
 							//------------ ntuple
-							mass_tru = truth_all_Mhat;
-							mass_rec = recon_all_Mhat;
+							// mass_tru = truth_all_Mhat;
+							// mass_rec = recon_all_Mhat;
+							// mass_wgt = mass_weight;
+							// cost_tru = truth_all_CosThetaCS;
+							// cost_rec = recon_all_CosThetaCS;
+							// cost_wgt = cost_weight;
+							// yQ_tru   = truth_all_ySystem;
+							// yQ_rec   = recon_all_ySystem;
+							// yQ_wgt   = yQ_weight;
+							// xscn_wgt = bin_xs_weight; // in units of fb
+							mass_tru = M_tru;
+							mass_rec = M_rec;
 							mass_wgt = mass_weight;
-							cost_tru = truth_all_CosThetaCS;
-							cost_rec = recon_all_CosThetaCS;
+							cost_tru = COSTHETA_tru;
+							cost_rec = COSTHETA_rec;
 							cost_wgt = cost_weight;
-							yQ_tru   = truth_all_ySystem;
-							yQ_rec   = recon_all_ySystem;
+							yQ_tru   = YQ_tru;
+							yQ_rec   = YQ_rec;
 							yQ_wgt   = yQ_weight;
 							xscn_wgt = bin_xs_weight; // in units of fb
 							fillNtuple(vvtBinnedNtuples[afb_bin-1][model],counter,modulu);
@@ -1340,30 +1453,58 @@ int plot_ratio_weights()
 					}
 				}
 				else // data
-				{
-					afb_bin = hDummy_afb->FindBin(recon_all_Mhat*TeV2GeV);
+				{	
+					imuon_rec  = (recon_all_charge->at(0)<0.) ? 0 : 1;
+					iamuon_rec = (imuon_rec==0) ? 1 : 0;
+					tlva_rec->SetPtEtaPhiM(recon_all_pt->at(imuon_rec),recon_all_eta->at(imuon_rec),recon_all_phi->at(imuon_rec),recon_all_m->at(imuon_rec));
+					tlvb_rec->SetPtEtaPhiM(recon_all_pt->at(iamuon_rec),recon_all_eta->at(iamuon_rec),recon_all_phi->at(iamuon_rec),recon_all_m->at(iamuon_rec));
+					ca_rec = recon_all_charge->at(imuon_rec);
+					cb_rec = recon_all_charge->at(iamuon_rec);
+					if(ca_rec*cb_rec>=0.)        {_WARNING("Reconstructed: ca_rec*cb_rec>=0., skipping event"); continue;};
+					M_rec        = imass(tlva_rec,tlvb_rec)*MeV2GeV;
+					if(M_rec<=5. || M_rec>5000.) {_WARNING("Reconstructed: M_rec<=5. || M_rec>5000.  ->  M_rec="+_s(M_rec)+", skipping event"); continue;}
+					COSTHETA_rec = cosThetaCollinsSoper(tlva_rec,ca_rec,tlvb_rec,cb_rec);
+					if(fabs(COSTHETA_rec)>1.)   _WARNING("Reconstructed: |cos(theta)|>1.");
+					YQ_rec       = ySystem(tlva_rec,tlvb_rec);
+					if(fabs(YQ_rec)>6.)         _WARNING("Reconstructed: |yQ|>6.");
+				
+					// afb_bin = hDummy_afb->FindBin(recon_all_Mhat*TeV2GeV);
+					afb_bin = hDummy_afb->FindBin(M_rec);
 					if(afb_bin<=0 || afb_bin>imass_afb_nbins) continue;
 					
 					// fill from d3pd, use all events
 
 					//------------ imass
-					hvBinnedHistos_imass[n]->Fill(recon_all_Mhat*TeV2GeV);
+					// hvBinnedHistos_imass[n]->Fill(recon_all_Mhat*TeV2GeV);
+					hvBinnedHistos_imass[n]->Fill(M_rec);
 					
 					//------------ cosTheta
-					hvvBinnedHistos_cosTh[n][afb_bin-1]->Fill(recon_all_CosThetaCS);
+					// hvvBinnedHistos_cosTh[n][afb_bin-1]->Fill(recon_all_CosThetaCS);
+					hvvBinnedHistos_cosTh[n][afb_bin-1]->Fill(COSTHETA_rec);
 					
 					//------------ yQ
-					hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(recon_all_ySystem);
+					// hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(recon_all_ySystem);
+					hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(YQ_rec);
 					
 					//------------ ntuple
+					// mass_tru = -1;
+					// mass_rec = recon_all_Mhat*TeV2GeV;
+					// mass_wgt = 1.;
+					// cost_tru = -1;
+					// cost_rec = recon_all_CosThetaCS;
+					// cost_wgt = 1.;
+					// yQ_tru   = -1;
+					// yQ_rec   = recon_all_ySystem;
+					// yQ_wgt   = 1.;
+					// xscn_wgt = 1.; // in units of fb
 					mass_tru = -1;
-					mass_rec = recon_all_Mhat*TeV2GeV;
+					mass_rec = M_rec;
 					mass_wgt = 1.;
 					cost_tru = -1;
-					cost_rec = recon_all_CosThetaCS;
+					cost_rec = COSTHETA_rec;
 					cost_wgt = 1.;
 					yQ_tru   = -1;
-					yQ_rec   = recon_all_ySystem;
+					yQ_rec   = YQ_rec;
 					yQ_wgt   = 1.;
 					xscn_wgt = 1.; // in units of fb
 					fillNtuple(vvtBinnedNtuples[afb_bin-1][model],counter,modulu);
@@ -1371,8 +1512,6 @@ int plot_ratio_weights()
 					counter++;
 				}
 			}
-			
-			
 			
 			
 			/////////////////////////////////////////////////////////////
@@ -1389,7 +1528,6 @@ int plot_ratio_weights()
 			/////////////////////////////////////////////////////////////
 			
 			
-			
 			/////////////////////////////////////////////////////////////
 			if(model!=DT)
 			{
@@ -1397,7 +1535,6 @@ int plot_ratio_weights()
 				hvBinnedHistos_imassRes[n]->Scale(dvWeights[n]); // scale ///
 			}
 			/////////////////////////////////////////////////////////////
-			
 			
 			
 			////////////////////////////////////////////////////
@@ -1553,14 +1690,14 @@ int plot_ratio_weights()
 		file = TFile::Open(svPaths[n].c_str(),"READ");	
 		tree = (TTree*)file->Get("truth/truth_tree");
 		
-		tree->Branch( "truth_all_mc_pt", &truth_all_mc_pt );
-		tree->Branch( "truth_all_mc_m", &truth_all_mc_m );
-		tree->Branch( "truth_all_mc_eta", &truth_all_mc_eta );
-		tree->Branch( "truth_all_mc_phi", &truth_all_mc_phi );
-		tree->Branch( "truth_all_mc_status", &truth_all_mc_status );
-		tree->Branch( "truth_all_mc_barcode", &truth_all_mc_barcode );
-		tree->Branch( "truth_all_mc_pdgId", &truth_all_mc_pdgId );
-		tree->Branch( "truth_all_mc_charge", &truth_all_mc_charge );
+		tree->SetBranchAddress( "truth_all_mc_pt", &truth_all_mc_pt );
+		tree->SetBranchAddress( "truth_all_mc_m", &truth_all_mc_m );
+		tree->SetBranchAddress( "truth_all_mc_eta", &truth_all_mc_eta );
+		tree->SetBranchAddress( "truth_all_mc_phi", &truth_all_mc_phi );
+		tree->SetBranchAddress( "truth_all_mc_status", &truth_all_mc_status );
+		tree->SetBranchAddress( "truth_all_mc_barcode", &truth_all_mc_barcode );
+		tree->SetBranchAddress( "truth_all_mc_pdgId", &truth_all_mc_pdgId );
+		tree->SetBranchAddress( "truth_all_mc_charge", &truth_all_mc_charge );
 		tree->SetBranchAddress("truth_all_Mhat", &truth_all_Mhat);
 		tree->SetBranchAddress("truth_all_CosThetaCS", &truth_all_CosThetaCS);
 		tree->SetBranchAddress("truth_all_CosThetaHE", &truth_all_CosThetaHE);
@@ -1590,11 +1727,41 @@ int plot_ratio_weights()
 		{
 			tree->GetEntry(i);
 			
-			//if(recon_all_isValid  &&  truth_all_isValid)
-			//{
-				hvBinnedHistos_imass[n]->Fill(recon_all_Mhat);
-				hvBinnedHistos_imassRes[n]->Fill((recon_all_Mhat-truth_all_Mhat)/truth_all_Mhat); // use all events
-			//}
+			if(recon_all_isValid  &&  truth_all_isValid)
+			{
+				imuon_tru  = (truth_all_mc_pdgId->at(0)>0) ? 0 : 1;
+				iamuon_tru = (imuon_tru==0) ? 1 : 0;
+				tlva_tru->SetPtEtaPhiM(truth_all_mc_pt->at(imuon_tru),truth_all_mc_eta->at(imuon_tru),truth_all_mc_phi->at(imuon_tru),truth_all_mc_m->at(imuon_tru));
+				tlvb_tru->SetPtEtaPhiM(truth_all_mc_pt->at(iamuon_tru),truth_all_mc_eta->at(iamuon_tru),truth_all_mc_phi->at(iamuon_tru),truth_all_mc_m->at(iamuon_tru));
+				ca_tru = truth_all_mc_charge->at(imuon_tru);
+				cb_tru = truth_all_mc_charge->at(iamuon_tru);
+				if(ca_tru*cb_tru>=0.)       {_WARNING("Truth: ca_tru*cb_tru>=0., skipping event"); continue;};
+				M_tru        = imass(tlva_tru,tlvb_tru);
+				if(M_tru<=5. || M_tru>5000.) {_WARNING("Truth: M_tru<=5. || M_tru>5000.  ->  M_tru="+_s(M_tru)+", skipping event"); continue;}
+				COSTHETA_tru = cosThetaCollinsSoper(tlva_tru,ca_tru,tlvb_tru,cb_tru);
+				if(fabs(COSTHETA_tru)>1.)   _WARNING("Truth: |cos(theta)|>1.");
+				YQ_tru       = ySystem(tlva_tru,tlvb_tru);
+				if(fabs(YQ_tru)>6.)         _WARNING("Truth: |yQ|>6.");
+			
+				imuon_rec  = (recon_all_charge->at(0)<0.) ? 0 : 1;
+				iamuon_rec = (imuon_rec==0) ? 1 : 0;
+				tlva_rec->SetPtEtaPhiM(recon_all_pt->at(imuon_rec),recon_all_eta->at(imuon_rec),recon_all_phi->at(imuon_rec),recon_all_m->at(imuon_rec));
+				tlvb_rec->SetPtEtaPhiM(recon_all_pt->at(iamuon_rec),recon_all_eta->at(iamuon_rec),recon_all_phi->at(iamuon_rec),recon_all_m->at(iamuon_rec));
+				ca_rec = recon_all_charge->at(imuon_rec);
+				cb_rec = recon_all_charge->at(iamuon_rec);
+				if(ca_rec*cb_rec>=0.)       {_WARNING("Reconstructed: ca_rec*cb_rec>=0., skipping event"); continue;};
+				M_rec        = imass(tlva_rec,tlvb_rec);
+				if(M_rec<=5. || M_rec>5000.) {_WARNING("Reconstructed: M_rec<=5. || M_rec>5000.  ->  M_rec="+_s(M_rec)+", skipping event"); continue;}
+				COSTHETA_rec = cosThetaCollinsSoper(tlva_rec,ca_rec,tlvb_rec,cb_rec);
+				if(fabs(COSTHETA_rec)>1.)   _WARNING("Reconstructed: |cos(theta)|>1.");
+				YQ_rec       = ySystem(tlva_rec,tlvb_rec);
+				if(fabs(YQ_rec)>6.)         _WARNING("Reconstructed: |yQ|>6.");
+			
+				// hvBinnedHistos_imass[n]->Fill(recon_all_Mhat);
+				// hvBinnedHistos_imassRes[n]->Fill((recon_all_Mhat-truth_all_Mhat)/truth_all_Mhat); // use all events
+				hvBinnedHistos_imass[n]->Fill(M_rec);
+				hvBinnedHistos_imassRes[n]->Fill((M_rec-M_tru)/M_tru); // use all events
+			}
 		}
 
 		/////////////////////////////////////////////////////////////

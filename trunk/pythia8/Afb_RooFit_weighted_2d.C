@@ -811,16 +811,16 @@ void drawAfb()
 	pad_mHat->Update();
 	cnvAfb->Update();
 	
-	cnvAfb->SaveAs("fitplots/FitAfb.root");
-	cnvAfb->SaveAs("fitplots/FitAfb.C");
-	cnvAfb->SaveAs("fitplots/FitAfb.eps");
-	cnvAfb->SaveAs("fitplots/FitAfb.ps");
-	cnvAfb->SaveAs("fitplots/FitAfb.pdf");
-	cnvAfb->SaveAs("fitplots/FitAfb.png");
+	cnvAfb->SaveAs("fitplots/2d_FitAfb.root");
+	cnvAfb->SaveAs("fitplots/2d_FitAfb.C");
+	cnvAfb->SaveAs("fitplots/2d_FitAfb.eps");
+	cnvAfb->SaveAs("fitplots/2d_FitAfb.ps");
+	cnvAfb->SaveAs("fitplots/2d_FitAfb.pdf");
+	cnvAfb->SaveAs("fitplots/2d_FitAfb.png");
 }
 
 
-void Afb_RooFit_weighted()
+void Afb_RooFit_weighted_2d()
 {
 	setMSGlevel(VISUAL,VISUAL,VISUAL);
 
@@ -1055,20 +1055,20 @@ void Afb_RooFit_weighted()
 		vPadBin[massBin-1][DT+1]->RedrawAxis();
 		
 		// vCanvases[massBin-1]->Update();
-		// vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".root");
-		// vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".C");
-		// vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".eps");
-		// vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".ps");
-		// vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".pdf");
-		// vCanvases[massBin-1]->SaveAs("fitplots/FitMassBin_" + sMassBin + ".png");
+		// vCanvases[massBin-1]->SaveAs("fitplots/2d_FitMassBin_" + sMassBin + ".root");
+		// vCanvases[massBin-1]->SaveAs("fitplots/2d_FitMassBin_" + sMassBin + ".C");
+		// vCanvases[massBin-1]->SaveAs("fitplots/2d_FitMassBin_" + sMassBin + ".eps");
+		// vCanvases[massBin-1]->SaveAs("fitplots/2d_FitMassBin_" + sMassBin + ".ps");
+		// vCanvases[massBin-1]->SaveAs("fitplots/2d_FitMassBin_" + sMassBin + ".pdf");
+		// vCanvases[massBin-1]->SaveAs("fitplots/2d_FitMassBin_" + sMassBin + ".png");
 		
 		cnvTmp->Update();
-		cnvTmp->SaveAs("fitplots/FitMassBin_" + sMassBin + ".root");
-		cnvTmp->SaveAs("fitplots/FitMassBin_" + sMassBin + ".C");
-		cnvTmp->SaveAs("fitplots/FitMassBin_" + sMassBin + ".eps");
-		cnvTmp->SaveAs("fitplots/FitMassBin_" + sMassBin + ".ps");
-		cnvTmp->SaveAs("fitplots/FitMassBin_" + sMassBin + ".pdf");
-		cnvTmp->SaveAs("fitplots/FitMassBin_" + sMassBin + ".png");
+		cnvTmp->SaveAs("fitplots/2d_FitMassBin_" + sMassBin + ".root");
+		cnvTmp->SaveAs("fitplots/2d_FitMassBin_" + sMassBin + ".C");
+		cnvTmp->SaveAs("fitplots/2d_FitMassBin_" + sMassBin + ".eps");
+		cnvTmp->SaveAs("fitplots/2d_FitMassBin_" + sMassBin + ".ps");
+		cnvTmp->SaveAs("fitplots/2d_FitMassBin_" + sMassBin + ".pdf");
+		cnvTmp->SaveAs("fitplots/2d_FitMassBin_" + sMassBin + ".png");
 		//------------------------------------------------------------
 		
 		
@@ -1083,12 +1083,12 @@ void Afb_RooFit_weighted()
 	
 	cnv->Update();
 	
-	cnv->SaveAs("fitplots/FitAllMassBins.root");
-	cnv->SaveAs("fitplots/FitAllMassBins.C");
-	cnv->SaveAs("fitplots/FitAllMassBins.eps");
-	cnv->SaveAs("fitplots/FitAllMassBins.ps");
-	cnv->SaveAs("fitplots/FitAllMassBins.pdf");
-	cnv->SaveAs("fitplots/FitAllMassBins.png");
+	cnv->SaveAs("fitplots/2d_FitAllMassBins.root");
+	cnv->SaveAs("fitplots/2d_FitAllMassBins.C");
+	cnv->SaveAs("fitplots/2d_FitAllMassBins.eps");
+	cnv->SaveAs("fitplots/2d_FitAllMassBins.ps");
+	cnv->SaveAs("fitplots/2d_FitAllMassBins.pdf");
+	cnv->SaveAs("fitplots/2d_FitAllMassBins.png");
 	
 	drawAfb();
 	

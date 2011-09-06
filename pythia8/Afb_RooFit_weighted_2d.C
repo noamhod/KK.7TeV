@@ -34,8 +34,8 @@ double minA0 = -10.;
 double maxA0 = +10.;
 // double minA4 = -10.;
 // double maxA4 = +10.;
-double minA4 = -5.; //-2.666;
-double maxA4 = +5.; //+2.666;
+double minA4 = -10.; //-2.666;
+double maxA4 = +10.; //+2.666;
 double _A0 = 0.;
 double _A4 = 0.;
 struct fitpars
@@ -626,27 +626,27 @@ void plot(int mod, TVirtualPad* pad)
 		if(mod==DT || doGeneration)
 		{
 			if(vBinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is weighted $$$$$$$$$$$");
-			vBinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins));
+			vBinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),NumCPU(8));
 		}
 		else
 		{
 			if(!vBinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is unweighted $$$$$$$$$$$");
-			vBinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2));
+			vBinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2),NumCPU(8));
 		}
 		
-		vModel[mod]->plotOn(cosThetaFrame,ProjWData(*yQ,*vBinnedDataSet[mod]),LineWidth(1),LineColor(cPdf),NormRange("range_cosThe"));
+		vModel[mod]->plotOn(cosThetaFrame,ProjWData(*yQ,*vBinnedDataSet[mod]),LineWidth(1),LineColor(cPdf),NormRange("range_cosThe"),NumCPU(8));
 	}
 	else
 	{
 		if(mod==DT || doGeneration)
 		{
 			if(vUnbinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is weighted $$$$$$$$$$$");
-			vUnbinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins));
+			vUnbinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),NumCPU(8));
 		}
 		else
 		{
 			if(!vUnbinnedDataSet[mod]->isWeighted()) _WARNING("$$$$$$$$$$$ The dataset is unweighted $$$$$$$$$$$");
-			vUnbinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2));
+			vUnbinnedDataSet[mod]->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2),NumCPU(8));
 		}
 		
 		vModel[mod]->plotOn(cosThetaFrame,ProjWData(*yQ,*vUnbinnedDataSet[mod]),LineWidth(1),LineColor(cPdf),NormRange("range_cosThe"));

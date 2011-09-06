@@ -717,7 +717,7 @@ int plot_ratio_weights()
 						cb_tru = truth_all_mc_charge->at(iamuon_tru);
 						if(ca_tru*cb_tru>=0.)       {_WARNING("Truth: ca_tru*cb_tru>=0., skipping event"); continue;};
 						M_tru        = imass(tlva_tru,tlvb_tru);
-						if(M_tru<=5. || M_tru>5000.) {_WARNING("Truth: M_tru<=5. || M_tru>5000.  ->  M_tru="+_s(M_tru)+", skipping event"); continue;}
+						if(M_tru<=minPossibleImass || M_tru>maxPossibleImass) {_WARNING("Truth: M_tru<=minPossibleImass || M_tru>maxPossibleImass  ->  M_tru="+_s(M_tru)+", skipping event"); continue;}
 						COSTHETA_tru = cosThetaCollinsSoper(tlva_tru,ca_tru,tlvb_tru,cb_tru);
 						if(fabs(COSTHETA_tru)>1.)   _WARNING("Truth: |cos(theta)|>1.");
 						YQ_tru       = ySystem(tlva_tru,tlvb_tru);
@@ -775,7 +775,7 @@ int plot_ratio_weights()
 					cb_tru = charge->at(iamuon_tru);
 					if(ca_tru*cb_tru>=0.)       {_WARNING("Truth: ca_tru*cb_tru>=0., skipping event"); continue;};
 					M_tru        = imass(tlva_tru,tlvb_tru);
-					if(M_tru<=5. || M_tru>5000.) {_WARNING("Truth: M_tru<=5. || M_tru>5000.  ->  M_tru="+_s(M_tru)+", skipping event"); continue;}
+					if(M_tru<=minPossibleImass || M_tru>maxPossibleImass) {_WARNING("Truth: M_tru<=minPossibleImass || M_tru>maxPossibleImass  ->  M_tru="+_s(M_tru)+", skipping event"); continue;}
 					COSTHETA_tru = cosThetaCollinsSoper(tlva_tru,ca_tru,tlvb_tru,cb_tru);
 					if(fabs(COSTHETA_tru)>1.)   _WARNING("Truth: |cos(theta)|>1.");
 					YQ_tru       = ySystem(tlva_tru,tlvb_tru);
@@ -1354,7 +1354,7 @@ int plot_ratio_weights()
 						cb_tru = truth_all_mc_charge->at(iamuon_tru);
 						if(ca_tru*cb_tru>=0.)       {_WARNING("Truth: ca_tru*cb_tru>=0., skipping event"); continue;};
 						M_tru        = imass(tlva_tru,tlvb_tru);
-						if(M_tru<=5. || M_tru>5000.) {_WARNING("Truth: M_tru<=5. || M_tru>5000.  ->  M_tru="+_s(M_tru)+", skipping event"); continue;}
+						if(M_tru<=minPossibleImass || M_tru>maxPossibleImass) {_WARNING("Truth: M_tru<=minPossibleImass || M_tru>maxPossibleImass  ->  M_tru="+_s(M_tru)+", skipping event"); continue;}
 						COSTHETA_tru = cosThetaCollinsSoper(tlva_tru,ca_tru,tlvb_tru,cb_tru);
 						if(fabs(COSTHETA_tru)>1.)   _WARNING("Truth: |cos(theta)|>1.");
 						YQ_tru       = ySystem(tlva_tru,tlvb_tru);
@@ -1368,7 +1368,7 @@ int plot_ratio_weights()
 						cb_rec = recon_all_charge->at(iamuon_rec);
 						if(ca_rec*cb_rec>=0.)       {_WARNING("Reconstructed: ca_rec*cb_rec>=0., skipping event"); continue;};
 						M_rec        = imass(tlva_rec,tlvb_rec);
-						if(M_rec<=5. || M_rec>5000.) {_WARNING("Reconstructed: M_rec<=5. || M_rec>5000.  ->  M_rec="+_s(M_rec)+", skipping event"); continue;}
+						if(M_rec<=minPossibleImass || M_rec>maxPossibleImass) {_WARNING("Reconstructed: M_rec<=minPossibleImass || M_rec>maxPossibleImass  ->  M_rec="+_s(M_rec)+", skipping event"); continue;}
 						COSTHETA_rec = cosThetaCollinsSoper(tlva_rec,ca_rec,tlvb_rec,cb_rec);
 						if(fabs(COSTHETA_rec)>1.)   _WARNING("Reconstructed: |cos(theta)|>1.");
 						YQ_rec       = ySystem(tlva_rec,tlvb_rec);
@@ -1462,7 +1462,7 @@ int plot_ratio_weights()
 					cb_rec = recon_all_charge->at(iamuon_rec);
 					if(ca_rec*cb_rec>=0.)        {_WARNING("Reconstructed: ca_rec*cb_rec>=0., skipping event"); continue;};
 					M_rec        = imass(tlva_rec,tlvb_rec)*MeV2GeV;
-					if(M_rec<=5. || M_rec>5000.) {_WARNING("Reconstructed: M_rec<=5. || M_rec>5000.  ->  M_rec="+_s(M_rec)+", skipping event"); continue;}
+					if(M_rec<=minPossibleImass || M_rec>maxPossibleImass) {_WARNING("Reconstructed: M_rec<=minPossibleImass || M_rec>maxPossibleImass  ->  M_rec="+_s(M_rec)+", skipping event"); continue;}
 					COSTHETA_rec = cosThetaCollinsSoper(tlva_rec,ca_rec,tlvb_rec,cb_rec);
 					if(fabs(COSTHETA_rec)>1.)   _WARNING("Reconstructed: |cos(theta)|>1.");
 					YQ_rec       = ySystem(tlva_rec,tlvb_rec);
@@ -1737,7 +1737,7 @@ int plot_ratio_weights()
 				cb_tru = truth_all_mc_charge->at(iamuon_tru);
 				if(ca_tru*cb_tru>=0.)       {_WARNING("Truth: ca_tru*cb_tru>=0., skipping event"); continue;};
 				M_tru        = imass(tlva_tru,tlvb_tru);
-				if(M_tru<=5. || M_tru>5000.) {_WARNING("Truth: M_tru<=5. || M_tru>5000.  ->  M_tru="+_s(M_tru)+", skipping event"); continue;}
+				if(M_tru<=minPossibleImass || M_tru>maxPossibleImass) {_WARNING("Truth: M_tru<=minPossibleImass || M_tru>maxPossibleImass  ->  M_tru="+_s(M_tru)+", skipping event"); continue;}
 				COSTHETA_tru = cosThetaCollinsSoper(tlva_tru,ca_tru,tlvb_tru,cb_tru);
 				if(fabs(COSTHETA_tru)>1.)   _WARNING("Truth: |cos(theta)|>1.");
 				YQ_tru       = ySystem(tlva_tru,tlvb_tru);
@@ -1751,7 +1751,7 @@ int plot_ratio_weights()
 				cb_rec = recon_all_charge->at(iamuon_rec);
 				if(ca_rec*cb_rec>=0.)       {_WARNING("Reconstructed: ca_rec*cb_rec>=0., skipping event"); continue;};
 				M_rec        = imass(tlva_rec,tlvb_rec);
-				if(M_rec<=5. || M_rec>5000.) {_WARNING("Reconstructed: M_rec<=5. || M_rec>5000.  ->  M_rec="+_s(M_rec)+", skipping event"); continue;}
+				if(M_rec<=minPossibleImass || M_rec>maxPossibleImass) {_WARNING("Reconstructed: M_rec<=minPossibleImass || M_rec>maxPossibleImass  ->  M_rec="+_s(M_rec)+", skipping event"); continue;}
 				COSTHETA_rec = cosThetaCollinsSoper(tlva_rec,ca_rec,tlvb_rec,cb_rec);
 				if(fabs(COSTHETA_rec)>1.)   _WARNING("Reconstructed: |cos(theta)|>1.");
 				YQ_rec       = ySystem(tlva_rec,tlvb_rec);

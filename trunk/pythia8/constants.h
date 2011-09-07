@@ -3,6 +3,8 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+static const float  muonMass = 0.105658367; // GeV
+
 static const double nGeneratedEvents = 5e5;
 
 static const double luminosity = 2.28348; //1.60708;//5.; // 1/fb
@@ -22,6 +24,10 @@ static const int    nCosThetaBins = 10; // for the acceptance binning
 static const double minyQ   = -2.5; // for the FB false identify probability binning
 static const double maxyQ   = +2.5; // for the FB false identify probability binning
 static const int    nyQbins = 30;   // for the FB false identify probability binning
+
+static const double minetamu   = -2.5; // for the etamu binning
+static const double maxetamu   = +2.5; // for the etamu binning
+static const int    nbinsetamu = 30;   // for the etamu binning
 
 enum models
 {

@@ -9,6 +9,7 @@ float cb_tru = 0.;
 float M_tru = 0.;
 float YQ_tru = 0.;
 float COSTHETA_tru = 0.;
+float ETAMU_tru = 0.;
 
 TLorentzVector* tlva_rec = new TLorentzVector;
 TLorentzVector* tlvb_rec = new TLorentzVector;
@@ -19,11 +20,17 @@ float cb_rec = 0.;
 float M_rec = 0.;
 float YQ_rec = 0.;
 float COSTHETA_rec = 0.;
+float ETAMU_rec = 0.;
 
 // bins for the cosTheta histos
 double    costmin   = minCosTheta;
 double    costmax   = maxCosTheta;
 const int ncostbins = nCosThetaBins;
+
+// bins for the etamu histos 
+double   etamumin   = minetamu;
+double   etamumax   = maxetamu;
+int      netamubins = nbinsetamu;
 
 // bins for the yQ histos 
 double   yqmin   = minyQ;
@@ -56,6 +63,7 @@ TDirectory* dirAllHistograms;
 TDirectory* dirCostHistograms;
 TDirectory* dirMassHistograms;
 TDirectory* diryQHistograms;
+TDirectory* dirEtaHistograms;
 TDirectory* dirNtuples;
 
 vector<string> svNames;
@@ -67,6 +75,11 @@ vector<vector<TH1D*> > hvvBinnedHistos_cosTh;
 vector<vector<TH1D*> > hvvBinnedHistos_cosTh_unscaled;
 vector<vector<TH1D*> > hvvBinnedHistos_yQ;
 vector<vector<TH1D*> > hvvBinnedHistos_yQ_unscaled;
+vector<vector<TH1D*> > hvvBinnedHistos_eta;
+vector<vector<TH1D*> > hvvBinnedHistos_eta_unscaled;
+
+// TMapsvvP2TH1 hvvBinnedHistos[2];
+// TMapsvvP2TH1 hvvBinnedHistos_unscaled[2];
 
 vector<vector<TTree*> > vvtBinnedNtuples;
 
@@ -76,7 +89,7 @@ TTree* tAfbMassBins;
 vector<double> dvWeights;
 vector<Color_t> cvColors;
 
-float mass_tru, mass_rec, mass_wgt, cost_tru, cost_rec, cost_wgt, yQ_tru, yQ_rec, yQ_wgt, xscn_wgt;
+float mass_tru, mass_rec, mass_wgt, cost_tru, cost_rec, cost_wgt, yQ_tru, yQ_rec, yQ_wgt, eta_tru, eta_rec, eta_wgt, xscn_wgt;
 
 string sDir  = "/data/hod/pythia8_ntuples/";
 string sName = "";
@@ -103,9 +116,13 @@ void clearSamples()
 			
 			if(hvvBinnedHistos_yQ[n][m]!=NULL)          delete hvvBinnedHistos_yQ[n][m];
 			if(hvvBinnedHistos_yQ_unscaled[n][m]!=NULL) delete hvvBinnedHistos_yQ_unscaled[n][m];
+			
+			if(hvvBinnedHistos_eta[n][m]!=NULL)          delete hvvBinnedHistos_eta[n][m];
+			if(hvvBinnedHistos_eta_unscaled[n][m]!=NULL) delete hvvBinnedHistos_eta_unscaled[n][m];
 		}
 		hvvBinnedHistos_cosTh[n].clear();
 		hvvBinnedHistos_yQ[n].clear();
+		hvvBinnedHistos_eta[n].clear();
 	}
 	hvBinnedHistos_imass.clear();
 	hvBinnedHistos_imass_unscaled.clear();
@@ -114,6 +131,8 @@ void clearSamples()
 	hvvBinnedHistos_cosTh_unscaled.clear();
 	hvvBinnedHistos_yQ.clear();
 	hvvBinnedHistos_yQ_unscaled.clear();
+	hvvBinnedHistos_eta.clear();
+	hvvBinnedHistos_eta_unscaled.clear();
 	dvWeights.clear();
 	cvColors.clear();
 }
@@ -161,6 +180,17 @@ void addSample(string sname, Color_t color, double events, double sigma /*in [mb
 	hvvBinnedHistos_yQ_unscaled.push_back( vTmp_unscaled );
 	
 	
+	vTmp.clear();
+	vTmp_unscaled.clear();
+	for(int b=0 ; b<imass_afb_nbins ; b++)
+	{
+		vTmp.push_back( new TH1D((sName+"_massbin_etamu_"+_s(b)).c_str(),(sName+"_massbin_etamu_"+_s(b)).c_str(),netamubins,etamumin,etamumax) );
+		vTmp_unscaled.push_back( new TH1D((sName+"unscaled_massbin_etamu_"+_s(b)).c_str(),(sName+"unscaled_massbin_etamu_"+_s(b)).c_str(),netamubins,etamumin,etamumax) );
+	}
+	hvvBinnedHistos_eta.push_back( vTmp );
+	hvvBinnedHistos_eta_unscaled.push_back( vTmp_unscaled );
+	
+	
 	dvWeights.push_back(luminosity/(events/(sigma*mb2fb)));
 	cvColors.push_back(color);
 	
@@ -196,6 +226,9 @@ void initOutNtuples(TDirectory* tDir)
 			vvtBinnedNtuples[t-1][mod]->Branch( "yQ_rec",   &yQ_rec );
 			vvtBinnedNtuples[t-1][mod]->Branch( "yQ_wgt",   &yQ_wgt );
 			vvtBinnedNtuples[t-1][mod]->Branch( "xscn_wgt", &xscn_wgt );
+			vvtBinnedNtuples[t-1][mod]->Branch( "eta_tru",  &eta_tru );
+			vvtBinnedNtuples[t-1][mod]->Branch( "eta_rec",  &eta_rec );
+			vvtBinnedNtuples[t-1][mod]->Branch( "eta_wgt",  &eta_wgt );
 		}
 	}
 }
@@ -250,6 +283,7 @@ int plot_ratio_weights()
 	dirCostHistograms = fWeights->mkdir("cosTheta_histograms");
 	dirMassHistograms = fWeights->mkdir("iMass_histograms");
 	diryQHistograms   = fWeights->mkdir("yQ_histograms");
+	dirEtaHistograms  = fWeights->mkdir("etamu_histograms");
 	dirAllHistograms  = fWeights->mkdir("all_histograms");
 	
 	dirAllHistograms->cd();
@@ -264,7 +298,6 @@ int plot_ratio_weights()
 	float ysystem;
 	float cosThetaHE;
 	float cosThetaCS;
-	//vector<int>*    index  = new vector<int>;
 	vector<int>*    id     = new vector<int>;
 	vector<double>* charge = new vector<double>;
 	vector<double>* px     = new vector<double>;
@@ -422,6 +455,9 @@ int plot_ratio_weights()
 	vector<TH1D*> vhyQSumTmp;
 	vector<TH1D*> vhyQSumTmp_unscaled;
 	
+	vector<TH1D*> vhEtaSumTmp;
+	vector<TH1D*> vhEtaSumTmp_unscaled;
+	
 	vector<TH1D*> vhCosThSumZ0d3pd_unscaled;
 	vector<TH1D*> vhCosThSumZ0d3pd_acceptance;
 	vector<TH1D*> vhCosThSumZ0d3pd;
@@ -433,6 +469,12 @@ int plot_ratio_weights()
 	vector<TH1D*> vhyQSumReconZ0d3pd;
 	vector<TH1D*> vhyQSumReconDTd3pd;
 	
+	vector<TH1D*> vhEtaSumZ0d3pd_unscaled;
+	vector<TH1D*> vhEtaSumZ0d3pd_acceptance;
+	vector<TH1D*> vhEtaSumZ0d3pd;
+	vector<TH1D*> vhEtaSumReconZ0d3pd;
+	vector<TH1D*> vhEtaSumReconDTd3pd;
+	
 	vector<vector<TH1D*> > vvhCosThSum;
 	vector<vector<TH1D*> > vvhCosThSumRecTemplate;
 	vector<vector<TH1D*> > vvhCosThSumAcceptance;
@@ -442,8 +484,14 @@ int plot_ratio_weights()
 	vector<vector<TH1D*> > vvhyQSumRecTemplate;
 	vector<vector<TH1D*> > vvhyQSumWeights;
 	
+	vector<vector<TH1D*> > vvhEtaSum;
+	vector<vector<TH1D*> > vvhEtaSumRecTemplate;
+	vector<vector<TH1D*> > vvhEtaSumAcceptance;
+	vector<vector<TH1D*> > vvhEtaSumWeights;
+	
 	vector<TH1D*>          vhCosThSumXSweights;
 	vector<TH1D*>          vhyQSumXSweights;
+	vector<TH1D*>          vhEtaSumXSweights;
 
 	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
 	{	
@@ -454,6 +502,9 @@ int plot_ratio_weights()
 		
 		vhyQSumTmp.push_back( new TH1D("yQ_"+tsrange,"yQ_"+tsrange, nyqbins,yqmin,yqmax) );
 		vhyQSumTmp_unscaled.push_back( new TH1D("yQ_xs"+tsrange,"yQ_xs"+tsrange, nyqbins,yqmin,yqmax) );
+		
+		vhEtaSumTmp.push_back( new TH1D("etamu_"+tsrange,"etamu_"+tsrange, netamubins,etamumin,etamumax) );
+		vhEtaSumTmp_unscaled.push_back( new TH1D("etamu_xs"+tsrange,"etamu_xs"+tsrange, netamubins,etamumin,etamumax) );
 		
 		vhCosThSumZ0d3pd.push_back( new TH1D("cost_sumZ0d3pd_"+tsrange, "cost_cost_sumZ0d3pd_"+tsrange, ncostbins,costmin,costmax) );
 		vhCosThSumReconZ0d3pd.push_back( new TH1D("cost_sumRecZ0d3pd_"+tsrange, "cost_sumRecZ0d3pd_"+tsrange, ncostbins,costmin,costmax) );
@@ -466,6 +517,12 @@ int plot_ratio_weights()
 		vhyQSumReconDTd3pd.push_back( new TH1D("yQ_sumRecDTd3pd_"+tsrange, "yQ_sumRecDTd3pd_"+tsrange, nyqbins,yqmin,yqmax) );
 		vhyQSumZ0d3pd_unscaled.push_back( new TH1D("yQ_sumZ0d3pd_unscaled_"+tsrange, "yQ_sumZ0d3pd_unscaled_"+tsrange, nyqbins,yqmin,yqmax) );
 		
+		vhEtaSumZ0d3pd.push_back( new TH1D("etamu_sumZ0d3pd_"+tsrange, "etamu_sumZ0d3pd_"+tsrange, netamubins,etamumin,etamumax) );
+		vhEtaSumReconZ0d3pd.push_back( new TH1D("etamu_sumRecZ0d3pd_"+tsrange, "etamu_sumRecZ0d3pd_"+tsrange, netamubins,etamumin,etamumax) );
+		vhEtaSumReconDTd3pd.push_back( new TH1D("etamu_sumRecDTd3pd_"+tsrange, "etamu_sumRecDTd3pd_"+tsrange, netamubins,etamumin,etamumax) );
+		vhEtaSumZ0d3pd_unscaled.push_back( new TH1D("etamu_sumZ0d3pd_unscaled_"+tsrange, "etamu_sumZ0d3pd_unscaled_"+tsrange, netamubins,etamumin,etamumax) );
+		vhEtaSumZ0d3pd_acceptance.push_back( new TH1D("etamu_sumZ0d3pd_acceptance_"+tsrange, "etamu_sumZ0d3pd_acceptance_"+tsrange, netamubins,etamumin,etamumax) );
+		
 		vector<TH1D*> vhTmp;
 		vhTmp.clear();
 		
@@ -477,6 +534,11 @@ int plot_ratio_weights()
 		vvhyQSum.push_back(vhTmp);
 		vvhyQSumRecTemplate.push_back(vhTmp);
 		vvhyQSumWeights.push_back(vhTmp);
+		
+		vvhEtaSum.push_back(vhTmp);
+		vvhEtaSumRecTemplate.push_back(vhTmp);
+		vvhEtaSumAcceptance.push_back(vhTmp);
+		vvhEtaSumWeights.push_back(vhTmp);
 		
 		for(int mod=Z0 ; mod<=DT ; mod++)
 		{
@@ -493,9 +555,15 @@ int plot_ratio_weights()
 			vvhyQSum[i].push_back( new TH1D("yQ_sum"+tsname, "yQ_sum"+tsname, nyqbins,yqmin,yqmax) );
 			vvhyQSumRecTemplate[i].push_back( new TH1D("yQ_sumRec"+tsname, "yQ_sumRec"+tsname, nyqbins,yqmin,yqmax) );
 			vvhyQSumWeights[i].push_back( new TH1D("yQ_wgt"+tsname, "yQ_wgt"+tsname, nyqbins,yqmin,yqmax) );
+			
+			vvhEtaSum[i].push_back( new TH1D("etamu_sum"+tsname, "etamu_sum"+tsname, netamubins,etamumin,etamumax) );
+			vvhEtaSumRecTemplate[i].push_back( new TH1D("etamu_sumRec"+tsname, "etamu_sumRec"+tsname, netamubins,etamumin,etamumax) );
+			vvhEtaSumAcceptance[i].push_back( new TH1D("etamu_sumAcc"+tsname, "etamu_sumAcc"+tsname, netamubins,etamumin,etamumax) );
+			vvhEtaSumWeights[i].push_back( new TH1D("etamu_wgt"+tsname, "etamu_wgt"+tsname, netamubins,etamumin,etamumax) );
 		}
 		vhCosThSumXSweights.push_back( new TH1D("cost_wgtXS_"+tsrange,"cost_wgtXS_"+tsrange, ncostbins,costmin,costmax) );
 		vhyQSumXSweights.push_back( new TH1D("yQ_wgtXS_"+tsrange,"yQ_wgtXS_"+tsrange, nyqbins,yqmin,yqmax) );
+		vhEtaSumXSweights.push_back( new TH1D("etamu_wgtXS_"+tsrange,"etamu_wgtXS_"+tsrange, netamubins,etamumin,etamumax) );
 	}
 	
 	
@@ -711,8 +779,8 @@ int plot_ratio_weights()
 						valids++;
 						imuon_tru  = (truth_all_mc_pdgId->at(0)>0) ? 0 : 1;
 						iamuon_tru = (imuon_tru==0) ? 1 : 0;
-						tlva_tru->SetPtEtaPhiM(truth_all_mc_pt->at(imuon_tru),truth_all_mc_eta->at(imuon_tru),truth_all_mc_phi->at(imuon_tru),truth_all_mc_m->at(imuon_tru));
-						tlvb_tru->SetPtEtaPhiM(truth_all_mc_pt->at(iamuon_tru),truth_all_mc_eta->at(iamuon_tru),truth_all_mc_phi->at(iamuon_tru),truth_all_mc_m->at(iamuon_tru));
+						tlva_tru->SetPtEtaPhiM(truth_all_mc_pt->at(imuon_tru),truth_all_mc_eta->at(imuon_tru),truth_all_mc_phi->at(imuon_tru),muonMass);
+						tlvb_tru->SetPtEtaPhiM(truth_all_mc_pt->at(iamuon_tru),truth_all_mc_eta->at(iamuon_tru),truth_all_mc_phi->at(iamuon_tru),muonMass);
 						ca_tru = truth_all_mc_charge->at(imuon_tru);
 						cb_tru = truth_all_mc_charge->at(iamuon_tru);
 						if(ca_tru*cb_tru>=0.)       {_WARNING("Truth: ca_tru*cb_tru>=0., skipping event"); continue;};
@@ -722,14 +790,7 @@ int plot_ratio_weights()
 						if(fabs(COSTHETA_tru)>1.)   _WARNING("Truth: |cos(theta)|>1.");
 						YQ_tru       = ySystem(tlva_tru,tlvb_tru);
 						if(fabs(YQ_tru)>6.)         _WARNING("Truth: |yQ|>6.");
-						// hvBinnedHistos_imass[n]->Fill(truth_all_Mhat);
-						// hvBinnedHistos_imass_unscaled[n]->Fill(truth_all_Mhat);
-						// int bin = hDummy_afb->FindBin(truth_all_Mhat);
-						// if(bin<=0 || bin>imass_afb_nbins) continue;
-						// hvvBinnedHistos_cosTh[n][bin-1]->Fill(truth_all_CosThetaCS);
-						// hvvBinnedHistos_cosTh_unscaled[n][bin-1]->Fill(truth_all_CosThetaCS);
-						// hvvBinnedHistos_yQ[n][bin-1]->Fill(truth_all_ySystem);
-						// hvvBinnedHistos_yQ_unscaled[n][bin-1]->Fill(truth_all_ySystem);
+
 						hvBinnedHistos_imass[n]->Fill(M_tru);
 						hvBinnedHistos_imass_unscaled[n]->Fill(M_tru);
 						int bin = hDummy_afb->FindBin(M_tru);
@@ -738,6 +799,8 @@ int plot_ratio_weights()
 						hvvBinnedHistos_cosTh_unscaled[n][bin-1]->Fill(COSTHETA_tru);
 						hvvBinnedHistos_yQ[n][bin-1]->Fill(YQ_tru);
 						hvvBinnedHistos_yQ_unscaled[n][bin-1]->Fill(YQ_tru);
+						hvvBinnedHistos_eta[n][bin-1]->Fill(truth_all_mc_eta->at(imuon_tru));
+						hvvBinnedHistos_eta_unscaled[n][bin-1]->Fill(truth_all_mc_eta->at(imuon_tru));
 					}
 				}
 				cout << "n=" << n << ", valids=" << valids << endl;
@@ -769,28 +832,34 @@ int plot_ratio_weights()
 					
 					imuon_tru  = (charge->at(0)<0.) ? 0 : 1;
 					iamuon_tru = (imuon_tru==0) ? 1 : 0;
-					tlva_tru->SetPtEtaPhiM(pT->at(imuon_tru),eta->at(imuon_tru),phi->at(imuon_tru),m->at(imuon_tru));
-					tlvb_tru->SetPtEtaPhiM(pT->at(iamuon_tru),eta->at(iamuon_tru),phi->at(iamuon_tru),m->at(iamuon_tru));
+					tlva_tru->SetPtEtaPhiM(pT->at(imuon_tru),eta->at(imuon_tru),phi->at(imuon_tru),muonMass);
+					tlvb_tru->SetPtEtaPhiM(pT->at(iamuon_tru),eta->at(iamuon_tru),phi->at(iamuon_tru),muonMass);
 					ca_tru = charge->at(imuon_tru);
 					cb_tru = charge->at(iamuon_tru);
-					if(ca_tru*cb_tru>=0.)       {_WARNING("Truth: ca_tru*cb_tru>=0., skipping event"); continue;};
+					if(ca_tru*cb_tru>=0.)
+					{
+						_WARNING("Truth: ca_tru*cb_tru>=0., skipping event");
+						_WARNING("ca="+_s(charge->at(imuon_tru))+", cb="+_s(charge->at(iamuon_tru)));
+						continue;
+					}
 					M_tru        = imass(tlva_tru,tlvb_tru);
-					if(M_tru<=minPossibleImass || M_tru>maxPossibleImass) {_WARNING("Truth: M_tru<=minPossibleImass || M_tru>maxPossibleImass  ->  M_tru="+_s(M_tru)+", skipping event"); continue;}
+					if(M_tru<=minPossibleImass || M_tru>maxPossibleImass)
+					{
+						_WARNING("Truth: M_tru<=minPossibleImass || M_tru>maxPossibleImass  ->  M_tru="+_s(M_tru)+", skipping event");
+						_WARNING("\t pT="+_s(pT->at(imuon_tru))+",  m="+_s(muonMass));
+						continue;
+					}
 					COSTHETA_tru = cosThetaCollinsSoper(tlva_tru,ca_tru,tlvb_tru,cb_tru);
 					if(fabs(COSTHETA_tru)>1.)   _WARNING("Truth: |cos(theta)|>1.");
 					YQ_tru       = ySystem(tlva_tru,tlvb_tru);
 					if(fabs(YQ_tru)>6.)         _WARNING("Truth: |yQ|>6.");
 					
-					// hvBinnedHistos_imass[n]->Fill(mHat);
-					// int bin = hDummy_afb->FindBin(mHat);
-					// if(bin<=0 || bin>imass_afb_nbins) continue;
-					// hvvBinnedHistos_cosTh[n][bin-1]->Fill(cosThetaCS); 
-					// hvvBinnedHistos_yQ[n][bin-1]->Fill(ysystem); 
 					hvBinnedHistos_imass[n]->Fill(M_tru);
 					int bin = hDummy_afb->FindBin(M_tru);
 					if(bin<=0 || bin>imass_afb_nbins) continue;
 					hvvBinnedHistos_cosTh[n][bin-1]->Fill(COSTHETA_tru); 
 					hvvBinnedHistos_yQ[n][bin-1]->Fill(YQ_tru); 
+					hvvBinnedHistos_eta[n][bin-1]->Fill(eta->at(imuon_tru)); 
 				}
 			}
 			
@@ -801,6 +870,7 @@ int plot_ratio_weights()
 			{
 				hvvBinnedHistos_cosTh[n][i]->Scale(dvWeights[n]);
 				hvvBinnedHistos_yQ[n][i]->Scale(dvWeights[n]);
+				hvvBinnedHistos_eta[n][i]->Scale(dvWeights[n]);
 			}
 			/////////////////////////////////////////////////////////////
 			
@@ -812,11 +882,13 @@ int plot_ratio_weights()
 			{
 				vhCosThSumTmp[i]->Add(hvvBinnedHistos_cosTh[n][i]);
 				vhyQSumTmp[i]->Add(hvvBinnedHistos_yQ[n][i]);
+				vhEtaSumTmp[i]->Add(hvvBinnedHistos_eta[n][i]);
 				
 				if(model==Z0d3pd)
 				{
 					vhCosThSumTmp_unscaled[i]->Add(hvvBinnedHistos_cosTh_unscaled[n][i]);
 					vhyQSumTmp_unscaled[i]->Add(hvvBinnedHistos_yQ_unscaled[n][i]);
+					vhEtaSumTmp_unscaled[i]->Add(hvvBinnedHistos_eta_unscaled[n][i]);
 				}
 			}
 			////////////////////////////////////////////////////////
@@ -837,6 +909,9 @@ int plot_ratio_weights()
 				
 				vhyQSumZ0d3pd[i] = (TH1D*)vhyQSumTmp[i]->Clone("");
 				vhyQSumZ0d3pd_unscaled[i] = (TH1D*)vhyQSumTmp_unscaled[i]->Clone("");
+				
+				vhEtaSumZ0d3pd[i] = (TH1D*)vhEtaSumTmp[i]->Clone("");
+				vhEtaSumZ0d3pd_unscaled[i] = (TH1D*)vhEtaSumTmp_unscaled[i]->Clone("");
 			}
 		}
 		else
@@ -846,6 +921,7 @@ int plot_ratio_weights()
 			{
 				vvhCosThSum[i][model] = (TH1D*)vhCosThSumTmp[i]->Clone("");
 				vvhyQSum[i][model] = (TH1D*)vhyQSumTmp[i]->Clone("");
+				vvhEtaSum[i][model] = (TH1D*)vhEtaSumTmp[i]->Clone("");
 			}
 		}
 	}
@@ -933,6 +1009,39 @@ int plot_ratio_weights()
 		vhyQSumXSweights[i]->SetTitle((TString)"yQ weights_XS: " + (TString)vhyQSumXSweights[i]->GetTitle());
 		vhyQSumXSweights[i]->SetName( "hyQXS_wgt_"+b );
 		vhyQSumXSweights[i]->Write("", TObject::kOverwrite);
+	}
+	////////////////////////////////////////////////////////////////
+
+	
+	dirEtaHistograms->cd();
+	for(Int_t i=0 ; i<imass_afb_nbins ; i++) 
+	{
+		TString b = (TString)tostring(i+1);
+	
+		for(int mod=Z0 ; mod<=KK ; mod++) 
+		{
+			if(mod==Z0) tsname = "Z0";
+			if(mod==ZP) tsname = "ZP";
+			if(mod==KK) tsname = "KK";
+			
+			vvhEtaSumWeights[i][mod] = (TH1D*)vvhEtaSum[i][mod]->Clone(""); 
+			//vvhEtaSumWeights[i][mod]->Divide(vhEtaSumZ0d3pd[i]);
+			divide(vvhEtaSumWeights[i][mod],vhEtaSumZ0d3pd[i]);
+			
+			dirEtaHistograms->cd();
+			vvhEtaSumWeights[i][mod]->SetTitle((TString)"etamu weights: " + (TString)vvhEtaSumWeights[i][mod]->GetTitle());
+			vvhEtaSumWeights[i][mod]->SetName( "hEtamu"+tsname+"_wgt_"+b );
+			vvhEtaSumWeights[i][mod]->Write("", TObject::kOverwrite);
+		}
+		
+		vhEtaSumXSweights[i] = (TH1D*)vhEtaSumZ0d3pd[i]->Clone(""); 
+		//vhEtaSumXSweights[i]->Divide(vhEtaSumZ0d3pd_unscaled[i]); 
+		divide(vhEtaSumXSweights[i],vhEtaSumZ0d3pd_unscaled[i]); 
+		
+		dirEtaHistograms->cd();
+		vhEtaSumXSweights[i]->SetTitle((TString)"etamu weights_XS: " + (TString)vhEtaSumXSweights[i]->GetTitle());
+		vhEtaSumXSweights[i]->SetName( "hEtamuXS_wgt_"+b );
+		vhEtaSumXSweights[i]->Write("", TObject::kOverwrite);
 	}
 	////////////////////////////////////////////////////////////////
 
@@ -1224,6 +1333,149 @@ int plot_ratio_weights()
 	
 	
 	
+	// draw etamu
+	dirEtaHistograms->cd();
+	vector<TCanvas*> vCetamu;
+	vector<TVirtualPad*> vP1etamu;
+	vector<TVirtualPad*> vP2etamu;
+	vector<TLegend*> vL1etamu;
+	vector<TLegend*> vL2etamu;
+	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
+	{
+		
+		TString b = (TString)tostring(i+1);
+		
+		vCetamu.push_back( new TCanvas("etamu_c"+b,"etamu_c"+b,0,0,1200,800) );
+		vCetamu[i]->Divide(1,2);
+		vCetamu[i]->Draw();
+		
+		vP1etamu.push_back( vCetamu[i]->cd(1) );
+		vP1etamu[i]->SetLogy();
+		
+		vP2etamu.push_back( vCetamu[i]->cd(2) );
+		vP2etamu[i]->SetLogy();
+		
+		vL1etamu.push_back( new TLegend(0.6928196,0.1761658,0.8771074,0.3353843,NULL,"brNDC") );
+		vL1etamu[i]->SetFillColor(kWhite);
+		
+		vL2etamu.push_back( new TLegend(0.7554766,0.8272493,0.877596,0.947087,NULL,"brNDC") );
+		vL2etamu[i]->SetFillColor(kWhite);
+		
+		
+		vP1etamu[i]->cd();
+		vP1etamu[i]->Draw();
+		
+		float min = 1.e-2;
+		float max = vhEtaSumZ0d3pd[i]->GetMaximum();
+		for(int mod=Z0 ; mod<=KK ; mod++) max = (vvhEtaSum[i][mod]->GetMaximum() > max) ? vvhEtaSum[i][mod]->GetMaximum() : max;
+	
+		vhEtaSumZ0d3pd[i]->SetMinimum(1.e-2);
+		vhEtaSumZ0d3pd[i]->SetMaximum(5.*max);
+		vhEtaSumZ0d3pd[i]->SetLineColor(col0);
+		vhEtaSumZ0d3pd[i]->SetLineStyle(1);
+		vhEtaSumZ0d3pd[i]->SetLineWidth(2);
+		vhEtaSumZ0d3pd[i]->SetXTitle("#eta_{#mu^{-}}");
+		vhEtaSumZ0d3pd[i]->SetYTitle("Events");
+		//if(5.*max<1.e2) vhEtaSumZ0d3pd[i]->GetYaxis()->SetMoreLogLabels();
+		vhEtaSumZ0d3pd[i]->Draw();
+		vL1yQ[i]->AddEntry(vhEtaSumZ0d3pd[i], "SM #gamma/Z^{0} (#it{ATLAS} MC10 tru)", "l");
+		
+		for(int mod=Z0 ; mod<=KK ; mod++)
+		{
+			Color_t  col = 0;
+			if(mod==Z0)
+			{
+				col = kBlue;
+				sName = "SM #gamma/Z^{0} (#scale[1.1]{P}#scale[0.9]{YTHIA8})";
+			}
+			if(mod==ZP)
+			{
+				col = col2;
+				sName = sMass + " GeV S^{1}/Z_{2} KK (#scale[1.1]{P}#scale[0.9]{YTHIA8})"; 
+			}
+			if(mod==KK)
+			{
+				col = kGreen+3;
+				sName = sMass + " GeV S^{1}/Z_{2} KK (#scale[1.1]{P}#scale[0.9]{YTHIA8})"; 
+			}
+		
+			vvhEtaSum[i][mod]->SetMinimum(min);
+			vvhEtaSum[i][mod]->SetMaximum(5.*max);
+			vvhEtaSum[i][mod]->SetLineColor(col);
+			vvhEtaSum[i][mod]->SetLineStyle(1);
+			vvhEtaSum[i][mod]->SetLineWidth(2);
+			vvhEtaSum[i][mod]->SetXTitle("#eta_{#mu^{-}}");
+			vvhEtaSum[i][mod]->SetYTitle("Events");
+			//if(5.*max<1.e2) vvhEtaSum[i][mod]->GetYaxis()->SetMoreLogLabels();
+			vvhEtaSum[i][mod]->Draw("SAMES");
+			vL1etamu[i]->AddEntry(vvhEtaSum[i][mod], sName.c_str(), "l");
+		}
+		vL1etamu[i]->Draw("SAMES");
+		
+		vP1etamu[i]->cd();
+		vP1etamu[i]->RedrawAxis();
+		vP1etamu[i]->Update();
+		
+		//--------------------------------------------
+		
+		vP2etamu[i]->cd();
+		vP2etamu[i]->Draw();
+		
+		min = 1.e-1;
+		max = -1.;
+		for(int mod=Z0 ; mod<=KK ; mod++) max = (vvhEtaSumWeights[i][mod]->GetMaximum() > max) ? vvhEtaSumWeights[i][mod]->GetMaximum() : max;
+		string sYTitle = "Events_{#scale[1.1]{P}#scale[0.9]{YTHIA8}}/Events_{#gamma/Z^{0}}";
+		for(int mod=Z0 ; mod<=KK ; mod++)
+		{
+			Color_t  col = 0;
+			TString drawOpt = "";
+			if(mod==Z0)
+			{
+				col = kBlue;
+				sName = "SM #gamma/Z^{0}";
+				drawOpt = "";
+			}
+			if(mod==ZP)
+			{
+				col = col2;
+				sName = sMass + " GeV Z' SSM";
+				drawOpt = "SAMES";
+			}
+			if(mod==KK)
+			{
+				col = kGreen+3;
+				sName   = sMass + " GeV S^{1}/Z_{2} KK";
+				drawOpt = "SAMES";
+			}
+			vvhEtaSumWeights[i][mod]->SetMinimum(min);
+			vvhEtaSumWeights[i][mod]->SetMaximum(5.*max);
+			vvhEtaSumWeights[i][mod]->SetLineColor(col2);
+			vvhEtaSumWeights[i][mod]->SetLineStyle(1);
+			vvhEtaSumWeights[i][mod]->SetLineWidth(2);
+			vvhEtaSumWeights[i][mod]->SetXTitle("#eta_{#mu^{-}}");
+			vvhEtaSumWeights[i][mod]->SetYTitle(sYTitle.c_str());
+			//if(5.*max<1.e2) vvhEtaSumWeights[i][mod]->GetYaxis()->SetMoreLogLabels(); 
+			vvhEtaSumWeights[i][mod]->Draw(drawOpt);
+			vL2etamu[i]->AddEntry(vvhEtaSumWeights[i][mod], sName.c_str(), "l");
+		}
+		vL2etamu[i]->Draw("SAMES");
+		
+		vP2etamu[i]->cd();
+		vP2etamu[i]->RedrawAxis();
+		vP2etamu[i]->Update();
+		vCetamu[i]->Update();
+		
+		tsname = "plots/plot_etamu_" + b;
+		vCetamu[i]->SaveAs(tsname+".eps");
+		vCetamu[i]->SaveAs(tsname+".C");
+		vCetamu[i]->SaveAs(tsname+".root");
+		vCetamu[i]->SaveAs(tsname+".png");
+	}
+	cout << "yQ weights are calculated and written\n" << endl;
+	//---------------------------------------------------------------------------
+	
+	
+	
 	
 	
 	
@@ -1237,6 +1489,8 @@ int plot_ratio_weights()
 		else { for(Int_t b=0 ; b<=hMassSumTmp->GetNbinsX() ; b++) hMassSumTmp->SetBinContent(b,0.); }
 		hResTmp->Reset();
 		for(int i=0 ; i<imass_afb_nbins ; i++) vhCosThSumTmp[i]->Reset();
+		for(int i=0 ; i<imass_afb_nbins ; i++) vhyQSumTmp[i]->Reset();
+		for(int i=0 ; i<imass_afb_nbins ; i++) vhEtaSumTmp[i]->Reset();
 		
 		////////////////////////////
 	
@@ -1341,6 +1595,7 @@ int plot_ratio_weights()
 				Double_t mass_weight = 0.;
 				Double_t cost_weight = 0.;
 				Double_t yQ_weight   = 0.;
+				Double_t eta_weight  = 0.;
 				if(model!=DT)
 				{
 					if(recon_all_isValid  &&  truth_all_isValid)
@@ -1348,8 +1603,8 @@ int plot_ratio_weights()
 						// for all models (practically we read only the Z0 and weight the ZP and KK)
 						imuon_tru  = (truth_all_mc_pdgId->at(0)>0) ? 0 : 1;
 						iamuon_tru = (imuon_tru==0) ? 1 : 0;
-						tlva_tru->SetPtEtaPhiM(truth_all_mc_pt->at(imuon_tru),truth_all_mc_eta->at(imuon_tru),truth_all_mc_phi->at(imuon_tru),truth_all_mc_m->at(imuon_tru));
-						tlvb_tru->SetPtEtaPhiM(truth_all_mc_pt->at(iamuon_tru),truth_all_mc_eta->at(iamuon_tru),truth_all_mc_phi->at(iamuon_tru),truth_all_mc_m->at(iamuon_tru));
+						tlva_tru->SetPtEtaPhiM(truth_all_mc_pt->at(imuon_tru),truth_all_mc_eta->at(imuon_tru),truth_all_mc_phi->at(imuon_tru),muonMass);
+						tlvb_tru->SetPtEtaPhiM(truth_all_mc_pt->at(iamuon_tru),truth_all_mc_eta->at(iamuon_tru),truth_all_mc_phi->at(iamuon_tru),muonMass);
 						ca_tru = truth_all_mc_charge->at(imuon_tru);
 						cb_tru = truth_all_mc_charge->at(iamuon_tru);
 						if(ca_tru*cb_tru>=0.)       {_WARNING("Truth: ca_tru*cb_tru>=0., skipping event"); continue;};
@@ -1362,13 +1617,18 @@ int plot_ratio_weights()
 						
 						imuon_rec  = (recon_all_charge->at(0)<0.) ? 0 : 1;
 						iamuon_rec = (imuon_rec==0) ? 1 : 0;
-						tlva_rec->SetPtEtaPhiM(recon_all_pt->at(imuon_rec),recon_all_eta->at(imuon_rec),recon_all_phi->at(imuon_rec),recon_all_m->at(imuon_rec));
-						tlvb_rec->SetPtEtaPhiM(recon_all_pt->at(iamuon_rec),recon_all_eta->at(iamuon_rec),recon_all_phi->at(iamuon_rec),recon_all_m->at(iamuon_rec));
+						tlva_rec->SetPtEtaPhiM(recon_all_pt->at(imuon_rec),recon_all_eta->at(imuon_rec),recon_all_phi->at(imuon_rec),muonMass);
+						tlvb_rec->SetPtEtaPhiM(recon_all_pt->at(iamuon_rec),recon_all_eta->at(iamuon_rec),recon_all_phi->at(iamuon_rec),muonMass);
 						ca_rec = recon_all_charge->at(imuon_rec);
 						cb_rec = recon_all_charge->at(iamuon_rec);
 						if(ca_rec*cb_rec>=0.)       {_WARNING("Reconstructed: ca_rec*cb_rec>=0., skipping event"); continue;};
 						M_rec        = imass(tlva_rec,tlvb_rec);
-						if(M_rec<=minPossibleImass || M_rec>maxPossibleImass) {_WARNING("Reconstructed: M_rec<=minPossibleImass || M_rec>maxPossibleImass  ->  M_rec="+_s(M_rec)+", skipping event"); continue;}
+						if(M_rec<=minPossibleImass || M_rec>maxPossibleImass)
+						{
+							_WARNING("Reconstructed: M_rec<=minPossibleImass || M_rec>maxPossibleImass  ->  M_rec="+_s(M_rec)+", skipping event");
+							_WARNING("\t pT="+_s(recon_all_pt->at(imuon_rec))+",  m="+_s(muonMass));
+							continue;
+						}
 						COSTHETA_rec = cosThetaCollinsSoper(tlva_rec,ca_rec,tlvb_rec,cb_rec);
 						if(fabs(COSTHETA_rec)>1.)   _WARNING("Reconstructed: |cos(theta)|>1.");
 						YQ_rec       = ySystem(tlva_rec,tlvb_rec);
@@ -1376,7 +1636,7 @@ int plot_ratio_weights()
 						
 						
 						// afb_bin = hDummy_afb->FindBin(truth_all_Mhat);
-						afb_bin = hDummy_afb->FindBin(M_tru); // ?????????????????????????????? WHY NOT M_rec ?????????????????????????????????????????????????????????????????????????????????????????????????
+						afb_bin = hDummy_afb->FindBin(M_tru); // ?????????????????????????????? MAYBE need to be M_tru ?????????????????????????????????????????????????????????????????????????????????????????????????
 						if(afb_bin<=0 || afb_bin>imass_afb_nbins) continue;
 						
 						// fill from d3pd
@@ -1396,6 +1656,10 @@ int plot_ratio_weights()
 							//------------ yQ
 							// hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(recon_all_ySystem);
 							hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(YQ_rec);
+							
+							//------------ etamu
+							// hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(recon_all_eta->at(imuon_rec));
+							hvvBinnedHistos_eta[n][afb_bin-1]->Fill(recon_all_eta->at(imuon_rec));
 						}
 						
 						else // for Z0, ZP and KK we need to scale by the weight
@@ -1415,6 +1679,7 @@ int plot_ratio_weights()
 							// cost_weight = vvhCosThSumWeights[afb_bin-1][model]->GetBinContent(bin);
 							// hvvBinnedHistos_cosTh[n][afb_bin-1]->Fill(recon_all_CosThetaCS,cost_weight);
 							bin = vvhCosThSumWeights[afb_bin-1][model]->FindBin(COSTHETA_tru);
+							if(bin<1  ||  bin>vvhCosThSumWeights[afb_bin-1][model]->GetNbinsX()) continue;
 							cost_weight = vvhCosThSumWeights[afb_bin-1][model]->GetBinContent(bin);
 							hvvBinnedHistos_cosTh[n][afb_bin-1]->Fill(COSTHETA_rec,cost_weight);
 							
@@ -1423,8 +1688,15 @@ int plot_ratio_weights()
 							// yQ_weight = vvhyQSumWeights[afb_bin-1][model]->GetBinContent(bin);
 							// hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(recon_all_ySystem,yQ_weight);
 							bin = vvhyQSumWeights[afb_bin-1][model]->FindBin(YQ_tru);
+							if(bin<1  ||  bin>vvhyQSumWeights[afb_bin-1][model]->GetNbinsX()) continue;
 							yQ_weight = vvhyQSumWeights[afb_bin-1][model]->GetBinContent(bin);
 							hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(YQ_rec,yQ_weight);
+							
+							//------------ etamu
+							bin = vvhEtaSumWeights[afb_bin-1][model]->FindBin(truth_all_mc_eta->at(imuon_tru));
+							if(bin<1  ||  bin>vvhEtaSumWeights[afb_bin-1][model]->GetNbinsX()) continue;
+							eta_weight = vvhEtaSumWeights[afb_bin-1][model]->GetBinContent(bin);
+							hvvBinnedHistos_eta[n][afb_bin-1]->Fill(recon_all_eta->at(imuon_rec),eta_weight);
 							
 							//------------ ntuple
 							// mass_tru = truth_all_Mhat;
@@ -1446,6 +1718,9 @@ int plot_ratio_weights()
 							yQ_tru   = YQ_tru;
 							yQ_rec   = YQ_rec;
 							yQ_wgt   = yQ_weight;
+							eta_tru   = truth_all_mc_eta->at(imuon_tru);
+							eta_rec   = recon_all_eta->at(imuon_rec);
+							eta_wgt   = eta_weight;
 							xscn_wgt = bin_xs_weight; // in units of fb
 							fillNtuple(vvtBinnedNtuples[afb_bin-1][model],counter,modulu);
 						}
@@ -1456,12 +1731,12 @@ int plot_ratio_weights()
 				{	
 					imuon_rec  = (recon_all_charge->at(0)<0.) ? 0 : 1;
 					iamuon_rec = (imuon_rec==0) ? 1 : 0;
-					tlva_rec->SetPtEtaPhiM(recon_all_pt->at(imuon_rec),recon_all_eta->at(imuon_rec),recon_all_phi->at(imuon_rec),recon_all_m->at(imuon_rec));
-					tlvb_rec->SetPtEtaPhiM(recon_all_pt->at(iamuon_rec),recon_all_eta->at(iamuon_rec),recon_all_phi->at(iamuon_rec),recon_all_m->at(iamuon_rec));
+					tlva_rec->SetPtEtaPhiM(recon_all_pt->at(imuon_rec)*MeV2GeV,recon_all_eta->at(imuon_rec),recon_all_phi->at(imuon_rec),muonMass);
+					tlvb_rec->SetPtEtaPhiM(recon_all_pt->at(iamuon_rec)*MeV2GeV,recon_all_eta->at(iamuon_rec),recon_all_phi->at(iamuon_rec),muonMass);
 					ca_rec = recon_all_charge->at(imuon_rec);
 					cb_rec = recon_all_charge->at(iamuon_rec);
 					if(ca_rec*cb_rec>=0.)        {_WARNING("Reconstructed: ca_rec*cb_rec>=0., skipping event"); continue;};
-					M_rec        = imass(tlva_rec,tlvb_rec)*MeV2GeV;
+					M_rec        = imass(tlva_rec,tlvb_rec);
 					if(M_rec<=minPossibleImass || M_rec>maxPossibleImass) {_WARNING("Reconstructed: M_rec<=minPossibleImass || M_rec>maxPossibleImass  ->  M_rec="+_s(M_rec)+", skipping event"); continue;}
 					COSTHETA_rec = cosThetaCollinsSoper(tlva_rec,ca_rec,tlvb_rec,cb_rec);
 					if(fabs(COSTHETA_rec)>1.)   _WARNING("Reconstructed: |cos(theta)|>1.");
@@ -1486,6 +1761,10 @@ int plot_ratio_weights()
 					// hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(recon_all_ySystem);
 					hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(YQ_rec);
 					
+					//------------ etamu
+					// hvvBinnedHistos_eta[n][afb_bin-1]->Fill(recon_all_eta->at(imuon_rec));
+					hvvBinnedHistos_eta[n][afb_bin-1]->Fill(recon_all_eta->at(imuon_rec));
+					
 					//------------ ntuple
 					// mass_tru = -1;
 					// mass_rec = recon_all_Mhat*TeV2GeV;
@@ -1506,6 +1785,9 @@ int plot_ratio_weights()
 					yQ_tru   = -1;
 					yQ_rec   = YQ_rec;
 					yQ_wgt   = 1.;
+					eta_tru   = -1;
+					eta_rec   = recon_all_eta->at(imuon_rec);
+					eta_wgt   = 1.;
 					xscn_wgt = 1.; // in units of fb
 					fillNtuple(vvtBinnedNtuples[afb_bin-1][model],counter,modulu);
 
@@ -1521,9 +1803,11 @@ int plot_ratio_weights()
 				{
 					hvvBinnedHistos_cosTh[n][i]->Scale(dvWeights[n]);
 					hvvBinnedHistos_yQ[n][i]->Scale(dvWeights[n]);
+					hvvBinnedHistos_eta[n][i]->Scale(dvWeights[n]);
 				}
 				vhCosThSumTmp[i]->Add(hvvBinnedHistos_cosTh[n][i]);
 				vhyQSumTmp[i]->Add(hvvBinnedHistos_yQ[n][i]);
+				vhEtaSumTmp[i]->Add(hvvBinnedHistos_eta[n][i]);
 			}
 			/////////////////////////////////////////////////////////////
 			
@@ -1554,6 +1838,7 @@ int plot_ratio_weights()
 			{
 				vhCosThSumReconDTd3pd[i] = (TH1D*)vhCosThSumTmp[i]->Clone("");
 				vhyQSumReconDTd3pd[i] = (TH1D*)vhyQSumTmp[i]->Clone("");
+				vhEtaSumReconDTd3pd[i] = (TH1D*)vhEtaSumTmp[i]->Clone("");
 			}
 		}
 		else if(model==Z0d3pd)
@@ -1564,6 +1849,7 @@ int plot_ratio_weights()
 			{
 				vhCosThSumReconZ0d3pd[i] = (TH1D*)vhCosThSumTmp[i]->Clone("");
 				vhyQSumReconZ0d3pd[i] = (TH1D*)vhyQSumTmp[i]->Clone("");
+				vhEtaSumReconZ0d3pd[i] = (TH1D*)vhEtaSumTmp[i]->Clone("");
 			}
 		}
 		else
@@ -1574,6 +1860,7 @@ int plot_ratio_weights()
 			{
 				vvhCosThSumRecTemplate[i][model] = (TH1D*)vhCosThSumTmp[i]->Clone("");
 				vvhyQSumRecTemplate[i][model] = (TH1D*)vhyQSumTmp[i]->Clone("");
+				vvhEtaSumRecTemplate[i][model] = (TH1D*)vhEtaSumTmp[i]->Clone("");
 			}
 		}
 		
@@ -1667,6 +1954,47 @@ int plot_ratio_weights()
 	}
 	
 	
+	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
+	{
+		TString b = (TString)tostring(i+1);
+		
+		dirEtaHistograms->cd();
+		vhEtaSumZ0d3pd_acceptance[i] = (TH1D*)vhEtaSumReconZ0d3pd[i]->Clone("");
+		//vhEtaSumZ0d3pd_acceptance[i]->Divide(vhEtaSumZ0d3pd[i]);
+		divide(vhEtaSumZ0d3pd_acceptance[i],vhEtaSumZ0d3pd[i]);
+		
+		dirEtaHistograms->cd();
+		vhEtaSumZ0d3pd_acceptance[i]->SetName("hEtaZ0d3pd_acceptance_"+b);
+		vhEtaSumZ0d3pd_acceptance[i]->Write("", TObject::kOverwrite);
+		
+		dirEtaHistograms->cd();
+		vhEtaSumReconZ0d3pd[i]->SetName("hEtaRecZ0d3pd_"+b);
+		vhEtaSumReconZ0d3pd[i]->Write("", TObject::kOverwrite);
+		dirEtaHistograms->cd();
+		vhEtaSumReconDTd3pd[i]->SetName("hEtaRecDTd3pd_"+b);
+		vhEtaSumReconDTd3pd[i]->Write("", TObject::kOverwrite);
+		
+		for(int mod=Z0 ; mod<=KK ; mod++) 
+		{
+			if(mod==Z0) tsname = "Z0";
+			if(mod==ZP) tsname = "ZP";
+			if(mod==KK) tsname = "KK";
+			
+			dirEtaHistograms->cd();
+			vvhEtaSumAcceptance[i][mod] = (TH1D*)vvhEtaSumRecTemplate[i][mod]->Clone("");
+			//vvhEtaSumAcceptance[i][mod]->Divide(vvhEtaSum[i][mod]);
+			divide(vvhEtaSumAcceptance[i][mod],vvhEtaSum[i][mod]);
+			
+			dirEtaHistograms->cd();
+			vvhEtaSumAcceptance[i][mod]->SetName("hEta"+tsname+"_acceptance_"+b);
+			vvhEtaSumAcceptance[i][mod]->Write("", TObject::kOverwrite);
+			dirEtaHistograms->cd();
+			vvhEtaSumRecTemplate[i][mod]->SetName("hEtaRec"+tsname+"_"+b);
+			vvhEtaSumRecTemplate[i][mod]->Write("", TObject::kOverwrite);
+		}
+	}
+	
+	
 	
 	
 
@@ -1731,8 +2059,8 @@ int plot_ratio_weights()
 			{
 				imuon_tru  = (truth_all_mc_pdgId->at(0)>0) ? 0 : 1;
 				iamuon_tru = (imuon_tru==0) ? 1 : 0;
-				tlva_tru->SetPtEtaPhiM(truth_all_mc_pt->at(imuon_tru),truth_all_mc_eta->at(imuon_tru),truth_all_mc_phi->at(imuon_tru),truth_all_mc_m->at(imuon_tru));
-				tlvb_tru->SetPtEtaPhiM(truth_all_mc_pt->at(iamuon_tru),truth_all_mc_eta->at(iamuon_tru),truth_all_mc_phi->at(iamuon_tru),truth_all_mc_m->at(iamuon_tru));
+				tlva_tru->SetPtEtaPhiM(truth_all_mc_pt->at(imuon_tru),truth_all_mc_eta->at(imuon_tru),truth_all_mc_phi->at(imuon_tru),muonMass);
+				tlvb_tru->SetPtEtaPhiM(truth_all_mc_pt->at(iamuon_tru),truth_all_mc_eta->at(iamuon_tru),truth_all_mc_phi->at(iamuon_tru),muonMass);
 				ca_tru = truth_all_mc_charge->at(imuon_tru);
 				cb_tru = truth_all_mc_charge->at(iamuon_tru);
 				if(ca_tru*cb_tru>=0.)       {_WARNING("Truth: ca_tru*cb_tru>=0., skipping event"); continue;};
@@ -1745,13 +2073,18 @@ int plot_ratio_weights()
 			
 				imuon_rec  = (recon_all_charge->at(0)<0.) ? 0 : 1;
 				iamuon_rec = (imuon_rec==0) ? 1 : 0;
-				tlva_rec->SetPtEtaPhiM(recon_all_pt->at(imuon_rec),recon_all_eta->at(imuon_rec),recon_all_phi->at(imuon_rec),recon_all_m->at(imuon_rec));
-				tlvb_rec->SetPtEtaPhiM(recon_all_pt->at(iamuon_rec),recon_all_eta->at(iamuon_rec),recon_all_phi->at(iamuon_rec),recon_all_m->at(iamuon_rec));
+				tlva_rec->SetPtEtaPhiM(recon_all_pt->at(imuon_rec),recon_all_eta->at(imuon_rec),recon_all_phi->at(imuon_rec),muonMass);
+				tlvb_rec->SetPtEtaPhiM(recon_all_pt->at(iamuon_rec),recon_all_eta->at(iamuon_rec),recon_all_phi->at(iamuon_rec),muonMass);
 				ca_rec = recon_all_charge->at(imuon_rec);
 				cb_rec = recon_all_charge->at(iamuon_rec);
 				if(ca_rec*cb_rec>=0.)       {_WARNING("Reconstructed: ca_rec*cb_rec>=0., skipping event"); continue;};
 				M_rec        = imass(tlva_rec,tlvb_rec);
-				if(M_rec<=minPossibleImass || M_rec>maxPossibleImass) {_WARNING("Reconstructed: M_rec<=minPossibleImass || M_rec>maxPossibleImass  ->  M_rec="+_s(M_rec)+", skipping event"); continue;}
+				if(M_rec<=minPossibleImass || M_rec>maxPossibleImass)
+				{
+					_WARNING("Reconstructed: M_rec<=minPossibleImass || M_rec>maxPossibleImass  ->  M_rec="+_s(M_rec)+", skipping event");
+					_WARNING("\t pT="+_s(recon_all_pt->at(imuon_rec))+",  m="+_s(muonMass));
+					continue;
+				}
 				COSTHETA_rec = cosThetaCollinsSoper(tlva_rec,ca_rec,tlvb_rec,cb_rec);
 				if(fabs(COSTHETA_rec)>1.)   _WARNING("Reconstructed: |cos(theta)|>1.");
 				YQ_rec       = ySystem(tlva_rec,tlvb_rec);
@@ -1857,6 +2190,27 @@ int plot_ratio_weights()
 			diryQHistograms->cd();
 			vvhyQSum[i][mod]->SetName("hyQTru"+tsname+"_"+b);
 			vvhyQSum[i][mod]->Write("", TObject::kOverwrite);
+		}
+	}
+	
+	
+	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
+	{
+		TString b = (TString)tostring(i+1);
+		
+		dirEtaHistograms->cd();
+		vhEtaSumZ0d3pd[i]->SetName("hEtaTruZ0d3pd_"+b);
+		vhEtaSumZ0d3pd[i]->Write("", TObject::kOverwrite);
+		
+		for(int mod=Z0 ; mod<=KK ; mod++) 
+		{
+			if(mod==Z0) tsname = "Z0";
+			if(mod==ZP) tsname = "ZP";
+			if(mod==KK) tsname = "KK";
+			
+			dirEtaHistograms->cd();
+			vvhEtaSum[i][mod]->SetName("hEtaTru"+tsname+"_"+b);
+			vvhEtaSum[i][mod]->Write("", TObject::kOverwrite);
 		}
 	}
 	

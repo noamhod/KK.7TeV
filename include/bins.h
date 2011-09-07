@@ -24,7 +24,12 @@ static const Double_t logmassmin   = 120.;
 static const Double_t logmassmax   = 1500.;
 static Double_t logmassbins[nlogmassbins+1];
 
-static const Int_t    netabins = 25;
+static const Int_t    nlogimassbins = 40;
+static const Double_t logimassmin   = 120.;
+static const Double_t logimassmax   = 1500.;
+static Double_t logimassbins[nlogimassbins+1];
+
+static const Int_t    netabins = 30;
 static const Double_t etamin   = -2.5;
 static const Double_t etamax   = +2.5;
 static const Double_t etax     = 1.;

@@ -95,6 +95,7 @@ typedef vector<TLorentzVector*> TVectorP2VL;
 typedef map<string, TObject*>   TMapSP2TOBJ;
 typedef map<TString, TObject*>  TMapTSP2TOBJ;
 typedef map<string, TH1*>       TMapSP2TH1;
+typedef map<string, vector<TH1*> > TMapSvTH1;
 typedef map<string, TH2*>       TMapSP2TH2;
 typedef map<string, TGraph*>    TMapSP2TGraph;
 typedef map<TString, TH1*>      TMapTSP2TH1;
@@ -114,6 +115,7 @@ typedef map<double, string>     TMapds;
 typedef map<double, int>        TMapdi;
 typedef map<string, vector<double> >  TMapsvd;
 typedef map<string, vector<double>* > TMapsP2vd;
+typedef map<string, vector<float>* > TMapsP2vf;
 typedef map<string, string> TMapss;
 typedef map<string, vector<string> > TMapsvs;
 typedef map<string, vector<string>* > TMapsP2vs;
@@ -126,6 +128,8 @@ typedef vector<TCanvas*> TVecCanvas;
 #include "style.h"
 
 #include "bins.h"
+
+#include "colors.h"
 
 #define utilities_cxx
 #include "utilities.C"

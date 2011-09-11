@@ -50,8 +50,12 @@ TFile* file = new TFile("weights.root", "READ");
 vector<TH1D*> vhMassBins;
 vector<TH1D*> vhAfbBins;
 
-TFile* fProb = new TFile("/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/run/plots/mchistograms.root", "READ");
-TH1D*  hProb = (TH1D*)fProb->Get("hprobyQ_quark_ratio");
+// TFile* fProb = new TFile("/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/run/plots/DY_histograms.root", "READ");
+// TH1D*  hProb = (TH1D*)fProb->Get("hprobyQ_quark_ratio");
+
+TFile* fProb = new TFile("/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/pythia8/hTest.root", "READ");
+TH1D*  hProb = (TH1D*)fProb->Get("hTest");
+
 
 vector<TTree*> vtData;
 float mass_tru, mass_rec, mass_wgt;
@@ -507,11 +511,21 @@ Int_t loop(int mod)
 	else
 	{
 		setBranches(mod);
-		N = vtData[mod]->GetEntries();
-		_DEBUG("N = "+tostring(N));
-		for(Int_t i=0 ; i<N ; i++)
+		N = 0;
+		for(Int_t i=0 ; i<(Int_t)vtData[mod]->GetEntries() ; i++)
 		{
 			vtData[mod]->GetEntry(i);
+			
+			//////////////////////////////////////////////////
+			//////////////////////////////////////////////////
+			//////////////////////////////////////////////////
+			//////////////////////////////////////////////////
+			if(fabs(yQ_rec)<0.35) continue; /////////////////// ????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
+			//////////////////////////////////////////////////
+			//////////////////////////////////////////////////
+			//////////////////////////////////////////////////
+			//////////////////////////////////////////////////
+			N++;
 			*cosThe = cost_rec;
 			*yQ     = yQ_rec;
 			float w;
@@ -539,6 +553,7 @@ Int_t loop(int mod)
 			if(mod==DT) vUnbinnedDataSet[mod]->add(RooArgSet(*cosThe,*yQ));   // UNWEIGHTED
 			else        vUnbinnedDataSet[mod]->add(RooArgSet(*cosThe,*yQ),w); // WEIGHTED   
 		}
+		_DEBUG("N = "+tostring(N));
 	}
 	
 	if(doBinned)

@@ -266,9 +266,9 @@ class QSUB
 			# end
 		# end
 		# puts nodes
-		# %x(qsub -l #{nodes} -q N -e #{rundirregular}/tmp/err -o #{rundirregular}/tmp/out #{jobname})
+		# %x(qsub -l #{nodes} -q S -e #{rundirregular}/tmp/err -o #{rundirregular}/tmp/out #{jobname})
 
-		%x(qsub -q N -e #{rundirregular}/tmp/err -o #{rundirregular}/tmp/out #{jobname})
+		%x(qsub -q S -e #{rundirregular}/tmp/err -o #{rundirregular}/tmp/out #{jobname})
 		logd.info "sent --> #{dataset}"
 	end
 	

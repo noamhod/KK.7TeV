@@ -29,10 +29,14 @@ static const Double_t logimassmin   = 120.;
 static const Double_t logimassmax   = 1500.;
 static Double_t logimassbins[nlogimassbins+1];
 
+static const Int_t    nlogfullimassbins = 60;
+static const Double_t logfullimassmin   = 70.;
+static const Double_t logfullimassmax   = 2000.;
+static Double_t logfullimassbins[nlogfullimassbins+1];
+
 static const Int_t    netabins = 30;
 static const Double_t etamin   = -2.5;
 static const Double_t etamax   = +2.5;
-static const Double_t etax     = 1.;
 
 static const double minMassBin = 120;  // for the asymmetry fit
 static const double maxMassBin = 1500; // for the asymmetry fit
@@ -47,6 +51,14 @@ static const double minyQ   = -2.5; // for the FB false identify probability bin
 static const double maxyQ   = +2.5; // for the FB false identify probability binning
 static const int    nyQbins = 30;   // for the FB false identify probability binning
 
+const int      etalogicnbins = 22;
+const Double_t etalogicbins[etalogicnbins+1] =
+											{
+												-2.5,-2.18,-1.95,-1.74,-1.52,-1.37,-1.05,-0.84,-0.63,-0.42,-0.21,
+												0,
+												+0.21,+0.42,+0.63,+0.84,+1.05,+1.37,+1.52,+1.74,+1.95,+2.18,+2.5
+											};
+static const Double_t etax     = 1.05;
 
 static const double minPossibleImass = 5.; // GeV
 static const double maxPossibleImass = 7000.; // GeV

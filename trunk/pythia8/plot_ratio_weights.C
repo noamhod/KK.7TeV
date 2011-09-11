@@ -184,8 +184,8 @@ void addSample(string sname, Color_t color, double events, double sigma /*in [mb
 	vTmp_unscaled.clear();
 	for(int b=0 ; b<imass_afb_nbins ; b++)
 	{
-		vTmp.push_back( new TH1D((sName+"_massbin_etamu_"+_s(b)).c_str(),(sName+"_massbin_etamu_"+_s(b)).c_str(),netamubins,etamumin,etamumax) );
-		vTmp_unscaled.push_back( new TH1D((sName+"unscaled_massbin_etamu_"+_s(b)).c_str(),(sName+"unscaled_massbin_etamu_"+_s(b)).c_str(),netamubins,etamumin,etamumax) );
+		vTmp.push_back( new TH1D((sName+"_massbin_etamu_"+_s(b)).c_str(),(sName+"_massbin_etamu_"+_s(b)).c_str(),etalogicnbins,etalogicbins) );
+		vTmp_unscaled.push_back( new TH1D((sName+"unscaled_massbin_etamu_"+_s(b)).c_str(),(sName+"unscaled_massbin_etamu_"+_s(b)).c_str(),etalogicnbins,etalogicbins) );
 	}
 	hvvBinnedHistos_eta.push_back( vTmp );
 	hvvBinnedHistos_eta_unscaled.push_back( vTmp_unscaled );
@@ -503,8 +503,8 @@ int plot_ratio_weights()
 		vhyQSumTmp.push_back( new TH1D("yQ_"+tsrange,"yQ_"+tsrange, nyqbins,yqmin,yqmax) );
 		vhyQSumTmp_unscaled.push_back( new TH1D("yQ_xs"+tsrange,"yQ_xs"+tsrange, nyqbins,yqmin,yqmax) );
 		
-		vhEtaSumTmp.push_back( new TH1D("etamu_"+tsrange,"etamu_"+tsrange, netamubins,etamumin,etamumax) );
-		vhEtaSumTmp_unscaled.push_back( new TH1D("etamu_xs"+tsrange,"etamu_xs"+tsrange, netamubins,etamumin,etamumax) );
+		vhEtaSumTmp.push_back( new TH1D("etamu_"+tsrange,"etamu_"+tsrange, etalogicnbins,etalogicbins) );
+		vhEtaSumTmp_unscaled.push_back( new TH1D("etamu_xs"+tsrange,"etamu_xs"+tsrange, etalogicnbins,etalogicbins) );
 		
 		vhCosThSumZ0d3pd.push_back( new TH1D("cost_sumZ0d3pd_"+tsrange, "cost_cost_sumZ0d3pd_"+tsrange, ncostbins,costmin,costmax) );
 		vhCosThSumReconZ0d3pd.push_back( new TH1D("cost_sumRecZ0d3pd_"+tsrange, "cost_sumRecZ0d3pd_"+tsrange, ncostbins,costmin,costmax) );
@@ -517,11 +517,11 @@ int plot_ratio_weights()
 		vhyQSumReconDTd3pd.push_back( new TH1D("yQ_sumRecDTd3pd_"+tsrange, "yQ_sumRecDTd3pd_"+tsrange, nyqbins,yqmin,yqmax) );
 		vhyQSumZ0d3pd_unscaled.push_back( new TH1D("yQ_sumZ0d3pd_unscaled_"+tsrange, "yQ_sumZ0d3pd_unscaled_"+tsrange, nyqbins,yqmin,yqmax) );
 		
-		vhEtaSumZ0d3pd.push_back( new TH1D("etamu_sumZ0d3pd_"+tsrange, "etamu_sumZ0d3pd_"+tsrange, netamubins,etamumin,etamumax) );
-		vhEtaSumReconZ0d3pd.push_back( new TH1D("etamu_sumRecZ0d3pd_"+tsrange, "etamu_sumRecZ0d3pd_"+tsrange, netamubins,etamumin,etamumax) );
-		vhEtaSumReconDTd3pd.push_back( new TH1D("etamu_sumRecDTd3pd_"+tsrange, "etamu_sumRecDTd3pd_"+tsrange, netamubins,etamumin,etamumax) );
-		vhEtaSumZ0d3pd_unscaled.push_back( new TH1D("etamu_sumZ0d3pd_unscaled_"+tsrange, "etamu_sumZ0d3pd_unscaled_"+tsrange, netamubins,etamumin,etamumax) );
-		vhEtaSumZ0d3pd_acceptance.push_back( new TH1D("etamu_sumZ0d3pd_acceptance_"+tsrange, "etamu_sumZ0d3pd_acceptance_"+tsrange, netamubins,etamumin,etamumax) );
+		vhEtaSumZ0d3pd.push_back( new TH1D("etamu_sumZ0d3pd_"+tsrange, "etamu_sumZ0d3pd_"+tsrange, etalogicnbins,etalogicbins) );
+		vhEtaSumReconZ0d3pd.push_back( new TH1D("etamu_sumRecZ0d3pd_"+tsrange, "etamu_sumRecZ0d3pd_"+tsrange, etalogicnbins,etalogicbins) );
+		vhEtaSumReconDTd3pd.push_back( new TH1D("etamu_sumRecDTd3pd_"+tsrange, "etamu_sumRecDTd3pd_"+tsrange, etalogicnbins,etalogicbins) );
+		vhEtaSumZ0d3pd_unscaled.push_back( new TH1D("etamu_sumZ0d3pd_unscaled_"+tsrange, "etamu_sumZ0d3pd_unscaled_"+tsrange, etalogicnbins,etalogicbins) );
+		vhEtaSumZ0d3pd_acceptance.push_back( new TH1D("etamu_sumZ0d3pd_acceptance_"+tsrange, "etamu_sumZ0d3pd_acceptance_"+tsrange, etalogicnbins,etalogicbins) );
 		
 		vector<TH1D*> vhTmp;
 		vhTmp.clear();
@@ -556,14 +556,14 @@ int plot_ratio_weights()
 			vvhyQSumRecTemplate[i].push_back( new TH1D("yQ_sumRec"+tsname, "yQ_sumRec"+tsname, nyqbins,yqmin,yqmax) );
 			vvhyQSumWeights[i].push_back( new TH1D("yQ_wgt"+tsname, "yQ_wgt"+tsname, nyqbins,yqmin,yqmax) );
 			
-			vvhEtaSum[i].push_back( new TH1D("etamu_sum"+tsname, "etamu_sum"+tsname, netamubins,etamumin,etamumax) );
-			vvhEtaSumRecTemplate[i].push_back( new TH1D("etamu_sumRec"+tsname, "etamu_sumRec"+tsname, netamubins,etamumin,etamumax) );
-			vvhEtaSumAcceptance[i].push_back( new TH1D("etamu_sumAcc"+tsname, "etamu_sumAcc"+tsname, netamubins,etamumin,etamumax) );
-			vvhEtaSumWeights[i].push_back( new TH1D("etamu_wgt"+tsname, "etamu_wgt"+tsname, netamubins,etamumin,etamumax) );
+			vvhEtaSum[i].push_back( new TH1D("etamu_sum"+tsname, "etamu_sum"+tsname, etalogicnbins,etalogicbins) );
+			vvhEtaSumRecTemplate[i].push_back( new TH1D("etamu_sumRec"+tsname, "etamu_sumRec"+tsname, etalogicnbins,etalogicbins) );
+			vvhEtaSumAcceptance[i].push_back( new TH1D("etamu_sumAcc"+tsname, "etamu_sumAcc"+tsname, etalogicnbins,etalogicbins) );
+			vvhEtaSumWeights[i].push_back( new TH1D("etamu_wgt"+tsname, "etamu_wgt"+tsname, etalogicnbins,etalogicbins) );
 		}
 		vhCosThSumXSweights.push_back( new TH1D("cost_wgtXS_"+tsrange,"cost_wgtXS_"+tsrange, ncostbins,costmin,costmax) );
 		vhyQSumXSweights.push_back( new TH1D("yQ_wgtXS_"+tsrange,"yQ_wgtXS_"+tsrange, nyqbins,yqmin,yqmax) );
-		vhEtaSumXSweights.push_back( new TH1D("etamu_wgtXS_"+tsrange,"etamu_wgtXS_"+tsrange, netamubins,etamumin,etamumax) );
+		vhEtaSumXSweights.push_back( new TH1D("etamu_wgtXS_"+tsrange,"etamu_wgtXS_"+tsrange, etalogicnbins,etalogicbins) );
 	}
 	
 	
@@ -2380,8 +2380,8 @@ int plot_ratio_weights()
 	hMassReconDTd3pd->SetYTitle(sYTitle.c_str());
 	if(doLogx) hMassReconDTd3pd->GetXaxis()->SetMoreLogLabels(); 
 	if(doLogx) hMassReconDTd3pd->GetXaxis()->SetMoreLogLabels(); 
-	hMassReconDTd3pd->Draw("e1x0 SAMES");
-	leg_mass_recon->AddEntry(hMassReconDTd3pd, "2011 Data (#it{ATLAS} rec)", "lep");
+	// hMassReconDTd3pd->Draw("e1x0 SAMES");
+	// leg_mass_recon->AddEntry(hMassReconDTd3pd, "2011 Data (#it{ATLAS} rec)", "lep");
 	
 	leg_mass_recon->Draw("SAMES");
 	pvtxt_recon->Draw("SAMES");

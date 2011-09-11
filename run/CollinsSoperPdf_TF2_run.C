@@ -7,7 +7,7 @@ TH1D *hPy;
 
 void setprobhist(TString type)
 {
-	TFile* f = new TFile("plots/mchistograms.root", "READ");
+	TFile* f = new TFile("plots/DY_histograms.root", "READ");
 	hPy = (TH1D*)f->Get("hprobyQ_"+type+"_ratio")->Clone("hPy");
 
 }
@@ -35,12 +35,12 @@ Double_t CS_corrected(Double_t *x, Double_t *par)
 
 void CollinsSoperPdf_TF2_run()
 {
-	TString type = "truqqbar";
+	TString type = "quark";
 
 	style();
 	setprobhist(type);
 	
-	Double_t Afb = 0.35;
+	Double_t Afb = 0.75;
 	Double_t A4 = 8./3.*Afb;
 
 	TCanvas* cnv_TF2 = new TCanvas("cnv_TF2", "", 600, 400);

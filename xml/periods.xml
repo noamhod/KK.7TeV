@@ -150,7 +150,7 @@
 
   <obj NAME="K" FLAG="on">
     <start>186873</start>
-    <end>187219</end>
+    <end>187815</end>
     <ntriggers>3</ntriggers>
     <triggers>
       <trigger NAME="EF_mu18_medium" PRIORITY="1" MIN="1">18.</trigger>
@@ -184,7 +184,7 @@
   <obj NAME="TRIGGERPERIODS" FLAG="on">
     <ntriggerperiods>1</ntriggerperiods>
     <triggerperiods>
-      <triggerperiod NAME="EF_mu22" FLAG="on">2.28348</triggerperiod>
+      <triggerperiod NAME="EF_mu22" FLAG="on">2.488457</triggerperiod>
     </triggerperiods>
     <description>
       The values are in fb^-1.

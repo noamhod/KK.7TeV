@@ -14,6 +14,7 @@ TMapTSP2TTREE treMap;
 TMapTSd       wgtMap;
 
 Bool_t isMC=true;
+Bool_t isZprime=false;
 Bool_t dolog=true;
 kinematics kin;
 TLorentzVector* tlva   = new TLorentzVector;
@@ -104,10 +105,11 @@ float EtaSum;
 
 
 ///////////// admin /////////////
-void setisMC(Bool_t ismc)
+void setisMC(Bool_t ismc, Bool_t iszprime)
 {
 	_DEBUG("setisMC");
 	isMC = ismc;
+	isZprime = iszprime;
 }
 
 void draw(TObject* tobj, TString oName, TString drawopt="", Bool_t logx=!dolog, Bool_t logy=!dolog)
@@ -120,6 +122,18 @@ void draw(TObject* tobj, TString oName, TString drawopt="", Bool_t logx=!dolog, 
 	if(logy) cnvMap[oName]->SetLogy();
 	cnvMap[oName]->cd();
 	tobj->Draw(drawopt);
+}
+
+void setlogx(TH1* h)
+{
+	h->GetXaxis()->SetMoreLogLabels();
+	h->GetXaxis()->SetNoExponent();
+}
+
+void setlogx(TH2* h)
+{
+	h->GetXaxis()->SetMoreLogLabels();
+	h->GetXaxis()->SetNoExponent();
 }
 
 void drawon(TString existing_oName, TObject* tobj, TString drawopt="")
@@ -146,7 +160,15 @@ void save(TString oDir)
 	}
 	
 	_INFO("save all histograms (to a single .root file)");
-	TString pName = (isMC) ? oDir+"/mchistograms.root" : oDir+"/datahistograms.root";
+	TString pName = "";
+	if(isMC)
+	{
+		pName = (isZprime) ? oDir+"/Zpripe_histograms.root" : oDir+"/DY_histograms.root";
+	}
+	else
+	{
+		pName = oDir+"/datahistograms.root";
+	}
 	TFile* f = new TFile(pName,"RECREATE");
 	f->cd();
 	for(TMapTSP2TH1::iterator it=h1Map.begin() ; it!=h1Map.end() ; ++it) it->second->Write();
@@ -379,8 +401,10 @@ void hbook()
 
 	setLogBins(npbins,pmin,pmax,pbins);
 	setLogBins(nlogmassbins,logmassmin,logmassmax,logmassbins);
+	setLogBins(nlogfullimassbins,logfullimassmin,logfullimassmax,logfullimassbins);
 
-	h1Map.insert( make_pair("hMass", new TH1D("hMass",";m_{#mu#mu} GeV;Events",250,70.,2500.)) );
+	h1Map.insert( make_pair("hMass", new TH1D("hMass",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
+	setlogx(h1Map["hMass"]);
 	h1Map.insert( make_pair("hbetaZ", new TH1D("hbetaZ",";#beta_{Q}^{z};Events",200,-1.,1.)) );
 	h1Map.insert( make_pair("hcosalpha_quark", new TH1D("hcosalpha_quark","#vec{#beta}_{Q}^{rec}#bullet#vec{p}_{q};#vec{#beta}_{Q}^{rec}#bullet#vec{p}_{q}/#beta_{Q}^{rec}p_{q};Events",50,-1.,1.)) );
 	h1Map.insert( make_pair("hcosalpha_trumumu", new TH1D("hcosalpha_trumumu","#vec{#beta}_{Q}^{rec}#bullet#vec{#beta}_{Q}^{#mu#mu,tru};#vec{#beta}_{Q}^{rec}#bullet#vec{#beta}_{Q}^{#mu#mu,tru}/#beta_{Q}^{rec}#beta_{Q}^{#mu#mu,tru};Events",50,-1.,1.)) );
@@ -388,12 +412,14 @@ void hbook()
 	h1Map.insert( make_pair("hyQ", new TH1D("hyQ",";y_{Q};Events",100,-2.5,+2.5)) );
 	h1Map.insert( make_pair("hyQabs", new TH1D("hyQabs",";|y_{Q}|;Events",50,0.,+2.5)) );
 	
-	h1Map.insert( make_pair("hprobyQ_quark_denominator", new TH1D("hprobyQ_quark_denominator",";y_{Q};P(y_{Q})",30,-2.5,+2.5)) );
-	h1Map.insert( make_pair("hprobyQ_quark_ratio", new TH1D("hprobyQ_quark_ratio","P(y_{Q})=#LT#vec{#beta}_{Q}^{rec}#bullet#vec{p}_{q}<0#GT/All;y_{Q};P",30,-2.5,+2.5)) );
-	h1Map.insert( make_pair("hprobyQ_trumumu_denominator", new TH1D("hprobyQ_trumumu_denominator",";y_{Q};P(y_{Q})",30,-2.5,+2.5)) );
-	h1Map.insert( make_pair("hprobyQ_trumumu_ratio", new TH1D("hprobyQ_trumumu_ratio","P(y_{Q})=#LT#vec{#beta}_{Q}^{rec}#bullet#vec{#beta}_{Q}^{#mu#mu,tru}<0#GT/All;y_{Q};P",30,-2.5,+2.5)) );
-	h1Map.insert( make_pair("hprobyQ_truqqbar_denominator", new TH1D("hprobyQ_truqqbar_denominator",";y_{Q};P(y_{Q})",30,-2.5,+2.5)) );
-	h1Map.insert( make_pair("hprobyQ_truqqbar_ratio", new TH1D("hprobyQ_truqqbar_ratio","P(y_{Q})=#LT#vec{#beta}_{Q}^{rec}#bullet#vec{#beta}_{Q}^{q#bar{q}}<0#GT/All;y_{Q};P",30,-2.5,+2.5)) );
+	h1Map.insert( make_pair("hprobabsyQ_quark_denominator", new TH1D("hprobabsyQ_quark_denominator",";|y_{Q}|;P(|y_{Q}|)",25,0.,+2.5)) );
+	h1Map.insert( make_pair("hprobabsyQ_quark_ratio", new TH1D("hprobabsyQ_quark_ratio","P(|y_{Q}|)=#LT#vec{#beta}_{Q}^{rec}#bullet#vec{p}_{q}<0#GT/All;|y_{Q}|;P",25,0.,+2.5)) );
+	h1Map.insert( make_pair("hprobyQ_quark_denominator", new TH1D("hprobyQ_quark_denominator",";y_{Q};P(y_{Q})",16,-2.5,+2.5)) );
+	h1Map.insert( make_pair("hprobyQ_quark_ratio", new TH1D("hprobyQ_quark_ratio","P(y_{Q})=#LT#vec{#beta}_{Q}^{rec}#bullet#vec{p}_{q}<0#GT/All;y_{Q};P",16,-2.5,+2.5)) );
+	h1Map.insert( make_pair("hprobyQ_trumumu_denominator", new TH1D("hprobyQ_trumumu_denominator",";y_{Q};P(y_{Q})",16,-2.5,+2.5)) );
+	h1Map.insert( make_pair("hprobyQ_trumumu_ratio", new TH1D("hprobyQ_trumumu_ratio","P(y_{Q})=#LT#vec{#beta}_{Q}^{rec}#bullet#vec{#beta}_{Q}^{#mu#mu,tru}<0#GT/All;y_{Q};P",16,-2.5,+2.5)) );
+	h1Map.insert( make_pair("hprobyQ_truqqbar_denominator", new TH1D("hprobyQ_truqqbar_denominator",";y_{Q};P(y_{Q})",16,-2.5,+2.5)) );
+	h1Map.insert( make_pair("hprobyQ_truqqbar_ratio", new TH1D("hprobyQ_truqqbar_ratio","P(y_{Q})=#LT#vec{#beta}_{Q}^{rec}#bullet#vec{#beta}_{Q}^{q#bar{q}}<0#GT/All;y_{Q};P",16,-2.5,+2.5)) );
 	
 	h1Map.insert( make_pair("hprobChargeFlip_p_denominator", new TH1D("hprobChargeFlip_p_denominator",";|p| GeV;P(|p|)",npbins,pbins)) );
 	h1Map.insert( make_pair("hprobChargeFlip_p_ratio", new TH1D("hprobChargeFlip_p_ratio","P(|p|)=Charge Flip/All;|p| GeV;P",npbins,pbins)) );
@@ -402,7 +428,14 @@ void hbook()
 	h1Map.insert( make_pair("hprobChargeFlip_y_denominator", new TH1D("hprobChargeFlip_y_denominator",";y;P(y)",25,-2.5,+2.5)) );
 	h1Map.insert( make_pair("hprobChargeFlip_y_ratio", new TH1D("hprobChargeFlip_y_ratio","P(y)=Charge Flips/All;y;P",25,-2.5,+2.5)) );
 	
+	TString proc = "DYmumu";
+	if(isZprime) proc = "Z' 1 TeV";
+	h1Map.insert( make_pair("hforward_trumu_quark",new TH1D("hforward_trumu_quark",proc+" truth Forward events;m_{#mu#mu} GeV;N_{f}",nlogmassbins,logmassbins)));
+	h1Map.insert( make_pair("hbackward_trumu_quark",new TH1D("hbackward_trumu_quark",proc+" truth Backward events;m_{#mu#mu} GeV;N_{b}",nlogmassbins,logmassbins)));
+	h1Map.insert( make_pair("hAfb_trumu_quark",new TH1D("hAfb_trumu_quark",proc+" truth FB-asymmetry;m_{#mu#mu} GeV;A_{fb}",nlogmassbins,logmassbins)));
+	
 	h1Map.insert( make_pair("hEllipticity", new TH1D("hEllipticity","Uncorrected ellipticity;m_{#mu#mu} GeV;E_{#eta}",nlogmassbins,logmassbins)) );
+	setlogx(h1Map["hEllipticity"]);
 	for(int i=0 ; i<nlogmassbins ; i++)
 	{
 		TString tshName  = "";
@@ -421,12 +454,14 @@ void hbook()
 	}
 	
 	h2Map.insert( make_pair("hMassCosThetaCS", new TH2D("hMassCosThetaCS",";m_{#mu#mu} GeV;cos(#theta*);Events",250,70.,2500., 50,-1.,+1)) );
+	setlogx(h2Map["hMassCosThetaCS"]);
 	linMap.insert( make_pair("hMassCosThetaCS_horline", new TLine(70.,0.,2500.,0.)) );
 	for(int ms=0 ; ms<=nlogmassbins ; ms++)
 	{
 		linMap.insert( make_pair("hMassCosThetaCS_vertline_"+_s(logmassbins[ms]), new TLine(logmassbins[ms],-1.,logmassbins[ms],+1.)) );
 	}
 	h2Map.insert( make_pair("hMassyQ", new TH2D("hMassyQ",";m_{#mu#mu} GeV;y_{Q};Events",250,70.,2500., 50,-2.5,+2.5)) );
+	setlogx(h2Map["hMassyQ"]);
 	linMap.insert( make_pair("hMassyQ_horline", new TLine(70.,0.,2500.,0.)) );
 	for(int ms=0 ; ms<=nlogmassbins ; ms++)
 	{
@@ -455,18 +490,22 @@ void hdraw()
 	draw(h1Map["hyQ"], "hyQ");
 	draw(h1Map["hyQabs"], "hyQabs");
 
+	h1Map["hprobabsyQ_quark_ratio"]->Divide(h1Map["hprobabsyQ_quark_denominator"]);
+	h1Map["hprobabsyQ_quark_ratio"]->SetMinimum(1.e-5);
+	h1Map["hprobabsyQ_quark_ratio"]->SetMaximum(0.5);
+	draw(h1Map["hprobabsyQ_quark_ratio"], "hprobabsyQ_quark_ratio", ""/*, !dolog, dolog*/);
 	h1Map["hprobyQ_quark_ratio"]->Divide(h1Map["hprobyQ_quark_denominator"]);
 	h1Map["hprobyQ_quark_ratio"]->SetMinimum(1.e-5);
 	h1Map["hprobyQ_quark_ratio"]->SetMaximum(1.);
-	draw(h1Map["hprobyQ_quark_ratio"], "hprobyQ_quark_ratio", "", !dolog, dolog);
+	draw(h1Map["hprobyQ_quark_ratio"], "hprobyQ_quark_ratio", ""/*, !dolog, dolog*/);
 	h1Map["hprobyQ_trumumu_ratio"]->Divide(h1Map["hprobyQ_trumumu_denominator"]);
 	h1Map["hprobyQ_trumumu_ratio"]->SetMinimum(1.e-5);
 	h1Map["hprobyQ_trumumu_ratio"]->SetMaximum(1.);
-	draw(h1Map["hprobyQ_trumumu_ratio"], "hprobyQ_trumumu_ratio", "", !dolog, dolog);
+	draw(h1Map["hprobyQ_trumumu_ratio"], "hprobyQ_trumumu_ratio", ""/*, !dolog, dolog*/);
 	h1Map["hprobyQ_truqqbar_ratio"]->Divide(h1Map["hprobyQ_truqqbar_denominator"]);
 	h1Map["hprobyQ_truqqbar_ratio"]->SetMinimum(1.e-5);
 	h1Map["hprobyQ_truqqbar_ratio"]->SetMaximum(1.);
-	draw(h1Map["hprobyQ_truqqbar_ratio"], "hprobyQ_truqqbar_ratio", "", !dolog, dolog);
+	draw(h1Map["hprobyQ_truqqbar_ratio"], "hprobyQ_truqqbar_ratio", ""/*, !dolog, dolog*/);
 	
 	h1Map["hprobChargeFlip_p_ratio"]->Divide(h1Map["hprobChargeFlip_p_denominator"]);
 	h1Map["hprobChargeFlip_p_ratio"]->SetMinimum(1.e-5);
@@ -520,6 +559,26 @@ void hdraw()
 	h1Map["hEllipticity"]->SetMaximum(+1.);
 	h1Map["hEllipticity"]->SetMarkerStyle(24);
 	draw(h1Map["hEllipticity"], "hEllipticity", "e1x1", dolog);
+
+	
+	// Afb truth
+	for(Int_t b=1 ; b<=(Int_t)h1Map["hAfb_trumu_quark"]->GetNbinsX() ; b++)
+	{
+		Double_t Nf = h1Map["hforward_trumu_quark"]->GetBinContent(b);
+		Double_t Nb = h1Map["hbackward_trumu_quark"]->GetBinContent(b);
+		Double_t N = Nf+Nb;
+		if(N<=0.) continue;
+		Double_t afb = (Nf-Nb)/N;
+		h1Map["hAfb_trumu_quark"]->SetBinContent(b,afb);
+		h1Map["hAfb_trumu_quark"]->SetBinError(b,TMath::Sqrt((1.-afb*afb)/N));
+	}
+	h1Map["hAfb_trumu_quark"]->GetXaxis()->SetMoreLogLabels(); 
+	h1Map["hAfb_trumu_quark"]->GetXaxis()->SetNoExponent(); 
+	h1Map["hAfb_trumu_quark"]->SetMinimum(-1.);
+	h1Map["hAfb_trumu_quark"]->SetMaximum(+1.5);
+	h1Map["hAfb_trumu_quark"]->SetMarkerStyle(24);
+	draw(h1Map["hAfb_trumu_quark"], "hAfb_trumu_quark", "e1x1", dolog);
+	//drawon("hAfb_trumu_quark", h1Map["hMass"]);
 }
 
 void hfill(Double_t wgt=1.)
@@ -544,6 +603,7 @@ void hfill(Double_t wgt=1.)
 	float cosalpha_quark    = -999.;
 	float cosalpha_trumumu  = -999.;
 	float cosalpha_truqqbar = -999.;
+	float cosalpha_trumuon_quark = -999.;
 	float betaztru          = -999.;
 	
 	float dr  = 0.;
@@ -594,11 +654,22 @@ void hfill(Double_t wgt=1.)
 			tv3b->SetXYZ(betax_rec, betay_rec, betaz_rec);
 			if(recon_all_isValid)
 			{
+				iamuontru = (imuontru==0) ? 1 : 0;
+				tlva->SetPtEtaPhiM(truth_all_mc_pt->at(imuontru),truth_all_mc_eta->at(imuontru),truth_all_mc_phi->at(imuontru),truth_all_mc_m->at(imuontru));
+				tlvb->SetPtEtaPhiM(truth_all_mc_pt->at(iamuontru),truth_all_mc_eta->at(iamuontru),truth_all_mc_phi->at(iamuontru),truth_all_mc_m->at(iamuontru));
+				yQ = kin.ySystem(tlva,tlvb);
 				tv3a->SetPtEtaPhi(truth_all_partons_mc_pt->at(iquark), truth_all_partons_mc_eta->at(iquark), truth_all_partons_mc_phi->at(iquark));
 				cosalpha_quark = tv3a->Dot(*tv3b)/(tv3a->Mag()*tv3b->Mag());
 				h1Map["hcosalpha_quark"]->Fill(cosalpha_quark,wgt);
-				if(cosalpha_quark<=0.) h1Map["hprobyQ_quark_ratio"]->Fill(truth_all_ySystem,wgt);
+				if(cosalpha_quark<=0.) h1Map["hprobyQ_quark_ratio"]->Fill(yQ/*truth_all_ySystem*/,wgt);
+				if(cosalpha_quark<=0.) h1Map["hprobabsyQ_quark_ratio"]->Fill(fabs(yQ)/*truth_all_ySystem*/,wgt);
 				// _INFO("cosalpha_quark = "+_s(cosalpha_quark));
+				
+				h1Map["hprobabsyQ_quark_denominator"]->Fill(fabs(yQ),wgt);
+				h1Map["hprobyQ_quark_denominator"]->Fill(yQ,wgt);
+				h1Map["hprobyQ_trumumu_denominator"]->Fill(yQ,wgt);
+				h1Map["hprobyQ_truqqbar_denominator"]->Fill(yQ,wgt);
+				
 				
 				tv3a->SetXYZ(betax_trumumu, betay_trumumu, betaz_trumumu);
 				cosalpha_trumumu = tv3a->Dot(*tv3b)/(tv3a->Mag()*tv3b->Mag());
@@ -683,31 +754,24 @@ void hfill(Double_t wgt=1.)
 						string hName = (fabs(eta_rec)<etax) ? "hEllipticity_sides_bin_" : "hEllipticity_central_bin_";
 						hName += _s(bin);
 						if(fabs(eta_rec)<=etamax) h1Map[hName]->Fill(eta_rec,wgt);
-						else _WARNING("Eta exceeds its cut limit  ->  "+_s(eta_rec));
+						//else _WARNING("Eta exceeds its cut limit  ->  "+_s(eta_rec));
 					}
 				}
 			}
 			
+			// For the truth Afb
 			iamuontru = (imuontru==0) ? 1 : 0;
+			tv3a->SetPtEtaPhi(truth_all_mc_pt->at(imuontru),truth_all_mc_eta->at(imuontru),truth_all_mc_phi->at(imuontru));
+			tv3b->SetPtEtaPhi(truth_all_partons_mc_pdgId->at(iquark),truth_all_partons_mc_eta->at(iquark),truth_all_partons_mc_phi->at(iquark));
 			tlva->SetPtEtaPhiM(truth_all_mc_pt->at(imuontru),truth_all_mc_eta->at(imuontru),truth_all_mc_phi->at(imuontru),truth_all_mc_m->at(imuontru));
 			tlvb->SetPtEtaPhiM(truth_all_mc_pt->at(iamuontru),truth_all_mc_eta->at(iamuontru),truth_all_mc_phi->at(iamuontru),truth_all_mc_m->at(iamuontru));
-			ca = truth_all_mc_charge->at(imuontru);
-			cb = truth_all_mc_charge->at(iamuontru);
-			if(ca*cb>=0.) _WARNING("ca*cb>=0., skipping event");
+			//yQ = kin.ySystem(tlva,tlvb);
 			mass = kin.imass(tlva,tlvb);
 			if(mass<=minPossibleImass || mass>maxPossibleImass) _WARNING("mass<=minPossibleImass || mass>maxPossibleImass  ->  mass="+_s(mass));
-			costhetaCS = kin.cosThetaCollinsSoper(tlva,ca,tlvb,cb);
-			if(fabs(costhetaCS)>1.) _WARNING("|cos(theta)|>1.");
-			yQ = kin.ySystem(tlva,tlvb);
-			if(fabs(yQ)>6.) _WARNING("|yQ|>6.");
+			cosalpha_trumuon_quark = tv3a->Dot(*tv3b)/(tv3a->Mag()*tv3b->Mag());
+			if(cosalpha_trumuon_quark>0.) h1Map["hforward_trumu_quark"]->Fill(mass,wgt);
+			else                          h1Map["hbackward_trumu_quark"]->Fill(mass,wgt);
 			
-			h1Map["hprobyQ_quark_denominator"]->Fill(yQ,wgt);
-			h1Map["hprobyQ_trumumu_denominator"]->Fill(yQ,wgt);
-			h1Map["hprobyQ_truqqbar_denominator"]->Fill(yQ,wgt);
-			
-			// h1Map["hprobyQ_quark_denominator"]->Fill(truth_all_ySystem,wgt);
-			// h1Map["hprobyQ_trumumu_denominator"]->Fill(truth_all_ySystem,wgt);
-			// h1Map["hprobyQ_truqqbar_denominator"]->Fill(truth_all_ySystem,wgt);
 			
 			tlva->SetPtEtaPhiM(truth_all_mc_pt->at(imuontru), truth_all_mc_eta->at(imuontru), truth_all_mc_phi->at(imuontru), muonMass);
 			h1Map["hprobChargeFlip_p_denominator"]->Fill(tlva->P(),wgt);
@@ -720,9 +784,6 @@ void hfill(Double_t wgt=1.)
 			betaztru = kin.betaSystem(tlva->Pz(), tlvb->Pz(), tlva->E(), tlvb->E());
 			h2Map["hbetaZyQtru"]->Fill(betaztru,yQ,wgt);
 			h2Map["hyQCosThetaCS_tru"]->Fill(yQ,costhetaCS,wgt);
-			
-			// h2Map["hbetaZyQtru"]->Fill(betaztru,truth_all_ySystem,wgt);
-			// h2Map["hyQCosThetaCS_tru"]->Fill(truth_all_ySystem,truth_all_CosThetaCS,wgt);
 		}
 	}
 	else
@@ -782,7 +843,7 @@ void hfill(Double_t wgt=1.)
 				string hName = (fabs(eta_rec)<etax) ? "hEllipticity_sides_bin_" : "hEllipticity_central_bin_";
 				hName += _s(bin);
 				if(fabs(eta_rec)<=etamax) h1Map[hName]->Fill(eta_rec);
-				else _WARNING("Eta exceeds its cut limit  ->  "+_s(eta_rec));
+				//else _WARNING("Eta exceeds its cut limit  ->  "+_s(eta_rec));
 			}
 		}
 	}
@@ -797,13 +858,12 @@ void init(TTree* t=NULL)
 		if(isMC)
 		{
 			fName = "/data/hod/pythia8_ntuples/ATLASZP/mcLocalControl_Zprime_mumu_SSM1500.root";
-			// fName = "/tmp/hod/mcLocalControl_Zprime_mumu_SSM1500.root";
+			// fName = "/data/hod/pythia8_ntuples/ATLASZP/mcLocalControl_Zprime_mumu_SSM1000.root";
 			tName = "truth/truth_tree";
 		}
 		else
 		{
 			fName = "../data/merged.root";
-			// fName = "/tmp/hod/merged.root";
 			tName = "allCuts/allCuts_tree";
 		}
 		
@@ -835,7 +895,7 @@ void run()
 	style();
 	hbook();
 
-	if(!isMC)
+	if(!isMC || (isMC && isZprime))
 	{
 		init();
 		Int_t N = tree->GetEntriesFast();

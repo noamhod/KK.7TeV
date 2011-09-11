@@ -1,9 +1,9 @@
 #include "basicIncludes.h"
 
 TTree* tree;
-TH1D* hEtaCentral = new TH1D("hEtaCentral", ";#eta;Events", netabins,etamin,etamax);
-TH1D* hEtaSides   = new TH1D("hEtaSides", ";#eta;Events", netabins,etamin,etamax);
-TH1D* hEtaTotal   = new TH1D("hEtaTotal", ";#eta;Events", netabins,etamin,etamax);
+TH1D* hEtaCentral = new TH1D("hEtaCentral", ";#eta;Events", etalogicnbins,etalogicbins);
+TH1D* hEtaSides   = new TH1D("hEtaSides", ";#eta;Events", etalogicnbins,etalogicbins);
+TH1D* hEtaTotal   = new TH1D("hEtaTotal", ";#eta;Events", etalogicnbins,etalogicbins);
 
 TPaveText* pvtxt_lumi;
 TPaveText* pvtxt_atlas;
@@ -38,29 +38,34 @@ float hintegral(TH1* h)
 	return I;
 }
 
-void correct(TH1* hPyhsics, TString sModel, int massbin)
+TH1* correct(TH1* hPyhsics, TString sModel, int massbin)
 {
 	TString hName = "";
 	if(sModel=="Z0" || sModel=="DT") hName = "hEtaZ0d3pd_acceptance_"+(TString)_s(massbin);
 	else                             hName = "hEta"+sModel+"_acceptance_"+(TString)_s(massbin);
 	
-	TH1* hFactor = (TH1D*)file->Get("etamu_histograms/"+hName);
-
-	Int_t bins = hPyhsics->GetNbinsX();
-	if(hFactor->GetNbinsX()!=bins)
+	TH1* hAcceptance = (TH1D*)file->Get("etamu_histograms/"+hName);
+	if(hAcceptance->GetNbinsX()!=hPyhsics->GetNbinsX())
 	{
-		_ERROR("hFactor->GetNbinsX()!=hPyhsics->GetNbinsX()  ->  "+_s(hFactor->GetNbinsX())+":"+_s(bins)+", exitting now");
+		_ERROR("hAcceptance->GetNbinsX()!=hPyhsics->GetNbinsX()  ->  "+_s(hAcceptance->GetNbinsX())+":"+_s(hPyhsics->GetNbinsX())+", exitting now");
 		exit(-1);
 	}
+	
+	TH1* hCorrected = (TH1*)hPyhsics->Clone("");
+	hCorrected->Divide(hAcceptance);
+	
+	return hCorrected;
+	
+	/*
 	for(Int_t bin=1 ; bin<=bins ; bin++)
 	{
-		Double_t factor = hFactor->GetBinContent(bin);
+		Double_t factor = hAcceptance->GetBinContent(bin);
 		Double_t value  = hPyhsics->GetBinContent(bin);
 		Double_t newvalue = (factor!=0.) ? value/factor : 0.;
 		hPyhsics->SetBinContent(bin,newvalue);
 		//hPyhsics->SetBinError(bin,???);
 	}
-	
+	*/
 }
 
 void setTree(TString model, TString massbin)
@@ -245,6 +250,10 @@ void ellipticity()
 				// correct(hEtaSides, sModel, massbin);
 				// correct(hEtaCentral, sModel, massbin);
 				// correct(hEtaTotal, sModel, massbin);
+				
+				TH1D* hEtaSidesCorrected   = (TH1D*)correct(hEtaSides,   sModel, massbin);
+				TH1D* hEtaCentralCorrected = (TH1D*)correct(hEtaCentral, sModel, massbin);
+				TH1D* hEtaTotalCorrected   = (TH1D*)correct(hEtaTotal,   sModel, massbin);
 			
 				TString hname = "";
 				hname = (TString)hEtaSides->GetName()+"_"+sModel+"_massbin_"+(TString)_s(massbin)+".png";
@@ -253,10 +262,22 @@ void ellipticity()
 				show(hEtaCentral, hname);
 				hname = (TString)hEtaTotal->GetName()+"_"+sModel+"_massbin_"+(TString)_s(massbin)+".png";
 				show(hEtaTotal, hname);
+				
+				hname = (TString)hEtaSidesCorrected->GetName()+"_corrected_"+sModel+"_massbin_"+(TString)_s(massbin)+".png";
+				show(hEtaSidesCorrected, hname);
+				hname = (TString)hEtaCentralCorrected->GetName()+"_corrected_"+sModel+"_massbin_"+(TString)_s(massbin)+".png";
+				show(hEtaCentralCorrected, hname);
+				hname = (TString)hEtaTotalCorrected->GetName()+"_corrected_"+sModel+"_massbin_"+(TString)_s(massbin)+".png";
+				show(hEtaTotalCorrected, hname);
+				
+				TString hName = "";
+				if(mod==Z0 || mod==DT) hName = "hEtaZ0d3pd_acceptance_"+(TString)_s(massbin);
+				else                   hName = "hEta"+sModel+"_acceptance_"+(TString)_s(massbin);
+				show((TH1D*)file->Get("etamu_histograms/"+hName), hName+".png");
 			
-				Double_t Nsides   = hintegral(hEtaSides);
-				Double_t Ncentral = hintegral(hEtaCentral);
-				// Double_t Nall     = hintegral(hEtaTotal);
+				Double_t Nsides   = hintegral(hEtaSidesCorrected);
+				Double_t Ncentral = hintegral(hEtaCentralCorrected);
+				// Double_t Nall     = hintegral(hEtaTotalCorrected);
 				Double_t Nall     = Nsides+Ncentral;
 				_INFO("In bin "+_s(massbin)+", model "+(string)sModel+"  ->  Ncentral="+_s(Ncentral)+", Nsides="+_s(Nsides));
 				if(Nall!=Nsides+Ncentral) _WARNING("In bin "+_s(massbin)+", model "+(string)sModel+"  ->  Nall="+_s(Nall)+" != Nsides+Ncentral="+_s(Nsides+Ncentral));

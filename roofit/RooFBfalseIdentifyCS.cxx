@@ -44,7 +44,7 @@
  Double_t RooFBfalseIdentifyCS::evaluate() const 
  { 
    // ENTER EXPRESSION IN TERMS OF VARIABLE ARGUMENTS HERE
-   Double_t dflt = 1.e-30;
+   Double_t dflt = 0.; // 1.e-30;
    Int_t bin = hPyQ->FindBin(yQ);
    if(bin<1 || bin>hPyQ->GetNbinsX()) return dflt;
    Double_t PyQ = hPyQ->GetBinContent(bin);

@@ -134,7 +134,12 @@ insets  = [
 			'user.wanghill.data11_7TeV.00186965.physics_Muons.merge.NTUP_SMDILEP.f395_m939_p605_dimuon_p605/',
 			'user.wanghill.data11_7TeV.00187014.physics_Muons.merge.NTUP_SMDILEP.f395_m939_p605_dimuon_p605/',
 			'user.wanghill.data11_7TeV.00187196.physics_Muons.merge.NTUP_SMDILEP.f395_m939_p605_dimuon_p605_1/',
-			'user.wanghill.data11_7TeV.00187219.physics_Muons.merge.NTUP_SMDILEP.f395_m939_p605_dimuon_p605/'
+			'user.wanghill.data11_7TeV.00187219.physics_Muons.merge.NTUP_SMDILEP.f395_m939_p605_dimuon_p605/',
+			'user.wanghill.data11_7TeV.00187552.physics_Muons.merge.NTUP_SMDILEP.f396_m945_p605_dimuon_p605/',
+			'user.wanghill.data11_7TeV.00187763.physics_Muons.merge.NTUP_SMDILEP.f396_m945_p605_dimuon_p605/',
+			'user.wanghill.data11_7TeV.00187811.physics_Muons.merge.NTUP_SMDILEP.f396_m945_p605_dimuon_p605/',
+			'user.wanghill.data11_7TeV.00187812.physics_Muons.merge.NTUP_SMDILEP.f396_m945_p605_dimuon_p605/',
+			'user.wanghill.data11_7TeV.00187815.physics_Muons.merge.NTUP_SMDILEP.f396_m945_p605_dimuon_p605/'
 		  ]
 outlist=[]
 runnumbers = Array.new

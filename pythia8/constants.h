@@ -7,7 +7,7 @@ static const float  muonMass = 0.105658367; // GeV
 
 static const double nGeneratedEvents = 5e5;
 
-static const double luminosity = 2.28348; //1.60708;//5.; // 1/fb
+static const double luminosity = 2.488457; //2.28348; //1.60708;//5.; // 1/fb
 
 static const double minPossibleImass = 5.; // GeV
 static const double maxPossibleImass = 7000.; // GeV
@@ -28,6 +28,14 @@ static const int    nyQbins = 30;   // for the FB false identify probability bin
 static const double minetamu   = -2.5; // for the etamu binning
 static const double maxetamu   = +2.5; // for the etamu binning
 static const int    nbinsetamu = 30;   // for the etamu binning
+
+const int    etalogicnbins = 22;
+const Double_t      etalogicbins[etalogicnbins+1] =
+											{
+												-2.5,-2.18,-1.95,-1.74,-1.52,-1.37,-1.05,-0.84,-0.63,-0.42,-0.21,
+												0,
+												+0.21,+0.42,+0.63,+0.84,+1.05,+1.37,+1.52,+1.74,+1.95,+2.18,+2.5
+											};
 
 enum models
 {

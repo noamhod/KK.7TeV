@@ -131,6 +131,8 @@ typedef vector<TCanvas*> TVecCanvas;
 
 #include "colors.h"
 
+#include "histos.h"
+
 #define utilities_cxx
 #include "utilities.C"
 

@@ -9,7 +9,7 @@
 	Double_t mean     = 0.;
 	Double_t sigma    = 3.;
 	Double_t maxeta   = 2.5;
-	Double_t norm     = 0.41;
+	Double_t norm     = 0.5;
 	Double_t fraction = 0.95;
 
 	Int_t N=1000000;

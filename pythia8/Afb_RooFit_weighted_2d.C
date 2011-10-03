@@ -50,11 +50,8 @@ TFile* file = new TFile("weights.root", "READ");
 vector<TH1D*> vhMassBins;
 vector<TH1D*> vhAfbBins;
 
-// TFile* fProb = new TFile("/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/run/plots/DY_histograms.root", "READ");
-// TH1D*  hProb = (TH1D*)fProb->Get("hprobyQ_quark_ratio");
-
-TFile* fProb = new TFile("/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/pythia8/hTest.root", "READ");
-TH1D*  hProb = (TH1D*)fProb->Get("hTest");
+TFile* fDYmumuPyQ = new TFile("plots/PyQ_DYmumu_all.root", "READ");
+vector<TH1D*>  vhDYmumuPyQ;
 
 
 vector<TTree*> vtData;
@@ -92,7 +89,6 @@ vector<RooFitResult*> vFitResult;
 
 vector<bool>          vbFitStatus;
 vector<vector<bool> > vvbFitStatus;
-
 
 vector<RooAbsPdf*> vModel;   // the final model pdf
 vector<RooAbsPdf*> vDetAcc;  // will be taken from the acceptance histogram
@@ -219,7 +215,7 @@ fitpars getTheoryAfb(int massBin, int mod)
 	else if(mod==ZP)       fp.A4 = normflat*(1.-TMath::Exp(-expscale*imass/expunits)) - normgausdwn*TMath::Gaus(imass,800,100);
 	// else                   fp.A4 = normflat*(1.-TMath::Exp(-expscale*imass/expunits)) + normgausup*TMath::Gaus(imass,800,100);
 	else                   fp.A4 = normflat*(1.-TMath::Exp(-expscale*imass/expunits));
-	_INFO("A0="+tostring(fp.A0)+", A4="+tostring(fp.A4));
+	_INFO("A0="+_s(fp.A0)+", A4="+_s(fp.A4));
 	return fp;
 }
 
@@ -227,14 +223,14 @@ void generateToy(int massBin, int mod, int N)
 {
 	_DEBUG("generateToy");
 	
-	TString sMassBin = (TString)tostring(massBin);
+	TString sMassBin = (TString)_s(massBin);
 
 	fitpars fp = getTheoryAfb(massBin,mod);
-	A0_gen[mod] = new RooRealVar(("A0_gen"+tostring(massBin)+"_mod"+tostring(mod)).c_str(),"A0_gen",fp.A0);
-	A4_gen[mod] = new RooRealVar(("A4_gen"+tostring(massBin)+"_mod"+tostring(mod)).c_str(),"A4_gen",fp.A4);
+	A0_gen[mod] = new RooRealVar(("A0_gen"+_s(massBin)+"_mod"+_s(mod)).c_str(),"A0_gen",fp.A0);
+	A4_gen[mod] = new RooRealVar(("A4_gen"+_s(massBin)+"_mod"+_s(mod)).c_str(),"A4_gen",fp.A4);
 
-	// sigPdf_gen[mod] = new RooAngular(("SignalPdf_bin"+tostring(massBin)+"_mod"+tostring(mod)).c_str(), "SignalPdf_gen", *cosThe, *A0_gen[mod], *A4_gen[mod]);
-	sigPdf_gen[mod] = new RooCollinsSoper(("SignalPdf_bin"+tostring(massBin)+"_mod"+tostring(mod)).c_str(), "SignalPdf_gen", *cosThe, *A0_gen[mod], *A4_gen[mod]);
+	// sigPdf_gen[mod] = new RooAngular(("SignalPdf_bin"+_s(massBin)+"_mod"+_s(mod)).c_str(), "SignalPdf_gen", *cosThe, *A0_gen[mod], *A4_gen[mod]);
+	sigPdf_gen[mod] = new RooCollinsSoper(("SignalPdf_bin"+_s(massBin)+"_mod"+_s(mod)).c_str(), "SignalPdf_gen", *cosThe, *A0_gen[mod], *A4_gen[mod]);
 	
 	TString sName, sId;
 	
@@ -266,7 +262,7 @@ void generateToy(int massBin, int mod, int N)
 	rhpdfAcc[mod] = new RooHistPdf("rhpdfAcc_gen"+sId,"rhpdfAcc_gen"+sId,RooArgSet(*cosThe),*rdhAcc[mod],4); // last argument is the order of polinomial interpulation
 	model[mod]    = new RooProdPdf("model_"+sId+"_gen","truPdf*accPdf_gen",*sigPdf_gen[mod],*rhpdfAcc[mod]);
 	rad[mod]      = model[mod]->generate(*cosThe,N);
-	_INFO("Data entries = "+tostring(rad[mod]->numEntries()));
+	_INFO("Data entries = "+_s(rad[mod]->numEntries()));
 }
 
 void init(int massBin, int mod)
@@ -277,9 +273,9 @@ void init(int massBin, int mod)
 	Double_t iMassMin = hMassBinsDummy->GetBinLowEdge(massBin);
 	Double_t iMassMax = iMassMin + hMassBinsDummy->GetBinWidth(massBin);
 	
-	TString sMassBin = (TString)tostring(massBin);
-	string sMassMin = tostring((double)iMassMin);
-	string sMassMax = tostring((double)iMassMax);
+	TString sMassBin = (TString)_s(massBin);
+	string sMassMin = _s((double)iMassMin);
+	string sMassMax = _s((double)iMassMax);
 	TString sTitle = "Mass-bin[" + sMassBin + "] " + sMassMin + "#rightarrow" + sMassMax + " GeV";
 	
 	setLogMassBins(iMassMin, iMassMax);
@@ -304,14 +300,17 @@ void init(int massBin, int mod)
 	vvInitialGuess[massBin-1].push_back(fp);
 	A0 = new RooRealVar("A0","A0",_A0,minA0,maxA0);
 	A4 = new RooRealVar("A4","A4",_A4,minA4,maxA4);
-	// A0->setError(0.001);
-	// A4->setError(0.001);
 	A0->setError(0.00001);
 	A4->setError(0.00001);
 	
-	// sigPdf = new RooAngular("SignalPdf", "SignalPdf", *cosThe, *A0, *A4);
-	// sigPdf = new RooCollinsSoper("SignalPdf", "SignalPdf", *cosThe, *A0, *A4);
-	sigPdf = new RooFBfalseIdentifyCS("SignalPdf", "SignalPdf", *cosThe,*yQ,*A0,*A4,*hProb);
+	// A0 = new RooRealVar("A0","A0",0.);
+	// A0->setConstant(kTRUE);
+	// A4 = new RooRealVar("A4","A4",_A4,minA4,maxA4);
+	// A4->setError(0.00001);
+	
+	
+	vhDYmumuPyQ.push_back( (TH1D*)((TH1D*)fDYmumuPyQ->Get("massbin_"+sMassBin))->Clone("") );
+	sigPdf = new RooFBfalseIdentifyCS("SignalPdf", "SignalPdf", *cosThe,*yQ,*A0,*A4,*vhDYmumuPyQ[massBin-1]);
 	
 	TString sName, sId, sIdShort, sChannelFit, sChannelMass;
 	Int_t fillStyle = 0;
@@ -427,7 +426,7 @@ void init(int massBin, int mod)
 		RooAbsData* r = (RooAbsData*)rad[mod]->Clone("");
 		Int_t N = r->numEntries();
 		vUnbinnedDataSet.push_back( r );
-		_INFO("Data entries = "+tostring(N));
+		_INFO("Data entries = "+_s(N));
 	}
 	else
 	{
@@ -520,11 +519,13 @@ Int_t loop(int mod)
 			//////////////////////////////////////////////////
 			//////////////////////////////////////////////////
 			//////////////////////////////////////////////////
-			if(fabs(yQ_rec)<0.35) continue; /////////////////// ????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
+			//if(fabs(yQ_rec)<0.35) continue; ////////////////
+			if(yQ_rec>yqmax  || yQ_rec<yqmin) continue; //////
 			//////////////////////////////////////////////////
 			//////////////////////////////////////////////////
 			//////////////////////////////////////////////////
 			//////////////////////////////////////////////////
+			
 			N++;
 			*cosThe = cost_rec;
 			*yQ     = yQ_rec;
@@ -553,7 +554,7 @@ Int_t loop(int mod)
 			if(mod==DT) vUnbinnedDataSet[mod]->add(RooArgSet(*cosThe,*yQ));   // UNWEIGHTED
 			else        vUnbinnedDataSet[mod]->add(RooArgSet(*cosThe,*yQ),w); // WEIGHTED   
 		}
-		_DEBUG("N = "+tostring(N));
+		_DEBUG("N = "+_s(N));
 	}
 	
 	if(doBinned)
@@ -891,7 +892,7 @@ void Afb_RooFit_weighted_2d()
 	
 	pvtxt_lumi = new TPaveText(0.1620603,0.458042,0.3140704,0.5716783,"brNDC");
 	pvtxt_lumi->SetFillColor(kWhite);
-	TString sLumi = (TString)tostring(luminosity,2);
+	TString sLumi = (TString)_s(luminosity,2);
 	txt = pvtxt_lumi->AddText( "#intLdt~"+ sLumi +" fb^{-1}" );
 	
 	pvtxt_atlas = new TPaveText(0.3277592,0.8056995,0.4916388,0.9002591,"brNDC");
@@ -919,7 +920,7 @@ void Afb_RooFit_weighted_2d()
 	
 	for(int massBin=1 ; massBin<=nMassBins ; massBin++)
 	{
-		TString sMassBin = (TString)tostring(massBin);
+		TString sMassBin = (TString)_s(massBin);
 	
 		vPadTmp.clear();
 		vAfbResultTmp.clear();
@@ -959,7 +960,7 @@ void Afb_RooFit_weighted_2d()
 		
 		for(int mod=Z0 ; mod<=DT ; mod++)
 		{
-			_INFO("\n\n\n~~~~~~~~~~~~~~~~~~~~~~~~START: mass bin "+tostring(massBin)+", model "+tostring(mod)+"~~~~~~~~~~~~~~~~~~~~~~~~");
+			_INFO("\n\n\n~~~~~~~~~~~~~~~~~~~~~~~~START: mass bin "+_s(massBin)+", model "+_s(mod)+"~~~~~~~~~~~~~~~~~~~~~~~~");
 			bool skip = false;
 			/////////////////////////////////////////
 			init(massBin, mod); /////////////////////
@@ -967,7 +968,7 @@ void Afb_RooFit_weighted_2d()
 			if(N<=minEntries2Fit) skip=true; ////////
 			if(!skip) getFit(mod); //////////////////
 			/////////////////////////////////////////
-			_INFO("~~~~~~~~~~~~~~~~~~~~~~~~END:   mass bin "+tostring(massBin)+", model "+tostring(mod)+"~~~~~~~~~~~~~~~~~~~~~~~~");
+			_INFO("~~~~~~~~~~~~~~~~~~~~~~~~END:   mass bin "+_s(massBin)+", model "+_s(mod)+"~~~~~~~~~~~~~~~~~~~~~~~~");
 			
 			vPad[massBin-1].push_back( cnv->cd( padCounter ) );
 			padCounter++;
@@ -992,7 +993,7 @@ void Afb_RooFit_weighted_2d()
 				vvAfbError[massBin-1].push_back( dAfb );
 				plot(mod,vPad[massBin-1][mod]);
 				plot(mod,vPadBin[massBin-1][mod]);
-				_INFO((string)vModelName[mod]+"(N="+tostring(N)+") --> Afb = "+tostring(vvAfbResult[massBin-1][mod])+" +- "+tostring(vvAfbError[massBin-1][mod]));
+				_INFO((string)vModelName[mod]+"(N="+_s(N)+") --> Afb = "+_s(vvAfbResult[massBin-1][mod])+" +- "+_s(vvAfbError[massBin-1][mod]));
 			}
 			else
 			{
@@ -1090,11 +1091,11 @@ void Afb_RooFit_weighted_2d()
 		
 		
 		
-		_INFO("completted massBin="+tostring(massBin));
+		_INFO("completted massBin="+_s(massBin));
 		/////////////
 		reset(); ////
 		/////////////
-		_INFO("reset massBin="+tostring(massBin));
+		_INFO("reset massBin="+_s(massBin));
 	}
 	
 	cnv->Update();

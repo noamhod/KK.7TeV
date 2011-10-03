@@ -1,6 +1,31 @@
 #include "pythiaROOT.h"
 #include "all.h"
 
+void findpair(vector<int>* index, Event& evt, int& ia, int& ib)
+{
+	if(index->size()==2)
+	{
+		ia = index->at(0);
+		ib = index->at(1);
+		return;
+	}
+
+	for(int i=0 ; i<(int)index->size() ; ++i)
+	{
+		for(int j=0 ; (j<(int)index->size()  &&  j>i) ; ++j)
+		{
+			if(evt[index->at(i)].charge()*evt[index->at(j)].charge()<0.)
+			{
+				ia = index->at(i);
+				ib = index->at(j);
+			}
+		}
+	}
+
+	ia = -1;
+	ib = -1;
+}
+
 int main() {
 
 	// Generator.
@@ -12,7 +37,7 @@ int main() {
 	pythia.readString("Random:seed = 0");
 
 	// Process selection.
-	 pythia.readString("NewGaugeBoson:ffbar2gmZZprime = on");
+	pythia.readString("NewGaugeBoson:ffbar2gmZZprime = on");
 	pythia.readString("Zprime:gmZmode = 0"); // full gamma/Z0/Z' interference
 	//Zprime:gmZmode = 0 ---> 6
 	//0 = full gamma/Z0/Z' interference
@@ -44,8 +69,8 @@ int main() {
 	strm >> sNewHighBound;
 
 	strm.clear();
-        strm << prm.idF;
-        strm >> sId;
+	strm << prm.idF;
+	strm >> sId;
 
 	// Feed in KK state information and other generation specifics.
 	pythia.readString("32:m0 = " + sNewMass);
@@ -57,9 +82,9 @@ int main() {
 
 
 	pythia.readString("32:onMode = off");
-        pythia.readString("32:onIfAny = " + sId);
-        pythia.readString("23:onMode = off"); // switch off all of the Z0 decay modes
-        pythia.readString("23:onIfAny = " + sId); // switch on the Z0->mu-mu+ decay mode only
+	pythia.readString("32:onIfAny = " + sId);
+	pythia.readString("23:onMode = off"); // switch off all of the Z0 decay modes
+	pythia.readString("23:onIfAny = " + sId); // switch on the Z0->mu-mu+ decay mode only
 
 
 	// Initialize.
@@ -74,44 +99,53 @@ int main() {
 	string sTitle = prm.sName + sNewMass + prm.sFFbar + "_" + sNewLowBound + "M" + sNewHighBound;
 	string sFileName = sDir + sTitle + ".root";
 	TFile *file = TFile::Open(sFileName.c_str(),"recreate");
-	TTree *tree = new TTree("tree","tree");
-	float mHat;
-	float qT;
-	float ysystem;
-	float cosThetaHE;
-	float cosThetaCS;
-	vector<int>*    index  = new vector<int>;
-	vector<int>*    id     = new vector<int>;
-	vector<double>* charge = new vector<double>;
-	vector<double>* px     = new vector<double>;
-	vector<double>* py     = new vector<double>;
-	vector<double>* pz     = new vector<double>;
-	vector<double>* E      = new vector<double>;
-	vector<double>* m      = new vector<double>;
-	vector<double>* y      = new vector<double>;
-	vector<double>* pT     = new vector<double>;
-	vector<double>* eta    = new vector<double>;
-	vector<double>* phi    = new vector<double>;
-	vector<double>* theta  = new vector<double>;
-	tree->Branch("mHat",&mHat);
-	tree->Branch("QT",&qT);
-	tree->Branch("ySystem",&ysystem);
-	tree->Branch("cosThetaHE",&cosThetaHE);
-	tree->Branch("cosThetaCS",&cosThetaCS);
-	tree->Branch("id",&id);
-	tree->Branch("charge",&charge);
-	tree->Branch("px",&px);
-	tree->Branch("py",&py);
-	tree->Branch("pz",&pz);
-	tree->Branch("E",&E);
-	tree->Branch("m",&m);
-	tree->Branch("y",&y);
-	tree->Branch("pT",&pT);
-	tree->Branch("eta",&eta);
-	tree->Branch("phi",&phi);
-	tree->Branch("theta",&theta);
-
-	vector<int> moms;
+	TDirectory* tDir = file->mkdir("truth");
+	tDir->cd();
+	TTree *tree = new TTree("truth_tree","truth_tree");
+	
+	
+	bool truth_all_isValid;
+	
+	vector<double>* truth_all_mc_pt = new vector<double>;
+	vector<double>* truth_all_mc_m = new vector<double>;
+	vector<double>* truth_all_mc_eta = new vector<double>;
+	vector<double>* truth_all_mc_phi = new vector<double>;
+	vector<int>*   truth_all_mc_status = new vector<int>;
+	vector<int>*   truth_all_mc_barcode = new vector<int>;
+	vector<int>*   truth_all_mc_pdgId = new vector<int>;
+	vector<double>* truth_all_mc_charge = new vector<double>;
+	
+	vector<double>* truth_all_partons_mc_pt = new vector<double>;
+	vector<double>* truth_all_partons_mc_m = new vector<double>;
+	vector<double>* truth_all_partons_mc_eta = new vector<double>;
+	vector<double>* truth_all_partons_mc_phi = new vector<double>;
+	vector<int>*   truth_all_partons_mc_status = new vector<int>;
+	vector<int>*   truth_all_partons_mc_barcode = new vector<int>;
+	vector<int>*   truth_all_partons_mc_pdgId = new vector<int>;
+	vector<double>* truth_all_partons_mc_charge = new vector<double>;
+	
+	tree->Branch( "truth_all_isValid", &truth_all_isValid );
+	
+	tree->Branch( "truth_all_mc_pt", &truth_all_mc_pt );
+	tree->Branch( "truth_all_mc_m", &truth_all_mc_m );
+	tree->Branch( "truth_all_mc_eta", &truth_all_mc_eta );
+	tree->Branch( "truth_all_mc_phi", &truth_all_mc_phi );
+	tree->Branch( "truth_all_mc_status", &truth_all_mc_status );
+	tree->Branch( "truth_all_mc_barcode", &truth_all_mc_barcode );
+	tree->Branch( "truth_all_mc_pdgId", &truth_all_mc_pdgId );
+	tree->Branch( "truth_all_mc_charge", &truth_all_mc_charge );
+	
+	tree->Branch( "truth_all_partons_mc_pt", &truth_all_partons_mc_pt);
+	tree->Branch( "truth_all_partons_mc_m", &truth_all_partons_mc_m);
+	tree->Branch( "truth_all_partons_mc_eta", &truth_all_partons_mc_eta);
+	tree->Branch( "truth_all_partons_mc_phi", &truth_all_partons_mc_phi);
+	tree->Branch( "truth_all_partons_mc_status", &truth_all_partons_mc_status);
+	tree->Branch( "truth_all_partons_mc_barcode", &truth_all_partons_mc_barcode);
+	tree->Branch( "truth_all_partons_mc_pdgId", &truth_all_partons_mc_pdgId);
+	tree->Branch( "truth_all_partons_mc_charge", &truth_all_partons_mc_charge);
+	
+	
+	vector<int>* index  = new vector<int>;
 
 	// Measure the cpu runtime,
 	clock_t start, stop;
@@ -134,26 +168,51 @@ int main() {
 		
 		// Begin event analysis.
 		index->clear();
-			
-		id->clear();
-		charge->clear();
-		px->clear();
-		py->clear();
-		pz->clear();
-		E->clear();
-		m->clear();
-		y->clear();
-		pT->clear();
-		eta->clear();
-		phi->clear();
-		theta->clear();
+		
+		truth_all_mc_pt->clear();
+		truth_all_mc_m->clear();
+		truth_all_mc_eta->clear();
+		truth_all_mc_phi->clear();
+		truth_all_mc_status->clear();
+		truth_all_mc_barcode->clear();
+		truth_all_mc_pdgId->clear();
+		truth_all_mc_charge->clear();
+		
+		truth_all_partons_mc_pt->clear();
+		truth_all_partons_mc_m->clear();
+		truth_all_partons_mc_eta->clear();
+		truth_all_partons_mc_phi->clear();
+		truth_all_partons_mc_status->clear();
+		truth_all_partons_mc_barcode->clear();
+		truth_all_partons_mc_pdgId->clear();
+		truth_all_partons_mc_charge->clear();
 		
 		int iZ = 0;
-		for (int i=0 ; i<10 ; ++i)
+		for (int i=20 ; i>=0 ; --i)
 		{
 			if(pythia.event[i].id()==32)
 			{
 				iZ = i;
+				
+				int momA = pythia.event[i].mother1();
+				int momB = pythia.event[i].mother2();
+				
+				if(momA==momB) continue;
+				
+				truth_all_partons_mc_pdgId->push_back(pythia.event[momA].id());
+				truth_all_partons_mc_charge->push_back(pythia.event[momA].charge());
+				truth_all_partons_mc_m->push_back(pythia.event[momA].m());
+				truth_all_partons_mc_pt->push_back(pythia.event[momA].pT());
+				truth_all_partons_mc_eta->push_back(pythia.event[momA].eta());
+				truth_all_partons_mc_phi->push_back(pythia.event[momA].phi());
+				
+				truth_all_partons_mc_pdgId->push_back(pythia.event[momB].id());
+				truth_all_partons_mc_charge->push_back(pythia.event[momB].charge());
+				truth_all_partons_mc_m->push_back(pythia.event[momB].m());
+				truth_all_partons_mc_pt->push_back(pythia.event[momB].pT());
+				truth_all_partons_mc_eta->push_back(pythia.event[momB].eta());
+				truth_all_partons_mc_phi->push_back(pythia.event[momB].phi());
+				
 				break;
 			}
 		}
@@ -172,49 +231,48 @@ int main() {
 			// Particle::status() = 41 - 49 : particles produced by initial-state-showers
 			// Particle::status() = 51 - 59 : particles produced by final-state-showers
 			bool isHardProcsess = (
-									(status>=21 && status<=29)  ||
-									(status>=31 && status<=39)  ||
-									(status>=41 && status<=49)  ||
-									(status>=51 && status<=59)
-								   );
+			(status>=21 && status<=29)  ||
+			(status>=31 && status<=39)  ||
+			(status>=41 && status<=49)  ||
+			(status>=51 && status<=59)
+			);
 			
 			bool isZ = pythia.event.isAncestor(i,iZ);
 			
 			if(isfinal  &&  isHardProcsess  &&  idf*idf==prm.idF*prm.idF  &&  isZ)
 			{
 				index->push_back(i);
-			
-				id->push_back(pythia.event[i].id());
-				charge->push_back(pythia.event[i].charge());
-				px->push_back(pythia.event[i].px());
-				py->push_back(pythia.event[i].py());
-				pz->push_back(pythia.event[i].pz());
-				E->push_back(pythia.event[i].e());
-				m->push_back(pythia.event[i].m());
-				y->push_back(pythia.event[i].y());
-				pT->push_back(pythia.event[i].pT());
-				eta->push_back(pythia.event[i].eta());
-				phi->push_back(pythia.event[i].phi());
-				theta->push_back(pythia.event[i].theta());
-			} // end if final fermion
-		} // end for event.size()
+			}
+		}
 		
 		if(index->size()>1)
 		{
-			pa->SetPtEtaPhiM( pT->at(0), eta->at(0), phi->at(0), m->at(0));
-			pb->SetPtEtaPhiM( pT->at(1), eta->at(1), phi->at(1), m->at(1));
-			float ca = charge->at(0);
-			float cb = charge->at(1);
+			int ia = -1;
+			int ib = -1;
+			findpair(index,pythia.event,ia,ib);
 			
-			mHat       = imass(pa,pb);
-			qT         = QT(pa,pb);
-			ysystem    = ySystem(pa,pb);
-			cosThetaHE = cosThetaBoost(pa,ca,pb,cb);
-			cosThetaCS = cosThetaCollinsSoper(pa,ca,pb,cb);
+			if(ia>=0  &&  ib>=0  &&  ia!=ib)
+			{
+				truth_all_mc_pdgId->push_back(pythia.event[ia].id());
+				truth_all_mc_charge->push_back(pythia.event[ia].charge());
+				truth_all_mc_m->push_back(pythia.event[ia].m());
+				truth_all_mc_pt->push_back(pythia.event[ia].pT());
+				truth_all_mc_eta->push_back(pythia.event[ia].eta());
+				truth_all_mc_phi->push_back(pythia.event[ia].phi());
 				
-			///////////////////
-			tree->Fill(); /////
-			///////////////////
+				truth_all_mc_pdgId->push_back(pythia.event[ib].id());
+				truth_all_mc_charge->push_back(pythia.event[ib].charge());
+				truth_all_mc_m->push_back(pythia.event[ib].m());
+				truth_all_mc_pt->push_back(pythia.event[ib].pT());
+				truth_all_mc_eta->push_back(pythia.event[ib].eta());
+				truth_all_mc_phi->push_back(pythia.event[ib].phi());
+				
+				truth_all_isValid = true;
+				
+				///////////////////
+				tree->Fill(); /////
+				///////////////////
+			}
 		}
 		if(iEvent%1000==0) cout << "Event: " << iEvent << endl;
 	} // end for iEvent<prm.nEvents
@@ -240,11 +298,11 @@ int main() {
 	
 	ofstream* f = new ofstream("XSs_ZP_current.dat", ios_base::app);
 	(*f) << sTitle << "\t\t"
-		 << pythia.info.nTried() << "\t\t"
-		 << pythia.info.nSelected() << "\t\t"
-		 << pythia.info.nAccepted() << "\t\t"
-		 << pythia.info.sigmaGen() << "\t\t"
-		 << pythia.info.sigmaErr() << endl;
+	<< pythia.info.nTried() << "\t\t"
+	<< pythia.info.nSelected() << "\t\t"
+	<< pythia.info.nAccepted() << "\t\t"
+	<< pythia.info.sigmaGen() << "\t\t"
+	<< pythia.info.sigmaErr() << endl;
 	f->close();
 	delete f;
 

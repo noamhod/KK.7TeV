@@ -17,17 +17,25 @@ static const double maxMassBin = 1500; // for the asymmetry fit
 static const int    nMassBins  = 6;   // for the asymmetry fit
 static const int    niMassBins = 40;  // for the imass histos
 
-static const double minCosTheta = -1.;  // for the acceptance binning
-static const double maxCosTheta = +1.;  // for the acceptance binning
+static const double minCosTheta   = -1.;  // for the acceptance binning
+static const double maxCosTheta   = +1.;  // for the acceptance binning
 static const int    nCosThetaBins = 10; // for the acceptance binning
+
+static const double minAbsCosTheta   = 0.;  // for the acceptance binning
+static const double maxAbsCosTheta   = +1.;  // for the acceptance binning
+static const int    nAbsCosThetaBins = 20; // for the acceptance binning
 
 static const double minyQ   = -2.5; // for the FB false identify probability binning
 static const double maxyQ   = +2.5; // for the FB false identify probability binning
-static const int    nyQbins = 30;   // for the FB false identify probability binning
+static const int    nyQbins = 16;   // for the FB false identify probability binning
 
 static const double minetamu   = -2.5; // for the etamu binning
 static const double maxetamu   = +2.5; // for the etamu binning
-static const int    nbinsetamu = 30;   // for the etamu binning
+static const int    nbinsetamu = 20;   // for the etamu binning
+
+static const double minystar   = -3.; // for the chi binning
+static const double maxystar   = +3.; // for the chi binning
+static const int    nystarbins = 20;   // for the chi binning
 
 const int    etalogicnbins = 22;
 const Double_t      etalogicbins[etalogicnbins+1] =
@@ -54,6 +62,7 @@ static const float TeV2GeV = 1.e+3;
 
 static const double mb2fb = 1.e12;
 static const double nb2mb = 1.e-6;
+static const double nb2fb = 1.e+6;
 
 static const Color_t cData    = kBlack;
 static const Color_t cGammaZ  = kAzure-9;

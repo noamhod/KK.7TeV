@@ -12,16 +12,47 @@ TMapSP2TGraph grMap;
 TMapTSP2TLINE linMap;
 TMapTSP2TTREE treMap;
 TMapTSd       wgtMap;
+int truth_entries = 0;
 
 Bool_t isMC=true;
 Bool_t isZprime=false;
 Bool_t dolog=true;
-kinematics kin;
+
+kinematics* K;
+
 TLorentzVector* tlva   = new TLorentzVector;
 TLorentzVector* tlvb   = new TLorentzVector;
 TLorentzVector* tlvtmp = new TLorentzVector;
-TVector3*       tv3a = new TVector3;
-TVector3*       tv3b = new TVector3;
+TVector3*       tv3a   = new TVector3;
+TVector3*       tv3b   = new TVector3;
+
+TLorentzVector* tlvmutrua = new TLorentzVector;
+TLorentzVector* tlvmutrub = new TLorentzVector;
+TLorentzVector* tlvmureca = new TLorentzVector;
+TLorentzVector* tlvmurecb = new TLorentzVector;
+TLorentzVector* tlvqa  = new TLorentzVector;
+TLorentzVector* tlvqb  = new TLorentzVector;
+
+TLorentzVector* tlvmutruaBoosted = new TLorentzVector;
+TLorentzVector* tlvmutrubBoosted = new TLorentzVector;
+TLorentzVector* tlvmurecaBoosted = new TLorentzVector;
+TLorentzVector* tlvmurecbBoosted = new TLorentzVector;
+TLorentzVector* tlvqaBoosted  = new TLorentzVector;
+TLorentzVector* tlvqbBoosted  = new TLorentzVector;
+
+TVector3*       tv3mutrua = new TVector3;
+TVector3*       tv3mutrub = new TVector3;
+TVector3*       tv3mureca = new TVector3;
+TVector3*       tv3murecb = new TVector3;
+TVector3*       tv3qa  = new TVector3;
+TVector3*       tv3qb  = new TVector3;
+
+TVector3*       tv3mutruaBoosted = new TVector3;
+TVector3*       tv3mutrubBoosted = new TVector3;
+TVector3*       tv3murecaBoosted = new TVector3;
+TVector3*       tv3murecbBoosted = new TVector3;
+TVector3*       tv3qaBoosted  = new TVector3;
+TVector3*       tv3qbBoosted  = new TVector3;
 
 
 /////////////  MC  /////////////
@@ -151,7 +182,9 @@ void save(TString oDir)
 	_INFO("save all canvases");
 	for(TMapTSP2TCNV::iterator it=cnvMap.begin() ; it!=cnvMap.end() ; ++it)
 	{
-		TString pName = oDir+"/"+it->first;
+		TString dataOrMC = (isMC) ? "DYmumu_" : "data_";
+		if(isMC && isZprime) dataOrMC = "Zprime_";
+		TString pName = oDir+"/"+dataOrMC+it->first;
 		it->second->SaveAs(pName+".png");
 		it->second->SaveAs(pName+".eps");
 		it->second->SaveAs(pName+".pdf");
@@ -194,6 +227,7 @@ void settrees()
 {
 	_DEBUG("settrees");
 
+	settree("../data/mcLocalControl_DYmumu_75M120.root", "mcLocalControl_DYmumu_75M120", 19996, 0.81705*nb2fb);
 	settree("../data/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 19999, 0.0086861*nb2fb);
 	settree("../data/mcLocalControl_DYmumu_250M400.root", "mcLocalControl_DYmumu_250M400", 19996, 0.00041431*nb2fb);
 	settree("../data/mcLocalControl_DYmumu_400M600.root", "mcLocalControl_DYmumu_400M600", 19993, 0.000067464*nb2fb);
@@ -205,6 +239,7 @@ void settrees()
 	settree("../data/mcLocalControl_DYmumu_1750M2000.root", "mcLocalControl_DYmumu_1750M2000", 19993, 0.000000026003*nb2fb);
 	settree("../data/mcLocalControl_DYmumu_M2000.root", "mcLocalControl_DYmumu_M2000", 19996, 0.000000015327*nb2fb);
 
+	// settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_75M120.root", "mcLocalControl_DYmumu_75M120", 19996, 0.81705*nb2fb);
 	// settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 19999, 0.0086861*nb2fb);
 	// settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_250M400.root", "mcLocalControl_DYmumu_250M400", 19996, 0.00041431*nb2fb);
 	// settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_400M600.root", "mcLocalControl_DYmumu_400M600", 19993, 0.000067464*nb2fb);
@@ -216,6 +251,7 @@ void settrees()
 	// settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_1750M2000.root", "mcLocalControl_DYmumu_1750M2000", 19993, 0.000000026003*nb2fb);
 	// settree("/data/hod/pythia8_ntuples/ATLASZ0/mcLocalControl_DYmumu_M2000.root", "mcLocalControl_DYmumu_M2000", 19996, 0.000000015327*nb2fb);
 	
+	// settree("/tmp/hod/mcLocalControl_DYmumu_75M120.root", "mcLocalControl_DYmumu_75M120", 19996, 0.81705*nb2fb);
 	// settree("/tmp/hod/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 19999, 0.0086861*nb2fb);
 	// settree("/tmp/hod/mcLocalControl_DYmumu_250M400.root", "mcLocalControl_DYmumu_250M400", 19996, 0.00041431*nb2fb);
 	// settree("/tmp/hod/mcLocalControl_DYmumu_400M600.root", "mcLocalControl_DYmumu_400M600", 19993, 0.000067464*nb2fb);
@@ -412,14 +448,16 @@ void hbook()
 	h1Map.insert( make_pair("hyQ", new TH1D("hyQ",";y_{Q};Events",100,-2.5,+2.5)) );
 	h1Map.insert( make_pair("hyQabs", new TH1D("hyQabs",";|y_{Q}|;Events",50,0.,+2.5)) );
 	
+	h1Map.insert( make_pair("hprobyQtru_quark_denominator", new TH1D("hprobyQtru_quark_denominator",";y_{Q};P(y_{Q})",25,-2.5,+2.5)) );
+	h1Map.insert( make_pair("hprobyQtru_quark_ratio", new TH1D("hprobyQtru_quark_ratio","P(y_{Q}^{tru})=#LT#vec{#beta}_{Q}^{tru}#bullet#vec{p}_{q}<0#GT/All;y_{Q}^{tru};P",25,-2.5,+2.5)) );
 	h1Map.insert( make_pair("hprobabsyQ_quark_denominator", new TH1D("hprobabsyQ_quark_denominator",";|y_{Q}|;P(|y_{Q}|)",25,0.,+2.5)) );
 	h1Map.insert( make_pair("hprobabsyQ_quark_ratio", new TH1D("hprobabsyQ_quark_ratio","P(|y_{Q}|)=#LT#vec{#beta}_{Q}^{rec}#bullet#vec{p}_{q}<0#GT/All;|y_{Q}|;P",25,0.,+2.5)) );
-	h1Map.insert( make_pair("hprobyQ_quark_denominator", new TH1D("hprobyQ_quark_denominator",";y_{Q};P(y_{Q})",16,-2.5,+2.5)) );
-	h1Map.insert( make_pair("hprobyQ_quark_ratio", new TH1D("hprobyQ_quark_ratio","P(y_{Q})=#LT#vec{#beta}_{Q}^{rec}#bullet#vec{p}_{q}<0#GT/All;y_{Q};P",16,-2.5,+2.5)) );
-	h1Map.insert( make_pair("hprobyQ_trumumu_denominator", new TH1D("hprobyQ_trumumu_denominator",";y_{Q};P(y_{Q})",16,-2.5,+2.5)) );
-	h1Map.insert( make_pair("hprobyQ_trumumu_ratio", new TH1D("hprobyQ_trumumu_ratio","P(y_{Q})=#LT#vec{#beta}_{Q}^{rec}#bullet#vec{#beta}_{Q}^{#mu#mu,tru}<0#GT/All;y_{Q};P",16,-2.5,+2.5)) );
-	h1Map.insert( make_pair("hprobyQ_truqqbar_denominator", new TH1D("hprobyQ_truqqbar_denominator",";y_{Q};P(y_{Q})",16,-2.5,+2.5)) );
-	h1Map.insert( make_pair("hprobyQ_truqqbar_ratio", new TH1D("hprobyQ_truqqbar_ratio","P(y_{Q})=#LT#vec{#beta}_{Q}^{rec}#bullet#vec{#beta}_{Q}^{q#bar{q}}<0#GT/All;y_{Q};P",16,-2.5,+2.5)) );
+	h1Map.insert( make_pair("hprobyQ_quark_denominator", new TH1D("hprobyQ_quark_denominator",";y_{Q};P(y_{Q})",nPyQbins,minPyQ,maxPyQ)) );
+	h1Map.insert( make_pair("hprobyQ_quark_ratio", new TH1D("hprobyQ_quark_ratio","P(y_{Q})=#LT#vec{#beta}_{Q}^{rec}#bullet#vec{p}_{q}<0#GT/All;y_{Q};P",nPyQbins,minPyQ,maxPyQ)) );
+	h1Map.insert( make_pair("hprobyQ_trumumu_denominator", new TH1D("hprobyQ_trumumu_denominator",";y_{Q};P(y_{Q})",nPyQbins,minPyQ,maxPyQ)) );
+	h1Map.insert( make_pair("hprobyQ_trumumu_ratio", new TH1D("hprobyQ_trumumu_ratio","P(y_{Q})=#LT#vec{#beta}_{Q}^{rec}#bullet#vec{#beta}_{Q}^{#mu#mu,tru}<0#GT/All;y_{Q};P",nPyQbins,minPyQ,maxPyQ)) );
+	h1Map.insert( make_pair("hprobyQ_truqqbar_denominator", new TH1D("hprobyQ_truqqbar_denominator",";y_{Q};P(y_{Q})",nPyQbins,minPyQ,maxPyQ)) );
+	h1Map.insert( make_pair("hprobyQ_truqqbar_ratio", new TH1D("hprobyQ_truqqbar_ratio","P(y_{Q})=#LT#vec{#beta}_{Q}^{rec}#bullet#vec{#beta}_{Q}^{q#bar{q}}<0#GT/All;y_{Q};P",nPyQbins,minPyQ,maxPyQ)) );
 	
 	h1Map.insert( make_pair("hprobChargeFlip_p_denominator", new TH1D("hprobChargeFlip_p_denominator",";|p| GeV;P(|p|)",npbins,pbins)) );
 	h1Map.insert( make_pair("hprobChargeFlip_p_ratio", new TH1D("hprobChargeFlip_p_ratio","P(|p|)=Charge Flip/All;|p| GeV;P",npbins,pbins)) );
@@ -428,12 +466,16 @@ void hbook()
 	h1Map.insert( make_pair("hprobChargeFlip_y_denominator", new TH1D("hprobChargeFlip_y_denominator",";y;P(y)",25,-2.5,+2.5)) );
 	h1Map.insert( make_pair("hprobChargeFlip_y_ratio", new TH1D("hprobChargeFlip_y_ratio","P(y)=Charge Flips/All;y;P",25,-2.5,+2.5)) );
 	
+	h1Map.insert( make_pair("hRes_yQ_ratio", new TH1D("hRes_yQ_ratio","y_{Q} resolution;y_{Q}^{rec}/y_{Q}^{tru}-1;Events",100,-0.15,+0.15)) );
+	
+	// Afb
 	TString proc = "DYmumu";
 	if(isZprime) proc = "Z' 1 TeV";
 	h1Map.insert( make_pair("hforward_trumu_quark",new TH1D("hforward_trumu_quark",proc+" truth Forward events;m_{#mu#mu} GeV;N_{f}",nlogmassbins,logmassbins)));
 	h1Map.insert( make_pair("hbackward_trumu_quark",new TH1D("hbackward_trumu_quark",proc+" truth Backward events;m_{#mu#mu} GeV;N_{b}",nlogmassbins,logmassbins)));
 	h1Map.insert( make_pair("hAfb_trumu_quark",new TH1D("hAfb_trumu_quark",proc+" truth FB-asymmetry;m_{#mu#mu} GeV;A_{fb}",nlogmassbins,logmassbins)));
 	
+	// Ellipticity
 	h1Map.insert( make_pair("hEllipticity", new TH1D("hEllipticity","Uncorrected ellipticity;m_{#mu#mu} GeV;E_{#eta}",nlogmassbins,logmassbins)) );
 	setlogx(h1Map["hEllipticity"]);
 	for(int i=0 ; i<nlogmassbins ; i++)
@@ -453,6 +495,31 @@ void hbook()
 		h1Map.insert( make_pair(shName, new TH1D(tshName,tshTitle,netabins,etamin,etamax)) );
 	}
 	
+	// F_chi
+	h1Map.insert( make_pair("hFchi", new TH1D("hFchi","Binned F_{#chi};m_{#mu#mu} GeV;F_{#chi}",nlogmassbins,logmassbins)) );
+	setlogx(h1Map["hFchi"]);
+	for(int i=0 ; i<nlogmassbins ; i++)
+	{
+		TString tshName  = "";
+		TString tshTitle = "";
+		string  shName   = "";
+		
+		tshName = "hystar_central_bin_"+(TString)_s(i+1);
+		shName  = (string)tshName;
+		tshTitle = "y*_{central} mass bin"+(TString)_s(i+1)+";y*;Events";
+		h1Map.insert( make_pair(shName, new TH1D(tshName,tshTitle,nystarbins,minystar,ystarlow)) );
+		
+		tshName = "hystar_all_bin_"+(TString)_s(i+1);
+		shName  = (string)tshName;
+		tshTitle = "y*_{all} mass bin"+(TString)_s(i+1)+";y*;Events";
+		h1Map.insert( make_pair(shName, new TH1D(tshName,tshTitle,nystarbins,minystar,ystarhigh)) );
+		
+		tshName = "hystar_bin_"+(TString)_s(i+1);
+		shName  = (string)tshName;
+		tshTitle = "y* mass bin"+(TString)_s(i+1)+";y*;Events";
+		h1Map.insert( make_pair(shName, new TH1D(tshName,tshTitle,nystarbins,minystar,maxystar)) );
+	}
+	
 	h2Map.insert( make_pair("hMassCosThetaCS", new TH2D("hMassCosThetaCS",";m_{#mu#mu} GeV;cos(#theta*);Events",250,70.,2500., 50,-1.,+1)) );
 	setlogx(h2Map["hMassCosThetaCS"]);
 	linMap.insert( make_pair("hMassCosThetaCS_horline", new TLine(70.,0.,2500.,0.)) );
@@ -467,6 +534,19 @@ void hbook()
 	{
 		linMap.insert( make_pair("hMassyQ_vertline_"+_s(logmassbins[ms]), new TLine(logmassbins[ms],-2.5,logmassbins[ms],+2.5)) );
 	}
+	
+	for(int i=0 ; i<nlogmassbins ; i++)
+	{
+		TString tshName  = "";
+		TString tshTitle = "";
+		string  shName   = "";
+		
+		tshName = "hyQ_bin_"+(TString)_s(i+1);
+		shName  = (string)tshName;
+		tshTitle = "y_{Q} mass bin "+(TString)_s(i+1)+";#y_{Q};Events";
+		h1Map.insert( make_pair(shName, new TH1D(tshName,tshTitle,nPyQbins,minPyQ,maxPyQ)) );
+	}
+	h1Map.insert( make_pair("hprobyQ_quark_average", new TH1D("hprobyQ_quark_average","Average of P(y_{Q});m_{#mu#mu} GeV;#LTP(y_{Q})#GT",nlogmassbins,logmassbins)) );
 
 	h2Map.insert( make_pair("hbetaZyQ", new TH2D("hbetaZyQ",";#beta_{Q}^{z};y_{Q};Events",50,-1.,+1, 50,-2.5,+2.5)) );
 	h2Map.insert( make_pair("hbetaabsyQabs", new TH2D("hbetaabsyQabs",";|#beta_{Q}|;|y_{Q}|;Events",50,0.,+1., 50,0.,+2.5)) );
@@ -490,6 +570,10 @@ void hdraw()
 	draw(h1Map["hyQ"], "hyQ");
 	draw(h1Map["hyQabs"], "hyQabs");
 
+	h1Map["hprobyQtru_quark_ratio"]->Divide(h1Map["hprobyQtru_quark_denominator"]);
+	h1Map["hprobyQtru_quark_ratio"]->SetMinimum(1.e-5);
+	h1Map["hprobyQtru_quark_ratio"]->SetMaximum(0.5);
+	draw(h1Map["hprobyQtru_quark_ratio"], "hprobyQtru_quark_ratio", ""/*, !dolog, dolog*/);
 	h1Map["hprobabsyQ_quark_ratio"]->Divide(h1Map["hprobabsyQ_quark_denominator"]);
 	h1Map["hprobabsyQ_quark_ratio"]->SetMinimum(1.e-5);
 	h1Map["hprobabsyQ_quark_ratio"]->SetMaximum(0.5);
@@ -520,6 +604,9 @@ void hdraw()
 	h1Map["hprobChargeFlip_y_ratio"]->SetMaximum(1.);
 	draw(h1Map["hprobChargeFlip_y_ratio"], "hprobChargeFlip_y_ratio", "");
 	
+	
+	draw(h1Map["hRes_yQ_ratio"], "hRes_yQ_ratio", "");
+	
 	h2Map["hyQCosThetaCS_acc"]->Divide(h2Map["hyQCosThetaCS_tru"]);
 	h2Map["hyQCosThetaCS_acc"]->SetMinimum(0.);
 	h2Map["hyQCosThetaCS_acc"]->SetMaximum(1.);
@@ -545,10 +632,11 @@ void hdraw()
 	
 	draw(h2Map["hdRtru1dRtru2"], "hdRtru1dRtru2", "COLZ");
 	
+	// ellipticity
 	for(Int_t b=1 ; b<=(Int_t)h1Map["hEllipticity"]->GetNbinsX() ; b++)
 	{
-		Double_t Nsides   = h1Map["hEllipticity_sides_bin_"+_s(b)]->Integral();
-		Double_t Ncentral = h1Map["hEllipticity_central_bin_"+_s(b)]->Integral();
+		Double_t Nsides   = Integral(h1Map["hEllipticity_sides_bin_"+_s(b)]);
+		Double_t Ncentral = Integral(h1Map["hEllipticity_central_bin_"+_s(b)]);
 		Double_t Nall  = Ncentral+Nsides;
 		Double_t Eeta  = (Nall!=0.) ? (Ncentral-Nsides)/(Ncentral+Nsides) : -999.;
 		Double_t dEeta = (Nall!=0.) ? sqrt((1.-Eeta*Eeta)/Nall) : -999.;
@@ -559,10 +647,27 @@ void hdraw()
 	h1Map["hEllipticity"]->SetMaximum(+1.);
 	h1Map["hEllipticity"]->SetMarkerStyle(24);
 	draw(h1Map["hEllipticity"], "hEllipticity", "e1x1", dolog);
+	
+	// F_chi
+	for(Int_t b=1 ; b<=h1Map["hFchi"]->GetNbinsX() ; b++)
+	{
+		Double_t Nall     = Integral(h1Map["hystar_all_bin_"+_s(b)]);
+		Double_t Ncentral = Integral(h1Map["hystar_central_bin_"+_s(b)]);
+		Double_t Fchi  = (Nall!=0.) ? Ncentral/Nall : -999.;
+		Double_t dFchi = (Nall!=0.) ? sqrt(Fchi*(1.-Fchi)/Nall) : -999.;
+		h1Map["hFchi"]->SetBinContent(b,Fchi);
+		h1Map["hFchi"]->SetBinError(b,dFchi);
+		
+		draw(h1Map["hystar_bin_"+_s(b)],"hystar_bin_"+_s(b));
+	}
+	h1Map["hFchi"]->SetMinimum(-0.5);
+	h1Map["hFchi"]->SetMaximum(+1.5);
+	h1Map["hFchi"]->SetMarkerStyle(24);
+	draw(h1Map["hFchi"], "hFchi", "e1x1", dolog);
 
 	
 	// Afb truth
-	for(Int_t b=1 ; b<=(Int_t)h1Map["hAfb_trumu_quark"]->GetNbinsX() ; b++)
+	for(Int_t b=1 ; b<=nlogmassbins ; b++)
 	{
 		Double_t Nf = h1Map["hforward_trumu_quark"]->GetBinContent(b);
 		Double_t Nb = h1Map["hbackward_trumu_quark"]->GetBinContent(b);
@@ -578,7 +683,37 @@ void hdraw()
 	h1Map["hAfb_trumu_quark"]->SetMaximum(+1.5);
 	h1Map["hAfb_trumu_quark"]->SetMarkerStyle(24);
 	draw(h1Map["hAfb_trumu_quark"], "hAfb_trumu_quark", "e1x1", dolog);
-	//drawon("hAfb_trumu_quark", h1Map["hMass"]);
+	
+	
+	// the averaged probability of FB false identify
+	for(Int_t b=1 ; b<=nlogmassbins ; b++)
+	{
+		Double_t avg = 0;
+		Double_t nrm = 0;
+		for(Int_t ybin=1 ; ybin<=h1Map["hprobyQ_quark_ratio"]->GetNbinsX() ; ybin++)
+		{
+			avg += h1Map["hprobyQ_quark_ratio"]->GetBinContent(ybin)*h1Map["hyQ_bin_"+_s(b)]->GetBinContent(ybin);
+			nrm += h1Map["hyQ_bin_"+_s(b)]->GetBinContent(ybin);
+		}
+		avg = (nrm>0.) ? avg/nrm : -999.;
+		h1Map["hprobyQ_quark_average"]->SetBinContent(b,avg);
+		h1Map["hprobyQ_quark_average"]->SetBinError(b,0.);
+		_INFO("Mass bin "+_s(b)+"  ->  probability average is "+_s(avg));
+	}
+	h1Map["hprobyQ_quark_average"]->GetXaxis()->SetMoreLogLabels(); 
+	h1Map["hprobyQ_quark_average"]->GetXaxis()->SetNoExponent(); 
+	h1Map["hprobyQ_quark_average"]->SetMinimum(0.0);
+	h1Map["hprobyQ_quark_average"]->SetMaximum(1.);
+	h1Map["hprobyQ_quark_average"]->SetMarkerStyle(24);
+	draw(h1Map["hprobyQ_quark_average"], "hprobyQ_quark_average", "e1x1", dolog);
+	
+	Double_t sum = 0;
+	for(Int_t ybin=1 ; ybin<=h1Map["hprobyQ_quark_ratio"]->GetNbinsX() ; ybin++)
+	{
+		sum += h1Map["hprobyQ_quark_ratio"]->GetBinContent(ybin);
+	}
+	sum = sum/(Double_t)h1Map["hprobyQ_quark_ratio"]->GetNbinsX();
+	_INFO("NAIVE probability average is "+_s(sum));
 }
 
 void hfill(Double_t wgt=1.)
@@ -589,7 +724,7 @@ void hfill(Double_t wgt=1.)
 	float betay_rec   = -999.;	
 	float betaz_rec   = -999.;
 	float betamag_rec = -999.;
-			
+	
 	float betax_trumumu   = -999.;	
 	float betay_trumumu   = -999.;	
 	float betaz_trumumu   = -999.;	
@@ -600,13 +735,14 @@ void hfill(Double_t wgt=1.)
 	float betaz_quarks   = -999.;	
 	float betamag_quarks = -999.;
 	
-	float cosalpha_quark    = -999.;
-	float cosalpha_trumumu  = -999.;
-	float cosalpha_truqqbar = -999.;
+	float cosalpha_quark         = -999.;
+	float cosalpha_betatru_quark = -999.;
+	float cosalpha_trumumu       = -999.;
+	float cosalpha_truqqbar      = -999.;
 	float cosalpha_trumuon_quark = -999.;
-	float betaztru          = -999.;
+	float betaztru               = -999.;
 	
-	float dr  = 0.;
+	//float dr  = 0.;
 	float dr1 = 0.;
 	float dr2 = 0.;
 	
@@ -615,107 +751,139 @@ void hfill(Double_t wgt=1.)
 	float cb         = 0.;
 	float yQ         = 0.;
 	float costhetaCS = 0.;
+	float Chi        = 0.;
+	float ystar      = 0.;
 	
 	int iquark    = -999;
+	int iaquark   = -999;
 	int imuontru  = -999;
 	int iamuontru = -999;
 	int imuonrec  = -999;
 	int iamuonrec = -999;
-
+	
 	if(isMC)
 	{
 		if(truth_all_isValid)
 		{
+			iquark    = (truth_all_partons_mc_pdgId->at(0)>0) ? 0 : 1;
+			iaquark   = (iquark==0) ? 1 : 0;
+			imuontru  = (truth_all_mc_pdgId->at(0)>0) ? 0 : 1;
+			iamuontru = (imuontru==0) ? 1 : 0;
+
+			tlvmutrua->SetPtEtaPhiM(truth_all_mc_pt->at(imuontru),  truth_all_mc_eta->at(imuontru),  truth_all_mc_phi->at(imuontru),  muonMass);
+			tlvmutrub->SetPtEtaPhiM(truth_all_mc_pt->at(iamuontru), truth_all_mc_eta->at(iamuontru), truth_all_mc_phi->at(iamuontru), muonMass);
+			(*tv3mutrua) = tlvmutrua->Vect();
+			(*tv3mutrub) = tlvmutrub->Vect();
+			tlvmutruaBoosted = K->Boost(tlvmutrua,tlvmutrub,tlvmutrua);
+			tlvmutrubBoosted = K->Boost(tlvmutrua,tlvmutrub,tlvmutrub);
+			(*tv3mutruaBoosted) = tlvmutruaBoosted->Vect();
+			(*tv3mutrubBoosted) = tlvmutrubBoosted->Vect();
+
+			tlvqa->SetPtEtaPhiM(truth_all_partons_mc_pt->at(iquark),  truth_all_partons_mc_eta->at(iquark),  truth_all_partons_mc_phi->at(iquark),  truth_all_partons_mc_m->at(iquark));
+			tlvqb->SetPtEtaPhiM(truth_all_partons_mc_pt->at(iaquark), truth_all_partons_mc_eta->at(iaquark), truth_all_partons_mc_phi->at(iaquark), truth_all_partons_mc_m->at(iaquark));
+			(*tv3qa) = tlvqa->Vect();
+			(*tv3qb) = tlvqb->Vect();
+			tlvqaBoosted = K->Boost(tlvqa,tlvqb,tlvqa);
+			tlvqbBoosted = K->Boost(tlvqa,tlvqb,tlvqb);
+			(*tv3qaBoosted) = tlvqaBoosted->Vect();
+			(*tv3qbBoosted) = tlvqbBoosted->Vect();
+
 			if(recon_all_isValid)
 			{
-				betax_rec = kin.betaSystem(recon_all_px->at(0), recon_all_px->at(1), recon_all_E->at(0), recon_all_E->at(1));	
-				betay_rec = kin.betaSystem(recon_all_py->at(0), recon_all_py->at(1), recon_all_E->at(0), recon_all_E->at(1));	
-				betaz_rec = kin.betaSystem(recon_all_pz->at(0), recon_all_pz->at(1), recon_all_E->at(0), recon_all_E->at(1));
-				betamag_rec = sqrt(betax_rec*betax_rec+betay_rec*betay_rec+betaz_rec*betaz_rec);
-			}
-			
-			tlva->SetPtEtaPhiM(truth_all_mc_pt->at(0), truth_all_mc_eta->at(0), truth_all_mc_phi->at(0), muonMass);
-			tlvb->SetPtEtaPhiM(truth_all_mc_pt->at(1), truth_all_mc_eta->at(1), truth_all_mc_phi->at(1), muonMass);
-			betax_trumumu = kin.betaSystem(tlva->X(), tlvb->X(), tlva->E(), tlvb->E());	
-			betay_trumumu = kin.betaSystem(tlva->Y(), tlvb->Y(), tlva->E(), tlvb->E());	
-			betaz_trumumu = kin.betaSystem(tlva->Z(), tlvb->Z(), tlva->E(), tlvb->E());	
-			betamag_trumumu = sqrt(betax_trumumu*betax_trumumu+betay_trumumu*betay_trumumu+betaz_trumumu*betaz_trumumu);
-			
-			tlva->SetPtEtaPhiM(truth_all_partons_mc_pt->at(0), truth_all_partons_mc_eta->at(0), truth_all_partons_mc_phi->at(0), muonMass);
-			tlvb->SetPtEtaPhiM(truth_all_partons_mc_pt->at(1), truth_all_partons_mc_eta->at(1), truth_all_partons_mc_phi->at(1), muonMass);
-			betax_quarks = kin.betaSystem(tlva->X(), tlvb->X(), tlva->E(), tlvb->E());	
-			betay_quarks = kin.betaSystem(tlva->Y(), tlvb->Y(), tlva->E(), tlvb->E());	
-			betaz_quarks = kin.betaSystem(tlva->Z(), tlvb->Z(), tlva->E(), tlvb->E());	
-			betamag_quarks = sqrt(betax_quarks*betax_quarks+betay_quarks*betay_quarks+betaz_quarks*betaz_quarks);
-			
-			iquark   = (truth_all_partons_mc_pdgId->at(0)>0) ? 0 : 1;
-			imuontru = (truth_all_mc_pdgId->at(0)>0) ? 0 : 1;
-			
-			tv3b->SetXYZ(betax_rec, betay_rec, betaz_rec);
-			if(recon_all_isValid)
-			{
-				iamuontru = (imuontru==0) ? 1 : 0;
-				tlva->SetPtEtaPhiM(truth_all_mc_pt->at(imuontru),truth_all_mc_eta->at(imuontru),truth_all_mc_phi->at(imuontru),truth_all_mc_m->at(imuontru));
-				tlvb->SetPtEtaPhiM(truth_all_mc_pt->at(iamuontru),truth_all_mc_eta->at(iamuontru),truth_all_mc_phi->at(iamuontru),truth_all_mc_m->at(iamuontru));
-				yQ = kin.ySystem(tlva,tlvb);
-				tv3a->SetPtEtaPhi(truth_all_partons_mc_pt->at(iquark), truth_all_partons_mc_eta->at(iquark), truth_all_partons_mc_phi->at(iquark));
-				cosalpha_quark = tv3a->Dot(*tv3b)/(tv3a->Mag()*tv3b->Mag());
-				h1Map["hcosalpha_quark"]->Fill(cosalpha_quark,wgt);
-				if(cosalpha_quark<=0.) h1Map["hprobyQ_quark_ratio"]->Fill(yQ/*truth_all_ySystem*/,wgt);
-				if(cosalpha_quark<=0.) h1Map["hprobabsyQ_quark_ratio"]->Fill(fabs(yQ)/*truth_all_ySystem*/,wgt);
-				// _INFO("cosalpha_quark = "+_s(cosalpha_quark));
-				
-				h1Map["hprobabsyQ_quark_denominator"]->Fill(fabs(yQ),wgt);
-				h1Map["hprobyQ_quark_denominator"]->Fill(yQ,wgt);
-				h1Map["hprobyQ_trumumu_denominator"]->Fill(yQ,wgt);
-				h1Map["hprobyQ_truqqbar_denominator"]->Fill(yQ,wgt);
-				
-				
-				tv3a->SetXYZ(betax_trumumu, betay_trumumu, betaz_trumumu);
-				cosalpha_trumumu = tv3a->Dot(*tv3b)/(tv3a->Mag()*tv3b->Mag());
-				h1Map["hcosalpha_trumumu"]->Fill(cosalpha_trumumu,wgt);
-				if(cosalpha_trumumu<=0.)     h1Map["hprobyQ_trumumu_ratio"]->Fill(truth_all_ySystem,wgt);
-				// _INFO("cosalpha_trumumu = "+_s(cosalpha_trumumu));
-			
-				tv3a->SetXYZ(betax_quarks, betay_quarks, betaz_quarks);
-				cosalpha_truqqbar = tv3a->Dot(*tv3b)/(tv3a->Mag()*tv3b->Mag());
-				h1Map["hcosalpha_truqqbar"]->Fill(cosalpha_truqqbar,wgt);
-				if(cosalpha_truqqbar<=0.) h1Map["hprobyQ_truqqbar_ratio"]->Fill(truth_all_ySystem,wgt);
-				// _INFO("cosalpha_truqqbar = "+_s(cosalpha_truqqbar));
-				
-				tlva->SetPtEtaPhiM(truth_all_mc_pt->at(imuontru), truth_all_mc_eta->at(imuontru), truth_all_mc_phi->at(imuontru), muonMass);
-				tlvb->SetPtEtaPhiM(recon_all_pt->at(0), recon_all_eta->at(0), recon_all_phi->at(0), muonMass);
-				tlvtmp->SetPtEtaPhiM(recon_all_pt->at(1), recon_all_eta->at(1), recon_all_phi->at(1), muonMass);
-				dr1 = kin.dR(tlva,tlvb);
-				dr2 = kin.dR(tlva,tlvtmp);
-				h2Map["hdRtru1dRtru2"]->Fill(dr1,dr2,wgt);
-				imuonrec = (dr1<0.1) ? 0 : 1;
-				dr = (dr1<0.2) ? dr1 : dr2;
-				// _INFO("imuontru[qtru="+_s(truth_all_mc_charge->at(imuontru))+"]="+_s(imuontru)+",  imuonrec="+_s(imuonrec)+",  dr="+_s(dr)+",  qrec="+_s(recon_all_charge->at(imuonrec)));
-				if(truth_all_mc_charge->at(imuontru)*recon_all_charge->at(imuonrec)<0.) // muon matched but the charge is flipped
-				{
-					_INFO("Charge flip  ->  dR0="+_s(dr1)+",  dR1="+_s(dr2)+"  ->  imuonrec="+_s(imuonrec)+"  ->  c(imuonrec)="+_s(recon_all_charge->at(imuonrec)));
-					// _INFO("charge flip, TRUTH:  tlva->Pt()="+_s(tlva->Pt())+",  pt="+_s(truth_all_mc_pt->at(imuontru))+",  m="+_s(muonMass));
-					// _INFO("charge flip, RECON:  tlvb->Pt()="+_s(tlvb->Pt())+",  pt="+_s(recon_all_pt->at(imuonrec))+",  m="+_s(muonMass));
-					h1Map["hprobChargeFlip_p_ratio"]->Fill(tlva->P(),wgt);
-					h1Map["hprobChargeFlip_pT_ratio"]->Fill(tlva->Pt(),wgt);
-					h1Map["hprobChargeFlip_y_ratio"]->Fill(tlva->Rapidity(),wgt);
-				}
-			
 				imuonrec  = (recon_all_charge->at(0)<0.) ? 0 : 1;
 				iamuonrec = (imuonrec==0) ? 1 : 0;
-				tlva->SetPtEtaPhiM(recon_all_pt->at(imuonrec),recon_all_eta->at(imuonrec),recon_all_phi->at(imuonrec),recon_all_m->at(imuonrec));
-				tlvb->SetPtEtaPhiM(recon_all_pt->at(iamuonrec),recon_all_eta->at(iamuonrec),recon_all_phi->at(iamuonrec),recon_all_m->at(iamuonrec));
+				
+				tlvtmp->SetPtEtaPhiM(recon_all_pt->at(imuonrec), recon_all_eta->at(imuonrec), recon_all_phi->at(imuonrec), muonMass);
+				dr1 = K->dR(tlvtmp,tlvmutrua);
+				dr2 = K->dR(tlvtmp,tlvmutrub);
+				imuonrec  = (dr1<=dr2) ? imuonrec : iamuonrec;
+				iamuonrec = (imuonrec==0) ? 1 : 0;
+				if(dr1>dr2) _WARNING("dr1(recA,truA) > dr2(recA,truB)");
+				
+				tlvmureca->SetPtEtaPhiM(recon_all_pt->at(imuonrec),  recon_all_eta->at(imuonrec),  recon_all_phi->at(imuonrec),  muonMass);
+				tlvmurecb->SetPtEtaPhiM(recon_all_pt->at(iamuonrec), recon_all_eta->at(iamuonrec), recon_all_phi->at(iamuonrec), muonMass);
+				(*tv3mureca) = tlvmureca->Vect();
+				(*tv3murecb) = tlvmurecb->Vect();
+				tlvmurecaBoosted = K->Boost(tlvmureca,tlvmurecb,tlvmureca);
+				tlvmurecbBoosted = K->Boost(tlvmureca,tlvmurecb,tlvmurecb);
+				(*tv3murecaBoosted) = tlvmurecaBoosted->Vect();
+				(*tv3murecbBoosted) = tlvmurecbBoosted->Vect();
+			}
+			
+			////////////////////////////
+			/// analysis statrs here ///
+			////////////////////////////
+			
+			betax_trumumu = K->betaiSystem(tlvmutrua,tlvmutrub,1);
+			betay_trumumu = K->betaiSystem(tlvmutrua,tlvmutrub,2);
+			betaz_trumumu = K->betaiSystem(tlvmutrua,tlvmutrub,3);
+			betamag_trumumu = K->magBetaSystem(tlvmutrua,tlvmutrub);
+			
+			betax_quarks = K->betaiSystem(tlvqa,tlvqb,1);
+			betay_quarks = K->betaiSystem(tlvqa,tlvqb,2);
+			betaz_quarks = K->betaiSystem(tlvqa,tlvqb,3);
+			betamag_quarks = K->magBetaSystem(tlvqa,tlvqb);
+			
+			yQ = K->ySystem(tlvmutrua,tlvmutrub);
+			cosalpha_betatru_quark = tv3qaBoosted->Dot(K->systemBoostVector(tlvmutrua,tlvmutrub))/(tv3qaBoosted->Mag()*K->systemBoostVector(tlvmutrua,tlvmutrub).Mag());
+			if(cosalpha_betatru_quark<=0.) h1Map["hprobyQtru_quark_ratio"]->Fill(yQ,wgt);
+			h1Map["hprobyQtru_quark_denominator"]->Fill(yQ,wgt);
+			truth_entries++;
+			
+			if(recon_all_isValid  &&  imuonrec>=0. && iamuonrec>=0.  &&  imuonrec!=iamuonrec)
+			{
+				betax_rec = K->betaiSystem(tlvmureca,tlvmurecb,1);
+				betay_rec = K->betaiSystem(tlvmureca,tlvmurecb,2);
+				betaz_rec = K->betaiSystem(tlvmureca,tlvmurecb,3);
+				betamag_rec = K->magBetaSystem(tlvmureca,tlvmurecb);
+
+				yQ = K->ySystem(tlvmutrua,tlvmutrub);
+				cosalpha_quark = tv3qa->Dot(K->systemBoostVector(tlvmutrua,tlvmutrub))/(tv3qa->Mag()*K->systemBoostVector(tlvmutrua,tlvmutrub).Mag());
+				h1Map["hcosalpha_quark"]->Fill(cosalpha_quark,wgt);
+				if(cosalpha_quark<=0.) h1Map["hprobyQ_quark_ratio"]->Fill(yQ,wgt);
+				h1Map["hprobyQ_quark_denominator"]->Fill(yQ,wgt);
+				if(cosalpha_quark<=0.) h1Map["hprobabsyQ_quark_ratio"]->Fill(fabs(yQ),wgt);
+				h1Map["hprobabsyQ_quark_denominator"]->Fill(fabs(yQ),wgt);
+				_DEBUG("yQ="+_s(yQ));
+				_DEBUG("cosalpha_quark="+_s(cosalpha_quark));
+				
+				cosalpha_trumumu = K->systemBoostVector(tlvmutrua,tlvmutrub).Dot(K->systemBoostVector(tlvmureca,tlvmurecb))/(K->systemBoostVector(tlvmutrua,tlvmutrub).Mag()*K->systemBoostVector(tlvmureca,tlvmurecb).Mag());
+				h1Map["hcosalpha_trumumu"]->Fill(cosalpha_trumumu,wgt);
+				if(cosalpha_trumumu<=0.) h1Map["hprobyQ_trumumu_ratio"]->Fill(truth_all_ySystem,wgt);
+				h1Map["hprobyQ_trumumu_denominator"]->Fill(yQ,wgt);
+				_DEBUG("cosalpha_trumumu="+_s(cosalpha_trumumu));
+			
+				cosalpha_truqqbar = K->systemBoostVector(tlvqa,tlvqb).Dot(K->systemBoostVector(tlvmureca,tlvmurecb))/(K->systemBoostVector(tlvqa,tlvqb).Mag()*K->systemBoostVector(tlvmureca,tlvmurecb).Mag());
+				h1Map["hcosalpha_truqqbar"]->Fill(cosalpha_truqqbar,wgt);
+				if(cosalpha_truqqbar<=0.) h1Map["hprobyQ_truqqbar_ratio"]->Fill(truth_all_ySystem,wgt);
+				h1Map["hprobyQ_truqqbar_denominator"]->Fill(yQ,wgt);
+				_DEBUG("cosalpha_truqqbar="+_s(cosalpha_truqqbar));
+				
+				if(truth_all_mc_charge->at(imuontru)*recon_all_charge->at(imuonrec)<0.) // muon matched but the charge is flipped
+				{
+					h1Map["hprobChargeFlip_p_ratio"]->Fill(tlvmutrua->P(),wgt);
+					h1Map["hprobChargeFlip_pT_ratio"]->Fill(tlvmutrua->Pt(),wgt);
+					h1Map["hprobChargeFlip_y_ratio"]->Fill(tlvmutrua->Rapidity(),wgt);
+				}
+				h1Map["hprobChargeFlip_p_denominator"]->Fill(tlvmutrua->P(),wgt);
+				h1Map["hprobChargeFlip_pT_denominator"]->Fill(tlvmutrua->Pt(),wgt);
+				h1Map["hprobChargeFlip_y_denominator"]->Fill(tlvmutrua->Rapidity(),wgt);
+				
 				ca = recon_all_charge->at(imuonrec);
 				cb = recon_all_charge->at(iamuonrec);
-				if(ca*cb>=0.) _WARNING("ca*cb>=0., skipping event");
-				mass = kin.imass(tlva,tlvb);
+				if(ca*cb>=0.) _WARNING("ca*cb>=0, skipping event");
+				mass = K->imass(tlvmureca,tlvmurecb);
 				if(mass<=minPossibleImass || mass>maxPossibleImass) _WARNING("mass<=minPossibleImass || mass>maxPossibleImass  ->  mass="+_s(mass));
-				costhetaCS = kin.cosThetaCollinsSoper(tlva,ca,tlvb,cb);
+				costhetaCS = K->cosThetaCollinsSoper(tlvmureca,ca,tlvmurecb,cb);
 				if(fabs(costhetaCS)>1.) _WARNING("|cos(theta)|>1.");
-				yQ = kin.ySystem(tlva,tlvb);
+				yQ = K->ySystem(tlvmureca,tlvmurecb);
 				if(fabs(yQ)>6.) _WARNING("|yQ|>6.");
-			
+				_DEBUG("yQ="+_s(yQ));
+				_DEBUG("costhetaCS="+_s(costhetaCS));
+				_DEBUG("mass="+_s(mass));
+				_DEBUG("ca="+_s(ca));
+				_DEBUG("cb="+_s(cb));
+
 				h1Map["hMass"]->Fill(mass,wgt);
 				h1Map["hbetaZ"]->Fill(betaz_rec,wgt);
 				h1Map["hyQ"]->Fill(yQ,wgt);
@@ -727,84 +895,113 @@ void hfill(Double_t wgt=1.)
 				h2Map["hyQCosThetaCS_acc"]->Fill(yQ,costhetaCS,wgt);
 				h2Map["hbetaZyQ"]->Fill(betaz_rec,yQ,wgt);
 				h2Map["hbetaabsyQabs"]->Fill(betamag_rec,fabs(yQ),wgt);
-			
-				// h1Map["hMass"]->Fill(recon_all_Mhat,wgt);
-				// h1Map["hbetaZ"]->Fill(betaz_rec,wgt);
-				// h1Map["hyQ"]->Fill(recon_all_ySystem,wgt);
-				// h1Map["hyQabs"]->Fill(fabs(recon_all_ySystem),wgt);
 				
-				// h2Map["hMassyQ"]->Fill(recon_all_Mhat,recon_all_ySystem,wgt);
-				// h2Map["hMassCosThetaCS"]->Fill(recon_all_Mhat,recon_all_CosThetaCS,wgt);
-				// h2Map["hyQCosThetaCS"]->Fill(recon_all_ySystem,recon_all_CosThetaCS,wgt);
-				// h2Map["hyQCosThetaCS_acc"]->Fill(recon_all_ySystem,recon_all_CosThetaCS,wgt);
-				// h2Map["hbetaZyQ"]->Fill(betaz_rec,recon_all_ySystem,wgt);
-				// h2Map["hbetaabsyQabs"]->Fill(betamag_rec,fabs(recon_all_ySystem),wgt);
+				_DEBUG("betamag_rec="+_s(betamag_rec));
+				_DEBUG("betaz_rec="+_s(betaz_rec));
+
 				
-				tlva->SetPtEtaPhiM(recon_all_pt->at(0), recon_all_eta->at(0), recon_all_phi->at(0), muonMass);
-				tlvb->SetPtEtaPhiM(recon_all_pt->at(1), recon_all_eta->at(1), recon_all_phi->at(1), muonMass);
-				mass = kin.imass(tlva,tlvb);
+				// yQ resolution
+				float resyQ = (K->ySystem(tlvmutrua,tlvmurecb)!=0.) ? K->ySystem(tlvmureca,tlvmurecb)/K->ySystem(tlvmutrua,tlvmutrub) - 1. : -99999.;
+				h1Map["hRes_yQ_ratio"]->Fill( resyQ,wgt );
+				
+				// ellipticity
+				mass = K->imass(tlvmureca,tlvmurecb);
+				_DEBUG("mass="+_s(mass));
 				if(mass>=logmassmin && mass<=logmassmax)
 				{
 					int bin = h1Map["hEllipticity"]->FindBin(mass);
-					if(bin>0 && bin<h1Map["hEllipticity"]->GetNbinsX())
+					if(bin>=1 && bin<=h1Map["hEllipticity"]->GetNbinsX())
 					{
 						int imuonrec_uncorrected = (recon_all_id->at(0)>0) ? 0 : 1;
 						float eta_rec = recon_all_eta->at(imuonrec_uncorrected);
-						// _INFO("mass="+_s(mass)+", bin="+_s(bin)+", imuonrec_uncorrected="+_s(imuonrec_uncorrected)+", eta_rec="+_s(eta_rec));
 						string hName = (fabs(eta_rec)<etax) ? "hEllipticity_sides_bin_" : "hEllipticity_central_bin_";
 						hName += _s(bin);
 						if(fabs(eta_rec)<=etamax) h1Map[hName]->Fill(eta_rec,wgt);
-						//else _WARNING("Eta exceeds its cut limit  ->  "+_s(eta_rec));
+					}
+				}
+
+				// F_chi
+				mass  = K->imass(tlvmureca,tlvmurecb);
+				Chi   = K->chi(tlvmureca,tlvmurecb);
+				ystar = fabs(K->yStar(tlvmureca,tlvmurecb));
+				
+				_DEBUG("mass="+_s(mass));
+				_DEBUG("Chi="+_s(Chi));
+				_DEBUG("ystar="+_s(ystar));
+				
+				if(mass>=logmassmin && mass<=logmassmax)
+				{
+					int bin = h1Map["hFchi"]->FindBin(mass);
+					if(bin>=1 && bin<=h1Map["hFchi"]->GetNbinsX())
+					{
+						if(ystar<ystarlow)  h1Map["hystar_central_bin_"+_s(bin)]->Fill(ystar,wgt);
+						if(ystar<ystarhigh) h1Map["hystar_all_bin_"+_s(bin)]->Fill(ystar,wgt);
+						
+						h1Map["hystar_bin_"+_s(bin)]->Fill(ystar,wgt);
+					}
+				}
+
+				if(mass>=logmassmin && mass<=logmassmax)
+				{
+					int massbin = h1Map["hAfb_trumu_quark"]->FindBin(mass);
+					if(massbin>=1  &&  massbin<=h1Map["hAfb_trumu_quark"]->GetNbinsX())
+					{
+						h1Map["hyQ_bin_"+_s(massbin)]->Fill(yQ,wgt);
 					}
 				}
 			}
 			
 			// For the truth Afb
-			iamuontru = (imuontru==0) ? 1 : 0;
-			tv3a->SetPtEtaPhi(truth_all_mc_pt->at(imuontru),truth_all_mc_eta->at(imuontru),truth_all_mc_phi->at(imuontru));
-			tv3b->SetPtEtaPhi(truth_all_partons_mc_pdgId->at(iquark),truth_all_partons_mc_eta->at(iquark),truth_all_partons_mc_phi->at(iquark));
-			tlva->SetPtEtaPhiM(truth_all_mc_pt->at(imuontru),truth_all_mc_eta->at(imuontru),truth_all_mc_phi->at(imuontru),truth_all_mc_m->at(imuontru));
-			tlvb->SetPtEtaPhiM(truth_all_mc_pt->at(iamuontru),truth_all_mc_eta->at(iamuontru),truth_all_mc_phi->at(iamuontru),truth_all_mc_m->at(iamuontru));
-			//yQ = kin.ySystem(tlva,tlvb);
-			mass = kin.imass(tlva,tlvb);
+			mass = K->imass(tlvmutrua,tlvmutrub);
 			if(mass<=minPossibleImass || mass>maxPossibleImass) _WARNING("mass<=minPossibleImass || mass>maxPossibleImass  ->  mass="+_s(mass));
-			cosalpha_trumuon_quark = tv3a->Dot(*tv3b)/(tv3a->Mag()*tv3b->Mag());
+			cosalpha_trumuon_quark = tv3mutruaBoosted->Dot(*tv3qaBoosted)/(tv3mutruaBoosted->Mag()*tv3qaBoosted->Mag());
 			if(cosalpha_trumuon_quark>0.) h1Map["hforward_trumu_quark"]->Fill(mass,wgt);
 			else                          h1Map["hbackward_trumu_quark"]->Fill(mass,wgt);
-			
-			
-			tlva->SetPtEtaPhiM(truth_all_mc_pt->at(imuontru), truth_all_mc_eta->at(imuontru), truth_all_mc_phi->at(imuontru), muonMass);
-			h1Map["hprobChargeFlip_p_denominator"]->Fill(tlva->P(),wgt);
-			h1Map["hprobChargeFlip_pT_denominator"]->Fill(tlva->Pt(),wgt);
-			h1Map["hprobChargeFlip_y_denominator"]->Fill(tlva->Rapidity(),wgt);
-			
-			
-			tlva->SetPtEtaPhiM(truth_all_mc_pt->at(0), truth_all_mc_eta->at(0), truth_all_mc_phi->at(0), muonMass);
-			tlvb->SetPtEtaPhiM(truth_all_mc_pt->at(1), truth_all_mc_eta->at(1), truth_all_mc_phi->at(1), muonMass);
-			betaztru = kin.betaSystem(tlva->Pz(), tlvb->Pz(), tlva->E(), tlvb->E());
+			_DEBUG("mass="+_s(mass));
+			_DEBUG("cosalpha_trumuon_quark="+_s(cosalpha_trumuon_quark));
+
+			ca = truth_all_mc_charge->at(imuontru);
+			cb = truth_all_mc_charge->at(iamuontru);
+			mass = K->imass(tlvmutrua,tlvmutrub);
+			yQ = K->ySystem(tlvmutrua,tlvmutrub);
+			costhetaCS = K->cosThetaCollinsSoper(tlvmutrua,ca,tlvmutrub,cb);
+			betaztru = K->betaiSystem(tlvmutrua,tlvmutrub,3);
 			h2Map["hbetaZyQtru"]->Fill(betaztru,yQ,wgt);
 			h2Map["hyQCosThetaCS_tru"]->Fill(yQ,costhetaCS,wgt);
+			_DEBUG("ca="+_s(ca));
+			_DEBUG("cb="+_s(cb));
+			_DEBUG("mass="+_s(mass));
+			_DEBUG("costhetaCS="+_s(costhetaCS));
+			_DEBUG("betaztru="+_s(betaztru));
 		}
 	}
 	else
 	{
-		betax_rec = kin.betaSystem(px->at(0), px->at(1), E->at(0), E->at(1));	
-		betay_rec = kin.betaSystem(py->at(0), py->at(1), E->at(0), E->at(1));	
-		betaz_rec = kin.betaSystem(pz->at(0), pz->at(1), E->at(0), E->at(1));
-		betamag_rec = sqrt(betax_rec*betax_rec+betay_rec*betay_rec+betaz_rec*betaz_rec);
-		
 		imuonrec  = (charge->at(0)<0.) ? 0 : 1;
 		iamuonrec = (imuonrec==0) ? 1 : 0;
-		tlva->SetPtEtaPhiM(pt->at(imuonrec),eta->at(imuonrec),phi->at(imuonrec),m->at(imuonrec));
-		tlvb->SetPtEtaPhiM(pt->at(iamuonrec),eta->at(iamuonrec),phi->at(iamuonrec),m->at(iamuonrec));
+		
+		tlvmureca->SetPtEtaPhiM(pt->at(imuonrec)*MeV2GeV,  eta->at(imuonrec),  phi->at(imuonrec),  muonMass);
+		tlvmurecb->SetPtEtaPhiM(pt->at(iamuonrec)*MeV2GeV, eta->at(iamuonrec), phi->at(iamuonrec), muonMass);
+		(*tv3mureca) = tlvmureca->Vect();
+		(*tv3murecb) = tlvmurecb->Vect();
+		tlvmurecaBoosted = K->Boost(tlvmureca,tlvmurecb,tlvmureca);
+		tlvmurecbBoosted = K->Boost(tlvmureca,tlvmurecb,tlvmurecb);
+		(*tv3murecaBoosted) = tlvmurecaBoosted->Vect();
+		(*tv3murecbBoosted) = tlvmurecbBoosted->Vect();
+	
+		betax_rec = K->betaiSystem(tlvmureca,tlvmurecb,1);
+		betay_rec = K->betaiSystem(tlvmureca,tlvmurecb,2);
+		betaz_rec = K->betaiSystem(tlvmureca,tlvmurecb,3);
+		betamag_rec = K->magBetaSystem(tlvmureca,tlvmurecb);
+	
 		ca = charge->at(imuonrec);
 		cb = charge->at(iamuonrec);
-		if(ca*cb>=0.) _WARNING("ca*cb>=0., skipping event");
-		mass = kin.imass(tlva,tlvb)*MeV2GeV;
+		if(ca*cb>=0.) _WARNING("ca*cb>=0, skipping event");
+		mass = K->imass(tlvmureca,tlvmurecb);
 		if(mass<=minPossibleImass || mass>maxPossibleImass) _WARNING("mass<=minPossibleImass || mass>maxPossibleImass  ->  mass="+_s(mass));
-		costhetaCS = kin.cosThetaCollinsSoper(tlva,ca,tlvb,cb);
+		costhetaCS = K->cosThetaCollinsSoper(tlvmureca,ca,tlvmurecb,cb);
 		if(fabs(costhetaCS)>1.) _WARNING("|cos(theta)|>1.");
-		yQ = kin.ySystem(tlva,tlvb);
+		yQ = K->ySystem(tlvmureca,tlvmurecb);
 		if(fabs(yQ)>6.) _WARNING("|yQ|>6.");
 		
 		h1Map["hMass"]->Fill(mass);
@@ -818,20 +1015,7 @@ void hfill(Double_t wgt=1.)
 		h2Map["hbetaZyQ"]->Fill(betaz_rec,yQ);
 		h2Map["hbetaabsyQabs"]->Fill(betamag_rec,fabs(yQ));
 		
-		// h1Map["hMass"]->Fill(Mhat*TeV2GeV);
-		// h1Map["hbetaZ"]->Fill(betaz_rec);
-		// h1Map["hyQ"]->Fill(Ysystem);
-		// h1Map["hyQabs"]->Fill(fabs(Ysystem));
-		
-		// h2Map["hMassyQ"]->Fill(Mhat*TeV2GeV,Ysystem);
-		// h2Map["hMassCosThetaCS"]->Fill(Mhat*TeV2GeV,CosThetaCS);
-		// h2Map["hyQCosThetaCS"]->Fill(Ysystem,CosThetaCS);
-		// h2Map["hbetaZyQ"]->Fill(betaz_rec,Ysystem);
-		// h2Map["hbetaabsyQabs"]->Fill(betamag_rec,fabs(Ysystem));
-		
-		tlva->SetPtEtaPhiM(pt->at(0)*MeV2GeV, eta->at(0), phi->at(0), muonMass);
-		tlvb->SetPtEtaPhiM(pt->at(1)*MeV2GeV, eta->at(1), phi->at(1), muonMass);
-		mass = kin.imass(tlva,tlvb);
+		mass = K->imass(tlvmureca,tlvmurecb);
 		if(mass>=logmassmin && mass<=logmassmax)
 		{
 			int bin = h1Map["hEllipticity"]->FindBin(mass);
@@ -839,11 +1023,25 @@ void hfill(Double_t wgt=1.)
 			{
 				int imuonrec_uncorrected = (charge->at(0)<0.) ? 0 : 1;
 				float eta_rec = eta->at(imuonrec_uncorrected);
-				// _INFO("mass="+_s(mass)+", bin="+_s(bin)+", imuonrec_uncorrected="+_s(imuonrec_uncorrected)+", eta_rec="+_s(eta_rec));
 				string hName = (fabs(eta_rec)<etax) ? "hEllipticity_sides_bin_" : "hEllipticity_central_bin_";
 				hName += _s(bin);
 				if(fabs(eta_rec)<=etamax) h1Map[hName]->Fill(eta_rec);
-				//else _WARNING("Eta exceeds its cut limit  ->  "+_s(eta_rec));
+			}
+		}
+		
+		// F_chi
+		mass  = K->imass(tlvmureca,tlvmurecb);
+		Chi   = K->chi(tlvmureca,tlvmurecb);
+		ystar = fabs(K->yStar(tlvmureca,tlvmurecb));
+		if(mass>=logmassmin && mass<=logmassmax)
+		{
+			int bin = h1Map["hFchi"]->FindBin(mass);
+			if(bin>0 && bin<h1Map["hFchi"]->GetNbinsX())
+			{
+				if(ystar<ystarlow)  h1Map["hystar_central_bin_"+_s(bin)]->Fill(ystar,wgt);
+				if(ystar<ystarhigh) h1Map["hystar_all_bin_"+_s(bin)]->Fill(ystar,wgt);
+				
+				h1Map["hystar_bin_"+_s(bin)]->Fill(ystar,wgt);
 			}
 		}
 	}
@@ -899,6 +1097,7 @@ void run()
 	{
 		init();
 		Int_t N = tree->GetEntriesFast();
+		truth_entries = 0;
 		for(Int_t entry=0 ; entry<N ; entry++)
 		{
 			tree->GetEntry(entry);
@@ -908,6 +1107,7 @@ void run()
 			hfill(); ///////////////////////////
 			////////////////////////////////////
 		}
+		_INFO("truth_entries = "+_s(truth_entries));
 	}
 	else
 	{
@@ -916,6 +1116,7 @@ void run()
 		{
 			init(it->second);
 			Int_t N = tree->GetEntriesFast();
+			truth_entries = 0;
 			for(Int_t entry=0 ; entry<N ; entry++)
 			{
 				tree->GetEntry(entry);
@@ -925,6 +1126,7 @@ void run()
 				hfill(wgtMap[it->first]); //////////
 				////////////////////////////////////
 			}
+			_INFO("truth_entries = "+_s(truth_entries));
 		}
 	}
 	

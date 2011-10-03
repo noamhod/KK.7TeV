@@ -27,6 +27,8 @@ public:
 	bool AS_isMC;
 	SmearingClass* MCPpTsmearing;
 	
+	bool alreadyFilled;
+	
 	int tmp_counter_1;
 	int tmp_counter_2;
 	int tmp_counter_3;
@@ -122,34 +124,10 @@ public:
 	int coreError;
 	
 	// L1 triggers
-	// int L1_MU0;
 	bool L1_MU10;
-	// bool L1_MU15;
-	// bool L1_MU20;
-	// int L1_MU6;
+
 	
-	// EF triggers
-	// int EF_mu10;
-	// int EF_mu10_MG;
-	// int EF_mu10_MSonly;
-	// int EF_mu10_MSonly_tight;
-	// int EF_mu10_NoAlg;
-	// int EF_mu10_tight;
-	// int EF_mu10i_loose;
-	// int EF_mu13;
-	// int EF_mu13_MG;
-	// int EF_mu13_MG_tight;
-	// int EF_mu13_tight;
-	// int EF_mu15;
-	// int EF_mu15_NoAlg;
-	// int EF_mu20;
-	// int EF_mu20_MSonly;
-	// int EF_mu20_NoAlg;
-	// int EF_mu20_slow;
-	// int EF_mu30_MSonly;
-	// int EF_mu4;
-	// int EF_mu40_MSonly;
-	
+	// EF triggers	
 	bool EF_mu22;
 	bool EF_mu22_MG;
 	bool EF_mu40_MSonly_barrel;
@@ -605,7 +583,7 @@ public:
 	void resetMuQAflags(int nMus);
 	int  countQAflags();
 	void pTSort();
-	void pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b);
+	void pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* charge);
 	void imassSort();
 	bool assignPairIndices();
 	

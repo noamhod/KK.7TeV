@@ -8,14 +8,20 @@
 #ifdef kinematics_cxx
 #include "kinematics.h"
 
-kinematics::kinematics() {}
+kinematics*  kinematics::theInstance=0;
+kinematics* kinematics::getInstance()
+{
+	if(theInstance==0) theInstance = new kinematics();
+	return theInstance;
+}
 
+kinematics::kinematics() {}
 kinematics::~kinematics() {}
 
 inline float kinematics::imass( TLorentzVector* pa, TLorentzVector* pb )
 {
-	m_pTmp = (*pa)+(*pb);
-	return m_pTmp.M();
+	TLorentzVector pTmp = (*pa)+(*pb);
+	return pTmp.M();
 }
 
 inline float kinematics::pT( TLorentzVector* p )
@@ -35,16 +41,28 @@ inline float kinematics::eta( TLorentzVector* p )
 
 inline float kinematics::dR( TLorentzVector* pa, TLorentzVector* pb )
 {
-	//pa = NULL;
-	//pb = NULL;
 	return pa->DeltaR(*pb);
-	//return 0.;
 }
 
 inline float kinematics::pAbs( TLorentzVector* p )
 {       
 	return p->Mag();
 }       
+
+inline float kinematics::chi( TLorentzVector* pa, TLorentzVector* pb )
+{
+	return TMath::Exp(fabs(pa->Rapidity()-pb->Rapidity()));
+}
+
+inline float kinematics::yStar( TLorentzVector* pa, TLorentzVector* pb )
+{
+	return (pa->Rapidity()-pb->Rapidity())/2.;
+}
+
+inline float kinematics::yB( TLorentzVector* pa, TLorentzVector* pb )
+{
+	return (pa->Rapidity()+pb->Rapidity())/2.;
+}
 
 inline float kinematics::cosThetaDimu( TLorentzVector* pa, TLorentzVector* pb )
 {
@@ -56,8 +74,8 @@ inline float kinematics::cosThetaDimu( TLorentzVector* pa, TLorentzVector* pb )
 
 inline float kinematics::QT( TLorentzVector* pa, TLorentzVector* pb )
 {
-	m_pTmp = (*pa)+(*pb);
-	return m_pTmp.Perp();
+	TLorentzVector pTmp = (*pa)+(*pb);
+	return pTmp.Perp();
 }       
 
 inline float kinematics::y( TLorentzVector* p )
@@ -67,31 +85,57 @@ inline float kinematics::y( TLorentzVector* p )
 
 inline float kinematics::ySystem( TLorentzVector* pa, TLorentzVector* pb )
 {
-	m_pTmp = (*pa)+(*pb);
-	return m_pTmp.Rapidity();
+	TLorentzVector pTmp = (*pa)+(*pb);
+	return pTmp.Rapidity();
 }
 
-inline float kinematics::betaSystem( TLorentzVector* pa, TLorentzVector* pb )
+inline float kinematics::magBetaSystem( TLorentzVector* pa, TLorentzVector* pb )
 {
-	m_pTmp = (*pa)+(*pb);
-	return m_pTmp.Beta();
+	TLorentzVector pTmp = (*pa)+(*pb);
+	return pTmp.Beta();
 }
 
-inline float kinematics::betazSystem( TLorentzVector* pa, TLorentzVector* pb )
+inline TVector3 kinematics::systemBoostVector( TLorentzVector* pa, TLorentzVector* pb )
 {
-	m_pTmp = (*pa)+(*pb);
-	return (m_pTmp.Mag()!=0.) ? m_pTmp.Pz()/m_pTmp.Mag() : -999.;
+	TLorentzVector pTmp = (*pa)+(*pb);
+	return pTmp.BoostVector();
+}
+
+inline TLorentzVector* kinematics::Boost( TLorentzVector* pBoost, TLorentzVector* p )
+{
+	TLorentzVector* pBoosted = (TLorentzVector*)p->Clone("");
+	pBoosted->Boost(-1.*pBoost->BoostVector());
+	return pBoosted;
+}
+
+inline TLorentzVector* kinematics::Boost( TLorentzVector* pa, TLorentzVector* pb, TLorentzVector* p )
+{
+	TLorentzVector pTmp = (*pa)+(*pb);
+	TLorentzVector* pBoosted = (TLorentzVector*)p->Clone("");
+	pBoosted->Boost(-1.*pTmp.BoostVector());
+	return pBoosted;
+}
+
+inline float kinematics::betaiSystem( TLorentzVector* pa, TLorentzVector* pb, int i)
+{
+	TLorentzVector pTmp = (*pa)+(*pb);
+	float E = pTmp.E();
+	if     (i=1) return (E!=0.) ? pTmp.Px()/E : -99999999.;
+	else if(i=2) return (E!=0.) ? pTmp.Py()/E : -99999999.;
+	else if(i=3) return (E!=0.) ? pTmp.Pz()/E : -99999999.;
+	else return -99999999.;
+	return -99999999.;
 }
 
 inline float kinematics::betaTSystem( TLorentzVector* pa, TLorentzVector* pb )
 {
-	m_pTmp = (*pa)+(*pb);
-	return (m_pTmp.Mag()!=0.) ? m_pTmp.Pt()/m_pTmp.Mag() : -999.;
+	TLorentzVector pTmp = (*pa)+(*pb);
+	return (pTmp.E()!=0.) ? pTmp.Pt()/pTmp.E() : -999.;
 }
 
-inline float kinematics::betaSystem( float pa, float pb, float ea, float eb )
+inline float kinematics::magBetaSystem( float pa, float pb, float ea, float eb )
 {
-	return ((ea+eb)>0.) ? (pa+pb)/(ea+eb) : -999.;
+	return ((ea+eb)>0.) ? (pa+pb)/(ea+eb) : -999999.;
 }
 
 inline float kinematics::cosThetaBoost( TLorentzVector* pa, float ca,
@@ -104,14 +148,14 @@ inline float kinematics::cosThetaBoost( TLorentzVector* pa, float ca,
 	//decaying parent particle, X, between the direction of the
 	// decay daughter a and the direction of the grandparent particle Y.
 
-	m_pTmp = (*pa)+(*pb); // this is the mumu system (Z) 4vector
-	TVector3 ZboostVector = m_pTmp.BoostVector(); // this is the 3vector of the Z
+	TLorentzVector pTmp = (*pa)+(*pb); // this is the mumu system (Z) 4vector
+	TVector3 ZboostVector = pTmp.BoostVector(); // this is the 3vector of the Z
 	TLorentzVector p; // this is the muon 4vector
 	
 	if(ca<0)      p.SetPxPyPzE(pa->Px(),pa->Py(),pa->Pz(),pa->E());
 	else if(cb<0) p.SetPxPyPzE(pb->Px(),pb->Py(),pb->Pz(),pb->E());
 	p.Boost( -ZboostVector ); // boost p to the dimuon CM (rest) frame
-	float cosThetaB = p.Vect()*m_pTmp.Vect()/(p.P()*m_pTmp.P());
+	float cosThetaB = p.Vect()*pTmp.Vect()/(p.P()*pTmp.P());
 	//if (ySystem(pa,pb) < 0) cosThetaB *= -1.; // reclassify ???
 	return cosThetaB;
 }

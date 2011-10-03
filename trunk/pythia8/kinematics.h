@@ -21,6 +21,65 @@ inline float ySystem( TLorentzVector* pa, TLorentzVector* pb )
 	return pTmp.Rapidity();
 }
 
+inline float chi( TLorentzVector* pa, TLorentzVector* pb )
+{
+	return TMath::Exp(fabs(pa->Rapidity()-pb->Rapidity()));
+}
+
+inline float yStar( TLorentzVector* pa, TLorentzVector* pb )
+{
+	return (pa->Rapidity()-pb->Rapidity())/2.;
+}
+
+inline float yB( TLorentzVector* pa, TLorentzVector* pb )
+{
+	return (pa->Rapidity()+pb->Rapidity())/2.;
+}
+
+inline float betaSystem( TLorentzVector* pa, TLorentzVector* pb )
+{
+	TLorentzVector pTmp = (*pa)+(*pb);
+	return pTmp.Beta();
+}
+
+inline TVector3 systemBoostVector( TLorentzVector* pa, TLorentzVector* pb )
+{
+	TLorentzVector pTmp = (*pa)+(*pb);
+	return pTmp.BoostVector();
+}
+
+inline TLorentzVector* Boost( TLorentzVector* pBoost, TLorentzVector* p )
+{
+	TLorentzVector* pBoosted = (TLorentzVector*)p->Clone("");
+	pBoosted->Boost(-1.*pBoost->BoostVector());
+	return pBoosted;
+}
+
+inline TLorentzVector* Boost( TLorentzVector* pa, TLorentzVector* pb, TLorentzVector* p )
+{
+	TLorentzVector pTmp = (*pa)+(*pb);
+	TLorentzVector* pBoosted = (TLorentzVector*)p->Clone("");
+	pBoosted->Boost(-1.*pTmp.BoostVector());
+	return pBoosted;
+}
+
+inline float betazSystem( TLorentzVector* pa, TLorentzVector* pb )
+{
+	TLorentzVector pTmp = (*pa)+(*pb);
+	return (pTmp.Mag()!=0.) ? pTmp.Pz()/pTmp.Mag() : -999.;
+}
+
+inline float betaTSystem( TLorentzVector* pa, TLorentzVector* pb )
+{
+	TLorentzVector pTmp = (*pa)+(*pb);
+	return (pTmp.Mag()!=0.) ? pTmp.Pt()/pTmp.Mag() : -999.;
+}
+
+inline float betaSystem( float pa, float pb, float ea, float eb )
+{
+	return ((ea+eb)>0.) ? (pa+pb)/(ea+eb) : -999.;
+}
+
 inline float cosThetaBoost( TLorentzVector* pa, float ca, TLorentzVector* pb, float cb )
 {
 	// http://xrootd.slac.stanford.edu/BFROOT/www/doc/workbook_backup_010108/analysis/analysis.html

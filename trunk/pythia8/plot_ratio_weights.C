@@ -8,6 +8,7 @@ float ca_tru = 0.;
 float cb_tru = 0.;
 float M_tru = 0.;
 float YQ_tru = 0.;
+float Ystar_tru = 0.;
 float COSTHETA_tru = 0.;
 float ETAMU_tru = 0.;
 
@@ -19,6 +20,7 @@ float ca_rec = 0.;
 float cb_rec = 0.;
 float M_rec = 0.;
 float YQ_rec = 0.;
+float Ystar_rec = 0.;
 float COSTHETA_rec = 0.;
 float ETAMU_rec = 0.;
 
@@ -42,6 +44,11 @@ double    imassmin   = minMassBin; //120.;
 double    imassmax   = maxMassBin; //4000.;
 const int nimassbins = niMassBins; // 400;
 
+// bins for the ystar histos
+double     minyStar   = minystar; //120.;
+double     maxyStar   = maxystar; //4000.;
+static int nyStarbins = nystarbins;
+
 static Double_t logMmin;
 static Double_t logMmax;
 static Double_t logMbinwidth;
@@ -64,6 +71,7 @@ TDirectory* dirCostHistograms;
 TDirectory* dirMassHistograms;
 TDirectory* diryQHistograms;
 TDirectory* dirEtaHistograms;
+TDirectory* diryStarHistograms;
 TDirectory* dirNtuples;
 
 vector<string> svNames;
@@ -77,10 +85,8 @@ vector<vector<TH1D*> > hvvBinnedHistos_yQ;
 vector<vector<TH1D*> > hvvBinnedHistos_yQ_unscaled;
 vector<vector<TH1D*> > hvvBinnedHistos_eta;
 vector<vector<TH1D*> > hvvBinnedHistos_eta_unscaled;
-
-// TMapsvvP2TH1 hvvBinnedHistos[2];
-// TMapsvvP2TH1 hvvBinnedHistos_unscaled[2];
-
+vector<vector<TH1D*> > hvvBinnedHistos_yStar;
+vector<vector<TH1D*> > hvvBinnedHistos_yStar_unscaled;
 vector<vector<TTree*> > vvtBinnedNtuples;
 
 
@@ -89,7 +95,16 @@ TTree* tAfbMassBins;
 vector<double> dvWeights;
 vector<Color_t> cvColors;
 
-float mass_tru, mass_rec, mass_wgt, cost_tru, cost_rec, cost_wgt, yQ_tru, yQ_rec, yQ_wgt, eta_tru, eta_rec, eta_wgt, xscn_wgt;
+float mass_tru, mass_rec, mass_wgt,
+	  cost_tru, cost_rec, cost_wgt,
+	  yQ_tru, yQ_rec, yQ_wgt,
+	  eta_tru, eta_rec, eta_wgt,
+	  yStar_tru, yStar_rec, yStar_wgt,
+	  xscn_wgt;
+TLorentzVector* tlv1Tru = new TLorentzVector;
+TLorentzVector* tlv2Tru = new TLorentzVector;
+TLorentzVector* tlv1Rec = new TLorentzVector;
+TLorentzVector* tlv2Rec = new TLorentzVector;
 
 string sDir  = "/data/hod/pythia8_ntuples/";
 string sName = "";
@@ -119,10 +134,14 @@ void clearSamples()
 			
 			if(hvvBinnedHistos_eta[n][m]!=NULL)          delete hvvBinnedHistos_eta[n][m];
 			if(hvvBinnedHistos_eta_unscaled[n][m]!=NULL) delete hvvBinnedHistos_eta_unscaled[n][m];
+			
+			if(hvvBinnedHistos_yStar[n][m]!=NULL)          delete hvvBinnedHistos_yStar[n][m];
+			if(hvvBinnedHistos_yStar_unscaled[n][m]!=NULL) delete hvvBinnedHistos_yStar_unscaled[n][m];
 		}
 		hvvBinnedHistos_cosTh[n].clear();
 		hvvBinnedHistos_yQ[n].clear();
 		hvvBinnedHistos_eta[n].clear();
+		hvvBinnedHistos_yStar[n].clear();
 	}
 	hvBinnedHistos_imass.clear();
 	hvBinnedHistos_imass_unscaled.clear();
@@ -133,6 +152,8 @@ void clearSamples()
 	hvvBinnedHistos_yQ_unscaled.clear();
 	hvvBinnedHistos_eta.clear();
 	hvvBinnedHistos_eta_unscaled.clear();
+	hvvBinnedHistos_yStar.clear();
+	hvvBinnedHistos_yStar_unscaled.clear();
 	dvWeights.clear();
 	cvColors.clear();
 }
@@ -190,6 +211,16 @@ void addSample(string sname, Color_t color, double events, double sigma /*in [mb
 	hvvBinnedHistos_eta.push_back( vTmp );
 	hvvBinnedHistos_eta_unscaled.push_back( vTmp_unscaled );
 	
+	vTmp.clear();
+	vTmp_unscaled.clear();
+	for(int b=0 ; b<imass_afb_nbins ; b++)
+	{
+		vTmp.push_back( new TH1D((sName+"_massbin_yStar_"+_s(b)).c_str(),(sName+"_massbin_yStar_"+_s(b)).c_str(),nyStarbins,minyStar,maxyStar) );
+		vTmp_unscaled.push_back( new TH1D((sName+"unscaled_massbin_yStar_"+_s(b)).c_str(),(sName+"unscaled_massbin_yStar_"+_s(b)).c_str(),nyStarbins,minyStar,maxyStar) );
+	}
+	hvvBinnedHistos_yStar.push_back( vTmp );
+	hvvBinnedHistos_yStar_unscaled.push_back( vTmp_unscaled );
+	
 	
 	dvWeights.push_back(luminosity/(events/(sigma*mb2fb)));
 	cvColors.push_back(color);
@@ -225,10 +256,18 @@ void initOutNtuples(TDirectory* tDir)
 			vvtBinnedNtuples[t-1][mod]->Branch( "yQ_tru",   &yQ_tru );
 			vvtBinnedNtuples[t-1][mod]->Branch( "yQ_rec",   &yQ_rec );
 			vvtBinnedNtuples[t-1][mod]->Branch( "yQ_wgt",   &yQ_wgt );
-			vvtBinnedNtuples[t-1][mod]->Branch( "xscn_wgt", &xscn_wgt );
 			vvtBinnedNtuples[t-1][mod]->Branch( "eta_tru",  &eta_tru );
 			vvtBinnedNtuples[t-1][mod]->Branch( "eta_rec",  &eta_rec );
 			vvtBinnedNtuples[t-1][mod]->Branch( "eta_wgt",  &eta_wgt );
+			vvtBinnedNtuples[t-1][mod]->Branch( "yStar_tru",  &yStar_tru );
+			vvtBinnedNtuples[t-1][mod]->Branch( "yStar_rec",  &yStar_rec );
+			vvtBinnedNtuples[t-1][mod]->Branch( "yStar_wgt",  &yStar_wgt );
+			vvtBinnedNtuples[t-1][mod]->Branch( "xscn_wgt", &xscn_wgt );
+			
+			vvtBinnedNtuples[t-1][mod]->Branch( "tlv1Tru", &tlv1Tru );
+			vvtBinnedNtuples[t-1][mod]->Branch( "tlv2Tru", &tlv2Tru );
+			vvtBinnedNtuples[t-1][mod]->Branch( "tlv1Rec", &tlv1Rec );
+			vvtBinnedNtuples[t-1][mod]->Branch( "tlv2Rec", &tlv2Rec );
 		}
 	}
 }
@@ -284,6 +323,7 @@ int plot_ratio_weights()
 	dirMassHistograms = fWeights->mkdir("iMass_histograms");
 	diryQHistograms   = fWeights->mkdir("yQ_histograms");
 	dirEtaHistograms  = fWeights->mkdir("etamu_histograms");
+	diryStarHistograms  = fWeights->mkdir("yStar_histograms");
 	dirAllHistograms  = fWeights->mkdir("all_histograms");
 	
 	dirAllHistograms->cd();
@@ -351,6 +391,8 @@ int plot_ratio_weights()
 	cin >> sMass;
 	
 
+	
+	
 	logMmin  = log10(imassmin);
 	logMmax  = log10(imassmax);
 	logMbinwidth = (Double_t)( (logMmax-logMmin)/(Double_t)nimassbins );
@@ -364,6 +406,8 @@ int plot_ratio_weights()
 		MassBin = xbins[i];
 		tMassBins->Fill();
 	}
+	
+	
 	
 	TCanvas* cnv = new TCanvas("cnv", "cnv", 0,0,1200,800);
 	cnv->Divide(2,2);
@@ -395,6 +439,8 @@ int plot_ratio_weights()
 	cnv->cd();
 	cnv->Draw();
 	
+	
+	
 	TLegend* leg_mass = new TLegend(0.1462841,0.1774325,0.5373268,0.4004816,NULL,"brNDC");
 	leg_mass->SetFillColor(kWhite);
 	
@@ -418,6 +464,8 @@ int plot_ratio_weights()
 	TPaveText* pvtxt_compare = new TPaveText(0.1688387,0.4001352,0.4258138,0.5691372,"brNDC");
 	pvtxt_compare->SetFillColor(kWhite);
 	txt = pvtxt_compare->AddText( "#splitline{Template vs. #it{ATLAS}}{MC10 reconstructed}" );
+	
+	
 	
 	
 	// for the binned-wights histograms
@@ -446,17 +494,19 @@ int plot_ratio_weights()
 		tAfbMassBins->Fill();
 	}
 	
+	
+	
 	//dirCostHistograms->cd();
 	TH1D* hDummy_afb = new TH1D("dummy","dummy",imass_afb_nbins,imass_afb_bins);
 	
 	vector<TH1D*> vhCosThSumTmp;
 	vector<TH1D*> vhCosThSumTmp_unscaled;
-	
 	vector<TH1D*> vhyQSumTmp;
 	vector<TH1D*> vhyQSumTmp_unscaled;
-	
 	vector<TH1D*> vhEtaSumTmp;
 	vector<TH1D*> vhEtaSumTmp_unscaled;
+	vector<TH1D*> vhyStarSumTmp;
+	vector<TH1D*> vhyStarSumTmp_unscaled;
 	
 	vector<TH1D*> vhCosThSumZ0d3pd_unscaled;
 	vector<TH1D*> vhCosThSumZ0d3pd_acceptance;
@@ -475,6 +525,12 @@ int plot_ratio_weights()
 	vector<TH1D*> vhEtaSumReconZ0d3pd;
 	vector<TH1D*> vhEtaSumReconDTd3pd;
 	
+	vector<TH1D*> vhyStarSumZ0d3pd_unscaled;
+	vector<TH1D*> vhyStarSumZ0d3pd_acceptance;
+	vector<TH1D*> vhyStarSumZ0d3pd;
+	vector<TH1D*> vhyStarSumReconZ0d3pd;
+	vector<TH1D*> vhyStarSumReconDTd3pd;
+	
 	vector<vector<TH1D*> > vvhCosThSum;
 	vector<vector<TH1D*> > vvhCosThSumRecTemplate;
 	vector<vector<TH1D*> > vvhCosThSumAcceptance;
@@ -489,10 +545,18 @@ int plot_ratio_weights()
 	vector<vector<TH1D*> > vvhEtaSumAcceptance;
 	vector<vector<TH1D*> > vvhEtaSumWeights;
 	
+	vector<vector<TH1D*> > vvhyStarSum;
+	vector<vector<TH1D*> > vvhyStarSumRecTemplate;
+	vector<vector<TH1D*> > vvhyStarSumAcceptance;
+	vector<vector<TH1D*> > vvhyStarSumWeights;
+	
 	vector<TH1D*>          vhCosThSumXSweights;
 	vector<TH1D*>          vhyQSumXSweights;
 	vector<TH1D*>          vhEtaSumXSweights;
+	vector<TH1D*>          vhyStarSumXSweights;
 
+	
+	
 	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
 	{	
 		tsrange = (TString)tostring(imass_afb_bins[i]) +  " GeV #rightarrow "  + (TString)tostring(imass_afb_bins[i+1]) + " GeV";
@@ -505,6 +569,9 @@ int plot_ratio_weights()
 		
 		vhEtaSumTmp.push_back( new TH1D("etamu_"+tsrange,"etamu_"+tsrange, etalogicnbins,etalogicbins) );
 		vhEtaSumTmp_unscaled.push_back( new TH1D("etamu_xs"+tsrange,"etamu_xs"+tsrange, etalogicnbins,etalogicbins) );
+
+		vhyStarSumTmp.push_back( new TH1D("yStar_"+tsrange,"yStar_"+tsrange, nyStarbins,minyStar,maxyStar) );
+		vhyStarSumTmp_unscaled.push_back( new TH1D("yStar_xs"+tsrange,"yStar_xs"+tsrange, nyStarbins,minyStar,maxyStar) );
 		
 		vhCosThSumZ0d3pd.push_back( new TH1D("cost_sumZ0d3pd_"+tsrange, "cost_cost_sumZ0d3pd_"+tsrange, ncostbins,costmin,costmax) );
 		vhCosThSumReconZ0d3pd.push_back( new TH1D("cost_sumRecZ0d3pd_"+tsrange, "cost_sumRecZ0d3pd_"+tsrange, ncostbins,costmin,costmax) );
@@ -523,6 +590,14 @@ int plot_ratio_weights()
 		vhEtaSumZ0d3pd_unscaled.push_back( new TH1D("etamu_sumZ0d3pd_unscaled_"+tsrange, "etamu_sumZ0d3pd_unscaled_"+tsrange, etalogicnbins,etalogicbins) );
 		vhEtaSumZ0d3pd_acceptance.push_back( new TH1D("etamu_sumZ0d3pd_acceptance_"+tsrange, "etamu_sumZ0d3pd_acceptance_"+tsrange, etalogicnbins,etalogicbins) );
 		
+		vhyStarSumZ0d3pd.push_back( new TH1D("yStar_sumZ0d3pd_"+tsrange, "yStar_sumZ0d3pd_"+tsrange, nyStarbins,minyStar,maxyStar) );
+		vhyStarSumReconZ0d3pd.push_back( new TH1D("yStar_sumRecZ0d3pd_"+tsrange, "yStar_sumRecZ0d3pd_"+tsrange, nyStarbins,minyStar,maxyStar) );
+		vhyStarSumReconDTd3pd.push_back( new TH1D("yStar_sumRecDTd3pd_"+tsrange, "yStar_sumRecDTd3pd_"+tsrange, nyStarbins,minyStar,maxyStar) );
+		vhyStarSumZ0d3pd_unscaled.push_back( new TH1D("yStar_sumZ0d3pd_unscaled_"+tsrange, "yStar_sumZ0d3pd_unscaled_"+tsrange, nyStarbins,minyStar,maxyStar) );
+		vhyStarSumZ0d3pd_acceptance.push_back( new TH1D("yStar_sumZ0d3pd_acceptance_"+tsrange, "yStar_sumZ0d3pd_acceptance_"+tsrange, nyStarbins,minyStar,maxyStar) );
+		
+		
+		
 		vector<TH1D*> vhTmp;
 		vhTmp.clear();
 		
@@ -539,6 +614,13 @@ int plot_ratio_weights()
 		vvhEtaSumRecTemplate.push_back(vhTmp);
 		vvhEtaSumAcceptance.push_back(vhTmp);
 		vvhEtaSumWeights.push_back(vhTmp);
+		
+		vvhyStarSum.push_back(vhTmp);
+		vvhyStarSumRecTemplate.push_back(vhTmp);
+		vvhyStarSumAcceptance.push_back(vhTmp);
+		vvhyStarSumWeights.push_back(vhTmp);
+		
+		
 		
 		for(int mod=Z0 ; mod<=DT ; mod++)
 		{
@@ -560,10 +642,20 @@ int plot_ratio_weights()
 			vvhEtaSumRecTemplate[i].push_back( new TH1D("etamu_sumRec"+tsname, "etamu_sumRec"+tsname, etalogicnbins,etalogicbins) );
 			vvhEtaSumAcceptance[i].push_back( new TH1D("etamu_sumAcc"+tsname, "etamu_sumAcc"+tsname, etalogicnbins,etalogicbins) );
 			vvhEtaSumWeights[i].push_back( new TH1D("etamu_wgt"+tsname, "etamu_wgt"+tsname, etalogicnbins,etalogicbins) );
+			
+			vvhyStarSum[i].push_back( new TH1D("yStar_sum"+tsname, "yStar_sum"+tsname, nyStarbins,minyStar,maxyStar) );
+			vvhyStarSumRecTemplate[i].push_back( new TH1D("yStar_sumRec"+tsname, "yStar_sumRec"+tsname, nyStarbins,minyStar,maxyStar) );
+			vvhyStarSumAcceptance[i].push_back( new TH1D("yStar_sumAcc"+tsname, "yStar_sumAcc"+tsname, nyStarbins,minyStar,maxyStar) );
+			vvhyStarSumWeights[i].push_back( new TH1D("yStar_wgt"+tsname, "yStar_wgt"+tsname, nyStarbins,minyStar,maxyStar) );
+			
+			
 		}
 		vhCosThSumXSweights.push_back( new TH1D("cost_wgtXS_"+tsrange,"cost_wgtXS_"+tsrange, ncostbins,costmin,costmax) );
 		vhyQSumXSweights.push_back( new TH1D("yQ_wgtXS_"+tsrange,"yQ_wgtXS_"+tsrange, nyqbins,yqmin,yqmax) );
 		vhEtaSumXSweights.push_back( new TH1D("etamu_wgtXS_"+tsrange,"etamu_wgtXS_"+tsrange, etalogicnbins,etalogicbins) );
+		vhyStarSumXSweights.push_back( new TH1D("yStar_wgtXS_"+tsrange,"yStar_wgtXS_"+tsrange, nyStarbins,minyStar,maxyStar) );
+		
+		
 	}
 	
 	
@@ -590,6 +682,8 @@ int plot_ratio_weights()
 	TH1D* hResReconZ0d3pd;
 	TH1D* hResReconZPd3pd;
 	
+	
+	
 	if(doLogx)
 	{
 		hMassSumTmp = new TH1D("sumTmp","sumTmp",nimassbins,xbins);
@@ -600,23 +694,31 @@ int plot_ratio_weights()
 		hMassSumZ0d3pd_unscaled = new TH1D("sumZ0d3pd_unscaled","sumZ0d3pd_unscaled",nimassbins,xbins);
 		hMassSumZ0d3pd_acceptance = new TH1D("sumZ0d3pd_acceptance","sumZ0d3pd_acceptance",nimassbins,xbins);
 		
+		
+		
 		for(int mod=Z0 ; mod<=DT ; mod++)
 		{
 			if(mod==Z0) tsname = "Z0";
 			if(mod==ZP) tsname = "ZP";
 			if(mod==KK) tsname = "KK";
 			if(mod==DT) tsname = "DT";
+			
+			
 		
 			vhMassSum.push_back( new TH1D("sum"+tsname,"sum"+tsname,nimassbins,xbins) );
 			vhMassAcceptance.push_back( new TH1D("sumAcc"+tsname,"sumAcc"+tsname,nimassbins,xbins) );
 			vhMassWeights.push_back( new TH1D("weights"+tsname,"weights"+tsname,nimassbins,xbins) );
 			vhMassReconTemplate.push_back( new TH1D("RecTemplate"+tsname,"RecTemplate"+tsname,nimassbins,xbins) );
+			
+			
 		}
 		hWeightsXS = new TH1D("weightsXS","weightsXS",nimassbins,xbins);
 		
 		hMassReconDTd3pd = new TH1D("ReconDTd3pd","ReconDTd3pd",nimassbins,xbins);
 		hMassReconZ0d3pd = new TH1D("ReconZ0d3pd","ReconZ0d3pd",nimassbins,xbins);
 		hMassReconZPd3pd = new TH1D("ReconZPd3pd","ReconZPd3pd",nimassbins,xbins);
+		
+		
 	}
 	else
 	{
@@ -627,6 +729,8 @@ int plot_ratio_weights()
 		hMassSumZ0d3pd = new TH1D("sumZ0d3pd","sumZ0d3pd",nimassbins,imassmin,imassmax);
 		hMassSumZ0d3pd_unscaled = new TH1D("sumZ0d3pd_unscaled","sumZ0d3pd_unscaled",nimassbins,imassmin,imassmax);
 		hMassSumZ0d3pd_acceptance = new TH1D("sumZ0d3pd_acceptance","sumZ0d3pd_acceptance",nimassbins,imassmin,imassmax);
+		
+		
 		
 		for(int mod=Z0 ; mod<=DT ; mod++)
 		{
@@ -639,12 +743,16 @@ int plot_ratio_weights()
 			vhMassAcceptance.push_back( new TH1D("sumAcc"+tsname,"sumAcc"+tsname,nimassbins,imassmin,imassmax) );
 			vhMassWeights.push_back( new TH1D("weights"+tsname,"weights"+tsname,nimassbins,imassmin,imassmax) );
 			vhMassReconTemplate.push_back( new TH1D("RecTemplate"+tsname,"RecTemplate"+tsname,nimassbins,imassmin,imassmax) );
+			
+			
 		}
 		hWeightsXS = new TH1D("weightsXS","weightsXS",nimassbins,imassmin,imassmax);
 		
 		hMassReconDTd3pd = new TH1D("ReconDTd3pd","ReconDTd3pd",nimassbins,imassmin,imassmax);
 		hMassReconZ0d3pd = new TH1D("ReconZ0d3pd","ReconZ0d3pd",nimassbins,imassmin,imassmax);
 		hMassReconZPd3pd = new TH1D("ReconZPd3pd","ReconZPd3pd",nimassbins,imassmin,imassmax);
+		
+		
 	}
 	
 	//dirAllHistograms->cd();
@@ -664,8 +772,12 @@ int plot_ratio_weights()
 	double ymin = 0.;
 	int vsize = 0;
 	
+	
+	
 	for(int model=Z0d3pd ; model<=KK ; model++)
 	{
+		
+	
 		////////////////////////////
 		// reset all ///////////////
 		clearSamples(); ////////////
@@ -675,13 +787,25 @@ int plot_ratio_weights()
 		else { for(Int_t b=0 ; b<=hMassSumTmp_unscaled->GetNbinsX() ; b++) hMassSumTmp_unscaled->SetBinContent(b,0.); }
 		for(int i=0 ; i<imass_afb_nbins ; i++)
 		{
+			
+		
 			vhCosThSumTmp[i]->Reset();
 			vhCosThSumTmp_unscaled[i]->Reset();
 			
 			vhyQSumTmp[i]->Reset();
 			vhyQSumTmp_unscaled[i]->Reset();
+			
+			vhEtaSumTmp[i]->Reset();
+			vhEtaSumTmp_unscaled[i]->Reset();
+			
+			vhyStarSumTmp[i]->Reset();
+			vhyStarSumTmp_unscaled[i]->Reset();
+			
+			
 		}
 		////////////////////////////
+	
+		
 	
 		if(model==Z0d3pd)
 		{
@@ -696,6 +820,8 @@ int plot_ratio_weights()
 			addSample("ATLASZ0/mcLocalControl_DYmumu_1750M2000", col5, 19993, 0.000000026003*nb2mb);
 			addSample("ATLASZ0/mcLocalControl_DYmumu_M2000",     col5, 19996, 0.000000015327*nb2mb);
 		}
+		
+		
 		
 		if(model==Z0)
 		{
@@ -745,7 +871,9 @@ int plot_ratio_weights()
 		// get the data
 		ymin = 0.;
 		vsize = (int)svPaths.size();
-				
+		
+		
+		
 		for(int n=vsize-1 ; n>=0 ; n--)
 		{
 			cout << "svPaths[" << n << "]=" << svPaths[n] << endl;
@@ -790,6 +918,9 @@ int plot_ratio_weights()
 						if(fabs(COSTHETA_tru)>1.)   _WARNING("Truth: |cos(theta)|>1.");
 						YQ_tru       = ySystem(tlva_tru,tlvb_tru);
 						if(fabs(YQ_tru)>6.)         _WARNING("Truth: |yQ|>6.");
+						Ystar_tru = yStar(tlva_tru,tlvb_tru);
+						
+						
 
 						hvBinnedHistos_imass[n]->Fill(M_tru);
 						hvBinnedHistos_imass_unscaled[n]->Fill(M_tru);
@@ -801,6 +932,8 @@ int plot_ratio_weights()
 						hvvBinnedHistos_yQ_unscaled[n][bin-1]->Fill(YQ_tru);
 						hvvBinnedHistos_eta[n][bin-1]->Fill(truth_all_mc_eta->at(imuon_tru));
 						hvvBinnedHistos_eta_unscaled[n][bin-1]->Fill(truth_all_mc_eta->at(imuon_tru));
+						hvvBinnedHistos_yStar[n][bin-1]->Fill(Ystar_tru);
+						hvvBinnedHistos_yStar_unscaled[n][bin-1]->Fill(Ystar_tru);
 					}
 				}
 				cout << "n=" << n << ", valids=" << valids << endl;
@@ -853,6 +986,7 @@ int plot_ratio_weights()
 					if(fabs(COSTHETA_tru)>1.)   _WARNING("Truth: |cos(theta)|>1.");
 					YQ_tru       = ySystem(tlva_tru,tlvb_tru);
 					if(fabs(YQ_tru)>6.)         _WARNING("Truth: |yQ|>6.");
+					Ystar_tru = yStar(tlva_tru,tlvb_tru);
 					
 					hvBinnedHistos_imass[n]->Fill(M_tru);
 					int bin = hDummy_afb->FindBin(M_tru);
@@ -860,6 +994,7 @@ int plot_ratio_weights()
 					hvvBinnedHistos_cosTh[n][bin-1]->Fill(COSTHETA_tru); 
 					hvvBinnedHistos_yQ[n][bin-1]->Fill(YQ_tru); 
 					hvvBinnedHistos_eta[n][bin-1]->Fill(eta->at(imuon_tru)); 
+					hvvBinnedHistos_yStar[n][bin-1]->Fill(Ystar_tru); 
 				}
 			}
 			
@@ -871,6 +1006,7 @@ int plot_ratio_weights()
 				hvvBinnedHistos_cosTh[n][i]->Scale(dvWeights[n]);
 				hvvBinnedHistos_yQ[n][i]->Scale(dvWeights[n]);
 				hvvBinnedHistos_eta[n][i]->Scale(dvWeights[n]);
+				hvvBinnedHistos_yStar[n][i]->Scale(dvWeights[n]);
 			}
 			/////////////////////////////////////////////////////////////
 			
@@ -883,12 +1019,14 @@ int plot_ratio_weights()
 				vhCosThSumTmp[i]->Add(hvvBinnedHistos_cosTh[n][i]);
 				vhyQSumTmp[i]->Add(hvvBinnedHistos_yQ[n][i]);
 				vhEtaSumTmp[i]->Add(hvvBinnedHistos_eta[n][i]);
+				vhyStarSumTmp[i]->Add(hvvBinnedHistos_yStar[n][i]);
 				
 				if(model==Z0d3pd)
 				{
 					vhCosThSumTmp_unscaled[i]->Add(hvvBinnedHistos_cosTh_unscaled[n][i]);
 					vhyQSumTmp_unscaled[i]->Add(hvvBinnedHistos_yQ_unscaled[n][i]);
 					vhEtaSumTmp_unscaled[i]->Add(hvvBinnedHistos_eta_unscaled[n][i]);
+					vhyStarSumTmp_unscaled[i]->Add(hvvBinnedHistos_yStar_unscaled[n][i]);
 				}
 			}
 			////////////////////////////////////////////////////////
@@ -912,6 +1050,9 @@ int plot_ratio_weights()
 				
 				vhEtaSumZ0d3pd[i] = (TH1D*)vhEtaSumTmp[i]->Clone("");
 				vhEtaSumZ0d3pd_unscaled[i] = (TH1D*)vhEtaSumTmp_unscaled[i]->Clone("");
+				
+				vhyStarSumZ0d3pd[i] = (TH1D*)vhyStarSumTmp[i]->Clone("");
+				vhyStarSumZ0d3pd_unscaled[i] = (TH1D*)vhyStarSumTmp_unscaled[i]->Clone("");
 			}
 		}
 		else
@@ -922,6 +1063,7 @@ int plot_ratio_weights()
 				vvhCosThSum[i][model] = (TH1D*)vhCosThSumTmp[i]->Clone("");
 				vvhyQSum[i][model] = (TH1D*)vhyQSumTmp[i]->Clone("");
 				vvhEtaSum[i][model] = (TH1D*)vhEtaSumTmp[i]->Clone("");
+				vvhyStarSum[i][model] = (TH1D*)vhyStarSumTmp[i]->Clone("");
 			}
 		}
 	}
@@ -1042,6 +1184,39 @@ int plot_ratio_weights()
 		vhEtaSumXSweights[i]->SetTitle((TString)"etamu weights_XS: " + (TString)vhEtaSumXSweights[i]->GetTitle());
 		vhEtaSumXSweights[i]->SetName( "hEtamuXS_wgt_"+b );
 		vhEtaSumXSweights[i]->Write("", TObject::kOverwrite);
+	}
+	////////////////////////////////////////////////////////////////
+	
+	
+	diryStarHistograms->cd();
+	for(Int_t i=0 ; i<imass_afb_nbins ; i++) 
+	{
+		TString b = (TString)tostring(i+1);
+	
+		for(int mod=Z0 ; mod<=KK ; mod++) 
+		{
+			if(mod==Z0) tsname = "Z0";
+			if(mod==ZP) tsname = "ZP";
+			if(mod==KK) tsname = "KK";
+			
+			vvhyStarSumWeights[i][mod] = (TH1D*)vvhyStarSum[i][mod]->Clone(""); 
+			//vvhyStarSumWeights[i][mod]->Divide(vhyStarSumZ0d3pd[i]);
+			divide(vvhyStarSumWeights[i][mod],vhyStarSumZ0d3pd[i]);
+			
+			diryStarHistograms->cd();
+			vvhyStarSumWeights[i][mod]->SetTitle((TString)"yStar weights: " + (TString)vvhyStarSumWeights[i][mod]->GetTitle());
+			vvhyStarSumWeights[i][mod]->SetName( "hyStar"+tsname+"_wgt_"+b );
+			vvhyStarSumWeights[i][mod]->Write("", TObject::kOverwrite);
+		}
+		
+		vhyStarSumXSweights[i] = (TH1D*)vhyStarSumZ0d3pd[i]->Clone(""); 
+		//vhyStarSumXSweights[i]->Divide(vhyStarSumZ0d3pd_unscaled[i]); 
+		divide(vhyStarSumXSweights[i],vhyStarSumZ0d3pd_unscaled[i]); 
+		
+		diryStarHistograms->cd();
+		vhyStarSumXSweights[i]->SetTitle((TString)"yStar weights_XS: " + (TString)vhyStarSumXSweights[i]->GetTitle());
+		vhyStarSumXSweights[i]->SetName( "hyStarXS_wgt_"+b );
+		vhyStarSumXSweights[i]->Write("", TObject::kOverwrite);
 	}
 	////////////////////////////////////////////////////////////////
 
@@ -1471,7 +1646,149 @@ int plot_ratio_weights()
 		vCetamu[i]->SaveAs(tsname+".root");
 		vCetamu[i]->SaveAs(tsname+".png");
 	}
-	cout << "yQ weights are calculated and written\n" << endl;
+	cout << "eta weights are calculated and written\n" << endl;
+	//---------------------------------------------------------------------------
+	
+	
+	// draw yStar
+	diryStarHistograms->cd();
+	vector<TCanvas*> vCyStar;
+	vector<TVirtualPad*> vP1yStar;
+	vector<TVirtualPad*> vP2yStar;
+	vector<TLegend*> vL1yStar;
+	vector<TLegend*> vL2yStar;
+	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
+	{
+		
+		TString b = (TString)tostring(i+1);
+		
+		vCyStar.push_back( new TCanvas("yStar_c"+b,"yStar_c"+b,0,0,1200,800) );
+		vCyStar[i]->Divide(1,2);
+		vCyStar[i]->Draw();
+		
+		vP1yStar.push_back( vCyStar[i]->cd(1) );
+		vP1yStar[i]->SetLogy();
+		
+		vP2yStar.push_back( vCyStar[i]->cd(2) );
+		vP2yStar[i]->SetLogy();
+		
+		vL1yStar.push_back( new TLegend(0.6928196,0.1761658,0.8771074,0.3353843,NULL,"brNDC") );
+		vL1yStar[i]->SetFillColor(kWhite);
+		
+		vL2yStar.push_back( new TLegend(0.7554766,0.8272493,0.877596,0.947087,NULL,"brNDC") );
+		vL2yStar[i]->SetFillColor(kWhite);
+		
+		
+		vP1yStar[i]->cd();
+		vP1yStar[i]->Draw();
+		
+		float min = 1.e-2;
+		float max = vhyStarSumZ0d3pd[i]->GetMaximum();
+		for(int mod=Z0 ; mod<=KK ; mod++) max = (vvhyStarSum[i][mod]->GetMaximum() > max) ? vvhyStarSum[i][mod]->GetMaximum() : max;
+	
+		vhyStarSumZ0d3pd[i]->SetMinimum(1.e-2);
+		vhyStarSumZ0d3pd[i]->SetMaximum(5.*max);
+		vhyStarSumZ0d3pd[i]->SetLineColor(col0);
+		vhyStarSumZ0d3pd[i]->SetLineStyle(1);
+		vhyStarSumZ0d3pd[i]->SetLineWidth(2);
+		vhyStarSumZ0d3pd[i]->SetXTitle("y*");
+		vhyStarSumZ0d3pd[i]->SetYTitle("Events");
+		//if(5.*max<1.e2) vhyStarSumZ0d3pd[i]->GetYaxis()->SetMoreLogLabels();
+		vhyStarSumZ0d3pd[i]->Draw();
+		vL1yQ[i]->AddEntry(vhyStarSumZ0d3pd[i], "SM #gamma/Z^{0} (#it{ATLAS} MC10 tru)", "l");
+		
+		for(int mod=Z0 ; mod<=KK ; mod++)
+		{
+			Color_t  col = 0;
+			if(mod==Z0)
+			{
+				col = kBlue;
+				sName = "SM #gamma/Z^{0} (#scale[1.1]{P}#scale[0.9]{YTHIA8})";
+			}
+			if(mod==ZP)
+			{
+				col = col2;
+				sName = sMass + " GeV S^{1}/Z_{2} KK (#scale[1.1]{P}#scale[0.9]{YTHIA8})"; 
+			}
+			if(mod==KK)
+			{
+				col = kGreen+3;
+				sName = sMass + " GeV S^{1}/Z_{2} KK (#scale[1.1]{P}#scale[0.9]{YTHIA8})"; 
+			}
+		
+			vvhyStarSum[i][mod]->SetMinimum(min);
+			vvhyStarSum[i][mod]->SetMaximum(5.*max);
+			vvhyStarSum[i][mod]->SetLineColor(col);
+			vvhyStarSum[i][mod]->SetLineStyle(1);
+			vvhyStarSum[i][mod]->SetLineWidth(2);
+			vvhyStarSum[i][mod]->SetXTitle("y*");
+			vvhyStarSum[i][mod]->SetYTitle("Events");
+			//if(5.*max<1.e2) vvhyStarSum[i][mod]->GetYaxis()->SetMoreLogLabels();
+			vvhyStarSum[i][mod]->Draw("SAMES");
+			vL1yStar[i]->AddEntry(vvhyStarSum[i][mod], sName.c_str(), "l");
+		}
+		vL1yStar[i]->Draw("SAMES");
+		
+		vP1yStar[i]->cd();
+		vP1yStar[i]->RedrawAxis();
+		vP1yStar[i]->Update();
+		
+		//--------------------------------------------
+		
+		vP2yStar[i]->cd();
+		vP2yStar[i]->Draw();
+		
+		min = 1.e-1;
+		max = -1.;
+		for(int mod=Z0 ; mod<=KK ; mod++) max = (vvhyStarSumWeights[i][mod]->GetMaximum() > max) ? vvhyStarSumWeights[i][mod]->GetMaximum() : max;
+		string sYTitle = "Events_{#scale[1.1]{P}#scale[0.9]{YTHIA8}}/Events_{#gamma/Z^{0}}";
+		for(int mod=Z0 ; mod<=KK ; mod++)
+		{
+			Color_t  col = 0;
+			TString drawOpt = "";
+			if(mod==Z0)
+			{
+				col = kBlue;
+				sName = "SM #gamma/Z^{0}";
+				drawOpt = "";
+			}
+			if(mod==ZP)
+			{
+				col = col2;
+				sName = sMass + " GeV Z' SSM";
+				drawOpt = "SAMES";
+			}
+			if(mod==KK)
+			{
+				col = kGreen+3;
+				sName   = sMass + " GeV S^{1}/Z_{2} KK";
+				drawOpt = "SAMES";
+			}
+			vvhyStarSumWeights[i][mod]->SetMinimum(min);
+			vvhyStarSumWeights[i][mod]->SetMaximum(5.*max);
+			vvhyStarSumWeights[i][mod]->SetLineColor(col2);
+			vvhyStarSumWeights[i][mod]->SetLineStyle(1);
+			vvhyStarSumWeights[i][mod]->SetLineWidth(2);
+			vvhyStarSumWeights[i][mod]->SetXTitle("y*");
+			vvhyStarSumWeights[i][mod]->SetYTitle(sYTitle.c_str());
+			//if(5.*max<1.e2) vvhyStarSumWeights[i][mod]->GetYaxis()->SetMoreLogLabels(); 
+			vvhyStarSumWeights[i][mod]->Draw(drawOpt);
+			vL2yStar[i]->AddEntry(vvhyStarSumWeights[i][mod], sName.c_str(), "l");
+		}
+		vL2yStar[i]->Draw("SAMES");
+		
+		vP2yStar[i]->cd();
+		vP2yStar[i]->RedrawAxis();
+		vP2yStar[i]->Update();
+		vCyStar[i]->Update();
+		
+		tsname = "plots/plot_yStar_" + b;
+		vCyStar[i]->SaveAs(tsname+".eps");
+		vCyStar[i]->SaveAs(tsname+".C");
+		vCyStar[i]->SaveAs(tsname+".root");
+		vCyStar[i]->SaveAs(tsname+".png");
+	}
+	cout << "yStar weights are calculated and written\n" << endl;
 	//---------------------------------------------------------------------------
 	
 	
@@ -1491,6 +1808,7 @@ int plot_ratio_weights()
 		for(int i=0 ; i<imass_afb_nbins ; i++) vhCosThSumTmp[i]->Reset();
 		for(int i=0 ; i<imass_afb_nbins ; i++) vhyQSumTmp[i]->Reset();
 		for(int i=0 ; i<imass_afb_nbins ; i++) vhEtaSumTmp[i]->Reset();
+		for(int i=0 ; i<imass_afb_nbins ; i++) vhyStarSumTmp[i]->Reset();
 		
 		////////////////////////////
 	
@@ -1591,11 +1909,12 @@ int plot_ratio_weights()
 			for(Int_t i=0 ; i<tree->GetEntries() ; i++)
 			{
 				tree->GetEntry(i);
-				Int_t    bin    = 0;
-				Double_t mass_weight = 0.;
-				Double_t cost_weight = 0.;
-				Double_t yQ_weight   = 0.;
-				Double_t eta_weight  = 0.;
+				Int_t    bin          = 0;
+				Double_t mass_weight  = 0.;
+				Double_t cost_weight  = 0.;
+				Double_t yQ_weight    = 0.;
+				Double_t eta_weight   = 0.;
+				Double_t yStar_weight = 0.;
 				if(model!=DT)
 				{
 					if(recon_all_isValid  &&  truth_all_isValid)
@@ -1614,6 +1933,7 @@ int plot_ratio_weights()
 						if(fabs(COSTHETA_tru)>1.)   _WARNING("Truth: |cos(theta)|>1.");
 						YQ_tru       = ySystem(tlva_tru,tlvb_tru);
 						if(fabs(YQ_tru)>6.)         _WARNING("Truth: |yQ|>6.");
+						Ystar_tru = yStar(tlva_tru,tlvb_tru);
 						
 						imuon_rec  = (recon_all_charge->at(0)<0.) ? 0 : 1;
 						iamuon_rec = (imuon_rec==0) ? 1 : 0;
@@ -1633,6 +1953,7 @@ int plot_ratio_weights()
 						if(fabs(COSTHETA_rec)>1.)   _WARNING("Reconstructed: |cos(theta)|>1.");
 						YQ_rec       = ySystem(tlva_rec,tlvb_rec);
 						if(fabs(YQ_rec)>6.)         _WARNING("Reconstructed: |yQ|>6.");
+						Ystar_rec = yStar(tlva_rec,tlvb_rec);
 						
 						
 						// afb_bin = hDummy_afb->FindBin(truth_all_Mhat);
@@ -1658,8 +1979,12 @@ int plot_ratio_weights()
 							hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(YQ_rec);
 							
 							//------------ etamu
-							// hvvBinnedHistos_yQ[n][afb_bin-1]->Fill(recon_all_eta->at(imuon_rec));
+							// hvvBinnedHistos_eta[n][afb_bin-1]->Fill(recon_all_eta->at(imuon_rec));
 							hvvBinnedHistos_eta[n][afb_bin-1]->Fill(recon_all_eta->at(imuon_rec));
+							
+							//------------ yStar
+							// hvvBinnedHistos_yStar[n][afb_bin-1]->Fill(Ystar_rec);
+							hvvBinnedHistos_yStar[n][afb_bin-1]->Fill(Ystar_rec);
 						}
 						
 						else // for Z0, ZP and KK we need to scale by the weight
@@ -1698,17 +2023,13 @@ int plot_ratio_weights()
 							eta_weight = vvhEtaSumWeights[afb_bin-1][model]->GetBinContent(bin);
 							hvvBinnedHistos_eta[n][afb_bin-1]->Fill(recon_all_eta->at(imuon_rec),eta_weight);
 							
+							//------------ yStar
+							bin = vvhyStarSumWeights[afb_bin-1][model]->FindBin(Ystar_tru);
+							if(bin<1  ||  bin>vvhyStarSumWeights[afb_bin-1][model]->GetNbinsX()) continue;
+							yStar_weight = vvhyStarSumWeights[afb_bin-1][model]->GetBinContent(bin);
+							hvvBinnedHistos_yStar[n][afb_bin-1]->Fill(Ystar_rec,yStar_weight);
+							
 							//------------ ntuple
-							// mass_tru = truth_all_Mhat;
-							// mass_rec = recon_all_Mhat;
-							// mass_wgt = mass_weight;
-							// cost_tru = truth_all_CosThetaCS;
-							// cost_rec = recon_all_CosThetaCS;
-							// cost_wgt = cost_weight;
-							// yQ_tru   = truth_all_ySystem;
-							// yQ_rec   = recon_all_ySystem;
-							// yQ_wgt   = yQ_weight;
-							// xscn_wgt = bin_xs_weight; // in units of fb
 							mass_tru = M_tru;
 							mass_rec = M_rec;
 							mass_wgt = mass_weight;
@@ -1718,10 +2039,19 @@ int plot_ratio_weights()
 							yQ_tru   = YQ_tru;
 							yQ_rec   = YQ_rec;
 							yQ_wgt   = yQ_weight;
-							eta_tru   = truth_all_mc_eta->at(imuon_tru);
-							eta_rec   = recon_all_eta->at(imuon_rec);
-							eta_wgt   = eta_weight;
+							eta_tru  = truth_all_mc_eta->at(imuon_tru);
+							eta_rec  = recon_all_eta->at(imuon_rec);
+							eta_wgt  = eta_weight;
+							yStar_tru = Ystar_tru;
+							yStar_rec = Ystar_rec;
+							yStar_wgt = yStar_weight;
 							xscn_wgt = bin_xs_weight; // in units of fb
+							
+							tlv1Tru->SetPtEtaPhiM(truth_all_mc_pt->at(imuon_tru),truth_all_mc_eta->at(imuon_tru),truth_all_mc_phi->at(imuon_tru),muonMass);
+							tlv2Tru->SetPtEtaPhiM(truth_all_mc_pt->at(iamuon_tru),truth_all_mc_eta->at(iamuon_tru),truth_all_mc_phi->at(iamuon_tru),muonMass);
+							tlv1Rec->SetPtEtaPhiM(recon_all_pt->at(imuon_rec),recon_all_eta->at(imuon_rec),recon_all_phi->at(imuon_rec),muonMass);
+							tlv2Rec->SetPtEtaPhiM(recon_all_pt->at(iamuon_rec),recon_all_eta->at(iamuon_rec),recon_all_phi->at(iamuon_rec),muonMass);
+							
 							fillNtuple(vvtBinnedNtuples[afb_bin-1][model],counter,modulu);
 						}
 						counter++;
@@ -1742,6 +2072,7 @@ int plot_ratio_weights()
 					if(fabs(COSTHETA_rec)>1.)   _WARNING("Reconstructed: |cos(theta)|>1.");
 					YQ_rec       = ySystem(tlva_rec,tlvb_rec);
 					if(fabs(YQ_rec)>6.)         _WARNING("Reconstructed: |yQ|>6.");
+					Ystar_rec = yStar(tlva_rec,tlvb_rec);
 				
 					// afb_bin = hDummy_afb->FindBin(recon_all_Mhat*TeV2GeV);
 					afb_bin = hDummy_afb->FindBin(M_rec);
@@ -1765,17 +2096,11 @@ int plot_ratio_weights()
 					// hvvBinnedHistos_eta[n][afb_bin-1]->Fill(recon_all_eta->at(imuon_rec));
 					hvvBinnedHistos_eta[n][afb_bin-1]->Fill(recon_all_eta->at(imuon_rec));
 					
+					//------------ yStar
+					// hvvBinnedHistos_yStar[n][afb_bin-1]->Fill(Ystar_rec);
+					hvvBinnedHistos_yStar[n][afb_bin-1]->Fill(Ystar_rec);
+					
 					//------------ ntuple
-					// mass_tru = -1;
-					// mass_rec = recon_all_Mhat*TeV2GeV;
-					// mass_wgt = 1.;
-					// cost_tru = -1;
-					// cost_rec = recon_all_CosThetaCS;
-					// cost_wgt = 1.;
-					// yQ_tru   = -1;
-					// yQ_rec   = recon_all_ySystem;
-					// yQ_wgt   = 1.;
-					// xscn_wgt = 1.; // in units of fb
 					mass_tru = -1;
 					mass_rec = M_rec;
 					mass_wgt = 1.;
@@ -1788,7 +2113,14 @@ int plot_ratio_weights()
 					eta_tru   = -1;
 					eta_rec   = recon_all_eta->at(imuon_rec);
 					eta_wgt   = 1.;
+					yStar_tru   = -1;
+					yStar_rec   = Ystar_rec;
+					yStar_wgt   = 1.;
 					xscn_wgt = 1.; // in units of fb
+					
+					tlv1Rec->SetPtEtaPhiM(recon_all_pt->at(imuon_rec),recon_all_eta->at(imuon_rec),recon_all_phi->at(imuon_rec),muonMass);
+					tlv2Rec->SetPtEtaPhiM(recon_all_pt->at(iamuon_rec),recon_all_eta->at(iamuon_rec),recon_all_phi->at(iamuon_rec),muonMass);
+					
 					fillNtuple(vvtBinnedNtuples[afb_bin-1][model],counter,modulu);
 
 					counter++;
@@ -1804,10 +2136,12 @@ int plot_ratio_weights()
 					hvvBinnedHistos_cosTh[n][i]->Scale(dvWeights[n]);
 					hvvBinnedHistos_yQ[n][i]->Scale(dvWeights[n]);
 					hvvBinnedHistos_eta[n][i]->Scale(dvWeights[n]);
+					hvvBinnedHistos_yStar[n][i]->Scale(dvWeights[n]);
 				}
 				vhCosThSumTmp[i]->Add(hvvBinnedHistos_cosTh[n][i]);
 				vhyQSumTmp[i]->Add(hvvBinnedHistos_yQ[n][i]);
 				vhEtaSumTmp[i]->Add(hvvBinnedHistos_eta[n][i]);
+				vhyStarSumTmp[i]->Add(hvvBinnedHistos_yStar[n][i]);
 			}
 			/////////////////////////////////////////////////////////////
 			
@@ -1839,6 +2173,7 @@ int plot_ratio_weights()
 				vhCosThSumReconDTd3pd[i] = (TH1D*)vhCosThSumTmp[i]->Clone("");
 				vhyQSumReconDTd3pd[i] = (TH1D*)vhyQSumTmp[i]->Clone("");
 				vhEtaSumReconDTd3pd[i] = (TH1D*)vhEtaSumTmp[i]->Clone("");
+				vhyStarSumReconDTd3pd[i] = (TH1D*)vhyStarSumTmp[i]->Clone("");
 			}
 		}
 		else if(model==Z0d3pd)
@@ -1850,6 +2185,7 @@ int plot_ratio_weights()
 				vhCosThSumReconZ0d3pd[i] = (TH1D*)vhCosThSumTmp[i]->Clone("");
 				vhyQSumReconZ0d3pd[i] = (TH1D*)vhyQSumTmp[i]->Clone("");
 				vhEtaSumReconZ0d3pd[i] = (TH1D*)vhEtaSumTmp[i]->Clone("");
+				vhyStarSumReconZ0d3pd[i] = (TH1D*)vhyStarSumTmp[i]->Clone("");
 			}
 		}
 		else
@@ -1861,6 +2197,7 @@ int plot_ratio_weights()
 				vvhCosThSumRecTemplate[i][model] = (TH1D*)vhCosThSumTmp[i]->Clone("");
 				vvhyQSumRecTemplate[i][model] = (TH1D*)vhyQSumTmp[i]->Clone("");
 				vvhEtaSumRecTemplate[i][model] = (TH1D*)vhEtaSumTmp[i]->Clone("");
+				vvhyStarSumRecTemplate[i][model] = (TH1D*)vhyStarSumTmp[i]->Clone("");
 			}
 		}
 		
@@ -1953,7 +2290,6 @@ int plot_ratio_weights()
 		}
 	}
 	
-	
 	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
 	{
 		TString b = (TString)tostring(i+1);
@@ -1991,6 +2327,46 @@ int plot_ratio_weights()
 			dirEtaHistograms->cd();
 			vvhEtaSumRecTemplate[i][mod]->SetName("hEtaRec"+tsname+"_"+b);
 			vvhEtaSumRecTemplate[i][mod]->Write("", TObject::kOverwrite);
+		}
+	}
+	
+	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
+	{
+		TString b = (TString)tostring(i+1);
+		
+		diryStarHistograms->cd();
+		vhyStarSumZ0d3pd_acceptance[i] = (TH1D*)vhyStarSumReconZ0d3pd[i]->Clone("");
+		//vhyStarSumZ0d3pd_acceptance[i]->Divide(vhyStarSumZ0d3pd[i]);
+		divide(vhyStarSumZ0d3pd_acceptance[i],vhyStarSumZ0d3pd[i]);
+		
+		diryStarHistograms->cd();
+		vhyStarSumZ0d3pd_acceptance[i]->SetName("hyStarZ0d3pd_acceptance_"+b);
+		vhyStarSumZ0d3pd_acceptance[i]->Write("", TObject::kOverwrite);
+		
+		diryStarHistograms->cd();
+		vhyStarSumReconZ0d3pd[i]->SetName("hyStarRecZ0d3pd_"+b);
+		vhyStarSumReconZ0d3pd[i]->Write("", TObject::kOverwrite);
+		diryStarHistograms->cd();
+		vhyStarSumReconDTd3pd[i]->SetName("hyStarRecDTd3pd_"+b);
+		vhyStarSumReconDTd3pd[i]->Write("", TObject::kOverwrite);
+		
+		for(int mod=Z0 ; mod<=KK ; mod++) 
+		{
+			if(mod==Z0) tsname = "Z0";
+			if(mod==ZP) tsname = "ZP";
+			if(mod==KK) tsname = "KK";
+			
+			diryStarHistograms->cd();
+			vvhyStarSumAcceptance[i][mod] = (TH1D*)vvhyStarSumRecTemplate[i][mod]->Clone("");
+			//vvhyStarSumAcceptance[i][mod]->Divide(vvhyStarSum[i][mod]);
+			divide(vvhyStarSumAcceptance[i][mod],vvhyStarSum[i][mod]);
+			
+			diryStarHistograms->cd();
+			vvhyStarSumAcceptance[i][mod]->SetName("hyStar"+tsname+"_acceptance_"+b);
+			vvhyStarSumAcceptance[i][mod]->Write("", TObject::kOverwrite);
+			diryStarHistograms->cd();
+			vvhyStarSumRecTemplate[i][mod]->SetName("hyStarRec"+tsname+"_"+b);
+			vvhyStarSumRecTemplate[i][mod]->Write("", TObject::kOverwrite);
 		}
 	}
 	
@@ -2070,6 +2446,7 @@ int plot_ratio_weights()
 				if(fabs(COSTHETA_tru)>1.)   _WARNING("Truth: |cos(theta)|>1.");
 				YQ_tru       = ySystem(tlva_tru,tlvb_tru);
 				if(fabs(YQ_tru)>6.)         _WARNING("Truth: |yQ|>6.");
+				Ystar_tru = yStar(tlva_tru,tlvb_tru);
 			
 				imuon_rec  = (recon_all_charge->at(0)<0.) ? 0 : 1;
 				iamuon_rec = (imuon_rec==0) ? 1 : 0;
@@ -2089,6 +2466,7 @@ int plot_ratio_weights()
 				if(fabs(COSTHETA_rec)>1.)   _WARNING("Reconstructed: |cos(theta)|>1.");
 				YQ_rec       = ySystem(tlva_rec,tlvb_rec);
 				if(fabs(YQ_rec)>6.)         _WARNING("Reconstructed: |yQ|>6.");
+				Ystar_rec = yStar(tlva_rec,tlvb_rec);
 			
 				// hvBinnedHistos_imass[n]->Fill(recon_all_Mhat);
 				// hvBinnedHistos_imassRes[n]->Fill((recon_all_Mhat-truth_all_Mhat)/truth_all_Mhat); // use all events
@@ -2211,6 +2589,27 @@ int plot_ratio_weights()
 			dirEtaHistograms->cd();
 			vvhEtaSum[i][mod]->SetName("hEtaTru"+tsname+"_"+b);
 			vvhEtaSum[i][mod]->Write("", TObject::kOverwrite);
+		}
+	}
+	
+	
+	for(Int_t i=0 ; i<imass_afb_nbins ; i++)
+	{
+		TString b = (TString)tostring(i+1);
+		
+		diryStarHistograms->cd();
+		vhyStarSumZ0d3pd[i]->SetName("hyStarTruZ0d3pd_"+b);
+		vhyStarSumZ0d3pd[i]->Write("", TObject::kOverwrite);
+		
+		for(int mod=Z0 ; mod<=KK ; mod++)
+		{
+			if(mod==Z0) tsname = "Z0";
+			if(mod==ZP) tsname = "ZP";
+			if(mod==KK) tsname = "KK";
+			
+			diryStarHistograms->cd();
+			vvhyStarSum[i][mod]->SetName("hyStarTru"+tsname+"_"+b);
+			vvhyStarSum[i][mod]->Write("", TObject::kOverwrite);
 		}
 	}
 	

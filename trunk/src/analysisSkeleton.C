@@ -104,10 +104,10 @@ string analysisSkeleton::getPeriodName()
 	_DEBUG("speriod = "+speriod);
 	if(RunNumber != currentRun)
 	{
-		_DEBUG("RunNumber="+tostring(RunNumber));
+		_DEBUG("RunNumber="+_s(RunNumber));
 		speriod = getPeriod( RunNumber, m_firstrun2periodMap, m_lastrun2periodMap );
 		_DEBUG("");
-		_INFO("switching to period: "+speriod+" (run "+tostring(RunNumber)+")");
+		_INFO("switching to period: "+speriod+" (run "+_s(RunNumber)+")");
 		currentRun     = RunNumber;
 		sCurrentPeriod = speriod;
 	}
@@ -269,53 +269,6 @@ bool analysisSkeleton::checkTrigger(float trigThreshold)
 	return false;
 }
 
-
-// void analysisSkeleton::runEventDumper()
-// {
-	// _DEBUG("analysisSkeleton::runEventDumper");
-	// if(doEventDump)
-	// {
-		// int lead_mu     = ai;
-		// int sublead_mu  = bi;
-
-		// if( mu_pt->at(ai) < mu_pt->at(bi) )
-		// {
-			// lead_mu     = bi;
-			// sublead_mu  = ai;
-		// }
-		
-		// current_imass       = imass(pmu[lead_mu],pmu[sublead_mu]);
-		// current_cosTheta    = cosThetaCollinsSoper( pmu[lead_mu], -1, pmu[sublead_mu], +1 );
-		// current_mu_pT       = mu_pt->at(lead_mu)*MeV2TeV;//pT(mu_me_qoverp->at(lead_mu),mu_me_theta->at(lead_mu))*MeV2TeV;
-		// current_muplus_pT   = mu_pt->at(sublead_mu)*MeV2TeV;//pT(mu_me_qoverp->at(sublead_mu),mu_me_theta->at(sublead_mu))*MeV2TeV;
-		// current_mu_eta      = mu_eta->at(lead_mu);
-		// current_muplus_eta  = mu_eta->at(sublead_mu);
-		// current_cosmicCosth = cosThetaDimu(pmu[lead_mu],pmu[sublead_mu]);
-		// current_etaSum      = current_muplus_eta + current_mu_eta;
-		
-		// setCurrentEventMass( imass(pmu[lead_mu],pmu[sublead_mu]) );
-		// writeEventHeader(RunNumber, lbn, EventNumber);
-		
-		// writeProperty("$p_T$", mu_pt->at(lead_mu)*MeV2TeV, mu_pt->at(sublead_mu)*MeV2TeV);
-		// writeProperty("$\\eta$", mu_eta->at(lead_mu), mu_eta->at(sublead_mu));
-		
-		// writeProperty("$\\sum{p_T^{cone20}}/p_T$", mu_ptcone20->at(lead_mu)/mu_pt->at(lead_mu), mu_ptcone20->at(sublead_mu)/mu_pt->at(sublead_mu));
-		// writeProperty("$\\sum{p_T^{cone30}}/p_T$", mu_ptcone30->at(lead_mu)/mu_pt->at(lead_mu), mu_ptcone30->at(sublead_mu)/mu_pt->at(sublead_mu));
-		// writeProperty("$\\sum{p_T^{cone40}}/p_T$", mu_ptcone40->at(lead_mu)/mu_pt->at(lead_mu), mu_ptcone40->at(sublead_mu)/mu_pt->at(sublead_mu));
-		
-		// writeProperty("nSCThits", mu_nSCTHits->at(lead_mu), mu_nSCTHits->at(sublead_mu));
-		// writeProperty("nPIXhits", mu_nPixHits->at(lead_mu), mu_nPixHits->at(sublead_mu));
-		// writeProperty("nIDhits ", mu_nSCTHits->at(lead_mu)+mu_nPixHits->at(lead_mu), mu_nSCTHits->at(sublead_mu)+mu_nPixHits->at(sublead_mu));
-		
-		// writeProperty("$\\hat{m}_{\\mu\\mu}$", "red", imass(pmu[lead_mu],pmu[sublead_mu]));
-		// writeProperty("$\\sum{\\eta_{\\mu}}$", "red", current_muplus_eta + current_mu_eta);
-		// writeProperty("$\\hat{p}_{\\mu^-}\\cdot\\hat{p}_{\\mu^+}$", cosThetaDimu(pmu[lead_mu],pmu[sublead_mu]));
-		// writeProperty("$\\cos\\theta_{\\mu^-}$", cosThetaCollinsSoper( pmu[lead_mu], -1, pmu[sublead_mu], +1 ));
-		
-		// writeEventFooter();
-	// }
-// }
-
 void analysisSkeleton::runEventDumper()
 {
 	if(!isInteresting(current_imass)) return;
@@ -446,33 +399,6 @@ void analysisSkeleton::printAllProperties(int aii, int bii, int iv)
 	printProperty("EventNumber", EventNumber);
 	printProperty("isGRL", isGRL);
 	printProperty("imass", imass(pmu[aii],pmu[bii]));
-	
-	// L1 triggers
-	// printProperty("L1_MU10", L1_MU10);
-	// printProperty("L1_MU15", L1_MU15);
-	// printProperty("L1_MU20", L1_MU20);
-
-	// EF triggers
-	// printProperty("EF_mu10", EF_mu10);
-	// printProperty("EF_mu10_MG", EF_mu10_MG);
-	// printProperty("EF_mu10_MSonly", EF_mu10_MSonly);
-	// printProperty("EF_mu10_MSonly_tight", EF_mu10_MSonly_tight);
-	// printProperty("EF_mu10_NoAlg", EF_mu10_NoAlg);
-	// printProperty("EF_mu10_tight", EF_mu10_tight);
-	// printProperty("EF_mu10i_loose", EF_mu10i_loose);
-	// printProperty("EF_mu13", EF_mu13);
-	// printProperty("EF_mu13_MG", EF_mu13_MG);
-	// printProperty("EF_mu13_MG_tight", EF_mu13_MG_tight);
-	// printProperty("EF_mu13_tight", EF_mu13_tight);
-	// printProperty("EF_mu15", EF_mu15);
-	// printProperty("EF_mu15_NoAlg", EF_mu15_NoAlg);
-	// printProperty("EF_mu20", EF_mu20);
-	// printProperty("EF_mu20_MSonly", EF_mu20_MSonly);
-	// printProperty("EF_mu20_NoAlg", EF_mu20_NoAlg);
-	// printProperty("EF_mu20_slow", EF_mu20_slow);
-	// printProperty("EF_mu30_MSonly", EF_mu30_MSonly);
-	// printProperty("EF_mu4", EF_mu4);
-	// printProperty("EF_mu40_MSonly", EF_mu40_MSonly);
    
 	// vertexes (for the PV preselection)
 	printProperty("vxp_n", vxp_n);
@@ -609,8 +535,6 @@ void analysisSkeleton::fillAfterCuts()
 	// for the final histograms:
 	// i.e., not the curFlow histos
 	
-	//int lead_mu = (mu_charge->at(ai)<0) ? ai : bi;
-	//int sublead_mu  = (mu_charge->at(ai)>0) ? ai : bi;
 	int lead_mu     = ai;
 	int sublead_mu  = bi;
 	if( mu_pt->at(ai) < mu_pt->at(bi) )
@@ -773,31 +697,6 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::ie_phi_exPV->push_back(mu_ie_phi_exPV->at(lead_mu));
 	graphicObjects::ie_theta_exPV->push_back(mu_ie_theta_exPV->at(lead_mu));
 	graphicObjects::ie_qoverp_exPV->push_back(mu_ie_qoverp_exPV->at(lead_mu));
-	//graphicObjects::SpaceTime_detID->push_back(mu_SpaceTime_detID->at(lead_mu));
-	//graphicObjects::SpaceTime_t->push_back(mu_SpaceTime_t->at(lead_mu));
-	//graphicObjects::SpaceTime_tError->push_back(mu_SpaceTime_tError->at(lead_mu));
-	//graphicObjects::SpaceTime_weight->push_back(mu_SpaceTime_weight->at(lead_mu));
-	//graphicObjects::SpaceTime_x->push_back(mu_SpaceTime_x->at(lead_mu));
-	//graphicObjects::SpaceTime_y->push_back(mu_SpaceTime_y->at(lead_mu));
-	//graphicObjects::SpaceTime_z->push_back(mu_SpaceTime_z->at(lead_mu));
-	//graphicObjects::SpaceTime_t_Tile->push_back(mu_SpaceTime_t_Tile->at(lead_mu));
-	//graphicObjects::SpaceTime_tError_Tile->push_back(mu_SpaceTime_tError_Tile->at(lead_mu));
-	//graphicObjects::SpaceTime_weight_Tile->push_back(mu_SpaceTime_weight_Tile->at(lead_mu));
-	//graphicObjects::SpaceTime_x_Tile->push_back(mu_SpaceTime_x_Tile->at(lead_mu));
-	//graphicObjects::SpaceTime_y_Tile->push_back(mu_SpaceTime_y_Tile->at(lead_mu));
-	//graphicObjects::SpaceTime_z_Tile->push_back(mu_SpaceTime_z_Tile->at(lead_mu));
-	//graphicObjects::SpaceTime_t_TRT->push_back(mu_SpaceTime_t_TRT->at(lead_mu));
-	//graphicObjects::SpaceTime_tError_TRT->push_back(mu_SpaceTime_tError_TRT->at(lead_mu));
-	//graphicObjects::SpaceTime_weight_TRT->push_back(mu_SpaceTime_weight_TRT->at(lead_mu));
-	//graphicObjects::SpaceTime_x_TRT->push_back(mu_SpaceTime_x_TRT->at(lead_mu));
-	//graphicObjects::SpaceTime_y_TRT->push_back(mu_SpaceTime_y_TRT->at(lead_mu));
-	//graphicObjects::SpaceTime_z_TRT->push_back(mu_SpaceTime_z_TRT->at(lead_mu));
-	//graphicObjects::SpaceTime_t_MDT->push_back(mu_SpaceTime_t_MDT->at(lead_mu));
-	//graphicObjects::SpaceTime_tError_MDT->push_back(mu_SpaceTime_tError_MDT->at(lead_mu));
-	//graphicObjects::SpaceTime_weight_MDT->push_back(mu_SpaceTime_weight_MDT->at(lead_mu));
-	//graphicObjects::SpaceTime_x_MDT->push_back(mu_SpaceTime_x_MDT->at(lead_mu));
-	//graphicObjects::SpaceTime_y_MDT->push_back(mu_SpaceTime_y_MDT->at(lead_mu));
-	//graphicObjects::SpaceTime_z_MDT->push_back(mu_SpaceTime_z_MDT->at(lead_mu));
 	graphicObjects::TileCellEnergyLayer1->push_back(mu_TileCellEnergyLayer1->at(lead_mu));
 	graphicObjects::TileTimeLayer1->push_back(mu_TileTimeLayer1->at(lead_mu));
 	graphicObjects::TileCellRmsNoiseLayer1->push_back(mu_TileCellRmsNoiseLayer1->at(lead_mu));
@@ -1044,31 +943,6 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::ie_phi_exPV->push_back(mu_ie_phi_exPV->at(sublead_mu));
 	graphicObjects::ie_theta_exPV->push_back(mu_ie_theta_exPV->at(sublead_mu));
 	graphicObjects::ie_qoverp_exPV->push_back(mu_ie_qoverp_exPV->at(sublead_mu));
-	//graphicObjects::SpaceTime_detID->push_back(mu_SpaceTime_detID->at(sublead_mu));
-	//graphicObjects::SpaceTime_t->push_back(mu_SpaceTime_t->at(sublead_mu));
-	//graphicObjects::SpaceTime_tError->push_back(mu_SpaceTime_tError->at(sublead_mu));
-	//graphicObjects::SpaceTime_weight->push_back(mu_SpaceTime_weight->at(sublead_mu));
-	//graphicObjects::SpaceTime_x->push_back(mu_SpaceTime_x->at(sublead_mu));
-	//graphicObjects::SpaceTime_y->push_back(mu_SpaceTime_y->at(sublead_mu));
-	//graphicObjects::SpaceTime_z->push_back(mu_SpaceTime_z->at(sublead_mu));
-	//graphicObjects::SpaceTime_t_Tile->push_back(mu_SpaceTime_t_Tile->at(sublead_mu));
-	//graphicObjects::SpaceTime_tError_Tile->push_back(mu_SpaceTime_tError_Tile->at(sublead_mu));
-	//graphicObjects::SpaceTime_weight_Tile->push_back(mu_SpaceTime_weight_Tile->at(sublead_mu));
-	//graphicObjects::SpaceTime_x_Tile->push_back(mu_SpaceTime_x_Tile->at(sublead_mu));
-	//graphicObjects::SpaceTime_y_Tile->push_back(mu_SpaceTime_y_Tile->at(sublead_mu));
-	//graphicObjects::SpaceTime_z_Tile->push_back(mu_SpaceTime_z_Tile->at(sublead_mu));
-	//graphicObjects::SpaceTime_t_TRT->push_back(mu_SpaceTime_t_TRT->at(sublead_mu));
-	//graphicObjects::SpaceTime_tError_TRT->push_back(mu_SpaceTime_tError_TRT->at(sublead_mu));
-	//graphicObjects::SpaceTime_weight_TRT->push_back(mu_SpaceTime_weight_TRT->at(sublead_mu));
-	//graphicObjects::SpaceTime_x_TRT->push_back(mu_SpaceTime_x_TRT->at(sublead_mu));
-	//graphicObjects::SpaceTime_y_TRT->push_back(mu_SpaceTime_y_TRT->at(sublead_mu));
-	//graphicObjects::SpaceTime_z_TRT->push_back(mu_SpaceTime_z_TRT->at(sublead_mu));
-	//graphicObjects::SpaceTime_t_MDT->push_back(mu_SpaceTime_t_MDT->at(sublead_mu));
-	//graphicObjects::SpaceTime_tError_MDT->push_back(mu_SpaceTime_tError_MDT->at(sublead_mu));
-	//graphicObjects::SpaceTime_weight_MDT->push_back(mu_SpaceTime_weight_MDT->at(sublead_mu));
-	//graphicObjects::SpaceTime_x_MDT->push_back(mu_SpaceTime_x_MDT->at(sublead_mu));
-	//graphicObjects::SpaceTime_y_MDT->push_back(mu_SpaceTime_y_MDT->at(sublead_mu));
-	//graphicObjects::SpaceTime_z_MDT->push_back(mu_SpaceTime_z_MDT->at(sublead_mu));
 	graphicObjects::TileCellEnergyLayer1->push_back(mu_TileCellEnergyLayer1->at(sublead_mu));
 	graphicObjects::TileTimeLayer1->push_back(mu_TileTimeLayer1->at(sublead_mu));
 	graphicObjects::TileCellRmsNoiseLayer1->push_back(mu_TileCellRmsNoiseLayer1->at(sublead_mu));
@@ -1300,9 +1174,6 @@ void analysisSkeleton::fillBeforeCuts()
 		h1_z0exPV->Fill(mu_z0_exPV->at(0));
 		h1_z0exPV->Fill(mu_z0_exPV->at(1));
 		
-		//X( prtD0*cos(phi) );
-		//Y( prtD0*sin(phi) );
-		//Z( Z0 );
 		h2_xyVertex->Fill( mu_d0_exPV->at(0)*cos(mu_phi->at(0)), mu_d0_exPV->at(0)*sin(mu_phi->at(0)) );
 		h2_xyVertex->Fill( mu_d0_exPV->at(1)*cos(mu_phi->at(1)), mu_d0_exPV->at(1)*sin(mu_phi->at(1)) );
 	}
@@ -1378,19 +1249,19 @@ void analysisSkeleton::pTSort()
 		if((RunNumber+EventNumber+lbn)!=EventHash)
 		{
 			_INFO("MultiGoodMuon N{"
-				  +tostring((int)pTtoIndexMap.size())
-				  +"}{run-lb-evt: "+tostring(RunNumber)+"-"+tostring(lbn)+"-"+tostring(EventNumber)
-				  +"} -> ai["+tostring(mu_charge->at(ai))+"]="+tostring(ai)
-				  +", bi["+tostring(mu_charge->at(bi))+"]="+tostring(bi));
+				  +_s((int)pTtoIndexMap.size())
+				  +"}{run-lb-evt: "+_s(RunNumber)+"-"+_s(lbn)+"-"+_s(EventNumber)
+				  +"} -> ai["+_s(mu_charge->at(ai))+"]="+_s(ai)
+				  +", bi["+_s(mu_charge->at(bi))+"]="+_s(bi));
 			EventHash = RunNumber+EventNumber+lbn;
 			isMultiMuonPrint = true;
 		}
 	}
 }
 
-void analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b)
+void analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* charge)
 {
-	_DEBUG("analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b)");
+	_DEBUG("analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* charge)");
 	// the map is already sorted by the pT size but,
 	// from the lowest to the highest, so there's
 	// no need to convert values.
@@ -1400,17 +1271,15 @@ void analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b)
 	
 	if(pTtoIndex.size()<2)
 	{
-		_ERROR("in pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b), trying to sort a <2 map. Exitting now !");
+		_ERROR("in pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* charge), trying to sort a <2 map. Exitting now !");
 		exit(-1);
 	}
 	
-	///////////////////////////////////////////////////////////////////////////////
-	// no matter how many entries in the map, just take the 2 with highest pT: ////
-	// TMapdi::reverse_iterator rit=pTtoIndex.rbegin(); //////////////////////////////
-	// index_a = rit->second; ///////////////////////////////////////////////////////
-	// rit++; ////////////////////////////////////////////////////////////////////////
-	// index_b = rit->second; ///////////////////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////////////
+	if(charge->size()<2)
+	{
+		_ERROR("in pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* charge), trying to sort a <2 map [charge->size()<2]. Exitting now !");
+		exit(-1);
+	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// no matter how many entries in the map, just take the ///////////////////////////////////////
@@ -1421,7 +1290,7 @@ void analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b)
 	index_b = rit->second; ////////////////////////////////////////////////////////////////////////
 	if(pTtoIndex.size()>2)                           //////////////////////////////////////////////
 	{                                                //////////////////////////////////////////////
-		while(mu_charge->at(index_a)*mu_charge->at(index_b)>0  &&  rit!=pTtoIndex.rend()) /////////
+		while(charge->at(index_a)*charge->at(index_b)>0  &&  rit!=pTtoIndex.rend()) ///////////////
 		{                                            //////////////////////////////////////////////
 			rit++;                                   //////////////////////////////////////////////
 			index_b = rit->second;                   //////////////////////////////////////////////
@@ -1434,10 +1303,10 @@ void analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b)
 		if((RunNumber+EventNumber+lbn)!=EventHash)
 		{
 			_INFO("MultiGoodMuon N{"
-				  +tostring((int)pTtoIndex.size())
-				  +"}{run-lb-evt: "+tostring(RunNumber)+"-"+tostring(lbn)+"-"+tostring(EventNumber)
-				  +"} -> ai["+tostring(mu_charge->at(ai))+"]="+tostring(ai)
-				  +", bi["+tostring(mu_charge->at(bi))+"]="+tostring(bi));
+				  +_s((int)pTtoIndex.size())
+				  +"}{run-lb-evt: "+_s(RunNumber)+"-"+_s(lbn)+"-"+_s(EventNumber)
+				  +"} -> ai["+_s(charge->at(ai))+"]="+_s(ai)
+				  +", bi["+_s(charge->at(bi))+"]="+_s(bi));
 			EventHash = RunNumber+EventNumber+lbn;
 			isMultiMuonPrint = true;
 		}
@@ -1467,22 +1336,6 @@ void analysisSkeleton::imassSort()
 		}
 	}
 }
-
-// void analysisSkeleton::buildMU4Vector(int nMus)
-// {
-	// _DEBUG("analysisSkeleton::buildMU4Vector");
-
-	// wipeMU4Vector();
-	// for(int j=0 ; j<nMus ; j++)
-	// {
-		// pmu.push_back( new TLorentzVector() );
-		// pmu[j]->SetPx( mu_px->at(j)*MeV2TeV );
-		// pmu[j]->SetPy( mu_py->at(j)*MeV2TeV );
-		// pmu[j]->SetPz( mu_pz->at(j)*MeV2TeV );
-		// pmu[j]->SetE(  mu_E->at(j)*MeV2TeV );
-	// }
-// }
-
 
 void analysisSkeleton::buildMU4Vector(int nMus)
 {
@@ -2213,7 +2066,7 @@ void analysisSkeleton::fillTruthEfficiency()
 	float pTreconstructed = 0.;
 	for(int t=0 ; t<(int)mu_truth_pt->size() ; t++)
 	{
-		_DEBUG("Start: t="+tostring(t));
+		_DEBUG("Start: t="+_s(t));
 	
 		if(!isCBpT) pTreconstructed = fabs(pT(mu_me_qoverp->at(t), mu_me_theta->at(t))*MeV2GeV); 
 		else        pTreconstructed = mu_pt->at(t)*MeV2GeV;
@@ -2298,93 +2151,11 @@ void analysisSkeleton::fillTruthEfficiency()
 		tru_succ_eta->push_back( mu_eta->at(t) );
 		tru_succ_phi->push_back( mu_phi->at(t) );
 		
-		_DEBUG("End: t="+tostring(t));
+		_DEBUG("End: t="+_s(t));
 	}
 	
 	_DEBUG("");
 }
-
-/*
-void analysisSkeleton::fillTruth()
-{
-	//mu_truth_matched    : True if muon is matched to the truth
-	//mu_truth_status     : Status oMC status = 1 final particle, status = 3 intermediate particle (documentary)
-	
-	if(mu_truth_pt==0)         return;
-	if(mu_truth_status==0)     return;
-	
-	//////////////////////////////////////
-	if(mu_truth_pt->size()<2) return;  ///
-	//////////////////////////////////////
-	
-	int truth_valid_index = 0;
-	//////////////////////////////////////
-	pTtoIndexMapTruth.clear(); ///////////
-	//////////////////////////////////////
-	for(int t=0 ; t<(int)mu_truth_pt->size() ; t++)
-	{
-		if(!mu_truth_status->at(t)) continue; // has to be final particle
-		if(mu_truth_mothertype->at(t)!=PDTZ  &&  mu_truth_mothertype->at(t)!=PDTGAMMA) continue; // has to come out of Z^0 (since the cuts on the reconstructed muons are Z^0-oriented) ?????
-		
-		truth_all_dr->push_back( mu_truth_dr->at(t) );
-		truth_all_E->push_back( mu_truth_E->at(t)*MeV2GeV );
-		truth_all_pt->push_back( mu_truth_pt->at(t)*MeV2GeV );
-		truth_all_eta->push_back( mu_truth_eta->at(t) );
-		truth_all_phi->push_back( mu_truth_phi->at(t) );
-		truth_all_type->push_back( mu_truth_type->at(t) );
-		truth_all_status->push_back( mu_truth_status->at(t) );
-		truth_all_barcode->push_back( mu_truth_barcode->at(t) );
-		truth_all_mothertype->push_back( mu_truth_mothertype->at(t) );
-		truth_all_motherbarcode->push_back( mu_truth_motherbarcode->at(t) );
-		truth_all_matched->push_back( mu_truth_matched->at(t) );
-		truth_all_isValid = true;
-		
-		///////////////////////////////////////////////////////////////////////////////////////
-		// FILL THE pTtoIndexMapTruth MAP WITH THE PT(KEY) AND INDEX(VALUE) ///////////////////
-		pTtoIndexMapTruth.insert(make_pair(mu_truth_pt->at(t)*MeV2GeV,truth_valid_index)); ////
-		///////////////////////////////////////////////////////////////////////////////////////
-		
-		truth_valid_index++;
-	}
-	
-	// SORT BY PT AND FIND THE INDICES OF THE FIRST 2 MUONS (HIGHEST PT).
-	ai_truth = -1;
-	bi_truth = -1;
-	if(truth_valid_index>=2  &&  pTtoIndexMapTruth.size()>=2  &&  truth_all_isValid) pTSort(pTtoIndexMapTruth, ai_truth, bi_truth);
-	else
-	{
-		truth_valid_index = 0;
-		truth_all_isValid = false;
-		return;
-	}
-	
-	// CALCULATE ALL THE 'EVENT-LEVEL' VARIABLES (DI-MUON VARIABLES)
-	if( truth_valid_index>=2  &&  ai_truth>=0  &&  bi_truth>=0  &&  ai_truth!=bi_truth )
-	{
-		if( truth_all_type->at(ai_truth)*truth_all_type->at(bi_truth) >= 0. ) // require opposite charge
-		{
-			truth_valid_index = 0;
-			truth_all_isValid = false;
-			return;
-		}
-	
-		float c1 = (truth_all_type->at(ai_truth)>0) ? -1. : +1.;
-		float c2 = (truth_all_type->at(bi_truth)>0) ? -1. : +1.;
-		
-		TLorentzVector* p1 = new TLorentzVector();
-		TLorentzVector* p2 = new TLorentzVector();
-		p1->SetPtEtaPhiE( truth_all_pt->at(ai_truth), truth_all_eta->at(ai_truth), truth_all_phi->at(ai_truth), truth_all_E->at(ai_truth));
-		p2->SetPtEtaPhiE( truth_all_pt->at(bi_truth), truth_all_eta->at(bi_truth), truth_all_phi->at(bi_truth), truth_all_E->at(bi_truth));
-		truth_all_Mhat       = imass(p1,p2);
-		truth_all_CosThetaCS = cosThetaCollinsSoper(p1,c1, p2,c2);
-		truth_all_CosThetaHE = cosThetaBoost(p1,c1, p2,c2);
-		truth_all_ySystem    = ySystem(p1,p2);
-		truth_all_QT         = QT(p1,p2);
-		delete p1;
-		delete p2;
-	}
-}
-*/
 
 void analysisSkeleton::fillTruth()
 {
@@ -2435,11 +2206,41 @@ void analysisSkeleton::fillTruth()
 	*/
 	
 	
-	////////////////////////////////////
+	// write an example of one event record
+	if(!alreadyFilled)
+	{
+		int nfinalmuons = 0;
+		for(int i=0 ; i<(int)mc_pdgId->size() ; i++)
+		{
+			if(mc_status->at(i)!=1)          continue; // has to be final particle
+			if(fabs(mc_pdgId->at(i))!=PDTMU) continue; // has to be a muon
+			
+			nfinalmuons++;
+		}
+	
+		if(nfinalmuons>3)
+		{
+			ofstream* tmpFile = new ofstream;
+			tmpFile->open("mc_event.txt");
+			for(int i=0 ; i<(int)mc_pdgId->size() ; i++)
+			{
+				(*tmpFile) << "index[" << i << "] \t status[" << mc_status->at(i) << "] \t id[" << mc_pdgId->at(i) << "]" << endl;
+				for(int mom=0 ; mom<(int)mc_parent_index->at(i).size() ; mom++)
+				{
+					int imom = mc_parent_index->at(i)[mom];
+					(*tmpFile) << "\tmother[" << mom+1 << "]  index[" << imom << "]  motherid[" << mc_pdgId->at(imom) << "]" << endl; 
+				}
+				(*tmpFile) << endl;
+			}
+			tmpFile->close();
+			alreadyFilled = true;
+		}
+	}
+	
+	////////////////////////////////
 	if(mc_pt==0)        return; ////
 	if(mc_pt->size()<2) return; ////
-	////////////////////////////////////
-	
+	////////////////////////////////
 	
 	int truth_valid_index = 0;
 	//////////////////////////////////////
@@ -2447,21 +2248,18 @@ void analysisSkeleton::fillTruth()
 	//////////////////////////////////////
 	
 	vector<int> intermediate_index;
-	
 	for(int t=0 ; t<(int)mc_pt->size() ; t++)
 	{
-		// string sid = (mc_parent_index->at(t).size()>0) ? tostring(mc_pdgId->at(mc_parent_index->at(t)[0])) : "??";
-		// if(t<10) _INFO("mc_pdgId->at("+tostring(t)+")="+tostring(mc_pdgId->at(t))+" -> mc_pdgId->at(mc_parent_index->at(t)[0])="+ sid);
-	
-		if(mc_status->at(t)!=1) {tmp_counter_1++; continue;} // has to be final particle
-		if(fabs(mc_pdgId->at(t))!=PDTMU) {tmp_counter_2++; continue;} // has to be a muon
+		if(mc_status->at(t)!=1)          continue; // has to be final particle
+		if(fabs(mc_pdgId->at(t))!=PDTMU) continue; // has to be a muon
 		
+		// take the following information from the montecarlo xml !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 		bool isZ      = false; 
 		bool isGamma  = false;
 		bool isW      = false;
 		bool isTop    = false;
 		bool isZprime = false;
-		for(int mom=0 ; mom<(int)mc_parent_index->at(t).size() ; mom++) // has to come out of Z^0 (since the cuts on the reconstructed muons are Z^0-oriented) ?????
+		for(int mom=0 ; mom<(int)mc_parent_index->at(t).size() ; mom++) // has to come out of Z^0 / Z' / W / gamma
 		{
 			int imom = mc_parent_index->at(t)[mom];
 			if(mc_pdgId->at(imom)==PDTZ)
@@ -2495,7 +2293,7 @@ void analysisSkeleton::fillTruth()
 				break;
 			}
 		}
-		if(!isZ && !isGamma && !isW && !isTop && !isZprime) {tmp_counter_3++; continue;}
+		if(!isZ && !isGamma && !isW && !isTop && !isZprime) continue;
 		
 		truth_all_mc_m->push_back( mc_m->at(t)*MeV2GeV );
 		truth_all_mc_pt->push_back( mc_pt->at(t)*MeV2GeV );
@@ -2517,88 +2315,39 @@ void analysisSkeleton::fillTruth()
 	// SORT BY PT AND FIND THE INDICES OF THE FIRST 2 MUONS (HIGHEST PT).
 	ai_truth = -1;
 	bi_truth = -1;
-	// if(truth_valid_index>=2  &&  pTtoIndexMapTruth.size()>=2) pTSort(pTtoIndexMapTruth, ai_truth, bi_truth);
-	if(truth_valid_index==2  &&  pTtoIndexMapTruth.size()==2) pTSort(pTtoIndexMapTruth, ai_truth, bi_truth);
+	 if(truth_valid_index>=2  &&  pTtoIndexMapTruth.size()>=2) pTSort(pTtoIndexMapTruth, ai_truth, bi_truth, truth_all_mc_charge);
+	//if(truth_valid_index==2  &&  pTtoIndexMapTruth.size()==2) pTSort(pTtoIndexMapTruth, ai_truth, bi_truth, truth_all_mc_charge);
 	else
 	{
 		truth_valid_index = 0;
 		truth_all_isValid = false;
-		tmp_counter_4++;
-		_WARNING("truth_valid_index!=2 -> "+tostring(truth_valid_index)+"  ||  pTtoIndexMapTruth.size()!=2 -> "+tostring((int)pTtoIndexMapTruth.size())+", skipping event");
+		_WARNING("truth_valid_index<2 -> "+_s(truth_valid_index)+"  ||  pTtoIndexMapTruth.size()<2 -> "+_s((int)pTtoIndexMapTruth.size())+", skipping event");
 		return;
 	}
 	if(intermediate_index.size()!=2)
 	{
-		_WARNING("intermediate_index.size()!=2  ->  "+tostring((int)intermediate_index.size())+", skipping event");
+		_WARNING("intermediate_index.size()!=2  ->  "+_s((int)intermediate_index.size())+", skipping event");
 		return;
 	}
 	if(intermediate_index[0]!=intermediate_index[1])
 	{
-		_WARNING("intermediate_index[0] -> "+tostring(intermediate_index[0])+"  !=  intermediate_index[1] -> "+tostring(intermediate_index[1])+", skipping event");
+		_WARNING("intermediate_index[0]  ->  "+_s(intermediate_index[0])+"  !=  intermediate_index[1] -> "+_s(intermediate_index[1])+", skipping event");
 		return;
 	}
 	if(mc_pdgId->at(intermediate_index[0])!=mc_pdgId->at(4)) // the "Z" is always number 4 in the event
 	{
-		_WARNING("mc_pdgId->at(intermediate_index[0]) -> "+tostring(mc_pdgId->at(intermediate_index[0]))+"  !=  mc_pdgId->at(4) -> "+tostring(mc_pdgId->at(4))+", skipping event");
+		_WARNING("mc_pdgId->at(intermediate_index[0]) -> "+_s(mc_pdgId->at(intermediate_index[0]))+"  !=  mc_pdgId->at(4) -> "+_s(mc_pdgId->at(4))+", skipping event");
 		return;
 	}
 	
-	//////////////////////////////////////////////////////////////////////////////
-	// write the partons - only if there's one common intermediate mother particle
-	// int current_intermediate_id = mc_pdgId->at(intermediate_index[0]);
-	// int current_intermediate_index = intermediate_index[0];
-	// while(current_intermediate_id==mc_pdgId->at(intermediate_index[0]))
-	// {
-		// int imom  = (mc_parent_index->at(current_intermediate_index).size()>0) ? mc_parent_index->at(current_intermediate_index)[0] : -1;
-		// int idmom = (imom>=0) ? mc_pdgId->at(imom) : -1;
-		// if(idmom>=0)
-		// {
-			// current_intermediate_id = idmom;
-			// current_intermediate_index = imom;
-		// }
-	// }
-	// _INFO("found quark: "+tostring(current_intermediate_id)+" in index: "+tostring(current_intermediate_index));
-	
-	// vector<int> quarks_index;
-	// for(int mom=0 ; mom<(int)mc_parent_index->at(intermediate_index[0]).size() ; mom++) // find the quarks
-	// {
-		// int imom = mc_parent_index->at(intermediate_index[0])[mom];
-		// _INFO("mc_pdgId->at("+tostring(imom)+") = "+tostring(mc_pdgId->at(imom)));
-		// if(mc_pdgId->at(imom)>=0  &&  mc_pdgId->at(imom)<=PDTTOP) quarks_index.push_back(imom);
-	// }
-	// if(quarks_index.size()!=2)
-	// {
-		// _WARNING("quarks_index.size()!=2  ->  "+tostring((int)quarks_index.size())+", skipping event");
-		// return;
-	// }
-	// else
-	// {
-		// truth_all_partons_mc_m->push_back( mc_m->at(quarks_index[0])*MeV2GeV );
-		// truth_all_partons_mc_pt->push_back( mc_pt->at(quarks_index[0])*MeV2GeV );
-		// truth_all_partons_mc_eta->push_back( mc_eta->at(quarks_index[0]) );
-		// truth_all_partons_mc_phi->push_back( mc_phi->at(quarks_index[0]) );
-		// truth_all_partons_mc_pdgId->push_back( mc_pdgId->at(quarks_index[0]) );
-		// truth_all_partons_mc_status->push_back( mc_status->at(quarks_index[0]) );
-		// truth_all_partons_mc_barcode->push_back( mc_barcode->at(quarks_index[0]) );
-		// truth_all_partons_mc_charge->push_back( mc_charge->at(quarks_index[0]) );
-
-		// truth_all_partons_mc_m->push_back( mc_m->at(quarks_index[1])*MeV2GeV );
-		// truth_all_partons_mc_pt->push_back( mc_pt->at(quarks_index[1])*MeV2GeV );
-		// truth_all_partons_mc_eta->push_back( mc_eta->at(quarks_index[1]) );
-		// truth_all_partons_mc_phi->push_back( mc_phi->at(quarks_index[1]) );
-		// truth_all_partons_mc_pdgId->push_back( mc_pdgId->at(quarks_index[1]) );
-		// truth_all_partons_mc_status->push_back( mc_status->at(quarks_index[1]) );
-		// truth_all_partons_mc_barcode->push_back( mc_barcode->at(quarks_index[1]) );
-		// truth_all_partons_mc_charge->push_back( mc_charge->at(quarks_index[1]) );
-	// }
 	
 	// the incoming quarks are always at the 2 and 3 places in the event
 	if(mc_pdgId->at(2) > PDTTOP || mc_pdgId->at(3) > PDTTOP) // both have to be quarks
 	{
-		_WARNING("mc_pdgId->at(2)>PDTTOP -> "+tostring(mc_pdgId->at(2))+" ||  mc_pdgId->at(3)>PDTTOP -> "+tostring(mc_pdgId->at(3))+", skipping event");
+		_WARNING("mc_pdgId->at(2)>PDTTOP -> "+_s(mc_pdgId->at(2))+" ||  mc_pdgId->at(3)>PDTTOP -> "+_s(mc_pdgId->at(3))+", skipping event");
 		return;
 	}
-	if(mc_pdgId->at(2)!=(-1*mc_pdgId->at(3))) // to have opposite charge
+	if(mc_pdgId->at(2)!=(-1*mc_pdgId->at(3))) // to have opposite flavor
 	{
 		_WARNING("mc_pdgId->at(2)!=(-1*mc_pdgId->at(3))");
 		return;
@@ -2629,12 +2378,10 @@ void analysisSkeleton::fillTruth()
 		{
 			truth_valid_index = 0;
 			truth_all_isValid = false;
-			tmp_counter_5++;
 			return;
 		}
 
 		truth_all_isValid = true;
-		tmp_counter_5++;
 
 		float c1 = truth_all_mc_charge->at(ai_truth);
 		float c2 = truth_all_mc_charge->at(bi_truth);
@@ -2655,7 +2402,6 @@ void analysisSkeleton::fillTruth()
 		delete p1;
 		delete p2;
 	}
-	//cout << "tmp_counter_1=" << tmp_counter_1 << ", tmp_counter_2=" << tmp_counter_2 << ", tmp_counter_3=" << tmp_counter_3 << ", tmp_counter_4=" << tmp_counter_4 << ", tmp_counter_5=" << tmp_counter_5 << endl;	
 }
 
 
@@ -2834,7 +2580,7 @@ inline bool analysisSkeleton::throwInfo(string cutName)
 	else if(RunNumber==184130 && lbn==1331 && EventNumber==198888828)  show = true;  
 	else if(RunNumber==184130 && lbn==1331 && EventNumber==198902925)  show = true;  
 	
-	if(show) _INFO("Run-LB-Evt  "+tostring(RunNumber)+" "+tostring(lbn)+" "+tostring(EventNumber)+" failed cut: "+cutName);
+	if(show) _INFO("Run-LB-Evt  "+_s(RunNumber)+" "+_s(lbn)+" "+_s(EventNumber)+" failed cut: "+cutName);
 	return show;
 }
 
@@ -2893,11 +2639,11 @@ inline bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 				trigVal   = isTrigger( trigName );
 				//pass1Trig = ( triggerCut((*m_cutFlowMapSVD)[sorderedcutname][0], trigVal, trigName) ) ? true : false;
 				pass1Trig = isTrigger( vTriggers->at(t) );
-				//if(throwInfo(sorderedcutname)) _INFO("Trigger="+trigName+":"+tostring(trigVal));
+				//if(throwInfo(sorderedcutname)) _INFO("Trigger="+trigName+":"+_s(trigVal));
 				if(pass1Trig) break;
 			}
 			passCurrentCut = pass1Trig;
-			//if(!passCurrentCut  &&  throwInfo(sorderedcutname)) _INFO("Trigger decision ="+tostring(passCurrentCut));
+			//if(!passCurrentCut  &&  throwInfo(sorderedcutname)) _INFO("Trigger decision ="+_s(passCurrentCut));
 		}
 		
 		else if(sorderedcutname=="PV"  &&  !bSkipCut)
@@ -3205,10 +2951,10 @@ inline bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
 				if(nQAflags>2  &&  isMultiMuonPrint)
 				{
 					_INFO("MultiGoodMuon N{"
-						  +tostring(nQAflags)
-						  +"}{run-lb-evt: "+tostring(RunNumber)+"-"+tostring(lbn)+"-"+tostring(EventNumber)
-						  +"} -> Assigned indices: ai["+tostring(mu_charge->at(ai))+"]="+tostring(ai)
-						  +", bi["+tostring(mu_charge->at(bi))+"]="+tostring(bi));
+						  +_s(nQAflags)
+						  +"}{run-lb-evt: "+_s(RunNumber)+"-"+_s(lbn)+"-"+_s(EventNumber)
+						  +"} -> Assigned indices: ai["+_s(mu_charge->at(ai))+"]="+_s(ai)
+						  +", bi["+_s(mu_charge->at(bi))+"]="+_s(bi));
 					isMultiMuonPrint = false;
 				}
 				/////////////////////////////////////////////////////

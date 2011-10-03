@@ -75,6 +75,8 @@ public:
 		
 		EventHash = 0;
 		
+		alreadyFilled = false;
+		
 		nSkim = 0;
 		nAll = 0;
 		n0mu = 0;

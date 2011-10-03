@@ -46,6 +46,8 @@
 
 typedef map<string, vector<float>* > TMapsP2vf;
 typedef map<string, vector<vector<TH1D*> > > TMapsvvP2TH1;
+typedef map<TString, TTree*>    TMapTSP2TTREE;
+typedef map<TString, double>    TMapTSd;
 
 using namespace std;
 

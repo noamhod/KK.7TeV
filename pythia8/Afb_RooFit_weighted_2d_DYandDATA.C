@@ -13,58 +13,58 @@ const double maxMass = 1500.;
 // static const Double_t logicmassmin   = 75.;
 // static const Double_t logicmassmax   = maxMass;
 // const Double_t logicmassbins[nlogicmassbins+1] =
-				// {
-					// 75,85,95,105,120,
-					// 135,150,165,180,195,215,230,250,
-					// 270,290,310,330,350,375,400,
-					// 430,460,490,520,560,600,
-					// 640,680,720,760,800,850,900,
-					// 950,1000,1075,1150,1250,
-					// 1375,1500,1625,1750,
-					// 1875,2000,
-					// maxMass
-				// };
+// {
+// 75,85,95,105,120,
+// 135,150,165,180,195,215,230,250,
+// 270,290,310,330,350,375,400,
+// 430,460,490,520,560,600,
+// 640,680,720,760,800,850,900,
+// 950,1000,1075,1150,1250,
+// 1375,1500,1625,1750,
+// 1875,2000,
+// maxMass
+// };
 // const int             nlogicmassbins = 36;
 // static const Double_t logicmassmin   = 75.;
 // static const Double_t logicmassmax   = maxMass;
 // const Double_t logicmassbins[nlogicmassbins+1] =
-				// {
-					// 75,85,95,105,120,
-					// 135,150,170,190,210,230,250,
-					// 280,310,340,370,400,
-					// 440,480,520,560,600,
-					// 650,700,750,800,
-					// 900,1000,
-					// 1125,1250,
-					// 1375,1500,
-					// 1625,1750,
-					// 1875,2000,
-					// maxMass
-				// };
+// {
+// 75,85,95,105,120,
+// 135,150,170,190,210,230,250,
+// 280,310,340,370,400,
+// 440,480,520,560,600,
+// 650,700,750,800,
+// 900,1000,
+// 1125,1250,
+// 1375,1500,
+// 1625,1750,
+// 1875,2000,
+// maxMass
+// };
 
 // const int             nlogicmassbins = 15;
 // static const Double_t logicmassmin   = 75.;
 // static const Double_t logicmassmax   = maxMass;
 // const Double_t logicmassbins[nlogicmassbins+1] =
-				// {
-					// 75,95,120,
-					// 180,250,
-					// 325,400,
-					// 500,600,
-					// 800,
-					// 1000,
-					// 1250,
-					// 1500,
-					// 1750,
-					// 2000,
-					// maxMass
-				// };
+// {
+// 75,95,120,
+// 180,250,
+// 325,400,
+// 500,600,
+// 800,
+// 1000,
+// 1250,
+// 1500,
+// 1750,
+// 2000,
+// maxMass
+// };
 
 // const int      ndymassbins = 11;
 // const Double_t dymassbins[ndymassbins+1] =
-				// {
-					// 75,120,250,400,600,800,1000,1250,1500,1750,2000,maxMass
-				// };
+// {
+// 75,120,250,400,600,800,1000,1250,1500,1750,2000,maxMass
+// };
 // TH1* hDYbins = new TH1("hDYbins","hDYbins",ndymassbins,dymassbins);	
 
 static const Int_t    nlogmassbins = 6;
@@ -92,6 +92,10 @@ int      nabscostbins = nAbsCosThetaBins;
 double   yqmin   = minyQ;
 double   yqmax   = maxyQ;
 int      nyqbins = nyQbins;
+
+double   absyqmin   = minabsyQ;
+double   absyqmax   = maxabsyQ;
+int      nabsyqbins = nabsyQbins;
 
 double minA0 = -10.;
 double maxA0 = +10.;
@@ -161,9 +165,9 @@ TText* txt;
 vector<TGraphAsymmErrors*> gMpoissonErr;
 
 TString sName = "Z^{0}";
-TString sChannelFit   = "#gamma/Z^{0} [MC10b Truth]: A_{FB} fit";
+TString sChannelFit   = "#gamma/Z^{0} [MC10b Reco']: A_{FB} fit";
 TString sChannelCount = "#gamma/Z^{0} [MC10b Truth]: A_{FB} count";
-TString sChannelMass  = "#gamma/Z^{0} [MC10b Truth]: Events";
+TString sChannelMass  = "#gamma/Z^{0} [MC10b Reco']: Events";
 Int_t fillStyle = 3003;
 Int_t lineStyle = 2;
 Int_t markerStyle = 24;
@@ -179,6 +183,7 @@ TPad *pad_compare;
 RooRealVar* cosThe; // the variable 
 RooRealVar* cosTheAbs; // the variable 
 RooRealVar* yQ;     // the variable 
+RooRealVar* yQabs;  // the variable 
 RooRealVar* weight; // the weight
 RooRealVar* A0;     // the parameter to find
 RooRealVar* A4;     // the parameter to find
@@ -189,9 +194,20 @@ RooAbsData* unbinnedDataSet; // Roo Data holder
 vector<RooFitResult*> vFitResult;
 vector<bool>          vbFitStatus;
 vector<TH1D*> vhPyQ;
+vector<TH1D*> vhPyQnumerator;
 vector<TH1D*> vhPyQdenominator;
 vector<TH1D*> vhAcceptance;
+vector<TH1D*> vhAcceptanceNumerator;
 vector<TH1D*> vhAcceptanceDenominator;
+vector<TH1D*> vh1dSymmAcceptance;
+vector<TH2D*> vh2dAcceptance;
+vector<TH2D*> vh2dAcceptanceNumerator;
+vector<TH2D*> vh2dAcceptanceDenominator;
+vector<TH2D*> vh2dSymmAcceptance;
+
+vector<TH1D*> vhEtaAcceptanceNumerator;
+vector<TH1D*> vhEtaAcceptanceDenominator;
+vector<TH1D*> vhEtaAcceptance;
 
 RooAbsPdf* modelPdf; // the final model pdf
 RooAbsPdf* sigPdf;   // the truth pdf
@@ -422,6 +438,58 @@ void correctHisto(TH1D* h)
 	}
 }
 
+void symmetrizeHisto(TH2D* hAbs, TH2D* hSymm)
+{
+	Int_t Nx = hAbs->GetNbinsX();
+	Int_t Ny = hAbs->GetNbinsY();
+
+	for(Int_t bx=1 ; bx<=Nx ; bx++)
+	{
+		for(Int_t by=1 ; by<=Ny ; by++)
+		{
+			// Double_t val = (hAbs->GetBinContent(bx,by)>0.) ? hAbs->GetBinContent(bx,by) : 1.e-30;
+			Double_t val = hAbs->GetBinContent(bx,by);
+			Double_t err = hAbs->GetBinError(bx,by);
+
+			Int_t x1 = Nx + bx;			
+			Int_t x2 = Nx + 1 - bx;
+			Int_t y1 = Ny + by;
+			Int_t y2 = Ny + 1 - by;
+
+			hSymm->SetBinContent(x1,y1,val);
+			hSymm->SetBinContent(x1,y2,val);
+			hSymm->SetBinContent(x2,y1,val);
+			hSymm->SetBinContent(x2,y2,val);
+			
+			hSymm->SetBinError(x1,y1,err);
+			hSymm->SetBinError(x1,y2,err);
+			hSymm->SetBinError(x2,y1,err);
+			hSymm->SetBinError(x2,y2,err);
+		}
+	}
+}
+
+void symmetrizeHisto(TH1D* hAbs, TH1D* hSymm)
+{
+	Int_t Nx = hAbs->GetNbinsX();
+
+	for(Int_t bx=1 ; bx<=Nx ; bx++)
+	{
+		// Double_t val = (hAbs->GetBinContent(bx)>0.) ? hAbs->GetBinContent(bx) : 1.e-30;
+		Double_t val = hAbs->GetBinContent(bx);
+		Double_t err = hAbs->GetBinError(bx);
+		
+		Int_t x1 = Nx + bx;			
+		Int_t x2 = Nx + 1 - bx;
+
+		hSymm->SetBinContent(x1,val);
+		hSymm->SetBinContent(x2,val);
+		
+		hSymm->SetBinError(x1,err);
+		hSymm->SetBinError(x2,err);
+	}
+}
+
 void init(int massBin)
 {
 	_DEBUG("init");
@@ -434,17 +502,29 @@ void init(int massBin)
 	string sMassMax = _s((double)iMassMax);
 	TString sTitle = "Mass-bin[" + sMassBin + "] " + sMassMin + "#rightarrow" + sMassMax + " GeV";
 
-	cosThe = new RooRealVar("cosTheta","cos#theta*",costmin,costmax);
-	cosThe->setRange("range_cosThe",costmin,costmax);
-	cosThe->setBins(ncostbins);
+	// cosThe = new RooRealVar("cosTheta","cos#theta*",costmin,costmax);
+	// cosThe->setRange("range_cosThe",costmin,costmax);
+	// cosThe->setBins(ncostbins);
+	
+	cosThe = new RooRealVar("cosTheta","cos#theta*",-1.*abscostmax,abscostmax);
+	cosThe->setRange("range_cosThe",-1.*abscostmax,abscostmax);
+	cosThe->setBins(2*nabscostbins);
 	
 	cosTheAbs = new RooRealVar("cosThetaAbs","|cos#theta*|",abscostmin,abscostmax);
 	cosTheAbs->setRange("range_cosTheAbs",abscostmin,abscostmax);
 	cosTheAbs->setBins(nabscostbins);
 	
-	yQ = new RooRealVar("yQ","y_{Q}",yqmin,yqmax);
-	yQ->setRange("range_yQ",yqmin,yqmax);
-	yQ->setBins(nyqbins);
+	// yQ = new RooRealVar("yQ","y_{Q}",yqmin,yqmax);
+	// yQ->setRange("range_yQ",yqmin,yqmax);
+	// yQ->setBins(nyqbins);
+	
+	yQ = new RooRealVar("yQ","y_{Q}",-1.*absyqmax,absyqmax);
+	yQ->setRange("range_yQ",-1.*absyqmax,absyqmax);
+	yQ->setBins(nabsyqbins);
+	
+	yQabs = new RooRealVar("yQabs","|y_{Q}|",absyqmin,absyqmax);
+	yQabs->setRange("range_yQabs",absyqmin,absyqmax);
+	yQabs->setBins(nabsyqbins);
 	
 	weight = new RooRealVar("weight","weight",0.,1e10);
 
@@ -467,8 +547,11 @@ void init(int massBin)
 	
 	if(doAcc)
 	{
-		if(doLumiXSweights) unbinnedDataSet = new RooDataSet("data","data",RooArgSet(*cosThe,*cosTheAbs,*yQ,*weight),WeightVar(weight->GetName()));
-		else                unbinnedDataSet = new RooDataSet("data","data",RooArgSet(*cosThe,*cosTheAbs,*yQ));
+		// if(doLumiXSweights) unbinnedDataSet = new RooDataSet("data","data",RooArgSet(*cosThe,*cosTheAbs,*yQ,*yQabs,*weight),WeightVar(weight->GetName()));
+		// else                unbinnedDataSet = new RooDataSet("data","data",RooArgSet(*cosThe,*cosTheAbs,*yQ,*yQabs));
+		
+		if(doLumiXSweights) unbinnedDataSet = new RooDataSet("data","data",RooArgSet(*cosThe,*yQ,*weight),WeightVar(weight->GetName()));
+		else                unbinnedDataSet = new RooDataSet("data","data",RooArgSet(*cosThe,*yQ));
 	}
 	else
 	{
@@ -479,10 +562,10 @@ void init(int massBin)
 
 void reset()
 {	
-
 	delete cosThe;
 	delete cosTheAbs;
 	delete yQ;
+	delete yQabs;
 	delete weight;
 	delete A0;
 	delete A4;
@@ -552,12 +635,14 @@ Int_t loop(int massBin)
 			
 			if(isTruth)
 			{
-				ca    = truth_all_mc_charge->at(imuontru);
-				cb    = truth_all_mc_charge->at(iamuontru);
+				ca   = truth_all_mc_charge->at(imuontru);
+				cb   = truth_all_mc_charge->at(iamuontru);
 				cost = cosThetaCollinsSoper(tlvmua,ca,tlvmub,cb);
 				// double cost = cosThetaBoost(tlvmua,ca,tlvmub,cb);
 				
 				vhAcceptanceDenominator[massBin-1]->Fill(fabs(cost),W);
+				vh2dAcceptanceDenominator[massBin-1]->Fill(fabs(cost),fabs(YQ),W);
+				vhEtaAcceptanceDenominator[massBin-1]->Fill(truth_all_mc_eta->at(imuontru),W);
 				
 				int iquark = (truth_all_partons_mc_pdgId->at(0)>0) ? 0 : 1;
 				int iaquark = (iquark==0) ? 1 : 0;
@@ -581,7 +666,11 @@ Int_t loop(int massBin)
 				double cosalpha_beta_quark = tv3qa->Dot((*tv3BoostVector))/(tv3qa->Mag()*tv3BoostVector->Mag());
 				int currentMassBin = hForward->FindBin(mHat);
 				if(currentMassBin!=massBin) _WARNING("currentMassBin!=massBin  ->  "+_s(currentMassBin)+":"+_s(massBin));
-				if(cosalpha_beta_quark<=0.) vhPyQ[massBin-1]->Fill(YQ,W);
+				if(cosalpha_beta_quark<=0.)
+				{
+					vhPyQnumerator[massBin-1]->Fill(YQ,W);
+					vhPyQ[massBin-1]->Fill(YQ,W);
+				}
 				vhPyQdenominator[massBin-1]->Fill(YQ,W);
 				
 				if(doLumiXSweights)
@@ -630,14 +719,20 @@ Int_t loop(int massBin)
 			
 			if(isRecon)
 			{
-				ca    = recon_all_charge->at(imuonrec);
-				cb    = recon_all_charge->at(iamuonrec);
+				ca   = recon_all_charge->at(imuonrec);
+				cb   = recon_all_charge->at(iamuonrec);
 				cost = cosThetaCollinsSoper(tlvmua,ca,tlvmub,cb);
 				// double cost = cosThetaBoost(tlvmua,ca,tlvmub,cb);
 				
 				if(fabs(cost)>1.) _WARNING("cos(theta)="+_s(cost));
 				
 				vhAcceptance[massBin-1]->Fill(fabs(cost),W);
+				vh2dAcceptance[massBin-1]->Fill(fabs(cost),fabs(YQ),W);
+				vhEtaAcceptance[massBin-1]->Fill(recon_all_eta->at(imuonrec),W);
+				
+				vhAcceptanceNumerator[massBin-1]->Fill(fabs(cost),W);
+				vh2dAcceptanceNumerator[massBin-1]->Fill(fabs(cost),fabs(YQ),W);
+				vhEtaAcceptanceNumerator[massBin-1]->Fill(recon_all_eta->at(imuonrec),W);
 				
 				recon_entries++;
 				
@@ -646,14 +741,21 @@ Int_t loop(int massBin)
 					/////////////////////////////
 					/// fill the dataset ////////
 					/////////////////////////////
-					*yQ = YQ;
-					*cosThe = cost;
+					*yQ        = YQ;
+					*yQabs     = fabs(YQ);
+					*cosThe    = cost;
 					*cosTheAbs = fabs(cost);
-					*weight = W;
+					*weight    = W;
 					hMass->Fill(mHat,W);
 					
-					if(doLumiXSweights) unbinnedDataSet->add(RooArgSet(*cosThe,*cosTheAbs,*yQ,*weight),W); // WEIGHTED
-					else                unbinnedDataSet->add(RooArgSet(*cosThe,*cosTheAbs,*yQ));           // UNWEIGHTED
+					// if(doLumiXSweights) unbinnedDataSet->add(RooArgSet(*cosThe,*cosTheAbs,*yQ,*weight),W); // WEIGHTED
+					// else                unbinnedDataSet->add(RooArgSet(*cosThe,*cosTheAbs,*yQ));           // UNWEIGHTED
+					
+					// if(doLumiXSweights) unbinnedDataSet->add(RooArgSet(*cosThe,*cosTheAbs,*yQ,*yQabs,*weight),W); // WEIGHTED
+					// else                unbinnedDataSet->add(RooArgSet(*cosThe,*cosTheAbs,*yQ,*yQabs));           // UNWEIGHTED
+					
+					if(doLumiXSweights) unbinnedDataSet->add(RooArgSet(*cosThe,*yQ,*weight),W); // WEIGHTED
+					else                unbinnedDataSet->add(RooArgSet(*cosThe,*yQ));           // UNWEIGHTED
 				}
 			}
 		}
@@ -663,13 +765,42 @@ Int_t loop(int massBin)
 	
 	vhPyQ[massBin-1]->Divide(vhPyQdenominator[massBin-1]);
 	vhAcceptance[massBin-1]->Divide(vhAcceptanceDenominator[massBin-1]);
-	correctHisto(vhAcceptance[massBin-1]);
+	vh2dAcceptance[massBin-1]->Divide(vh2dAcceptanceDenominator[massBin-1]);
+	vhEtaAcceptance[massBin-1]->Divide(vhEtaAcceptanceDenominator[massBin-1]);
+	
+	symmetrizeHisto(vh2dAcceptance[massBin-1],vh2dSymmAcceptance[massBin-1]);
+	symmetrizeHisto(vhAcceptance[massBin-1],vh1dSymmAcceptance[massBin-1]);
 	
 	sigPdf    = new RooFBfalseIdentifyCS("SignalPdf", "SignalPdf", *cosThe,*yQ,*A0,*A4,*vhPyQ[massBin-1]);
-	rdhAcc    = new RooDataHist("rdhAcc","rdhAcc",RooArgSet(*cosTheAbs),vhAcceptance[massBin-1]);
-	rhpdfAcc  = new RooHistPdf("rhpdfAcc","rhpdfAcc",RooArgSet(*cosTheAbs),*rdhAcc,2);
+	
+	// rdhAcc    = new RooDataHist("rdhAcc","rdhAcc",RooArgSet(*cosTheAbs),vhAcceptance[massBin-1]);
+	// rhpdfAcc  = new RooHistPdf("rhpdfAcc","rhpdfAcc",RooArgSet(*cosTheAbs),*rdhAcc,2);
+	
+	// rdhAcc    = new RooDataHist("rdhAcc","rdhAcc",RooArgSet(*cosTheAbs,*yQabs),vh2dAcceptance[massBin-1]);
+	// rhpdfAcc  = new RooHistPdf("rhpdfAcc","rhpdfAcc",RooArgSet(*cosTheAbs,*yQabs),*rdhAcc,2);
+	
+	// rdhAcc    = new RooDataHist("rdhAcc","rdhAcc",RooArgSet(*cosThe,*yQ),vh2dSymmAcceptance[massBin-1]);
+	// rhpdfAcc  = new RooHistPdf("rhpdfAcc","rhpdfAcc",RooArgSet(*cosThe,*yQ),*rdhAcc,2);
+	
+	rdhAcc    = new RooDataHist("rdhAcc","rdhAcc",RooArgSet(*cosThe),vh1dSymmAcceptance[massBin-1]);
+	rhpdfAcc  = new RooHistPdf("rhpdfAcc","rhpdfAcc",RooArgSet(*cosThe),*rdhAcc,2); // the best interpulation is of order 2.
+	
 	detAccPdf = (RooAbsPdf*)rhpdfAcc->Clone("");
-	if(doAcc) modelPdf = new RooProdPdf("model","truPdf*accPdf",RooArgSet(*sigPdf),Conditional(*detAccPdf,*cosTheAbs));
+	
+	// if(doAcc) modelPdf = new RooProdPdf("model","truPdf*accPdf",RooArgSet(*sigPdf),Conditional(*detAccPdf,*cosTheAbs));
+	
+	// if(doAcc) modelPdf = new RooProdPdf("model","truPdf*accPdf",RooArgSet(*sigPdf),Conditional(*detAccPdf,*cosTheAbs,*yQabs));
+	
+	// if(doAcc) modelPdf = new RooProdPdf("model","truPdf*accPdf",RooArgSet(*sigPdf),Conditional(*detAccPdf,*yQ));
+	
+	// if(doAcc) modelPdf = new RooProdPdf("model","truPdf*accPdf",RooArgSet(*sigPdf),Conditional(*detAccPdf,RooArgSet(*cosThe,*yQ)));
+	
+	// if(doAcc) modelPdf = new RooProdPdf("model","truPdf*accPdf",RooArgSet(*sigPdf),Conditional(*detAccPdf,RooArgSet(*yQ)));
+	
+	// if(doAcc) modelPdf = new RooProdPdf("model","truPdf*accPdf",RooArgSet(*sigPdf),Conditional(*detAccPdf,RooArgSet(*cosThe,*yQ)));
+	
+	if(doAcc) modelPdf = new RooProdPdf("model","truPdf*accPdf",*sigPdf,*detAccPdf);
+	
 	else      modelPdf = (RooAbsPdf*)sigPdf->Clone("");
 	
 	return recon_entries;
@@ -706,9 +837,15 @@ RooFitResult* fit()
 	RooFitResult* fitresult;
 	if(!unbinnedDataSet->isWeighted()  &&  doLumiXSweights) _WARNING("$$$$$$$$$$$ The dataset is unweighted $$$$$$$$$$$");
 	if(doAcc)
-	{
-		if(doLumiXSweights) fitresult = modelPdf->fitTo( *unbinnedDataSet,Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),SumW2Error(kTRUE),NumCPU(8),ConditionalObservables(RooArgSet(*cosTheAbs,*yQ)));
-		else                fitresult = modelPdf->fitTo( *unbinnedDataSet,Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),NumCPU(8),ConditionalObservables(RooArgSet(*cosTheAbs,*yQ)));
+	{	
+		// if(doLumiXSweights) fitresult = modelPdf->fitTo( *unbinnedDataSet,Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),SumW2Error(kTRUE),NumCPU(8),ConditionalObservables(RooArgSet(*cosTheAbs,*yQ)));
+		// else                fitresult = modelPdf->fitTo( *unbinnedDataSet,Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),NumCPU(8),ConditionalObservables(RooArgSet(*cosTheAbs,*yQ)));
+		
+		// if(doLumiXSweights) fitresult = modelPdf->fitTo( *unbinnedDataSet,Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),SumW2Error(kTRUE),NumCPU(8),ConditionalObservables(RooArgSet(*cosTheAbs,*yQabs,*yQ)));
+		// else                fitresult = modelPdf->fitTo( *unbinnedDataSet,Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),NumCPU(8),ConditionalObservables(RooArgSet(*cosTheAbs,*yQabs,*yQ)));
+		
+		if(doLumiXSweights) fitresult = modelPdf->fitTo( *unbinnedDataSet,Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),SumW2Error(kTRUE),NumCPU(8),ConditionalObservables(RooArgSet(*yQ)));
+		else                fitresult = modelPdf->fitTo( *unbinnedDataSet,Minos(kTRUE),Range("range_cosThe"),Strategy(2),Save(kTRUE),Timer(kTRUE),NumCPU(8),ConditionalObservables(RooArgSet(*yQ)));
 	}
 	else
 	{
@@ -759,10 +896,17 @@ void plot(int massbin)
 	
 	RooPlot* cosThetaFrame = cosThe->frame(Name("cosThetaFrame"), Title("DYmumu"));
 	if(!unbinnedDataSet->isWeighted()  &&  doLumiXSweights) _WARNING("$$$$$$$$$$$ The dataset is unweighted $$$$$$$$$$$");
-	if(doLumiXSweights) unbinnedDataSet->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),DataError(RooAbsData::SumW2),NumCPU(8));
-	else                unbinnedDataSet->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(ncostbins),NumCPU(8));
-	if(doAcc) modelPdf->plotOn(cosThetaFrame,ProjWData(RooArgSet(*cosTheAbs,*yQ),*unbinnedDataSet),LineWidth(1),LineColor(cPdf),NormRange("range_cosThe"),NumCPU(8));
+	if(doLumiXSweights) unbinnedDataSet->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(2*nabscostbins),DataError(RooAbsData::SumW2),NumCPU(8));
+	else                unbinnedDataSet->plotOn(cosThetaFrame,Name("cos#theta*"),XErrorSize(0),MarkerSize(0.3),Binning(2*nabscostbins),NumCPU(8));
+	
+	// if(doAcc) modelPdf->plotOn(cosThetaFrame,ProjWData(RooArgSet(*cosTheAbs,*yQ),*unbinnedDataSet),LineWidth(1),LineColor(cPdf),NormRange("range_cosThe"),NumCPU(8));
+	
+	// if(doAcc) modelPdf->plotOn(cosThetaFrame,ProjWData(RooArgSet(*cosTheAbs,*yQabs,*yQ),*unbinnedDataSet),LineWidth(1),LineColor(cPdf),NormRange("range_cosThe"),NumCPU(8));
+
+	if(doAcc) modelPdf->plotOn(cosThetaFrame,ProjWData(RooArgSet(*yQ),*unbinnedDataSet),LineWidth(1),LineColor(cPdf),NormRange("range_cosThe"),NumCPU(8));
+	
 	else      modelPdf->plotOn(cosThetaFrame,ProjWData(*yQ,*unbinnedDataSet),LineWidth(1),LineColor(cPdf),NormRange("range_cosThe"),NumCPU(8));
+	
 	modelPdf->paramOn(cosThetaFrame,Layout(0.4,0.75,1), Format("NEU", AutoPrecision(1)));
 	cosThetaFrame->getAttText()->SetTextSize(0.05);
 	cnv->SetLeftMargin(0.2);
@@ -852,6 +996,18 @@ void drawHistos(int massBin)
 	TCanvas* cnvAcc = new TCanvas("cAcc_"+sMassBin, "", 600,400);
 	cnvAcc->SetFillColor(0);
 	
+	TCanvas* cnv1dSymmAcc = new TCanvas("c1dSymmAcc_"+sMassBin, "", 600,400);
+	cnv1dSymmAcc->SetFillColor(0);
+	
+	TCanvas* cnv2dAcc = new TCanvas("c2dAcc_"+sMassBin, "", 600,400);
+	cnv2dAcc->SetFillColor(0);
+	
+	TCanvas* cnv2dSymmAcc = new TCanvas("c2dSymmAcc_"+sMassBin, "", 600,400);
+	cnv2dSymmAcc->SetFillColor(0);
+	
+	TCanvas* cnvEtaAcc = new TCanvas("cEtaAcc_"+sMassBin, "", 600,400);
+	cnvEtaAcc->SetFillColor(0);
+	
 	TPaveText* pvtxt_massbinname = new TPaveText(0.3277592,0.8056995,0.4916388,0.9002591,"brNDC");
 	pvtxt_massbinname->SetFillColor(0);
 	pvtxt_massbinname->SetTextFont(42);
@@ -861,7 +1017,7 @@ void drawHistos(int massBin)
 	cnvPyQ->cd();
 	cnvPyQ->Draw();
 	vhPyQ[massBin-1]->SetMinimum(0.);
-	vhPyQ[massBin-1]->SetMaximum(1.);
+	vhPyQ[massBin-1]->SetMaximum(0.65);
 	vhPyQ[massBin-1]->SetMarkerStyle(24);
 	vhPyQ[massBin-1]->SetMarkerSize(1);
 	vhPyQ[massBin-1]->Draw("e1x1");
@@ -889,16 +1045,92 @@ void drawHistos(int massBin)
 	cnvAcc->SaveAs("fitplots/Acceptance_"+sMassBin+".root");
 	cnvAcc->SaveAs("fitplots/Acceptance_"+sMassBin+".C");
 	
+	/// 1d Symmetrized Acceptance
+	cnv1dSymmAcc->cd();
+	cnv1dSymmAcc->Draw();
+	vh1dSymmAcceptance[massBin-1]->SetMinimum(0.);
+	vh1dSymmAcceptance[massBin-1]->SetMaximum(1.);
+	vh1dSymmAcceptance[massBin-1]->SetMarkerStyle(24);
+	vh1dSymmAcceptance[massBin-1]->SetMarkerSize(1);
+	vh1dSymmAcceptance[massBin-1]->Draw("e1x1");
+	pvtxt_massbinname->Draw("SAMES");
+	cnv1dSymmAcc->SaveAs("fitplots/AcceptanceSymm1d_"+sMassBin+".png");
+	cnv1dSymmAcc->SaveAs("fitplots/AcceptanceSymm1d_"+sMassBin+".eps");
+	cnv1dSymmAcc->SaveAs("fitplots/AcceptanceSymm1d_"+sMassBin+".pdf");
+	cnv1dSymmAcc->SaveAs("fitplots/AcceptanceSymm1d_"+sMassBin+".ps");
+	cnv1dSymmAcc->SaveAs("fitplots/AcceptanceSymm1d_"+sMassBin+".root");
+	cnv1dSymmAcc->SaveAs("fitplots/AcceptanceSymm1d_"+sMassBin+".C");
+	
+	/// 2d Acceptance
+	cnv2dAcc->cd();
+	cnv2dAcc->Draw();
+	vh2dAcceptance[massBin-1]->SetMinimum(0.);
+	vh2dAcceptance[massBin-1]->SetMaximum(1.);
+	vh2dAcceptance[massBin-1]->Draw("COLZ");
+	pvtxt_massbinname->Draw("SAMES");
+	cnv2dAcc->SaveAs("fitplots/Acceptance2d_"+sMassBin+".png");
+	cnv2dAcc->SaveAs("fitplots/Acceptance2d_"+sMassBin+".eps");
+	cnv2dAcc->SaveAs("fitplots/Acceptance2d_"+sMassBin+".pdf");
+	cnv2dAcc->SaveAs("fitplots/Acceptance2d_"+sMassBin+".ps");
+	cnv2dAcc->SaveAs("fitplots/Acceptance2d_"+sMassBin+".root");
+	cnv2dAcc->SaveAs("fitplots/Acceptance2d_"+sMassBin+".C");
+	
+	/// 2d Symmetrized Acceptance
+	cnv2dSymmAcc->cd();
+	cnv2dSymmAcc->Draw();
+	vh2dSymmAcceptance[massBin-1]->SetMinimum(0.);
+	vh2dSymmAcceptance[massBin-1]->SetMaximum(1.);
+	vh2dSymmAcceptance[massBin-1]->Draw("COLZ");
+	pvtxt_massbinname->Draw("SAMES");
+	cnv2dSymmAcc->SaveAs("fitplots/AcceptanceSymm2d_"+sMassBin+".png");
+	cnv2dSymmAcc->SaveAs("fitplots/AcceptanceSymm2d_"+sMassBin+".eps");
+	cnv2dSymmAcc->SaveAs("fitplots/AcceptanceSymm2d_"+sMassBin+".pdf");
+	cnv2dSymmAcc->SaveAs("fitplots/AcceptanceSymm2d_"+sMassBin+".ps");
+	cnv2dSymmAcc->SaveAs("fitplots/AcceptanceSymm2d_"+sMassBin+".root");
+	cnv2dSymmAcc->SaveAs("fitplots/AcceptanceSymm2d_"+sMassBin+".C");
+	
+	/// Eta(mu) Acceptance
+	cnvEtaAcc->cd();
+	cnvEtaAcc->Draw();
+	vhEtaAcceptance[massBin-1]->SetMinimum(0.);
+	vhEtaAcceptance[massBin-1]->SetMaximum(1.);
+	vhEtaAcceptance[massBin-1]->SetMarkerStyle(24);
+	vhEtaAcceptance[massBin-1]->SetMarkerSize(1);
+	vhEtaAcceptance[massBin-1]->Draw("e1x1");
+	pvtxt_massbinname->Draw("SAMES");
+	cnvEtaAcc->SaveAs("fitplots/AcceptanceEta_"+sMassBin+".png");
+	cnvEtaAcc->SaveAs("fitplots/AcceptanceEta_"+sMassBin+".eps");
+	cnvEtaAcc->SaveAs("fitplots/AcceptanceEta_"+sMassBin+".pdf");
+	cnvEtaAcc->SaveAs("fitplots/AcceptanceEta_"+sMassBin+".ps");
+	cnvEtaAcc->SaveAs("fitplots/AcceptanceEta_"+sMassBin+".root");
+	cnvEtaAcc->SaveAs("fitplots/AcceptanceEta_"+sMassBin+".C");
+	
+	
 	TFile* f = new TFile("fitplots/DYmumu_all.root","UPDATE");
 	f->cd();
 	vhPyQ[massBin-1]->Write();
+	vhPyQnumerator[massBin-1]->Write();
+	vhPyQdenominator[massBin-1]->Write();
+	vhAcceptanceNumerator[massBin-1]->Write();
+	vhAcceptanceDenominator[massBin-1]->Write();
 	vhAcceptance[massBin-1]->Write();
+	vh2dAcceptanceNumerator[massBin-1]->Write();
+	vh2dAcceptanceDenominator[massBin-1]->Write();
+	vh2dAcceptance[massBin-1]->Write();
+	vh2dSymmAcceptance[massBin-1]->Write();
+	vh1dSymmAcceptance[massBin-1]->Write();
+	vhEtaAcceptanceNumerator[massBin-1]->Write();
+	vhEtaAcceptanceDenominator[massBin-1]->Write();
+	vhEtaAcceptance[massBin-1]->Write();
 	f->Write();
 	f->Close();
 	delete f;
 	
 	delete cnvPyQ;
 	delete cnvAcc;
+	delete cnv2dAcc;
+	delete cnv1dSymmAcc;
+	delete cnvEtaAcc;
 	delete pvtxt_massbinname;
 }
 
@@ -909,25 +1141,71 @@ void setHistos(int massBin)
 	
 	sTitles = "Fraction of events where #vec{#beta}_{Q}^{det}#bullet#vec{p}_{q}^{cmf}<0;y_{Q};P(y_{Q})";
 	vhPyQ.push_back(new TH1D("PyQ_massbin_"+sMassBin,sTitles,nyqbins,yqmin,yqmax));
+	sTitles = "Events where #vec{#beta}_{Q}^{det}#bullet#vec{p}_{q}^{cmf}<0;y_{Q};Events";
+	vhPyQnumerator.push_back(new TH1D("PyQ_massbin_"+sMassBin+"_numerator",sTitles,nyqbins,yqmin,yqmax));
+	sTitles = "All events;y_{Q};P(y_{Q});Events";
 	vhPyQdenominator.push_back(new TH1D("PyQ_massbin_"+sMassBin+"_denominator",sTitles,nyqbins,yqmin,yqmax));
 	vhPyQ[massBin-1]->SetDefaultSumw2(kTRUE);
+	vhPyQnumerator[massBin-1]->SetDefaultSumw2(kTRUE);
 	vhPyQdenominator[massBin-1]->SetDefaultSumw2(kTRUE);
 	vhPyQ[massBin-1]->SetMarkerStyle(24);
 	vhPyQ[massBin-1]->SetMarkerSize(1);
+	vhPyQnumerator[massBin-1]->SetMarkerStyle(24);
+	vhPyQnumerator[massBin-1]->SetMarkerSize(1);
 	vhPyQdenominator[massBin-1]->SetMarkerStyle(24);
 	vhPyQdenominator[massBin-1]->SetMarkerSize(1);
 	
-	sTitles = "Acceptance in cos#theta*";
-	// vhAcceptance.push_back(new TH1D("acc_massbin_"+sMassBin,sTitles,ncostbins,costmin,costmax));
-	// vhAcceptanceDenominator.push_back(new TH1D("acc_massbin_"+sMassBin+"_denominator",sTitles,ncostbins,costmin,costmax));
+	sTitles = "Acceptance in |cos#theta*|;|cos#theta*|;Acceptance";
 	vhAcceptance.push_back(new TH1D("acc_massbin_"+sMassBin,sTitles,nabscostbins,abscostmin,abscostmax));
+	sTitles = "Reconstructed(+selection) |cos#theta*| distribution;|cos#theta*|;Events";
+	vhAcceptanceNumerator.push_back(new TH1D("acc_massbin_"+sMassBin+"_numerator",sTitles,nabscostbins,abscostmin,abscostmax));
+	sTitles = "Truth |cos#theta*| distribution;|cos#theta*|;Events";
 	vhAcceptanceDenominator.push_back(new TH1D("acc_massbin_"+sMassBin+"_denominator",sTitles,nabscostbins,abscostmin,abscostmax));
 	vhAcceptance[massBin-1]->SetDefaultSumw2(kTRUE);
+	vhAcceptanceNumerator[massBin-1]->SetDefaultSumw2(kTRUE);
 	vhAcceptanceDenominator[massBin-1]->SetDefaultSumw2(kTRUE);
 	vhAcceptance[massBin-1]->SetMarkerStyle(24);
 	vhAcceptance[massBin-1]->SetMarkerSize(1);
+	vhAcceptanceNumerator[massBin-1]->SetMarkerStyle(24);
+	vhAcceptanceNumerator[massBin-1]->SetMarkerSize(1);
 	vhAcceptanceDenominator[massBin-1]->SetMarkerStyle(24);
 	vhAcceptanceDenominator[massBin-1]->SetMarkerSize(1);
+	
+	sTitles = "Acceptance in #eta_{#mu^{-}};#eta_{#mu^{-}};Acceptance";
+	vhEtaAcceptance.push_back(new TH1D("acc_eta_massbin_"+sMassBin,sTitles,etalogicnbins,etalogicbins));
+	sTitles = "Reconstructed(+selection) #eta_{#mu^{-}} distribution;#eta_{#mu^{-}};Events";
+	vhEtaAcceptanceNumerator.push_back(new TH1D("acc_eta_massbin_"+sMassBin+"_numerator",sTitles,etalogicnbins,etalogicbins));
+	sTitles = "Truth #eta_{#mu^{-}} distribution;#eta_{#mu^{-}};Events";
+	vhEtaAcceptanceDenominator.push_back(new TH1D("acc_eta_massbin_"+sMassBin+"_denominator",sTitles,etalogicnbins,etalogicbins));
+	vhEtaAcceptance[massBin-1]->SetDefaultSumw2(kTRUE);
+	vhEtaAcceptanceNumerator[massBin-1]->SetDefaultSumw2(kTRUE);
+	vhEtaAcceptanceDenominator[massBin-1]->SetDefaultSumw2(kTRUE);
+	vhEtaAcceptance[massBin-1]->SetMarkerStyle(24);
+	vhEtaAcceptance[massBin-1]->SetMarkerSize(1);
+	vhEtaAcceptanceNumerator[massBin-1]->SetMarkerStyle(24);
+	vhEtaAcceptanceNumerator[massBin-1]->SetMarkerSize(1);
+	vhEtaAcceptanceDenominator[massBin-1]->SetMarkerStyle(24);
+	vhEtaAcceptanceDenominator[massBin-1]->SetMarkerSize(1);
+	
+	sTitles = "2d Acceptance in |cos#theta*| vs |y_{Q}|;|cos#theta*|;|y_{Q}|;Acceptance";
+	vh2dAcceptance.push_back(new TH2D("2d_acc_massbin_"+sMassBin,sTitles,nabscostbins,abscostmin,abscostmax, nabsyqbins,absyqmin,absyqmax));
+	sTitles = "Reconstructed(+selection) |cos#theta*| vs |y_{Q}| distribution;|cos#theta*|;|y_{Q}|;Events";
+	vh2dAcceptanceNumerator.push_back(new TH2D("2d_acc_massbin_"+sMassBin+"_numerator",sTitles,nabscostbins,abscostmin,abscostmax, nabsyqbins,absyqmin,absyqmax));
+	sTitles = "Truth |cos#theta*| vs |y_{Q}| distribution;|cos#theta*|;|y_{Q}|;Events";
+	vh2dAcceptanceDenominator.push_back(new TH2D("2d_acc_massbin_"+sMassBin+"_denominator",sTitles,nabscostbins,abscostmin,abscostmax, nabsyqbins,absyqmin,absyqmax));
+	vh2dAcceptance[massBin-1]->SetDefaultSumw2(kTRUE);
+	vh2dAcceptanceNumerator[massBin-1]->SetDefaultSumw2(kTRUE);
+	vh2dAcceptanceDenominator[massBin-1]->SetDefaultSumw2(kTRUE);
+
+	sTitles = "1d Symmetrized Acceptance in cos#theta*;Symm|cos#theta*|;Acceptance";
+	vh1dSymmAcceptance.push_back(new TH1D("1d_symm_acc_massbin_"+sMassBin,sTitles,2*nabscostbins,-1.*abscostmax,abscostmax));
+	vh1dSymmAcceptance[massBin-1]->SetDefaultSumw2(kTRUE);
+	vh1dSymmAcceptance[massBin-1]->SetMarkerStyle(24);
+	vh1dSymmAcceptance[massBin-1]->SetMarkerSize(1);
+	
+	sTitles = "2d Symmetrized Acceptance in cos#theta* vs y_{Q};Symm|cos#theta*|;Symm|y_{Q}|;Acceptance";
+	vh2dSymmAcceptance.push_back(new TH2D("2d_symm_acc_massbin_"+sMassBin,sTitles,2*nabscostbins,-1.*abscostmax,abscostmax, 2*nabsyqbins,-1.*absyqmax,absyqmax));
+	vh2dSymmAcceptance[massBin-1]->SetDefaultSumw2(kTRUE);
 }
 
 
@@ -949,8 +1227,8 @@ void Afb_RooFit_weighted_2d_DYandDATA()
 	
 	randGen = new TRandom();
 	randGen->SetSeed(0); // Note that the machine clock is returned with a precision of 1 second.
-						 // If one calls SetSeed(0) within a loop and the loop time is less than 1s,
-						 // all generated numbers will be identical!
+	// If one calls SetSeed(0) within a loop and the loop time is less than 1s,
+	// all generated numbers will be identical!
 	
 	vector<fitpars> vFitParsResult;
 	vector<fitpars> vFitParsResultErr;
@@ -1098,14 +1376,14 @@ void Afb_RooFit_weighted_2d_DYandDATA()
 	for(int massBin=1 ; massBin<=nlogmassbins ; massBin++)
 	{
 		int i = massBin-1;
-	
+		
 		cout << "\nmass bin " << i << " [" << logfullimassbins[i] << "->" << logfullimassbins[i+1] << "]:" << endl; 
 		cout << "STATUS=" << vbFitStatus[i]
-			 << "\t[A0,A4](guess)=[" << vInitialGuess[i].A0 << "," << vInitialGuess[i].A4
-			 << "]\t->  Afb(guess)=" << getAfb(vInitialGuess[i].A4)
-			 << "\t-> \tA0(fit)=" << vFitParsResult[i].A0 << "+-" << vFitParsResultErr[i].A0
-			 << "\t-> \tA4(fit)=" << vFitParsResult[i].A4 << "+-" << vFitParsResultErr[i].A4
-			 << ",\tAfb(fit)=" << vAfbResult[i] << "+-" << vAfbError[i] << endl;
+		<< "\t[A0,A4](guess)=[" << vInitialGuess[i].A0 << "," << vInitialGuess[i].A4
+		<< "]\t->  Afb(guess)=" << getAfb(vInitialGuess[i].A4)
+		<< "\t-> \tA0(fit)=" << vFitParsResult[i].A0 << "+-" << vFitParsResultErr[i].A0
+		<< "\t-> \tA4(fit)=" << vFitParsResult[i].A4 << "+-" << vFitParsResultErr[i].A4
+		<< ",\tAfb(fit)=" << vAfbResult[i] << "+-" << vAfbError[i] << endl;
 	}
 	
 	printRunConfig();

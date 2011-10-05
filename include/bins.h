@@ -47,9 +47,17 @@ static const double minCosTheta = -1.;  // for the acceptance binning
 static const double maxCosTheta = +1.;  // for the acceptance binning
 static const int    nCosThetaBins = 10; // for the acceptance binning
 
+static const double minAbsCosTheta   = 0.;  // for the acceptance binning
+static const double maxAbsCosTheta   = +1.; // for the acceptance binning
+static const int    nAbsCosThetaBins = 8;   // for the acceptance binning
+
 static const double minyQ   = -2.5; // for the FB false identify probability binning
 static const double maxyQ   = +2.5; // for the FB false identify probability binning
 static const int    nyQbins = 30;   // for the FB false identify probability binning
+
+static const double minabsyQ   = 0.;   // for the 2d acceptance binning
+static const double maxabsyQ   = +2.5; // for the 2d acceptance binning
+static const int    nabsyQbins = 8;    // for the 2d acceptance binning
 
 static const double minPyQ   = -2.5; // for the FB false identify probability binning
 static const double maxPyQ   = +2.5; // for the FB false identify probability binning

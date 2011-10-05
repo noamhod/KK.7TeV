@@ -22,12 +22,16 @@ static const double maxCosTheta   = +1.;  // for the acceptance binning
 static const int    nCosThetaBins = 10; // for the acceptance binning
 
 static const double minAbsCosTheta   = 0.;  // for the acceptance binning
-static const double maxAbsCosTheta   = +1.;  // for the acceptance binning
-static const int    nAbsCosThetaBins = 20; // for the acceptance binning
+static const double maxAbsCosTheta   = +1.; // for the acceptance binning
+static const int    nAbsCosThetaBins = 8;   // for the acceptance binning
 
 static const double minyQ   = -2.5; // for the FB false identify probability binning
 static const double maxyQ   = +2.5; // for the FB false identify probability binning
 static const int    nyQbins = 16;   // for the FB false identify probability binning
+
+static const double minabsyQ   = 0.;   // for the 2d acceptance binning
+static const double maxabsyQ   = +2.5; // for the 2d acceptance binning
+static const int    nabsyQbins = 8;    // for the 2d acceptance binning
 
 static const double minetamu   = -2.5; // for the etamu binning
 static const double maxetamu   = +2.5; // for the etamu binning

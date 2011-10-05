@@ -4,7 +4,7 @@
 <!--
   The montecarlo names and values
 -->
-  <obj NAME="DYmumu_57M120" FLAG="on">
+  <obj NAME="DYmumu_75M120" FLAG="on">
     <number>150000</number>
     <internalnumber>1</internalnumber>
     <isbinned>true</isbinned>

@@ -3973,7 +3973,7 @@ void WZphysD3PDmaker::fill()
 		assign2Dvector(mu_muid_SpaceTime_x, m_WZphysD3PD->mu_muid_SpaceTime_x->at(i) );
 		assign2Dvector(mu_muid_SpaceTime_y, m_WZphysD3PD->mu_muid_SpaceTime_y->at(i) );
 		assign2Dvector(mu_muid_SpaceTime_z, m_WZphysD3PD->mu_muid_SpaceTime_z->at(i) );
-		assign2Dvector(mu_muid_SpaceTime_t_Tile, m_WZphysD3PD->mu_muid_SpaceTime_t_Tile->at(i) );
+/*		assign2Dvector(mu_muid_SpaceTime_t_Tile, m_WZphysD3PD->mu_muid_SpaceTime_t_Tile->at(i) );
 		assign2Dvector(mu_muid_SpaceTime_tError_Tile, m_WZphysD3PD->mu_muid_SpaceTime_tError_Tile->at(i) );
 		assign2Dvector(mu_muid_SpaceTime_weight_Tile, m_WZphysD3PD->mu_muid_SpaceTime_weight_Tile->at(i) );
 		assign2Dvector(mu_muid_SpaceTime_x_Tile, m_WZphysD3PD->mu_muid_SpaceTime_x_Tile->at(i) );
@@ -4097,6 +4097,7 @@ void WZphysD3PDmaker::fill()
 		mu_muid_nCSCPhiHits->push_back( m_WZphysD3PD->mu_muid_nCSCPhiHits->at(i) );
 		mu_muid_nCSCPhiHoles->push_back( m_WZphysD3PD->mu_muid_nCSCPhiHoles->at(i) );
 		mu_muid_nRPCEtaHits->push_back( m_WZphysD3PD->mu_muid_nRPCEtaHits->at(i) );
+*/
 		mu_muid_nRPCEtaHoles->push_back( m_WZphysD3PD->mu_muid_nRPCEtaHoles->at(i) );
 		mu_muid_nRPCPhiHits->push_back( m_WZphysD3PD->mu_muid_nRPCPhiHits->at(i) );
 		mu_muid_nRPCPhiHoles->push_back( m_WZphysD3PD->mu_muid_nRPCPhiHoles->at(i) );
@@ -4280,7 +4281,7 @@ void WZphysD3PDmaker::fill()
 		assign2Dvector(mu_staco_SpaceTime_x, m_WZphysD3PD->mu_staco_SpaceTime_x->at(i) );
 		assign2Dvector(mu_staco_SpaceTime_y, m_WZphysD3PD->mu_staco_SpaceTime_y->at(i) );
 		assign2Dvector(mu_staco_SpaceTime_z, m_WZphysD3PD->mu_staco_SpaceTime_z->at(i) );
-		assign2Dvector(mu_staco_SpaceTime_t_Tile, m_WZphysD3PD->mu_staco_SpaceTime_t_Tile->at(i) );
+/*		assign2Dvector(mu_staco_SpaceTime_t_Tile, m_WZphysD3PD->mu_staco_SpaceTime_t_Tile->at(i) );
 		assign2Dvector(mu_staco_SpaceTime_tError_Tile, m_WZphysD3PD->mu_staco_SpaceTime_tError_Tile->at(i) );
 		assign2Dvector(mu_staco_SpaceTime_weight_Tile, m_WZphysD3PD->mu_staco_SpaceTime_weight_Tile->at(i) );
 		assign2Dvector(mu_staco_SpaceTime_x_Tile, m_WZphysD3PD->mu_staco_SpaceTime_x_Tile->at(i) );
@@ -4314,6 +4315,7 @@ void WZphysD3PDmaker::fill()
 		mu_staco_MSTrkT0_1->push_back( m_WZphysD3PD->mu_staco_MSTrkT0_1->at(i) );
 		mu_staco_MSTrkT0_2->push_back( m_WZphysD3PD->mu_staco_MSTrkT0_2->at(i) );
 		mu_staco_MSTrkT0_3->push_back( m_WZphysD3PD->mu_staco_MSTrkT0_3->at(i) );
+*/
 		mu_staco_cov_d0_exPV->push_back( m_WZphysD3PD->mu_staco_cov_d0_exPV->at(i) );
 		mu_staco_cov_z0_exPV->push_back( m_WZphysD3PD->mu_staco_cov_z0_exPV->at(i) );
 		mu_staco_cov_phi_exPV->push_back( m_WZphysD3PD->mu_staco_cov_phi_exPV->at(i) );
@@ -5283,15 +5285,16 @@ void WZphysD3PDmaker::fill()
 		// assign2Dvector(trig_RoI_L2_TileMu_TrigInDetTrackCollection_TrigIDSCAN_TileStatus, m_WZphysD3PD->trig_RoI_L2_TileMu_TrigInDetTrackCollection_TrigIDSCAN_TileStatus->at(i) );
 	// }
 		
-	trig_RoI_EF_mu_n = m_WZphysD3PD->trig_RoI_EF_mu_n;
-	trigInsitu = (int)m_WZphysD3PD->trig_RoI_EF_mu_type->size();
+//	trig_RoI_EF_mu_n = m_WZphysD3PD->trig_RoI_EF_mu_n;
+//	trigInsitu = (int)m_WZphysD3PD->trig_RoI_EF_mu_type->size();
 	for(int i=0 ; i<trigInsitu ; i++)
 	{
+/*
 		trig_RoI_EF_mu_type->push_back( m_WZphysD3PD->trig_RoI_EF_mu_type->at(i) );
 		trig_RoI_EF_mu_lastStep->push_back( m_WZphysD3PD->trig_RoI_EF_mu_lastStep->at(i) );
 		trig_RoI_EF_mu_Muon_ROI->push_back( m_WZphysD3PD->trig_RoI_EF_mu_Muon_ROI->at(i) );
 		trig_RoI_EF_mu_Muon_ROIStatus->push_back( m_WZphysD3PD->trig_RoI_EF_mu_Muon_ROIStatus->at(i) );
-		
+*/		
 		/*
 		trig_RoI_EF_mu_TrackCollection_InDetTrigTrackSlimmer_Muon_EFID->push_back( m_WZphysD3PD->trig_RoI_EF_mu_TrackCollection_InDetTrigTrackSlimmer_Muon_EFID->at(i) );
 		trig_RoI_EF_mu_TrackCollection_InDetTrigTrackSlimmer_Muon_EFIDStatus->push_back( m_WZphysD3PD->trig_RoI_EF_mu_TrackCollection_InDetTrigTrackSlimmer_Muon_EFIDStatus->at(i) );
@@ -5301,7 +5304,7 @@ void WZphysD3PDmaker::fill()
 		trig_RoI_EF_mu_TrigMuonEFInfoContainer_MuGirlStatus->push_back( m_WZphysD3PD->trig_RoI_EF_mu_TrigMuonEFInfoContainer_MuGirlStatus->at(i) );
 		trig_RoI_EF_mu_TrigMuonEFInfoContainer_MuTagIMO_EF->push_back( m_WZphysD3PD->trig_RoI_EF_mu_TrigMuonEFInfoContainer_MuTagIMO_EF->at(i) );
 		trig_RoI_EF_mu_TrigMuonEFInfoContainer_MuTagIMO_EFStatus->push_back( m_WZphysD3PD->trig_RoI_EF_mu_TrigMuonEFInfoContainer_MuTagIMO_EFStatus->at(i) );
-		*/
+		
 		assign2Dvector(trig_RoI_EF_mu_TrackCollection_InDetTrigTrackSlimmer_Muon_EFID, m_WZphysD3PD->trig_RoI_EF_mu_TrackCollection_InDetTrigTrackSlimmer_Muon_EFID->at(i) );
 		assign2Dvector(trig_RoI_EF_mu_TrackCollection_InDetTrigTrackSlimmer_Muon_EFIDStatus, m_WZphysD3PD->trig_RoI_EF_mu_TrackCollection_InDetTrigTrackSlimmer_Muon_EFIDStatus->at(i) );
 		assign2Dvector(trig_RoI_EF_mu_TrigMuonEFInfoContainer, m_WZphysD3PD->trig_RoI_EF_mu_TrigMuonEFInfoContainer->at(i) );
@@ -5310,6 +5313,7 @@ void WZphysD3PDmaker::fill()
 		assign2Dvector(trig_RoI_EF_mu_TrigMuonEFInfoContainer_MuGirlStatus, m_WZphysD3PD->trig_RoI_EF_mu_TrigMuonEFInfoContainer_MuGirlStatus->at(i) );
 		assign2Dvector(trig_RoI_EF_mu_TrigMuonEFInfoContainer_MuTagIMO_EF, m_WZphysD3PD->trig_RoI_EF_mu_TrigMuonEFInfoContainer_MuTagIMO_EF->at(i) );
 		assign2Dvector(trig_RoI_EF_mu_TrigMuonEFInfoContainer_MuTagIMO_EFStatus, m_WZphysD3PD->trig_RoI_EF_mu_TrigMuonEFInfoContainer_MuTagIMO_EFStatus->at(i) );
+		*/
 	}
 		
 	// trig_RoI_EF_TileMu_n = m_WZphysD3PD->trig_RoI_EF_TileMu_n;

@@ -120,10 +120,12 @@ inline float kinematics::betaiSystem( TLorentzVector* pa, TLorentzVector* pb, in
 {
 	TLorentzVector pTmp = (*pa)+(*pb);
 	float E = pTmp.E();
-	if     (i=1) return (E!=0.) ? pTmp.Px()/E : -99999999.;
-	else if(i=2) return (E!=0.) ? pTmp.Py()/E : -99999999.;
-	else if(i=3) return (E!=0.) ? pTmp.Pz()/E : -99999999.;
-	else return -99999999.;
+	if(E>0.) return -99999999.;
+
+	if     (i==1) return pTmp.Px()/E;
+	else if(i==2) return pTmp.Py()/E;
+	else if(i==3) return pTmp.Pz()/E;
+	else _WARNING("i needs to be 1,2,3 (x,y,z), returning -99999999.");
 	return -99999999.;
 }
 

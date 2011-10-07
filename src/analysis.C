@@ -190,6 +190,7 @@ void analysis::setEventVariables()
 	
 	// event level
 	analysisSkeleton::RunNumber    = m_WZphysD3PD->RunNumber;
+	_DEBUG("analysisSkeleton::RunNumber="+_s(analysisSkeleton::RunNumber)+", m_WZphysD3PD->RunNumber="+_s(m_WZphysD3PD->RunNumber));
 	analysisSkeleton::EventNumber  = m_WZphysD3PD->EventNumber;
 	analysisSkeleton::timestamp    = m_WZphysD3PD->timestamp;
 	analysisSkeleton::timestamp_ns = m_WZphysD3PD->timestamp_ns;
@@ -205,8 +206,7 @@ void analysis::setEventVariables()
 	//////////////////////////////////////////////////////
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	if(!m_isMC) analysisSkeleton::isGRL = m_analysis_grl->m_grl.HasRunLumiBlock( m_WZphysD3PD->RunNumber,
-																				 m_WZphysD3PD->lbn ); ///////////
+	if(!m_isMC) analysisSkeleton::isGRL = m_analysis_grl->m_grl.HasRunLumiBlock( m_WZphysD3PD->RunNumber,m_WZphysD3PD->lbn ); ///////////
 	if(m_isMC) analysisSkeleton::isGRL = 1; /////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -217,10 +217,12 @@ void analysis::setEventVariables()
 	analysisSkeleton::EF_mu22 = m_WZphysD3PD->EF_mu22;
 	analysisSkeleton::EF_mu22_MG = m_WZphysD3PD->EF_mu22_MG;
 	analysisSkeleton::EF_mu40_MSonly_barrel = m_WZphysD3PD->EF_mu40_MSonly_barrel;
+/*
 	analysisSkeleton::EF_mu18 = m_WZphysD3PD->EF_mu18;
 	analysisSkeleton::EF_mu18_MG = m_WZphysD3PD->EF_mu18_MG;
 	analysisSkeleton::EF_mu18_MG_medium = m_WZphysD3PD->EF_mu18_MG_medium;
 	analysisSkeleton::EF_mu18_medium = m_WZphysD3PD->EF_mu18_medium;
+*/
 	analysisSkeleton::EF_mu40_MSonly_barrel_medium = m_WZphysD3PD->EF_mu40_MSonly_barrel_medium;
 	
 	// vertexes (for the PV preselection)
@@ -353,7 +355,7 @@ void analysis::setStacoVariables()
 	analysisSkeleton::mu_SpaceTime_x = m_WZphysD3PD->mu_staco_SpaceTime_x;
 	analysisSkeleton::mu_SpaceTime_y = m_WZphysD3PD->mu_staco_SpaceTime_y;
 	analysisSkeleton::mu_SpaceTime_z = m_WZphysD3PD->mu_staco_SpaceTime_z;
-	analysisSkeleton::mu_SpaceTime_t_Tile = m_WZphysD3PD->mu_staco_SpaceTime_t_Tile;
+/*	analysisSkeleton::mu_SpaceTime_t_Tile = m_WZphysD3PD->mu_staco_SpaceTime_t_Tile;
 	analysisSkeleton::mu_SpaceTime_tError_Tile = m_WZphysD3PD->mu_staco_SpaceTime_tError_Tile;
 	analysisSkeleton::mu_SpaceTime_weight_Tile = m_WZphysD3PD->mu_staco_SpaceTime_weight_Tile;
 	analysisSkeleton::mu_SpaceTime_x_Tile = m_WZphysD3PD->mu_staco_SpaceTime_x_Tile;
@@ -386,6 +388,7 @@ void analysis::setStacoVariables()
 	analysisSkeleton::mu_MSTrkT0_1 = m_WZphysD3PD->mu_staco_MSTrkT0_1;
 	analysisSkeleton::mu_MSTrkT0_2 = m_WZphysD3PD->mu_staco_MSTrkT0_2;
 	analysisSkeleton::mu_MSTrkT0_3 = m_WZphysD3PD->mu_staco_MSTrkT0_3;
+*/
 	analysisSkeleton::mu_cov_d0_exPV = m_WZphysD3PD->mu_staco_cov_d0_exPV;
 	analysisSkeleton::mu_cov_z0_exPV = m_WZphysD3PD->mu_staco_cov_z0_exPV;
 	analysisSkeleton::mu_cov_phi_exPV = m_WZphysD3PD->mu_staco_cov_phi_exPV;
@@ -631,7 +634,7 @@ void analysis::setMuidVariables()
 	analysisSkeleton::mu_SpaceTime_x = m_WZphysD3PD->mu_muid_SpaceTime_x;
 	analysisSkeleton::mu_SpaceTime_y = m_WZphysD3PD->mu_muid_SpaceTime_y;
 	analysisSkeleton::mu_SpaceTime_z = m_WZphysD3PD->mu_muid_SpaceTime_z;
-	analysisSkeleton::mu_SpaceTime_t_Tile = m_WZphysD3PD->mu_muid_SpaceTime_t_Tile;
+/*	analysisSkeleton::mu_SpaceTime_t_Tile = m_WZphysD3PD->mu_muid_SpaceTime_t_Tile;
 	analysisSkeleton::mu_SpaceTime_tError_Tile = m_WZphysD3PD->mu_muid_SpaceTime_tError_Tile;
 	analysisSkeleton::mu_SpaceTime_weight_Tile = m_WZphysD3PD->mu_muid_SpaceTime_weight_Tile;
 	analysisSkeleton::mu_SpaceTime_x_Tile = m_WZphysD3PD->mu_muid_SpaceTime_x_Tile;
@@ -664,6 +667,7 @@ void analysis::setMuidVariables()
 	analysisSkeleton::mu_MSTrkT0_1 = m_WZphysD3PD->mu_muid_MSTrkT0_1;
 	analysisSkeleton::mu_MSTrkT0_2 = m_WZphysD3PD->mu_muid_MSTrkT0_2;
 	analysisSkeleton::mu_MSTrkT0_3 = m_WZphysD3PD->mu_muid_MSTrkT0_3;
+*/
 	analysisSkeleton::mu_cov_d0_exPV = m_WZphysD3PD->mu_muid_cov_d0_exPV;
 	analysisSkeleton::mu_cov_z0_exPV = m_WZphysD3PD->mu_muid_cov_z0_exPV;
 	analysisSkeleton::mu_cov_phi_exPV = m_WZphysD3PD->mu_muid_cov_phi_exPV;

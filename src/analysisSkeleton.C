@@ -105,8 +105,7 @@ string analysisSkeleton::getPeriodName()
 	if(RunNumber != currentRun)
 	{
 		_DEBUG("RunNumber="+_s(RunNumber));
-		speriod = getPeriod( RunNumber, m_firstrun2periodMap, m_lastrun2periodMap );
-		_DEBUG("");
+		speriod = (AS_isMC) ? "MC" : getPeriod( RunNumber, m_firstrun2periodMap, m_lastrun2periodMap ); // ???????????????????????
 		_INFO("switching to period: "+speriod+" (run "+_s(RunNumber)+")");
 		currentRun     = RunNumber;
 		sCurrentPeriod = speriod;
@@ -544,6 +543,8 @@ void analysisSkeleton::fillAfterCuts()
 	}
 	vi = getPVindex();
 
+	_DEBUG("");
+
 	current_mu_me_pT     = pT(mu_me_qoverp->at(lead_mu),mu_me_theta->at(lead_mu))*MeV2TeV;
 	current_muplus_me_pT = pT(mu_me_qoverp->at(sublead_mu),mu_me_theta->at(sublead_mu))*MeV2TeV;
 	current_mu_id_pT     = pT(mu_id_qoverp->at(lead_mu),mu_id_theta->at(lead_mu))*MeV2TeV;
@@ -561,6 +562,8 @@ void analysisSkeleton::fillAfterCuts()
 	current_mu_id_theta     = mu_id_theta->at(lead_mu);;
 	current_muplus_id_theta = mu_id_theta->at(sublead_mu);;
 	
+	_DEBUG("");
+
 	current_imass       = imass(pmu[lead_mu],pmu[sublead_mu]);
 	current_cosTheta    = cosThetaCollinsSoper( pmu[lead_mu], mu_charge->at(lead_mu), pmu[sublead_mu], mu_charge->at(sublead_mu) );
 	current_cosThetaCS  = cosThetaCollinsSoper( pmu[lead_mu], mu_charge->at(lead_mu), pmu[sublead_mu], mu_charge->at(sublead_mu) );
@@ -571,10 +574,12 @@ void analysisSkeleton::fillAfterCuts()
 	current_ipTdiff     = (current_muplus_pT!=0.  &&  current_mu_pT!=0.) ? 1./current_muplus_pT-1./current_mu_pT : -999.;
 	current_ivertex     = vi;
 	current_etaSum      = current_muplus_eta + current_mu_eta;
-	current_betaQ       = betaSystem(pmu[lead_mu],pmu[sublead_mu]);
-	current_betazQ      = betazSystem(pmu[lead_mu],pmu[sublead_mu]);
+	current_betaQ       = magBetaSystem(pmu[lead_mu],pmu[sublead_mu]);
+	current_betazQ      = betaiSystem(pmu[lead_mu],pmu[sublead_mu],3);
 	current_betaTQ      = betaTSystem(pmu[lead_mu],pmu[sublead_mu]);
 	
+	_DEBUG("");
+
 	current_pTdiff      = current_mu_me_pT - current_mu_id_pT;
 	current_pTdiff_muplus  = current_muplus_me_pT - current_muplus_id_pT;
 	current_pTratio        = (current_mu_id_pT!=0.) ? fabs( current_mu_me_pT / current_mu_id_pT ) : -999.;
@@ -582,6 +587,7 @@ void analysisSkeleton::fillAfterCuts()
 	current_pTratio_muplus = (current_muplus_id_pT!=0.) ? fabs( current_muplus_me_pT / current_muplus_id_pT ) : -999.;
 	current_pTres_muplus   = (current_muplus_id_pT!=0.) ? (current_muplus_me_pT-current_muplus_id_pT)/current_muplus_id_pT : -999.;
 	
+	_DEBUG("");
 	
 	if(current_imass>=XMIN  &&  current_imass<=XMAX) { h1_costh->Fill( current_cosTheta ); }
 	h1_cosmicCosthAllCuts->Fill( current_cosmicCosth );
@@ -602,6 +608,7 @@ void analysisSkeleton::fillAfterCuts()
 	h2_pTmevspTid->Fill( current_mu_me_pT, current_mu_id_pT );
 	h2_pTmevspTid_muplus->Fill( current_muplus_me_pT, current_muplus_id_pT );
 	
+	_DEBUG("");
 	
 	/////////////////////////////////////////////////
 	// fill the graphicObjects all cuts tree ////////
@@ -616,6 +623,8 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::iLeadingMuon    = lead_mu;
 	graphicObjects::iSubLeadingMuon = sublead_mu;
 	
+	_DEBUG("");
+
 	// all cuts - vectors
 	graphicObjects::graphicObjects::vxp_n = vxp_n;
 	graphicObjects::vxp_nTracks->push_back(vxp_nTracks->at(current_ivertex));
@@ -634,6 +643,8 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::ipTDiff      = current_ipTdiff;
 	graphicObjects::EtaSum       = current_etaSum;
 	
+	_DEBUG("");
+
 	graphicObjects::n = mu_n;
 	graphicObjects::E->push_back(mu_E->at(lead_mu));
 	graphicObjects::pt->push_back(mu_pt->at(lead_mu));
@@ -648,6 +659,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::author->push_back(mu_author->at(lead_mu));
 	graphicObjects::beta->push_back(mu_beta->at(lead_mu));
 	graphicObjects::isMuonLikelihood->push_back(mu_isMuonLikelihood->at(lead_mu));
+	
+	_DEBUG("");
+
 	graphicObjects::matchchi2->push_back(mu_matchchi2->at(lead_mu));
 	graphicObjects::matchndof->push_back(mu_matchndof->at(lead_mu));
 	graphicObjects::etcone20->push_back(mu_etcone20->at(lead_mu));
@@ -662,6 +676,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::energyLossPar->push_back(mu_energyLossPar->at(lead_mu));
 	graphicObjects::energyLossErr->push_back(mu_energyLossErr->at(lead_mu));
 	graphicObjects::etCore->push_back(mu_etCore->at(lead_mu));
+
+	_DEBUG("");
+
 	graphicObjects::energyLossType->push_back(mu_energyLossType->at(lead_mu));
 	graphicObjects::caloMuonIdTag->push_back(mu_caloMuonIdTag->at(lead_mu));
 	graphicObjects::caloLRLikelihood->push_back(mu_caloLRLikelihood->at(lead_mu));
@@ -684,6 +701,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::cb_qoverp_exPV->push_back(mu_cb_qoverp_exPV->at(lead_mu));
 	graphicObjects::id_d0_exPV->push_back(mu_id_d0_exPV->at(lead_mu));
 	graphicObjects::id_z0_exPV->push_back(mu_id_z0_exPV->at(lead_mu));
+
+	_DEBUG("");
+
 	graphicObjects::id_phi_exPV->push_back(mu_id_phi_exPV->at(lead_mu));
 	graphicObjects::id_theta_exPV->push_back(mu_id_theta_exPV->at(lead_mu));
 	graphicObjects::id_qoverp_exPV->push_back(mu_id_qoverp_exPV->at(lead_mu));
@@ -697,8 +717,12 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::ie_phi_exPV->push_back(mu_ie_phi_exPV->at(lead_mu));
 	graphicObjects::ie_theta_exPV->push_back(mu_ie_theta_exPV->at(lead_mu));
 	graphicObjects::ie_qoverp_exPV->push_back(mu_ie_qoverp_exPV->at(lead_mu));
-	graphicObjects::TileCellEnergyLayer1->push_back(mu_TileCellEnergyLayer1->at(lead_mu));
-	graphicObjects::TileTimeLayer1->push_back(mu_TileTimeLayer1->at(lead_mu));
+	//graphicObjects::TileCellEnergyLayer1->push_back(mu_TileCellEnergyLayer1->at(lead_mu));
+	//graphicObjects::TileTimeLayer1->push_back(mu_TileTimeLayer1->at(lead_mu));
+
+	_DEBUG("");
+
+	/*
 	graphicObjects::TileCellRmsNoiseLayer1->push_back(mu_TileCellRmsNoiseLayer1->at(lead_mu));
 	graphicObjects::TileCellSignLayer1->push_back(mu_TileCellSignLayer1->at(lead_mu));
 	graphicObjects::TileCellEnergyLayer2->push_back(mu_TileCellEnergyLayer2->at(lead_mu));
@@ -712,13 +736,20 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::MSTrkT0_1->push_back(mu_MSTrkT0_1->at(lead_mu));
 	graphicObjects::MSTrkT0_2->push_back(mu_MSTrkT0_2->at(lead_mu));
 	graphicObjects::MSTrkT0_3->push_back(mu_MSTrkT0_3->at(lead_mu));
+	*/
 	graphicObjects::cov_d0_exPV->push_back(mu_cov_d0_exPV->at(lead_mu));
 	graphicObjects::cov_z0_exPV->push_back(mu_cov_z0_exPV->at(lead_mu));
 	graphicObjects::cov_phi_exPV->push_back(mu_cov_phi_exPV->at(lead_mu));
 	graphicObjects::cov_theta_exPV->push_back(mu_cov_theta_exPV->at(lead_mu));
+
+	_DEBUG("");
+
 	graphicObjects::cov_qoverp_exPV->push_back(mu_cov_qoverp_exPV->at(lead_mu));
 	graphicObjects::cov_d0_z0_exPV->push_back(mu_cov_d0_z0_exPV->at(lead_mu));
 	graphicObjects::cov_d0_phi_exPV->push_back(mu_cov_d0_phi_exPV->at(lead_mu));
+
+	_DEBUG("");
+
 	graphicObjects::cov_d0_theta_exPV->push_back(mu_cov_d0_theta_exPV->at(lead_mu));
 	graphicObjects::cov_d0_qoverp_exPV->push_back(mu_cov_d0_qoverp_exPV->at(lead_mu));
 	graphicObjects::cov_z0_phi_exPV->push_back(mu_cov_z0_phi_exPV->at(lead_mu));
@@ -737,6 +768,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::id_cov_d0_theta_exPV->push_back(mu_id_cov_d0_theta_exPV->at(lead_mu));
 	graphicObjects::id_cov_d0_qoverp_exPV->push_back(mu_id_cov_d0_qoverp_exPV->at(lead_mu));
 	graphicObjects::id_cov_z0_phi_exPV->push_back(mu_id_cov_z0_phi_exPV->at(lead_mu));
+
+	_DEBUG("");
+
 	graphicObjects::id_cov_z0_theta_exPV->push_back(mu_id_cov_z0_theta_exPV->at(lead_mu));
 	graphicObjects::id_cov_z0_qoverp_exPV->push_back(mu_id_cov_z0_qoverp_exPV->at(lead_mu));
 	graphicObjects::id_cov_phi_theta_exPV->push_back(mu_id_cov_phi_theta_exPV->at(lead_mu));
@@ -757,6 +791,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::me_cov_phi_theta_exPV->push_back(mu_me_cov_phi_theta_exPV->at(lead_mu));
 	graphicObjects::me_cov_phi_qoverp_exPV->push_back(mu_me_cov_phi_qoverp_exPV->at(lead_mu));
 	graphicObjects::me_cov_theta_qoverp_exPV->push_back(mu_me_cov_theta_qoverp_exPV->at(lead_mu));
+
+	_DEBUG("");
+
 	graphicObjects::ms_d0->push_back(mu_ms_d0->at(lead_mu));
 	graphicObjects::ms_z0->push_back(mu_ms_z0->at(lead_mu));
 	graphicObjects::ms_phi->push_back(mu_ms_phi->at(lead_mu));
@@ -774,6 +811,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::me_qoverp->push_back(mu_me_qoverp->at(lead_mu));
 	graphicObjects::ie_d0->push_back(mu_ie_d0->at(lead_mu));
 	graphicObjects::ie_z0->push_back(mu_ie_z0->at(lead_mu));
+
+	_DEBUG("");
+
 	graphicObjects::ie_phi->push_back(mu_ie_phi->at(lead_mu));
 	graphicObjects::ie_theta->push_back(mu_ie_theta->at(lead_mu));
 	graphicObjects::ie_qoverp->push_back(mu_ie_qoverp->at(lead_mu));
@@ -792,6 +832,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::nTRTHighTOutliers->push_back(mu_nTRTHighTOutliers->at(lead_mu));
 	graphicObjects::nGangedPixels->push_back(mu_nGangedPixels->at(lead_mu));
 	graphicObjects::nPixelDeadSensors->push_back(mu_nPixelDeadSensors->at(lead_mu));
+
+	_DEBUG("");
+
 	graphicObjects::nSCTDeadSensors->push_back(mu_nSCTDeadSensors->at(lead_mu));
 	graphicObjects::nTRTDeadStraws->push_back(mu_nTRTDeadStraws->at(lead_mu));
 	graphicObjects::expectBLayerHit->push_back(mu_expectBLayerHit->at(lead_mu));
@@ -812,6 +855,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::nMDTBIHits->push_back(mu_nMDTBIHits->at(lead_mu));
 	graphicObjects::nMDTBMHits->push_back(mu_nMDTBMHits->at(lead_mu));
 	graphicObjects::nMDTBOHits->push_back(mu_nMDTBOHits->at(lead_mu));
+
+	_DEBUG("");
+
 	graphicObjects::nMDTBEEHits->push_back(mu_nMDTBEEHits->at(lead_mu));
 	graphicObjects::nMDTBIS78Hits->push_back(mu_nMDTBIS78Hits->at(lead_mu));
 	graphicObjects::nMDTEIHits->push_back(mu_nMDTEIHits->at(lead_mu));
@@ -832,6 +878,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::nTGCLayer2PhiHits->push_back(mu_nTGCLayer2PhiHits->at(lead_mu));
 	graphicObjects::nTGCLayer3PhiHits->push_back(mu_nTGCLayer3PhiHits->at(lead_mu));
 	graphicObjects::nTGCLayer4PhiHits->push_back(mu_nTGCLayer4PhiHits->at(lead_mu));
+
+	_DEBUG("");
+
 	graphicObjects::barrelSectors->push_back(mu_barrelSectors->at(lead_mu));
 	graphicObjects::endcapSectors->push_back(mu_endcapSectors->at(lead_mu));
 	graphicObjects::trackd0->push_back(mu_trackd0->at(lead_mu));
@@ -857,6 +906,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::trackfitchi2->push_back(mu_trackfitchi2->at(lead_mu));
 	graphicObjects::trackfitndof->push_back(mu_trackfitndof->at(lead_mu));
 	graphicObjects::hastrack->push_back(mu_hastrack->at(lead_mu));
+
+	_DEBUG("");
+
 	if(AS_isMC)
 	{
 		graphicObjects::truth_dr->push_back(mu_truth_dr->at(lead_mu));
@@ -871,6 +923,9 @@ void analysisSkeleton::fillAfterCuts()
 		graphicObjects::truth_motherbarcode->push_back(mu_truth_motherbarcode->at(lead_mu));
 		graphicObjects::truth_matched->push_back(mu_truth_matched->at(lead_mu));
 	}
+
+	_DEBUG("");
+
 	graphicObjects::EFCB_dr->push_back(mu_EFCB_dr->at(lead_mu));
 	graphicObjects::EFCB_index->push_back(mu_EFCB_index->at(lead_mu));
 	graphicObjects::EFMG_dr->push_back(mu_EFMG_dr->at(lead_mu));
@@ -889,6 +944,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::px->push_back(mu_px->at(sublead_mu));
 	graphicObjects::py->push_back(mu_py->at(sublead_mu));
 	graphicObjects::pz->push_back(mu_pz->at(sublead_mu));
+
+	_DEBUG("");
+
 	graphicObjects::charge->push_back(mu_charge->at(sublead_mu));
 	graphicObjects::allauthor->push_back(mu_allauthor->at(sublead_mu));
 	graphicObjects::author->push_back(mu_author->at(sublead_mu));
@@ -908,6 +966,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::energyLossPar->push_back(mu_energyLossPar->at(sublead_mu));
 	graphicObjects::energyLossErr->push_back(mu_energyLossErr->at(sublead_mu));
 	graphicObjects::etCore->push_back(mu_etCore->at(sublead_mu));
+
+	_DEBUG("");
+
 	graphicObjects::energyLossType->push_back(mu_energyLossType->at(sublead_mu));
 	graphicObjects::caloMuonIdTag->push_back(mu_caloMuonIdTag->at(sublead_mu));
 	graphicObjects::caloLRLikelihood->push_back(mu_caloLRLikelihood->at(sublead_mu));
@@ -931,6 +992,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::id_d0_exPV->push_back(mu_id_d0_exPV->at(sublead_mu));
 	graphicObjects::id_z0_exPV->push_back(mu_id_z0_exPV->at(sublead_mu));
 	graphicObjects::id_phi_exPV->push_back(mu_id_phi_exPV->at(sublead_mu));
+
+	_DEBUG("");
+
 	graphicObjects::id_theta_exPV->push_back(mu_id_theta_exPV->at(sublead_mu));
 	graphicObjects::id_qoverp_exPV->push_back(mu_id_qoverp_exPV->at(sublead_mu));
 	graphicObjects::me_d0_exPV->push_back(mu_me_d0_exPV->at(sublead_mu));
@@ -943,6 +1007,7 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::ie_phi_exPV->push_back(mu_ie_phi_exPV->at(sublead_mu));
 	graphicObjects::ie_theta_exPV->push_back(mu_ie_theta_exPV->at(sublead_mu));
 	graphicObjects::ie_qoverp_exPV->push_back(mu_ie_qoverp_exPV->at(sublead_mu));
+	/*
 	graphicObjects::TileCellEnergyLayer1->push_back(mu_TileCellEnergyLayer1->at(sublead_mu));
 	graphicObjects::TileTimeLayer1->push_back(mu_TileTimeLayer1->at(sublead_mu));
 	graphicObjects::TileCellRmsNoiseLayer1->push_back(mu_TileCellRmsNoiseLayer1->at(sublead_mu));
@@ -958,6 +1023,7 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::MSTrkT0_1->push_back(mu_MSTrkT0_1->at(sublead_mu));
 	graphicObjects::MSTrkT0_2->push_back(mu_MSTrkT0_2->at(sublead_mu));
 	graphicObjects::MSTrkT0_3->push_back(mu_MSTrkT0_3->at(sublead_mu));
+	*/
 	graphicObjects::cov_d0_exPV->push_back(mu_cov_d0_exPV->at(sublead_mu));
 	graphicObjects::cov_z0_exPV->push_back(mu_cov_z0_exPV->at(sublead_mu));
 	graphicObjects::cov_phi_exPV->push_back(mu_cov_phi_exPV->at(sublead_mu));
@@ -973,6 +1039,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::cov_phi_theta_exPV->push_back(mu_cov_phi_theta_exPV->at(sublead_mu));
 	graphicObjects::cov_phi_qoverp_exPV->push_back(mu_cov_phi_qoverp_exPV->at(sublead_mu));
 	graphicObjects::cov_theta_qoverp_exPV->push_back(mu_cov_theta_qoverp_exPV->at(sublead_mu));
+
+	_DEBUG("");
+
 	graphicObjects::id_cov_d0_exPV->push_back(mu_id_cov_d0_exPV->at(sublead_mu));
 	graphicObjects::id_cov_z0_exPV->push_back(mu_id_cov_z0_exPV->at(sublead_mu));
 	graphicObjects::id_cov_phi_exPV->push_back(mu_id_cov_phi_exPV->at(sublead_mu));
@@ -990,6 +1059,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::id_cov_theta_qoverp_exPV->push_back(mu_id_cov_theta_qoverp_exPV->at(sublead_mu));
 	graphicObjects::me_cov_d0_exPV->push_back(mu_me_cov_d0_exPV->at(sublead_mu));
 	graphicObjects::me_cov_z0_exPV->push_back(mu_me_cov_z0_exPV->at(sublead_mu));
+
+	_DEBUG("");
+
 	graphicObjects::me_cov_phi_exPV->push_back(mu_me_cov_phi_exPV->at(sublead_mu));
 	graphicObjects::me_cov_theta_exPV->push_back(mu_me_cov_theta_exPV->at(sublead_mu));
 	graphicObjects::me_cov_qoverp_exPV->push_back(mu_me_cov_qoverp_exPV->at(sublead_mu));
@@ -1012,6 +1084,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::id_z0->push_back(mu_id_z0->at(sublead_mu));
 	graphicObjects::id_phi->push_back(mu_id_phi->at(sublead_mu));
 	graphicObjects::id_theta->push_back(mu_id_theta->at(sublead_mu));
+
+	_DEBUG("");
+
 	graphicObjects::id_qoverp->push_back(mu_id_qoverp->at(sublead_mu));
 	graphicObjects::me_d0->push_back(mu_me_d0->at(sublead_mu));
 	graphicObjects::me_z0->push_back(mu_me_z0->at(sublead_mu));
@@ -1033,6 +1108,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::nPixSharedHits->push_back(mu_nPixSharedHits->at(sublead_mu));
 	graphicObjects::nPixHoles->push_back(mu_nPixHoles->at(sublead_mu));
 	graphicObjects::nSCTSharedHits->push_back(mu_nSCTSharedHits->at(sublead_mu));
+
+	_DEBUG("");
+
 	graphicObjects::nSCTHoles->push_back(mu_nSCTHoles->at(sublead_mu));
 	graphicObjects::nTRTOutliers->push_back(mu_nTRTOutliers->at(sublead_mu));
 	graphicObjects::nTRTHighTOutliers->push_back(mu_nTRTHighTOutliers->at(sublead_mu));
@@ -1053,6 +1131,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::nRPCPhiHoles->push_back(mu_nRPCPhiHoles->at(sublead_mu));
 	graphicObjects::nTGCEtaHits->push_back(mu_nTGCEtaHits->at(sublead_mu));
 	graphicObjects::nTGCEtaHoles->push_back(mu_nTGCEtaHoles->at(sublead_mu));
+
+	_DEBUG("");
+
 	graphicObjects::nTGCPhiHits->push_back(mu_nTGCPhiHits->at(sublead_mu));
 	graphicObjects::nTGCPhiHoles->push_back(mu_nTGCPhiHoles->at(sublead_mu));
 	graphicObjects::nMDTBIHits->push_back(mu_nMDTBIHits->at(sublead_mu));
@@ -1073,6 +1154,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::nTGCLayer1EtaHits->push_back(mu_nTGCLayer1EtaHits->at(sublead_mu));
 	graphicObjects::nTGCLayer2EtaHits->push_back(mu_nTGCLayer2EtaHits->at(sublead_mu));
 	graphicObjects::nTGCLayer3EtaHits->push_back(mu_nTGCLayer3EtaHits->at(sublead_mu));
+
+	_DEBUG("");
+
 	graphicObjects::nTGCLayer4EtaHits->push_back(mu_nTGCLayer4EtaHits->at(sublead_mu));
 	graphicObjects::nTGCLayer1PhiHits->push_back(mu_nTGCLayer1PhiHits->at(sublead_mu));
 	graphicObjects::nTGCLayer2PhiHits->push_back(mu_nTGCLayer2PhiHits->at(sublead_mu));
@@ -1094,6 +1178,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::trackcov_d0_phi->push_back(mu_trackcov_d0_phi->at(sublead_mu));
 	graphicObjects::trackcov_d0_theta->push_back(mu_trackcov_d0_theta->at(sublead_mu));
 	graphicObjects::trackcov_d0_qoverp->push_back(mu_trackcov_d0_qoverp->at(sublead_mu));
+
+	_DEBUG("");
+
 	graphicObjects::trackcov_z0_phi->push_back(mu_trackcov_z0_phi->at(sublead_mu));
 	graphicObjects::trackcov_z0_theta->push_back(mu_trackcov_z0_theta->at(sublead_mu));
 	graphicObjects::trackcov_z0_qoverp->push_back(mu_trackcov_z0_qoverp->at(sublead_mu));
@@ -1103,6 +1190,9 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::trackfitchi2->push_back(mu_trackfitchi2->at(sublead_mu));
 	graphicObjects::trackfitndof->push_back(mu_trackfitndof->at(sublead_mu));
 	graphicObjects::hastrack->push_back(mu_hastrack->at(sublead_mu));
+
+	_DEBUG("");
+
 	if(AS_isMC)
 	{
 		graphicObjects::truth_dr->push_back(mu_truth_dr->at(sublead_mu));
@@ -1117,6 +1207,9 @@ void analysisSkeleton::fillAfterCuts()
 		graphicObjects::truth_motherbarcode->push_back(mu_truth_motherbarcode->at(sublead_mu));
 		graphicObjects::truth_matched->push_back(mu_truth_matched->at(sublead_mu));
 	}
+
+	_DEBUG("");
+
 	graphicObjects::EFCB_dr->push_back(mu_EFCB_dr->at(sublead_mu));
 	graphicObjects::EFCB_index->push_back(mu_EFCB_index->at(sublead_mu));
 	graphicObjects::EFMG_dr->push_back(mu_EFMG_dr->at(sublead_mu));
@@ -1128,6 +1221,8 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::L1_dr->push_back(mu_L1_dr->at(sublead_mu));
 	graphicObjects::L1_index->push_back(mu_L1_index->at(sublead_mu));
 	
+	_DEBUG("");
+
 	/////////////////////////////////////////////////////
 	// fill the all cuts tree ///////////////////////////
 	tree_allCuts->Fill(); ///////////////////////////////
@@ -1139,15 +1234,21 @@ void analysisSkeleton::fillAfterCuts()
 	m_allCuts_counter++; ////////////////////////////////
 	/////////////////////////////////////////////////////
 	
+	_DEBUG("");
+
 	///////////////////////////////////////////////////////////////////////
 	// for the Afb calculation ////////////////////////////////////////////
 	fillAfbMap(current_imass,current_cosThetaCS,current_cosThetaHE); //////
 	///////////////////////////////////////////////////////////////////////
 	
+	_DEBUG("");
+
 	/////////////////////////////////////////////
 	// fill the xVector for the ML fit: /////////
 	fillXvec( current_imass ); //////////////////
 	/////////////////////////////////////////////
+
+	_DEBUG("");
 }
 
 void analysisSkeleton::fillBeforeCuts()
@@ -1259,9 +1360,9 @@ void analysisSkeleton::pTSort()
 	}
 }
 
-void analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* charge)
+void analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* Charge)
 {
-	_DEBUG("analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* charge)");
+	_DEBUG("analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* Charge)");
 	// the map is already sorted by the pT size but,
 	// from the lowest to the highest, so there's
 	// no need to convert values.
@@ -1271,13 +1372,13 @@ void analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vec
 	
 	if(pTtoIndex.size()<2)
 	{
-		_ERROR("in pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* charge), trying to sort a <2 map. Exitting now !");
+		_ERROR("in pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* Charge), trying to sort a <2 map. Exitting now !");
 		exit(-1);
 	}
 	
-	if(charge->size()<2)
+	if(Charge->size()<2)
 	{
-		_ERROR("in pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* charge), trying to sort a <2 map [charge->size()<2]. Exitting now !");
+		_ERROR("in pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* Charge), trying to sort a <2 map [Charge->size()<2]. Exitting now !");
 		exit(-1);
 	}
 	
@@ -1290,7 +1391,7 @@ void analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vec
 	index_b = rit->second; ////////////////////////////////////////////////////////////////////////
 	if(pTtoIndex.size()>2)                           //////////////////////////////////////////////
 	{                                                //////////////////////////////////////////////
-		while(charge->at(index_a)*charge->at(index_b)>0  &&  rit!=pTtoIndex.rend()) ///////////////
+		while(Charge->at(index_a)*Charge->at(index_b)>0  &&  rit!=pTtoIndex.rend()) ///////////////
 		{                                            //////////////////////////////////////////////
 			rit++;                                   //////////////////////////////////////////////
 			index_b = rit->second;                   //////////////////////////////////////////////
@@ -1305,8 +1406,8 @@ void analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vec
 			_INFO("MultiGoodMuon N{"
 				  +_s((int)pTtoIndex.size())
 				  +"}{run-lb-evt: "+_s(RunNumber)+"-"+_s(lbn)+"-"+_s(EventNumber)
-				  +"} -> ai["+_s(charge->at(ai))+"]="+_s(ai)
-				  +", bi["+_s(charge->at(bi))+"]="+_s(bi));
+				  +"} -> ai["+_s(Charge->at(ai))+"]="+_s(ai)
+				  +", bi["+_s(Charge->at(bi))+"]="+_s(bi));
 			EventHash = RunNumber+EventNumber+lbn;
 			isMultiMuonPrint = true;
 		}
@@ -2395,8 +2496,8 @@ void analysisSkeleton::fillTruth()
 		truth_all_CosThetaHE = cosThetaBoost(p1,c1, p2,c2);
 		truth_all_ySystem    = ySystem(p1,p2);
 		truth_all_QT         = QT(p1,p2);
-		truth_all_betaQ      = betaSystem(p1,p2);
-		truth_all_betazQ     = betazSystem(p1,p2);
+		truth_all_betaQ      = magBetaSystem(p1,p2);
+		truth_all_betazQ     = betaiSystem(p1,p2,3);
 		truth_all_betaTQ     = betaTSystem(p1,p2);
 
 		delete p1;
@@ -2445,8 +2546,8 @@ void analysisSkeleton::fillRecon()
 	recon_all_CosThetaHE = cosThetaBoost(p1,c1, p2,c2);
 	recon_all_ySystem = ySystem(p1,p2);
 	recon_all_QT = QT(p1,p2);
-	recon_all_betaQ  = betaSystem(p1,p2);
-	recon_all_betazQ = betazSystem(p1,p2);
+	recon_all_betaQ  = magBetaSystem(p1,p2);
+	recon_all_betazQ = betaiSystem(p1,p2,3);
 	recon_all_betaTQ = betaTSystem(p1,p2);
 	delete p1;
 	delete p2;

@@ -152,7 +152,8 @@ void analysisLocalControl::initialize(int RunNumber, string runs, string basedir
 	}
 	else
 	{
-		if(runs=="ALLRUNS")   str_list = checkANDsetFilepath("PWD", "/../conf/NTUP_SMDILEP_dimuon_p605_runs.list");
+		//if(runs=="ALLRUNS")   str_list = checkANDsetFilepath("PWD", "/../conf/NTUP_SMDILEP_dimuon_p605_runs.list");
+		if(runs=="ALLRUNS")   str_list = checkANDsetFilepath("PWD", "/../conf/NTUP_SMDILEP_dimuon_p716_runs.list");
 		if(runs=="SINGLERUN") str_list = basedir+"/../conf/tmp/"+tostring(RunNumber)+".list";
 		
 		str_dir  = "";//checkANDsetFilepath("PWD", "/local_datasetdir/");

@@ -885,12 +885,12 @@ public :
 //    Bool_t          EF_mu15i;
 //    Bool_t          EF_mu15i_medium;
 //    Bool_t          EF_mu15ii_debug;
-//    Bool_t          EF_mu18;
+    Bool_t          EF_mu18;
 //    Bool_t          EF_mu18_L1J10;
-//    Bool_t          EF_mu18_MG;
+    Bool_t          EF_mu18_MG;
 //    Bool_t          EF_mu18_MG_L1J10;
-//    Bool_t          EF_mu18_MG_medium;
-//    Bool_t          EF_mu18_medium;
+    Bool_t          EF_mu18_MG_medium;
+    Bool_t          EF_mu18_medium;
 //    Bool_t          EF_mu20;
 //    Bool_t          EF_mu20_IDTrkNoCut;
 //    Bool_t          EF_mu20_IDTrkNoCut_ManyVx;
@@ -6925,12 +6925,12 @@ public :
 //    vector<int>     *trig_EF_trigmuonef_EF_mu15i;
 //    vector<int>     *trig_EF_trigmuonef_EF_mu15i_medium;
 //    vector<int>     *trig_EF_trigmuonef_EF_mu15ii_debug;
-//    vector<int>     *trig_EF_trigmuonef_EF_mu18;
+    vector<int>     *trig_EF_trigmuonef_EF_mu18;
 //    vector<int>     *trig_EF_trigmuonef_EF_mu18_L1J10;
-//    vector<int>     *trig_EF_trigmuonef_EF_mu18_MG;
+    vector<int>     *trig_EF_trigmuonef_EF_mu18_MG;
 //    vector<int>     *trig_EF_trigmuonef_EF_mu18_MG_L1J10;
-//    vector<int>     *trig_EF_trigmuonef_EF_mu18_MG_medium;
-//    vector<int>     *trig_EF_trigmuonef_EF_mu18_medium;
+    vector<int>     *trig_EF_trigmuonef_EF_mu18_MG_medium;
+    vector<int>     *trig_EF_trigmuonef_EF_mu18_medium;
 //    vector<int>     *trig_EF_trigmuonef_EF_mu20;
 //    vector<int>     *trig_EF_trigmuonef_EF_mu20_IDTrkNoCut;
 //    vector<int>     *trig_EF_trigmuonef_EF_mu20_IDTrkNoCut_ManyVx;
@@ -7149,12 +7149,12 @@ public :
 //    vector<int>     *trig_EF_trigmugirl_EF_mu15i;
 //    vector<int>     *trig_EF_trigmugirl_EF_mu15i_medium;
 //    vector<int>     *trig_EF_trigmugirl_EF_mu15ii_debug;
-//    vector<int>     *trig_EF_trigmugirl_EF_mu18;
+    vector<int>     *trig_EF_trigmugirl_EF_mu18;
 //    vector<int>     *trig_EF_trigmugirl_EF_mu18_L1J10;
-//    vector<int>     *trig_EF_trigmugirl_EF_mu18_MG;
+    vector<int>     *trig_EF_trigmugirl_EF_mu18_MG;
 //    vector<int>     *trig_EF_trigmugirl_EF_mu18_MG_L1J10;
-//    vector<int>     *trig_EF_trigmugirl_EF_mu18_MG_medium;
-//    vector<int>     *trig_EF_trigmugirl_EF_mu18_medium;
+    vector<int>     *trig_EF_trigmugirl_EF_mu18_MG_medium;
+    vector<int>     *trig_EF_trigmugirl_EF_mu18_medium;
 //    vector<int>     *trig_EF_trigmugirl_EF_mu20;
 //    vector<int>     *trig_EF_trigmugirl_EF_mu20_IDTrkNoCut;
 //    vector<int>     *trig_EF_trigmugirl_EF_mu20_IDTrkNoCut_ManyVx;
@@ -8354,20 +8354,20 @@ public :
    TBranch        *b_EF_mu18_MG_L1J10;   //!
    TBranch        *b_EF_mu18_MG_medium;   //!
    TBranch        *b_EF_mu18_medium;   //!
-   TBranch        *b_EF_mu20;   //!
+//   TBranch        *b_EF_mu20;   //!
 //   TBranch        *b_EF_mu20_IDTrkNoCut;   //!
 //   TBranch        *b_EF_mu20_IDTrkNoCut_ManyVx;   //!
 //   TBranch        *b_EF_mu20_L2Star_IDTrkNoCut;   //!
-   TBranch        *b_EF_mu20_MG;   //!
-   TBranch        *b_EF_mu20_MG_medium;   //!
-   TBranch        *b_EF_mu20_MSonly;   //!
-   TBranch        *b_EF_mu20_empty;   //!
-   TBranch        *b_EF_mu20_medium;   //!
+//   TBranch        *b_EF_mu20_MG;   //!
+//   TBranch        *b_EF_mu20_MG_medium;   //!
+//   TBranch        *b_EF_mu20_MSonly;   //!
+//   TBranch        *b_EF_mu20_empty;   //!
+//   TBranch        *b_EF_mu20_medium;   //!
 //   TBranch        *b_EF_mu20_mu10_EFFS_tight;   //!
 //   TBranch        *b_EF_mu20_mu7_EFFS;   //!
 //   TBranch        *b_EF_mu20_muCombTag_NoEF;   //!
-   TBranch        *b_EF_mu20i;   //!
-   TBranch        *b_EF_mu20i_medium;   //!
+//   TBranch        *b_EF_mu20i;   //!
+//   TBranch        *b_EF_mu20i_medium;   //!
    TBranch        *b_EF_mu22;   //!
    TBranch        *b_EF_mu22_MG;   //!
    TBranch        *b_EF_mu22_MG_medium;   //!
@@ -14403,12 +14403,12 @@ public :
 //    TBranch        *b_trig_EF_trigmuonef_EF_mu15i;   //!
 //    TBranch        *b_trig_EF_trigmuonef_EF_mu15i_medium;   //!
 //    TBranch        *b_trig_EF_trigmuonef_EF_mu15ii_debug;   //!
-//    TBranch        *b_trig_EF_trigmuonef_EF_mu18;   //!
+    TBranch        *b_trig_EF_trigmuonef_EF_mu18;   //!
 //    TBranch        *b_trig_EF_trigmuonef_EF_mu18_L1J10;   //!
-//    TBranch        *b_trig_EF_trigmuonef_EF_mu18_MG;   //!
+    TBranch        *b_trig_EF_trigmuonef_EF_mu18_MG;   //!
 //    TBranch        *b_trig_EF_trigmuonef_EF_mu18_MG_L1J10;   //!
-//    TBranch        *b_trig_EF_trigmuonef_EF_mu18_MG_medium;   //!
-//    TBranch        *b_trig_EF_trigmuonef_EF_mu18_medium;   //!
+    TBranch        *b_trig_EF_trigmuonef_EF_mu18_MG_medium;   //!
+    TBranch        *b_trig_EF_trigmuonef_EF_mu18_medium;   //!
 //    TBranch        *b_trig_EF_trigmuonef_EF_mu20;   //!
 //    TBranch        *b_trig_EF_trigmuonef_EF_mu20_IDTrkNoCut;   //!
 //    TBranch        *b_trig_EF_trigmuonef_EF_mu20_IDTrkNoCut_ManyVx;   //!
@@ -14627,12 +14627,12 @@ public :
 //    TBranch        *b_trig_EF_trigmugirl_EF_mu15i;   //!
 //    TBranch        *b_trig_EF_trigmugirl_EF_mu15i_medium;   //!
 //    TBranch        *b_trig_EF_trigmugirl_EF_mu15ii_debug;   //!
-//    TBranch        *b_trig_EF_trigmugirl_EF_mu18;   //!
+    TBranch        *b_trig_EF_trigmugirl_EF_mu18;   //!
 //    TBranch        *b_trig_EF_trigmugirl_EF_mu18_L1J10;   //!
-//    TBranch        *b_trig_EF_trigmugirl_EF_mu18_MG;   //!
+    TBranch        *b_trig_EF_trigmugirl_EF_mu18_MG;   //!
 //    TBranch        *b_trig_EF_trigmugirl_EF_mu18_MG_L1J10;   //!
-//    TBranch        *b_trig_EF_trigmugirl_EF_mu18_MG_medium;   //!
-//    TBranch        *b_trig_EF_trigmugirl_EF_mu18_medium;   //!
+    TBranch        *b_trig_EF_trigmugirl_EF_mu18_MG_medium;   //!
+    TBranch        *b_trig_EF_trigmugirl_EF_mu18_medium;   //!
 //    TBranch        *b_trig_EF_trigmugirl_EF_mu20;   //!
 //    TBranch        *b_trig_EF_trigmugirl_EF_mu20_IDTrkNoCut;   //!
 //    TBranch        *b_trig_EF_trigmugirl_EF_mu20_IDTrkNoCut_ManyVx;   //!
@@ -22659,12 +22659,12 @@ void WZphysD3PD::Init(TTree *tree)
 //    trig_EF_trigmuonef_EF_mu15i = 0;
 //    trig_EF_trigmuonef_EF_mu15i_medium = 0;
 //    trig_EF_trigmuonef_EF_mu15ii_debug = 0;
-//    trig_EF_trigmuonef_EF_mu18 = 0;
+    trig_EF_trigmuonef_EF_mu18 = 0;
 //    trig_EF_trigmuonef_EF_mu18_L1J10 = 0;
-//    trig_EF_trigmuonef_EF_mu18_MG = 0;
+    trig_EF_trigmuonef_EF_mu18_MG = 0;
 //    trig_EF_trigmuonef_EF_mu18_MG_L1J10 = 0;
-//    trig_EF_trigmuonef_EF_mu18_MG_medium = 0;
-//    trig_EF_trigmuonef_EF_mu18_medium = 0;
+    trig_EF_trigmuonef_EF_mu18_MG_medium = 0;
+    trig_EF_trigmuonef_EF_mu18_medium = 0;
 //    trig_EF_trigmuonef_EF_mu20 = 0;
 //    trig_EF_trigmuonef_EF_mu20_IDTrkNoCut = 0;
 //    trig_EF_trigmuonef_EF_mu20_IDTrkNoCut_ManyVx = 0;
@@ -22882,12 +22882,12 @@ void WZphysD3PD::Init(TTree *tree)
 //    trig_EF_trigmugirl_EF_mu15i = 0;
 //    trig_EF_trigmugirl_EF_mu15i_medium = 0;
 //    trig_EF_trigmugirl_EF_mu15ii_debug = 0;
-//    trig_EF_trigmugirl_EF_mu18 = 0;
+    trig_EF_trigmugirl_EF_mu18 = 0;
 //    trig_EF_trigmugirl_EF_mu18_L1J10 = 0;
-//    trig_EF_trigmugirl_EF_mu18_MG = 0;
+    trig_EF_trigmugirl_EF_mu18_MG = 0;
 //    trig_EF_trigmugirl_EF_mu18_MG_L1J10 = 0;
-//    trig_EF_trigmugirl_EF_mu18_MG_medium = 0;
-//    trig_EF_trigmugirl_EF_mu18_medium = 0;
+    trig_EF_trigmugirl_EF_mu18_MG_medium = 0;
+    trig_EF_trigmugirl_EF_mu18_medium = 0;
 //    trig_EF_trigmugirl_EF_mu20 = 0;
 //    trig_EF_trigmugirl_EF_mu20_IDTrkNoCut = 0;
 //    trig_EF_trigmugirl_EF_mu20_IDTrkNoCut_ManyVx = 0;
@@ -24053,12 +24053,12 @@ void WZphysD3PD::Init(TTree *tree)
 //    fChain->SetBranchAddress("EF_mu15i", &EF_mu15i, &b_EF_mu15i);
 //    fChain->SetBranchAddress("EF_mu15i_medium", &EF_mu15i_medium, &b_EF_mu15i_medium);
 //    fChain->SetBranchAddress("EF_mu15ii_debug", &EF_mu15ii_debug, &b_EF_mu15ii_debug);
-//    fChain->SetBranchAddress("EF_mu18", &EF_mu18, &b_EF_mu18);
+    fChain->SetBranchAddress("EF_mu18", &EF_mu18, &b_EF_mu18);
 //    fChain->SetBranchAddress("EF_mu18_L1J10", &EF_mu18_L1J10, &b_EF_mu18_L1J10);
-//    fChain->SetBranchAddress("EF_mu18_MG", &EF_mu18_MG, &b_EF_mu18_MG);
+    fChain->SetBranchAddress("EF_mu18_MG", &EF_mu18_MG, &b_EF_mu18_MG);
 //    fChain->SetBranchAddress("EF_mu18_MG_L1J10", &EF_mu18_MG_L1J10, &b_EF_mu18_MG_L1J10);
-//    fChain->SetBranchAddress("EF_mu18_MG_medium", &EF_mu18_MG_medium, &b_EF_mu18_MG_medium);
-//    fChain->SetBranchAddress("EF_mu18_medium", &EF_mu18_medium, &b_EF_mu18_medium);
+    fChain->SetBranchAddress("EF_mu18_MG_medium", &EF_mu18_MG_medium, &b_EF_mu18_MG_medium);
+    fChain->SetBranchAddress("EF_mu18_medium", &EF_mu18_medium, &b_EF_mu18_medium);
 //    fChain->SetBranchAddress("EF_mu20", &EF_mu20, &b_EF_mu20);
 //    fChain->SetBranchAddress("EF_mu20_IDTrkNoCut", &EF_mu20_IDTrkNoCut, &b_EF_mu20_IDTrkNoCut);
 //    fChain->SetBranchAddress("EF_mu20_IDTrkNoCut_ManyVx", &EF_mu20_IDTrkNoCut_ManyVx, &b_EF_mu20_IDTrkNoCut_ManyVx);
@@ -30093,12 +30093,12 @@ void WZphysD3PD::Init(TTree *tree)
 //    fChain->SetBranchAddress("trig_EF_trigmuonef_EF_mu15i", &trig_EF_trigmuonef_EF_mu15i, &b_trig_EF_trigmuonef_EF_mu15i);
 //    fChain->SetBranchAddress("trig_EF_trigmuonef_EF_mu15i_medium", &trig_EF_trigmuonef_EF_mu15i_medium, &b_trig_EF_trigmuonef_EF_mu15i_medium);
 //    fChain->SetBranchAddress("trig_EF_trigmuonef_EF_mu15ii_debug", &trig_EF_trigmuonef_EF_mu15ii_debug, &b_trig_EF_trigmuonef_EF_mu15ii_debug);
-//    fChain->SetBranchAddress("trig_EF_trigmuonef_EF_mu18", &trig_EF_trigmuonef_EF_mu18, &b_trig_EF_trigmuonef_EF_mu18);
+    fChain->SetBranchAddress("trig_EF_trigmuonef_EF_mu18", &trig_EF_trigmuonef_EF_mu18, &b_trig_EF_trigmuonef_EF_mu18);
 //    fChain->SetBranchAddress("trig_EF_trigmuonef_EF_mu18_L1J10", &trig_EF_trigmuonef_EF_mu18_L1J10, &b_trig_EF_trigmuonef_EF_mu18_L1J10);
-//    fChain->SetBranchAddress("trig_EF_trigmuonef_EF_mu18_MG", &trig_EF_trigmuonef_EF_mu18_MG, &b_trig_EF_trigmuonef_EF_mu18_MG);
+    fChain->SetBranchAddress("trig_EF_trigmuonef_EF_mu18_MG", &trig_EF_trigmuonef_EF_mu18_MG, &b_trig_EF_trigmuonef_EF_mu18_MG);
 //    fChain->SetBranchAddress("trig_EF_trigmuonef_EF_mu18_MG_L1J10", &trig_EF_trigmuonef_EF_mu18_MG_L1J10, &b_trig_EF_trigmuonef_EF_mu18_MG_L1J10);
-//    fChain->SetBranchAddress("trig_EF_trigmuonef_EF_mu18_MG_medium", &trig_EF_trigmuonef_EF_mu18_MG_medium, &b_trig_EF_trigmuonef_EF_mu18_MG_medium);
-//    fChain->SetBranchAddress("trig_EF_trigmuonef_EF_mu18_medium", &trig_EF_trigmuonef_EF_mu18_medium, &b_trig_EF_trigmuonef_EF_mu18_medium);
+    fChain->SetBranchAddress("trig_EF_trigmuonef_EF_mu18_MG_medium", &trig_EF_trigmuonef_EF_mu18_MG_medium, &b_trig_EF_trigmuonef_EF_mu18_MG_medium);
+    fChain->SetBranchAddress("trig_EF_trigmuonef_EF_mu18_medium", &trig_EF_trigmuonef_EF_mu18_medium, &b_trig_EF_trigmuonef_EF_mu18_medium);
 //    fChain->SetBranchAddress("trig_EF_trigmuonef_EF_mu20", &trig_EF_trigmuonef_EF_mu20, &b_trig_EF_trigmuonef_EF_mu20);
 //    fChain->SetBranchAddress("trig_EF_trigmuonef_EF_mu20_IDTrkNoCut", &trig_EF_trigmuonef_EF_mu20_IDTrkNoCut, &b_trig_EF_trigmuonef_EF_mu20_IDTrkNoCut);
 //    fChain->SetBranchAddress("trig_EF_trigmuonef_EF_mu20_IDTrkNoCut_ManyVx", &trig_EF_trigmuonef_EF_mu20_IDTrkNoCut_ManyVx, &b_trig_EF_trigmuonef_EF_mu20_IDTrkNoCut_ManyVx);
@@ -30317,12 +30317,12 @@ void WZphysD3PD::Init(TTree *tree)
 //    fChain->SetBranchAddress("trig_EF_trigmugirl_EF_mu15i", &trig_EF_trigmugirl_EF_mu15i, &b_trig_EF_trigmugirl_EF_mu15i);
 //    fChain->SetBranchAddress("trig_EF_trigmugirl_EF_mu15i_medium", &trig_EF_trigmugirl_EF_mu15i_medium, &b_trig_EF_trigmugirl_EF_mu15i_medium);
 //    fChain->SetBranchAddress("trig_EF_trigmugirl_EF_mu15ii_debug", &trig_EF_trigmugirl_EF_mu15ii_debug, &b_trig_EF_trigmugirl_EF_mu15ii_debug);
-//    fChain->SetBranchAddress("trig_EF_trigmugirl_EF_mu18", &trig_EF_trigmugirl_EF_mu18, &b_trig_EF_trigmugirl_EF_mu18);
+    fChain->SetBranchAddress("trig_EF_trigmugirl_EF_mu18", &trig_EF_trigmugirl_EF_mu18, &b_trig_EF_trigmugirl_EF_mu18);
 //    fChain->SetBranchAddress("trig_EF_trigmugirl_EF_mu18_L1J10", &trig_EF_trigmugirl_EF_mu18_L1J10, &b_trig_EF_trigmugirl_EF_mu18_L1J10);
-//    fChain->SetBranchAddress("trig_EF_trigmugirl_EF_mu18_MG", &trig_EF_trigmugirl_EF_mu18_MG, &b_trig_EF_trigmugirl_EF_mu18_MG);
+    fChain->SetBranchAddress("trig_EF_trigmugirl_EF_mu18_MG", &trig_EF_trigmugirl_EF_mu18_MG, &b_trig_EF_trigmugirl_EF_mu18_MG);
 //    fChain->SetBranchAddress("trig_EF_trigmugirl_EF_mu18_MG_L1J10", &trig_EF_trigmugirl_EF_mu18_MG_L1J10, &b_trig_EF_trigmugirl_EF_mu18_MG_L1J10);
-//    fChain->SetBranchAddress("trig_EF_trigmugirl_EF_mu18_MG_medium", &trig_EF_trigmugirl_EF_mu18_MG_medium, &b_trig_EF_trigmugirl_EF_mu18_MG_medium);
-//    fChain->SetBranchAddress("trig_EF_trigmugirl_EF_mu18_medium", &trig_EF_trigmugirl_EF_mu18_medium, &b_trig_EF_trigmugirl_EF_mu18_medium);
+    fChain->SetBranchAddress("trig_EF_trigmugirl_EF_mu18_MG_medium", &trig_EF_trigmugirl_EF_mu18_MG_medium, &b_trig_EF_trigmugirl_EF_mu18_MG_medium);
+    fChain->SetBranchAddress("trig_EF_trigmugirl_EF_mu18_medium", &trig_EF_trigmugirl_EF_mu18_medium, &b_trig_EF_trigmugirl_EF_mu18_medium);
 //    fChain->SetBranchAddress("trig_EF_trigmugirl_EF_mu20", &trig_EF_trigmugirl_EF_mu20, &b_trig_EF_trigmugirl_EF_mu20);
 //    fChain->SetBranchAddress("trig_EF_trigmugirl_EF_mu20_IDTrkNoCut", &trig_EF_trigmugirl_EF_mu20_IDTrkNoCut, &b_trig_EF_trigmugirl_EF_mu20_IDTrkNoCut);
 //    fChain->SetBranchAddress("trig_EF_trigmugirl_EF_mu20_IDTrkNoCut_ManyVx", &trig_EF_trigmugirl_EF_mu20_IDTrkNoCut_ManyVx, &b_trig_EF_trigmugirl_EF_mu20_IDTrkNoCut_ManyVx);

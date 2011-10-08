@@ -150,11 +150,13 @@ bool analysisSkeleton::isTrigger(string trigName)
 	if     (trigName=="L1_MU10")                      isTrig = L1_MU10;
 	else if(trigName=="EF_mu18")                      isTrig = EF_mu18;
 	else if(trigName=="EF_mu18_MG")                   isTrig = EF_mu18_MG;
+	else if(trigName=="EF_mu18_medium")               isTrig = EF_mu18_medium;
+	else if(trigName=="EF_mu18_MG_medium")            isTrig = EF_mu18_MG_medium;
 	else if(trigName=="EF_mu22")                      isTrig = EF_mu22;
 	else if(trigName=="EF_mu22_MG")                   isTrig = EF_mu22_MG;
+	else if(trigName=="EF_mu22_medium")               isTrig = EF_mu22_medium;
+	else if(trigName=="EF_mu22_MG_medium")            isTrig = EF_mu22_MG_medium;
 	else if(trigName=="EF_mu40_MSonly_barrel")        isTrig = EF_mu40_MSonly_barrel;
-	else if(trigName=="EF_mu18_MG_medium")            isTrig = EF_mu18_MG_medium;
-	else if(trigName=="EF_mu18_medium")               isTrig = EF_mu18_medium;
 	else if(trigName=="EF_mu40_MSonly_barrel_medium") isTrig = EF_mu40_MSonly_barrel_medium;
 	else _WARNING("in analysisSkeleton::isTrigger -> the trigger "+trigName+" was not found and the event is regected by default");
 	

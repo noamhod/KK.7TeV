@@ -214,15 +214,19 @@ void analysis::setEventVariables()
 	analysisSkeleton::L1_MU10 = m_WZphysD3PD->L1_MU10;
 
 	// EF triggers
-	analysisSkeleton::EF_mu22 = m_WZphysD3PD->EF_mu22;
-	analysisSkeleton::EF_mu22_MG = m_WZphysD3PD->EF_mu22_MG;
-	analysisSkeleton::EF_mu40_MSonly_barrel = m_WZphysD3PD->EF_mu40_MSonly_barrel;
-/*
 	analysisSkeleton::EF_mu18 = m_WZphysD3PD->EF_mu18;
 	analysisSkeleton::EF_mu18_MG = m_WZphysD3PD->EF_mu18_MG;
+	
 	analysisSkeleton::EF_mu18_MG_medium = m_WZphysD3PD->EF_mu18_MG_medium;
 	analysisSkeleton::EF_mu18_medium = m_WZphysD3PD->EF_mu18_medium;
-*/
+
+	analysisSkeleton::EF_mu22 = m_WZphysD3PD->EF_mu22;
+	analysisSkeleton::EF_mu22_MG = m_WZphysD3PD->EF_mu22_MG;
+	
+	analysisSkeleton::EF_mu22_medium = m_WZphysD3PD->EF_mu22_medium;
+	analysisSkeleton::EF_mu22_MG_medium = m_WZphysD3PD->EF_mu22_MG_medium;
+
+	analysisSkeleton::EF_mu40_MSonly_barrel = m_WZphysD3PD->EF_mu40_MSonly_barrel;
 	analysisSkeleton::EF_mu40_MSonly_barrel_medium = m_WZphysD3PD->EF_mu40_MSonly_barrel_medium;
 	
 	// vertexes (for the PV preselection)

@@ -128,13 +128,15 @@ public:
 
 	
 	// EF triggers	
+	bool EF_mu18;
+        bool EF_mu18_MG;
+	bool EF_mu18_medium;
+	bool EF_mu18_MG_medium;
 	bool EF_mu22;
 	bool EF_mu22_MG;
+	bool EF_mu22_medium;
+        bool EF_mu22_MG_medium;
 	bool EF_mu40_MSonly_barrel;
-	bool EF_mu18;
-	bool EF_mu18_MG;
-	bool EF_mu18_MG_medium;
-	bool EF_mu18_medium;
 	bool EF_mu40_MSonly_barrel_medium;
 
 	

@@ -23,7 +23,9 @@ class QSUB
 				  :prefix,
 				  :nchars,
 				  :secondprefix,
-				  :nsubchars
+				  :nsubchars,
+				  :grltag,
+				  :mcptag
 	
 	def initialize(dosetup=false)
 		if(dosetup) then
@@ -56,6 +58,8 @@ class QSUB
 		logd.info nchars
 		logd.info secondprefix
 		logd.info nsubchars
+		logd.info grltag
+		logd.info mcptag
 		
 		if(!homedir)	then
 			ok=false
@@ -101,6 +105,14 @@ class QSUB
 			ok=false
 			logd.error "nsubchars is not set"
 		end
+		if(!grltag)	then
+			ok=false
+			logd.error "grltag is not set"
+		end
+		if(!mcptag)	then
+			ok=false
+			logd.error "mcptag is not set"
+		end
 		
 		return ok
 	end
@@ -141,6 +153,14 @@ class QSUB
 	def set_secondprefix(str="",nsubcr=5)
 		@secondprefix = str
 		@nsubchars    = nsubcr
+	end
+	
+	def set_grltag(str="")
+		@grltag = str
+	end
+	
+	def set_mcptag(str="")
+		@mcptag = str
 	end
 	
 	def set_loggerdec(logfilename="")
@@ -212,7 +232,7 @@ class QSUB
 		jobname   = "#{jobdir}/job_#{runnumber}.sh"
 		rundirregular="#{thisdir}/../run"
 		rundir='\"'+"#{thisdir}"+'/../run/\"'
-		grltag='\"00-00-91\"'
+		grlTag='\"'+"#{grltag}"+'\"'
 		singlerun = '\"SINGLERUN\"'
 		
 		#cd(rundir)
@@ -220,7 +240,7 @@ class QSUB
 			f.puts "{"
 			f.puts "   gROOT->Reset();"
 			f.puts "   gROOT->ProcessLine(\".L #{rundirregular}/analysisLocalControlMain.C\");"
-			f.puts "   gROOT->ProcessLine(\"load(#{grltag},#{rundir})\");"
+			f.puts "   gROOT->ProcessLine(\"load(#{grlTag},#{rundir})\");"
 			f.puts "   gROOT->ProcessLine(\"alc.initialize(#{runnumber},#{singlerun},#{rundir})\");"
 			f.puts "   gROOT->ProcessLine(\"alc.loop(0,0)\");"
 			f.puts "}"
@@ -237,36 +257,12 @@ class QSUB
 			f.puts "export PATH=$ROOTSYS/bin:$PATH"
 			f.puts "export RUBYLIB=$ROOTSYS/lib:$RUBYLIB"
 			f.puts "export LD_LIBRABY_PATH=$LD_LIBRABY_PATH:#{rundirregular}"
-			f.puts "export LD_LIBRABY_PATH=$LD_LIBRABY_PATH:#{thisdir}/../GoodRunsLists-00-00-91/StandAlone"
+			f.puts "export LD_LIBRABY_PATH=$LD_LIBRABY_PATH:#{thisdir}/../GoodRunsLists-#{grltag}/StandAlone"
+			f.puts "export LD_LIBRABY_PATH=$LD_LIBRABY_PATH:#{thisdir}/../MuonMomentumCorrections-#{mcptag}/StandAlone"
 			f.puts "$ROOTSYS/bin/root.exe -l -b -q #{macroname}"
 			f.puts "echo   \"RunNumber=$RUNNUMBER\""
 			f.puts "echo   \"host = $HOSTNAME\""
 		}
-		
-		# nodes = "nodes="
-		# nNodes=1
-		# for i in 1..nNodes
-			# if(i==5)  then next end
-			# if(i==17) then next end
-			# if(i==24) then next end
-			# if(i==29) then next end
-			# if(i==32) then next end
-			# if(i<nNodes) then
-				# if(i<10) then
-					# nodes += "tau-wn0#{i.to_s()}+" 
-				# else
-					# nodes += "tau-wn#{i.to_s()}+" 
-				# end
-			# else
-				# if(i<10) then
-					# nodes += "tau-wn0#{i.to_s()}"
-				# else
-					# nodes += "tau-wn#{i.to_s()}"
-				# end
-			# end
-		# end
-		# puts nodes
-		# %x(qsub -l #{nodes} -q S -e #{rundirregular}/tmp/err -o #{rundirregular}/tmp/out #{jobname})
 
 		%x(qsub -q S -e #{rundirregular}/tmp/err -o #{rundirregular}/tmp/out #{jobname})
 		logd.info "sent --> #{dataset}"

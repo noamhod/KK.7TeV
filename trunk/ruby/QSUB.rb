@@ -25,7 +25,8 @@ class QSUB
 				  :secondprefix,
 				  :nsubchars,
 				  :grltag,
-				  :mcptag
+				  :mcptag,
+				  :prwtag
 	
 	def initialize(dosetup=false)
 		if(dosetup) then
@@ -60,6 +61,7 @@ class QSUB
 		logd.info nsubchars
 		logd.info grltag
 		logd.info mcptag
+		logd.info prwtag
 		
 		if(!homedir)	then
 			ok=false
@@ -113,6 +115,10 @@ class QSUB
 			ok=false
 			logd.error "mcptag is not set"
 		end
+		if(!prwtag)	then
+			ok=false
+			logd.error "prwtag is not set"
+		end
 		
 		return ok
 	end
@@ -161,6 +167,10 @@ class QSUB
 	
 	def set_mcptag(str="")
 		@mcptag = str
+	end
+	
+	def set_prwtag(str="")
+		@prwtag = str
 	end
 	
 	def set_loggerdec(logfilename="")
@@ -259,6 +269,7 @@ class QSUB
 			f.puts "export LD_LIBRABY_PATH=$LD_LIBRABY_PATH:#{rundirregular}"
 			f.puts "export LD_LIBRABY_PATH=$LD_LIBRABY_PATH:#{thisdir}/../GoodRunsLists-#{grltag}/StandAlone"
 			f.puts "export LD_LIBRABY_PATH=$LD_LIBRABY_PATH:#{thisdir}/../MuonMomentumCorrections-#{mcptag}/StandAlone"
+			f.puts "export LD_LIBRABY_PATH=$LD_LIBRABY_PATH:#{thisdir}/../PileupReweighting-#{prwtag}/StandAlone"
 			f.puts "$ROOTSYS/bin/root.exe -l -b -q #{macroname}"
 			f.puts "echo   \"RunNumber=$RUNNUMBER\""
 			f.puts "echo   \"host = $HOSTNAME\""

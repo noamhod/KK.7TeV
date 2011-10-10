@@ -169,16 +169,23 @@ void analysis::execute()
 	
 	//////////////////////////////////////////////////////////////
 	// the double muon selection /////////////////////////////////
-	bool pass2MUselection = applyDoubleMuonSelection(); ////
+	bool pass2MUselection = applyDoubleMuonSelection(); //////////
 	if( !pass2MUselection ) return; //////////////////////////////
 	//////////////////////////////////////////////////////////////
 	
+	// if(analysisSkeleton::pileup_weight>0.) _INFO("pileup_weight = "+_s(analysisSkeleton::pileup_weight,5));
+	// if(analysisSkeleton::EW_kfactor_weight>1.) _INFO("EW_kfactor_weight = "+_s(analysisSkeleton::EW_kfactor_weight,5));
+	// if(analysisSkeleton::QCD_kfactor_weight>0.) _INFO("QCD_kfactor_weight = "+_s(analysisSkeleton::QCD_kfactor_weight,5));
+	// if(analysisSkeleton::mcevent_weight>0.) _INFO("mcevent_weight = "+_s(analysisSkeleton::mcevent_weight,5));
+	
+	
 	_DEBUG("");
 	
-	(*fCandidates)	<< "Run-LB-Evt  "
+	(*fCandidates)	<< "Run-LB-Evt-Wgt  "
 					<< analysisSkeleton::RunNumber	 << " "
 					<< analysisSkeleton::lbn 		 << " "
-					<< analysisSkeleton::EventNumber
+					<< analysisSkeleton::EventNumber << " "
+					<< analysisSkeleton::pileup_weight
 					<< endl;
 
 	_DEBUG("");
@@ -205,11 +212,66 @@ void analysis::setEventVariables()
 	analysisSkeleton::vTriggers = getPeriodTriggers(); ///
 	//////////////////////////////////////////////////////
 	
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	if(!m_isMC) analysisSkeleton::isGRL = m_analysis_grl->m_grl.HasRunLumiBlock( m_WZphysD3PD->RunNumber,m_WZphysD3PD->lbn ); ///////////
-	if(m_isMC) analysisSkeleton::isGRL = 1; /////////////////////////////////////////////////////////////////////
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	if(!m_isMC) analysisSkeleton::isGRL = m_analysis_grl->m_grl.HasRunLumiBlock( m_WZphysD3PD->RunNumber,m_WZphysD3PD->lbn ); ///
+	if(m_isMC) analysisSkeleton::isGRL = 1; /////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	analysisSkeleton::actualIntPerXing  = m_WZphysD3PD->actualIntPerXing;
+	analysisSkeleton::averageIntPerXing = m_WZphysD3PD->averageIntPerXing;
+	if(m_isMC)
+	{
+		analysisSkeleton::mc_channel_number = m_WZphysD3PD->mc_channel_number;
+		analysisSkeleton::mc_event_number   = m_WZphysD3PD->mc_event_number;
+		analysisSkeleton::mc_event_weight   = m_WZphysD3PD->mc_event_weight;
+	}
+	/////////////////////////////////////////////////////////////////////////////////
+	// pileup reweighting, needs to come after setting the lbn //////////////////////
+	analysisSkeleton::pileup_weight = getPileupWeight(); ////////////////////////////
+	if(analysisSkeleton::pileup_weight<=0.) analysisSkeleton::pileup_weight = 1.; ///
+	/////////////////////////////////////////////////////////////////////////////////
+	
+	/////////////////////////////////////////////////////////////////////////////////
+	analysisSkeleton::EW_kfactor_weight  = 1.;
+	analysisSkeleton::QCD_kfactor_weight = 1.;
+	if(m_isMC  &&  kFactors::iskFactor(sMCsampleName))
+	{	
+		// apply EW & QCD corrections to the Z and DY MC
+		if(sMCsampleName.find("DYmumu")!=string::npos  ||  sMCsampleName.find("Zmumu")!=string::npos)
+		{
+			double truth_mass = kFactors::getTruthMass(m_WZphysD3PD->mc_pdgId, m_WZphysD3PD->mc_m, PDTZ)*MeV2GeV;
+			analysisSkeleton::EW_kfactor_weight = kFactors::ElectroWeak(truth_mass, "NNLO/LO*");
+			analysisSkeleton::QCD_kfactor_weight = kFactors::QCD(truth_mass, "NNLO/LO*");
+		}
+		
+		// apply ONLY QCD corrections to the Z'
+		if(sMCsampleName.find("Zprime_mumu")!=string::npos)
+		{
+			double truth_mass = kFactors::getTruthMass(m_WZphysD3PD->mc_pdgId, m_WZphysD3PD->mc_m, PDTZPRIME0)*MeV2GeV;
+			analysisSkeleton::QCD_kfactor_weight = kFactors::QCD(truth_mass, "NNLO/LO*");
+		}
+		
+		// do not apply to any other sample !!!
+	}
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	
+	////////////////////////////////////////////////////////////////////////////////////
+	analysisSkeleton::mcevent_weight = 1.; /////////////////////////////////////////////
+	if(m_isMC)                                    //////////////////////////////////////
+	{                                             //////////////////////////////////////
+		if(m_WZphysD3PD->mcevt_weight->size()>=1) //////////////////////////////////////
+		{                                         //////////////////////////////////////
+			analysisSkeleton::mcevent_weight = m_WZphysD3PD->mcevt_weight->at(0)[0]; ///
+		}                                         //////////////////////////////////////
+	}                                             //////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////
+	
+	analysisSkeleton::total_weight = analysisSkeleton::pileup_weight*
+									 analysisSkeleton::EW_kfactor_weight*
+									 analysisSkeleton::QCD_kfactor_weight*
+									 analysisSkeleton::mcevent_weight;
+									 
+									 
 	// L1 triggers
 	analysisSkeleton::L1_MU10 = m_WZphysD3PD->L1_MU10;
 

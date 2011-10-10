@@ -10,38 +10,39 @@
 #ifndef UTILITIES_H
 #define UTILITIES_H
 
+static clock_t clockStart;
+static clock_t clockEnd;
+
 class utilities
 {
 	public:
-		clock_t clockStart;
-		clock_t clockEnd;
-		ProcInfo_t pi;
+		/*
+		static string          m_skey;
+		static vector<double>  m_dval;
+		*/
 		
 	public:
 		utilities();
 		~utilities();
 		
-		string getDateHour();
+		static string getDateHour();
 		
-		double getRunTime();
-		void   startTimer();
-		void   stopTimer(bool print);
-		string pickMCinputSampe();
+		static double getRunTime();
+		static void   startTimer();
+		static void   stopTimer(bool print);
+		static string pickMCinputSampe();
 
-		string checkANDsetFilepath(string envPath, string fileName);
+		static string checkANDsetFilepath(string envPath, string fileName);
 		string removeDoubleDot(string spath);
 		bool   checkPath(string envPath);
 
-		void   parseKeyValLine(string sLine);
-		int    getNVals();
-		string getKey();
-		double getVal(int valNum);
-		void   parseFile(string sFilePath);
-		
-	private:
-		string          m_skey;
-		vector<double>  m_dval;
-
+		/*
+		static void   parseKeyValLine(string sLine);
+		static int    getNVals();
+		static string getKey();
+		static double getVal(int valNum);
+		static void   parseFile(string sFilePath);
+		*/
 };
 #endif
 

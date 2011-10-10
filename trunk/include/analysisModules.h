@@ -53,7 +53,8 @@ class analysisModules : public selection,
 		analysisModules(string sEventDumpFilePath) :
 		eventDumper(sEventDumpFilePath)
 		{
-			xmlconfig::get("/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/xml");
+			string str_xml_path = utilities::checkANDsetFilepath("PWD", "/../xml");
+			xmlconfig::get(str_xml_path/*"/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/xml"*/);
 			
 			if(sEventDumpFilePath != "") setInterestingThreshold( 646.33*GeV2TeV );
 			

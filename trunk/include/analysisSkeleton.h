@@ -15,6 +15,8 @@
 
 #include "SmearingClass.h"
 
+#include "TPileupReweighting.h"
+
 #ifndef ANALYSISSKELETON_H
 #define ANALYSISSKELETON_H
 
@@ -26,6 +28,7 @@ public:
 
 	bool AS_isMC;
 	SmearingClass* MCPpTsmearing;
+	Root::TPileupReweighting* pileuprw;
 	
 	bool alreadyFilled;
 	
@@ -37,6 +40,8 @@ public:
 	
 	int EventHash;
 	bool isMultiMuonPrint;
+	
+	string sMCsampleName;
 	
 	TMapii muPairMap;
 	bool passCutFlow;
@@ -123,19 +128,32 @@ public:
 	int fwdError;
 	int coreError;
 	
+	float actualIntPerXing;
+	float averageIntPerXing;
+	unsigned int mc_channel_number;
+	unsigned int mc_event_number;
+	double mc_event_weight;
+	
+	float pileup_weight;
+	float EW_kfactor_weight;
+	float QCD_kfactor_weight;
+	float mcevent_weight;
+	float total_weight;
+	
 	// L1 triggers
 	bool L1_MU10;
+	bool L1_MU11;
 
 	
 	// EF triggers	
 	bool EF_mu18;
-        bool EF_mu18_MG;
+	bool EF_mu18_MG;
 	bool EF_mu18_medium;
 	bool EF_mu18_MG_medium;
 	bool EF_mu22;
 	bool EF_mu22_MG;
 	bool EF_mu22_medium;
-        bool EF_mu22_MG_medium;
+	bool EF_mu22_MG_medium;
 	bool EF_mu40_MSonly_barrel;
 	bool EF_mu40_MSonly_barrel_medium;
 
@@ -579,6 +597,8 @@ public:
 	void setMC(bool isMC) { AS_isMC = isMC; }
 	void setSmearedMCPpT(int nMus);
 	void setMCPpTparameters(string sAlgo, string spTtype, string sDataPath);
+	void setPileupParameters(TString dataRootFileName, TString dataRootHistName, TString mcRootFileName, TString mcRootHistName);
+	float getPileupWeight();
 	
 	void setPtCandidatesFile(string sCandFilePath = "", string srunnumber = "");
 	

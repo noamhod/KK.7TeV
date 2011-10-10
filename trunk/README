@@ -27,12 +27,23 @@ to get and make the MCP smearing class:L
 	check the latest tag in:
 		https://svnweb.cern.ch/trac/atlasoff/browser/PhysicsAnalysis/MuonID/MuonIDAnalysis/MuonMomentumCorrections/tags
 		https://twiki.cern.ch/twiki/bin/view/AtlasProtected/MCPAnalysisGuidelinesRel16#AnchorResolutions
-	cheout the latest tag:
+	checkout the latest tag:
 		svn co svn+ssh://svn.cern.ch/reps/atlasoff/PhysicsAnalysis/MuonID/MuonIDAnalysis/MuonMomentumCorrections/tags/MuonMomentumCorrections-XX-YY-ZZ
 	cd MuonMomentumCorrections-XX-YY-ZZ/cmt
 	make -f Makefile.Standalone
 	the library is:
 		MuonMomentumCorrections-XX-YY-ZZ/StandAlone/libMuonMomentumCorrections.so
+
+to get the Pilup reweighting lib:
+	check the latest tag in:
+		https://svnweb.cern.ch/trac/atlasoff/browser/PhysicsAnalysis/AnalysisCommon/PileupReweighting/tags
+		https://twiki.cern.ch/twiki/bin/view/AtlasProtected/PileupReweighting
+	checkout the latest tag:
+		svn co svn+ssh://svn.cern.ch/reps/atlasoff/PhysicsAnalysis/AnalysisCommon/PileupReweighting/tags/PileupReweighting-XX-YY-ZZ
+	cd PileupReweighting-XX-YY-ZZ/cmt
+	gmake -f Makefile.Standalone
+	the library is:
+		PileupReweighting-XX-YY-ZZ/Standalone/libPileupReweighting.so
 
 ################################
 ###### SEE run/RUNREADME #######

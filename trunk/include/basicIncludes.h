@@ -133,6 +133,8 @@ typedef vector<TCanvas*> TVecCanvas;
 
 #include "histos.h"
 
+#include "kFactors.h"
+
 #define utilities_cxx
 #include "utilities.C"
 

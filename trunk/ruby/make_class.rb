@@ -1,5 +1,10 @@
 #!/usr/bin/env ruby
 
+
+### NEED TO FIX THE DOUBLE OCCURANCES OF (isMC)
+### NEED TO FIX THE COMMENTING OF isMC = ismc;
+### NEED TO FIX THE BRANCHES COMMENTING;
+
 require 'pathname'
 require 'fileutils'
 require 'ftools'

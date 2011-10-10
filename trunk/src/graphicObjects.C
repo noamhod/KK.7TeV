@@ -40,6 +40,18 @@ void graphicObjects::clearTreeVars()
 	lbn          = -9999;
 	bcid         = -9999;
 
+	actualIntPerXing  = -9999.;
+	averageIntPerXing = -9999.;
+	mc_channel_number = 0;
+	mc_event_number   = 0;
+	mc_event_weight = -9999.;
+	
+	pileup_weight  = -9999.;
+	EW_kfactor_weight = -9999.;
+	QCD_kfactor_weight = -9999.;
+	mcevent_weight = -9999.;
+	total_weight   = -9999.;
+	
 	iLeadingMuon    = -9999;
 	iSubLeadingMuon = -9999;
 	ivxp            = -9999;
@@ -392,6 +404,18 @@ void graphicObjects::clearTreeVars()
 	tru_succ_phi->clear();
 	
 	// truth_all (for weights)
+	all_actualIntPerXing  = -9999.;
+	all_averageIntPerXing = -9999.;
+	all_mc_channel_number = 0;
+	all_mc_event_number   = 0;
+	all_mc_event_weight = -9999.;
+	
+	all_pileup_weight  = -9999.;
+	all_EW_kfactor_weight = -9999.;
+	all_QCD_kfactor_weight = -9999.;
+	all_mcevent_weight = -9999.;
+	all_total_weight   = -9999.;
+	
 	truth_all_dr->clear();
 	truth_all_E->clear();
 	truth_all_pt->clear();
@@ -906,6 +930,18 @@ TDirectory* tDir_efficiency)
 	tree_allCuts->Branch( "lbn",          &lbn );
 	tree_allCuts->Branch( "bcid",         &bcid );
 	
+	tree_allCuts->Branch( "actualIntPerXing",  &actualIntPerXing );
+	tree_allCuts->Branch( "averageIntPerXing", &averageIntPerXing );
+	tree_allCuts->Branch( "mc_channel_number", &mc_channel_number );
+	tree_allCuts->Branch( "mc_event_number",   &mc_event_number );
+	tree_allCuts->Branch( "mc_event_weight",   &mc_event_weight );
+	
+	tree_allCuts->Branch( "pileup_weight",  &pileup_weight );
+	tree_allCuts->Branch( "EW_kfactor_weight", &EW_kfactor_weight );
+	tree_allCuts->Branch( "QCD_kfactor_weight", &QCD_kfactor_weight );
+	tree_allCuts->Branch( "mcevent_weight", &mcevent_weight );
+	tree_allCuts->Branch( "total_weight",   &total_weight );
+	
 	tree_allCuts->Branch( "vxp_n",       &vxp_n );
 	tree_allCuts->Branch( "vxp_nTracks", &vxp_nTracks );
 	tree_allCuts->Branch( "vxp_type",    &vxp_type );
@@ -1343,6 +1379,19 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	if(tDir_truth!=NULL) tDir_truth->cd();
 	tree_truth = new TTree("truth_tree","truth_tree");
 	tree_truth->SetDirectory(tDir_truth);
+	
+	tree_truth->Branch( "all_actualIntPerXing",  &all_actualIntPerXing );
+	tree_truth->Branch( "all_averageIntPerXing", &all_averageIntPerXing );
+	tree_truth->Branch( "all_mc_channel_number", &all_mc_channel_number );
+	tree_truth->Branch( "all_mc_event_number",   &all_mc_event_number );
+	tree_truth->Branch( "all_mc_event_weight",   &all_mc_event_weight );
+	
+	tree_allCuts->Branch( "all_pileup_weight",  &all_pileup_weight );
+	tree_allCuts->Branch( "all_EW_kfactor_weight", &all_EW_kfactor_weight );
+	tree_allCuts->Branch( "all_QCD_kfactor_weight", &all_QCD_kfactor_weight );
+	tree_allCuts->Branch( "all_mcevent_weight", &all_mcevent_weight );
+	tree_allCuts->Branch( "all_total_weight",   &all_total_weight );
+	
 	tree_truth->Branch( "truth_all_isValid",  &truth_all_isValid );
 	tree_truth->Branch( "truth_all_dr",  &truth_all_dr );
 	tree_truth->Branch( "truth_all_E",  &truth_all_E );

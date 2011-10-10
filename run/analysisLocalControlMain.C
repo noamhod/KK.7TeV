@@ -10,6 +10,9 @@
 void prepare(TString sGRLtag, TString sRunDir="", TString sGdb="") // do not use alone
 {
 	gROOT->Reset();
+
+	TString sMCPtag = "00-03-02";
+	TString sPRWtag = "00-00-17";
 	
 	gROOT->ProcessLine(".include "+sRunDir+"../include/");
 	gROOT->ProcessLine(".include "+sRunDir+"../src/");
@@ -23,10 +26,15 @@ void prepare(TString sGRLtag, TString sRunDir="", TString sGdb="") // do not use
 	gROOT->ProcessLine(".include "+sRunDir+"../GoodRunsLists-" + sGRLtag + "/GoodRunsLists/");
 	gROOT->ProcessLine(".L "+sRunDir+"../GoodRunsLists-" + sGRLtag + "/StandAlone/libGoodRunsLists.so");
 	
-	gROOT->ProcessLine(".include "+sRunDir+"../MuonMomentumCorrections-00-03-02/");
-	gROOT->ProcessLine(".include "+sRunDir+"../MuonMomentumCorrections-00-03-02/MuonMomentumCorrections/");
-	gROOT->ProcessLine(".include "+sRunDir+"../MuonMomentumCorrections-00-03-02/Root/");
-	gROOT->ProcessLine(".L "+sRunDir+"../MuonMomentumCorrections-00-03-02/StandAlone/libMuonMomentumCorrections.so");
+	gROOT->ProcessLine(".include "+sRunDir+"../MuonMomentumCorrections-"+sMCPtag+"/");
+	gROOT->ProcessLine(".include "+sRunDir+"../MuonMomentumCorrections-"+sMCPtag+"/MuonMomentumCorrections/");
+	gROOT->ProcessLine(".include "+sRunDir+"../MuonMomentumCorrections-"+sMCPtag+"/Root/");
+	gROOT->ProcessLine(".L "+sRunDir+"../MuonMomentumCorrections-"+sMCPtag+"/StandAlone/libMuonMomentumCorrections.so");
+
+	gROOT->ProcessLine(".include "+sRunDir+"../PileupReweighting-"+sPRWtag+"/");
+        gROOT->ProcessLine(".include "+sRunDir+"../PileupReweighting-"+sPRWtag+"/PileupReweighting/");
+        gROOT->ProcessLine(".include "+sRunDir+"../PileupReweighting-"+sPRWtag+"/Root/");
+        gROOT->ProcessLine(".L "+sRunDir+"../PileupReweighting-"+sPRWtag+"/StandAlone/libPileupReweighting.so");
 	
 	// gROOT->ProcessLine(".include "+sRunDir+"../MuonMomentumCorrections-00-02-04/root/");
 	

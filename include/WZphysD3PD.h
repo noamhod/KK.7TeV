@@ -27,9 +27,9 @@ public :
    UInt_t          bcid;
 //    UInt_t          detmask0;
 //    UInt_t          detmask1;
-//    Float_t         actualIntPerXing;
-//    Float_t         averageIntPerXing;
-//    UInt_t          mc_channel_number;
+   Float_t         actualIntPerXing;
+   Float_t         averageIntPerXing;
+   UInt_t          mc_channel_number;
    UInt_t          mc_event_number;
    Double_t        mc_event_weight;
 //    UInt_t          pixelFlags;
@@ -14978,7 +14978,7 @@ WZphysD3PD::WZphysD3PD(TTree *tree, Bool_t ismc)
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree. 
-//    isMC = ismc; 
+    isMC = ismc; 
 /*
 
    if (tree == 0) {
@@ -23195,9 +23195,9 @@ void WZphysD3PD::Init(TTree *tree)
    fChain->SetBranchAddress("bcid", &bcid, &b_bcid);
 //    fChain->SetBranchAddress("detmask0", &detmask0, &b_detmask0);
 //    fChain->SetBranchAddress("detmask1", &detmask1, &b_detmask1);
-//    fChain->SetBranchAddress("actualIntPerXing", &actualIntPerXing, &b_actualIntPerXing);
-//    fChain->SetBranchAddress("averageIntPerXing", &averageIntPerXing, &b_averageIntPerXing);
-//    if(isMC)     fChain->SetBranchAddress("mc_channel_number", &mc_channel_number, &b_mc_channel_number);
+   fChain->SetBranchAddress("actualIntPerXing", &actualIntPerXing, &b_actualIntPerXing);
+   fChain->SetBranchAddress("averageIntPerXing", &averageIntPerXing, &b_averageIntPerXing);
+   if(isMC)     fChain->SetBranchAddress("mc_channel_number", &mc_channel_number, &b_mc_channel_number);
    if(isMC)     fChain->SetBranchAddress("mc_event_number", &mc_event_number, &b_mc_event_number);
    if(isMC)     fChain->SetBranchAddress("mc_event_weight", &mc_event_weight, &b_mc_event_weight);
 //    fChain->SetBranchAddress("pixelFlags", &pixelFlags, &b_pixelFlags);

@@ -504,27 +504,27 @@ void init(int massBin)
 
 	// cosThe = new RooRealVar("cosTheta","cos#theta*",costmin,costmax);
 	// cosThe->setRange("range_cosThe",costmin,costmax);
-	// cosThe->setBins(ncostbins);
+	// cosThe->setBins(ncostbins);  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	
 	cosThe = new RooRealVar("cosTheta","cos#theta*",-1.*abscostmax,abscostmax);
 	cosThe->setRange("range_cosThe",-1.*abscostmax,abscostmax);
-	cosThe->setBins(2*nabscostbins);
+	//cosThe->setBins(2*nabscostbins); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	
 	cosTheAbs = new RooRealVar("cosThetaAbs","|cos#theta*|",abscostmin,abscostmax);
 	cosTheAbs->setRange("range_cosTheAbs",abscostmin,abscostmax);
-	cosTheAbs->setBins(nabscostbins);
+	// cosTheAbs->setBins(nabscostbins);  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	
 	// yQ = new RooRealVar("yQ","y_{Q}",yqmin,yqmax);
 	// yQ->setRange("range_yQ",yqmin,yqmax);
-	// yQ->setBins(nyqbins);
+	// // yQ->setBins(nyqbins);  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	
 	yQ = new RooRealVar("yQ","y_{Q}",-1.*absyqmax,absyqmax);
 	yQ->setRange("range_yQ",-1.*absyqmax,absyqmax);
-	yQ->setBins(nabsyqbins);
+	// yQ->setBins(nabsyqbins);  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	
 	yQabs = new RooRealVar("yQabs","|y_{Q}|",absyqmin,absyqmax);
 	yQabs->setRange("range_yQabs",absyqmin,absyqmax);
-	yQabs->setBins(nabsyqbins);
+	// yQabs->setBins(nabsyqbins);  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	
 	weight = new RooRealVar("weight","weight",0.,1e10);
 
@@ -782,7 +782,8 @@ Int_t loop(int massBin)
 	// rdhAcc    = new RooDataHist("rdhAcc","rdhAcc",RooArgSet(*cosThe,*yQ),vh2dSymmAcceptance[massBin-1]);
 	// rhpdfAcc  = new RooHistPdf("rhpdfAcc","rhpdfAcc",RooArgSet(*cosThe,*yQ),*rdhAcc,2);
 	
-	rdhAcc    = new RooDataHist("rdhAcc","rdhAcc",RooArgSet(*cosThe),vh1dSymmAcceptance[massBin-1]);
+	rdhAcc    = new RooDataHist("rdhAcc","rdhAcc",RooArgSet(*cosThe),Import(*vh1dSymmAcceptance[massBin-1])); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+	//rdhAcc    = new RooDataHist("rdhAcc","rdhAcc",RooArgSet(*cosThe),vh1dSymmAcceptance[massBin-1]);
 	rhpdfAcc  = new RooHistPdf("rhpdfAcc","rhpdfAcc",RooArgSet(*cosThe),*rdhAcc,2); // the best interpulation is of order 2.
 	
 	detAccPdf = (RooAbsPdf*)rhpdfAcc->Clone("");

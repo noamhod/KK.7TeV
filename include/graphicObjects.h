@@ -258,6 +258,18 @@ class graphicObjects// : public utilities
 		int lbn;
 		int bcid;
 		
+		float actualIntPerXing;
+		float averageIntPerXing;
+		unsigned int mc_channel_number;
+		unsigned int mc_event_number;
+		double mc_event_weight;
+		
+		float pileup_weight;
+		float EW_kfactor_weight;
+		float QCD_kfactor_weight;
+		float mcevent_weight;
+		float total_weight;
+		
 		int iLeadingMuon;
 		int iSubLeadingMuon;
 		int ivxp;
@@ -626,6 +638,18 @@ class graphicObjects// : public utilities
 		
 		///////////////////////////////////////////
 		// for the truth tree (for the weights) ///
+		float all_actualIntPerXing;
+		float all_averageIntPerXing;
+		unsigned int all_mc_channel_number;
+		unsigned int all_mc_event_number;
+		double all_mc_event_weight;
+		
+		float all_pileup_weight;
+		float all_EW_kfactor_weight;
+		float all_QCD_kfactor_weight;
+		float all_mcevent_weight;
+		float all_total_weight;
+		
 		bool truth_all_isValid;
 		vector<float>* truth_all_dr;
 		vector<float>* truth_all_E;

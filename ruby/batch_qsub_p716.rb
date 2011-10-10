@@ -138,6 +138,7 @@ x.set_prefix("user.wanghill.data11_7TeV.00",6)
 x.set_secondprefix("._",5)
 x.set_grltag("00-00-95")
 x.set_mcptag("00-03-02")
+x.set_prwtag("00-00-17")
 
 x.check_variables
 x.batch_qsub(insets,runnumbers)

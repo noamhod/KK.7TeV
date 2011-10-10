@@ -235,6 +235,9 @@ bool utilities::checkPath(string envPath)
 	return(isDefined);
 }
 
+
+
+/*
 void utilities::parseKeyValLine(string sLine)
 {
 
@@ -305,3 +308,4 @@ void utilities::parseFile(string sFilePath)
 	}
 	cout << "\nread " << nLinesRead << " lines from " << sFilePath << endl;
 }
+*/

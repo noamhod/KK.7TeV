@@ -83,6 +83,50 @@ void analysisSkeleton::setSmearedMCPpT(int nMus)
 	}
 }
 
+void analysisSkeleton::setPileupParameters(TString dataRootFileName, TString dataRootHistName, TString mcRootFileName, TString mcRootHistName)
+{
+	pileuprw = new Root::TPileupReweighting( "NameThatYouWantToGiveYourPileupReweightingTool" );
+	int isGood = pileuprw->initialize( dataRootFileName, dataRootHistName, mcRootFileName, mcRootHistName );
+	
+	if(isGood!=0)
+	{
+		_ERROR("pileup reweighting isGood!=0, exitting now");
+		exit(-1);
+	}
+}
+
+float analysisSkeleton::getPileupWeight()
+{
+	// Get the mu value for this event
+	float mu = (float)lbn;
+
+	// Get the pileup weight for this event
+	float pileupEventWeight(-1.0);
+	int isGood = pileuprw->getPileupWeight(mu,pileupEventWeight);
+	if(isGood==0)
+	{
+		// Printout message
+		_DEBUG("Event has a mu of "+_s(mu)+" and a resulting pileup weight of "+_s(pileupEventWeight));
+	}
+	else if(isGood==-2)
+	{
+		_ERROR("Data histogram pointer got lost... exiting!");
+		exit(-1);
+	}
+	else if(isGood==-3)
+	{
+		_ERROR("MC histogram pointer got lost... exiting!");
+		exit(-1);
+	}
+	else 
+	{
+		_ERROR("Unrecognized return code... exiting!");
+		exit(-1);
+	}
+	
+	return pileupEventWeight;
+}
+
 void analysisSkeleton::setPtCandidatesFile(string sCandFilePath, string srunnumber)
 {
 	_DEBUG("analysisSkeleton::setPtCandidatesFile");
@@ -200,7 +244,7 @@ void analysisSkeleton::matchTrigger(string speriod, string sTrigType)
 		speriod=="MC" ||
 		speriod=="A"  || speriod=="B" || speriod=="D" || speriod=="E" ||
 		speriod=="F"  || speriod=="G" || speriod=="H" || speriod=="I" ||
-		speriod=="J"  || speriod=="K"
+		speriod=="J"  || speriod=="K" || speriod=="L" || speriod=="M"
 	)
 	{
 		_DEBUG("sTrigType = "+sTrigType);
@@ -620,7 +664,22 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::timestamp_ns = timestamp_ns;
 	graphicObjects::lbn = lbn;
 	graphicObjects::bcid = bcid;
-
+	
+	graphicObjects::actualIntPerXing  = actualIntPerXing;
+	graphicObjects::averageIntPerXing = averageIntPerXing;
+	if(AS_isMC)
+	{
+		graphicObjects::mc_channel_number = mc_channel_number;
+		graphicObjects::mc_event_number   = mc_event_number;
+		graphicObjects::mc_event_weight   = mc_event_weight;
+	}
+	
+	graphicObjects::pileup_weight  = pileup_weight;
+	graphicObjects::EW_kfactor_weight = EW_kfactor_weight;
+	graphicObjects::QCD_kfactor_weight = QCD_kfactor_weight;
+	graphicObjects::mcevent_weight = mcevent_weight;
+	graphicObjects::total_weight   = total_weight;
+	
 	graphicObjects::ivxp            = current_ivertex;
 	graphicObjects::iLeadingMuon    = lead_mu;
 	graphicObjects::iSubLeadingMuon = sublead_mu;
@@ -2415,11 +2474,25 @@ void analysisSkeleton::fillTruth()
 		truth_valid_index++;
 	}
 	
+	if(truth_valid_index>=2)
+	{
+		all_actualIntPerXing  = actualIntPerXing;
+		all_averageIntPerXing = averageIntPerXing;
+		all_mc_channel_number = mc_channel_number;
+		all_mc_event_number   = mc_event_number;
+		all_mc_event_weight   = mc_event_weight;
+		
+		all_pileup_weight  = all_pileup_weight;
+		all_EW_kfactor_weight = all_EW_kfactor_weight;
+		all_QCD_kfactor_weight = all_QCD_kfactor_weight;
+		all_mcevent_weight = all_mcevent_weight;
+		all_total_weight   = all_total_weight;
+	}
+	
 	// SORT BY PT AND FIND THE INDICES OF THE FIRST 2 MUONS (HIGHEST PT).
 	ai_truth = -1;
 	bi_truth = -1;
-	 if(truth_valid_index>=2  &&  pTtoIndexMapTruth.size()>=2) pTSort(pTtoIndexMapTruth, ai_truth, bi_truth, truth_all_mc_charge);
-	//if(truth_valid_index==2  &&  pTtoIndexMapTruth.size()==2) pTSort(pTtoIndexMapTruth, ai_truth, bi_truth, truth_all_mc_charge);
+	if(truth_valid_index>=2  &&  pTtoIndexMapTruth.size()>=2) pTSort(pTtoIndexMapTruth, ai_truth, bi_truth, truth_all_mc_charge);
 	else
 	{
 		truth_valid_index = 0;

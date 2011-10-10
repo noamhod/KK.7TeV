@@ -16,7 +16,7 @@
 #ifndef ANALYSISLOCALCONTROL_H
 #define ANALYSISLOCALCONTROL_H
 
-class analysisLocalControl : public chainMaker, public utilities
+class analysisLocalControl : public chainMaker/*, public utilities*/
 {
 	public:
 		// from MakeClass
@@ -54,6 +54,8 @@ class analysisLocalControl : public chainMaker, public utilities
 		Long64_t l64t_mod;
 		Long64_t l64t_startEvent;
 		Long64_t l64t_stopEvent;
+		
+		ProcInfo_t pi;
 
 		vector<int> vEntries;
 		vector<double> vResMemory;

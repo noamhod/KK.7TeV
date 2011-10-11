@@ -224,7 +224,7 @@ void analysisLocalControl::initialize(int RunNumber, string runs, string basedir
 	if(m_isMC) m_analysis->setMCPpTparameters(m_muRecAlgo, m_pTsmearingType, str_mcp);
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	string str_pileuphist_data = utilities::checkANDsetFilepath("PWD", "/../conf/ilumicalc_histograms_EF_mu22_178044-190120.root"); ///
+	string str_pileuphist_data = utilities::checkANDsetFilepath("PWD", "/../conf/ilumicalc_histograms_None.root"); ////////////////////
 	string str_pileuphist_mc   = utilities::checkANDsetFilepath("PWD", "/../conf/mu_mc10b.root"); /////////////////////////////////////
 	m_analysis->setPileupParameters((TString)str_pileuphist_data, "avgintperbx", (TString)str_pileuphist_mc, "mu_mc10b"); /////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

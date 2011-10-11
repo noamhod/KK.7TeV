@@ -173,7 +173,7 @@ void analysis::execute()
 	if( !pass2MUselection ) return; //////////////////////////////
 	//////////////////////////////////////////////////////////////
 	
-	// if(analysisSkeleton::pileup_weight>0.) _INFO("pileup_weight = "+_s(analysisSkeleton::pileup_weight,5));
+	if(analysisSkeleton::pileup_weight>=0.) _INFO("pileup_weight = "+_s(analysisSkeleton::pileup_weight,5));
 	// if(analysisSkeleton::EW_kfactor_weight>1.) _INFO("EW_kfactor_weight = "+_s(analysisSkeleton::EW_kfactor_weight,5));
 	// if(analysisSkeleton::QCD_kfactor_weight>0.) _INFO("QCD_kfactor_weight = "+_s(analysisSkeleton::QCD_kfactor_weight,5));
 	// if(analysisSkeleton::mcevent_weight>0.) _INFO("mcevent_weight = "+_s(analysisSkeleton::mcevent_weight,5));
@@ -225,10 +225,15 @@ void analysis::setEventVariables()
 		analysisSkeleton::mc_event_number   = m_WZphysD3PD->mc_event_number;
 		analysisSkeleton::mc_event_weight   = m_WZphysD3PD->mc_event_weight;
 	}
+
 	/////////////////////////////////////////////////////////////////////////////////
 	// pileup reweighting, needs to come after setting the lbn //////////////////////
-	analysisSkeleton::pileup_weight = getPileupWeight(); ////////////////////////////
-	if(analysisSkeleton::pileup_weight<=0.) analysisSkeleton::pileup_weight = 1.; ///
+	analysisSkeleton::pileup_weight = 1.;
+	if(m_isMC)
+	{
+		analysisSkeleton::pileup_weight = getPileUpWeight();
+		if(analysisSkeleton::pileup_weight<0.) analysisSkeleton::pileup_weight = 1.;
+	}
 	/////////////////////////////////////////////////////////////////////////////////
 	
 	/////////////////////////////////////////////////////////////////////////////////

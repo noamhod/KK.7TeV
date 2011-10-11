@@ -85,7 +85,7 @@ void analysisSkeleton::setSmearedMCPpT(int nMus)
 
 void analysisSkeleton::setPileupParameters(TString dataRootFileName, TString dataRootHistName, TString mcRootFileName, TString mcRootHistName)
 {
-	pileuprw = new Root::TPileupReweighting( "NameThatYouWantToGiveYourPileupReweightingTool" );
+	pileuprw = new Root::TPileupReweighting( "PileupReweightingTool" );
 	int isGood = pileuprw->initialize( dataRootFileName, dataRootHistName, mcRootFileName, mcRootHistName );
 	
 	if(isGood!=0)
@@ -95,13 +95,24 @@ void analysisSkeleton::setPileupParameters(TString dataRootFileName, TString dat
 	}
 }
 
-float analysisSkeleton::getPileupWeight()
+float analysisSkeleton::getPileUpWeight()
 {
 	// Get the mu value for this event
-	float mu = (float)lbn;
+	
+	// one should use the actualIntPerXing variable.
+	// This should be the one describing the "in-time" pileup,
+	// while averageIntPerXing describes the out-of-time pileup
+	// The difference should be marginal, but I think we should still use the first one for the pileup re-weighting.
+	
+	// float mu = (float)lbn;
+	// float mu = averageIntPerXing; // out-of-time pileup
+	float mu = actualIntPerXing;     // in-time pileup
 
 	// Get the pileup weight for this event
-	float pileupEventWeight(-1.0);
+	float pileupEventWeight = -1.0;
+	
+	pileupEventWeight = pileuprw->getPileupWeight(mu);
+	
 	int isGood = pileuprw->getPileupWeight(mu,pileupEventWeight);
 	if(isGood==0)
 	{
@@ -675,9 +686,12 @@ void analysisSkeleton::fillAfterCuts()
 	}
 	
 	graphicObjects::pileup_weight  = pileup_weight;
-	graphicObjects::EW_kfactor_weight = EW_kfactor_weight;
-	graphicObjects::QCD_kfactor_weight = QCD_kfactor_weight;
-	graphicObjects::mcevent_weight = mcevent_weight;
+	if(AS_isMC)
+	{
+		graphicObjects::EW_kfactor_weight = EW_kfactor_weight;
+		graphicObjects::QCD_kfactor_weight = QCD_kfactor_weight;
+		graphicObjects::mcevent_weight = mcevent_weight;
+	}
 	graphicObjects::total_weight   = total_weight;
 	
 	graphicObjects::ivxp            = current_ivertex;

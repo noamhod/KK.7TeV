@@ -598,7 +598,7 @@ public:
 	void setSmearedMCPpT(int nMus);
 	void setMCPpTparameters(string sAlgo, string spTtype, string sDataPath);
 	void setPileupParameters(TString dataRootFileName, TString dataRootHistName, TString mcRootFileName, TString mcRootHistName);
-	float getPileupWeight();
+	float getPileUpWeight();
 	
 	void setPtCandidatesFile(string sCandFilePath = "", string srunnumber = "");
 	

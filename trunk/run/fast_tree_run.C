@@ -1061,7 +1061,8 @@ void init(TTree* t=NULL)
 		}
 		else
 		{
-			fName = "../data/merged.root";
+			//fName = "../data/merged.root";
+			fName = "../data/analysisLocalControl.root";
 			tName = "allCuts/allCuts_tree";
 		}
 		

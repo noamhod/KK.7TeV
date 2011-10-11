@@ -1386,11 +1386,11 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_truth->Branch( "all_mc_event_number",   &all_mc_event_number );
 	tree_truth->Branch( "all_mc_event_weight",   &all_mc_event_weight );
 	
-	tree_allCuts->Branch( "all_pileup_weight",  &all_pileup_weight );
-	tree_allCuts->Branch( "all_EW_kfactor_weight", &all_EW_kfactor_weight );
-	tree_allCuts->Branch( "all_QCD_kfactor_weight", &all_QCD_kfactor_weight );
-	tree_allCuts->Branch( "all_mcevent_weight", &all_mcevent_weight );
-	tree_allCuts->Branch( "all_total_weight",   &all_total_weight );
+	tree_truth->Branch( "all_pileup_weight",  &all_pileup_weight );
+	tree_truth->Branch( "all_EW_kfactor_weight", &all_EW_kfactor_weight );
+	tree_truth->Branch( "all_QCD_kfactor_weight", &all_QCD_kfactor_weight );
+	tree_truth->Branch( "all_mcevent_weight", &all_mcevent_weight );
+	tree_truth->Branch( "all_total_weight",   &all_total_weight );
 	
 	tree_truth->Branch( "truth_all_isValid",  &truth_all_isValid );
 	tree_truth->Branch( "truth_all_dr",  &truth_all_dr );

@@ -111,7 +111,7 @@ float analysisSkeleton::getPileUpWeight()
 	// Get the pileup weight for this event
 	float pileupEventWeight = -1.0;
 	
-	pileupEventWeight = pileuprw->getPileupWeight(mu);
+	// pileupEventWeight = pileuprw->getPileupWeight(mu);
 	
 	int isGood = pileuprw->getPileupWeight(mu,pileupEventWeight);
 	if(isGood==0)
@@ -683,16 +683,13 @@ void analysisSkeleton::fillAfterCuts()
 		graphicObjects::mc_channel_number = mc_channel_number;
 		graphicObjects::mc_event_number   = mc_event_number;
 		graphicObjects::mc_event_weight   = mc_event_weight;
-	}
-	
-	graphicObjects::pileup_weight  = pileup_weight;
-	if(AS_isMC)
-	{
-		graphicObjects::EW_kfactor_weight = EW_kfactor_weight;
+
+		graphicObjects::pileup_weight      = pileup_weight;
+		graphicObjects::EW_kfactor_weight  = EW_kfactor_weight;
 		graphicObjects::QCD_kfactor_weight = QCD_kfactor_weight;
-		graphicObjects::mcevent_weight = mcevent_weight;
+		graphicObjects::mcevent_weight     = mcevent_weight;
+		graphicObjects::total_weight       = total_weight;
 	}
-	graphicObjects::total_weight   = total_weight;
 	
 	graphicObjects::ivxp            = current_ivertex;
 	graphicObjects::iLeadingMuon    = lead_mu;
@@ -2488,21 +2485,6 @@ void analysisSkeleton::fillTruth()
 		truth_valid_index++;
 	}
 	
-	if(truth_valid_index>=2)
-	{
-		all_actualIntPerXing  = actualIntPerXing;
-		all_averageIntPerXing = averageIntPerXing;
-		all_mc_channel_number = mc_channel_number;
-		all_mc_event_number   = mc_event_number;
-		all_mc_event_weight   = mc_event_weight;
-		
-		all_pileup_weight  = all_pileup_weight;
-		all_EW_kfactor_weight = all_EW_kfactor_weight;
-		all_QCD_kfactor_weight = all_QCD_kfactor_weight;
-		all_mcevent_weight = all_mcevent_weight;
-		all_total_weight   = all_total_weight;
-	}
-	
 	// SORT BY PT AND FIND THE INDICES OF THE FIRST 2 MUONS (HIGHEST PT).
 	ai_truth = -1;
 	bi_truth = -1;
@@ -2542,6 +2524,7 @@ void analysisSkeleton::fillTruth()
 		_WARNING("mc_pdgId->at(2)!=(-1*mc_pdgId->at(3))");
 		return;
 	}
+	
 	truth_all_partons_mc_m->push_back( mc_m->at(2)*MeV2GeV );
 	truth_all_partons_mc_pt->push_back( mc_pt->at(2)*MeV2GeV );
 	truth_all_partons_mc_eta->push_back( mc_eta->at(2) );
@@ -2559,6 +2542,7 @@ void analysisSkeleton::fillTruth()
 	truth_all_partons_mc_status->push_back( mc_status->at(3) );
 	truth_all_partons_mc_barcode->push_back( mc_barcode->at(3) );
 	truth_all_partons_mc_charge->push_back( mc_charge->at(3) );
+	
 	/////////////////////////////////////////////////////////////////////////////////
 	
 	// CALCULATE ALL THE 'EVENT-LEVEL' VARIABLES (DI-MUON VARIABLES)
@@ -2571,6 +2555,18 @@ void analysisSkeleton::fillTruth()
 			return;
 		}
 
+		graphicObjects::all_actualIntPerXing  = actualIntPerXing;
+		graphicObjects::all_averageIntPerXing = averageIntPerXing;
+		graphicObjects::all_mc_channel_number = mc_channel_number;
+		graphicObjects::all_mc_event_number   = mc_event_number;
+		graphicObjects::all_mc_event_weight   = mc_event_weight;
+		
+		graphicObjects::all_pileup_weight      = pileup_weight;
+		graphicObjects::all_EW_kfactor_weight  = EW_kfactor_weight;
+		graphicObjects::all_QCD_kfactor_weight = QCD_kfactor_weight;
+		graphicObjects::all_mcevent_weight     = mcevent_weight;
+		graphicObjects::all_total_weight       = total_weight;
+		
 		truth_all_isValid = true;
 
 		float c1 = truth_all_mc_charge->at(ai_truth);

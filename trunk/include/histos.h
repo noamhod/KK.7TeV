@@ -11,7 +11,7 @@ double Integral(TH1* h)
 	return I;
 }
 
-void Scale(TH1D* h, double d)
+void Scale(TH1* h, double d)
 { 
 	/// scale including over/underflow
 	for(int i=0 ; i<=h->GetNbinsX()+1 ; i++)
@@ -20,7 +20,7 @@ void Scale(TH1D* h, double d)
 	}
 }
 
-void ScaleWerrors(TH1D* h, double d)
+void ScaleWerrors(TH1* h, double d)
 { 
 	/// scale including over/underflow
 	for ( int i=0 ; i<=h->GetNbinsX()+1 ; i++ )
@@ -30,7 +30,7 @@ void ScaleWerrors(TH1D* h, double d)
 	}
 }
 
-double getYmin(TH1D* h)
+double getYmin(TH1* h)
 {
 	double min = 1.e20;
 	double binval = 0.;
@@ -42,7 +42,24 @@ double getYmin(TH1D* h)
 	return min;
 }
 
-void divide(TH1D* hNom, TH1D* hDen)
+void setMinMax(TH1* h1, TH1* h2)
+{
+	Double_t min1 = getYmin(h1);
+	Double_t min2 = getYmin(h2);
+	Double_t min  = (min1<min2) ? min1 : min2;
+	min *= 0.1;
+	h1->SetMinimum(min);
+	h2->SetMinimum(min);
+	
+	Double_t max1 = h1->GetMaximum();
+	Double_t max2 = h2->GetMaximum();
+	Double_t max  = (max1>max2) ? max1 : max2;
+	max *= 1.5;
+	h1->SetMaximum(max);
+	h2->SetMaximum(max);
+}
+
+void divide(TH1* hNom, TH1* hDen)
 {
 	Int_t nNom = hNom->GetNbinsX();
 	Int_t nDen = hDen->GetNbinsX();

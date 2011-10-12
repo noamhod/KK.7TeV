@@ -151,7 +151,8 @@ class DQ2
 
 	def search_directory(path="",pattern=".root",hashmap={})
 		# see: http://rosettacode.org/wiki/Walk_a_directory/Recursively
-		Find.find(targetdir) do |entry|
+		#Find.find(targetdir) do |entry|
+		Find.find(path) do |entry|
 			if File.file?(entry) and entry[pattern]
 				filepath = entry.to_s()
 				number    = ""

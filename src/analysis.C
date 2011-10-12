@@ -173,7 +173,7 @@ void analysis::execute()
 	if( !pass2MUselection ) return; //////////////////////////////
 	//////////////////////////////////////////////////////////////
 	
-	if(analysisSkeleton::pileup_weight>=0.) _INFO("pileup_weight = "+_s(analysisSkeleton::pileup_weight,5));
+	// if(analysisSkeleton::pileup_weight>=0.) _INFO("pileup_weight = "+_s(analysisSkeleton::pileup_weight,5));
 	// if(analysisSkeleton::EW_kfactor_weight>1.) _INFO("EW_kfactor_weight = "+_s(analysisSkeleton::EW_kfactor_weight,5));
 	// if(analysisSkeleton::QCD_kfactor_weight>0.) _INFO("QCD_kfactor_weight = "+_s(analysisSkeleton::QCD_kfactor_weight,5));
 	// if(analysisSkeleton::mcevent_weight>0.) _INFO("mcevent_weight = "+_s(analysisSkeleton::mcevent_weight,5));

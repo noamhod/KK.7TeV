@@ -506,6 +506,13 @@ void hbook()
 	graphics(h1Map["hMassDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
 }
 
+float getDataMCratio()
+{
+	float ratio = (nDYmumu70to110>0.) ? nData70to110/nDYmumu70to110 : 1.;
+	_INFO("DATA/DYmumu in 70 to 110 GeV is: "+_s(ratio,8));
+	return ratio;
+}
+
 void hdraw()
 {
 	_DEBUG("hdraw");
@@ -519,8 +526,7 @@ void hdraw()
 	gMpoissonErr->SetMarkerStyle(24);
 	gMpoissonErr->SetMarkerSize(1);
 	
-	float ratio = (nDYmumu70to110>0.) ? nData70to110/nDYmumu70to110 : 1.;
-	_INFO("DATA/DYmumu in 70 to 110 GeV is: "+_s(ratio,8));
+	float ratio = getDataMCratio();
 	Scale(h1Map["hMassDYmumu"],ratio);
 	
 	setMinMax(h1Map["hMassDYmumu"],h1Map["hMassData"]);

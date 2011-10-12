@@ -1,0 +1,5 @@
+root -b -p .x xml_reader.C++
+# will read cuts.xml
+# will read periods.xml
+
+# use the switch '-p' which tells CINT to use the compiler's preprocessor instead of its own (which has many limitations).

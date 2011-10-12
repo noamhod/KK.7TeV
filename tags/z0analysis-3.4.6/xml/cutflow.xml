@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE objects PUBLIC "" "cuts.dtd" []>
+<objects>
+<!--
+  The cuts types, names and parameters
+-->
+  <obj NAME="GRL" FLAG="on">
+    <order>1</order>
+    <phase>preselection</phase>
+    <skip>false</skip>
+    <nparameters>1</nparameters>
+    <parameters>
+      <parameter NAME="isGRL" ORDER="1" TYPE="bool">1.</parameter>
+    </parameters>
+    <description>
+      This is the Good Run List cut.
+      The parameter is Boolean-like.
+    </description>
+  </obj>
+
+  <obj NAME="Trigger" FLAG="on">
+    <order>2</order>
+    <phase>preselection</phase>
+    <skip>false</skip>
+    <nparameters>1</nparameters>
+    <parameters>
+      <parameter NAME="isTrigger" ORDER="1" TYPE="bool">1.</parameter>
+    </parameters>
+    <description>
+      This is the trigger cut.
+      The parameter is Boolean-like.
+    </description>
+  </obj>
+
+  <obj NAME="PV" FLAG="on">
+    <order>3</order>
+    <phase>preselection</phase>
+    <skip>false</skip>
+    <nparameters>3</nparameters>
+    <parameters>
+      <parameter NAME="Type" ORDER="1" TYPE="int">1.</parameter>
+      <parameter NAME="nTracksMin" ORDER="2" TYPE="int">2.</parameter>
+      <parameter NAME="AbsZ0Max" ORDER="3" TYPE="float">200.</parameter>
+    </parameters>
+    <description>
+      This is the primary vertex cut.
+      Absolute z position of primary (phase==1) vertex with more than 2 tracks is less than 200mm
+    </description>
+  </obj>
+
+  <obj NAME="isCombMu" FLAG="on">
+    <order>10</order>
+    <phase>selection</phase>
+    <skip>false</skip>
+    <nparameters>1</nparameters>
+    <parameters>
+      <parameter NAME="isCombMu" ORDER="1" TYPE="bool">1.</parameter>
+    </parameters>
+    <description>
+      This is the combined muon requirement cut (at least 2 combined muons in an event).
+      The parameter is Boolean-like.
+    </description>
+  </obj>
+
+  <obj NAME="pT" FLAG="on">
+    <order>11</order>
+    <phase>selection</phase>
+    <skip>false</skip>
+    <nparameters>1</nparameters>
+    <parameters>
+      <parameter NAME="pTmin" ORDER="1" TYPE="float">0.025</parameter>
+    </parameters>
+    <description>
+      This is the pT cut (pT(CB)>25GeV for both muons, use "mu_pt").
+      The parameter is in TeV.
+    </description>
+  </obj>
+
+  <obj NAME="IDhits" FLAG="on">
+    <order>12</order>
+    <phase>selection</phase>
+    <skip>false</skip>
+    <nparameters>8</nparameters>
+    <parameters>
+      <parameter NAME="expectBLayerHit" ORDER="1" TYPE="bool">0.</parameter>
+      <parameter NAME="nBLHits" ORDER="2" TYPE="int">1.</parameter>
+      <parameter NAME="nPixHits + nPixelDeadSensors" ORDER="3" TYPE="int">2.</parameter>
+      <parameter NAME="nSCTHits + nSCTDeadSensors" ORDER="4" TYPE="int">6.</parameter>
+      <parameter NAME="nPixHoles + nSCTHoles" ORDER="5" TYPE="int">2.</parameter>
+      <parameter NAME="nTRTHits + nTRTOutliers" ORDER="6" TYPE="int">5.</parameter>
+      <parameter NAME="eta" ORDER="7" TYPE="float">1.9</parameter>
+      <parameter NAME="outlier fraction" ORDER="8" TYPE="float">0.9</parameter>
+    </parameters>
+    <description>
+      This is the ID hits cut cut.
+      !expectBLayerHit OR nBLHits \ge 1,
+      nPixHits + nPixelDeadSensors \ge 2,
+      nSCTHits + nSCTDeadSensors \ge 6,
+      nPixHoles + nSCTHoles \le 2, 
+      nTRTHits + nTRTOutliers \gr 5 for eta \lt 1.9, outlier fraction \lt 0.9. 
+      If nTRTHits + nTRTOutliers \gr 5 for eta \ge 1.9, outlier fraction \lt 0.9
+      see: https://twiki.cern.ch/twiki/bin/view/AtlasProtected/MCPAnalysisGuidelinesEPS2011
+    </description>
+  </obj>
+
+  <obj NAME="MShits" FLAG="on">
+    <order>13</order>
+    <phase>selection</phase>
+    <skip>false</skip>
+    <nparameters>12</nparameters>
+    <parameters>
+      <parameter NAME="nMDTBIMOHits" ORDER="1" TYPE="int">3.</parameter>
+      <parameter NAME="nMDTEIMOHits" ORDER="2" TYPE="int">3.</parameter>
+      <parameter NAME="nCSCEtaHits" ORDER="3" TYPE="int">3.</parameter>
+      <parameter NAME="nMDTBarrel_LogicSum" ORDER="4" TYPE="int">3.</parameter>
+      <parameter NAME="nMDTorCSCEndcap_LogicSum" ORDER="5" TYPE="int">3.</parameter>
+      <parameter NAME="nMDTBEEHits" ORDER="6" TYPE="int">0.</parameter>
+      <parameter NAME="nMDTEEHits" ORDER="7" TYPE="int">0.</parameter>
+      <parameter NAME="nMDTBIS78Hits" ORDER="8" TYPE="int">0.</parameter>
+      <parameter NAME="nRPCLayer(Xof3)PhiHits" ORDER="9" TYPE="int">1.</parameter>
+      <parameter NAME="nTGCLayer(Xof4)PhiHits" ORDER="10" TYPE="int">1.</parameter>
+      <parameter NAME="nCSCPhiHits" ORDER="11" TYPE="int">1.</parameter>
+      <parameter NAME="nRPCTGCCSC_LogicSum" ORDER="12" TYPE="int">1.</parameter>
+    </parameters>
+    <description>
+      This is the MS hits cut cut.
+      At least 3 hits in all 3 layers of Barrel or Endcap Inner, Middle and Outer MDT/CSC precision layers (no overlap), 
+      at least one phi hit in a layer, at least one phi layer hit, 
+      no BEE, EE or BIS78 hits
+      see: https://twiki.cern.ch/twiki/bin/view/AtlasProtected/CutFlow2011Muons
+    </description>
+  </obj>
+
+  <obj NAME="d0" FLAG="on">
+    <order>14</order>
+    <phase>selection</phase>
+    <skip>false</skip>
+    <nparameters>1</nparameters>
+    <parameters>
+      <parameter NAME="d0max" ORDER="1" TYPE="float">0.2</parameter>
+    </parameters>
+    <description>
+      This is the d0 cut (use "mu_d0_exPV").
+      Impact parameter wrt primary vertex in d0 less than 0.2 mm
+    </description>
+  </obj>
+
+  <obj NAME="z0" FLAG="on">
+    <order>15</order>
+    <phase>selection</phase>
+    <skip>false</skip>
+    <nparameters>1</nparameters>
+    <parameters>
+      <parameter NAME="z0" ORDER="1" TYPE="float">1.</parameter>
+    </parameters>
+    <description>
+      This is the z0 cut (use "mu_z0_exPV").
+      z0 is less than 1 mm
+    </description>
+  </obj>
+
+  <obj NAME="isolation30" FLAG="on">
+    <order>16</order>
+    <phase>selection</phase>
+    <skip>false</skip>
+    <nparameters>1</nparameters>
+    <parameters>
+      <parameter NAME="ratiomax" ORDER="1" TYPE="float">0.05</parameter>
+    </parameters>
+    <description>
+      This is the isolation cut (use "mu_ptcone30" and "mu_pt").
+      Track sum pT in 0.3 cone relative to muon pT(CB) is less than 0.05 (mu_ptcone30/mu_pt \lt 0.05)
+    </description>
+  </obj>
+
+  <!--
+  <obj NAME="oppositeCharge" FLAG="off">
+    <order>100</order>
+    <phase>selection</phase>
+    <skip>true</skip>
+    <nparameters>1</nparameters>
+    <parameters>
+      <parameter NAME="isOppositeCharge" ORDER="1" TYPE="bool">1.</parameter>
+    </parameters>
+    <description>
+      This is the opposite charge requirement cut.
+    </description>
+  </obj>
+  -->
+ 
+  <obj NAME="oppositeChargeCandidates" FLAG="on">
+    <order>101</order>
+    <phase>selection</phase>
+    <skip>false</skip>
+    <nparameters>1</nparameters>
+    <parameters>
+      <parameter NAME="isOppositeChargeCandidates" ORDER="1" TYPE="bool">1.</parameter>
+    </parameters>
+    <description>
+      This is the opposite charge requirement cut.
+	  we look for at least one candidate, before pT sorting.
+    </description>
+  </obj>
+
+  <!--
+  <obj NAME="TriggerMatching" FLAG="on">
+    <order>102</order>
+    <phase>selection</phase>
+    <skip>true</skip>
+    <nparameters>1</nparameters>
+    <parameters>
+      <parameter NAME="isTriggerMatched" ORDER="1" TYPE="bool">1.</parameter>
+    </parameters>
+    <description>
+      This is the trigger matching requirement cut.
+      At least one of the selected muons from the pair should have triggered.
+      (use: mu_staco_EFCB_index, mu_staco_EFMG_index, trig_EF_trigmuonef_EF_mu22,
+      trig_EF_trigmugirl_EF_mu22_MG, trig_EF_trigmuonef_EF_mu40_MSonly_barrel)
+    </description>
+  </obj>
+  -->
+
+  <obj NAME="imass" FLAG="on">
+    <order>103</order>
+    <phase>selection</phase>
+    <skip>false</skip>
+    <nparameters>2</nparameters>
+    <parameters>
+      <parameter NAME="imass_min" ORDER="1" TYPE="float">0.07</parameter>
+      <parameter NAME="imass_max" ORDER="2" TYPE="float">0.4</parameter>
+    </parameters>
+    <description>
+      This is the invariant mass cut.
+      The upper boundary is for the blinded analysis.
+      When there are multiple candidates, take the muon pair whose scalar sum pT is the highest.
+      The parameters are in TeV.
+    </description>
+  </obj>
+
+
+
+</objects>

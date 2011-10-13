@@ -34,14 +34,36 @@ static const Double_t logfullimassmin   = 70.;
 static const Double_t logfullimassmax   = 2000.;
 static Double_t logfullimassbins[nlogfullimassbins+1];
 
+static const Int_t    nlinfullimassbins = 250;
+static const Double_t linfullimassmin   = 70.;
+static const Double_t linfullimassmax   = 2000.;
+
+static const Int_t    nlogptbins = 60;
+static const Double_t logptmin   = 20.;
+static const Double_t logptmax   = 1000.;
+static Double_t logptbins[nlogptbins+1];
+
+static const Int_t    nlogqtbins = 60;
+static const Double_t logqtmin   = 20.;
+static const Double_t logqtmax   = 1000.;
+static Double_t logqtbins[nlogqtbins+1];
+
 static const Int_t    netabins = 30;
 static const Double_t etamin   = -2.5;
 static const Double_t etamax   = +2.5;
+
+static const Int_t    nphibins = 30;
+static const Double_t phimin   = -TMath::Pi();
+static const Double_t phimax   = +TMath::Pi();
 
 static const double minMassBin = 120;  // for the asymmetry fit
 static const double maxMassBin = 1500; // for the asymmetry fit
 static const int    nMassBins  = 6;   // for the asymmetry fit
 static const int    niMassBins = 40;  // for the imass histos
+
+static const double minFullCosTheta = -1.;
+static const double maxFullCosTheta = +1.;
+static const int    nFullCosThetaBins = 50;
 
 static const double minCosTheta = -1.;  // for the acceptance binning
 static const double maxCosTheta = +1.;  // for the acceptance binning
@@ -50,6 +72,10 @@ static const int    nCosThetaBins = 10; // for the acceptance binning
 static const double minAbsCosTheta   = 0.;  // for the acceptance binning
 static const double maxAbsCosTheta   = +1.; // for the acceptance binning
 static const int    nAbsCosThetaBins = 8;   // for the acceptance binning
+
+static const double minfullyQ   = -2.5;
+static const double maxfullyQ   = +2.5;
+static const int    nfullyQbins = 50;
 
 static const double minyQ   = -2.5; // for the FB false identify probability binning
 static const double maxyQ   = +2.5; // for the FB false identify probability binning

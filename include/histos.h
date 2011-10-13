@@ -20,6 +20,18 @@ void Scale(TH1* h, double d)
 	}
 }
 
+void Scale(TH2* h, double d)
+{ 
+	/// scale including over/underflow
+	for(int i=0 ; i<=h->GetNbinsX()+1 ; i++)
+	{
+		for(int j=0 ; j<=h->GetNbinsY()+1 ; j++)
+		{
+			h->SetBinContent(i,j,h->GetBinContent(i,j)*d);
+		}
+	}
+}
+
 void ScaleWerrors(TH1* h, double d)
 { 
 	/// scale including over/underflow
@@ -42,7 +54,7 @@ double getYmin(TH1* h)
 	return min;
 }
 
-void setMinMax(TH1* h1, TH1* h2)
+void setMinMax(TH1* h1, TH1* h2, bool isLog=false)
 {
 	Double_t min1 = getYmin(h1);
 	Double_t min2 = getYmin(h2);
@@ -54,7 +66,8 @@ void setMinMax(TH1* h1, TH1* h2)
 	Double_t max1 = h1->GetMaximum();
 	Double_t max2 = h2->GetMaximum();
 	Double_t max  = (max1>max2) ? max1 : max2;
-	max *= 1.5;
+	if(isLog) max *= 1.5;
+	else      max *= 1.05;
 	h1->SetMaximum(max);
 	h2->SetMaximum(max);
 }

@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE objects PUBLIC "" "periods.dtd" []>
+<objects>
+<!--
+  The periods names and values
+-->
+  <obj NAME="MC" FLAG="on">
+    <start>100000</start>
+    <end>150000</end>
+    <ntriggers>3</ntriggers>
+    <triggers>
+      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
+    </triggers>
+    <nevents>0</nevents>
+    <luminosity>0.</luminosity>
+    <description>
+        The values are in GeV and fb^-1.
+    </description>
+  </obj>
+
+  <obj NAME="B" FLAG="on">
+    <start>178044</start>
+    <end>178109</end>
+    <ntriggers>3</ntriggers>
+    <triggers>
+      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
+    </triggers>
+    <nevents>0</nevents>
+    <luminosity>0.012957144</luminosity>
+    <description>
+      The values are in GeV and fb^-1.
+    </description>
+  </obj>
+
+  <obj NAME="D" FLAG="on">
+    <start>179710</start>
+    <end>180481</end>
+    <ntriggers>3</ntriggers>
+    <triggers>
+      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
+    </triggers>
+    <nevents>0</nevents>
+    <luminosity>0.182463874</luminosity>
+    <description>
+      The values are in GeV and fb^-1.
+    </description>
+  </obj>
+
+  <obj NAME="E" FLAG="on">
+    <start>180614</start>
+    <end>180776</end>
+    <ntriggers>3</ntriggers>
+    <triggers>
+      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
+    </triggers>
+    <nevents>0</nevents>
+    <luminosity>0.052197972</luminosity>
+    <description>
+      The values are in GeV and fb^-1.
+    </description>
+  </obj>
+
+  <obj NAME="F" FLAG="on">
+    <start>182013</start>
+    <end>182519</end>
+    <ntriggers>3</ntriggers>
+    <triggers>
+      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
+    </triggers>
+    <nevents>0</nevents>
+    <luminosity>0.154251603</luminosity>
+    <description>
+      The values are in GeV and fb^-1.
+    </description>
+  </obj>
+
+  <obj NAME="G" FLAG="on">
+    <start>182726</start>
+    <end>183462</end>
+    <ntriggers>3</ntriggers>
+    <triggers>
+      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
+    </triggers>
+    <nevents>0</nevents>
+    <luminosity>0.560371997</luminosity>
+    <description>
+      The values are in GeV and fb^-1.
+    </description>
+  </obj>  
+
+  <obj NAME="H" FLAG="on">
+    <start>183544</start>
+    <end>184169</end>
+    <ntriggers>3</ntriggers>
+    <triggers>
+      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
+    </triggers>
+    <nevents>0</nevents>
+    <luminosity>0.276517533</luminosity>
+    <description>
+      The values are in GeV and fb^-1.
+    </description>
+  </obj>
+
+  <obj NAME="I" FLAG="on">
+    <start>185353</start>
+    <end>186493</end>
+    <ntriggers>3</ntriggers>
+    <triggers>
+      <trigger NAME="EF_mu22" PRIORITY="1" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu22_MG" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu40_MSonly_barrel" PRIORITY="3" MIN="1">40.</trigger>
+    </triggers>
+    <nevents>0</nevents>
+    <luminosity>0.276517533</luminosity>
+    <description>
+      The values are in GeV and fb^-1.
+    </description>
+  </obj>
+
+  <obj NAME="J" FLAG="on">
+    <start>186516</start>
+    <end>186755</end>
+    <ntriggers>3</ntriggers>
+    <triggers>
+      <trigger NAME="EF_mu22_medium" PRIORITY="1" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu22_MG_medium" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu40_MSonly_barrel_medium" PRIORITY="3" MIN="1">40.</trigger>
+    </triggers>
+    <nevents>0</nevents>
+    <luminosity>0.276517533</luminosity>
+    <description>
+      The values are in GeV and fb^-1.
+    </description>
+  </obj>
+
+  <obj NAME="K" FLAG="on">
+    <start>186873</start>
+    <end>187815</end>
+    <ntriggers>3</ntriggers>
+    <triggers>
+      <trigger NAME="EF_mu22_medium" PRIORITY="1" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu22_MG_medium" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu40_MSonly_barrel_medium" PRIORITY="3" MIN="1">40.</trigger>
+    </triggers>
+    <nevents>0</nevents>
+    <luminosity>0.276517533</luminosity>
+    <description>
+      The values are in GeV and fb^-1.
+    </description>
+  </obj>
+
+  <obj NAME="L" FLAG="on">
+    <start>188902</start>
+    <end>190343</end>
+    <ntriggers>3</ntriggers>
+    <triggers>
+      <trigger NAME="EF_mu22_medium" PRIORITY="1" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu22_MG_medium" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu40_MSonly_barrel_medium" PRIORITY="3" MIN="1">40.</trigger>
+    </triggers>
+    <nevents>0</nevents>
+    <luminosity>0.276517533</luminosity>
+    <description>
+      The values are in GeV and fb^-1.
+    </description>
+  </obj>
+  
+  <obj NAME="M" FLAG="on">
+    <start>190503</start>
+    <end>190611</end>
+    <ntriggers>3</ntriggers>
+    <triggers>
+      <trigger NAME="EF_mu22_medium" PRIORITY="1" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu22_MG_medium" PRIORITY="2" MIN="1">22.</trigger>
+      <trigger NAME="EF_mu40_MSonly_barrel_medium" PRIORITY="3" MIN="1">40.</trigger>
+    </triggers>
+    <nevents>0</nevents>
+    <luminosity>0.276517533</luminosity>
+    <description>
+      The values are in GeV and fb^-1.
+    </description>
+  </obj>
+
+<!--
+  <obj NAME="PERIODS" FLAG="on">
+    <nperiods>6</nperiods>
+    <periods>
+      <period NAME="B" FLAG="on">0.</period>
+      <period NAME="D" FLAG="on">0.</period>
+      <period NAME="E" FLAG="on">0.</period>
+      <period NAME="F" FLAG="on">0.</period>
+      <period NAME="G" FLAG="on">0.</period>
+      <period NAME="H" FLAG="on">0.276517533</period>
+    </periods>
+    <description>
+      The values are in fb^-1.
+    </description>
+  </obj>
+-->
+
+  <obj NAME="TRIGGERPERIODS" FLAG="on">
+    <ntriggerperiods>1</ntriggerperiods>
+    <triggerperiods>
+      <triggerperiod NAME="EF_mu22" FLAG="on">2.488457</triggerperiod>
+    </triggerperiods>
+    <description>
+      The values are in fb^-1.
+    </description>
+  </obj>
+
+</objects>

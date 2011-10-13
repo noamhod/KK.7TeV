@@ -8,7 +8,7 @@
 #ifndef UNITS_H
 #define UNITS_H
 
-static const double luminosity = 2.039488; // 2.488457; //2.28348; // 1/fb
+static const double luminosity = 3.664723; // 2.039488; // 2.488457; //2.28348; // 1/fb
 
 static const float MeV2TeV = 1.e-6;
 static const float MeV2GeV = 1.e-3;

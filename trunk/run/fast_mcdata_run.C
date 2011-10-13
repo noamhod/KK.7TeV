@@ -162,7 +162,7 @@ float EtaSum;
 
 ///////////// admin /////////////
 void graphics(TH1* th1,
-			  Int_t mrkrstyle=-1, Int_t mrkrsize=-1,
+			  Int_t mrkrstyle=-1, Float_t mrkrsize=-1,
 			  Int_t fillstyle=-1,
 			  Int_t linestyle=-1, Int_t linewidth=-1,
 			  Color_t linecolor=-1, Color_t fillcolor=-1, Color_t mrkrcolor=-1,
@@ -191,11 +191,10 @@ void graphics(TH1* th1,
 }
 
 
-void draw(TObject* tobj, /*TString oName,*/ TString drawopt="", Bool_t logx=!dolog, Bool_t logy=!dolog)
+void draw(TObject* tobj, TString drawopt="", Bool_t logx=!dolog, Bool_t logy=!dolog)
 {
 	_DEBUG("draw");
 
-	// TString cName = "c"+oName;
 	TString oName = (TString)tobj->GetName();
 	TString cName = "c"+oName;
 	cnvMap.insert( make_pair(oName, new TCanvas(cName,cName,600,400)) );
@@ -279,17 +278,19 @@ void setMCtrees(TString tsMCname)
 	
 	if(tsMCname=="DYmumu")
 	{
-		setMCtree("../data/mcLocalControl_DYmumu_75M120.root", "mcLocalControl_DYmumu_75M120", 20000, 7.9862E-01*nb2fb);
-		setMCtree("../data/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 20000, 8.5275E-03*nb2fb);
-		setMCtree("../data/mcLocalControl_DYmumu_250M400.root", "mcLocalControl_DYmumu_250M400", 20000, 4.1075E-04*nb2fb);
-		setMCtree("../data/mcLocalControl_DYmumu_400M600.root", "mcLocalControl_DYmumu_400M600", 20000, 6.6459E-05*nb2fb);
-		// setMCtree("../data/mcLocalControl_DYmumu_600M800.root", "mcLocalControl_DYmumu_600M800", 20000, *nb2fb);
-		setMCtree("../data/mcLocalControl_DYmumu_800M1000.root", "mcLocalControl_DYmumu_800M1000", 20000, 2.6516E-06*nb2fb);
-		setMCtree("../data/mcLocalControl_DYmumu_1000M1250.root", "mcLocalControl_DYmumu_1000M1250", 20000, 8.9229E-07*nb2fb);
-		setMCtree("../data/mcLocalControl_DYmumu_1250M1500.root", "mcLocalControl_DYmumu_1250M1500", 20000, 2.3957E-07*nb2fb);
-		// setMCtree("../data/mcLocalControl_DYmumu_1500M1750.root", "mcLocalControl_DYmumu_1500M1750", 20000, *nb2fb);
-		setMCtree("../data/mcLocalControl_DYmumu_1750M2000.root", "mcLocalControl_DYmumu_1750M2000", 20000, 2.4614E-08*nb2fb);
-		setMCtree("../data/mcLocalControl_DYmumu_M2000.root", "mcLocalControl_DYmumu_M2000", 20000, 1.4001E-08*nb2fb);
+		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_Zmumu.root", "mcLocalControl_Zmumu", 5000000, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
+		//// setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_75M120.root", "mcLocalControl_DYmumu_75M120", 20000, 7.9862E-01*nb2fb);
+		//// setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 20000, 8.5275E-03*nb2fb);
+		
+		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_250M400.root", "mcLocalControl_DYmumu_250M400", 20000, 4.1075E-04*nb2fb);
+		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_400M600.root", "mcLocalControl_DYmumu_400M600", 20000, 6.6459E-05*nb2fb);
+		// setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_600M800.root", "mcLocalControl_DYmumu_600M800", 20000, *nb2fb);
+		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_800M1000.root", "mcLocalControl_DYmumu_800M1000", 20000, 2.6516E-06*nb2fb);
+		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_1000M1250.root", "mcLocalControl_DYmumu_1000M1250", 20000, 8.9229E-07*nb2fb);
+		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_1250M1500.root", "mcLocalControl_DYmumu_1250M1500", 20000, 2.3957E-07*nb2fb);
+		// setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_1500M1750.root", "mcLocalControl_DYmumu_1500M1750", 20000, *nb2fb);
+		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_1750M2000.root", "mcLocalControl_DYmumu_1750M2000", 20000, 2.4614E-08*nb2fb);
+		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_M2000.root", "mcLocalControl_DYmumu_M2000", 20000, 1.4001E-08*nb2fb);
 	}
 }
 
@@ -482,28 +483,111 @@ void setDATAbranches()
 	_DEBUG("successfully read data branches");
 }
 
-// TH1* th1,
-// Int_t mrkrstyle, Int_t mrkrsize,
-// Int_t fillstyle,
-// Int_t linestyle, Int_t linewidth,
-// Color_t linecolor, Color_t fillcolor, Color_t mrkrcolor,
-// Bool_t moreLogLabels=true, Bool_t noexponent=true,
-// TString title="", TString xtitle="", TString ytitle=""
 void hbook()
 {
 	_DEBUG("hbook");
 
 	setLogBins(npbins,pmin,pmax,pbins);
+	setLogBins(nlogptbins,logptmin,logptmax,logptbins);
+	setLogBins(nlogqtbins,logqtmin,logqtmax,logqtbins);
 	setLogBins(nlogmassbins,logmassmin,logmassmax,logmassbins);
 	setLogBins(nlogfullimassbins,logfullimassmin,logfullimassmax,logfullimassbins);
 
 	h1Map.insert( make_pair("hMassData", new TH1D("hMassData",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
 	setlogx(h1Map["hMassData"]);
-	graphics(h1Map["hMassData"],  24,1);
-	
+	graphics(h1Map["hMassData"],  24,0.8);
 	h1Map.insert( make_pair("hMassDYmumu", new TH1D("hMassDYmumu",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
+	h1Map["hMassDYmumu"]->SetDefaultSumw2(kTRUE);
 	setlogx(h1Map["hMassDYmumu"]);
 	graphics(h1Map["hMassDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
+	
+	h1Map.insert( make_pair("hyQData", new TH1D("hyQData",";y_{Q};Events",nyQbins,minyQ,maxyQ)) );
+	setlogx(h1Map["hyQData"]);
+	graphics(h1Map["hyQData"],  24,0.8);
+	h1Map.insert( make_pair("hyQDYmumu", new TH1D("hyQDYmumu",";y_{Q};Events",nyQbins,minyQ,maxyQ)) );
+	h1Map["hyQDYmumu"]->SetDefaultSumw2(kTRUE);
+	setlogx(h1Map["hyQDYmumu"]);
+	graphics(h1Map["hyQDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
+	
+	h1Map.insert( make_pair("hQTData", new TH1D("hQTData",";Q_{T} GeV;Events",nlogptbins,logptbins)) );
+	setlogx(h1Map["hQTData"]);
+	graphics(h1Map["hQTData"],  24,0.8);
+	h1Map.insert( make_pair("hQTDYmumu", new TH1D("hQTDYmumu",";Q_{T} GeV;Events",nlogptbins,logptbins)) );
+	h1Map["hQTDYmumu"]->SetDefaultSumw2(kTRUE);
+	setlogx(h1Map["hQTDYmumu"]);
+	graphics(h1Map["hQTDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
+	
+	h1Map.insert( make_pair("hEtaLeadingData", new TH1D("hEtaLeadingData",";#eta_{#mu}^{leading};Events",etalogicnbins,etalogicbins)) );
+	setlogx(h1Map["hEtaLeadingData"]);
+	graphics(h1Map["hEtaLeadingData"],  24,0.8);
+	h1Map.insert( make_pair("hEtaLeadingDYmumu", new TH1D("hEtaLeadingDYmumu",";#eta_{#mu}^{leading};Events",etalogicnbins,etalogicbins)) );
+	h1Map["hEtaLeadingDYmumu"]->SetDefaultSumw2(kTRUE);
+	setlogx(h1Map["hEtaLeadingDYmumu"]);
+	graphics(h1Map["hEtaLeadingDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
+	
+	h1Map.insert( make_pair("hEtaSubleadingData", new TH1D("hEtaSubleadingData",";#eta_{#mu}^{subleading};Events",etalogicnbins,etalogicbins)) );
+	setlogx(h1Map["hEtaSubleadingData"]);
+	graphics(h1Map["hEtaSubleadingData"],  24,0.8);
+	h1Map.insert( make_pair("hEtaSubleadingDYmumu", new TH1D("hEtaSubleadingDYmumu",";#eta_{#mu}^{subleading};Events",etalogicnbins,etalogicbins)) );
+	h1Map["hEtaSubleadingDYmumu"]->SetDefaultSumw2(kTRUE);
+	setlogx(h1Map["hEtaSubleadingDYmumu"]);
+	graphics(h1Map["hEtaSubleadingDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
+	
+	h1Map.insert( make_pair("hPhiLeadingData", new TH1D("hPhiLeadingData",";#phi_{#mu}^{leading};Events",nphibins,phimin,phimax)) );
+	setlogx(h1Map["hPhiLeadingData"]);
+	graphics(h1Map["hPhiLeadingData"],  24,0.8);
+	h1Map.insert( make_pair("hPhiLeadingDYmumu", new TH1D("hPhiLeadingDYmumu",";#phi_{#mu}^{leading};Events",nphibins,phimin,phimax)) );
+	h1Map["hPhiLeadingDYmumu"]->SetDefaultSumw2(kTRUE);
+	setlogx(h1Map["hPhiLeadingDYmumu"]);
+	graphics(h1Map["hPhiLeadingDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
+	
+	h1Map.insert( make_pair("hPhiSubleadingData", new TH1D("hPhiSubleadingData",";#phi_{#mu}^{subleading};Events",nphibins,phimin,phimax)) );
+	setlogx(h1Map["hPhiSubleadingData"]);
+	graphics(h1Map["hPhiSubleadingData"],  24,0.8);
+	h1Map.insert( make_pair("hPhiSubleadingDYmumu", new TH1D("hPhiSubleadingDYmumu",";#phi_{#mu}^{subleading};Events",nphibins,phimin,phimax)) );
+	h1Map["hPhiSubleadingDYmumu"]->SetDefaultSumw2(kTRUE);
+	setlogx(h1Map["hPhiSubleadingDYmumu"]);
+	graphics(h1Map["hPhiSubleadingDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
+	
+	h1Map.insert( make_pair("hpTLeadingData", new TH1D("hpTLeadingData",";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
+	setlogx(h1Map["hpTLeadingData"]);
+	graphics(h1Map["hpTLeadingData"],  24,0.8);
+	h1Map.insert( make_pair("hpTLeadingDYmumu", new TH1D("hpTLeadingDYmumu",";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
+	h1Map["hpTLeadingDYmumu"]->SetDefaultSumw2(kTRUE);
+	setlogx(h1Map["hpTLeadingDYmumu"]);
+	graphics(h1Map["hpTLeadingDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
+	
+	h1Map.insert( make_pair("hpTSubleadingData", new TH1D("hpTSubleadingData",";p_{T}^{subleading} GeV;Events",nlogptbins,logptbins)) );
+	setlogx(h1Map["hpTSubleadingData"]);
+	graphics(h1Map["hpTSubleadingData"],  24,0.8);
+	h1Map.insert( make_pair("hpTSubleadingDYmumu", new TH1D("hpTSubleadingDYmumu",";p_{T}^{subleading} GeV;Events",nlogptbins,logptbins)) );
+	h1Map["hpTSubleadingDYmumu"]->SetDefaultSumw2(kTRUE);
+	setlogx(h1Map["hpTSubleadingDYmumu"]);
+	graphics(h1Map["hpTSubleadingDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
+	
+	///// 2d /////
+	
+	h2Map.insert( make_pair("hMassCosThetaCSData", new TH2D("hMassCosThetaCSData",";m_{#mu#mu} GeV;cos(#theta*);Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nFullCosThetaBins,minFullCosTheta,maxFullCosTheta)) );
+	setlogx(h2Map["hMassCosThetaCSData"]);
+	linMap.insert( make_pair("hMassCosThetaCS_horline", new TLine(linfullimassmin,0.,linfullimassmax,0.)) );
+	for(int ms=0 ; ms<=nlogmassbins ; ms++)
+	{
+		linMap.insert( make_pair("hMassCosThetaCS_vertline_"+_s(logmassbins[ms]), new TLine(logmassbins[ms],minFullCosTheta,logmassbins[ms],maxFullCosTheta)) );
+	}
+	h2Map.insert( make_pair("hMassCosThetaCSDYmumu", new TH2D("hMassCosThetaCSDYmumu",";m_{#mu#mu} GeV;cos(#theta*);Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nFullCosThetaBins,minFullCosTheta,maxFullCosTheta)) );
+	h1Map["hMassCosThetaCSDYmumu"]->SetDefaultSumw2(kTRUE);
+	setlogx(h2Map["hMassCosThetaCSDYmumu"]);
+	
+	h2Map.insert( make_pair("hMassyQData", new TH2D("hMassyQData",";m_{#mu#mu} GeV;y_{Q};Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nfullyQbins,minfullyQ,maxfullyQ)) );
+	setlogx(h2Map["hMassyQData"]);
+	linMap.insert( make_pair("hMassyQ_horline", new TLine(linfullimassmin,0.,linfullimassmax,0.)) );
+	for(int ms=0 ; ms<=nlogmassbins ; ms++)
+	{
+		linMap.insert( make_pair("hMassyQ_vertline_"+_s(logmassbins[ms]), new TLine(logmassbins[ms],minfullyQ,logmassbins[ms],maxfullyQ)) );
+	}
+	h2Map.insert( make_pair("hMassyQDYmumu", new TH2D("hMassyQDYmumu",";m_{#mu#mu} GeV;y_{Q};Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nfullyQbins,minfullyQ,maxfullyQ)) );
+	h1Map["hMassyQDYmumu"]->SetDefaultSumw2(kTRUE);
+	setlogx(h2Map["hMassyQDYmumu"]);
 }
 
 float getDataMCratio()
@@ -511,6 +595,25 @@ float getDataMCratio()
 	float ratio = (nDYmumu70to110>0.) ? nData70to110/nDYmumu70to110 : 1.;
 	_INFO("DATA/DYmumu in 70 to 110 GeV is: "+_s(ratio,8));
 	return ratio;
+}
+
+void hscale2Zpeak()
+{
+	float ratio = getDataMCratio();
+	
+	Scale(h1Map["hMassDYmumu"],ratio);
+	Scale(h1Map["hyQDYmumu"],ratio);
+	Scale(h1Map["hQTDYmumu"],ratio);
+	Scale(h1Map["hEtaLeadingDYmumu"],ratio);
+	Scale(h1Map["hEtaSubleadingDYmumu"],ratio);
+	Scale(h1Map["hPhiLeadingDYmumu"],ratio);
+	Scale(h1Map["hPhiSubleadingDYmumu"],ratio);
+	Scale(h1Map["hpTLeadingDYmumu"],ratio);
+	Scale(h1Map["hpTSubleadingDYmumu"],ratio);
+	
+	///// 2d
+	Scale(h2Map["hMassCosThetaCSDYmumu"],ratio);
+	Scale(h2Map["hMassyQDYmumu"],ratio);
 }
 
 void hdraw()
@@ -526,13 +629,67 @@ void hdraw()
 	gMpoissonErr->SetMarkerStyle(24);
 	gMpoissonErr->SetMarkerSize(1);
 	
-	float ratio = getDataMCratio();
-	Scale(h1Map["hMassDYmumu"],ratio);
-	
-	setMinMax(h1Map["hMassDYmumu"],h1Map["hMassData"]);
+	setMinMax(h1Map["hMassDYmumu"],h1Map["hMassData"],true);
 	draw(h1Map["hMassDYmumu"], "", dolog, dolog);
 	drawon("hMassDYmumu", h1Map["hMassData"], "e1x1");
 	//drawon("hMassDYmumu", gMpoissonErr, "e1x1");
+	
+	setMinMax(h1Map["hyQDYmumu"],h1Map["hyQData"],true);
+	draw(h1Map["hyQDYmumu"]);
+	drawon("hyQDYmumu", h1Map["hyQData"], "e1x1");
+	
+	setMinMax(h1Map["hQTDYmumu"],h1Map["hQTData"],true);
+	draw(h1Map["hQTDYmumu"], "", dolog, dolog);
+	drawon("hQTDYmumu", h1Map["hQTData"], "e1x1");
+	
+	setMinMax(h1Map["hEtaLeadingDYmumu"],h1Map["hEtaLeadingData"]);
+	draw(h1Map["hEtaLeadingDYmumu"]);
+	drawon("hEtaLeadingDYmumu", h1Map["hEtaLeadingData"], "e1x1");
+	setMinMax(h1Map["hEtaSubleadingDYmumu"],h1Map["hEtaSubleadingData"]);
+	draw(h1Map["hEtaSubleadingDYmumu"]);
+	drawon("hEtaSubleadingDYmumu", h1Map["hEtaSubleadingData"], "e1x1");
+	
+	setMinMax(h1Map["hPhiLeadingDYmumu"],h1Map["hPhiLeadingData"]);
+	draw(h1Map["hPhiLeadingDYmumu"]);
+	drawon("hPhiLeadingDYmumu", h1Map["hPhiLeadingData"], "e1x1");
+	setMinMax(h1Map["hPhiSubleadingDYmumu"],h1Map["hPhiSubleadingData"]);
+	draw(h1Map["hPhiSubleadingDYmumu"]);
+	drawon("hPhiSubleadingDYmumu", h1Map["hPhiSubleadingData"], "e1x1");
+	
+	setMinMax(h1Map["hpTLeadingDYmumu"],h1Map["hpTLeadingData"],true);
+	draw(h1Map["hpTLeadingDYmumu"], "", dolog, dolog);
+	drawon("hpTLeadingDYmumu", h1Map["hpTLeadingData"], "e1x1");
+	setMinMax(h1Map["hpTSubleadingDYmumu"],h1Map["hpTSubleadingData"],true);
+	draw(h1Map["hpTSubleadingDYmumu"], "", dolog, dolog);
+	drawon("hpTSubleadingDYmumu", h1Map["hpTSubleadingData"], "e1x1");
+	
+	
+	///// 2d
+	draw(h2Map["hMassCosThetaCSData"], "COLZ", dolog);
+	drawon("hMassCosThetaCSData", linMap["hMassCosThetaCS_horline"]);
+	for(int ms=0 ; ms<=nlogmassbins ; ms++)
+	{
+		drawon("hMassCosThetaCSData", linMap["hMassCosThetaCS_vertline_"+_s(logmassbins[ms])]);
+	}
+	draw(h2Map["hMassCosThetaCSDYmumu"], "COLZ", dolog);
+	drawon("hMassCosThetaCSDYmumu", linMap["hMassCosThetaCS_horline"]);
+	for(int ms=0 ; ms<=nlogmassbins ; ms++)
+	{
+		drawon("hMassCosThetaCSDYmumu", linMap["hMassCosThetaCS_vertline_"+_s(logmassbins[ms])]);
+	}
+	
+	draw(h2Map["hMassyQData"], "COLZ", dolog);
+	drawon("hMassyQData", linMap["hMassyQ_horline"]);
+	for(int ms=0 ; ms<=nlogmassbins ; ms++)
+	{
+		drawon("hMassyQData", linMap["hMassyQ_vertline_"+_s(logmassbins[ms])]);
+	}
+	draw(h2Map["hMassyQDYmumu"], "COLZ", dolog);
+	drawon("hMassyQDYmumu", linMap["hMassyQ_horline"]);
+	for(int ms=0 ; ms<=nlogmassbins ; ms++)
+	{
+		drawon("hMassyQDYmumu", linMap["hMassyQ_vertline_"+_s(logmassbins[ms])]);
+	}
 }
 
 void hfill(TString tsRunType="DATA", TString tsMCname="DYmumu", Double_t wgt=1.)
@@ -540,10 +697,20 @@ void hfill(TString tsRunType="DATA", TString tsMCname="DYmumu", Double_t wgt=1.)
 	_DEBUG("hfill");
 	
 	float mass = 0.;
+	float yQ   = 0.;
+	float QT   = 0.;
+	float cosThetaCS = 0.;
+	float cosThetaHE = 0.;
 	float dr1  = 0.;
 	float dr2  = 0.;
 	float ca   = 0.;
 	float cb   = 0.;
+	float etaLeading = 0.;
+	float etaSubleading = 0.;
+	float phiLeading = 0.;
+	float phiSubleading = 0.;
+	float pTLeading = 0.;
+	float pTSubleading = 0.;
 	
 	int imuontru  = -999;
 	int iamuontru = -999;
@@ -599,20 +766,39 @@ void hfill(TString tsRunType="DATA", TString tsMCname="DYmumu", Double_t wgt=1.)
 				ca = recon_all_charge->at(imuonrec);
 				cb = recon_all_charge->at(iamuonrec);
 				if(ca*cb>=0.) _WARNING("ca*cb>=0, skipping event");
-				mass = K->imass(tlvmureca,tlvmurecb);
+				mass          = K->imass(tlvmureca,tlvmurecb);
+				yQ            = K->ySystem(tlvmureca,tlvmurecb);
+				QT            = K->QT(tlvmureca,tlvmurecb);
+				cosThetaCS    = K->cosThetaCollinsSoper(tlvmureca,ca,tlvmurecb,cb);
+				cosThetaHE    = K->cosThetaBoost(tlvmureca,ca,tlvmurecb,cb);
+				etaLeading    = recon_all_eta->at(0);
+				etaSubleading = recon_all_eta->at(1);
+				phiLeading    = recon_all_phi->at(0);
+				phiSubleading = recon_all_phi->at(1);
+				pTLeading     = recon_all_pt->at(0);
+				pTSubleading  = recon_all_pt->at(1);
 				
 				float event_weight = all_total_weight;
 				
 				if(mass>=70.  &&  mass<=110.) nDYmumu70to110 += 1.*wgt*event_weight;
-				
-				_DEBUG("MC -> mass="+_s(mass));
-				_DEBUG("MC -> ca="+_s(ca));
-				_DEBUG("MC -> cb="+_s(cb));
+
 				
 				/////////////////////////////////
 				/// MC histo fill statrs here ///
 				/////////////////////////////////
 				h1Map["hMass"+tsMCname]->Fill(mass,wgt*event_weight);
+				h1Map["hyQ"+tsMCname]->Fill(yQ,wgt*event_weight);
+				h1Map["hQT"+tsMCname]->Fill(QT,wgt*event_weight);
+				h1Map["hEtaLeading"+tsMCname]->Fill(etaLeading,wgt*event_weight);
+				h1Map["hEtaSubleading"+tsMCname]->Fill(etaSubleading,wgt*event_weight);
+				h1Map["hPhiLeading"+tsMCname]->Fill(phiLeading,wgt*event_weight);
+				h1Map["hPhiSubleading"+tsMCname]->Fill(phiSubleading,wgt*event_weight);
+				h1Map["hpTLeading"+tsMCname]->Fill(pTLeading,wgt*event_weight);
+				h1Map["hpTSubleading"+tsMCname]->Fill(pTSubleading,wgt*event_weight);
+				
+				///// 2d
+				h2Map["hMassCosThetaCS"+tsMCname]->Fill(mass,cosThetaCS,wgt*event_weight);
+				h2Map["hMassyQ"+tsMCname]->Fill(mass,yQ,wgt*event_weight);
 			}
 		}
 	}
@@ -637,7 +823,17 @@ void hfill(TString tsRunType="DATA", TString tsMCname="DYmumu", Double_t wgt=1.)
 		ca = charge->at(imuonrec);
 		cb = charge->at(iamuonrec);
 		if(ca*cb>=0.) _WARNING("ca*cb>=0, skipping event");
-		mass = K->imass(tlvmureca,tlvmurecb);
+		mass          = K->imass(tlvmureca,tlvmurecb);
+		yQ            = K->ySystem(tlvmureca,tlvmurecb);
+		QT            = K->QT(tlvmureca,tlvmurecb);
+		cosThetaCS    = K->cosThetaCollinsSoper(tlvmureca,ca,tlvmurecb,cb);
+		cosThetaHE    = K->cosThetaBoost(tlvmureca,ca,tlvmurecb,cb);
+		etaLeading    = eta->at(0);
+		etaSubleading = eta->at(1);
+		phiLeading    = phi->at(0);
+		phiSubleading = phi->at(1);
+		pTLeading     = pt->at(0)*MeV2GeV;
+		pTSubleading  = pt->at(1)*MeV2GeV;
 		
 		if(mass>=70.  &&  mass<=110.) nData70to110 += 1.;
 		
@@ -645,6 +841,18 @@ void hfill(TString tsRunType="DATA", TString tsMCname="DYmumu", Double_t wgt=1.)
 		/// DATA histo fill statrs here ///
 		///////////////////////////////////
 		h1Map["hMassData"]->Fill(mass);
+		h1Map["hyQData"]->Fill(yQ);
+		h1Map["hQTData"]->Fill(QT);
+		h1Map["hEtaLeadingData"]->Fill(etaLeading);
+		h1Map["hEtaSubleadingData"]->Fill(etaSubleading);
+		h1Map["hPhiLeadingData"]->Fill(phiLeading);
+		h1Map["hPhiSubleadingData"]->Fill(phiSubleading);
+		h1Map["hpTLeadingData"]->Fill(pTLeading);
+		h1Map["hpTSubleadingData"]->Fill(pTSubleading);
+		
+		///// 2d
+		h2Map["hMassCosThetaCSData"]->Fill(mass,cosThetaCS);
+		h2Map["hMassyQData"]->Fill(mass,yQ);
 	}
 }
 
@@ -703,6 +911,12 @@ void run()
 		for(Int_t entry=0 ; entry<N ; entry++)
 		{
 			tree->GetEntry(entry);
+			
+			if(it->first=="mcLocalControl_Zmumu"  &&
+			   truth_all_isValid                  && 
+			   recon_all_isValid                  && 
+			   truth_all_Mhat>250.) continue;
+			
 			////////////////////////////////////////////
 			//// blocks of analysis go here ////////////
 			////////////////////////////////////////////
@@ -711,6 +925,7 @@ void run()
 		}
 	}
 	
+	hscale2Zpeak();
 	hdraw();
 	save("plots");
 }

@@ -17,6 +17,7 @@ insets = {
 			"Pythia_DYmumu_1750M2000_unfiltered" => 'mc11_7TeV.105486.Pythia_DYmumu_1750M2000_unfiltered.merge.NTUP_SMWZ.e825_s1310_s1300_r2730_r2700_p716/',
 			"Pythia_DYmumu_M2000_unfiltered"	 => 'mc11_7TeV.105487.Pythia_DYmumu_M2000_unfiltered.merge.NTUP_SMWZ.e825_s1310_s1300_r2730_r2700_p716/',
 
+			#"PythiaZmumu_no_filter" => 'mc11_7TeV.106047.PythiaZmumu_no_filter.merge.NTUP_SMWZ.e815_s1272_s1274_r2730_r2700_p716/',
 			"PythiaZmumu_no_filter" => 'mc11_7TeV.106047.PythiaZmumu_no_filter.merge.NTUP_SMWZ.e815_s1272_s1274_r2730_r2700_p716_tid525356_00',
 
 			"PythiaWmunu_no_filter" => 'mc11_7TeV.106044.PythiaWmunu_no_filter.merge.NTUP_SMWZ.e815_s1272_s1274_r2730_r2700_p716/',

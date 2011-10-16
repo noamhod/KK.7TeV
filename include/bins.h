@@ -52,7 +52,7 @@ static const Int_t    netabins = 30;
 static const Double_t etamin   = -2.5;
 static const Double_t etamax   = +2.5;
 
-static const Int_t    nphibins = 30;
+static const Int_t    nphibins = 20;
 static const Double_t phimin   = -TMath::Pi();
 static const Double_t phimax   = +TMath::Pi();
 

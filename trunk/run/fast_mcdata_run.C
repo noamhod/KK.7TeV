@@ -4,6 +4,9 @@ TFile* file;
 TTree* tree;
 TString fName;
 TString tName;
+TPaveText* pvtxt_lumi;
+TPaveText* pvtxt_atlas;
+TText* txt;
 TMapTSP2TCNV  cnvMap;
 TMapTSP2TOBJ  oMap;
 TMapTSP2TH1   h1Map;
@@ -159,7 +162,6 @@ float EtaSum;
 ////////////////////////////////
 
 
-
 ///////////// admin /////////////
 void graphics(TH1* th1,
 			  Int_t mrkrstyle=-1, Float_t mrkrsize=-1,
@@ -190,8 +192,24 @@ void graphics(TH1* th1,
 	if(ytitle!="") th1->SetYTitle(ytitle);
 }
 
+void text()
+{
+	pvtxt_atlas = new TPaveText(0.4032663,0.2797203,0.5678392,0.3741259,"brNDC"); // 0.2110553,0.7097902,0.3756281,0.8041958 -> for 2d
+	//pvtxt_atlas->SetFillColor(0);
+	pvtxt_atlas->SetFillStyle(4000); //will be transparent
+	pvtxt_atlas->SetFillColor(0);
+	pvtxt_atlas->SetTextFont(42);
+	txt = pvtxt_atlas->AddText("#bf{#splitline{#it{ATLAS}}{#scale[0.42]{work in progress}}}");
 
-void draw(TObject* tobj, TString drawopt="", Bool_t logx=!dolog, Bool_t logy=!dolog)
+	pvtxt_lumi = new TPaveText(0.4032663,0.1660839,0.5678392,0.2727273,"brNDC"); // 0.2110553,0.5926573,0.3756281,0.6993007 -> for 2d
+	//pvtxt_lumi->SetFillColor(kWhite);
+	pvtxt_lumi->SetFillStyle(4000); //will be transparent
+	pvtxt_lumi->SetFillColor(0);
+	TString sLumi = (TString)_s(luminosity,2);
+	txt = pvtxt_lumi->AddText( "#intLdt~"+ sLumi +" fb^{-1}" );
+}
+
+void draw(TObject* tobj, TString drawopt="", Bool_t logx=!dolog, Bool_t logy=!dolog, Bool_t logz=!dolog)
 {
 	_DEBUG("draw");
 
@@ -200,6 +218,7 @@ void draw(TObject* tobj, TString drawopt="", Bool_t logx=!dolog, Bool_t logy=!do
 	cnvMap.insert( make_pair(oName, new TCanvas(cName,cName,600,400)) );
 	if(logx) cnvMap[oName]->SetLogx();
 	if(logy) cnvMap[oName]->SetLogy();
+	if(logz) cnvMap[oName]->SetLogz();
 	cnvMap[oName]->cd();
 	tobj->Draw(drawopt);
 }
@@ -223,6 +242,15 @@ void drawon(TString existing_oName, TObject* tobj, TString drawopt="")
 	cnvMap[existing_oName]->cd();
 	if(drawopt=="") tobj->Draw("SAMES");
 	else            tobj->Draw(drawopt+" SAMES");
+}
+
+void drawtxton(TString existing_oName)
+{
+	_DEBUG("drawtxton");
+
+	cnvMap[existing_oName]->cd();
+	pvtxt_lumi->Draw("SAMES");
+	pvtxt_atlas->Draw("SAMES");
 }
 
 void save(TString oDir)
@@ -633,63 +661,76 @@ void hdraw()
 	draw(h1Map["hMassDYmumu"], "", dolog, dolog);
 	drawon("hMassDYmumu", h1Map["hMassData"], "e1x1");
 	//drawon("hMassDYmumu", gMpoissonErr, "e1x1");
+	drawtxton("hMassDYmumu");
 	
 	setMinMax(h1Map["hyQDYmumu"],h1Map["hyQData"],true);
 	draw(h1Map["hyQDYmumu"]);
 	drawon("hyQDYmumu", h1Map["hyQData"], "e1x1");
+	drawtxton("hyQDYmumu");
 	
 	setMinMax(h1Map["hQTDYmumu"],h1Map["hQTData"],true);
 	draw(h1Map["hQTDYmumu"], "", dolog, dolog);
 	drawon("hQTDYmumu", h1Map["hQTData"], "e1x1");
+	drawtxton("hQTDYmumu");
 	
 	setMinMax(h1Map["hEtaLeadingDYmumu"],h1Map["hEtaLeadingData"]);
 	draw(h1Map["hEtaLeadingDYmumu"]);
 	drawon("hEtaLeadingDYmumu", h1Map["hEtaLeadingData"], "e1x1");
+	drawtxton("hEtaLeadingDYmumu");
 	setMinMax(h1Map["hEtaSubleadingDYmumu"],h1Map["hEtaSubleadingData"]);
 	draw(h1Map["hEtaSubleadingDYmumu"]);
 	drawon("hEtaSubleadingDYmumu", h1Map["hEtaSubleadingData"], "e1x1");
+	drawtxton("hEtaSubleadingDYmumu");
 	
 	setMinMax(h1Map["hPhiLeadingDYmumu"],h1Map["hPhiLeadingData"]);
 	draw(h1Map["hPhiLeadingDYmumu"]);
 	drawon("hPhiLeadingDYmumu", h1Map["hPhiLeadingData"], "e1x1");
+	drawtxton("hPhiLeadingDYmumu");
 	setMinMax(h1Map["hPhiSubleadingDYmumu"],h1Map["hPhiSubleadingData"]);
 	draw(h1Map["hPhiSubleadingDYmumu"]);
 	drawon("hPhiSubleadingDYmumu", h1Map["hPhiSubleadingData"], "e1x1");
+	drawtxton("hPhiSubleadingDYmumu");
 	
 	setMinMax(h1Map["hpTLeadingDYmumu"],h1Map["hpTLeadingData"],true);
 	draw(h1Map["hpTLeadingDYmumu"], "", dolog, dolog);
 	drawon("hpTLeadingDYmumu", h1Map["hpTLeadingData"], "e1x1");
+	drawtxton("hpTLeadingDYmumu");
 	setMinMax(h1Map["hpTSubleadingDYmumu"],h1Map["hpTSubleadingData"],true);
 	draw(h1Map["hpTSubleadingDYmumu"], "", dolog, dolog);
 	drawon("hpTSubleadingDYmumu", h1Map["hpTSubleadingData"], "e1x1");
+	drawtxton("hpTSubleadingDYmumu");
 	
 	
 	///// 2d
-	draw(h2Map["hMassCosThetaCSData"], "COLZ", dolog);
+	draw(h2Map["hMassCosThetaCSData"], "COLZ", dolog, !dolog, dolog);
 	drawon("hMassCosThetaCSData", linMap["hMassCosThetaCS_horline"]);
 	for(int ms=0 ; ms<=nlogmassbins ; ms++)
 	{
 		drawon("hMassCosThetaCSData", linMap["hMassCosThetaCS_vertline_"+_s(logmassbins[ms])]);
 	}
-	draw(h2Map["hMassCosThetaCSDYmumu"], "COLZ", dolog);
+	drawtxton("hMassCosThetaCSData");
+	draw(h2Map["hMassCosThetaCSDYmumu"], "COLZ", dolog, !dolog, dolog);
 	drawon("hMassCosThetaCSDYmumu", linMap["hMassCosThetaCS_horline"]);
 	for(int ms=0 ; ms<=nlogmassbins ; ms++)
 	{
 		drawon("hMassCosThetaCSDYmumu", linMap["hMassCosThetaCS_vertline_"+_s(logmassbins[ms])]);
 	}
+	drawtxton("hMassCosThetaCSDYmumu");
 	
-	draw(h2Map["hMassyQData"], "COLZ", dolog);
+	draw(h2Map["hMassyQData"], "COLZ", dolog, !dolog, dolog);
 	drawon("hMassyQData", linMap["hMassyQ_horline"]);
 	for(int ms=0 ; ms<=nlogmassbins ; ms++)
 	{
 		drawon("hMassyQData", linMap["hMassyQ_vertline_"+_s(logmassbins[ms])]);
 	}
-	draw(h2Map["hMassyQDYmumu"], "COLZ", dolog);
+	drawtxton("hMassyQData");
+	draw(h2Map["hMassyQDYmumu"], "COLZ", dolog, !dolog, dolog);
 	drawon("hMassyQDYmumu", linMap["hMassyQ_horline"]);
 	for(int ms=0 ; ms<=nlogmassbins ; ms++)
 	{
 		drawon("hMassyQDYmumu", linMap["hMassyQ_vertline_"+_s(logmassbins[ms])]);
 	}
+	drawtxton("hMassyQDYmumu");
 }
 
 void hfill(TString tsRunType="DATA", TString tsMCname="DYmumu", Double_t wgt=1.)
@@ -886,6 +927,7 @@ void run()
 	
 	style();
 	hbook();
+	text();
 
 	Int_t N = 0;
 	

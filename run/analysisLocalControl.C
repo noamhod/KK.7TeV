@@ -223,11 +223,17 @@ void analysisLocalControl::initialize(int RunNumber, string runs, string basedir
 	m_analysis->setMC(m_isMC);
 	if(m_isMC) m_analysis->setMCPpTparameters(m_muRecAlgo, m_pTsmearingType, str_mcp);
 	
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	string str_pileuphist_data = utilities::checkANDsetFilepath("PWD", "/../conf/ilumicalc_histograms_None.root"); ////////////////////
-	string str_pileuphist_mc   = utilities::checkANDsetFilepath("PWD", "/../conf/mu_mc10b.root"); /////////////////////////////////////
-	m_analysis->setPileupParameters((TString)str_pileuphist_data, "avgintperbx", (TString)str_pileuphist_mc, "mu_mc10b"); /////////////
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	string str_pileuphist_data = utilities::checkANDsetFilepath("PWD", "/../conf/CURRENT_iLUMICALC_HISTOGRAMS.root"); ////////////
+	// string str_pileuphist_mc   = utilities::checkANDsetFilepath("PWD", "/../conf/mu_mc10b.root"); /////////////////////////////
+	string str_pileuphist_mc   = utilities::checkANDsetFilepath("PWD", "/../conf/muhist_MC11a.root"); ////////////////////////////
+	m_vhNames.push_back("periodBtoD");
+	m_vhNames.push_back("periodEtoH");
+	m_vhNames.push_back("periodItoK1");
+	m_vhNames.push_back("periodFuture");
+	m_analysis->setPileupPeriodsIntegral((TString)str_pileuphist_mc, m_vhNames);
+	m_analysis->setPileupParameters((TString)str_pileuphist_data, "avgintperbx", (TString)str_pileuphist_mc, "periodBtoD"); //////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	///////////////////////////////////////////
 	m_analysis->sMCsampleName = sMCsample; ////

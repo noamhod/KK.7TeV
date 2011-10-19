@@ -16,6 +16,7 @@ TMapTSP2TLINE linMap;
 TMapTSP2TTREE treMap;
 TMapTSd       wgtMap;
 float nDYmumu70to110 = 0;
+float nDYmumu70to110_nopileup = 0;
 float nData70to110   = 0;
 
 Bool_t isMC=true;
@@ -67,6 +68,7 @@ unsigned int all_mc_event_number;
 double all_mc_event_weight;
 
 float all_pileup_weight;
+float all_lumi_pileup_weight;
 float all_EW_kfactor_weight;
 float all_QCD_kfactor_weight;
 float all_mcevent_weight;
@@ -97,6 +99,7 @@ vector<int>*   truth_all_partons_mc_pdgId;
 vector<float>* truth_all_partons_mc_charge;
 
 bool recon_all_isValid;
+int recon_all_vxp_n;
 vector<float>* recon_all_E;
 vector<float>* recon_all_pt;
 vector<float>* recon_all_m;
@@ -129,6 +132,7 @@ float QCD_kfactor_weight;
 float mcevent_weight;
 float total_weight;
 
+int vxp_n;
 vector<float>* E;
 vector<float>* pt;
 vector<float>* m;
@@ -200,8 +204,8 @@ void text()
 	pvtxt_atlas->SetFillColor(0);
 	pvtxt_atlas->SetTextFont(42);
 	txt = pvtxt_atlas->AddText("#bf{#splitline{#it{ATLAS}}{#scale[0.42]{work in progress}}}");
-
-	pvtxt_lumi = new TPaveText(0.4032663,0.1660839,0.5678392,0.2727273,"brNDC"); // 0.2110553,0.5926573,0.3756281,0.6993007 -> for 2d
+	
+	pvtxt_lumi = new TPaveText(0.4032663,0.166,0.5678392,0.2726,"brNDC"); // 0.2110553,0.5926573,0.3756281,0.6993007 -> for 2d
 	//pvtxt_lumi->SetFillColor(kWhite);
 	pvtxt_lumi->SetFillStyle(4000); //will be transparent
 	pvtxt_lumi->SetFillColor(0);
@@ -223,16 +227,81 @@ void draw(TObject* tobj, TString drawopt="", Bool_t logx=!dolog, Bool_t logy=!do
 	tobj->Draw(drawopt);
 }
 
-void setlogx(TH1* h)
+void drawratio(TH1* th1n, TH1* th1d, TString drawopt_n="", TString drawopt_d="", Bool_t logx=!dolog, Bool_t logy=!dolog)
 {
-	h->GetXaxis()->SetMoreLogLabels();
-	h->GetXaxis()->SetNoExponent();
-}
+	_DEBUG("draw");
 
-void setlogx(TH2* h)
-{
-	h->GetXaxis()->SetMoreLogLabels();
-	h->GetXaxis()->SetNoExponent();
+	TString hName = (TString)th1n->GetName();
+	hName = hName+"MCratio";
+	TString cName = "c"+hName;
+	
+	cnvMap.insert( make_pair(hName, new TCanvas(cName,cName,600,550)) );
+	
+	cnvMap[hName]->Divide(1,2);
+	TVirtualPad* tvp_hists = cnvMap[hName]->cd(1);
+	TVirtualPad* tvp_ratio = cnvMap[hName]->cd(2);
+	
+	if(logx) tvp_ratio->SetLogx();
+	if(logx) tvp_hists->SetLogx();
+	if(logy) tvp_hists->SetLogy();
+	
+	tvp_hists->SetPad(0.00, 0.35, 1.00, 1.00);
+	tvp_ratio->SetPad(0.00, 0.00, 1.00, 0.35);
+
+	tvp_hists->SetBottomMargin(0.012);
+	tvp_ratio->SetBottomMargin(0.20);
+	tvp_ratio->SetTopMargin(0.012);
+	
+	tvp_ratio->SetTicks(1,1);
+
+	TString cloneName_n = th1n->GetName();
+	TString cloneName_d = th1d->GetName();
+	TH1D* th1n_tmp = (TH1D*)th1n->Clone(cloneName_n+"_th1n_tmp");
+	TH1D* th1d_tmp = (TH1D*)th1d->Clone(cloneName_d+"_th1d_tmp");
+	th1n_tmp->Sumw2();
+	th1d_tmp->Sumw2();
+
+	TH1D* hr = (TH1D*)th1n->Clone(hName);
+	TString sXtitle = (TString)th1n->GetXaxis()->GetTitle();
+	// TString sTitle = "#frac{Data}{#sum MC#times wgt};"+sXtitle+";Ratio";
+	TString sTitle = ";"+sXtitle+";Ratio";
+	hr->SetTitle(sTitle);
+	hr->Divide(th1n_tmp,th1d_tmp,1.,1.,"B");
+
+	hr->GetXaxis()->SetLabelSize(0.075);
+	hr->GetYaxis()->SetLabelSize(0.075);
+	hr->GetXaxis()->SetTitleSize(0.075);
+	hr->GetYaxis()->SetTitleSize(0.075);
+	hr->SetTitleSize(0.075);
+	hr->SetTitleSize(0.075);
+	hr->GetYaxis()->SetTitleOffset(0.5);
+	hr->SetMinimum(0.);
+	hr->SetMaximum(+2.);
+	
+	if(logx) setlogx(hr);
+	
+	string name = (string)hName;
+	if(name.find("Nvxp")!=string::npos)
+	{
+		ofstream fWeights("pileup.weights");
+		for(Int_t b=1 ; b<=hr->GetNbinsX() ; b++) fWeights << "pu weight: Nvtx=" << b << " -> wgt=" << hr->GetBinContent(b) << " +- " << hr->GetBinError(b) << endl;
+		fWeights.close();
+	}
+	
+	TString lName = "l"+hName;
+	linMap.insert( make_pair(lName, new TLine(hr->GetXaxis()->GetXmin(),1.,hr->GetXaxis()->GetXmax(),1.)) );
+
+	tvp_hists->cd();
+	th1d->Draw(drawopt_d);
+	th1n->Draw(drawopt_n+"SAMES");
+	pvtxt_lumi->Draw("SAMES");
+	pvtxt_atlas->Draw("SAMES");
+	cnvMap[hName]->Update();
+
+	tvp_ratio->cd();
+	hr->Draw("e1x1");
+	linMap[lName]->Draw("SAMES");
+	cnvMap[hName]->Update();
 }
 
 void drawon(TString existing_oName, TObject* tobj, TString drawopt="")
@@ -293,7 +362,7 @@ void setDATAtree()
 {
 	_DEBUG("setDATAtree");
 	
-	//fName = "/data/hod/2011/NTUPLE/DATA/merged.root";
+	// fName = "/data/hod/2011/NTUPLE/DATA/merged.root";
 	fName = "/data/hod/2011/NTUPLE/DATA/analysisLocalControl.root";
 	tName = "allCuts/allCuts_tree";
 	file = new TFile(fName,"READ");
@@ -306,9 +375,10 @@ void setMCtrees(TString tsMCname)
 	
 	if(tsMCname=="DYmumu")
 	{
-		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_Zmumu.root", "mcLocalControl_Zmumu", 5000000, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
-		//// setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_75M120.root", "mcLocalControl_DYmumu_75M120", 20000, 7.9862E-01*nb2fb);
-		//// setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 20000, 8.5275E-03*nb2fb);
+		// setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_Zmumu.root", "mcLocalControl_Zmumu", 5000000, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
+		
+		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_75M120.root", "mcLocalControl_DYmumu_75M120", 20000, 7.9862E-01*nb2fb);
+		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 20000, 8.5275E-03*nb2fb);
 		
 		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_250M400.root", "mcLocalControl_DYmumu_250M400", 20000, 4.1075E-04*nb2fb);
 		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_400M600.root", "mcLocalControl_DYmumu_400M600", 20000, 6.6459E-05*nb2fb);
@@ -387,6 +457,7 @@ void setMCbranches()
 	tree->SetBranchAddress( "all_mc_event_weight",   &all_mc_event_weight );
 	
 	tree->SetBranchAddress( "all_pileup_weight",      &all_pileup_weight );
+	tree->SetBranchAddress( "all_lumi_pileup_weight", &all_lumi_pileup_weight );
 	tree->SetBranchAddress( "all_EW_kfactor_weight",  &all_EW_kfactor_weight );
 	tree->SetBranchAddress( "all_QCD_kfactor_weight", &all_QCD_kfactor_weight );
 	tree->SetBranchAddress( "all_mcevent_weight",     &all_mcevent_weight );
@@ -417,6 +488,7 @@ void setMCbranches()
 	tree->SetBranchAddress("truth_all_partons_mc_charge", &truth_all_partons_mc_charge);
 
 	tree->SetBranchAddress("recon_all_isValid", &recon_all_isValid);
+	tree->SetBranchAddress("recon_all_vxp_n", &recon_all_vxp_n);
 	tree->SetBranchAddress("recon_all_E", &recon_all_E);
 	tree->SetBranchAddress("recon_all_pt", &recon_all_pt);
 	tree->SetBranchAddress("recon_all_m", &recon_all_m);
@@ -477,6 +549,8 @@ void setDATAbranches()
 	tree->SetBranchAddress( "mcevent_weight", &mcevent_weight );
 	tree->SetBranchAddress( "total_weight",   &total_weight );
 	
+	tree->SetBranchAddress("vxp_n", &vxp_n);
+	
 	tree->SetBranchAddress("E", &E);
 	tree->SetBranchAddress("pt", &pt);
 	tree->SetBranchAddress("m", &m);
@@ -525,9 +599,18 @@ void hbook()
 	setlogx(h1Map["hMassData"]);
 	graphics(h1Map["hMassData"],  24,0.8);
 	h1Map.insert( make_pair("hMassDYmumu", new TH1D("hMassDYmumu",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
-	//h1Map["hMassDYmumu"]->SetDefaultSumw2(kTRUE);
 	setlogx(h1Map["hMassDYmumu"]);
 	graphics(h1Map["hMassDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
+	
+	h1Map.insert( make_pair("hNvxpData", new TH1D("hNvxpData",";N_{vertices};Events",35,1.,36.)) );
+	graphics(h1Map["hNvxpData"],  24,0.8);
+	h1Map.insert( make_pair("hNvxpDYmumu", new TH1D("hNvxpDYmumu",";N_{vertices};Events",35,1.,36.)) );
+	graphics(h1Map["hNvxpDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
+	
+	h1Map.insert( make_pair("hNvxpData_with_puwgt", new TH1D("hNvxpData_with_puwgt",";N_{vertices};Events",35,1.,36.)) );
+	graphics(h1Map["hNvxpData_with_puwgt"],  24,0.8);
+	h1Map.insert( make_pair("hNvxpDYmumu_with_puwgt", new TH1D("hNvxpDYmumu_with_puwgt",";N_{vertices};Events",35,1.,36.)) );
+	graphics(h1Map["hNvxpDYmumu_with_puwgt"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
 	
 	h1Map.insert( make_pair("hyQData", new TH1D("hyQData",";y_{Q};Events",nyQbins,minyQ,maxyQ)) );
 	setlogx(h1Map["hyQData"]);
@@ -593,8 +676,9 @@ void hbook()
 	setlogx(h1Map["hpTSubleadingDYmumu"]);
 	graphics(h1Map["hpTSubleadingDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
 	
-	///// 2d /////
 	
+	
+	///// 2d /////
 	h2Map.insert( make_pair("hMassCosThetaCSData", new TH2D("hMassCosThetaCSData",";m_{#mu#mu} GeV;cos(#theta*);Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nFullCosThetaBins,minFullCosTheta,maxFullCosTheta)) );
 	setlogx(h2Map["hMassCosThetaCSData"]);
 	linMap.insert( make_pair("hMassCosThetaCS_horline", new TLine(linfullimassmin,0.,linfullimassmax,0.)) );
@@ -625,9 +709,22 @@ float getDataMCratio()
 	return ratio;
 }
 
+float getDataMCratioNoPileup()
+{
+	float ratio = (nDYmumu70to110_nopileup>0.) ? nData70to110/nDYmumu70to110_nopileup : 1.;
+	_INFO("DATA/DYmumu (no pileup) in 70 to 110 GeV is: "+_s(ratio,8));
+	return ratio;
+}
+
 void hscale2Zpeak()
 {
-	float ratio = getDataMCratio();
+	float ratio          = getDataMCratio();
+	float ratio_nopileup = getDataMCratioNoPileup();
+	
+	// Scale(h1Map["hNvxpDYmumu"],ratio_nopileup);
+	// Scale(h1Map["hNvxpDYmumu"],ratio);
+	
+	Scale(h1Map["hNvxpDYmumu_with_puwgt"],ratio);
 	
 	Scale(h1Map["hMassDYmumu"],ratio);
 	Scale(h1Map["hyQDYmumu"],ratio);
@@ -662,46 +759,68 @@ void hdraw()
 	drawon("hMassDYmumu", h1Map["hMassData"], "e1x1");
 	//drawon("hMassDYmumu", gMpoissonErr, "e1x1");
 	drawtxton("hMassDYmumu");
+	drawratio(h1Map["hMassData"], h1Map["hMassDYmumu"], "e1x1", "", dolog, dolog);
+	
+	setMinMax(h1Map["hNvxpDYmumu"],h1Map["hNvxpData"]);
+	draw(h1Map["hNvxpDYmumu"]);
+	drawon("hNvxpDYmumu", h1Map["hNvxpData"], "e1x1");
+	drawtxton("hNvxpDYmumu");
+	drawratio(h1Map["hNvxpData"], h1Map["hNvxpDYmumu"], "e1x1");
+	
+	setMinMax(h1Map["hNvxpDYmumu_with_puwgt"],h1Map["hNvxpData_with_puwgt"]);
+	draw(h1Map["hNvxpDYmumu_with_puwgt"]);
+	drawon("hNvxpDYmumu_with_puwgt", h1Map["hNvxpData_with_puwgt"], "e1x1");
+	drawtxton("hNvxpDYmumu_with_puwgt");
+	drawratio(h1Map["hNvxpData_with_puwgt"], h1Map["hNvxpDYmumu_with_puwgt"], "e1x1");
 	
 	setMinMax(h1Map["hyQDYmumu"],h1Map["hyQData"],true);
 	draw(h1Map["hyQDYmumu"]);
 	drawon("hyQDYmumu", h1Map["hyQData"], "e1x1");
 	drawtxton("hyQDYmumu");
+	drawratio(h1Map["hyQData"], h1Map["hyQDYmumu"], "e1x1");
 	
 	setMinMax(h1Map["hQTDYmumu"],h1Map["hQTData"],true);
 	draw(h1Map["hQTDYmumu"], "", dolog, dolog);
 	drawon("hQTDYmumu", h1Map["hQTData"], "e1x1");
 	drawtxton("hQTDYmumu");
+	drawratio(h1Map["hQTData"], h1Map["hQTDYmumu"], "e1x1", "", dolog, dolog);
 	
 	setMinMax(h1Map["hEtaLeadingDYmumu"],h1Map["hEtaLeadingData"]);
 	draw(h1Map["hEtaLeadingDYmumu"]);
 	drawon("hEtaLeadingDYmumu", h1Map["hEtaLeadingData"], "e1x1");
 	drawtxton("hEtaLeadingDYmumu");
+	drawratio(h1Map["hEtaLeadingData"], h1Map["hEtaLeadingDYmumu"], "e1x1");
 	setMinMax(h1Map["hEtaSubleadingDYmumu"],h1Map["hEtaSubleadingData"]);
 	draw(h1Map["hEtaSubleadingDYmumu"]);
 	drawon("hEtaSubleadingDYmumu", h1Map["hEtaSubleadingData"], "e1x1");
 	drawtxton("hEtaSubleadingDYmumu");
+	drawratio(h1Map["hEtaSubleadingData"], h1Map["hEtaSubleadingDYmumu"], "e1x1");
 	
 	setMinMax(h1Map["hPhiLeadingDYmumu"],h1Map["hPhiLeadingData"]);
 	draw(h1Map["hPhiLeadingDYmumu"]);
 	drawon("hPhiLeadingDYmumu", h1Map["hPhiLeadingData"], "e1x1");
 	drawtxton("hPhiLeadingDYmumu");
+	drawratio(h1Map["hPhiLeadingData"], h1Map["hPhiLeadingDYmumu"], "e1x1");
 	setMinMax(h1Map["hPhiSubleadingDYmumu"],h1Map["hPhiSubleadingData"]);
 	draw(h1Map["hPhiSubleadingDYmumu"]);
 	drawon("hPhiSubleadingDYmumu", h1Map["hPhiSubleadingData"], "e1x1");
 	drawtxton("hPhiSubleadingDYmumu");
+	drawratio(h1Map["hPhiSubleadingData"], h1Map["hPhiSubleadingDYmumu"], "e1x1");
 	
 	setMinMax(h1Map["hpTLeadingDYmumu"],h1Map["hpTLeadingData"],true);
 	draw(h1Map["hpTLeadingDYmumu"], "", dolog, dolog);
 	drawon("hpTLeadingDYmumu", h1Map["hpTLeadingData"], "e1x1");
 	drawtxton("hpTLeadingDYmumu");
+	drawratio(h1Map["hpTLeadingData"], h1Map["hpTLeadingDYmumu"], "e1x1", "", dolog, dolog);
 	setMinMax(h1Map["hpTSubleadingDYmumu"],h1Map["hpTSubleadingData"],true);
 	draw(h1Map["hpTSubleadingDYmumu"], "", dolog, dolog);
 	drawon("hpTSubleadingDYmumu", h1Map["hpTSubleadingData"], "e1x1");
 	drawtxton("hpTSubleadingDYmumu");
+	drawratio(h1Map["hpTSubleadingData"], h1Map["hpTSubleadingDYmumu"], "e1x1", "", dolog, dolog);
 	
 	
 	///// 2d
+	h2Map["hMassCosThetaCSData"]->SetMinimum( getXYmin(h2Map["hMassCosThetaCSData"]) );
 	draw(h2Map["hMassCosThetaCSData"], "COLZ", dolog, !dolog, dolog);
 	drawon("hMassCosThetaCSData", linMap["hMassCosThetaCS_horline"]);
 	for(int ms=0 ; ms<=nlogmassbins ; ms++)
@@ -709,6 +828,7 @@ void hdraw()
 		drawon("hMassCosThetaCSData", linMap["hMassCosThetaCS_vertline_"+_s(logmassbins[ms])]);
 	}
 	drawtxton("hMassCosThetaCSData");
+	h2Map["hMassCosThetaCSDYmumu"]->SetMinimum( getXYmin(h2Map["hMassCosThetaCSDYmumu"]) );
 	draw(h2Map["hMassCosThetaCSDYmumu"], "COLZ", dolog, !dolog, dolog);
 	drawon("hMassCosThetaCSDYmumu", linMap["hMassCosThetaCS_horline"]);
 	for(int ms=0 ; ms<=nlogmassbins ; ms++)
@@ -718,12 +838,14 @@ void hdraw()
 	drawtxton("hMassCosThetaCSDYmumu");
 	
 	draw(h2Map["hMassyQData"], "COLZ", dolog, !dolog, dolog);
+	h2Map["hMassyQData"]->SetMinimum( getXYmin(h2Map["hMassyQData"]) );
 	drawon("hMassyQData", linMap["hMassyQ_horline"]);
 	for(int ms=0 ; ms<=nlogmassbins ; ms++)
 	{
 		drawon("hMassyQData", linMap["hMassyQ_vertline_"+_s(logmassbins[ms])]);
 	}
 	drawtxton("hMassyQData");
+	h2Map["hMassyQDYmumu"]->SetMinimum( getXYmin(h2Map["hMassyQDYmumu"]) );
 	draw(h2Map["hMassyQDYmumu"], "COLZ", dolog, !dolog, dolog);
 	drawon("hMassyQDYmumu", linMap["hMassyQ_horline"]);
 	for(int ms=0 ; ms<=nlogmassbins ; ms++)
@@ -731,6 +853,52 @@ void hdraw()
 		drawon("hMassyQDYmumu", linMap["hMassyQ_vertline_"+_s(logmassbins[ms])]);
 	}
 	drawtxton("hMassyQDYmumu");
+}
+
+float dummyPileupWeight(int Nvtx)
+{
+	float wgt = -999.;
+	float err = -999.;
+	switch(Nvtx)
+	{
+		case 1:  wgt=0.;         err=0.;          break;
+		case 2:  wgt=1.25141;    err=0.00577822;  break;
+		case 3:  wgt=1.16239;    err=0.00222276;  break;
+		case 4:  wgt=1.05372;    err=0.000841156; break;
+		case 5:  wgt=0.9909;     err=0.000282838; break;
+		case 6:  wgt=0.959231;   err=0.00057051;  break;
+		case 7:  wgt=0.960658;   err=0.000598648; break;
+		case 8:  wgt=1.01366;    err=0.000420445; break;
+		case 9:  wgt=1.11505;    err=0.00157366;  break;
+		case 10: wgt=1.2236;     err=0.0029407;   break;
+		case 11: wgt=1.31968;    err=0.00476801;  break;
+		case 12: wgt=1.33966;    err=0.00640612;  break;
+		case 13: wgt=1.13993;    err=0.00463242;  break;
+		case 14: wgt=0.807529;   err=0.00522407;  break;
+		case 15: wgt=0.502941;   err=0.00724853;  break;
+		case 16: wgt=0.286545;   err=0.00710636;  break;
+		case 17: wgt=0.15919;    err=0.00605587;  break;
+		case 18: wgt=0.0809666;  err=0.00481376;  break;
+		case 19: wgt=0.0428478;  err=0.00379524;  break;
+		case 20: wgt=0.0262842;  err=0.00332082;  break;
+		case 21: wgt=0.0117188;  err=0.00248377;  break;
+		case 22: wgt=0.00716806; err=0.00215349;  break;
+		case 23: wgt=0.00416974; err=0.00186087;  break;
+		case 24: wgt=0.0022554;  err=0.00159301;  break;
+		case 25: wgt=0.00300959; err=0.0021249;   break;
+		case 26: wgt=0.00408355; err=0.00288161;  break;
+		case 27: wgt=0.;         err=0.;          break;
+		case 28: wgt=0.00400175; err=0.00399374;  break;
+		case 29: wgt=0.;         err=0.;          break;
+		case 30: wgt=0.;         err=0.;          break;
+		case 31: wgt=0.;         err=0.;          break;
+		case 32: wgt=0.;         err=0.;          break;
+		case 33: wgt=0.;         err=0.;          break;
+		case 34: wgt=0.;         err=0.;          break;
+		case 35: wgt=0.;         err=0.;          break;
+		default: wgt=-999.; _WARNING("in dummyPileupWeight -> the value Nvtx="+_s(Nvtx)+" is not supported"); break;
+	}
+	return wgt;
 }
 
 void hfill(TString tsRunType="DATA", TString tsMCname="DYmumu", Double_t wgt=1.)
@@ -819,14 +987,48 @@ void hfill(TString tsRunType="DATA", TString tsMCname="DYmumu", Double_t wgt=1.)
 				pTLeading     = recon_all_pt->at(0);
 				pTSubleading  = recon_all_pt->at(1);
 				
-				float event_weight = all_total_weight;
 				
-				if(mass>=70.  &&  mass<=110.) nDYmumu70to110 += 1.*wgt*event_weight;
-
+				
+				/////////////////////////
+				/// weights handeling ///
+				/////////////////////////
+				float event_weight          = 1.;
+				float event_weight_nopileup = 1.;
+				float dummy_pileup_weight   = 1.;
+				
+				event_weight = all_EW_kfactor_weight  *
+							   all_QCD_kfactor_weight *
+							   all_mcevent_weight;
+				
+				// option 1 for the event weight with pileup
+				// event_weight = all_total_weight;
+				
+				// option 2 for the event weight with pileup
+				event_weight *= all_pileup_weight *
+								all_lumi_pileup_weight; // equivalent to the line above
+				
+				// option 3 for the event weight with pileup
+				// dummy_pileup_weight = dummyPileupWeight(recon_all_vxp_n);
+				// if(dummy_pileup_weight<0.) return;
+				// event_weight *= dummy_pileup_weight; // equivalent to the line above
+				
+				// for the event weight without pileup
+				event_weight_nopileup = all_EW_kfactor_weight  *
+										all_QCD_kfactor_weight *
+										all_mcevent_weight;
+				
+				// for the Z peak normalization
+				if(mass>=70.  &&  mass<=110.) nDYmumu70to110          += 1.*wgt*event_weight;
+				if(mass>=70.  &&  mass<=110.) nDYmumu70to110_nopileup += 1.*wgt*event_weight_nopileup;
+				
+				
 				
 				/////////////////////////////////
 				/// MC histo fill statrs here ///
 				/////////////////////////////////
+				h1Map["hNvxp"+tsMCname]->Fill(recon_all_vxp_n,wgt*event_weight_nopileup);
+				h1Map["hNvxp"+tsMCname+"_with_puwgt"]->Fill(recon_all_vxp_n,wgt*event_weight);
+				
 				h1Map["hMass"+tsMCname]->Fill(mass,wgt*event_weight);
 				h1Map["hyQ"+tsMCname]->Fill(yQ,wgt*event_weight);
 				h1Map["hQT"+tsMCname]->Fill(QT,wgt*event_weight);
@@ -881,6 +1083,9 @@ void hfill(TString tsRunType="DATA", TString tsMCname="DYmumu", Double_t wgt=1.)
 		///////////////////////////////////
 		/// DATA histo fill statrs here ///
 		///////////////////////////////////
+		h1Map["hNvxpData"]->Fill(vxp_n);
+		h1Map["hNvxpData_with_puwgt"]->Fill(vxp_n);
+		
 		h1Map["hMassData"]->Fill(mass);
 		h1Map["hyQData"]->Fill(yQ);
 		h1Map["hQTData"]->Fill(QT);

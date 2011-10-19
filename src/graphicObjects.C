@@ -47,6 +47,9 @@ void graphicObjects::clearTreeVars()
 	mc_event_weight = -9999.;
 	
 	pileup_weight  = -9999.;
+	intime_pileup_weight = -9999.;
+	outoftime_pileup_weight = -9999.;
+	lumi_pileup_weight = -9999.;
 	EW_kfactor_weight = -9999.;
 	QCD_kfactor_weight = -9999.;
 	mcevent_weight = -9999.;
@@ -411,10 +414,15 @@ void graphicObjects::clearTreeVars()
 	all_mc_event_weight = -9999.;
 	
 	all_pileup_weight  = -9999.;
+	all_intime_pileup_weight = -9999.;
+	all_outoftime_pileup_weight = -9999.;
+	all_lumi_pileup_weight = -9999.;
 	all_EW_kfactor_weight = -9999.;
 	all_QCD_kfactor_weight = -9999.;
 	all_mcevent_weight = -9999.;
 	all_total_weight   = -9999.;
+	
+	all_vxp_n = 0;
 	
 	truth_all_dr->clear();
 	truth_all_E->clear();
@@ -454,6 +462,7 @@ void graphicObjects::clearTreeVars()
 	truth_all_mcevt_pdf2->clear();
 	truth_all_mcevt_weight->clear();
 	//MC
+	truth_all_mc_vxp_n = -999;
 	truth_all_mc_pt->clear();
 	truth_all_mc_m->clear();
 	truth_all_mc_eta->clear();
@@ -494,6 +503,7 @@ void graphicObjects::clearTreeVars()
 	recon_all_id->clear();
 	recon_all_theta->clear();
 	recon_all_isValid    = false;
+	recon_all_vxp_n      = -999;
 	recon_all_Mhat       = 0.;
 	recon_all_CosThetaCS = 0.;
 	recon_all_CosThetaHE = 0.;
@@ -937,6 +947,9 @@ TDirectory* tDir_efficiency)
 	tree_allCuts->Branch( "mc_event_weight",   &mc_event_weight );
 	
 	tree_allCuts->Branch( "pileup_weight",  &pileup_weight );
+	tree_allCuts->Branch( "intime_pileup_weight",  &intime_pileup_weight );
+	tree_allCuts->Branch( "outoftime_pileup_weight",  &outoftime_pileup_weight );
+	tree_allCuts->Branch( "lumi_pileup_weight",  &lumi_pileup_weight );
 	tree_allCuts->Branch( "EW_kfactor_weight", &EW_kfactor_weight );
 	tree_allCuts->Branch( "QCD_kfactor_weight", &QCD_kfactor_weight );
 	tree_allCuts->Branch( "mcevent_weight", &mcevent_weight );
@@ -1387,10 +1400,15 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_truth->Branch( "all_mc_event_weight",   &all_mc_event_weight );
 	
 	tree_truth->Branch( "all_pileup_weight",  &all_pileup_weight );
+	tree_truth->Branch( "all_intime_pileup_weight", &all_intime_pileup_weight );
+	tree_truth->Branch( "all_outoftime_pileup_weight", &all_outoftime_pileup_weight );
+	tree_truth->Branch( "all_lumi_pileup_weight", &all_lumi_pileup_weight );
 	tree_truth->Branch( "all_EW_kfactor_weight", &all_EW_kfactor_weight );
 	tree_truth->Branch( "all_QCD_kfactor_weight", &all_QCD_kfactor_weight );
 	tree_truth->Branch( "all_mcevent_weight", &all_mcevent_weight );
 	tree_truth->Branch( "all_total_weight",   &all_total_weight );
+	
+	tree_truth->Branch( "all_vxp_n",   &all_vxp_n );
 	
 	tree_truth->Branch( "truth_all_isValid",  &truth_all_isValid );
 	tree_truth->Branch( "truth_all_dr",  &truth_all_dr );
@@ -1430,6 +1448,7 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_truth->Branch( "truth_all_mcevt_pdf2", &truth_all_mcevt_pdf2 );
 	tree_truth->Branch( "truth_all_mcevt_weight", &truth_all_mcevt_weight );
 	//MC
+	tree_truth->Branch( "truth_all_mc_vxp_n", &truth_all_mc_vxp_n );
 	tree_truth->Branch( "truth_all_mc_pt", &truth_all_mc_pt );
 	tree_truth->Branch( "truth_all_mc_m", &truth_all_mc_m );
 	tree_truth->Branch( "truth_all_mc_eta", &truth_all_mc_eta );
@@ -1459,6 +1478,7 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_truth->Branch( "truth_all_partons_mc_charge", &truth_all_partons_mc_charge);
 	
 	tree_truth->Branch( "recon_all_isValid",  &recon_all_isValid );
+	tree_truth->Branch( "recon_all_vxp_n",  &recon_all_vxp_n );
 	tree_truth->Branch( "recon_all_E", &recon_all_E );
 	tree_truth->Branch( "recon_all_pt", &recon_all_pt );
 	tree_truth->Branch( "recon_all_m", &recon_all_m );

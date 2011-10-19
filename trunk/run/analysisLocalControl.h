@@ -43,6 +43,8 @@ class analysisLocalControl : public chainMaker/*, public utilities*/
 		string m_RunType;
 		bool   m_isMC;
 		int    m_msglvl;
+		
+		vector<TString> m_vhNames;
 
 		// run control
 		Long64_t l64t_nentries;

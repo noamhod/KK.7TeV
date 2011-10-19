@@ -85,6 +85,8 @@ public:
 		n3mu = 0;
 		n4mu = 0;
 		nNmu = 0;
+		
+		previous_runnumber = 0;
 	}
 	~analysis();
 	

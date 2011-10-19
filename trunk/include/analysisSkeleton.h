@@ -28,7 +28,14 @@ public:
 
 	bool AS_isMC;
 	SmearingClass* MCPpTsmearing;
+	
 	Root::TPileupReweighting* pileuprw;
+	TString m_dataRootFileName;
+	TString m_dataRootHistName;
+	TString m_mcRootFileName;
+	unsigned int previous_runnumber;
+	float pileUpPeriodsIntegral;
+	float pileUpLumiWeight;
 	
 	bool alreadyFilled;
 	
@@ -135,6 +142,9 @@ public:
 	double mc_event_weight;
 	
 	float pileup_weight;
+	float intime_pileup_weight;
+	float outoftime_pileup_weight;
+	float lumi_pileup_weight;
 	float EW_kfactor_weight;
 	float QCD_kfactor_weight;
 	float mcevent_weight;
@@ -597,8 +607,12 @@ public:
 	void setMC(bool isMC) { AS_isMC = isMC; }
 	void setSmearedMCPpT(int nMus);
 	void setMCPpTparameters(string sAlgo, string spTtype, string sDataPath);
+	void setPileupPeriodsIntegral(TString mcRootFileName, vector<TString>& vhNames);
+	float getPileupPeriodsWeight(TString hName);
 	void setPileupParameters(TString dataRootFileName, TString dataRootHistName, TString mcRootFileName, TString mcRootHistName);
-	float getPileUpWeight();
+	TString setPileupMChisto(string sPeriodNameFromMC, int runNumberFromMC);
+	void resetPileupParameters(string sPeriodNameFromMC, int runNumberFromMC);
+	float getPileUpWeight(bool isIntime);
 	
 	void setPtCandidatesFile(string sCandFilePath = "", string srunnumber = "");
 	

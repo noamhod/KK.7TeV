@@ -83,9 +83,77 @@ void analysisSkeleton::setSmearedMCPpT(int nMus)
 	}
 }
 
+void analysisSkeleton::setPileupPeriodsIntegral(TString mcRootFileName, vector<TString>& vhNames)
+{
+	_DEBUG("analysisSkeleton::setPileupPeriodsIntegral");
+	
+	pileUpPeriodsIntegral = 0.;
+	TFile fTmp(mcRootFileName, "READ");
+	for(unsigned int i=0 ; i<vhNames.size() ; i++)
+	{
+		_DEBUG("getting "+(string)mcRootFileName+":"+(string)vhNames[i]);
+		
+		TH1* hTmp = (TH1*)fTmp.Get(vhNames[i]);
+		pileUpPeriodsIntegral += Integral(hTmp);
+	}
+	fTmp.Close();
+	
+	_DEBUG("pileUpPeriodsIntegral "+_s(pileUpPeriodsIntegral));
+}
+
+float analysisSkeleton::getPileupPeriodsWeight(TString hName)
+{
+	_DEBUG("analysisSkeleton::getPileupPeriodsWeight");
+	
+	// TFile fTmp(m_mcRootFileName, "READ");
+	// TH1* hCurrentPeriod = (TH1*)fTmp.Get(hName);
+	// if(pileUpPeriodsIntegral<=0.)
+	// {
+		// _ERROR("pileUpPeriodsIntegral<=0., exitting now");
+		// exit(-1);
+	// }
+	// float currentPeriodIntegral = Integral(hCurrentPeriod);
+	// if(currentPeriodIntegral<=0.)
+	// {
+		// _ERROR("currentPeriodIntegral<=0., exitting now");
+		// exit(-1);
+	// }
+	// fTmp.Close();
+	// return currentPeriodIntegral/pileUpPeriodsIntegral;
+	
+	
+	///////////////////////////////////////////
+	// B-D:		188.933986		w:	0.052906805
+	// E-H:		1020.228838		w:	0.285692635
+	// I-K1:	862.2172348		w:	0.241444962
+	// K2-L:	1499.691486		w:	0.419955598
+	// total:	3571.071545
+	///////////////////////////////////////////
+	if     (hName=="periodBtoD")   return 0.052906805;
+	else if(hName=="periodEtoH")   return 0.285692635;
+	else if(hName=="periodItoK1")  return 0.241444962;
+	else if(hName=="periodFuture") return 0.419955598;
+	else
+	{
+		_ERROR("unrecognized hName, exitting now");
+		exit(-1);
+	}
+	
+	return -9999.;
+}
+
 void analysisSkeleton::setPileupParameters(TString dataRootFileName, TString dataRootHistName, TString mcRootFileName, TString mcRootHistName)
 {
+	_DEBUG("analysisSkeleton::setPileupParameters");
+	
 	pileuprw = new Root::TPileupReweighting( "PileupReweightingTool" );
+	
+	m_dataRootFileName = dataRootFileName;
+	m_dataRootHistName = dataRootHistName;
+	m_mcRootFileName   = mcRootFileName;
+	
+	pileUpLumiWeight = getPileupPeriodsWeight(mcRootHistName);
+	
 	int isGood = pileuprw->initialize( dataRootFileName, dataRootHistName, mcRootFileName, mcRootHistName );
 	
 	if(isGood!=0)
@@ -95,8 +163,52 @@ void analysisSkeleton::setPileupParameters(TString dataRootFileName, TString dat
 	}
 }
 
-float analysisSkeleton::getPileUpWeight()
+TString analysisSkeleton::setPileupMChisto(string sPeriodNameFromMC, int runNumberFromMC)
 {
+	_DEBUG("analysisSkeleton::setPileupMChisto");
+
+	TString mcRootHistName = "";
+	
+	if(sPeriodNameFromMC=="B" || sPeriodNameFromMC=="D") mcRootHistName = "periodBtoD";
+	else if(sPeriodNameFromMC=="E" ||
+			sPeriodNameFromMC=="F" ||
+			sPeriodNameFromMC=="G" ||
+			sPeriodNameFromMC=="H") mcRootHistName = "periodEtoH";
+	else if(sPeriodNameFromMC=="I" ||
+			sPeriodNameFromMC=="J" ||
+			(sPeriodNameFromMC=="K"  && (runNumberFromMC>=186873 && runNumberFromMC<=186934))) mcRootHistName = "periodItoK1"; // K1=186873:186934
+	else if((sPeriodNameFromMC=="K"  && runNumberFromMC>186934) ||
+			sPeriodNameFromMC=="L"  ||
+			sPeriodNameFromMC=="M") mcRootHistName = "periodFuture";
+	else
+	{
+		_ERROR("couldn't identify the period="+sPeriodNameFromMC+", with run="+_s(runNumberFromMC)+" exitting now");
+		exit(-1);
+	}
+	
+	return mcRootHistName;
+}
+
+void analysisSkeleton::resetPileupParameters(string sPeriodNameFromMC, int runNumberFromMC)
+{
+	_DEBUG("analysisSkeleton::resetPileupParameters");
+
+	TString mcRootHistName = setPileupMChisto(sPeriodNameFromMC, runNumberFromMC);
+	
+	pileUpLumiWeight = getPileupPeriodsWeight(mcRootHistName);
+	
+	int isGood = pileuprw->initialize( m_dataRootFileName, m_dataRootHistName, m_mcRootFileName, mcRootHistName );
+	if(isGood!=0)
+	{
+		_ERROR("pileup reweighting isGood!=0, exitting now");
+		exit(-1);
+	}
+}
+
+float analysisSkeleton::getPileUpWeight(bool isIntime)
+{
+	_DEBUG("analysisSkeleton::getPileUpWeight");
+
 	// Get the mu value for this event
 	
 	// one should use the actualIntPerXing variable.
@@ -105,9 +217,13 @@ float analysisSkeleton::getPileUpWeight()
 	// The difference should be marginal, but I think we should still use the first one for the pileup re-weighting.
 	
 	// float mu = (float)lbn;
+	// float mu = actualIntPerXing;     // in-time pileup
 	// float mu = averageIntPerXing; // out-of-time pileup
-	float mu = actualIntPerXing;     // in-time pileup
 
+	float mu = 0.;
+	if(isIntime) mu = actualIntPerXing;
+	else         mu = averageIntPerXing;
+	
 	// Get the pileup weight for this event
 	float pileupEventWeight = -1.0;
 	
@@ -135,12 +251,15 @@ float analysisSkeleton::getPileUpWeight()
 		exit(-1);
 	}
 	
+	//_INFO("pileupEventWeight="+_s(pileupEventWeight)+", pileUpLumiWeight="+_s(pileUpLumiWeight));
+	
 	return pileupEventWeight;
 }
 
 void analysisSkeleton::setPtCandidatesFile(string sCandFilePath, string srunnumber)
 {
 	_DEBUG("analysisSkeleton::setPtCandidatesFile");
+	
 	string sLogFileName = sCandFilePath+"/candidates_pT.run_"+srunnumber+".cnd";//".time_"+getDateHour()+".cnd";
 	fCand = new ofstream( sLogFileName.c_str() );
 }
@@ -685,6 +804,9 @@ void analysisSkeleton::fillAfterCuts()
 		graphicObjects::mc_event_weight   = mc_event_weight;
 
 		graphicObjects::pileup_weight      = pileup_weight;
+		graphicObjects::intime_pileup_weight = intime_pileup_weight;
+		graphicObjects::outoftime_pileup_weight = outoftime_pileup_weight;
+		graphicObjects::lumi_pileup_weight = lumi_pileup_weight;
 		graphicObjects::EW_kfactor_weight  = EW_kfactor_weight;
 		graphicObjects::QCD_kfactor_weight = QCD_kfactor_weight;
 		graphicObjects::mcevent_weight     = mcevent_weight;
@@ -2562,10 +2684,16 @@ void analysisSkeleton::fillTruth()
 		graphicObjects::all_mc_event_weight   = mc_event_weight;
 		
 		graphicObjects::all_pileup_weight      = pileup_weight;
+		graphicObjects::all_intime_pileup_weight = intime_pileup_weight;
+		graphicObjects::all_outoftime_pileup_weight = outoftime_pileup_weight;
+		graphicObjects::all_lumi_pileup_weight = lumi_pileup_weight;
 		graphicObjects::all_EW_kfactor_weight  = EW_kfactor_weight;
 		graphicObjects::all_QCD_kfactor_weight = QCD_kfactor_weight;
 		graphicObjects::all_mcevent_weight     = mcevent_weight;
 		graphicObjects::all_total_weight       = total_weight;
+		
+		graphicObjects::all_vxp_n = -999;
+		truth_all_mc_vxp_n = -999;
 		
 		truth_all_isValid = true;
 
@@ -2636,6 +2764,8 @@ void analysisSkeleton::fillRecon()
 	recon_all_betaTQ = betaTSystem(p1,p2);
 	delete p1;
 	delete p2;
+	
+	recon_all_vxp_n = vxp_n;
 	
 	recon_all_isValid = true;
 }

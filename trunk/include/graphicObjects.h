@@ -265,6 +265,9 @@ class graphicObjects// : public utilities
 		double mc_event_weight;
 		
 		float pileup_weight;
+		float intime_pileup_weight;
+		float outoftime_pileup_weight;
+		float lumi_pileup_weight;
 		float EW_kfactor_weight;
 		float QCD_kfactor_weight;
 		float mcevent_weight;
@@ -645,10 +648,15 @@ class graphicObjects// : public utilities
 		double all_mc_event_weight;
 		
 		float all_pileup_weight;
+		float all_intime_pileup_weight;
+		float all_outoftime_pileup_weight;
+		float all_lumi_pileup_weight;
 		float all_EW_kfactor_weight;
 		float all_QCD_kfactor_weight;
 		float all_mcevent_weight;
 		float all_total_weight;
+		
+		int all_vxp_n;
 		
 		bool truth_all_isValid;
 		vector<float>* truth_all_dr;
@@ -688,6 +696,7 @@ class graphicObjects// : public utilities
 		vector<double>*  truth_all_mcevt_pdf2;
 		vector<double>*  truth_all_mcevt_weight;
 		//MC
+		int truth_all_mc_vxp_n;
 		vector<float>* truth_all_mc_pt;
 		vector<float>* truth_all_mc_m;
 		vector<float>* truth_all_mc_eta;
@@ -715,6 +724,7 @@ class graphicObjects// : public utilities
 		vector<float>* truth_all_partons_mc_charge;
 		
 		bool recon_all_isValid;
+		int recon_all_vxp_n;
 		vector<float>* recon_all_E;
 		vector<float>* recon_all_pt;
 		vector<float>* recon_all_m;

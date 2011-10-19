@@ -19,10 +19,8 @@ analysis::~analysis()
 
 void analysis::setAllCandidatesFiles(string sCandFilePath, string srunnumber)
 {
-
 	string sLogFileName = sCandFilePath+"/candidates_all.run_"+srunnumber+".cnd";//".time_"+getDateHour()+".cnd";
 	fCandidates = new ofstream( sLogFileName.c_str() );
-
 }
 
 void analysis::execute()
@@ -229,10 +227,39 @@ void analysis::setEventVariables()
 	/////////////////////////////////////////////////////////////////////////////////
 	// pileup reweighting, needs to come after setting the lbn //////////////////////
 	analysisSkeleton::pileup_weight = 1.;
+	bool isIntime = false;
 	if(m_isMC)
 	{
-		analysisSkeleton::pileup_weight = getPileUpWeight();
+		if(m_WZphysD3PD->RunNumber!=analysisSkeleton::previous_runnumber)
+		{
+			// if(pileuprw!=NULL) delete pileuprw;
+			// string sDataPeriodFromMC = getPeriod( m_WZphysD3PD->RunNumber, m_firstrun2periodMap, m_lastrun2periodMap );
+			// TString pileuphist_data  = (TString)utilities::checkANDsetFilepath("PWD", "/../conf/CURRENT_iLUMICALC_HISTOGRAMS.root");
+			// TString pileuphist_mc    = (TString)utilities::checkANDsetFilepath("PWD", "/../conf/muhist_MC11a.root");
+			// TString mcRootHistName   = setPileupMChisto(sDataPeriodFromMC, m_WZphysD3PD->RunNumber);
+			// setPileupParameters(pileuphist_data, "avgintperbx", pileuphist_mc, mcRootHistName);
+		
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			string sDataPeriodFromMC = getPeriod( m_WZphysD3PD->RunNumber, m_firstrun2periodMap, m_lastrun2periodMap ); //////
+			resetPileupParameters(sDataPeriodFromMC,m_WZphysD3PD->RunNumber); ////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			
+			analysisSkeleton::previous_runnumber = m_WZphysD3PD->RunNumber;
+		}
+	
+		analysisSkeleton::lumi_pileup_weight = pileUpLumiWeight; // is allocated in setPileupParameters OR in resetPileupParameters
+	
+		isIntime = false;
+		analysisSkeleton::pileup_weight = getPileUpWeight(isIntime); // will be the out-of-time pileup
 		if(analysisSkeleton::pileup_weight<0.) analysisSkeleton::pileup_weight = 1.;
+		
+		isIntime = false;
+		analysisSkeleton::outoftime_pileup_weight = getPileUpWeight(isIntime);
+		if(analysisSkeleton::outoftime_pileup_weight<0.) analysisSkeleton::outoftime_pileup_weight = 1.;
+		
+		isIntime = true;
+		analysisSkeleton::intime_pileup_weight = getPileUpWeight(isIntime);
+		if(analysisSkeleton::intime_pileup_weight<0.) analysisSkeleton::intime_pileup_weight = 1.;
 	}
 	/////////////////////////////////////////////////////////////////////////////////
 	
@@ -272,6 +299,7 @@ void analysis::setEventVariables()
 	////////////////////////////////////////////////////////////////////////////////////
 	
 	analysisSkeleton::total_weight = analysisSkeleton::pileup_weight*
+									 analysisSkeleton::lumi_pileup_weight*
 									 analysisSkeleton::EW_kfactor_weight*
 									 analysisSkeleton::QCD_kfactor_weight*
 									 analysisSkeleton::mcevent_weight;

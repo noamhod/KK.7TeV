@@ -122,22 +122,47 @@ float analysisSkeleton::getPileupPeriodsWeight(TString hName)
 	// return currentPeriodIntegral/pileUpPeriodsIntegral;
 	
 	
-	///////////////////////////////////////////
-	// B-D:		188.933986		w:	0.052906805
-	// E-H:		1020.228838		w:	0.285692635
-	// I-K1:	862.2172348		w:	0.241444962
-	// K2-L:	1499.691486		w:	0.419955598
-	// total:	3571.071545
-	///////////////////////////////////////////
-	if     (hName=="periodBtoD")   return 0.052906805;
-	else if(hName=="periodEtoH")   return 0.285692635;
-	else if(hName=="periodItoK1")  return 0.241444962;
-	else if(hName=="periodFuture") return 0.419955598;
+	//------------------------------------------------------------------------------------
+	
+	//////////////////////////////////////////////////////////////////////////////////////
+	// B->D:   [178044->180481]: 187.91  pb-1 EF_mu22         wL=0.0527434243
+	// E->H:   [180614->184169]: 1015.2  pb-1 EF_mu22         wL=0.284950904
+	// I->K1:  [185353->186493]: 390.364 pb-1 EF_mu22         wL=0.241495049
+			// [186516->186934]: 470.015 pb-1 EF_mu22_medium
+	// Future: [186965->190120]: 1499.23 pb-1 EF_mu22_medium  wL=0.420810622
+	// ----------------------------------------------------------------------
+	// Total:  [178044->190120]: 3562.719 pb-1
+	//////////////////////////////////////////////////////////////////////////////////////
+	if     (hName=="periodBtoD")   return 0.0527434243;
+	else if(hName=="periodEtoH")   return 0.284950904;
+	else if(hName=="periodItoK1")  return 0.241495049;
+	else if(hName=="periodFuture") return 0.420810622;
 	else
 	{
 		_ERROR("unrecognized hName, exitting now");
 		exit(-1);
 	}
+	
+	
+	//------------------------------------------------------------------------------------
+	
+	
+	//////////////////////////////////////////////////////////////////////////////////////
+	// https://twiki.cern.ch/twiki/bin/viewauth/Atlas/MC11a
+	// w1/sumw=0.0749687
+	// w2/sumw=0.409564
+	// w3/sumw=0.415467
+	// w4/sumw=0.1
+	//////////////////////////////////////////////////////////////////////////////////////
+	// if     (hName=="periodBtoD")   return 0.0749687;
+	// else if(hName=="periodEtoH")   return 0.409564;
+	// else if(hName=="periodItoK1")  return 0.415467;
+	// else if(hName=="periodFuture") return 0.1;
+	// else
+	// {
+		// _ERROR("unrecognized hName, exitting now");
+		// exit(-1);
+	// }
 	
 	return -9999.;
 }
@@ -163,41 +188,66 @@ void analysisSkeleton::setPileupParameters(TString dataRootFileName, TString dat
 	}
 }
 
-TString analysisSkeleton::setPileupMChisto(string sPeriodNameFromMC, int runNumberFromMC)
+TString analysisSkeleton::setPileupPeriodName(int runNumberFromMC)
 {
-	_DEBUG("analysisSkeleton::setPileupMChisto");
+	_DEBUG("analysisSkeleton::setPileupPeriodName");
 
-	TString mcRootHistName = "";
+	TString puPeriodName = "";
 	
-	if(sPeriodNameFromMC=="B" || sPeriodNameFromMC=="D") mcRootHistName = "periodBtoD";
-	else if(sPeriodNameFromMC=="E" ||
-			sPeriodNameFromMC=="F" ||
-			sPeriodNameFromMC=="G" ||
-			sPeriodNameFromMC=="H") mcRootHistName = "periodEtoH";
-	else if(sPeriodNameFromMC=="I" ||
-			sPeriodNameFromMC=="J" ||
-			(sPeriodNameFromMC=="K"  && (runNumberFromMC>=186873 && runNumberFromMC<=186934))) mcRootHistName = "periodItoK1"; // K1=186873:186934
-	else if((sPeriodNameFromMC=="K"  && runNumberFromMC>186934) ||
-			sPeriodNameFromMC=="L"  ||
-			sPeriodNameFromMC=="M") mcRootHistName = "periodFuture";
+	//////////////////////////////////////////////////////////////////
+	// see:  https://twiki.cern.ch/twiki/bin/viewauth/Atlas/MC11a
+	if     (runNumberFromMC==180164) puPeriodName = "periodBtoD";
+	else if(runNumberFromMC==183003) puPeriodName = "periodEtoH";
+	else if(runNumberFromMC==185649) puPeriodName = "periodItoK1"; // K1=186873:186934
+	else if(runNumberFromMC==185761) puPeriodName = "periodFuture";
 	else
 	{
-		_ERROR("couldn't identify the period="+sPeriodNameFromMC+", with run="+_s(runNumberFromMC)+" exitting now");
+		_ERROR("couldn't identify run="+_s(runNumberFromMC)+" exitting now");
+		exit(-1);
+	}
+	//////////////////////////////////////////////////////////////////
+	
+	return puPeriodName;
+}
+
+TString analysisSkeleton::binomialDecision()
+{
+	_DEBUG("analysisSkeleton::binomialDecision");
+
+	Int_t Nmax = 1;
+	Double_t n1 = 390.364; // periodItoK1 with EF_mu22
+	Double_t n2 = 470.015; // periodItoK1 with EF_mu22_medium
+	Double_t p = n2/(n1+n2);
+	Int_t r = randGen->Binomial(Nmax,p);
+	if     (r==0) return "1";
+	else if(r==1) return "2";
+	else
+	{
+		_ERROR("r="+_s(r)+" isnot supported, exitting now");
 		exit(-1);
 	}
 	
-	return mcRootHistName;
+	return "2";
 }
 
-void analysisSkeleton::resetPileupParameters(string sPeriodNameFromMC, int runNumberFromMC)
+void analysisSkeleton::resetPileupParameters(int runNumberFromMC)
 {
 	_DEBUG("analysisSkeleton::resetPileupParameters");
 
-	TString mcRootHistName = setPileupMChisto(sPeriodNameFromMC, runNumberFromMC);
+	TString mcRootHistName = setPileupPeriodName(runNumberFromMC);
+	
+	TString dataRootFileName = "";
+	if(runNumberFromMC==185649)
+	{
+		string randomized_suffix = (string)binomialDecision();
+		dataRootFileName  = (TString)utilities::checkANDsetFilepath("PWD", "/../conf/"+(string)mcRootHistName+"_"+randomized_suffix+".root");;
+	}
+	else dataRootFileName = (TString)utilities::checkANDsetFilepath("PWD", "/../conf/"+(string)mcRootHistName+".root");
 	
 	pileUpLumiWeight = getPileupPeriodsWeight(mcRootHistName);
 	
-	int isGood = pileuprw->initialize( m_dataRootFileName, m_dataRootHistName, m_mcRootFileName, mcRootHistName );
+	// int isGood = pileuprw->initialize( m_dataRootFileName, m_dataRootHistName, m_mcRootFileName, mcRootHistName );
+	int isGood = pileuprw->initialize( dataRootFileName, m_dataRootHistName, m_mcRootFileName, mcRootHistName );
 	if(isGood!=0)
 	{
 		_ERROR("pileup reweighting isGood!=0, exitting now");
@@ -2683,6 +2733,7 @@ void analysisSkeleton::fillTruth()
 		graphicObjects::all_mc_event_number   = mc_event_number;
 		graphicObjects::all_mc_event_weight   = mc_event_weight;
 		
+		graphicObjects::all_RunNumber          = RunNumber;
 		graphicObjects::all_pileup_weight      = pileup_weight;
 		graphicObjects::all_intime_pileup_weight = intime_pileup_weight;
 		graphicObjects::all_outoftime_pileup_weight = outoftime_pileup_weight;

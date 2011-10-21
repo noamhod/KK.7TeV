@@ -37,6 +37,7 @@
 #include <TDOMParser.h>
 #include <TXMLNode.h>
 #include <TXMLAttr.h>
+#include <TEventList.h>
 
 #include <RooFit.h>
 #include <RooRealVar.h>
@@ -98,6 +99,7 @@ typedef map<string, TH1*>       TMapSP2TH1;
 typedef map<string, vector<TH1*> > TMapSvTH1;
 typedef map<string, TH2*>       TMapSP2TH2;
 typedef map<string, TGraph*>    TMapSP2TGraph;
+typedef map<TString, TString>   TMapTSTS;
 typedef map<TString, TH1*>      TMapTSP2TH1;
 typedef map<TString, TH2*>      TMapTSP2TH2;
 typedef map<TString, TGraph*>   TMapTSP2TGraph;
@@ -113,6 +115,7 @@ typedef map<string, int>        TMapsi;
 typedef map<string, bool>       TMapsb;
 typedef map<double, string>     TMapds;
 typedef map<double, int>        TMapdi;
+typedef map<TString, vector<float> >  TMapTSvf;
 typedef map<string, vector<double> >  TMapsvd;
 typedef map<string, vector<double>* > TMapsP2vd;
 typedef map<string, vector<float>* > TMapsP2vf;

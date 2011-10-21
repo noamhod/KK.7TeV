@@ -29,6 +29,7 @@ public:
 	bool AS_isMC;
 	SmearingClass* MCPpTsmearing;
 	
+	TRandom* randGen;
 	Root::TPileupReweighting* pileuprw;
 	TString m_dataRootFileName;
 	TString m_dataRootHistName;
@@ -610,8 +611,9 @@ public:
 	void setPileupPeriodsIntegral(TString mcRootFileName, vector<TString>& vhNames);
 	float getPileupPeriodsWeight(TString hName);
 	void setPileupParameters(TString dataRootFileName, TString dataRootHistName, TString mcRootFileName, TString mcRootHistName);
-	TString setPileupMChisto(string sPeriodNameFromMC, int runNumberFromMC);
-	void resetPileupParameters(string sPeriodNameFromMC, int runNumberFromMC);
+	TString setPileupPeriodName(int runNumberFromMC);
+	TString binomialDecision();
+	void resetPileupParameters(int runNumberFromMC);
 	float getPileUpWeight(bool isIntime);
 	
 	void setPtCandidatesFile(string sCandFilePath = "", string srunnumber = "");

@@ -16,10 +16,6 @@ static clock_t clockEnd;
 class utilities
 {
 	public:
-		/*
-		static string          m_skey;
-		static vector<double>  m_dval;
-		*/
 		
 	public:
 		utilities();
@@ -35,14 +31,6 @@ class utilities
 		static string checkANDsetFilepath(string envPath, string fileName);
 		string removeDoubleDot(string spath);
 		bool   checkPath(string envPath);
-
-		/*
-		static void   parseKeyValLine(string sLine);
-		static int    getNVals();
-		static string getKey();
-		static double getVal(int valNum);
-		static void   parseFile(string sFilePath);
-		*/
 };
 #endif
 

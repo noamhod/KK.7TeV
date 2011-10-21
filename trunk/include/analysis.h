@@ -87,6 +87,11 @@ public:
 		nNmu = 0;
 		
 		previous_runnumber = 0;
+		
+		randGen = new TRandom();
+		randGen->SetSeed(0); // Note that the machine clock is returned with a precision of 1 second.
+		// If one calls SetSeed(0) within a loop and the loop time is less than 1s,
+		// all generated numbers will be identical!
 	}
 	~analysis();
 	

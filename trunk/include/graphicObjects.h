@@ -647,6 +647,7 @@ class graphicObjects// : public utilities
 		unsigned int all_mc_event_number;
 		double all_mc_event_weight;
 		
+		int all_RunNumber;
 		float all_pileup_weight;
 		float all_intime_pileup_weight;
 		float all_outoftime_pileup_weight;

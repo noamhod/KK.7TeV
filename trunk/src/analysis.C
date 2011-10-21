@@ -233,16 +233,14 @@ void analysis::setEventVariables()
 		if(m_WZphysD3PD->RunNumber!=analysisSkeleton::previous_runnumber)
 		{
 			// if(pileuprw!=NULL) delete pileuprw;
-			// string sDataPeriodFromMC = getPeriod( m_WZphysD3PD->RunNumber, m_firstrun2periodMap, m_lastrun2periodMap );
 			// TString pileuphist_data  = (TString)utilities::checkANDsetFilepath("PWD", "/../conf/CURRENT_iLUMICALC_HISTOGRAMS.root");
 			// TString pileuphist_mc    = (TString)utilities::checkANDsetFilepath("PWD", "/../conf/muhist_MC11a.root");
-			// TString mcRootHistName   = setPileupMChisto(sDataPeriodFromMC, m_WZphysD3PD->RunNumber);
+			// TString mcRootHistName   = setPileupPeriodName(m_WZphysD3PD->RunNumber);
 			// setPileupParameters(pileuphist_data, "avgintperbx", pileuphist_mc, mcRootHistName);
 		
-			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			string sDataPeriodFromMC = getPeriod( m_WZphysD3PD->RunNumber, m_firstrun2periodMap, m_lastrun2periodMap ); //////
-			resetPileupParameters(sDataPeriodFromMC,m_WZphysD3PD->RunNumber); ////////////////////////////////////////////////
-			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////
+			resetPileupParameters(m_WZphysD3PD->RunNumber); //////
+			//////////////////////////////////////////////////////
 			
 			analysisSkeleton::previous_runnumber = m_WZphysD3PD->RunNumber;
 		}

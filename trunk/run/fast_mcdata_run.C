@@ -14,7 +14,10 @@ TMapTSP2TH2   h2Map;
 TMapSP2TGraph grMap;
 TMapTSP2TLINE linMap;
 TMapTSP2TTREE treMap;
+TMapTSTS      pathMap;
 TMapTSd       wgtMap;
+TMapTSd       mcSigmaMap;
+TMapTSvf      mcPeriodsNevtsMap;
 float nDYmumu70to110 = 0;
 float nDYmumu70to110_nopileup = 0;
 float nData70to110   = 0;
@@ -67,6 +70,7 @@ unsigned int all_mc_channel_number;
 unsigned int all_mc_event_number;
 double all_mc_event_weight;
 
+int   all_RunNumber;
 float all_pileup_weight;
 float all_lumi_pileup_weight;
 float all_EW_kfactor_weight;
@@ -352,18 +356,57 @@ void save(TString oDir)
 void setMCtree(TString fPath, TString name, Double_t N, Double_t sigma)
 {
 	_DEBUG("setMCtree");
-
+	
 	file = new TFile(fPath,"READ");
 	treMap.insert( make_pair(name, (TTree*)file->Get("truth/truth_tree")->Clone("")) );
 	wgtMap.insert( make_pair(name, luminosity/(N/sigma)) );
+	mcSigmaMap.insert( make_pair(name, sigma) );
+	pathMap.insert( make_pair(name, fPath) );
+	
+	
+	// http://root.cern.ch/root/roottalk/roottalk03/4281.html
+	vector<float> vnEvts;
+	TEventList *elist;
+	Int_t npassed = 0;
+	
+	treMap[name]->Draw(">>elist_periodBtoD",  "all_RunNumber==180164");
+	elist = (TEventList*)gDirectory->Get("elist_periodBtoD");
+	npassed = elist->GetN();  // number of events to pass cuts
+	vnEvts.push_back( (float)npassed );
+	//treMap[name]->SetEventList(elist);
+	treMap[name]->SetEventList(0);
+	
+	treMap[name]->Draw(">>elist_periodEtoH",  "all_RunNumber==183003");
+	elist = (TEventList*)gDirectory->Get("elist_periodEtoH");
+	npassed = elist->GetN();  // number of events to pass cuts
+	vnEvts.push_back( (float)npassed );
+	//treMap[name]->SetEventList(elist);
+	treMap[name]->SetEventList(0);
+	
+	treMap[name]->Draw(">>elist_periodItoK1", "all_RunNumber==185649");
+	elist = (TEventList*)gDirectory->Get("elist_periodItoK1");
+	npassed = elist->GetN();  // number of events to pass cuts
+	vnEvts.push_back( (float)npassed );
+	//treMap[name]->SetEventList(elist);
+	treMap[name]->SetEventList(0);
+	
+	treMap[name]->Draw(">>elist_periodFuture","all_RunNumber==185761");
+	elist = (TEventList*)gDirectory->Get("elist_periodFuture");
+	npassed = elist->GetN();  // number of events to pass cuts
+	vnEvts.push_back( (float)npassed );
+	// treMap[name]->SetEventList(elist);
+	treMap[name]->SetEventList(0);
+	
+	for(unsigned int i=0 ; i<vnEvts.size() ; i++) _INFO((string)name+" -> events in period "+_s(i+1)+" -> "+_s(vnEvts[i]));
+	
+	mcPeriodsNevtsMap.insert( make_pair(name,vnEvts) );
 }
 
 void setDATAtree()
 {
 	_DEBUG("setDATAtree");
 	
-	// fName = "/data/hod/2011/NTUPLE/DATA/merged.root";
-	fName = "/data/hod/2011/NTUPLE/DATA/analysisLocalControl.root";
+	fName = "/data/hod/2011/NTUPLE/analysisLocalControl.root";
 	tName = "allCuts/allCuts_tree";
 	file = new TFile(fName,"READ");
 	tree = (TTree*)file->Get(tName);
@@ -375,20 +418,20 @@ void setMCtrees(TString tsMCname)
 	
 	if(tsMCname=="DYmumu")
 	{
-		// setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_Zmumu.root", "mcLocalControl_Zmumu", 5000000, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
+		// setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Zmumu.root", "mcLocalControl_Zmumu", 5000000, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
 		
-		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_75M120.root", "mcLocalControl_DYmumu_75M120", 20000, 7.9862E-01*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 20000, 8.5275E-03*nb2fb);
+		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_75M120.root", "mcLocalControl_DYmumu_75M120", 20000, 7.9862E-01*nb2fb);
+		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 20000, 8.5275E-03*nb2fb);
 		
-		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_250M400.root", "mcLocalControl_DYmumu_250M400", 20000, 4.1075E-04*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_400M600.root", "mcLocalControl_DYmumu_400M600", 20000, 6.6459E-05*nb2fb);
-		// setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_600M800.root", "mcLocalControl_DYmumu_600M800", 20000, *nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_800M1000.root", "mcLocalControl_DYmumu_800M1000", 20000, 2.6516E-06*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_1000M1250.root", "mcLocalControl_DYmumu_1000M1250", 20000, 8.9229E-07*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_1250M1500.root", "mcLocalControl_DYmumu_1250M1500", 20000, 2.3957E-07*nb2fb);
-		// setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_1500M1750.root", "mcLocalControl_DYmumu_1500M1750", 20000, *nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_1750M2000.root", "mcLocalControl_DYmumu_1750M2000", 20000, 2.4614E-08*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/MC/mcLocalControl_DYmumu_M2000.root", "mcLocalControl_DYmumu_M2000", 20000, 1.4001E-08*nb2fb);
+		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_250M400.root", "mcLocalControl_DYmumu_250M400", 20000, 4.1075E-04*nb2fb);
+		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_400M600.root", "mcLocalControl_DYmumu_400M600", 20000, 6.6459E-05*nb2fb);
+		// setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_600M800.root", "mcLocalControl_DYmumu_600M800", 20000, *nb2fb);
+		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_800M1000.root", "mcLocalControl_DYmumu_800M1000", 20000, 2.6516E-06*nb2fb);
+		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_1000M1250.root", "mcLocalControl_DYmumu_1000M1250", 20000, 8.9229E-07*nb2fb);
+		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_1250M1500.root", "mcLocalControl_DYmumu_1250M1500", 20000, 2.3957E-07*nb2fb);
+		// setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_1500M1750.root", "mcLocalControl_DYmumu_1500M1750", 20000, *nb2fb);
+		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_1750M2000.root", "mcLocalControl_DYmumu_1750M2000", 20000, 2.4614E-08*nb2fb);
+		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_M2000.root", "mcLocalControl_DYmumu_M2000", 20000, 1.4001E-08*nb2fb);
 	}
 }
 
@@ -455,6 +498,8 @@ void setMCbranches()
 	tree->SetBranchAddress( "all_mc_channel_number", &all_mc_channel_number );
 	tree->SetBranchAddress( "all_mc_event_number",   &all_mc_event_number );
 	tree->SetBranchAddress( "all_mc_event_weight",   &all_mc_event_weight );
+	
+	tree->SetBranchAddress( "all_RunNumber",         &all_RunNumber );
 	
 	tree->SetBranchAddress( "all_pileup_weight",      &all_pileup_weight );
 	tree->SetBranchAddress( "all_lumi_pileup_weight", &all_lumi_pileup_weight );
@@ -901,6 +946,54 @@ float dummyPileupWeight(int Nvtx)
 	return wgt;
 }
 
+float getLumiWeight(TString mcName, int mcRunNumber)
+{
+	_DEBUG("getLumiWeight");
+
+	/*//////////////////////////////////////////////////////////////////////
+	B->D:   [178044->180481]: 187.91  pb-1 EF_mu22         wL=0.0527434243
+	E->H:   [180614->184169]: 1015.2  pb-1 EF_mu22         wL=0.284950904
+	I->K1:  [185353->186493]: 390.364 pb-1 EF_mu22         wL=0.241495049
+			[186516->186934]: 470.015 pb-1 EF_mu22_medium
+	Future: [186965->190120]: 1499.23 pb-1 EF_mu22_medium  wL=0.420810622
+	----------------------------------------------------------------------
+	Total:  [178044->190120]: 3562.719 pb-1
+	*///////////////////////////////////////////////////////////////////////
+	
+	int iPeriod = 0;
+	float Ldata = 1.;
+	if     (mcRunNumber==180164) // periodBtoD
+	{
+		iPeriod = 0;
+		Ldata = 0.18791;
+	}
+	else if(mcRunNumber==183003) // periodEtoH
+	{
+		iPeriod = 1;
+		Ldata = 1.0152;
+	}
+	else if(mcRunNumber==185649) // periodItoK1
+	{
+		iPeriod = 2;
+		Ldata = 0.860379;
+	}
+	else if(mcRunNumber==185761) // periodFuture
+	{
+		iPeriod = 3;
+		Ldata = 1.49923;
+	}
+	else
+	{
+		_ERROR("unsupported RunNumber, exitting now");
+		exit(-1);
+	}
+	float N     = mcPeriodsNevtsMap[mcName][iPeriod];
+	float sigma = mcSigmaMap[mcName];
+	float Lmc   = N/sigma;
+	
+	return Ldata/Lmc;
+}
+
 void hfill(TString tsRunType="DATA", TString tsMCname="DYmumu", Double_t wgt=1.)
 {
 	_DEBUG("hfill");
@@ -1003,14 +1096,35 @@ void hfill(TString tsRunType="DATA", TString tsMCname="DYmumu", Double_t wgt=1.)
 				// option 1 for the event weight with pileup
 				// event_weight = all_total_weight;
 				
-				// option 2 for the event weight with pileup
-				event_weight *= all_pileup_weight *
-								all_lumi_pileup_weight; // equivalent to the line above
+				// option 2 for the event weight with pileup and luminosity weight
+				// These are taken from https://twiki.cern.ch/twiki/bin/viewauth/Atlas/MC11a
+				// or from the luminosity itself, both done in the method analysisSkeleton::getPileupPeriodsWeight
+				// event_weight *= all_pileup_weight *
+								// all_lumi_pileup_weight; // equivalent to the line above
+								
+				// option 3 for the event weight with pileup and luminosity weight, normalized to the luminosity itself
+				// event_weight *= all_pileup_weight;
+				// if     (all_RunNumber==180164) event_weight *= 0.0527434243; // periodBtoD
+				// else if(all_RunNumber==183003) event_weight *= 0.284950904;  // periodEtoH
+				// else if(all_RunNumber==185649) event_weight *= 0.241495049;  // periodItoK1
+				// else if(all_RunNumber==185761) event_weight *= 0.420810622;  // periodFuture
+				// else
+				// {
+					// _WARNING("unsupported RunNumber, setting event_weight to 0.");
+					// event_weight *= 0.;
+				// }
 				
-				// option 3 for the event weight with pileup
+				// option 4 for the event weight with pileup but with luminosity weight,
+				// taken as wgt = Ldata/(Nperiod/sigma) where sigma is the MC sample cross section,
+				// and Nperiod is the number of events in each of the four "dummy periods" that are in the MC sample.
+				// So, the luminosity weight is calculated separately for each "dummy period" (this is done in the method setMCtree)
+				// and there's no need to take the "pileup_luminosity_..." weigths from the ntuple
+				event_weight *= all_pileup_weight;
+				
+				// option 5 for the event weight with pileup
 				// dummy_pileup_weight = dummyPileupWeight(recon_all_vxp_n);
 				// if(dummy_pileup_weight<0.) return;
-				// event_weight *= dummy_pileup_weight; // equivalent to the line above
+				// event_weight *= dummy_pileup_weight;
 				
 				// for the event weight without pileup
 				event_weight_nopileup = all_EW_kfactor_weight  *
@@ -1167,8 +1281,9 @@ void run()
 			////////////////////////////////////////////
 			//// blocks of analysis go here ////////////
 			////////////////////////////////////////////
-			hfill("MC", mcName, wgtMap[it->first]); ////
-			////////////////////////////////////////////
+			// hfill("MC", mcName, wgtMap[it->first]); //////////////////////
+			hfill("MC", mcName, getLumiWeight(it->first,all_RunNumber)); ////
+			/////////////////////////////////////////////////////////////////
 		}
 	}
 	

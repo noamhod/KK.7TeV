@@ -413,6 +413,7 @@ void graphicObjects::clearTreeVars()
 	all_mc_event_number   = 0;
 	all_mc_event_weight = -9999.;
 	
+	all_RunNumber = 0;
 	all_pileup_weight  = -9999.;
 	all_intime_pileup_weight = -9999.;
 	all_outoftime_pileup_weight = -9999.;
@@ -1399,6 +1400,7 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_truth->Branch( "all_mc_event_number",   &all_mc_event_number );
 	tree_truth->Branch( "all_mc_event_weight",   &all_mc_event_weight );
 	
+	tree_truth->Branch( "all_RunNumber",  &all_RunNumber );
 	tree_truth->Branch( "all_pileup_weight",  &all_pileup_weight );
 	tree_truth->Branch( "all_intime_pileup_weight", &all_intime_pileup_weight );
 	tree_truth->Branch( "all_outoftime_pileup_weight", &all_outoftime_pileup_weight );

@@ -1,0 +1,615 @@
+<?xml version="1.0" ?>
+<!DOCTYPE LumiRangeCollection
+  SYSTEM 'http://atlas-runquery.cern.ch/LumiRangeCollection.dtd'>
+<!-- Good-runs-list created by AtlRunQuery.py on 2011-09-01 21:11:25.019690 -->
+<LumiRangeCollection>
+   <NamedLumiRange>
+      <Name>Muon</Name>
+      <Version>2.1</Version>
+      <Metadata Name="Query">find run data11_7TeV.periodAllYear and partition ATLAS and db DATA and ptag data11_7TeV and dq global_status DEFECTS#DetStatus-v28-pro08-07 g and dq atlsol DEFECTS#DetStatus-v28-pro08-07 g and dq atltor DEFECTS#DetStatus-v28-pro08-07 g and dq trig_muo DEFECTS#DetStatus-v28-pro08-07 g and dq cp_mu_mmuidcb DEFECTS#DetStatus-v28-pro08-07 g and dq cp_mu_mstaco DEFECTS#DetStatus-v28-pro08-07 g and dq idvx DEFECTS#DetStatus-v28-pro08-07 g and dq idbs DEFECTS#DetStatus-v28-pro08-07 g and dq lumi DEFECTS#DetStatus-v28-pro08-07 g  </Metadata>
+      <Metadata Name="RunList">187815,187812,187811,187763,187552,187219,187196,187014,186965,186934,186933,186923,186878,186877,186873,186755,186753,186729,186721,186673,186669,186533,186532,186516,186493,186456,186399,186396,186361,186275,186217,186216,186182,186180,186179,186178,186169,186156,186049,185998,185976,185856,185823,185761,185747,185731,185649,185644,185518,185353,184169,184130,184088,184074,184072,184066,184022,183963,183780,183602,183581,183580,183544,183462,183426,183412,183407,183391,183347,183286,183272,183216,183130,183129,183127,183081,183079,183078,183054,183045,183038,183021,183003,182997,182886,182879,182796,182787,182766,182747,182726,182519,182518,182516,182486,182456,182455,182454,182450,182449,182424,182372,182346,182284,182161,182013,180776,180710,180664,180636,180614,180481,180448,180400,180309,180242,180241,180225,180212,180164,180153,180149,180144,180139,180124,180122,179940,179939,179938,179804,179771,179739,179725,179710,178109,178047,178044</Metadata>
+      <Metadata Name="RQTSVNVersion">CoolRunQuery-00-04-00</Metadata>
+      <Metadata Name="StreamListInfo">
+         <Stream Name="physics_Background" TotalNumOfEvents="15079850" NumOfSelectedEvents="14185908"/>
+         <Stream Name="physics_CosmicCalo" TotalNumOfEvents="35258172" NumOfSelectedEvents="14368585"/>
+         <Stream Name="physics_CosmicMuons" TotalNumOfEvents="5313959" NumOfSelectedEvents="4697435"/>
+         <Stream Name="physics_Egamma" TotalNumOfEvents="261839674" NumOfSelectedEvents="257908413"/>
+         <Stream Name="physics_EnhancedBias" TotalNumOfEvents="5109856" NumOfSelectedEvents="5109856"/>
+         <Stream Name="physics_IDCosmic" TotalNumOfEvents="218973" NumOfSelectedEvents="214263"/>
+         <Stream Name="physics_JetTauEtmiss" TotalNumOfEvents="316762098" NumOfSelectedEvents="312073267"/>
+         <Stream Name="physics_L1Calo" TotalNumOfEvents="2393310" NumOfSelectedEvents="2378115"/>
+         <Stream Name="physics_MinBias" TotalNumOfEvents="42191924" NumOfSelectedEvents="35762345"/>
+         <Stream Name="physics_Muons" TotalNumOfEvents="243946419" NumOfSelectedEvents="240529668"/>
+         <Stream Name="physics_Standby" TotalNumOfEvents="1040979" NumOfSelectedEvents="0"/>
+         <Stream Name="physics_ZeroBias" TotalNumOfEvents="3756530" NumOfSelectedEvents="3597890"/>
+      </Metadata>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">187815</Run>
+         <LBRange Start="5" End="456"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">187812</Run>
+         <LBRange Start="4" End="214"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">187811</Run>
+         <LBRange Start="205" End="523"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">187763</Run>
+         <LBRange Start="130" End="229"/>
+         <LBRange Start="231" End="433"/>
+         <LBRange Start="457" End="595"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">187552</Run>
+         <LBRange Start="3" End="305"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">187219</Run>
+         <LBRange Start="111" End="612"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">187196</Run>
+         <LBRange Start="3" End="68"/>
+         <LBRange Start="91" End="257"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">187014</Run>
+         <LBRange Start="491" End="1001"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186965</Run>
+         <LBRange Start="161" End="1273"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186934</Run>
+         <LBRange Start="368" End="717"/>
+         <LBRange Start="723" End="1285"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186933</Run>
+         <LBRange Start="323" End="346"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186923</Run>
+         <LBRange Start="74" End="1088"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186878</Run>
+         <LBRange Start="7" End="119"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186877</Run>
+         <LBRange Start="139" End="150"/>
+         <LBRange Start="176" End="729"/>
+         <LBRange Start="731" End="1338"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186873</Run>
+         <LBRange Start="467" End="482"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186755</Run>
+         <LBRange Start="11" End="49"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186753</Run>
+         <LBRange Start="90" End="196"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186729</Run>
+         <LBRange Start="52" End="1146"/>
+         <LBRange Start="1153" End="1333"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186721</Run>
+         <LBRange Start="97" End="787"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186673</Run>
+         <LBRange Start="198" End="416"/>
+         <LBRange Start="421" End="606"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186669</Run>
+         <LBRange Start="370" End="539"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186533</Run>
+         <LBRange Start="185" End="226"/>
+         <LBRange Start="576" End="633"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186532</Run>
+         <LBRange Start="200" End="250"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186516</Run>
+         <LBRange Start="51" End="104"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186493</Run>
+         <LBRange Start="220" End="220"/>
+         <LBRange Start="223" End="516"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186456</Run>
+         <LBRange Start="234" End="689"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186399</Run>
+         <LBRange Start="281" End="425"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186396</Run>
+         <LBRange Start="70" End="756"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186361</Run>
+         <LBRange Start="72" End="224"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186275</Run>
+         <LBRange Start="102" End="463"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186217</Run>
+         <LBRange Start="51" End="159"/>
+         <LBRange Start="161" End="164"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186216</Run>
+         <LBRange Start="4" End="259"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186182</Run>
+         <LBRange Start="35" End="76"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186180</Run>
+         <LBRange Start="114" End="176"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186179</Run>
+         <LBRange Start="382" End="479"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186178</Run>
+         <LBRange Start="125" End="161"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186169</Run>
+         <LBRange Start="139" End="583"/>
+         <LBRange Start="588" End="819"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186156</Run>
+         <LBRange Start="43" End="545"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">186049</Run>
+         <LBRange Start="139" End="788"/>
+         <LBRange Start="792" End="1078"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">185998</Run>
+         <LBRange Start="37" End="126"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">185976</Run>
+         <LBRange Start="381" End="447"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">185856</Run>
+         <LBRange Start="141" End="156"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">185823</Run>
+         <LBRange Start="51" End="61"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">185761</Run>
+         <LBRange Start="182" End="548"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">185747</Run>
+         <LBRange Start="24" End="109"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">185731</Run>
+         <LBRange Start="216" End="290"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">185649</Run>
+         <LBRange Start="52" End="390"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">185644</Run>
+         <LBRange Start="21" End="316"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">185518</Run>
+         <LBRange Start="151" End="300"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">185353</Run>
+         <LBRange Start="26" End="117"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">184169</Run>
+         <LBRange Start="86" End="296"/>
+         <LBRange Start="303" End="528"/>
+         <LBRange Start="531" End="902"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">184130</Run>
+         <LBRange Start="216" End="253"/>
+         <LBRange Start="298" End="539"/>
+         <LBRange Start="582" End="930"/>
+         <LBRange Start="932" End="1407"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">184088</Run>
+         <LBRange Start="166" End="167"/>
+         <LBRange Start="171" End="274"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">184074</Run>
+         <LBRange Start="95" End="108"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">184072</Run>
+         <LBRange Start="37" End="110"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">184066</Run>
+         <LBRange Start="91" End="122"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">184022</Run>
+         <LBRange Start="226" End="1086"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183963</Run>
+         <LBRange Start="209" End="366"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183780</Run>
+         <LBRange Start="399" End="1482"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183602</Run>
+         <LBRange Start="19" End="32"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183581</Run>
+         <LBRange Start="210" End="672"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183580</Run>
+         <LBRange Start="302" End="352"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183544</Run>
+         <LBRange Start="278" End="725"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183462</Run>
+         <LBRange Start="402" End="1330"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183426</Run>
+         <LBRange Start="67" End="122"/>
+         <LBRange Start="129" End="580"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183412</Run>
+         <LBRange Start="405" End="421"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183407</Run>
+         <LBRange Start="147" End="245"/>
+         <LBRange Start="264" End="349"/>
+         <LBRange Start="354" End="975"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183391</Run>
+         <LBRange Start="201" End="550"/>
+         <LBRange Start="561" End="615"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183347</Run>
+         <LBRange Start="757" End="1330"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183286</Run>
+         <LBRange Start="58" End="139"/>
+         <LBRange Start="181" End="625"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183272</Run>
+         <LBRange Start="421" End="650"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183216</Run>
+         <LBRange Start="59" End="700"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183130</Run>
+         <LBRange Start="17" End="499"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183129</Run>
+         <LBRange Start="3" End="146"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183127</Run>
+         <LBRange Start="93" End="312"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183081</Run>
+         <LBRange Start="73" End="984"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183079</Run>
+         <LBRange Start="353" End="375"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183078</Run>
+         <LBRange Start="11" End="52"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183054</Run>
+         <LBRange Start="100" End="276"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183045</Run>
+         <LBRange Start="180" End="518"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183038</Run>
+         <LBRange Start="61" End="80"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183021</Run>
+         <LBRange Start="550" End="605"/>
+         <LBRange Start="616" End="1014"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">183003</Run>
+         <LBRange Start="177" End="349"/>
+         <LBRange Start="351" End="597"/>
+         <LBRange Start="603" End="946"/>
+         <LBRange Start="951" End="1074"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182997</Run>
+         <LBRange Start="61" End="117"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182886</Run>
+         <LBRange Start="48" End="117"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182879</Run>
+         <LBRange Start="331" End="413"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182796</Run>
+         <LBRange Start="77" End="604"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182787</Run>
+         <LBRange Start="125" End="126"/>
+         <LBRange Start="140" End="627"/>
+         <LBRange Start="630" End="747"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182766</Run>
+         <LBRange Start="189" End="276"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182747</Run>
+         <LBRange Start="14" End="39"/>
+         <LBRange Start="55" End="160"/>
+         <LBRange Start="165" End="620"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182726</Run>
+         <LBRange Start="213" End="213"/>
+         <LBRange Start="215" End="276"/>
+         <LBRange Start="281" End="315"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182519</Run>
+         <LBRange Start="3" End="97"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182518</Run>
+         <LBRange Start="163" End="209"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182516</Run>
+         <LBRange Start="284" End="484"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182486</Run>
+         <LBRange Start="155" End="309"/>
+         <LBRange Start="311" End="756"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182456</Run>
+         <LBRange Start="5" End="562"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182455</Run>
+         <LBRange Start="181" End="201"/>
+         <LBRange Start="204" End="215"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182454</Run>
+         <LBRange Start="191" End="405"/>
+         <LBRange Start="408" End="412"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182450</Run>
+         <LBRange Start="145" End="186"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182449</Run>
+         <LBRange Start="7" End="85"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182424</Run>
+         <LBRange Start="112" End="719"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182372</Run>
+         <LBRange Start="5" End="505"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182346</Run>
+         <LBRange Start="108" End="162"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182284</Run>
+         <LBRange Start="318" End="748"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182161</Run>
+         <LBRange Start="286" End="416"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">182013</Run>
+         <LBRange Start="637" End="732"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">180776</Run>
+         <LBRange Start="100" End="113"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">180710</Run>
+         <LBRange Start="394" End="745"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">180664</Run>
+         <LBRange Start="496" End="581"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">180636</Run>
+         <LBRange Start="61" End="1015"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">180614</Run>
+         <LBRange Start="33" End="138"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">180481</Run>
+         <LBRange Start="165" End="958"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">180448</Run>
+         <LBRange Start="122" End="161"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">180400</Run>
+         <LBRange Start="211" End="802"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">180309</Run>
+         <LBRange Start="75" End="522"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">180242</Run>
+         <LBRange Start="90" End="96"/>
+         <LBRange Start="108" End="367"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">180241</Run>
+         <LBRange Start="90" End="352"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">180225</Run>
+         <LBRange Start="4" End="977"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">180212</Run>
+         <LBRange Start="286" End="291"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">180164</Run>
+         <LBRange Start="67" End="1129"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">180153</Run>
+         <LBRange Start="5" End="531"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">180149</Run>
+         <LBRange Start="80" End="262"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">180144</Run>
+         <LBRange Start="97" End="359"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">180139</Run>
+         <LBRange Start="126" End="538"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">180124</Run>
+         <LBRange Start="89" End="592"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">180122</Run>
+         <LBRange Start="210" End="667"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">179940</Run>
+         <LBRange Start="6" End="24"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">179939</Run>
+         <LBRange Start="247" End="515"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">179938</Run>
+         <LBRange Start="53" End="150"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">179804</Run>
+         <LBRange Start="287" End="835"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">179771</Run>
+         <LBRange Start="86" End="177"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">179739</Run>
+         <LBRange Start="158" End="457"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">179725</Run>
+         <LBRange Start="18" End="230"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">179710</Run>
+         <LBRange Start="284" End="576"/>
+         <LBRange Start="586" End="646"/>
+         <LBRange Start="725" End="889"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">178109</Run>
+         <LBRange Start="153" End="848"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">178047</Run>
+         <LBRange Start="97" End="102"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">178044</Run>
+         <LBRange Start="92" End="613"/>
+      </LumiBlockCollection>
+   </NamedLumiRange>
+</LumiRangeCollection>

@@ -57,12 +57,12 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 		_ERROR("YOU CHOSE MCP TAG ["+sMCPtag+"], exitting now");
 		exit(-1);
 	}
-	if(sMCorData!="mc"  &&  sMCorData!="data")
+	if(sMCorData!="mc"  &&  sMCorData!="data"  &&  sMCorData!="mcqsub")
 	{
 		_ERROR("ERROR: YOU CHOSE MC/DATA ["+sMCorData+"], exitting now");
 		exit(-1);
 	}
-	isMC = (sMCorData=="mc") ? true : false;
+	isMC = (sMCorData=="mc" || sMCorData=="mcqsub") ? true : false;
 	for(int i=0 ; i<(int)msglvl.size()-2 ; i++)
 	{
 		ifsel >> sMsgTyp >> sMsgLvl;
@@ -76,7 +76,7 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 			}
 		}
 		msglvl[i] = (sMsgLvl=="SILENT") ? SILENT : VISUAL;
-		_INFO("msglvl["+tostring(i)+"]="+sMsgLvl);
+		_INFO("msglvl["+_s(i)+"]="+sMsgLvl);
 	}
 	
 	m_RunType   = sRun; // "grid" OR "local"
@@ -84,12 +84,14 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	m_pTsmearingType = spTtype; // "pT" OR "q_pT"
 	m_MCPtag = sMCPtag; // "MuonMomentumCorrections-XX-YY-ZZ"
 	m_isMC      = isMC;
+	m_input     = sMCorData;
 	
 	_INFO("m_RunType="+m_RunType);
 	_INFO("m_muRecAlgo="+m_muRecAlgo);
 	_INFO("m_pTsmearingType="+m_pTsmearingType);
 	_INFO("m_MCPtag="+m_MCPtag);
-	_INFO("m_isMC="+sMCorData);
+	_INFO("m_isMC="+_s(m_isMC));
+	_INFO("m_input="+sMCorData);
 	
 	///////////////////////////
 	//setMSGlevel(m_msglvl); ////
@@ -98,7 +100,7 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	ifsel.close();
 }
 
-void analysisLocalControl::initialize(int RunNumber, string runs, string basedir, string localRunControlFile)
+void analysisLocalControl::initialize(string run_number_str, string runs, string basedir, string localRunControlFile)
 {
 	_DEBUG("analysisLocalControl::initialize");
 	
@@ -110,6 +112,8 @@ void analysisLocalControl::initialize(int RunNumber, string runs, string basedir
 		_INFO("reading "+localRunControlFile+" from "+basedir);
 		setRunControl(basedir+"/"+localRunControlFile);
 	}
+	
+	_INFO("run_number_str="+run_number_str);
 
 	// run control
 	l64t_nentries = 0;
@@ -123,67 +127,75 @@ void analysisLocalControl::initialize(int RunNumber, string runs, string basedir
 	string str_tree = "";
 	string str_hist = "";
 	string str_mcp  = "";
-
+	string str_mcname = "";
 
 	string str = "";
-	if(runs=="ALLRUNS")   str = utilities::checkANDsetFilepath("PWD", "/../conf/Z_GRL_CURRENT.xml");	
-	if(runs=="SINGLERUN") str = basedir+"/../conf/Z_GRL_CURRENT.xml";//utilities::checkANDsetFilepath("PWD", "/../conf/Z_GRL_CURRENT.xml");
+	if(runs=="ALLRUNS")   str = basedir+"/../conf/Z_GRL_CURRENT.xml"; // utilities::checkANDsetFilepath("PWD", "/../conf/Z_GRL_CURRENT.xml");	
+	if(runs=="SINGLERUN") str = basedir+"/../conf/Z_GRL_CURRENT.xml";
+	_INFO("LOADING FILE -> "+str);
 	m_GRL = new GRLinterface();
 	m_GRL->glrinitialize( (TString)str );
 	
-	string sMCsample = "";
 	
-	if(m_isMC)
+	int run_number_int = (int)validate_double(run_number_str);
+	if(m_input=="mcqsub")
+	{
+		if(run_number_int==106047)                             str_mcname = "Zmumu";
+		if(run_number_int>=105477  &&  run_number_int<=105487) str_mcname = "DYmumu";
+	}
+	
+	
+	
+	if(m_isMC  &&  m_input!="mcqsub")
 	{
 		//////////////////////////////////////////////
 		// prompt to chose the MC sample here ////////
-		sMCsample = utilities::pickMCinputSampe(); ///
+		str_mcname = utilities::pickMCinputSampe(); ///
 		//////////////////////////////////////////////
 		
-		str_list = utilities::checkANDsetFilepath("PWD", "/../conf/mc_local_dataset_"+sMCsample+".list");
-		str_dir  = "";//utilities::checkANDsetFilepath("PWD", "/mc_local_datasetdir/");
-		str_hist = utilities::checkANDsetFilepath("PWD", "/../data/mcLocalControl_"+sMCsample+".root");
-		str_mcp  = utilities::checkANDsetFilepath("PWD", "/../"+m_MCPtag+"/share/");
+		str_list = basedir+"/../conf/mc_local_dataset_"+str_mcname+".list"; // utilities::checkANDsetFilepath("PWD", "/../conf/mc_local_dataset_"+str_mcname+".list");
+		_INFO("LOADING FILE -> "+str_list);
+		str_dir  = "";
+		_INFO("LOADING FILE -> "+str_dir);
+		str_hist = basedir+"/../data/mcLocalControl_"+str_mcname+".root";   // utilities::checkANDsetFilepath("PWD", "/../data/mcLocalControl_"+str_mcname+".root");
+		_INFO("LOADING FILE -> "+str_hist);
+		str_mcp  = basedir+"/../"+m_MCPtag+"/share/";                       // utilities::checkANDsetFilepath("PWD", "/../"+m_MCPtag+"/share/");
+		_INFO("LOADING FILE -> "+str_mcp);
 		
 		if(m_RunType!="local_noskim")
 		{
-			if(sMCsample=="mcWZphys_localTests") str_dir = utilities::checkANDsetFilepath("PWD", "/");
-			str_tree = utilities::checkANDsetFilepath("PWD", "/../data/mcLocalTree_"+sMCsample+".root");
+			if(str_mcname=="mcWZphys_localTests") str_dir = basedir+"/";    // utilities::checkANDsetFilepath("PWD", "/");
+			_INFO("LOADING FILE -> "+str_dir);
+			str_tree = basedir+"/../data/mcLocalTree_"+str_mcname+".root";  // utilities::checkANDsetFilepath("PWD", "/../data/mcLocalTree_"+str_mcname+".root");
+			_INFO("LOADING FILE -> "+str_tree);
 		}
 	}
 	else
 	{
-		if(runs=="ALLRUNS")   str_list = utilities::checkANDsetFilepath("PWD", "/../conf/NTUP_SMDILEP_DIMUON_RUNS_CURRENT.list");
-		if(runs=="SINGLERUN") str_list = basedir+"/../conf/tmp/"+tostring(RunNumber)+".list";
+		if(runs=="ALLRUNS")   str_list = basedir+"/../conf/NTUP_SMDILEP_DIMUON_RUNS_CURRENT.list";  // utilities::checkANDsetFilepath("PWD", "/../conf/NTUP_SMDILEP_DIMUON_RUNS_CURRENT.list");
+		if(runs=="SINGLERUN") str_list = basedir+"/../conf/tmp/"+run_number_str+".list";
 		
-		str_dir  = "";//utilities::checkANDsetFilepath("PWD", "/local_datasetdir/");
-		str_tree = utilities::checkANDsetFilepath("PWD", "/../data/localTree.root");
+		_INFO("LOADING FILE -> "+str_list);
 		
-		if(runs=="ALLRUNS")   str_hist = utilities::checkANDsetFilepath("PWD", "/../data/analysisLocalControl.root");
-		if(runs=="SINGLERUN") str_hist = basedir+"/../data/tmp/run_"+tostring(RunNumber)+".root";
+		str_dir  = "";
+		_INFO("LOADING FILE -> "+str_dir);
+		str_tree = basedir+"/../data/localTree.root";   // utilities::checkANDsetFilepath("PWD", "/../data/localTree.root");
+		_INFO("LOADING FILE -> "+str_tree);
 		
+		if(runs=="ALLRUNS")   str_hist = basedir+"/../data/analysisLocalControl.root";   // utilities::checkANDsetFilepath("PWD", "/../data/analysisLocalControl.root");
+		if(runs=="SINGLERUN") str_hist = basedir+"/../data/tmp/run_"+run_number_str+".root";
+		_INFO("LOADING FILE -> "+str_hist);
 		
-		
-		// for tests only
-		if(RunNumber==-1)
-		{
-			str_dir  = utilities::checkANDsetFilepath("PWD", "/");
-			str_list = utilities::checkANDsetFilepath("PWD", "/../conf/local_dataset_WZphys_localTests.list");
-		}
+		if(runs=="ALLRUNS")   str_mcp = "";
+		if(runs=="SINGLERUN") str_mcp = basedir+"/../"+m_MCPtag+"/share/";
+		_INFO("LOADING FILE -> "+str_mcp);
 	}
 	
 	vector<string>* vStr2find = NULL; // all the patterns to be found except for ".root"
 	chainInit(vStr2find);
 	
-	if(runs=="ALLRUNS")
-	{
-		if(RunNumber==-1) makeChain(true, str_list, str_dir);
-		else              makeChain(true, str_list, str_dir, RunNumber);
-	}
-	else
-	{
-		makeChain(true, str_list, str_dir);
-	}
+	if(runs=="ALLRUNS") makeChain(true, str_list, str_dir, run_number_int);
+	else                makeChain(true, str_list, str_dir);
 
 	m_WZphysD3PD = new WZphysD3PD( m_chain, m_isMC );
 
@@ -194,40 +206,27 @@ void analysisLocalControl::initialize(int RunNumber, string runs, string basedir
 	m_histfile = new TFile( str_hist.c_str(), "RECREATE");
 	m_histfile->cd();
 	
-	
-	string str_cutflow = "";
-	string str_periods = "";
-	if(runs=="ALLRUNS")
-	{
-		//str_cutflow = utilities::checkANDsetFilepath("PWD", "/../conf/cutFlow.cuts");
-		str_periods = utilities::checkANDsetFilepath("PWD", "/../conf/dataPeriods.data");
-	}
-	if(runs=="SINGLERUN")
-	{
-		str_cutflow = basedir+"/../conf/cutFlow.cuts";
-		str_periods = basedir+"/../conf/dataPeriods.data";
-		
-		//_DEBUG("cutfolw: "+str_cutflow);
-		_DEBUG("periods: "+str_periods);
-	}
-	
 	string str_events = "";
-	if(runs=="ALLRUNS")   str_events = utilities::checkANDsetFilepath("PWD", "/interestingEvents.dump");
-	if(runs=="SINGLERUN") str_events = basedir+"/../run/tmp/interestingEvents_"+tostring(RunNumber)+".dump";
+	if(runs=="ALLRUNS")   str_events = basedir+"/../run/interestingEvents.dump";  // utilities::checkANDsetFilepath("PWD", "/interestingEvents.dump");
+	if(runs=="SINGLERUN") str_events = basedir+"/../run/tmp/interestingEvents_"+run_number_str+".dump";
+	_INFO("LOADING FILE -> "+str_events);
 	m_analysis = new analysis(m_RunType, m_muRecAlgo, m_isMC,
 							  m_WZphysD3PD, m_GRL, m_treefile, str_events );
 	
 	string str_logspath = "";
-	if(runs=="ALLRUNS")   str_logspath = utilities::checkANDsetFilepath("PWD", "");
+	if(runs=="ALLRUNS")   str_logspath = basedir+"/../run";  // utilities::checkANDsetFilepath("PWD", "");
 	if(runs=="SINGLERUN") str_logspath = basedir+"/../run/tmp";
+	_INFO("LOADING FILE -> "+str_logspath);
 	m_analysis->setMC(m_isMC);
 	if(m_isMC) m_analysis->setMCPpTparameters(m_muRecAlgo, m_pTsmearingType, str_mcp);
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	string str_pileuphist_data = utilities::checkANDsetFilepath("PWD", "/../conf/periodBtoD.root"); ////////////
-	// string str_pileuphist_data = utilities::checkANDsetFilepath("PWD", "/../conf/CURRENT_iLUMICALC_HISTOGRAMS.root"); ////////////
-	// string str_pileuphist_mc   = utilities::checkANDsetFilepath("PWD", "/../conf/mu_mc10b.root"); /////////////////////////////
-	string str_pileuphist_mc   = utilities::checkANDsetFilepath("PWD", "/../conf/muhist_MC11a.root"); ////////////////////////////
+	string str_pileuphist_data = basedir+"/../conf/periodBtoD.root";                       // utilities::checkANDsetFilepath("PWD", "/../conf/periodBtoD.root"); ////////////
+	// string str_pileuphist_data = basedir+"/../conf/CURRENT_iLUMICALC_HISTOGRAMS.root";  // utilities::checkANDsetFilepath("PWD", "/../conf/CURRENT_iLUMICALC_HISTOGRAMS.root"); ////////////
+	_INFO("LOADING FILE -> "+str_pileuphist_data);
+	string str_pileuphist_mc   = basedir+"/../conf/muhist_MC11a.root";  // utilities::checkANDsetFilepath("PWD", "/../conf/muhist_MC11a.root"); ////////////////////////////
+	// string str_pileuphist_mc   = basedir+"/../conf/mu_mc10b";                           // utilities::checkANDsetFilepath("PWD", "/../conf/mu_mc10b.root"); /////////////////////////////
+	_INFO("LOADING FILE -> "+str_pileuphist_mc);
 	m_vhNames.push_back("periodBtoD");
 	m_vhNames.push_back("periodEtoH");
 	m_vhNames.push_back("periodItoK1");
@@ -237,12 +236,12 @@ void analysisLocalControl::initialize(int RunNumber, string runs, string basedir
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	///////////////////////////////////////////
-	m_analysis->sMCsampleName = sMCsample; ////
+	m_analysis->sMCsampleName = str_mcname; ////
 	///////////////////////////////////////////
 	
-	m_analysis->setCutFlowFile(str_logspath, tostring(RunNumber));
-	m_analysis->setPtCandidatesFile(str_logspath, tostring(RunNumber));
-	m_analysis->setAllCandidatesFiles(str_logspath, tostring(RunNumber));
+	m_analysis->setCutFlowFile(str_logspath, run_number_str);
+	m_analysis->setPtCandidatesFile(str_logspath, run_number_str);
+	m_analysis->setAllCandidatesFiles(str_logspath, run_number_str);
 	
 	m_analysis->setStyle((TString)basedir+"/../src");
 	

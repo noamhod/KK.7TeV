@@ -38,10 +38,7 @@ using namespace fitparameters;
 #define ANALYSISMUDULES_H
 
 class analysisModules : public selection,
-						//public cutFlowHandler,
 						public xmlconfig,
-						//public periodHandler,
-						//public monteCarloHandler,
 						public eventDumper,
 						public graphicObjects,
 						public fit,
@@ -53,8 +50,11 @@ class analysisModules : public selection,
 		analysisModules(string sEventDumpFilePath) :
 		eventDumper(sEventDumpFilePath)
 		{
-			string str_xml_path = utilities::checkANDsetFilepath("PWD", "/../xml");
-			xmlconfig::get(str_xml_path/*"/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/xml"*/);
+			_DEBUG("analysisModules::analysisModules");
+			
+			string str_xml_path = utilities::checkANDsetFilepath("BASEDIR", "/../xml");
+			_INFO("getting the xml file from this directory: "+str_xml_path);
+			xmlconfig::get(str_xml_path);
 			
 			if(sEventDumpFilePath != "") setInterestingThreshold( 646.33*GeV2TeV );
 			

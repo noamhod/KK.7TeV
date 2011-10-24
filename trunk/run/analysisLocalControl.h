@@ -41,6 +41,7 @@ class analysisLocalControl : public chainMaker/*, public utilities*/
 		string m_pTsmearingType;
 		string m_MCPtag;
 		string m_RunType;
+		string m_input;
 		bool   m_isMC;
 		int    m_msglvl;
 		
@@ -81,7 +82,7 @@ class analysisLocalControl : public chainMaker/*, public utilities*/
 		//void GetEntryMinimal(Long64_t entry);
 		
 		void setRunControl(string localRunControlFile);
-		void initialize(int runNumber = 0, string runs="ALLRUNS", string basedir="", string localRunControlFile = "localRunControl_noSkim.txt");
+		void initialize(string run_number_str = "0", string runs="ALLRUNS", string basedir="", string localRunControlFile = "localRunControl_noSkim.txt");
 		void finalize();
 		
 		void book();

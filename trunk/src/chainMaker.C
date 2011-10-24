@@ -27,6 +27,7 @@ void chainMaker::chainInit(vector<string>* vStr2find)
 void chainMaker::list2chain(string sListFilePath, string sListContentAbsolutePath, int runNumber)
 {
 	ifstream file;
+	_INFO("sListFilePath="+sListFilePath);
 	file.open(sListFilePath.c_str());
 	string sLine;
 	size_t pos;

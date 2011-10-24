@@ -78,7 +78,7 @@ string log(const char* file, int line, int type, int level, string message)
 	return os.str();
 }
 
-#define LOG(x,y,z)  log(__FILE__, __LINE__,  (x), (y),    (z)) // general log
+#define LOG(x,y,z)  log(__FILE__, __LINE__,  (x), (y),   (z)) // general log
 #define _DEBUG(x)   log(__FILE__, __LINE__, DBG, VISUAL, (x)) // for DEBUG VISUAL
 #define _INFO(x)    log(__FILE__, __LINE__, INF, VISUAL, (x)) // for INFO VISUAL
 #define _WARNING(x) log(__FILE__, __LINE__, WRN, VISUAL, (x)) // for WARNING VISUAL
@@ -132,7 +132,11 @@ static inline string tostring(short x)
 
 static inline string tostring(unsigned short x)
 {
-	return tostring((short)x);
+	stringstream strm;
+	string str;
+	strm << x;
+	strm >> str;
+	return str;
 }
 
 static inline string tostring(int x)
@@ -146,7 +150,11 @@ static inline string tostring(int x)
 
 static inline string tostring(unsigned int x)
 {
-	return tostring((int)x);
+	stringstream strm;
+	string str;
+	strm << x;
+	strm >> str;
+	return str;
 }
 
 static inline string tostring(double x)
@@ -160,7 +168,11 @@ static inline string tostring(double x)
 
 static inline string tostring(float x)
 {
-	return tostring((double)x);
+	stringstream strm;
+	string str;
+	strm << x;
+	strm >> str;
+	return str;
 }
 
 static inline string tostring(double x, int prcn)
@@ -172,10 +184,13 @@ static inline string tostring(double x, int prcn)
 	return str;
 }
 
-
 static inline string tostring(float x, int prcn)
 {
-	return tostring((double)x, prcn);
+	stringstream strm;
+	string str;
+	strm << setprecision(prcn) << fixed << x; 
+	strm >> str;
+	return str;
 }
 
 static inline int toint(string str)
@@ -196,14 +211,16 @@ static inline double todouble(string str)
 	return x;
 }
 
-static inline double validate_double(const char* cc) { return validate_double((string)cc); }
-static inline int    validate_int(string str)        { return (int)validate_double(str); }
-static inline int    validate_int(const char* cc)    { return validate_int((string)cc); }
-static inline float  validate_float(string str)      { return (float)validate_double(str); }
-static inline float  validate_float(const char* cc)  { return validate_float((string)cc); }
-static inline bool   validate_bool(const char* cc)   { return validate_bool((string)cc); }		
-static inline int    toint(const char* cc)           { return toint((string)cc); }
-static inline double todouble(const char* cc)        { return todouble((string)cc); }
+static inline double       validate_double(const char* cc) { return validate_double((string)cc); }
+static inline unsigned int validate_uint(string str)       { return (unsigned int)validate_double(str); }
+static inline unsigned int validate_uint(const char* cc)   { return validate_uint((string)cc); }
+static inline int          validate_int(string str)        { return (int)validate_double(str); }
+static inline int          validate_int(const char* cc)    { return validate_int((string)cc); }
+static inline float        validate_float(string str)      { return (float)validate_double(str); }
+static inline float        validate_float(const char* cc)  { return validate_float((string)cc); }
+static inline bool         validate_bool(const char* cc)   { return validate_bool((string)cc); }		
+static inline int          toint(const char* cc)           { return toint((string)cc); }
+static inline double       todouble(const char* cc)        { return todouble((string)cc); }
 
 static inline string _s(unsigned int x)     {return tostring(x);}
 static inline string _s(int x)              {return tostring(x);}

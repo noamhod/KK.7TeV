@@ -179,10 +179,10 @@ string utilities::checkANDsetFilepath(string envPath, string fileName)
 		fullPath = newpath.substr(0,newpos) + fin;
 		//cout << "\t file path was: " << oldPath << endl;
 		//cout << "\t corrected to: " << fullPath << endl;
-		_INFO("file path: "+fullPath);
+		_DEBUG("file path: "+fullPath);
 	}
 
-	if (!isDoubledot) {_INFO("file path: "+fullPath);}
+	if (!isDoubledot) {_DEBUG("file path: "+fullPath);}
 
 	return(fullPath);
 }

@@ -54,6 +54,7 @@ void graphicObjects::clearTreeVars()
 	QCD_kfactor_weight = -9999.;
 	mcevent_weight = -9999.;
 	total_weight   = -9999.;
+	randomized_decision = 999;
 	
 	iLeadingMuon    = -9999;
 	iSubLeadingMuon = -9999;
@@ -422,6 +423,7 @@ void graphicObjects::clearTreeVars()
 	all_QCD_kfactor_weight = -9999.;
 	all_mcevent_weight = -9999.;
 	all_total_weight   = -9999.;
+	all_randomized_decision = 999;
 	
 	all_vxp_n = 0;
 	
@@ -955,6 +957,7 @@ TDirectory* tDir_efficiency)
 	tree_allCuts->Branch( "QCD_kfactor_weight", &QCD_kfactor_weight );
 	tree_allCuts->Branch( "mcevent_weight", &mcevent_weight );
 	tree_allCuts->Branch( "total_weight",   &total_weight );
+	tree_allCuts->Branch( "randomized_decision",   &randomized_decision );
 	
 	tree_allCuts->Branch( "vxp_n",       &vxp_n );
 	tree_allCuts->Branch( "vxp_nTracks", &vxp_nTracks );
@@ -1409,6 +1412,7 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_truth->Branch( "all_QCD_kfactor_weight", &all_QCD_kfactor_weight );
 	tree_truth->Branch( "all_mcevent_weight", &all_mcevent_weight );
 	tree_truth->Branch( "all_total_weight",   &all_total_weight );
+	tree_truth->Branch( "all_randomized_decision",   &all_randomized_decision );
 	
 	tree_truth->Branch( "all_vxp_n",   &all_vxp_n );
 	

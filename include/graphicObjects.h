@@ -272,6 +272,7 @@ class graphicObjects// : public utilities
 		float QCD_kfactor_weight;
 		float mcevent_weight;
 		float total_weight;
+		unsigned int randomized_decision;
 		
 		int iLeadingMuon;
 		int iSubLeadingMuon;
@@ -656,6 +657,7 @@ class graphicObjects// : public utilities
 		float all_QCD_kfactor_weight;
 		float all_mcevent_weight;
 		float all_total_weight;
+		unsigned int all_randomized_decision;
 		
 		int all_vxp_n;
 		

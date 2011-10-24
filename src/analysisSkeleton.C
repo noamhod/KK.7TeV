@@ -22,6 +22,25 @@ analysisSkeleton::~analysisSkeleton()
 
 void analysisSkeleton::setMCPpTparameters(string sAlgo, string spTtype, string sDataPath)
 {
+	_DEBUG("analysisSkeleton::setMCPpTparameters");
+	if(sDataPath=="")
+	{
+		_ERROR("sDataPath string is empty, exitting now");
+		exit(-1);
+	}
+	
+	if(spTtype!="pT"  &&  spTtype!="q_pT")
+	{
+		_ERROR("spTtype string is unrecognized, exitting now");
+		exit(-1);
+	}
+	
+	if(sAlgo!="staco"  &&  sAlgo!="muid")
+	{
+		_ERROR("sAlgo string is unrecognized, exitting now");
+		exit(-1);
+	}
+
 	MCPpTsmearing = new SmearingClass(sAlgo,spTtype,sDataPath);
 	MCPpTsmearing->UseScale(1);
 }
@@ -230,17 +249,24 @@ TString analysisSkeleton::binomialDecision()
 	return "2";
 }
 
-void analysisSkeleton::resetPileupParameters(int runNumberFromMC)
+void analysisSkeleton::resetPileupParameters(int runNumberFromMC, string randomized_suffix)
 {
 	_DEBUG("analysisSkeleton::resetPileupParameters");
-
+	
 	TString mcRootHistName = setPileupPeriodName(runNumberFromMC);
 	
 	TString dataRootFileName = "";
 	if(runNumberFromMC==185649)
 	{
-		string randomized_suffix = (string)binomialDecision();
-		dataRootFileName  = (TString)utilities::checkANDsetFilepath("PWD", "/../conf/"+(string)mcRootHistName+"_"+randomized_suffix+".root");;
+		if(randomized_suffix=="1" || randomized_suffix=="2")
+		{
+			dataRootFileName  = (TString)utilities::checkANDsetFilepath("PWD", "/../conf/"+(string)mcRootHistName+"_"+randomized_suffix+".root");
+		}
+		else
+		{
+			_ERROR("unrecognized randomized_suffix="+randomized_suffix+", exitting now");
+			exit(-1);
+		}
 	}
 	else dataRootFileName = (TString)utilities::checkANDsetFilepath("PWD", "/../conf/"+(string)mcRootHistName+".root");
 	
@@ -312,6 +338,13 @@ void analysisSkeleton::setPtCandidatesFile(string sCandFilePath, string srunnumb
 	
 	string sLogFileName = sCandFilePath+"/candidates_pT.run_"+srunnumber+".cnd";//".time_"+getDateHour()+".cnd";
 	fCand = new ofstream( sLogFileName.c_str() );
+}
+
+void analysisSkeleton::setBaseDir(string sBaseDirPath)
+{
+	_DEBUG("analysisSkeleton::setBaseDir");
+	
+	base_dir_path = sBaseDirPath;
 }
 
 void analysisSkeleton::resetMuQAflags(int nMus)
@@ -861,6 +894,7 @@ void analysisSkeleton::fillAfterCuts()
 		graphicObjects::QCD_kfactor_weight = QCD_kfactor_weight;
 		graphicObjects::mcevent_weight     = mcevent_weight;
 		graphicObjects::total_weight       = total_weight;
+		graphicObjects::randomized_decision = randomized_decision;
 	}
 	
 	graphicObjects::ivxp            = current_ivertex;
@@ -2742,6 +2776,7 @@ void analysisSkeleton::fillTruth()
 		graphicObjects::all_QCD_kfactor_weight = QCD_kfactor_weight;
 		graphicObjects::all_mcevent_weight     = mcevent_weight;
 		graphicObjects::all_total_weight       = total_weight;
+		graphicObjects::all_randomized_decision = randomized_decision;
 		
 		graphicObjects::all_vxp_n = -999;
 		truth_all_mc_vxp_n = -999;

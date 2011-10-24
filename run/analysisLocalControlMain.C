@@ -32,13 +32,9 @@ void prepare(TString sGRLtag, TString sRunDir="", TString sGdb="") // do not use
 	gROOT->ProcessLine(".L "+sRunDir+"../MuonMomentumCorrections-"+sMCPtag+"/StandAlone/libMuonMomentumCorrections.so");
 
 	gROOT->ProcessLine(".include "+sRunDir+"../PileupReweighting-"+sPRWtag+"/");
-        gROOT->ProcessLine(".include "+sRunDir+"../PileupReweighting-"+sPRWtag+"/PileupReweighting/");
-        gROOT->ProcessLine(".include "+sRunDir+"../PileupReweighting-"+sPRWtag+"/Root/");
-        gROOT->ProcessLine(".L "+sRunDir+"../PileupReweighting-"+sPRWtag+"/StandAlone/libPileupReweighting.so");
-	
-	// gROOT->ProcessLine(".include "+sRunDir+"../MuonMomentumCorrections-00-02-04/root/");
-	
-	// gROOT->ProcessLine(".include "+sRunDir+"../MuonMomentumCorrections-00-02-06/root/");
+    gROOT->ProcessLine(".include "+sRunDir+"../PileupReweighting-"+sPRWtag+"/PileupReweighting/");
+    gROOT->ProcessLine(".include "+sRunDir+"../PileupReweighting-"+sPRWtag+"/Root/");
+    gROOT->ProcessLine(".L "+sRunDir+"../PileupReweighting-"+sPRWtag+"/StandAlone/libPileupReweighting.so");:
 }
 
 void compile(TString sGRLtag, TString sRunDir="", TString sGdb="") // for re-compilation

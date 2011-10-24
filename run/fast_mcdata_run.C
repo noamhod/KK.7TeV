@@ -72,11 +72,14 @@ double all_mc_event_weight;
 
 int   all_RunNumber;
 float all_pileup_weight;
+float all_intime_pileup_weight;
+float all_outoftime_pileup_weight;
 float all_lumi_pileup_weight;
 float all_EW_kfactor_weight;
 float all_QCD_kfactor_weight;
 float all_mcevent_weight;
 float all_total_weight;
+unsigned int all_randomized_decision;
 
 bool truth_all_isValid;
 vector<float>* truth_all_mc_pt;
@@ -383,8 +386,15 @@ void setMCtree(TString fPath, TString name, Double_t N, Double_t sigma)
 	//treMap[name]->SetEventList(elist);
 	treMap[name]->SetEventList(0);
 	
-	treMap[name]->Draw(">>elist_periodItoK1", "all_RunNumber==185649");
-	elist = (TEventList*)gDirectory->Get("elist_periodItoK1");
+	treMap[name]->Draw(">>elist_periodItoK1_1", "all_RunNumber==185649  &&  all_randomized_decision==1");
+	elist = (TEventList*)gDirectory->Get("elist_periodItoK1_1");
+	npassed = elist->GetN();  // number of events to pass cuts
+	vnEvts.push_back( (float)npassed );
+	//treMap[name]->SetEventList(elist);
+	treMap[name]->SetEventList(0);
+	
+	treMap[name]->Draw(">>elist_periodItoK1_2", "all_RunNumber==185649  &&  all_randomized_decision==2");
+	elist = (TEventList*)gDirectory->Get("elist_periodItoK1_2");
 	npassed = elist->GetN();  // number of events to pass cuts
 	vnEvts.push_back( (float)npassed );
 	//treMap[name]->SetEventList(elist);
@@ -418,10 +428,10 @@ void setMCtrees(TString tsMCname)
 	
 	if(tsMCname=="DYmumu")
 	{
-		// setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Zmumu.root", "mcLocalControl_Zmumu", 5000000, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
+		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Zmumu.root", "mcLocalControl_Zmumu", 5000000, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
 		
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_75M120.root", "mcLocalControl_DYmumu_75M120", 20000, 7.9862E-01*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 20000, 8.5275E-03*nb2fb);
+		// setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_75M120.root", "mcLocalControl_DYmumu_75M120", 20000, 7.9862E-01*nb2fb);
+		// setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 20000, 8.5275E-03*nb2fb);
 		
 		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_250M400.root", "mcLocalControl_DYmumu_250M400", 20000, 4.1075E-04*nb2fb);
 		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_400M600.root", "mcLocalControl_DYmumu_400M600", 20000, 6.6459E-05*nb2fb);
@@ -502,11 +512,14 @@ void setMCbranches()
 	tree->SetBranchAddress( "all_RunNumber",         &all_RunNumber );
 	
 	tree->SetBranchAddress( "all_pileup_weight",      &all_pileup_weight );
+	tree->SetBranchAddress( "all_intime_pileup_weight",    &all_intime_pileup_weight );
+	tree->SetBranchAddress( "all_outoftime_pileup_weight", &all_outoftime_pileup_weight );
 	tree->SetBranchAddress( "all_lumi_pileup_weight", &all_lumi_pileup_weight );
 	tree->SetBranchAddress( "all_EW_kfactor_weight",  &all_EW_kfactor_weight );
 	tree->SetBranchAddress( "all_QCD_kfactor_weight", &all_QCD_kfactor_weight );
 	tree->SetBranchAddress( "all_mcevent_weight",     &all_mcevent_weight );
 	tree->SetBranchAddress( "all_total_weight",       &all_total_weight );
+	tree->SetBranchAddress( "all_randomized_decision",&all_randomized_decision );
 
 	tree->SetBranchAddress("truth_all_isValid", &truth_all_isValid);
 	tree->SetBranchAddress("truth_all_mc_pt", &truth_all_mc_pt);
@@ -907,33 +920,33 @@ float dummyPileupWeight(int Nvtx)
 	switch(Nvtx)
 	{
 		case 1:  wgt=0.;         err=0.;          break;
-		case 2:  wgt=1.25141;    err=0.00577822;  break;
-		case 3:  wgt=1.16239;    err=0.00222276;  break;
-		case 4:  wgt=1.05372;    err=0.000841156; break;
-		case 5:  wgt=0.9909;     err=0.000282838; break;
-		case 6:  wgt=0.959231;   err=0.00057051;  break;
-		case 7:  wgt=0.960658;   err=0.000598648; break;
-		case 8:  wgt=1.01366;    err=0.000420445; break;
-		case 9:  wgt=1.11505;    err=0.00157366;  break;
-		case 10: wgt=1.2236;     err=0.0029407;   break;
-		case 11: wgt=1.31968;    err=0.00476801;  break;
-		case 12: wgt=1.33966;    err=0.00640612;  break;
-		case 13: wgt=1.13993;    err=0.00463242;  break;
-		case 14: wgt=0.807529;   err=0.00522407;  break;
-		case 15: wgt=0.502941;   err=0.00724853;  break;
-		case 16: wgt=0.286545;   err=0.00710636;  break;
-		case 17: wgt=0.15919;    err=0.00605587;  break;
-		case 18: wgt=0.0809666;  err=0.00481376;  break;
-		case 19: wgt=0.0428478;  err=0.00379524;  break;
-		case 20: wgt=0.0262842;  err=0.00332082;  break;
-		case 21: wgt=0.0117188;  err=0.00248377;  break;
-		case 22: wgt=0.00716806; err=0.00215349;  break;
-		case 23: wgt=0.00416974; err=0.00186087;  break;
-		case 24: wgt=0.0022554;  err=0.00159301;  break;
-		case 25: wgt=0.00300959; err=0.0021249;   break;
-		case 26: wgt=0.00408355; err=0.00288161;  break;
+		case 2:  wgt=1.81326;    err=0.0150585;   break;
+		case 3:  wgt=1.65073;    err=0.00631874;  break;
+		case 4:  wgt=1.41608;    err=0.00314592;  break;
+		case 5:  wgt=1.26549;    err=0.00195111;  break;
+		case 6:  wgt=1.12297;    err=0.00115998;  break;
+		case 7:  wgt=1.01051;    err=0.000325553; break;
+		case 8:  wgt=0.902816;   err=0.000998862; break;
+		case 9:  wgt=0.815026;   err=0.00145847;  break;
+		case 10: wgt=0.729515;   err=0.00192831;  break;
+		case 11: wgt=0.641988;   err=0.00245465;  break;
+		case 12: wgt=0.584297;   err=0.00309103;  break;
+		case 13: wgt=0.494007;   err=0.00381757;  break;
+		case 14: wgt=0.438138;   err=0.00484277;  break;
+		case 15: wgt=0.395561;   err=0.00628664;  break;
+		case 16: wgt=0.32917;    err=0.00791585;  break;
+		case 17: wgt=0.280448;   err=0.0098695;   break;
+		case 18: wgt=0.300399;   err=0.0155825;   break;
+		case 19: wgt=0.261624;   err=0.0203534;   break;
+		case 20: wgt=0.333972;   err=0.0348973;   break;
+		case 21: wgt=0.190723;   err=0.0365797;   break;
+		case 22: wgt=0.267786;   err=0.0690892;   break;
+		case 23: wgt=0.205879;   err=0.0820484;   break;
+		case 24: wgt=3.92444;    err=4.74552;     break;
+		case 25: wgt=0.192857;   err=0.122517;    break;
+		case 26: wgt=7.84888;    err= 14.5245;    break;
 		case 27: wgt=0.;         err=0.;          break;
-		case 28: wgt=0.00400175; err=0.00399374;  break;
+		case 28: wgt=0.;         err=0.;          break;
 		case 29: wgt=0.;         err=0.;          break;
 		case 30: wgt=0.;         err=0.;          break;
 		case 31: wgt=0.;         err=0.;          break;
@@ -946,7 +959,7 @@ float dummyPileupWeight(int Nvtx)
 	return wgt;
 }
 
-float getLumiWeight(TString mcName, int mcRunNumber)
+float getLumiWeight(TString mcName, int mcRunNumber, unsigned int randomized_decision=-1)
 {
 	_DEBUG("getLumiWeight");
 
@@ -960,8 +973,8 @@ float getLumiWeight(TString mcName, int mcRunNumber)
 	Total:  [178044->190120]: 3562.719 pb-1
 	*///////////////////////////////////////////////////////////////////////
 	
-	int iPeriod = 0;
-	float Ldata = 1.;
+	int iPeriod = -1;
+	float Ldata = -1.;
 	if     (mcRunNumber==180164) // periodBtoD
 	{
 		iPeriod = 0;
@@ -972,14 +985,19 @@ float getLumiWeight(TString mcName, int mcRunNumber)
 		iPeriod = 1;
 		Ldata = 1.0152;
 	}
-	else if(mcRunNumber==185649) // periodItoK1
+	else if(mcRunNumber==185649  &&  randomized_decision==1) // periodItoK1_1
 	{
 		iPeriod = 2;
-		Ldata = 0.860379;
+		Ldata = 0.390364;
+	}
+	else if(mcRunNumber==185649  &&  randomized_decision==2) // periodItoK1_2
+	{
+		iPeriod = 3;
+		Ldata = 0.470015;
 	}
 	else if(mcRunNumber==185761) // periodFuture
 	{
-		iPeriod = 3;
+		iPeriod = 4;
 		Ldata = 1.49923;
 	}
 	else
@@ -1119,7 +1137,9 @@ void hfill(TString tsRunType="DATA", TString tsMCname="DYmumu", Double_t wgt=1.)
 				// and Nperiod is the number of events in each of the four "dummy periods" that are in the MC sample.
 				// So, the luminosity weight is calculated separately for each "dummy period" (this is done in the method setMCtree)
 				// and there's no need to take the "pileup_luminosity_..." weigths from the ntuple
-				event_weight *= all_pileup_weight;
+				// event_weight *= all_pileup_weight;           // [1] out-of-time-pileup
+				// event_weight *= all_outoftime_pileup_weight; // [2] out-of-time-pileup
+				event_weight *= all_intime_pileup_weight;       // [3] in-time-pileup (should describe better the vxp_n distribution)
 				
 				// option 5 for the event weight with pileup
 				// dummy_pileup_weight = dummyPileupWeight(recon_all_vxp_n);
@@ -1281,9 +1301,9 @@ void run()
 			////////////////////////////////////////////
 			//// blocks of analysis go here ////////////
 			////////////////////////////////////////////
-			// hfill("MC", mcName, wgtMap[it->first]); //////////////////////
-			hfill("MC", mcName, getLumiWeight(it->first,all_RunNumber)); ////
-			/////////////////////////////////////////////////////////////////
+			// hfill("MC", mcName, wgtMap[it->first]); //////////////////////////////////////////////
+			hfill("MC", mcName, getLumiWeight(it->first,all_RunNumber,all_randomized_decision)); ////
+			/////////////////////////////////////////////////////////////////////////////////////////
 		}
 	}
 	

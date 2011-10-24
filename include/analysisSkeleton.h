@@ -27,6 +27,7 @@ public:
 	// basic local vars
 
 	bool AS_isMC;
+	string base_dir_path;
 	SmearingClass* MCPpTsmearing;
 	
 	TRandom* randGen;
@@ -37,6 +38,7 @@ public:
 	unsigned int previous_runnumber;
 	float pileUpPeriodsIntegral;
 	float pileUpLumiWeight;
+	unsigned int randomized_decision; // for periodItoK1 (MC run number 185649)
 	
 	bool alreadyFilled;
 	
@@ -613,10 +615,11 @@ public:
 	void setPileupParameters(TString dataRootFileName, TString dataRootHistName, TString mcRootFileName, TString mcRootHistName);
 	TString setPileupPeriodName(int runNumberFromMC);
 	TString binomialDecision();
-	void resetPileupParameters(int runNumberFromMC);
+	void resetPileupParameters(int runNumberFromMC, string randomized_suffix="2");
 	float getPileUpWeight(bool isIntime);
 	
 	void setPtCandidatesFile(string sCandFilePath = "", string srunnumber = "");
+	void setBaseDir(string sBaseDirPath = "");
 	
 	void resetMuQAflags(int nMus);
 	int  countQAflags();

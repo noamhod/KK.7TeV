@@ -260,7 +260,7 @@ void analysisSkeleton::resetPileupParameters(int runNumberFromMC, string randomi
 	{
 		if(randomized_suffix=="1" || randomized_suffix=="2")
 		{
-			dataRootFileName  = (TString)utilities::checkANDsetFilepath("PWD", "/../conf/"+(string)mcRootHistName+"_"+randomized_suffix+".root");
+			dataRootFileName  = (TString)utilities::checkANDsetFilepath("BASEDIR", "/../conf/"+(string)mcRootHistName+"_"+randomized_suffix+".root");
 		}
 		else
 		{
@@ -268,7 +268,7 @@ void analysisSkeleton::resetPileupParameters(int runNumberFromMC, string randomi
 			exit(-1);
 		}
 	}
-	else dataRootFileName = (TString)utilities::checkANDsetFilepath("PWD", "/../conf/"+(string)mcRootHistName+".root");
+	else dataRootFileName = (TString)utilities::checkANDsetFilepath("BASEDIR", "/../conf/"+(string)mcRootHistName+".root");
 	
 	pileUpLumiWeight = getPileupPeriodsWeight(mcRootHistName);
 	

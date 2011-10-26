@@ -1,28 +1,109 @@
 <?xml version="1.0" ?>
 <!DOCTYPE LumiRangeCollection
   SYSTEM 'http://atlas-runquery.cern.ch/LumiRangeCollection.dtd'>
-<!-- Good-runs-list created by AtlRunQuery.py on 2011-10-07 14:18:55.223829 -->
+<!-- Good-runs-list created by AtlRunQuery.py on 2011-10-22 13:46:57.888998 -->
 <LumiRangeCollection>
    <NamedLumiRange>
       <Name>Muon</Name>
       <Version>2.1</Version>
-      <Metadata Name="Query">find run data11_7TeV.periodAllYear and partition ATLAS and db DATA and ptag data11_7TeV and dq global_status DEFECTS#DetStatus-v32-pro09 g and dq atlsol DEFECTS#DetStatus-v32-pro09 g and dq atltor DEFECTS#DetStatus-v32-pro09 g and dq trig_muo DEFECTS#DetStatus-v32-pro09 g and dq cp_mu_mmuidcb DEFECTS#DetStatus-v32-pro09 g and dq cp_mu_mstaco DEFECTS#DetStatus-v32-pro09 g and dq idvx DEFECTS#DetStatus-v32-pro09 g and dq idbs DEFECTS#DetStatus-v32-pro09 g and dq lumi DEFECTS#DetStatus-v32-pro09 g  </Metadata>
-      <Metadata Name="RunList">190120,190119,190116,190046,189965,189963,189875,189845,189836,189822,189813,189781,189751,189719,189693,189660,189639,189610,189602,189598,189561,189536,189530,189483,189481,189425,189421,189372,189288,189280,189242,189207,189184,189090,189079,189049,189028,189027,188951,188921,187815,187812,187811,187763,187552,187543,187501,187457,187453,187219,187196,187014,186965,186934,186933,186923,186878,186877,186873,186755,186753,186729,186721,186673,186669,186533,186532,186516,186493,186456,186399,186396,186361,186275,186217,186216,186182,186180,186179,186178,186169,186156,186049,185998,185976,185856,185823,185761,185747,185731,185649,185644,185518,185353,184169,184130,184088,184074,184072,184066,184022,183963,183780,183602,183581,183580,183544,183462,183426,183412,183407,183391,183347,183286,183272,183216,183130,183129,183127,183081,183079,183078,183054,183045,183038,183021,183003,182997,182886,182879,182796,182787,182766,182747,182726,182519,182518,182516,182486,182456,182455,182454,182450,182449,182424,182372,182346,182284,182161,182013,180776,180710,180664,180636,180614,180481,180448,180400,180309,180242,180241,180225,180212,180164,180153,180149,180144,180139,180124,180122,179940,179939,179938,179804,179771,179739,179725,179710,178109,178047,178044</Metadata>
+      <Metadata Name="Query">find run data11_7TeV.periodAllYear and partition ATLAS and db DATA and ptag data11_7TeV and dq global_status DEFECTS#DetStatus-v34-pro09-02 g and dq atlsol DEFECTS#DetStatus-v34-pro09-02 g and dq atltor DEFECTS#DetStatus-v34-pro09-02 g and dq trig_muo DEFECTS#DetStatus-v34-pro09-02 g and dq cp_mu_mmuidcb DEFECTS#DetStatus-v34-pro09-02 g and dq cp_mu_mstaco DEFECTS#DetStatus-v34-pro09-02 g and dq idvx DEFECTS#DetStatus-v34-pro09-02 g and dq idbs DEFECTS#DetStatus-v34-pro09-02 g and dq lumi DEFECTS#DetStatus-v34-pro09-02 g  </Metadata>
+      <Metadata Name="RunList">191139,191138,190975,190934,190933,190878,190872,190689,190661,190644,190643,190618,190611,190608,190343,190300,190297,190256,190236,190120,190119,190116,190046,189965,189963,189875,189845,189836,189822,189813,189781,189751,189719,189693,189660,189639,189610,189602,189598,189561,189536,189530,189483,189481,189425,189421,189372,189288,189280,189242,189207,189184,189090,189079,189049,189028,189027,188951,188921,187815,187812,187811,187763,187552,187543,187501,187457,187453,187219,187196,187014,186965,186934,186933,186923,186878,186877,186873,186755,186753,186729,186721,186673,186669,186533,186532,186516,186493,186456,186399,186396,186361,186275,186217,186216,186182,186180,186179,186178,186169,186156,186049,185998,185976,185856,185823,185761,185747,185731,185649,185644,185518,185353,184169,184130,184088,184074,184072,184066,184022,183963,183780,183602,183581,183580,183544,183462,183426,183412,183407,183391,183347,183286,183272,183216,183130,183129,183127,183081,183079,183078,183054,183045,183038,183021,183003,182997,182886,182879,182796,182787,182766,182747,182726,182519,182518,182516,182486,182456,182455,182454,182450,182449,182424,182372,182346,182284,182161,182013,180776,180710,180664,180636,180614,180481,180448,180400,180309,180242,180241,180225,180212,180164,180153,180149,180144,180139,180124,180122,179940,179939,179938,179804,179771,179739,179725,179710,178109,178047,178044</Metadata>
       <Metadata Name="RQTSVNVersion">CoolRunQuery-00-04-00</Metadata>
       <Metadata Name="StreamListInfo">
-         <Stream Name="physics_Background" TotalNumOfEvents="24207011" NumOfSelectedEvents="20982348"/>
-         <Stream Name="physics_CosmicCalo" TotalNumOfEvents="44526375" NumOfSelectedEvents="17704874"/>
-         <Stream Name="physics_CosmicMuons" TotalNumOfEvents="5315324" NumOfSelectedEvents="4700092"/>
-         <Stream Name="physics_Egamma" TotalNumOfEvents="316736142" NumOfSelectedEvents="310559437"/>
+         <Stream Name="physics_Background" TotalNumOfEvents="28911013" NumOfSelectedEvents="25537077"/>
+         <Stream Name="physics_CosmicCalo" TotalNumOfEvents="49204467" NumOfSelectedEvents="19505104"/>
+         <Stream Name="physics_CosmicMuons" TotalNumOfEvents="5315443" NumOfSelectedEvents="4700208"/>
+         <Stream Name="physics_Egamma" TotalNumOfEvents="360372375" NumOfSelectedEvents="352930832"/>
          <Stream Name="physics_EnhancedBias" TotalNumOfEvents="6275084" NumOfSelectedEvents="6275084"/>
-         <Stream Name="physics_IDCosmic" TotalNumOfEvents="391554" NumOfSelectedEvents="380050"/>
-         <Stream Name="physics_JetTauEtmiss" TotalNumOfEvents="381419082" NumOfSelectedEvents="373232995"/>
+         <Stream Name="physics_IDCosmic" TotalNumOfEvents="492740" NumOfSelectedEvents="477709"/>
+         <Stream Name="physics_JetTauEtmiss" TotalNumOfEvents="424857033" NumOfSelectedEvents="415408677"/>
          <Stream Name="physics_L1Calo" TotalNumOfEvents="2393310" NumOfSelectedEvents="2378115"/>
-         <Stream Name="physics_MinBias" TotalNumOfEvents="49193383" NumOfSelectedEvents="42265367"/>
-         <Stream Name="physics_Muons" TotalNumOfEvents="329517585" NumOfSelectedEvents="322845256"/>
-         <Stream Name="physics_Standby" TotalNumOfEvents="1197413" NumOfSelectedEvents="0"/>
-         <Stream Name="physics_ZeroBias" TotalNumOfEvents="4965664" NumOfSelectedEvents="4668829"/>
+         <Stream Name="physics_MinBias" TotalNumOfEvents="54167520" NumOfSelectedEvents="45696705"/>
+         <Stream Name="physics_Muons" TotalNumOfEvents="394320421" NumOfSelectedEvents="385764466"/>
+         <Stream Name="physics_Standby" TotalNumOfEvents="1305757" NumOfSelectedEvents="0"/>
+         <Stream Name="physics_ZeroBias" TotalNumOfEvents="5316745" NumOfSelectedEvents="4984022"/>
       </Metadata>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">191139</Run>
+         <LBRange Start="289" End="410"/>
+         <LBRange Start="465" End="700"/>
+         <LBRange Start="702" End="1010"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">191138</Run>
+         <LBRange Start="6" End="74"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">190975</Run>
+         <LBRange Start="176" End="469"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">190934</Run>
+         <LBRange Start="4" End="10"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">190933</Run>
+         <LBRange Start="379" End="1139"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">190878</Run>
+         <LBRange Start="4" End="354"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">190872</Run>
+         <LBRange Start="5" End="381"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">190689</Run>
+         <LBRange Start="95" End="178"/>
+         <LBRange Start="182" End="352"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">190661</Run>
+         <LBRange Start="301" End="322"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">190644</Run>
+         <LBRange Start="4" End="319"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">190643</Run>
+         <LBRange Start="148" End="229"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">190618</Run>
+         <LBRange Start="4" End="5"/>
+         <LBRange Start="8" End="740"/>
+         <LBRange Start="742" End="817"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">190611</Run>
+         <LBRange Start="294" End="474"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">190608</Run>
+         <LBRange Start="541" End="569"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">190343</Run>
+         <LBRange Start="18" End="543"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">190300</Run>
+         <LBRange Start="38" End="664"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">190297</Run>
+         <LBRange Start="152" End="155"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">190256</Run>
+         <LBRange Start="272" End="1132"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">190236</Run>
+         <LBRange Start="398" End="1285"/>
+      </LumiBlockCollection>
       <LumiBlockCollection>
          <Run PrescaleRD0="8" PrescaleRD1="8">190120</Run>
          <LBRange Start="3" End="173"/>

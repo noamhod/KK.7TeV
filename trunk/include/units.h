@@ -8,7 +8,17 @@
 #ifndef UNITS_H
 #define UNITS_H
 
-static const double luminosity = 3.562719;// 3.664723; // 2.039488; // 2.488457; //2.28348; // 1/fb
+/*//////////////////////////////////////////////////////////////////////
+------------------------------------------------------------------------------------------------------------------------------------
+B->D:     [178044->180481]:   L1_MU10+EF_mu22        187.91   pb-1  wL=0.0423497425  https://atlas-lumicalc.cern.ch/results/25ef16/
+E->H:     [180614->184169]:   L1_MU10+EF_mu22        1015.2   pb-1  wL=0.22879814    https://atlas-lumicalc.cern.ch/results/8ccfda/
+I->K1_1:  [185353->186493]:   L1_MU10+EF_mu22        390.364  pb-1  wL=0.0879773023  https://atlas-lumicalc.cern.ch/results/8076cb/
+I->K1_2:  [186516->186934]:   L1_MU11+EF_mu22_medium 470.015  pb-1  wL=0.105928446   https://atlas-lumicalc.cern.ch/results/391636/
+Future:   [186965->191139]:   L1_MU11+EF_mu22_medium 2373.61  pb-1  wL=0.534946369   https://atlas-lumicalc.cern.ch/results/a6a915/
+Total:    [178044->191139]:                          4437.099 pb-1
+------------------------------------------------------------------------------------------------------------------------------------
+*///////////////////////////////////////////////////////////////////////
+static const double luminosity = 4.437099;  // 4.44414; // 3.562719; // 1/fb
 
 static const float MeV2TeV = 1.e-6;
 static const float MeV2GeV = 1.e-3;

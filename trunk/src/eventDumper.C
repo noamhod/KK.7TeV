@@ -12,7 +12,12 @@ inline eventDumper::eventDumper()
 	
 }
 
-inline eventDumper::eventDumper(string sEventDumpFilePath)
+inline eventDumper::~eventDumper()
+{
+	if(file) file->close();
+}
+
+inline void eventDumper::setEventDumperFile(string sEventDumpFilePath)
 {
 	b_print = false;
 	doEventDump = false;
@@ -28,12 +33,6 @@ inline eventDumper::eventDumper(string sEventDumpFilePath)
 		doEventDump = false;
 	}	
 }
-
-inline eventDumper::~eventDumper()
-{
-	file->close();
-}
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 

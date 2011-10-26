@@ -587,9 +587,7 @@ public:
 	int   current_ivertex;
 
 public:
-	analysisSkeleton();
-	analysisSkeleton(string sEventDumpFilePath) :
-	analysisModules(sEventDumpFilePath)
+	analysisSkeleton()
 	{
 		tmp_counter_1 = 0;
 		tmp_counter_2 = 0;
@@ -615,11 +613,13 @@ public:
 	void setPileupParameters(TString dataRootFileName, TString dataRootHistName, TString mcRootFileName, TString mcRootHistName);
 	TString setPileupPeriodName(int runNumberFromMC);
 	TString binomialDecision();
-	void resetPileupParameters(int runNumberFromMC, string randomized_suffix="2");
+	void resetPileupParameters(int runNumberFromMC, string randomized_suffix="2", bool doIntime=false);
 	float getPileUpWeight(bool isIntime);
 	
 	void setPtCandidatesFile(string sCandFilePath = "", string srunnumber = "");
 	void setBaseDir(string sBaseDirPath = "");
+	void setEventDumpFile(string sEventDumpFilePath);
+	void setXmlFile(string sXmlPath);
 	
 	void resetMuQAflags(int nMus);
 	int  countQAflags();

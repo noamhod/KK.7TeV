@@ -23,9 +23,9 @@ class eventDumper
 
 	public:
 		eventDumper();
-		eventDumper(string sEventDumpFilePath);
 		~eventDumper();
 
+		inline void setEventDumperFile(string sEventDumpFilePath);
 		inline void setInterestingThreshold(double massThreshold);
 		inline void setCurrentEventMass(double currentEventMass);
 		inline void writeEventHeader(int RunNumber, int lbn, int eventNumber);

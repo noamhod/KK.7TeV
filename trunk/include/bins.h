@@ -24,7 +24,7 @@ static const Double_t logmassmin   = 120.;
 static const Double_t logmassmax   = 1500.;
 static Double_t logmassbins[nlogmassbins+1];
 
-static const Int_t    nlogimassbins = 40;
+static const Int_t    nlogimassbins = 50;
 static const Double_t logimassmin   = 120.;
 static const Double_t logimassmax   = 1500.;
 static Double_t logimassbins[nlogimassbins+1];
@@ -38,13 +38,13 @@ static const Int_t    nlinfullimassbins = 250;
 static const Double_t linfullimassmin   = 70.;
 static const Double_t linfullimassmax   = 2000.;
 
-static const Int_t    nlogptbins = 60;
-static const Double_t logptmin   = 20.;
+static const Int_t    nlogptbins = 50;
+static const Double_t logptmin   = 25.;
 static const Double_t logptmax   = 1000.;
 static Double_t logptbins[nlogptbins+1];
 
-static const Int_t    nlogqtbins = 60;
-static const Double_t logqtmin   = 20.;
+static const Int_t    nlogqtbins = 50;
+static const Double_t logqtmin   = 1.;
 static const Double_t logqtmax   = 1000.;
 static Double_t logqtbins[nlogqtbins+1];
 

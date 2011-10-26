@@ -228,7 +228,7 @@ void analysis::setEventVariables()
 	// pileup reweighting, needs to come after setting the lbn //////////////////////
 	analysisSkeleton::pileup_weight       = 1.;
 	analysisSkeleton::randomized_decision = 999;
-	bool isIntime = false;
+	bool isIntime = true; // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ??????????
 	unsigned int RunNumber_tmp = m_WZphysD3PD->RunNumber;
 	if(m_isMC)
 	{
@@ -259,25 +259,22 @@ void analysis::setEventVariables()
 			// TString mcRootHistName   = setPileupPeriodName(m_WZphysD3PD->RunNumber);
 			// setPileupParameters(pileuphist_data, "avgintperbx", pileuphist_mc, mcRootHistName);
 		
-			/////////////////////////////////////////////////////////////////////////////
-			resetPileupParameters(m_WZphysD3PD->RunNumber, randomized_suffix_str); //////
-			/////////////////////////////////////////////////////////////////////////////
+			///////////////////////////////////////////////////////////////////////////////////////
+			resetPileupParameters(m_WZphysD3PD->RunNumber, randomized_suffix_str, isIntime); //////
+			///////////////////////////////////////////////////////////////////////////////////////
 			
 			analysisSkeleton::previous_runnumber = RunNumber_tmp;
 		}
 	
 		analysisSkeleton::lumi_pileup_weight = pileUpLumiWeight; // is allocated in setPileupParameters OR in resetPileupParameters
 	
-		isIntime = false;
-		analysisSkeleton::pileup_weight = getPileUpWeight(isIntime); // will be the out-of-time pileup
+		analysisSkeleton::pileup_weight = getPileUpWeight(false /*==>!isIntime*/); // will be the out-of-time pileup
 		if(analysisSkeleton::pileup_weight<0.) analysisSkeleton::pileup_weight = 1.;
 		
-		isIntime = false;
-		analysisSkeleton::outoftime_pileup_weight = getPileUpWeight(isIntime);
+		analysisSkeleton::outoftime_pileup_weight = getPileUpWeight(false /*==>!isIntime*/);  // will be the out-of-time pileup
 		if(analysisSkeleton::outoftime_pileup_weight<0.) analysisSkeleton::outoftime_pileup_weight = 1.;
 		
-		isIntime = true;
-		analysisSkeleton::intime_pileup_weight = getPileUpWeight(isIntime);
+		analysisSkeleton::intime_pileup_weight = getPileUpWeight(true /*==>!isIntime*/);  // will be the in-time pileup
 		if(analysisSkeleton::intime_pileup_weight<0.) analysisSkeleton::intime_pileup_weight = 1.;
 	}
 	/////////////////////////////////////////////////////////////////////////////////

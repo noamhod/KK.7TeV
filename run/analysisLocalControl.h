@@ -37,6 +37,7 @@ class analysisLocalControl : public chainMaker/*, public utilities*/
 		TDirectory*   m_dirTruth;
 		
 		// locals
+		string m_basedir;
 		string m_muRecAlgo;
 		string m_pTsmearingType;
 		string m_MCPtag;

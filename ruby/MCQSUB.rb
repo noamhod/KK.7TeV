@@ -317,6 +317,7 @@ class MCQSUB
 			rundir='\"'+"#{thisdir}"+'/../run/\"'
 			grlTag='\"'+"#{grltag}"+'\"'
 			singlerun = '\"SINGLERUN\"'
+			runnumstr = '\"'+"#{runnumber}"+'\"'
 			
 			#cd(rundir)
 			macrofile = File.open(macroname, 'w') { |f| 
@@ -324,7 +325,7 @@ class MCQSUB
 				f.puts "   gROOT->Reset();"
 				f.puts "   gROOT->ProcessLine(\".L #{rundirregular}/analysisLocalControlMain.C\");"
 				f.puts "   gROOT->ProcessLine(\"load(#{grlTag},#{rundir})\");"
-				f.puts "   gROOT->ProcessLine(\"alc.initialize(#{runnumber},#{singlerun},#{rundir})\");"
+				f.puts "   gROOT->ProcessLine(\"alc.initialize(#{runnumstr},#{singlerun},#{rundir})\");"
 				f.puts "   gROOT->ProcessLine(\"alc.loop(0,0)\");"
 				f.puts "}"
 			}

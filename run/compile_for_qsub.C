@@ -1,5 +1,5 @@
 {
    gROOT->Reset();
    gROOT->ProcessLine(".L analysisLocalControlMain.C");
-   gROOT->ProcessLine("compile(\"00-00-95\")");
+   gROOT->ProcessLine("compile(\"00-00-96\")");
 }

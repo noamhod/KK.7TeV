@@ -8,14 +8,33 @@
 
 #include "analysisSkeleton.h"
 
-analysisSkeleton::analysisSkeleton()
-{
-	nMultiMuonEvents = 0;
-}
-
 analysisSkeleton::~analysisSkeleton()
 {
 	fCand->close();
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+// GENERAL INITIALIZER METHODS
+
+void analysisSkeleton::setBaseDir(string sBaseDirPath)
+{
+	_DEBUG("analysisSkeleton::setBaseDir");
+	
+	base_dir_path = sBaseDirPath;
+}
+void analysisSkeleton::setEventDumpFile(string sEventDumpFilePath)
+{
+	_DEBUG("analysisSkeleton::setEventDumpFile");
+	
+	setEventDumperFile(sEventDumpFilePath);
+	if(sEventDumpFilePath != "") setInterestingThreshold( 646.33*GeV2TeV );
+}
+void analysisSkeleton::setXmlFile(string sXmlPath)
+{
+	_DEBUG("analysisSkeleton::setXmlFile");
+	
+	xmlconfig::get(sXmlPath);
+	setCutFlowMapSVDPtr( cutFlowHandler::m_cutFlowMapSVD );
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -152,10 +171,10 @@ float analysisSkeleton::getPileupPeriodsWeight(TString hName)
 	// ----------------------------------------------------------------------
 	// Total:  [178044->190120]: 3562.719 pb-1
 	//////////////////////////////////////////////////////////////////////////////////////
-	if     (hName=="periodBtoD")   return 0.0527434243;
-	else if(hName=="periodEtoH")   return 0.284950904;
-	else if(hName=="periodItoK1")  return 0.241495049;
-	else if(hName=="periodFuture") return 0.420810622;
+	if     (hName=="periodBtoD")   return 0.0423497425;
+	else if(hName=="periodEtoH")   return 0.22879814;
+	else if(hName=="periodItoK1")  return 0.0879773023+0.105928446;
+	else if(hName=="periodFuture") return 0.534946369;
 	else
 	{
 		_ERROR("unrecognized hName, exitting now");
@@ -249,35 +268,57 @@ TString analysisSkeleton::binomialDecision()
 	return "2";
 }
 
-void analysisSkeleton::resetPileupParameters(int runNumberFromMC, string randomized_suffix)
+void analysisSkeleton::resetPileupParameters(int runNumberFromMC, string randomized_suffix, bool doIntime)
 {
 	_DEBUG("analysisSkeleton::resetPileupParameters");
 	
 	TString mcRootHistName = setPileupPeriodName(runNumberFromMC);
-	
 	TString dataRootFileName = "";
-	if(runNumberFromMC==185649)
-	{
-		if(randomized_suffix=="1" || randomized_suffix=="2")
-		{
-			dataRootFileName  = (TString)utilities::checkANDsetFilepath("BASEDIR", "/../conf/"+(string)mcRootHistName+"_"+randomized_suffix+".root");
-		}
-		else
-		{
-			_ERROR("unrecognized randomized_suffix="+randomized_suffix+", exitting now");
-			exit(-1);
-		}
-	}
-	else dataRootFileName = (TString)utilities::checkANDsetFilepath("BASEDIR", "/../conf/"+(string)mcRootHistName+".root");
 	
 	pileUpLumiWeight = getPileupPeriodsWeight(mcRootHistName);
 	
-	// int isGood = pileuprw->initialize( m_dataRootFileName, m_dataRootHistName, m_mcRootFileName, mcRootHistName );
-	int isGood = pileuprw->initialize( dataRootFileName, m_dataRootHistName, m_mcRootFileName, mcRootHistName );
-	if(isGood!=0)
+	if(!doIntime)
 	{
-		_ERROR("pileup reweighting isGood!=0, exitting now");
-		exit(-1);
+		if(runNumberFromMC==185649)
+		{
+			if(randomized_suffix=="1" || randomized_suffix=="2")
+			{
+				dataRootFileName  = (TString)base_dir_path+"/../conf/data11_7TeV."+mcRootHistName+"_"+randomized_suffix+".root";  // utilities::checkANDsetFilepath("BASEDIR", "/../conf/"+(string)mcRootHistName+"_"+randomized_suffix+".root");
+			}
+			else
+			{
+				_ERROR("unrecognized randomized_suffix="+randomized_suffix+", exitting now");
+				exit(-1);
+			}
+		}
+		else dataRootFileName = (TString)base_dir_path+"/../conf/data11_7TeV."+mcRootHistName+".root";  // utilities::checkANDsetFilepath("BASEDIR", "/../conf/"+(string)mcRootHistName+".root");
+		
+		
+		int isGood = pileuprw->initialize( dataRootFileName, m_dataRootHistName, m_mcRootFileName, mcRootHistName );
+		if(isGood!=0)
+		{
+			_ERROR("pileup reweighting isGood!=0, exitting now");
+			exit(-1);
+		}
+	}
+	else
+	{
+		if     (runNumberFromMC==180164) dataRootFileName = (TString)base_dir_path+"/../conf/data11_7TeV.intimepileup_periodBtoD.root";
+		else if(runNumberFromMC==183003) dataRootFileName = (TString)base_dir_path+"/../conf/data11_7TeV.intimepileup_periodEtoH.root";
+		else if(runNumberFromMC==185649) dataRootFileName = (TString)base_dir_path+"/../conf/data11_7TeV.intimepileup_periodItoK.root";
+		else if(runNumberFromMC==185761) dataRootFileName = (TString)base_dir_path+"/../conf/data11_7TeV.intimepileup_periodKtoM.root";
+		else
+		{
+			_ERROR("couldn't identify run="+_s(runNumberFromMC)+" exitting now");
+			exit(-1);
+		}
+		
+		int isGood = pileuprw->initialize( dataRootFileName, "intperbx", m_mcRootFileName, mcRootHistName );
+		if(isGood!=0)
+		{
+			_ERROR("pileup reweighting isGood!=0, exitting now");
+			exit(-1);
+		}
 	}
 }
 
@@ -338,13 +379,6 @@ void analysisSkeleton::setPtCandidatesFile(string sCandFilePath, string srunnumb
 	
 	string sLogFileName = sCandFilePath+"/candidates_pT.run_"+srunnumber+".cnd";//".time_"+getDateHour()+".cnd";
 	fCand = new ofstream( sLogFileName.c_str() );
-}
-
-void analysisSkeleton::setBaseDir(string sBaseDirPath)
-{
-	_DEBUG("analysisSkeleton::setBaseDir");
-	
-	base_dir_path = sBaseDirPath;
 }
 
 void analysisSkeleton::resetMuQAflags(int nMus)

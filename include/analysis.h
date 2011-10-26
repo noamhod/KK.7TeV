@@ -53,9 +53,7 @@ public:
 			 bool ismc,
 			 WZphysD3PD* wzphysd3pd,
 			 GRLinterface* grl,
-			 TFile* treeFile,
-			 string sEventDumpFilePath) :
-	analysisSkeleton(sEventDumpFilePath)
+			 TFile* treeFile)
 	{
 		sRunType       = runtype;  // grid OR local
 		sMuonRecoAlgo  = murecalg; // staco OR muid

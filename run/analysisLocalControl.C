@@ -22,6 +22,7 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 {
 	_DEBUG("analysisLocalControl::setRunControl");
 
+	string sBaseDir;
 	string sRun;
 	string sRec;
 	string spTtype;
@@ -33,9 +34,13 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	//int    msgLvl;
 	
 	ifstream ifsel( localRunControlFile.c_str() );
-	ifsel >> sRun >> sRec >> spTtype >> sMCPtag >> sMCorData;
+	ifsel >> sBaseDir >> sRun >> sRec >> spTtype >> sMCPtag >> sMCorData;
 	
-	
+	if(sBaseDir=="")
+	{
+		_ERROR("YOU CHOSE EMPTY BASEDIR, exitting now");
+		exit(-1);
+	}
 	if(sRun!="local"  &&  sRun!="local_noskim")
 	{
 		_ERROR("YOU CHOSE RUN ["+sRun+"], exitting now");
@@ -79,6 +84,7 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 		_INFO("msglvl["+_s(i)+"]="+sMsgLvl);
 	}
 	
+	m_basedir   = sBaseDir;
 	m_RunType   = sRun; // "grid" OR "local"
 	m_muRecAlgo = sRec; // "staco" OR "muid"
 	m_pTsmearingType = spTtype; // "pT" OR "q_pT"
@@ -86,12 +92,22 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	m_isMC      = isMC;
 	m_input     = sMCorData;
 	
+	_INFO("m_basedir="+m_basedir);
 	_INFO("m_RunType="+m_RunType);
 	_INFO("m_muRecAlgo="+m_muRecAlgo);
 	_INFO("m_pTsmearingType="+m_pTsmearingType);
 	_INFO("m_MCPtag="+m_MCPtag);
 	_INFO("m_isMC="+_s(m_isMC));
 	_INFO("m_input="+sMCorData);
+	
+	////////////////////////////////////////////////////////
+	if(!getenv("BASEDIR"))
+	{
+		string senv = "BASEDIR="+m_basedir; ////////////////////
+		putenv((char*)senv.c_str()); ///////////////////////////
+		_INFO("getenv: BASEDIR="+(string)getenv("BASEDIR")); ///
+	}
+	////////////////////////////////////////////////////////
 	
 	///////////////////////////
 	//setMSGlevel(m_msglvl); ////
@@ -128,6 +144,12 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	string str_hist = "";
 	string str_mcp  = "";
 	string str_mcname = "";
+	
+	if(basedir=="")
+	{
+		basedir = m_basedir;
+		_INFO("setting basedir -> "+basedir);
+	}
 
 	string str = "";
 	if(runs=="ALLRUNS")   str = basedir+"/../conf/Z_GRL_CURRENT.xml"; // utilities::checkANDsetFilepath("PWD", "/../conf/Z_GRL_CURRENT.xml");	
@@ -206,12 +228,27 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	m_histfile = new TFile( str_hist.c_str(), "RECREATE");
 	m_histfile->cd();
 	
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// initialize the main analysis object //////////////////////////////////////////////////////////////////
+	m_analysis = new analysis(m_RunType, m_muRecAlgo, m_isMC, m_WZphysD3PD, m_GRL, m_treefile ); ////////////
+	m_analysis->setBaseDir(basedir); ////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
 	string str_events = "";
 	if(runs=="ALLRUNS")   str_events = basedir+"/../run/interestingEvents.dump";  // utilities::checkANDsetFilepath("PWD", "/interestingEvents.dump");
 	if(runs=="SINGLERUN") str_events = basedir+"/../run/tmp/interestingEvents_"+run_number_str+".dump";
 	_INFO("LOADING FILE -> "+str_events);
-	m_analysis = new analysis(m_RunType, m_muRecAlgo, m_isMC,
-							  m_WZphysD3PD, m_GRL, m_treefile, str_events );
+	m_analysis->setEventDumpFile(str_events);
+	
+	
+	// string str_xml_path = utilities::checkANDsetFilepath("BASEDIR", "/../xml");
+	// string str_xml_path = (string)getenv("BASEDIR")+"/../xml";
+	string str_xml_path = basedir+"/../xml";
+	_INFO("LOADING FILE -> "+str_xml_path);
+	m_analysis->setXmlFile(str_xml_path);
+	
 	
 	string str_logspath = "";
 	if(runs=="ALLRUNS")   str_logspath = basedir+"/../run";  // utilities::checkANDsetFilepath("PWD", "");
@@ -220,19 +257,22 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	m_analysis->setMC(m_isMC);
 	if(m_isMC) m_analysis->setMCPpTparameters(m_muRecAlgo, m_pTsmearingType, str_mcp);
 	
+	
+	m_analysis->ginitialize();
+	
+	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	string str_pileuphist_data = basedir+"/../conf/periodBtoD.root";                       // utilities::checkANDsetFilepath("PWD", "/../conf/periodBtoD.root"); ////////////
-	// string str_pileuphist_data = basedir+"/../conf/CURRENT_iLUMICALC_HISTOGRAMS.root";  // utilities::checkANDsetFilepath("PWD", "/../conf/CURRENT_iLUMICALC_HISTOGRAMS.root"); ////////////
+	string str_pileuphist_data = basedir+"/../conf/data11_7TeV.periodBtoD.root"; // this is just a default initializer. it is overriden in analysisSkeleton
+	// string str_pileuphist_data = basedir+"/../conf/CURRENT_iLUMICALC_HISTOGRAMS.root";
 	_INFO("LOADING FILE -> "+str_pileuphist_data);
-	string str_pileuphist_mc   = basedir+"/../conf/muhist_MC11a.root";  // utilities::checkANDsetFilepath("PWD", "/../conf/muhist_MC11a.root"); ////////////////////////////
-	// string str_pileuphist_mc   = basedir+"/../conf/mu_mc10b";                           // utilities::checkANDsetFilepath("PWD", "/../conf/mu_mc10b.root"); /////////////////////////////
+	string str_pileuphist_mc   = basedir+"/../conf/muhist_MC11a.root"; // this is just a default initializer. it is overriden in analysisSkeleton
 	_INFO("LOADING FILE -> "+str_pileuphist_mc);
 	m_vhNames.push_back("periodBtoD");
 	m_vhNames.push_back("periodEtoH");
 	m_vhNames.push_back("periodItoK1");
 	m_vhNames.push_back("periodFuture");
 	m_analysis->setPileupPeriodsIntegral((TString)str_pileuphist_mc, m_vhNames);
-	m_analysis->setPileupParameters((TString)str_pileuphist_data, "avgintperbx", (TString)str_pileuphist_mc, "periodBtoD"); //////
+	m_analysis->setPileupParameters((TString)str_pileuphist_data, "avgintperbx", (TString)str_pileuphist_mc, "periodBtoD");  // this is just a default initializer. it is overriden in analysisSkeleton
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	///////////////////////////////////////////

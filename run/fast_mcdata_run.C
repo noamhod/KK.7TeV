@@ -205,7 +205,7 @@ void graphics(TH1* th1,
 
 void text()
 {
-	pvtxt_atlas = new TPaveText(0.4032663,0.2797203,0.5678392,0.3741259,"brNDC"); // 0.2110553,0.7097902,0.3756281,0.8041958 -> for 2d
+	pvtxt_atlas = new TPaveText(0.4032663,0.2897141,0.5678392,0.3840259,"brNDC"); // 0.2110553,0.7097902,0.3756281,0.8041958 -> for 2d
 	//pvtxt_atlas->SetFillColor(0);
 	pvtxt_atlas->SetFillStyle(4000); //will be transparent
 	pvtxt_atlas->SetFillColor(0);
@@ -964,13 +964,14 @@ float getLumiWeight(TString mcName, int mcRunNumber, unsigned int randomized_dec
 	_DEBUG("getLumiWeight");
 
 	/*//////////////////////////////////////////////////////////////////////
-	B->D:   [178044->180481]: 187.91  pb-1 EF_mu22         wL=0.0527434243
-	E->H:   [180614->184169]: 1015.2  pb-1 EF_mu22         wL=0.284950904
-	I->K1:  [185353->186493]: 390.364 pb-1 EF_mu22         wL=0.241495049
-			[186516->186934]: 470.015 pb-1 EF_mu22_medium
-	Future: [186965->190120]: 1499.23 pb-1 EF_mu22_medium  wL=0.420810622
-	----------------------------------------------------------------------
-	Total:  [178044->190120]: 3562.719 pb-1
+	------------------------------------------------------------------------------------------------------------------------------------
+	B->D:     [178044->180481]:   L1_MU10+EF_mu22        187.91   pb-1  wL=0.0423497425  https://atlas-lumicalc.cern.ch/results/25ef16/
+	E->H:     [180614->184169]:   L1_MU10+EF_mu22        1015.2   pb-1  wL=0.22879814    https://atlas-lumicalc.cern.ch/results/8ccfda/
+	I->K1_1:  [185353->186493]:   L1_MU10+EF_mu22        390.364  pb-1  wL=0.0879773023  https://atlas-lumicalc.cern.ch/results/8076cb/
+	I->K1_2:  [186516->186934]:   L1_MU11+EF_mu22_medium 470.015  pb-1  wL=0.105928446   https://atlas-lumicalc.cern.ch/results/391636/
+	Future:   [186965->191139]:   L1_MU11+EF_mu22_medium 2373.61  pb-1  wL=0.534946369   https://atlas-lumicalc.cern.ch/results/a6a915/
+	Total:    [178044->191139]:                          4437.099 pb-1
+	------------------------------------------------------------------------------------------------------------------------------------
 	*///////////////////////////////////////////////////////////////////////
 	
 	int iPeriod = -1;
@@ -998,7 +999,7 @@ float getLumiWeight(TString mcName, int mcRunNumber, unsigned int randomized_dec
 	else if(mcRunNumber==185761) // periodFuture
 	{
 		iPeriod = 4;
-		Ldata = 1.49923;
+		Ldata = 2.37361;
 	}
 	else
 	{

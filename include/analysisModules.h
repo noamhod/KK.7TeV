@@ -46,20 +46,9 @@ class analysisModules : public selection,
 						public Afb
 {
 	public:
-		analysisModules();
-		analysisModules(string sEventDumpFilePath) :
-		eventDumper(sEventDumpFilePath)
+		analysisModules()
 		{
 			_DEBUG("analysisModules::analysisModules");
-			
-			string str_xml_path = utilities::checkANDsetFilepath("BASEDIR", "/../xml");
-			_INFO("getting the xml file from this directory: "+str_xml_path);
-			xmlconfig::get(str_xml_path);
-			
-			if(sEventDumpFilePath != "") setInterestingThreshold( 646.33*GeV2TeV );
-			
-			setCutFlowMapSVDPtr( cutFlowHandler::m_cutFlowMapSVD );
-			ginitialize();
 		}
 		~analysisModules();
 };

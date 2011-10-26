@@ -1,0 +1,7 @@
+fermion		13
+mBSM		2000
+mMin		2200
+mMax		0
+nEvents		100000
+name		Pythia8_KK
+ffbar		mumu

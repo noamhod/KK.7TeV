@@ -44,7 +44,6 @@ void analysis::execute()
 	{                               //////////////////////////////////////////
 		bool passedSkim = m_WZphysD3PDmaker->passPTskim(pTthreshold); ////////
 		if(passedSkim) m_WZphysD3PDmaker->fill(); ////////////////////////////
-		if(passedSkim) nSkim++; //////////////////////////////////////////////
 	} ////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 	
@@ -54,7 +53,6 @@ void analysis::execute()
 	{                              /////////////////////////////////////
 		bool passedSkim = true; ////////////////////////////////////////
 		if(passedSkim) m_WZphysD3PDmaker->fill(); //////////////////////
-		if(passedSkim) nSkim++; ////////////////////////////////////////
 	} //////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////
 	
@@ -66,7 +64,6 @@ void analysis::execute()
 	{                     /////////////////////////////////////////////////////////////////
 		bool passedSkim = m_WZphysD3PDmaker->passNPTCBskim(Nmu, pTthreshold2); ////////////
 		if(passedSkim) m_WZphysD3PDmaker->fill(); /////////////////////////////////////////
-		if(passedSkim) nSkim++; ///////////////////////////////////////////////////////////
 	} /////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////
 	
@@ -125,56 +122,48 @@ void analysis::execute()
 	
 	_DEBUG("");
 	
-	////////////////////////////////////////
-	// execute the cut profile analysis ////
-	fillCutProfile(); //////////////////////
-	////////////////////////////////////////
-	
-	_DEBUG("");
-	
-	/*
-	nAll++;
-	if(mu_n==0) n0mu++;
-	int N=0;
-	for(int n=0 ; n<mu_n ; n++)
-	{
-		if( fabs(analysisSkeleton::mu_pt->at(n)*MeV2GeV) > pTthreshold ) N++;
-	}
-	if(mu_n==1 && N>0) n1mu++;
-	if(mu_n==2 && N>0) n2mu++;
-	if(mu_n==3 && N>0) n3mu++;
-	if(mu_n==4 && N>0) n4mu++;
-	if(mu_n>4  && N>0) nNmu++;
- 	*/
-	
-	_DEBUG("");
-	
-	/////////////////////////////////////////////////////
-	// preform the entire preselection //////////////////
-	bool passPreselection = applyPreselection(); ////////
-	if( !passPreselection ) return; /////////////////////
-	/////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////
+	// execute the cut profile analysis //////////////////
+	fillCutProfile(); ////////////////////////////////////
+	//////////////////////////////////////////////////////
 	
 	_DEBUG("");
 	
 	///////////////////////////////////////////////////////
-	// the single muon selection //////////////////////////
-	bool pass1MUselection = applySingleMuonSelection(); ///
-	if( !pass1MUselection ) return; ///////////////////////
+	// preform the entire preselection ////////////////////
+	bool passPreselection = applyPreselection(); //////////
+	if( !passPreselection ) return; ///////////////////////
 	///////////////////////////////////////////////////////
+	
+	_DEBUG("");
+	
+	bool isLoose = false;
+	///////////////////////////////////////////////////////////////
+	// the single muon selection //////////////////////////////////
+	bool pass1MUselection = applySingleMuonSelection(isLoose); ////
+	if( !pass1MUselection ) return; ///////////////////////////////
+	///////////////////////////////////////////////////////////////
 	
 	_DEBUG("");
 	
 	//////////////////////////////////////////////////////////////
 	// the double muon selection /////////////////////////////////
-	bool pass2MUselection = applyDoubleMuonSelection(); //////////
+	iTight = -1;
+	if(isLoose)
+	{
+		for(int mu=0 ; mu<nMus ; mu++)
+		{
+			if(muQAflags[mu]) iTight = mu;
+		}
+		if(iTight<0  &&  iTight>=nMus)
+		{
+			_ERROR("iTight>0  &&  iTight<nMus, exitting now.");
+			exit(-1);
+		}
+	}
+	bool pass2MUselection = applyDoubleMuonSelection(iTight); ////
 	if( !pass2MUselection ) return; //////////////////////////////
 	//////////////////////////////////////////////////////////////
-	
-	// if(analysisSkeleton::pileup_weight>=0.) _INFO("pileup_weight = "+_s(analysisSkeleton::pileup_weight,5));
-	// if(analysisSkeleton::EW_kfactor_weight>1.) _INFO("EW_kfactor_weight = "+_s(analysisSkeleton::EW_kfactor_weight,5));
-	// if(analysisSkeleton::QCD_kfactor_weight>0.) _INFO("QCD_kfactor_weight = "+_s(analysisSkeleton::QCD_kfactor_weight,5));
-	// if(analysisSkeleton::mcevent_weight>0.) _INFO("mcevent_weight = "+_s(analysisSkeleton::mcevent_weight,5));
 	
 	
 	_DEBUG("");
@@ -182,8 +171,8 @@ void analysis::execute()
 	(*fCandidates)	<< "Run-LB-Evt-Wgt  "
 					<< analysisSkeleton::RunNumber	 << " "
 					<< analysisSkeleton::lbn 		 << " "
-					<< analysisSkeleton::EventNumber << " "
-					<< analysisSkeleton::pileup_weight
+					<< analysisSkeleton::EventNumber
+					// << " " << analysisSkeleton::pileup_weight
 					<< endl;
 
 	_DEBUG("");
@@ -204,11 +193,12 @@ void analysis::setEventVariables()
 	
 	// EventHash = RunNumber+EventNumber+lbn;
 	
-	//////////////////////////////////////////////////////
-	// do this only if the run number has changed ////////
-	analysisSkeleton::sPeriod   = getPeriodName(); ///////
-	analysisSkeleton::vTriggers = getPeriodTriggers(); ///
-	//////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////
+	// do this only if the run number has changed //////////////////
+	if(!m_isMC) analysisSkeleton::sPeriod = getPeriodName(); ///////
+	if(m_isMC)  analysisSkeleton::sPeriod = "MC"; //////////////////
+	analysisSkeleton::vTriggers = getPeriodTriggers(); /////////////
+	////////////////////////////////////////////////////////////////
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	if(!m_isMC) analysisSkeleton::isGRL = m_analysis_grl->m_grl.HasRunLumiBlock( m_WZphysD3PD->RunNumber,m_WZphysD3PD->lbn ); ///

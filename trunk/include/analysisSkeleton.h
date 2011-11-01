@@ -48,6 +48,8 @@ public:
 	int tmp_counter_4;
 	int tmp_counter_5;
 	
+	int iTight;
+	
 	int EventHash;
 	bool isMultiMuonPrint;
 	
@@ -72,6 +74,7 @@ public:
 	string sCurrentPeriod;
 	vector<string>* vTriggers;
 	vector<bool> muQAflags;
+	vector<bool> muLooseQAflags;
 	int nMusPassed;
 	TMapdi  pTtoIndexMap;
 	TMapdi  pTtoIndexMapTruth;
@@ -80,6 +83,7 @@ public:
 	TMapsd values2fill;
 	int nMultiMuonEvents;
 	bool inApplySingleSelection;
+	bool inApplySingleLooseSelection;
 	ofstream* fCand;
 	string sTriggerName;
 	
@@ -623,10 +627,10 @@ public:
 	
 	void resetMuQAflags(int nMus);
 	int  countQAflags();
-	void pTSort();
-	void pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* charge);
+	void pTSort(int iMuTight = -1);
+	void pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* charge, int iMuTight = -1);
 	void imassSort();
-	bool assignPairIndices();
+	bool assignPairIndices(int iMuTight=-1);
 	
 	string          getPeriodName();
 	string          getPeriodName(int run);
@@ -641,8 +645,8 @@ public:
 	void wipeMU4Vector();
 	
 	bool applyPreselection();
-	bool applySingleMuonSelection();
-	bool applyDoubleMuonSelection();
+	bool applySingleMuonSelection(bool isLoose=false);
+	bool applyDoubleMuonSelection(int iMuTight=-1);
 	
 	void fillCutProfile1D();
 	void fillCutProfile2D();
@@ -664,13 +668,15 @@ private:
 	
 	bool preselection(string sSkipCut);
 	bool singleSelection(string sSkipCut);
-	bool doubleSelection(string sSkipCut);
+	bool singleLooseSelection(string sSkipCut);
+	bool doubleSelection(string sSkipCut, int iMuTight=-1);
 	
 	inline bool throwInfo(string cutName);
 	
 	inline bool preselection(TMapsb& cutsToSkip);
-	inline bool singleSelection(TMapsb& cutsToSkip);
-	inline bool doubleSelection(TMapsb& cutsToSkip);
+	inline bool singleSelection(TMapsb& cutsToSkip, bool doFillCutFlow=true);
+	inline bool singleLooseSelection(TMapsb& cutsToSkip);
+	inline bool doubleSelection(TMapsb& cutsToSkip, int iMuTight=-1);
 	
 	void fillAfterCuts();
 	void fillBeforeCuts();

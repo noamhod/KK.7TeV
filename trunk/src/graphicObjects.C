@@ -1528,11 +1528,13 @@ void graphicObjects::ginitialize()
 	// get the cut value from the cutFlow map
 	string pTcutNmae;
 	TMapsvd::iterator it1=cut_cutFlowMapSVD->find("pT");
+	TMapsvd::iterator it2=cut_cutFlowMapSVD->find("pTloose");
 	TMapsvd::iterator itEnd=cut_cutFlowMapSVD->end();
 	if     ( it1 != itEnd ) pTcutNmae = "pT";
+	else if( it2 != itEnd ) pTcutNmae = "pTloose";
 	else
 	{
-		cout << "ERROR: in graphicObjects::ginitialize(): pT cut value was not found, exitting now" << endl;
+		_ERROR("in graphicObjects::ginitialize(): pT cut value was not found, exitting now");
 		exit(-1);
 	}
 	double pT_cut    = (*cut_cutFlowMapSVD)[pTcutNmae][0];

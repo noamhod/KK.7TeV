@@ -60,6 +60,11 @@ public:
 	inline bool isolationXXCut( float isolationCutVal, string sIsoValName, float pTmu, float pTcone );
 	inline bool isolationXXCut( float isolationCutVal, string sIsoValName, float qOp, float theta, float pTcone );
 	
+	inline bool antiIsolationXXCut( float isolationCutVal, string sIsoValName, float pTmu, float pTcone );
+	
+	inline bool eTisolationXXCut( float isolationCutVal, string sIsoValName, float eTcone );
+	inline bool eTantiIsolationXXCut( float isolationCutVal, string sIsoValName, float eTcone );
+	
 	
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 	// * * * combined cuts methods * * *

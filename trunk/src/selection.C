@@ -197,14 +197,11 @@ inline bool selection::isCombMuCut( float isCombMuCutVal, int isCombMu )
 inline bool selection::isolationXXCut( float isolationCutVal, string sIsoValName, float pTmu, float pTcone )
 {
 	// track sum pT in 0.XX cone relative to muon pT less than YYY
-	//pTmu   *= MeV2TeV;
-	//pTcone *= MeV2TeV;
 	float isolation = (pTmu==0) ? 999 : pTcone/pTmu;
 	
 	if(b_print) cout << "in isolationXXCut: isolation(" << sIsoValName << ")=" << isolation << endl;
 	return ( isolation < isolationCutVal ) ? true : false;
 }
-
 
 inline bool selection::isolationXXCut( float isolationCutVal, string sIsoValName, float qOp, float theta, float pTcone )
 {
@@ -215,6 +212,33 @@ inline bool selection::isolationXXCut( float isolationCutVal, string sIsoValName
 	
 	if(b_print) cout << "in isolationXXCut: isolation(" << sIsoValName << ")=" << isolation << endl;
 	return ( isolation < isolationCutVal ) ? true : false;
+}
+
+inline bool selection::antiIsolationXXCut( float isolationCutVal, string sIsoValName, float pTmu, float pTcone )
+{
+	// track sum pT in 0.XX cone relative to muon pT more than YYY
+	float isolation = (pTmu==0) ? 999 : pTcone/pTmu;
+	
+	if(b_print) cout << "in isolationXXCut: isolation(" << sIsoValName << ")=" << isolation << endl;
+	return ( isolation >= isolationCutVal ) ? true : false;
+}
+
+
+
+
+
+inline bool selection::eTisolationXXCut( float isolationCutVal, string sIsoValName, float eTcone )
+{
+	// track sum eT in 0.XX cone is more than YYY
+	if(b_print) cout << "in isolationXXCut: eTcone(" << sIsoValName << ")=" << eTcone << endl;
+	return ( eTcone < isolationCutVal ) ? true : false;
+}
+
+inline bool selection::eTantiIsolationXXCut( float isolationCutVal, string sIsoValName, float eTcone )
+{
+	// track sum pT in 0.XX cone relative to muon pT more than YYY
+	if(b_print) cout << "in isolationXXCut: eTcone(" << sIsoValName << ")=" << eTcone << endl;
+	return ( eTcone >= isolationCutVal ) ? true : false;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 

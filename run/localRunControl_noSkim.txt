@@ -1,7 +1,7 @@
 /srv01/tau/hod/z0analysis-tests/z0analysis-r170/run
 local_noskim
 muid	q_pT	MuonMomentumCorrections-00-03-02
-mcqsub
+mc
 DBG SILENT
 INF VISUAL
 WRN VISUAL

@@ -386,6 +386,9 @@ void analysisSkeleton::resetMuQAflags(int nMus)
 	_DEBUG("analysisSkeleton::resetMuQAflags");
 	if(muQAflags.size()>0)      muQAflags.clear();
 	for(int j=0 ; j<nMus ; j++) muQAflags.push_back(true);
+	
+	if(muLooseQAflags.size()>0) muLooseQAflags.clear();
+	for(int j=0 ; j<nMus ; j++) muLooseQAflags.push_back(true);
 }
 
 string analysisSkeleton::getPeriodName()
@@ -1624,7 +1627,7 @@ int analysisSkeleton::countQAflags()
 	return nGoodQAflags;
 }
 
-void analysisSkeleton::pTSort()
+void analysisSkeleton::pTSort(int iMuTight)
 {
 	_DEBUG("analysisSkeleton::pTSort");
 	// the map is already sorted by the pT size but,
@@ -1640,21 +1643,46 @@ void analysisSkeleton::pTSort()
 		exit(-1);
 	}
 	
+	////////////////////////////////////////////////////////////////////////////////
+	bool isLoose = (iMuTight>0 && iMuTight<(int)mu_pt->size()) ? true : false; /////
+	////////////////////////////////////////////////////////////////////////////////
+	
 	////////////////////////////////////////////////////////////////////////////////////////
 	// no matter how many entries in the map, just take the ////////////////////////////////
 	// two muons with highest pT that satisfy Q1*Q2<0 //////////////////////////////////////
 	TMapdi::reverse_iterator rit=pTtoIndexMap.rbegin(); ////////////////////////////////////
-	ai = rit->second; //////////////////////////////////////////////////////////////////////
-	rit++; /////////////////////////////////////////////////////////////////////////////////
-	bi = rit->second; //////////////////////////////////////////////////////////////////////
-	if(pTtoIndexMap.size()>2)                         //////////////////////////////////////
-	{                                                ///////////////////////////////////////
-		while(mu_charge->at(ai)*mu_charge->at(bi)>0  &&  rit!=pTtoIndexMap.rend()) /////////
-		{                                            ///////////////////////////////////////
-			rit++;                                   ///////////////////////////////////////
-			bi = rit->second;                        ///////////////////////////////////////
-		}                                            ///////////////////////////////////////
-	}                                                ///////////////////////////////////////
+	if(!isLoose)
+	{
+		ai = rit->second; //////////////////////////////////////////////////////////////////
+		rit++; /////////////////////////////////////////////////////////////////////////////
+		bi = rit->second; //////////////////////////////////////////////////////////////////
+
+		if(pTtoIndexMap.size()>2)                         //////////////////////////////////////
+		{                                                ///////////////////////////////////////
+			while(mu_charge->at(ai)*mu_charge->at(bi)>0  &&  rit!=pTtoIndexMap.rend()) /////////
+			{                                            ///////////////////////////////////////
+				rit++;                                   ///////////////////////////////////////
+				bi = rit->second;                        ///////////////////////////////////////
+			}                                            ///////////////////////////////////////
+		}                                                ///////////////////////////////////////
+	}
+	else
+	{
+		ai = iMuTight;
+		if(pTtoIndexMap.size()>=2)
+		{
+			while(rit!=pTtoIndexMap.rend())
+			{
+				if(rit->second==iMuTight) continue;
+				if(mu_charge->at(ai)*mu_charge->at(rit->second)<0.)
+				{
+					bi = rit->second;
+					break;
+				}
+				rit++;
+			}
+		} 
+	}
 	////////////////////////////////////////////////////////////////////////////////////////
 	
 	if(pTtoIndexMap.size()>2)
@@ -1672,7 +1700,7 @@ void analysisSkeleton::pTSort()
 	}
 }
 
-void analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* Charge)
+void analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* Charge, int iMuTight)
 {
 	_DEBUG("analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* Charge)");
 	// the map is already sorted by the pT size but,
@@ -1694,21 +1722,46 @@ void analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vec
 		exit(-1);
 	}
 	
+	////////////////////////////////////////////////////////////////////////////////
+	bool isLoose = (iMuTight>0 && iMuTight<(int)mu_pt->size()) ? true : false; /////
+	////////////////////////////////////////////////////////////////////////////////
+	
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// no matter how many entries in the map, just take the ///////////////////////////////////////
 	// two muons with highest pT that satisfy Q1*Q2<0 /////////////////////////////////////////////
 	TMapdi::reverse_iterator rit=pTtoIndex.rbegin(); //////////////////////////////////////////////
-	index_a = rit->second; ////////////////////////////////////////////////////////////////////////
-	rit++; ////////////////////////////////////////////////////////////////////////////////////////
-	index_b = rit->second; ////////////////////////////////////////////////////////////////////////
-	if(pTtoIndex.size()>2)                           //////////////////////////////////////////////
-	{                                                //////////////////////////////////////////////
-		while(Charge->at(index_a)*Charge->at(index_b)>0  &&  rit!=pTtoIndex.rend()) ///////////////
-		{                                            //////////////////////////////////////////////
-			rit++;                                   //////////////////////////////////////////////
-			index_b = rit->second;                   //////////////////////////////////////////////
-		}                                            //////////////////////////////////////////////
-	}                                                //////////////////////////////////////////////
+	
+	if(!isLoose)
+	{
+		index_a = rit->second; ////////////////////////////////////////////////////////////////////////
+		rit++; ////////////////////////////////////////////////////////////////////////////////////////
+		index_b = rit->second; ////////////////////////////////////////////////////////////////////////
+		if(pTtoIndex.size()>2)                           //////////////////////////////////////////////
+		{                                                //////////////////////////////////////////////
+			while(Charge->at(index_a)*Charge->at(index_b)>0  &&  rit!=pTtoIndex.rend()) ///////////////
+			{                                            //////////////////////////////////////////////
+				rit++;                                   //////////////////////////////////////////////
+				index_b = rit->second;                   //////////////////////////////////////////////
+			}                                            //////////////////////////////////////////////
+		}                                                //////////////////////////////////////////////
+	}
+	else
+	{
+		index_a = iMuTight;
+		if(pTtoIndex.size()>=2)
+		{
+			while(rit!=pTtoIndex.rend())
+			{
+				if(rit->second==iMuTight) continue;
+				if(Charge->at(index_a)*Charge->at(rit->second)<0.)
+				{
+					index_b = rit->second;
+					break;
+				}
+				rit++;
+			}
+		} 
+	}
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	
 	if(pTtoIndex.size()>2)
@@ -1777,14 +1830,14 @@ void analysisSkeleton::wipeMU4Vector()
 	}
 }
 
-bool analysisSkeleton::assignPairIndices()
+bool analysisSkeleton::assignPairIndices(int iMuTight)
 {
 	_DEBUG("analysisSkeleton::assignPairIndices");
 	// select the final muon pair
-	if     (pTtoIndexMap.size()==2) pTSort();
+	if     (pTtoIndexMap.size()==2) pTSort(iMuTight);
 	else if(pTtoIndexMap.size()>2)
 	{
-		pTSort(); // assigns vallues to ai and bi
+		pTSort(iMuTight); // assigns vallues to ai and bi
 		//imassSort();
 		nMultiMuonEvents++;
 	}
@@ -1819,7 +1872,7 @@ bool analysisSkeleton::applyPreselection()
 	return passCutFlow;
 }
 
-bool analysisSkeleton::applySingleMuonSelection()
+bool analysisSkeleton::applySingleMuonSelection(bool isLoose)
 {
 	_DEBUG("analysisSkeleton::applySingleMuonSelection");
 	////////////////////////////////////////
@@ -1829,19 +1882,54 @@ bool analysisSkeleton::applySingleMuonSelection()
 	
 	inApplySingleSelection = true;
 	
+	bool doFillCutFlow = !isLoose;
+	
 	TMapsb cutsToSkip; // dummy (empty)
-	passCutFlow = singleSelection(cutsToSkip);
+	passCutFlow = singleSelection(cutsToSkip,doFillCutFlow);
+	if(isLoose)
+	{
+		if(!passCutFlow)
+		{
+			int nTight = 0;
+			int itight = -1;
+			for(int nQA=0 ; nQA<(int)muQAflags.size() ; nQA++)
+			{
+				if(muQAflags[nQA])
+				{
+					nTight++;
+					itight = nQA;
+					muLooseQAflags[nQA] = false;
+				}
+			}
+			if(nTight==0) passCutFlow = false;
+			if(nTight==1  &&  itight>0)
+			{
+				passCutFlow = singleLooseSelection(cutsToSkip); // if the event didn't pass tight-tight selection, try to selsct tight-loose
+				
+				for(int nQA=0 ; nQA<(int)muQAflags.size() ; nQA++)
+				{
+					// muQAflags is the main QA flags vector that
+					// should be used outside of singleLooseSelection
+					// and outside of this function.
+					// the "trues" in muLooseQAflags are loose && !tight (by definition)
+					if(nQA==itight) continue;
+					else            muQAflags[nQA] = muLooseQAflags[nQA];
+				}
+			}
+		}
+		else passCutFlow = false; // if passsd tight-tight then reject the event since we are looking for tihgt-loose
+	}
 	
 	inApplySingleSelection = false;
 	
 	return passCutFlow;
 }
 
-bool analysisSkeleton::applyDoubleMuonSelection()
+bool analysisSkeleton::applyDoubleMuonSelection(int iMuTight)
 {
 	_DEBUG("analysisSkeleton::applyDoubleMuonSelection");
 	TMapsb cutsToSkip; // dummy (empty)
-	passCutFlow = doubleSelection(cutsToSkip);
+	passCutFlow = doubleSelection(cutsToSkip, iMuTight);
 	
 	if(passCutFlow)
 	{
@@ -2573,51 +2661,6 @@ void analysisSkeleton::fillTruthEfficiency()
 void analysisSkeleton::fillTruth()
 {
 	_DEBUG("analysisSkeleton::fillTruth");
-	/*
-	// muonTruth
-	vector<float>*   truth_all_muonTruth_pt;
-	vector<float>*   truth_all_muonTruth_m;
-	vector<float>*   truth_all_muonTruth_eta;
-	vector<float>*   truth_all_muonTruth_phi;
-	vector<float>*   truth_all_muonTruth_charge;
-	vector<int>*     truth_all_muonTruth_PDGID;
-	vector<int>*     truth_all_muonTruth_barcode;
-	vector<int>*     truth_all_muonTruth_type;
-	vector<int>*     truth_all_muonTruth_origin;
-	// MC event
-	vector<int>*     truth_all_mcevt_signal_process_id;
-	vector<int>*     truth_all_mcevt_event_number;
-	vector<double>*  truth_all_mcevt_event_scale;
-	vector<double>*  truth_all_mcevt_alphaQCD;
-	vector<double>*  truth_all_mcevt_alphaQED;
-	vector<int>*     truth_all_mcevt_pdf_id1;
-	vector<int>*     truth_all_mcevt_pdf_id2;
-	vector<double>*  truth_all_mcevt_pdf_x1;
-	vector<double>*  truth_all_mcevt_pdf_x2;
-	vector<double>*  truth_all_mcevt_pdf_scale;
-	vector<double>*  truth_all_mcevt_pdf1;
-	vector<double>*  truth_all_mcevt_pdf2;
-	vector<double>*  truth_all_mcevt_weight;
-	//MC
-	vector<float>* truth_all_mc_pt;
-	vector<float>* truth_all_mc_m;
-	vector<float>* truth_all_mc_eta;
-	vector<float>* truth_all_mc_phi;
-	vector<int>*   truth_all_mc_status;
-	vector<int>*   truth_all_mc_barcode;
-	vector<int>*   truth_all_mc_pdgId;
-	vector<float>* truth_all_mc_charge;
-	// partons
-	vector<float>* truth_all_partons_mc_pt;
-	vector<float>* truth_all_partons_mc_m;
-	vector<float>* truth_all_partons_mc_eta;
-	vector<float>* truth_all_partons_mc_phi;
-	vector<int>*   truth_all_partons_mc_status;
-	vector<int>*   truth_all_partons_mc_barcode;
-	vector<int>*   truth_all_partons_mc_pdgId;
-	vector<float>* truth_all_partons_mc_charge;
-	*/
-	
 	
 	// write an example of one event record
 	if(!alreadyFilled)
@@ -2977,44 +3020,52 @@ bool analysisSkeleton::singleSelection(string sSkipCut)
 	return singleSelection(cutsToSkip);
 }
 
-bool analysisSkeleton::doubleSelection(string sSkipCut)
+bool analysisSkeleton::singleLooseSelection(string sSkipCut)
+{
+	_DEBUG("analysisSkeleton::singleLooseSelection(string sSkipCut)");
+	TMapsb cutsToSkip;
+	cutsToSkip.insert(make_pair(sSkipCut,true));
+	return singleLooseSelection(cutsToSkip);
+}
+
+bool analysisSkeleton::doubleSelection(string sSkipCut, int iMuTight)
 {
 	_DEBUG("analysisSkeleton::doubleSelection(string sSkipCut)");
 	TMapsb cutsToSkip;
 	cutsToSkip.insert(make_pair(sSkipCut,true));
-	return doubleSelection(cutsToSkip);
+	return doubleSelection(cutsToSkip, iMuTight);
 }
 
 inline bool analysisSkeleton::throwInfo(string cutName)
 {
 	bool show = false;
-	if(RunNumber==180124 && lbn==493 && EventNumber==68526315) show = true;  
+	if     (RunNumber==180124 && lbn==493 && EventNumber==68526315)  show = true;  
 	else if(RunNumber==183003 && lbn==723 && EventNumber==121099951) show = true;
-	else if(RunNumber==183054 && lbn==198 && EventNumber==21026988) show = true;
-	else if(RunNumber==183780 && lbn==434 && EventNumber==7827222) show = true;
+	else if(RunNumber==183054 && lbn==198 && EventNumber==21026988)  show = true;
+	else if(RunNumber==183780 && lbn==434 && EventNumber==7827222)   show = true;
 	else if(RunNumber==184169 && lbn==644 && EventNumber==104197129) show = true;
-	else if(RunNumber==186169 && lbn==386 && EventNumber==47351357) show = true;
+	else if(RunNumber==186169 && lbn==386 && EventNumber==47351357)  show = true;
 	else if(RunNumber==186721 && lbn==643 && EventNumber==122815161) show = true;
 	else if(RunNumber==187219 && lbn==589 && EventNumber==111010363) show = true;
-	else if(RunNumber==180225 && lbn==300 && EventNumber==56266053) show = true;
-	else if(RunNumber==180225 && lbn==300 && EventNumber==56286764) show = true;
-	else if(RunNumber==180225 && lbn==300 && EventNumber==56310023) show = true; 
-	else if(RunNumber==180225 && lbn==300 && EventNumber==56415230) show = true;
-	else if(RunNumber==182454 && lbn==335 && EventNumber==35814784)   show = true;
-	else if(RunNumber==182486 && lbn==282 && EventNumber==33852510)   show = true;
+	else if(RunNumber==180225 && lbn==300 && EventNumber==56266053)  show = true;
+	else if(RunNumber==180225 && lbn==300 && EventNumber==56286764)  show = true;
+	else if(RunNumber==180225 && lbn==300 && EventNumber==56310023)  show = true; 
+	else if(RunNumber==180225 && lbn==300 && EventNumber==56415230)  show = true;
+	else if(RunNumber==182454 && lbn==335 && EventNumber==35814784)  show = true;
+	else if(RunNumber==182486 && lbn==282 && EventNumber==33852510)  show = true;
 	else if(RunNumber==182766 && lbn==213 && EventNumber==5404925)   show = true;
-	else if(RunNumber==183081 && lbn==634 && EventNumber==121479214)   show = true;
-	else if(RunNumber==183426 && lbn==145 && EventNumber==15925912) show = true;
-	else if(RunNumber==183462 && lbn==1251 && EventNumber==150376226) show = true;
-	else if(RunNumber==183462 && lbn==1251 && EventNumber==150401710) show = true;
-	else if(RunNumber==183462 && lbn==1251 && EventNumber==150474933) show = true;
-	else if(RunNumber==183462 && lbn==1251 && EventNumber==150512192) show = true;
-	else if(RunNumber==183602 && lbn==20 && EventNumber==282919)  show = true;
+	else if(RunNumber==183081 && lbn==634 && EventNumber==121479214) show = true;
+	else if(RunNumber==183426 && lbn==145 && EventNumber==15925912)  show = true;
+	else if(RunNumber==183462 && lbn==1251 && EventNumber==150376226)show = true;
+	else if(RunNumber==183462 && lbn==1251 && EventNumber==150401710)show = true;
+	else if(RunNumber==183462 && lbn==1251 && EventNumber==150474933)show = true;
+	else if(RunNumber==183462 && lbn==1251 && EventNumber==150512192)show = true;
+	else if(RunNumber==183602 && lbn==20 && EventNumber==282919)     show = true;
 	else if(RunNumber==184022 && lbn==575 && EventNumber==68635084)  show = true;
-	else if(RunNumber==184130 && lbn==1331 && EventNumber==198813439)  show = true;  
-	else if(RunNumber==184130 && lbn==1331 && EventNumber==198874411)  show = true;  
-	else if(RunNumber==184130 && lbn==1331 && EventNumber==198888828)  show = true;  
-	else if(RunNumber==184130 && lbn==1331 && EventNumber==198902925)  show = true;  
+	else if(RunNumber==184130 && lbn==1331 && EventNumber==198813439)show = true;  
+	else if(RunNumber==184130 && lbn==1331 && EventNumber==198874411)show = true;  
+	else if(RunNumber==184130 && lbn==1331 && EventNumber==198888828)show = true;  
+	else if(RunNumber==184130 && lbn==1331 && EventNumber==198902925)show = true;  
 	
 	if(show) _INFO("Run-LB-Evt  "+_s(RunNumber)+" "+_s(lbn)+" "+_s(EventNumber)+" failed cut: "+cutName);
 	return show;
@@ -3112,7 +3163,7 @@ inline bool analysisSkeleton::preselection(TMapsb& cutsToSkip)
 	return passCutFlow;
 }
 
-inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
+inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip, bool doFillCutFlow)
 {
 	_DEBUG("analysisSkeleton::singleSelection(TMapsb& cutsToSkip)");
 	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;
@@ -3156,7 +3207,6 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
-
 				thisMuPass = ( pTCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_pt->at(mu)) ) ? true : false;
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
@@ -3280,9 +3330,9 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 		if(!passCutFlow && inApplySingleSelection) throwInfo(sorderedcutname); ///
 		//////////////////////////////////////////////////////////////////////////
 		
-		////////////////////////////////////////////////////////////////////////////////////////
-		// cutFlow /////////////////////////////////////////////////////////////////////////////
-		if(passCutFlow  &&  !isSkippedCut  && bDoFill) fillCutFlow(sorderedcutname); ///////////
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// cutFlow ////////////////////////////////////////////////////////////////////////////////////////////////
+		if(passCutFlow  &&  !isSkippedCut  && bDoFill  &&  doFillCutFlow) fillCutFlow(sorderedcutname); ///////////
 		if(passCutFlow  &&  !isSkippedCut 
 						&&  sorderedcutname=="pT"
 						&&  inApplySingleSelection
@@ -3301,7 +3351,135 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip)
 	return passCutFlow;
 }
 
-inline bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
+inline bool analysisSkeleton::singleLooseSelection(TMapsb& cutsToSkip)
+{
+	_DEBUG("analysisSkeleton::singleLooseSelection(TMapsb& cutsToSkip)");
+	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;
+	TMapsb::iterator itrEnd = cutsToSkip.end();
+	TMapsb::iterator itr;
+	
+	int muSize  = (int)mu_charge->size();
+
+	passCutFlow = true;
+	
+	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
+	{
+		////////////////////////////
+		if(!passCutFlow) break; ////
+		////////////////////////////
+	
+		///////////////////////////////////////////////////////////////////////////
+		// ignore preselection: ///////////////////////////////////////////////////
+		float num = ii->first; ///////////////////////////////////////////////////
+		if(m_cutFlowTypeOrdered->operator[](num)=="preselection") continue; ///////
+		///////////////////////////////////////////////////////////////////////////
+		
+		string sorderedcutname = ii->second;
+		nMusPassed = 0;
+		
+		bool bSkipCut = false;
+		bool bDoFill  = true;
+		if(isSkippedCut)
+		{
+			itr = cutsToSkip.find(sorderedcutname);
+			if(itr!=itrEnd) bSkipCut = itr->second;
+			else
+			{
+				itr = cutsToSkip.find("noFills");
+				if(itr!=itrEnd) bDoFill = false;
+			}
+		}
+		
+		
+		// if(sorderedcutname=="pT"  &&  !bSkipCut)
+		// {
+			// for(int mu=0 ; mu<muSize ; mu++)
+			// {
+				// thisMuPass = ( pTCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_pt->at(mu)) ) ? true : false;
+				// muLooseQAflags[mu] = (!muQAflags[mu]  &&  thisMuPass) ? true : false;
+				// if(thisMuPass  &&  muLooseQAflags[mu]) nMusPassed++;
+			// }
+			// //_INFO(_s(EventNumber)+" -> "+sorderedcutname+": nMusPassed = "+_s(nMusPassed));
+		// }
+		
+		if(sorderedcutname=="pTloose"  &&  !bSkipCut)
+		{
+			for(int mu=0 ; mu<muSize ; mu++)
+			{
+				thisMuPass = ( pTCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_pt->at(mu)) ) ? true : false;
+				muLooseQAflags[mu] = (!muQAflags[mu]  &&  thisMuPass) ? true : false;
+				if(thisMuPass  &&  muLooseQAflags[mu]) nMusPassed++;
+			}
+			//_INFO(_s(EventNumber)+" -> "+sorderedcutname+": nMusPassed = "+_s(nMusPassed));
+		}
+		
+		else if(sorderedcutname=="eta"  &&  !bSkipCut)
+		{
+			for(int mu=0 ; mu<muSize ; mu++)
+			{
+				thisMuPass = ( etaCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_eta->at(mu)) ) ? true : false;
+				muLooseQAflags[mu] = (!muQAflags[mu]  &&  thisMuPass) ? true : false;
+				if(thisMuPass  &&  muLooseQAflags[mu]) nMusPassed++;
+			}
+			//_INFO(_s(EventNumber)+" -> "+sorderedcutname+": nMusPassed = "+_s(nMusPassed));
+		}
+		
+		else if(sorderedcutname=="isCombMu"  &&  !bSkipCut)
+		{
+			for(int mu=0 ; mu<muSize ; mu++)
+			{
+				thisMuPass = ( isCombMuCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_isCombinedMuon->at(mu)) ) ? true : false;
+				muLooseQAflags[mu] = (!muQAflags[mu]  &&  thisMuPass) ? true : false;
+				if(thisMuPass  &&  muLooseQAflags[mu]) nMusPassed++;
+			}
+			//_INFO(_s(EventNumber)+" -> "+sorderedcutname+": nMusPassed = "+_s(nMusPassed));
+		}
+		
+		else if(sorderedcutname=="antiIsolation30"  &&  !bSkipCut)
+		{
+			for(int mu=0 ; mu<muSize ; mu++)
+			{
+				thisMuPass = ( antiIsolationXXCut((*m_cutFlowMapSVD)[sorderedcutname][0],"isolation30",mu_pt->at(mu), mu_ptcone30->at(mu)) ) ? true : false;
+				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
+				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
+			}
+		}
+		
+		else if(sorderedcutname=="eTantiIsolation30"  &&  !bSkipCut)
+		{
+			for(int mu=0 ; mu<muSize ; mu++)
+			{
+				thisMuPass = ( eTantiIsolationXXCut((*m_cutFlowMapSVD)[sorderedcutname][0],"isolation30", mu_etcone30->at(mu)) ) ? true : false;
+				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
+				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
+			}
+		}
+		
+		else
+		{
+			//_ERROR("unknown cut: "+sorderedcutname);
+			continue;
+		}
+		
+		/////////////////////////////////////////////////////////////////////////////////
+		// increment if passes the cut flow /////////////////////////////////////////////
+		passCutFlow = (passCutFlow  &&  nMusPassed>0) ? true : false; ///////////////////
+		if(passCutFlow  &&  !isSkippedCut  && bDoFill) fillCutFlow(sorderedcutname); ////
+		/////////////////////////////////////////////////////////////////////////////////
+		
+		// if(passCutFlow)
+		// {
+			// for(int mu=0 ; mu<muSize ; mu++) 
+			// {
+				// if(muLooseQAflags[mu]  &&  !muQAflags[mu]) muQAflags[mu] = muLooseQAflags[mu]; // if loose && !tight
+			// }
+		// }
+	} // end for(m_cutFlowOrdered)
+	
+	return passCutFlow;
+}
+
+inline bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip, int iMuTight)
 {
 	_DEBUG("analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)");
 	bool isSkippedCut = (cutsToSkip.size()==0) ? false : true;
@@ -3319,32 +3497,6 @@ inline bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
 	int nQAflags = countQAflags(); //////////////////////
 	if(nQAflags<2) return false; ////////////////////////
 	/////////////////////////////////////////////////////
-	
-	TMapsb::iterator jj = m_cutsFlowSkipMap->find("oppositeChargeCandidates");
-	if(jj==m_cutsFlowSkipMap->end())
-	{
-		TMapsb::iterator kk = m_cutsFlowSkipMap->find("oppositeCharge");
-		if(kk!=m_cutsFlowSkipMap->end() && kk->second)
-		{
-			_INFO("didn't find oppositeChargeCandidates, found oppositeCharge and not skipped");
-		
-			// if we want to first do the sort and then do the Q1*Q2<0 requirment
-			// then we have to have the "oppositeCharge" cut in the list wehre it
-			// has to be enabled (i.e. skip=false).
-			// Otherwise, we do the sort afterwards
-			/////////////////////////////////////////////////////
-			// see if there's a good pair (pT or imass sorted) //
-			// and assign the ai and bi indices /////////////////
-			bool isPair = assignPairIndices(); //////////////////
-			if(!isPair) return false; ///////////////////////////
-			/////////////////////////////////////////////////////
-		}
-		else
-		{
-			_ERROR("didn't find oppositeChargeCandidates and also didn't find oppositeCharge OR the oppositeCharge is found but skipped. exitting now");
-			exit(-1);
-		}
-	}
 	
 	passCutFlow    = true;
 	passCurrentCut = true;
@@ -3383,7 +3535,7 @@ inline bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
 				/////////////////////////////////////////////////////
 				// see if there's a good pair (pT or imass sorted) //
 				// and assign the ai and bi indices /////////////////
-				assignPairIndices(); ////////////////////////////////
+				assignPairIndices(iMuTight); ////////////////////////
 				if(nQAflags>2  &&  isMultiMuonPrint)
 				{
 					_INFO("MultiGoodMuon N{"

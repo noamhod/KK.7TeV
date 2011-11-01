@@ -35,16 +35,6 @@ public:
 	string sMuonRecoAlgo;
 	bool   m_isMC;
 	int    nMus;
-	
-	// temp
-	int nSkim;
-	int nAll;
-	int n0mu;
-	int n1mu;
-	int n2mu;
-	int n3mu;
-	int n4mu;
-	int nNmu;
 
 public:
 	analysis();
@@ -74,15 +64,6 @@ public:
 		EventHash = 0;
 		
 		alreadyFilled = false;
-		
-		nSkim = 0;
-		nAll = 0;
-		n0mu = 0;
-		n1mu = 0;
-		n2mu = 0;
-		n3mu = 0;
-		n4mu = 0;
-		nNmu = 0;
 		
 		previous_runnumber = 0;
 		

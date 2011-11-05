@@ -36,7 +36,7 @@ class eventDumper
 		inline void printProperty(string sProperty, double dProperty);
 		
 		inline bool isInteresting(double invariantMass);
-		inline void setSingleEventFile(int RunNumber, int lbn, int EventNumber);
+		inline void setSingleEventFile(string basedir, int RunNumber, int lbn, int EventNumber);
 		inline void insertTableLine(string type, string line1, string line2="", bool isbreak=false, bool isLastLine=false);
 		inline void closeSingleEventFile();
 

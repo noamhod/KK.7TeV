@@ -27,6 +27,9 @@ public:
 	// basic local vars
 
 	bool AS_isMC;
+	
+	bool isLoose;
+	
 	string base_dir_path;
 	SmearingClass* MCPpTsmearing;
 	
@@ -549,6 +552,14 @@ public:
 	vector<vector<float> > *trig_EF_trigmugirl_track_CB_phi;
 	vector<vector<int> >   *trig_EF_trigmugirl_track_CB_hasCB;
 	
+	
+	
+	float MET_Final_phi;
+	float MET_Final_et;
+	float MET_Final_sumet;
+	
+	
+	
 	// * * * * * * * * * * * *  * * * * * * * * * * * * * * * * * * * * * * * *
 	// muon variables for selection
 	
@@ -610,6 +621,7 @@ public:
 	~analysisSkeleton();
 	
 	void setMC(bool isMC) { AS_isMC = isMC; }
+	void setLoose(bool isloose) { isLoose = isloose; }
 	void setSmearedMCPpT(int nMus);
 	void setMCPpTparameters(string sAlgo, string spTtype, string sDataPath);
 	void setPileupPeriodsIntegral(TString mcRootFileName, vector<TString>& vhNames);
@@ -622,15 +634,15 @@ public:
 	
 	void setPtCandidatesFile(string sCandFilePath = "", string srunnumber = "");
 	void setBaseDir(string sBaseDirPath = "");
-	void setEventDumpFile(string sEventDumpFilePath);
+	void setEventDumpFile(string sEventDumpFilePath, float massThresholdInGeV=500.);
 	void setXmlFile(string sXmlPath);
 	
 	void resetMuQAflags(int nMus);
 	int  countQAflags();
-	void pTSort(int iMuTight = -1);
-	void pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* charge, int iMuTight = -1);
+	void pTSort();
+	void pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* charge);
 	void imassSort();
-	bool assignPairIndices(int iMuTight=-1);
+	bool assignPairIndices();
 	
 	string          getPeriodName();
 	string          getPeriodName(int run);
@@ -645,8 +657,8 @@ public:
 	void wipeMU4Vector();
 	
 	bool applyPreselection();
-	bool applySingleMuonSelection(bool isLoose=false);
-	bool applyDoubleMuonSelection(int iMuTight=-1);
+	bool applySingleMuonSelection(bool isloose=false);
+	bool applyDoubleMuonSelection();
 	
 	void fillCutProfile1D();
 	void fillCutProfile2D();
@@ -669,14 +681,15 @@ private:
 	bool preselection(string sSkipCut);
 	bool singleSelection(string sSkipCut);
 	bool singleLooseSelection(string sSkipCut);
-	bool doubleSelection(string sSkipCut, int iMuTight=-1);
+	bool doubleSelection(string sSkipCut);
 	
 	inline bool throwInfo(string cutName);
 	
 	inline bool preselection(TMapsb& cutsToSkip);
-	inline bool singleSelection(TMapsb& cutsToSkip, bool doFillCutFlow=true);
+	// inline bool singleSelection(TMapsb& cutsToSkip, bool doFillCutFlow=true);
+	inline bool singleSelection(TMapsb& cutsToSkip, bool isloose=false);
 	inline bool singleLooseSelection(TMapsb& cutsToSkip);
-	inline bool doubleSelection(TMapsb& cutsToSkip, int iMuTight=-1);
+	inline bool doubleSelection(TMapsb& cutsToSkip);
 	
 	void fillAfterCuts();
 	void fillBeforeCuts();

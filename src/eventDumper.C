@@ -114,9 +114,9 @@ inline bool eventDumper::isInteresting(double invariantMass)
 }
 
 
-inline void eventDumper::setSingleEventFile(int RunNumber, int lbn, int EventNumber)
+inline void eventDumper::setSingleEventFile(string basedir, int RunNumber, int lbn, int EventNumber)
 {
-	string name = "/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/tex/Event_"+_s(RunNumber)+"_"+_s(lbn)+"_"+_s(EventNumber)+".tex";
+	string name = basedir+"../tex/Event_"+_s(RunNumber)+"_"+_s(lbn)+"_"+_s(EventNumber)+".tex";
 	singleEventFile = new ofstream();
 	singleEventFile->open( name.c_str() );
 	

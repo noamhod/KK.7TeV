@@ -20,7 +20,7 @@ def search_directory(dir="", pattern=".tex",list=[])
 	list = list.sort
 end
 
-texdir = "/srv01/tau/hod/z0analysis-tests/z0analysis-tmp_qsub/tex"
+texdir = "/srv01/tau/hod/z0analysis-tests/z0analysis-r170/tex"
 thisdir = Dir.getwd();
 Dir.chdir(texdir); 
 y = Dir.getwd();

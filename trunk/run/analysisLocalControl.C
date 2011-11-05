@@ -28,13 +28,15 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	string spTtype;
 	string sMCPtag;
 	string sMCorData;
+	string sIsLoose;
 	bool   isMC;
+	bool   isLoose;
 	string sMsgTyp;
 	string sMsgLvl;
 	//int    msgLvl;
 	
 	ifstream ifsel( localRunControlFile.c_str() );
-	ifsel >> sBaseDir >> sRun >> sRec >> spTtype >> sMCPtag >> sMCorData;
+	ifsel >> sBaseDir >> sRun >> sRec >> spTtype >> sMCPtag >> sMCorData >> sIsLoose;
 	
 	if(sBaseDir=="")
 	{
@@ -68,6 +70,12 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 		exit(-1);
 	}
 	isMC = (sMCorData=="mc" || sMCorData=="mcqsub") ? true : false;
+	if(sIsLoose!="tight"  &&  sIsLoose!="loose")
+	{
+		_ERROR("ERROR: YOU CHOSE isLoose ["+sIsLoose+"], exitting now");
+		exit(-1);
+	}
+	isLoose = (sIsLoose=="loose") ? true : false; // false if sIsLoose=="tight"
 	for(int i=0 ; i<(int)msglvl.size()-2 ; i++)
 	{
 		ifsel >> sMsgTyp >> sMsgLvl;
@@ -90,6 +98,7 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	m_pTsmearingType = spTtype; // "pT" OR "q_pT"
 	m_MCPtag = sMCPtag; // "MuonMomentumCorrections-XX-YY-ZZ"
 	m_isMC      = isMC;
+	m_isLoose   = isLoose;
 	m_input     = sMCorData;
 	
 	_INFO("m_basedir="+m_basedir);
@@ -98,6 +107,7 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	_INFO("m_pTsmearingType="+m_pTsmearingType);
 	_INFO("m_MCPtag="+m_MCPtag);
 	_INFO("m_isMC="+_s(m_isMC));
+	_INFO("m_isLoose="+_s(m_isLoose));
 	_INFO("m_input="+sMCorData);
 	
 	////////////////////////////////////////////////////////
@@ -236,11 +246,14 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	
+	m_analysis->setLoose(m_isLoose);
+	
+	
 	string str_events = "";
 	if(runs=="ALLRUNS")   str_events = basedir+"/../run/interestingEvents.dump";  // utilities::checkANDsetFilepath("PWD", "/interestingEvents.dump");
 	if(runs=="SINGLERUN") str_events = basedir+"/../run/tmp/interestingEvents_"+run_number_str+".dump";
 	_INFO("LOADING FILE -> "+str_events);
-	m_analysis->setEventDumpFile(str_events);
+	m_analysis->setEventDumpFile(str_events, 500.);
 	
 	
 	// string str_xml_path = utilities::checkANDsetFilepath("BASEDIR", "/../xml");

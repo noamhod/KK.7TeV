@@ -89,9 +89,23 @@
       The parameter is in TeV.
     </description>
   </obj>
+  
+  <obj NAME="etaLoose" FLAG="on">
+    <order>13</order>
+    <phase>selection</phase>
+    <skip>false</skip>
+    <nparameters>1</nparameters>
+    <parameters>
+      <parameter NAME="eta" ORDER="1" TYPE="float">2.5</parameter>
+    </parameters>
+    <description>
+      This is the eta loose cut (use "mu_eta").
+      abs(eta) is less than 2.5
+    </description>
+  </obj>
 
   <obj NAME="IDhits" FLAG="on">
-    <order>13</order>
+    <order>14</order>
     <phase>selection</phase>
     <skip>false</skip>
     <nparameters>8</nparameters>
@@ -118,7 +132,7 @@
   </obj>
 
   <obj NAME="MShits" FLAG="on">
-    <order>14</order>
+    <order>15</order>
     <phase>selection</phase>
     <skip>false</skip>
     <nparameters>12</nparameters>
@@ -146,7 +160,7 @@
   </obj>
 
   <obj NAME="d0" FLAG="on">
-    <order>15</order>
+    <order>16</order>
     <phase>selection</phase>
     <skip>false</skip>
     <nparameters>1</nparameters>
@@ -160,7 +174,7 @@
   </obj>
 
   <obj NAME="z0" FLAG="on">
-    <order>16</order>
+    <order>17</order>
     <phase>selection</phase>
     <skip>false</skip>
     <nparameters>1</nparameters>
@@ -174,7 +188,7 @@
   </obj>
 
   <obj NAME="isolation30" FLAG="on">
-    <order>17</order>
+    <order>18</order>
     <phase>selection</phase>
     <skip>false</skip>
     <nparameters>1</nparameters>
@@ -188,7 +202,7 @@
   </obj>
   
   <obj NAME="antiIsolation30" FLAG="on">
-    <order>18</order>
+    <order>19</order>
     <phase>selection</phase>
     <skip>false</skip>
     <nparameters>1</nparameters>
@@ -202,16 +216,44 @@
   </obj>
   
   <obj NAME="eTantiIsolation30" FLAG="on">
-    <order>19</order>
+    <order>20</order>
     <phase>selection</phase>
     <skip>false</skip>
     <nparameters>1</nparameters>
     <parameters>
-      <parameter NAME="ratiomax" ORDER="1" TYPE="float">10</parameter>
+      <parameter NAME="ratiomax" ORDER="1" TYPE="float">20</parameter>
     </parameters>
     <description>
       This is the anti isolation cut (use "mu_etcone30").
-      Track sum eT in 0.3 cone is greater than 10 GeV)
+      Track sum eT in 0.3 cone is greater than 20 GeV)
+    </description>
+  </obj>
+
+  <obj NAME="antid0" FLAG="on">
+    <order>21</order>
+    <phase>selection</phase>
+    <skip>false</skip>
+    <nparameters>1</nparameters>
+    <parameters>
+      <parameter NAME="d0max" ORDER="1" TYPE="float">0.002</parameter>
+    </parameters>
+    <description>
+      This is the d0 cut (use "mu_d0_exPV").
+      Impact parameter wrt primary vertex in d0 greater than 0.002 mm
+    </description>
+  </obj>
+
+  <obj NAME="antiz0" FLAG="on">
+    <order>22</order>
+    <phase>selection</phase>
+    <skip>false</skip>
+    <nparameters>1</nparameters>
+    <parameters>
+      <parameter NAME="z0" ORDER="1" TYPE="float">0.01</parameter>
+    </parameters>
+    <description>
+      This is the z0 cut (use "mu_z0_exPV").
+      z0 is greater than 0.01 mm
     </description>
   </obj>
  

@@ -52,6 +52,8 @@ public:
 
 	inline bool d0Cut(          float d0CutVal, float d0 );
 	inline bool z0Cut(          float z0CutVal, float z0 );
+	inline bool antid0Cut(      float d0CutVal, float d0 );
+	inline bool antiz0Cut(      float z0CutVal, float z0 );
 	inline bool oppositeChargeCut( float ca, float cb );
 	inline bool oppositeChargeCut( float oppositeChargeCutVal, float ca, float cb );
 	

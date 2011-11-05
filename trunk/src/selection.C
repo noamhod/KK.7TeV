@@ -187,6 +187,18 @@ inline bool selection::z0Cut( float z0CutVal, float z0 )
 	return ( fabs(z0)<z0CutVal ) ? true : false;
 }
 
+inline bool selection::antid0Cut( float d0CutVal, float d0 )
+{
+	if(b_print) cout << "in antid0Cut: d0=" << d0 << endl;
+	return ( fabs(d0)>d0CutVal ) ? true : false;
+}
+
+inline bool selection::antiz0Cut( float z0CutVal, float z0 )
+{
+	if(b_print) cout << "in antiz0Cut: z0=" << z0 << endl;
+	return ( fabs(z0)>z0CutVal ) ? true : false;
+}
+
 inline bool selection::isCombMuCut( float isCombMuCutVal, int isCombMu )
 {
 	/*mu_staco_isCombinedMuon*/

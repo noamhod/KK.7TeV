@@ -407,7 +407,7 @@ class MCQSUB
 	def batch_qsub(inlist=[],runnumberslist=[],isMC=false)
 	
 		############ clean before start ##############
-		%x(ruby clean_tmp.rb) ########################
+		#%x(ruby clean_tmp.rb) ########################
 		##############################################
 	
 		if(!self.check_variables) then
@@ -477,7 +477,7 @@ class MCQSUB
 	
 	def merge_cutflow(inlist=[], filename="merged.cutflow",isMC=false)
 		lastline=-1
-		firstline=-17
+		firstline=-26 # THIS IS THE NUMBER OF LINES COUNTED FROM BOTTOM, WHERE THE FIRST CUTFLOW LINE APPEARS - maybe should be 50 or some large number
 		types = Array.new
 		names = Array.new
 		evnts = Array.new

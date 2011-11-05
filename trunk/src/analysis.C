@@ -137,33 +137,20 @@ void analysis::execute()
 	
 	_DEBUG("");
 	
-	bool isLoose = false;
-	///////////////////////////////////////////////////////////////
-	// the single muon selection //////////////////////////////////
-	bool pass1MUselection = applySingleMuonSelection(isLoose); ////
-	if( !pass1MUselection ) return; ///////////////////////////////
-	///////////////////////////////////////////////////////////////
+	//bool isLoose = false;
+	/////////////////////////////////////////////////////////////////////////////////
+	// the single muon selection ////////////////////////////////////////////////////
+	bool pass1MUselection = applySingleMuonSelection(analysisSkeleton::isLoose); ////
+	if( !pass1MUselection ) return; /////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////
 	
 	_DEBUG("");
 	
-	//////////////////////////////////////////////////////////////
-	// the double muon selection /////////////////////////////////
-	iTight = -1;
-	if(isLoose)
-	{
-		for(int mu=0 ; mu<nMus ; mu++)
-		{
-			if(muQAflags[mu]) iTight = mu;
-		}
-		if(iTight<0  &&  iTight>=nMus)
-		{
-			_ERROR("iTight>0  &&  iTight<nMus, exitting now.");
-			exit(-1);
-		}
-	}
-	bool pass2MUselection = applyDoubleMuonSelection(iTight); ////
-	if( !pass2MUselection ) return; //////////////////////////////
-	//////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////
+	// the double muon selection ///////////////////////////
+	bool pass2MUselection = applyDoubleMuonSelection(); ////
+	if( !pass2MUselection ) return; ////////////////////////
+	////////////////////////////////////////////////////////
 	
 	
 	_DEBUG("");
@@ -180,7 +167,16 @@ void analysis::execute()
 
 void analysis::setEventVariables()
 {
-	_DEBUG("analysis::setEventVariables");	
+	_DEBUG("analysis::setEventVariables");
+
+	ai = -1;
+	bi = -1;
+	iTight = -1;
+	
+	
+	analysisSkeleton::MET_Final_phi = m_WZphysD3PD->MET_Final_phi;
+	analysisSkeleton::MET_Final_et = m_WZphysD3PD->MET_Final_et;
+	analysisSkeleton::MET_Final_sumet = m_WZphysD3PD->MET_Final_sumet;
 	
 	// event level
 	analysisSkeleton::RunNumber    = m_WZphysD3PD->RunNumber;

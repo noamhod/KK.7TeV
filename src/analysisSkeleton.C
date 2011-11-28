@@ -2705,6 +2705,25 @@ void analysisSkeleton::fillTruth()
 {
 	_DEBUG("analysisSkeleton::fillTruth");
 	
+	
+	// fill this anyway, even if the event itself is not "valid"
+	graphicObjects::all_actualIntPerXing  = actualIntPerXing;
+	graphicObjects::all_averageIntPerXing = averageIntPerXing;
+	graphicObjects::all_mc_channel_number = mc_channel_number;
+	graphicObjects::all_mc_event_number   = mc_event_number;
+	graphicObjects::all_mc_event_weight   = mc_event_weight;
+	graphicObjects::all_RunNumber               = RunNumber;
+	graphicObjects::all_pileup_weight           = pileup_weight;
+	graphicObjects::all_intime_pileup_weight    = intime_pileup_weight;
+	graphicObjects::all_outoftime_pileup_weight = outoftime_pileup_weight;
+	graphicObjects::all_lumi_pileup_weight      = lumi_pileup_weight;
+	graphicObjects::all_EW_kfactor_weight       = EW_kfactor_weight;
+	graphicObjects::all_QCD_kfactor_weight      = QCD_kfactor_weight;
+	graphicObjects::all_mcevent_weight          = mcevent_weight;
+	graphicObjects::all_total_weight            = total_weight;
+	graphicObjects::all_randomized_decision     = randomized_decision;
+	
+	
 	// write an example of one event record
 	if(!alreadyFilled)
 	{
@@ -2753,13 +2772,14 @@ void analysisSkeleton::fillTruth()
 		if(fabs(mc_pdgId->at(t))!=PDTMU) continue; // has to be a muon
 		
 		// take the following information from the montecarlo xml !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-		bool isZ      = false; 
-		bool isGamma  = false;
-		bool isW      = false;
-		bool isChm    = false;
-		bool isBot    = false;
-		bool isTop    = false;
-		bool isZprime = false;
+		bool isZ        = false; 
+		bool isGamma    = false;
+		bool isW        = false;
+		bool isChm      = false;
+		bool isBot      = false;
+		bool isTop      = false;
+		bool isZprime   = false;
+		bool isGraviton = false;
 		for(int mom=0 ; mom<(int)mc_parent_index->at(t).size() ; mom++) // has to come out of Z^0 / Z' / W / gamma
 		{
 			int imom = mc_parent_index->at(t)[mom];
@@ -2805,6 +2825,12 @@ void analysisSkeleton::fillTruth()
 				intermediate_index.push_back(imom);
 				break;
 			}
+			if(mc_pdgId->at(imom)==PDTGRV)
+			{
+				isGraviton = true;
+				intermediate_index.push_back(imom);
+				break;
+			}
 			if(mc_pdgId->at(imom)*mc_pdgId->at(imom)==PDTMU*PDTMU  ||  mc_pdgId->at(imom)*mc_pdgId->at(imom)==PDTTAU*PDTTAU)
 			{
 				for(int mom1=0 ; mom1<(int)mc_parent_index->at(imom).size() ; mom1++)
@@ -2826,7 +2852,7 @@ void analysisSkeleton::fillTruth()
 				if(isZ||isW) break;
 			}
 		}
-		if(!isZ && !isGamma && !isW && !isChm && !isBot && !isTop && !isZprime) 
+		if(!isZ && !isGamma && !isW && !isChm && !isBot && !isTop && !isZprime && !isGraviton) 
 		{
 			// for(int mom=0 ; mom<(int)mc_parent_index->at(t).size() ; mom++)
 			// {
@@ -2871,7 +2897,7 @@ void analysisSkeleton::fillTruth()
 	}
 	else
 	{
-		_WARNING("truth_valid_index<2 -> "+_s(truth_valid_index)+"  ||  pTtoIndexMapTruth.size()<2 -> "+_s((int)pTtoIndexMapTruth.size())+", skipping event");
+		//_WARNING("truth_valid_index<2 -> "+_s(truth_valid_index)+"  ||  pTtoIndexMapTruth.size()<2 -> "+_s((int)pTtoIndexMapTruth.size())+", skipping event");
 		truth_valid_index = 0;
 		truth_all_isValid = false;
 		return;
@@ -2944,23 +2970,6 @@ void analysisSkeleton::fillTruth()
 			truth_all_isValid = false;
 			return;
 		}
-
-		graphicObjects::all_actualIntPerXing  = actualIntPerXing;
-		graphicObjects::all_averageIntPerXing = averageIntPerXing;
-		graphicObjects::all_mc_channel_number = mc_channel_number;
-		graphicObjects::all_mc_event_number   = mc_event_number;
-		graphicObjects::all_mc_event_weight   = mc_event_weight;
-		
-		graphicObjects::all_RunNumber          = RunNumber;
-		graphicObjects::all_pileup_weight      = pileup_weight;
-		graphicObjects::all_intime_pileup_weight = intime_pileup_weight;
-		graphicObjects::all_outoftime_pileup_weight = outoftime_pileup_weight;
-		graphicObjects::all_lumi_pileup_weight = lumi_pileup_weight;
-		graphicObjects::all_EW_kfactor_weight  = EW_kfactor_weight;
-		graphicObjects::all_QCD_kfactor_weight = QCD_kfactor_weight;
-		graphicObjects::all_mcevent_weight     = mcevent_weight;
-		graphicObjects::all_total_weight       = total_weight;
-		graphicObjects::all_randomized_decision = randomized_decision;
 		
 		graphicObjects::all_vxp_n = -999;
 		truth_all_mc_vxp_n = -999;
@@ -3590,6 +3599,30 @@ inline bool analysisSkeleton::singleLooseSelection(TMapsb& cutsToSkip)
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
 				thisMuPass = ( eTantiIsolationXXCut((*m_cutFlowMapSVD)[sorderedcutname][0],"isolation30", mu_etcone30->at(mu)) ) ? true : false;
+				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
+				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
+			}
+		}
+		
+		else if(sorderedcutname=="didmuTrigger"  &&  !bSkipCut)
+		{
+			mu_HLT_dr    = mu_EFMG_dr;    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			mu_HLT_index = mu_EFMG_index; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			for(int mu=0 ; mu<muSize ; mu++)
+			{
+				thisMuPass = !didmuTriggerCut((*m_cutFlowMapSVD)[sorderedcutname][0], mu_HLT_dr->at(mu), mu_HLT_index->at(mu)); // it has to be NON triger object
+				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
+				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
+			}
+		}
+		
+		else if(sorderedcutname=="isLooseNoTight"  &&  !bSkipCut)
+		{
+			float cutval1  = (*m_cutFlowMapSVD)[sorderedcutname][0];
+			float cutval2  = (*m_cutFlowMapSVD)[sorderedcutname][1];
+			for(int mu=0 ; mu<muSize ; mu++)
+			{
+				thisMuPass = ( isLooseNoTightCut(cutval1,cutval2, mu_loose->at(mu), mu_tight->at(mu)) ) ? true : false;
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
 			}

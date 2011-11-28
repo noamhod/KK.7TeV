@@ -103,6 +103,9 @@ public:
 						   int nRPCLayer1PhiHits, int nRPCLayer2PhiHits, int nRPCLayer3PhiHits,
 						   int nTGCLayer1PhiHits, int nTGCLayer2PhiHits, int nTGCLayer3PhiHits, int nTGCLayer4PhiHits,
 						   int nCSCEtaHits, int nCSCPhiHits);
+						   
+	inline bool didmuTriggerCut( float drCutVal, float trig_dr, int roi_index );
+	inline bool isLooseNoTightCut( float isLooseCutVal, float isTightCutval, int isLoose, int isTight );
 	// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
 private:

@@ -33,9 +33,32 @@ static const double nb2mb = 1.e-6;
 
 static const float muonMass = 0.105658367; // GeV
 
-static const float pi = 3.14159265;
+static const double pi   = 3.14159265;
+static const double sq2 = sqrt(2.);
+static const double f12 = 1./2.;
+static const double f13 = 1./3.;
+static const double f23 = 2./3.;
 
-static const float mZ0 = 91.1876; // GeV
+static const double mZ0 = 91.1876; // GeV
+static const double wZ0 = 2.4952;  // GeV
+static const double mZ2 = mZ0*mZ0; // GeV
+
+static const double sw2     = 0.2312015;; 
+static const double cw2     = 0.7687985;
+static const double alphaEM = 0.00729735256824;
+static const double Gmu     = 0.0000116633980690699; // GeV^-2
+
+static const double GeV2mb  = 0.38937930419;      // 1/GeV^2 to mb (mili-barn) conversion constant
+static const double GeV2nb  = 1e6*0.38937930419;  // 1/GeV^2 to nb (nano-barn) conversion constant
+/*-----------------------------------------------------------------------------------------*/
+/*                                                   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+/* [1] == (hbar*c)^2 = 0.38937930419 [GeV^2 * mb] -> !!! [1/GeV^2] = 0.38937930419[mb] !!! */
+/*                                                   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+/* sigma ~ [mb] ~ [1/GeV^2]                                                                */ 
+/* d(sigms)/ds ~ [mb/GeV^2] ~ [1/GeV^4]                                                    */
+/* d(sigma)/d(sqrt(s) == d(sigms)/ds * 2sqrt(s) ~ [mb/GeV] ~ [1/GeV^3]                     */
+/* 1[mb] = 1e6[nb]                                                                         */
+/*-----------------------------------------------------------------------------------------*/
 
 #endif
 

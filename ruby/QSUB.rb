@@ -347,7 +347,7 @@ class QSUB
 	
 	def merge_cutflow(inlist=[], filename="merged.cutflow")
 		lastline=-1
-		firstline=-17
+		firstline=-27
 		types = Array.new
 		names = Array.new
 		evnts = Array.new
@@ -359,7 +359,9 @@ class QSUB
 			cutindex = 0
 			checkrun = 0
 			lines.each do |line|
+				logd.info "line -> #{line}"
 				words = parse_line(line)
+				logd.info "words -> #{words}"
 				if(!words) then next end
 				if(words.length>0) then
 					if(words[2]=="all"  and Integer(words[3])==0) then

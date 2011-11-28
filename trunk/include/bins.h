@@ -1,11 +1,13 @@
-#include <basicIncludes.h>
+//#include <basicIncludes.h>
+#include <TH1.h>
+#include <TMath.h>
 
 #ifndef BINS_H
 #define BINS_H
 
 static void setLogBins(Int_t nbins, Double_t min, Double_t max, Double_t* xpoints)
 {
-	_DEBUG("setLogBins");
+	//_DEBUG("setLogBins");
 
 	Double_t logmin  = log10(min);
 	Double_t logmax  = log10(max);
@@ -33,6 +35,15 @@ static const Int_t    nlogfullimassbins = 60;
 static const Double_t logfullimassmin   = 70.;
 static const Double_t logfullimassmax   = 2000.;
 static Double_t logfullimassbins[nlogfullimassbins+1];
+
+static const Int_t    nloglimitimassbins = 50;
+static const Double_t loglimitimassmin   = 0.13;
+static const Double_t loglimitimassmax   = 4;
+static Double_t loglimitimassbins[nloglimitimassbins+1];
+
+static const Int_t    nlinlimitimassbins = 50;
+static const Double_t linlimitimassmin   = 0.13;
+static const Double_t linlimitimassmax   = 4.;
 
 static const Int_t    nlinfullimassbins = 250;
 static const Double_t linfullimassmin   = 70.;
@@ -68,6 +79,14 @@ static const int    nFullCosThetaBins = 50;
 static const double minCosTheta = -1.;  // for the acceptance binning
 static const double maxCosTheta = +1.;  // for the acceptance binning
 static const int    nCosThetaBins = 10; // for the acceptance binning
+
+static const double minCosThetaLimit = -1.;  // for the limit binning
+static const double maxCosThetaLimit = +1.;  // for the limit binning
+static const int    nCosThetaBinsLimit = 2; // for the limit binning
+
+static const double mindEtaLimit = 0.;  // for the limit binning
+static const double maxdEtaLimit = +4.;  // for the limit binning
+static const int    ndEtaBinsLimit = 3; // for the limit binning
 
 static const double minAbsCosTheta   = 0.;  // for the acceptance binning
 static const double maxAbsCosTheta   = +1.; // for the acceptance binning

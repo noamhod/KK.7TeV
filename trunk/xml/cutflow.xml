@@ -256,6 +256,35 @@
       z0 is greater than 0.01 mm
     </description>
   </obj>
+  
+  <obj NAME="didmuTrigger" FLAG="on">
+    <order>23</order>
+    <phase>selection</phase>
+    <skip>false</skip>
+    <nparameters>1</nparameters>
+    <parameters>
+      <parameter NAME="dr" ORDER="1" TYPE="float">0.005</parameter>
+    </parameters>
+    <description>
+      The loose muon must not be associated with a trigger object.
+    </description>
+  </obj>
+  
+<!--
+   <obj NAME="isLooseNoTight" FLAG="on">
+    <order>24</order>
+    <phase>selection</phase>
+    <skip>false</skip>
+    <nparameters>2</nparameters>
+    <parameters>
+      <parameter NAME="isLoose" ORDER="1" TYPE="bool">1.</parameter>
+      <parameter NAME="isTight" ORDER="2" TYPE="bool">1.</parameter>
+    </parameters>
+    <description>
+      The loose muon must not be tight.
+    </description>
+  </obj>
+-->
  
   <obj NAME="oppositeChargeCandidates" FLAG="on">
     <order>101</order>

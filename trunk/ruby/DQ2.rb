@@ -21,8 +21,8 @@ class DQ2
 	
 	def initialize(dosetup=false)
 		if(dosetup) then
-			#%x(source ~hod/setupGrid_t302.sh)
-			%x(source ~hod/setupGrid.sh)
+			%x(source ~hod/setupGrid_t302.sh)
+			#%x(source ~hod/setupGrid.sh)
 		end
 		
 		set_loggerdec("")

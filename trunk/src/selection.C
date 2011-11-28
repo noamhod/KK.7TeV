@@ -235,10 +235,6 @@ inline bool selection::antiIsolationXXCut( float isolationCutVal, string sIsoVal
 	return ( isolation >= isolationCutVal ) ? true : false;
 }
 
-
-
-
-
 inline bool selection::eTisolationXXCut( float isolationCutVal, string sIsoValName, float eTcone )
 {
 	// track sum eT in 0.XX cone is more than YYY
@@ -251,6 +247,21 @@ inline bool selection::eTantiIsolationXXCut( float isolationCutVal, string sIsoV
 	// track sum pT in 0.XX cone relative to muon pT more than YYY
 	if(b_print) cout << "in isolationXXCut: eTcone(" << sIsoValName << ")=" << eTcone << endl;
 	return ( eTcone >= isolationCutVal ) ? true : false;
+}
+
+inline bool selection::didmuTriggerCut( float drCutVal, float trig_dr, int roi_index )
+{
+	// loose muon should not be associated with a trigger object
+	if(roi_index<0)       return false; // this muon is not associated with a trigger object
+	if(trig_dr<0.)        return false; // this muon is not associated with a trigger object
+	if(trig_dr>=drCutVal) return false; // this muon is associated with a trigger object but matching cone is too big
+	return true;
+}
+
+inline bool selection::isLooseNoTightCut( float isLooseCutVal, float isTightCutval, int isLoose, int isTight )
+{
+	if(isLoose==(int)isLooseCutVal && isTight==(int)isTightCutval) return true;
+	return false;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 

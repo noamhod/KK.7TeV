@@ -48,9 +48,11 @@
 
 using namespace std;
 
+static const float TeV2GeV = 1.e+3;
+
 static const Int_t    nlogfullimassbins = 60;
-static const Double_t logfullimassmin   = 0.07;
-static const Double_t logfullimassmax   = 1.2;
+static const Double_t logfullimassmin   = 70.;
+static const Double_t logfullimassmax   = 2000.;
 static Double_t logfullimassbins[nlogfullimassbins+1];
 
 void style()
@@ -123,25 +125,63 @@ void test()
 	style();
 	setLogBins(nlogfullimassbins,logfullimassmin,logfullimassmax,logfullimassbins);
 
-	TFile f("../data/merged.root", "READ");
-	TTree* t = (TTree*)f.Get("allCuts/allCuts_tree");
 	float Mhat;
-	t->SetBranchAddress("Mhat",  &Mhat);
-	Int_t N = t->GetEntries();
 	
 	TCanvas* c = new TCanvas("c","c",600,400);
-	TH1D* h = new TH1D("h","Tight-Loose selection;m_{#mu#mu} TeV;Events",nlogfullimassbins,logfullimassbins);
 	c->SetLogx();
 	c->SetLogy();
 	c->Draw();
 	c->cd();
+	
+	TLegend* leg = new TLegend(0.6627517,0.6846449,0.7919463,0.8261126,NULL,"brNDC");
+	leg->SetFillStyle(4000); //will be transparent
+	leg->SetFillColor(0);
+	leg->SetTextFont(42);
 
-	for(Int_t i=0 ; i<N ; i++)
+	TFile fLoose("../data/merged.root", "READ");
+	TTree* tLoose = (TTree*)fLoose.Get("allCuts/allCuts_tree");
+	tLoose->SetBranchAddress("Mhat",  &Mhat);
+	Int_t nLoose = tLoose->GetEntries();
+	TH1D* hLoose = new TH1D("hLoose","tight-loose vs. tight-tight selection;m_{#mu#mu} TeV;Events",nlogfullimassbins,logfullimassbins);
+	hLoose->SetLineColor(kRed);
+	hLoose->SetMarkerColor(kRed);
+	hLoose->SetMarkerStyle(24);
+	hLoose->SetMarkerSize(0.8);
+	hLoose->SetMinimum(1.e-3);
+	hLoose->SetMaximum(7.e+5);
+	hLoose->GetXaxis()->SetMoreLogLabels();
+	hLoose->GetXaxis()->SetNoExponent();
+	leg->AddEntry(hLoose,"tight-loose","lep");
+	for(Int_t i=0 ; i<nLoose ; i++)
 	{
-		t->GetEntry(i);
-		h->Fill(Mhat);
+		tLoose->GetEntry(i);
+		hLoose->Fill(Mhat*TeV2GeV);
+	}
+	
+	TFile fTight("/data/hod/2011/NTUPLE/analysisLocalControl.root", "READ");
+	TTree* tTight = (TTree*)fTight.Get("allCuts/allCuts_tree");
+	tTight->SetBranchAddress("Mhat",  &Mhat);
+	Int_t nTight = tTight->GetEntries();
+	TH1D* hTight = new TH1D("hTight","tight-loose vs. tight-tight selection;m_{#mu#mu} TeV;Events",nlogfullimassbins,logfullimassbins);
+	hTight->SetLineColor(kBlack);
+	hTight->SetMarkerColor(kBlack);
+	hTight->SetMarkerStyle(24);
+	hTight->SetMarkerSize(0.8);
+	hTight->SetMinimum(1.e-3);
+	hTight->SetMaximum(7.e+5);
+	hTight->GetXaxis()->SetMoreLogLabels();
+	hTight->GetXaxis()->SetNoExponent();
+	leg->AddEntry(hTight,"tight-tight","lep");
+	for(Int_t i=0 ; i<nTight ; i++)
+	{
+		tTight->GetEntry(i);
+		hTight->Fill(Mhat*TeV2GeV);
 	}
 
-	h->Draw();
+	
+	hTight->Draw("e1x1");
+	hLoose->Draw("e1x1SAMES");
+	leg->Draw("SAMES");
+	c->RedrawAxis();
 	c->SaveAs("plots/Wjets.png");
 }

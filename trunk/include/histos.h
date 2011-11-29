@@ -134,4 +134,12 @@ void setlogx(TH2* h)
 	h->GetXaxis()->SetNoExponent();
 }
 
+void saveas(TCanvas* c, TString name)
+{
+	c->SaveAs(name+".png");
+	c->SaveAs(name+".eps");
+	c->SaveAs(name+".C");
+	c->SaveAs(name+".root");
+}
+
 #endif

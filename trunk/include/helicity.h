@@ -24,17 +24,21 @@ static const unsigned int nModes  = 100;
 inline dcomplex hAG0(double s, unsigned int idIn, unsigned int idOut)
 {
 	dcomplex A(0,0);
+	if(s<0.) return A;
 	A = gG(idIn)*gG(idOut)/s;
 	return A;
 }
 inline dcomplex hAZ0(double s, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
 {
 	dcomplex A(0,0);
+	if(s<0.) return A;
 	A = gZH(idIn,hIn)*gZH(idOut,hOut)/(s-mZ2 + Im*s*(wZ0/mZ0));
 	return A;
 }
 inline dcomplex hASM(double s, double cosTheta, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
 {
+	dcomplex A(0,0);
+	if(fabs(cosTheta)>1.) return A;
 	return( (hAG0(s,idIn,idOut) + hAZ0(s,idIn,idOut,hIn,hOut))*sqrt(1.+4.*hIn*hOut*cosTheta) );
 }
 
@@ -43,6 +47,8 @@ inline dcomplex hASM(double s, double cosTheta, unsigned int idIn, unsigned int 
 inline dcomplex hAZP0(double s, double cosTheta, double w, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
 {
 	dcomplex A(0,0);
+	if(s<0.) return A;
+	if(fabs(cosTheta)>1.) return A;
 	double mass = mZP;
 	double m2 = mass*mass;
 	A = (gZH(idIn,hIn)*gZH(idOut,hOut)/(s-m2 + Im*s*(w/mass)) )*sqrt(1.+4.*hIn*hOut*cosTheta);
@@ -66,6 +72,7 @@ inline dcomplex hAZP(double s, double cosTheta, unsigned int idIn, unsigned int 
 inline dcomplex hAGKKn(double s, double w, unsigned int idIn, unsigned int idOut, unsigned int mode)
 {
 	dcomplex A(0,0);
+	if(s<0.) return A;
 	double mKKn2 = (mode*mKK)*(mode*mKK);
 	double mass = sqrt(0. + mKKn2);
 	double m2 = mass*mass;
@@ -75,6 +82,7 @@ inline dcomplex hAGKKn(double s, double w, unsigned int idIn, unsigned int idOut
 inline dcomplex hAZKKn(double s, double w, unsigned int idIn, unsigned int idOut, double hIn, double hOut, unsigned int mode)
 {
 	dcomplex A(0,0);
+	if(s<0.) return A;
 	double mKKn2 = (mode*mKK)*(mode*mKK);
 	double mass = sqrt(mZ2 + mKKn2);
 	double m2 = mass*mass;
@@ -83,6 +91,8 @@ inline dcomplex hAZKKn(double s, double w, unsigned int idIn, unsigned int idOut
 }
 inline dcomplex hAKKn(double s, double cosTheta, double wg, double wz, unsigned int idIn, unsigned int idOut, double hIn, double hOut, unsigned int mode)
 {
+	dcomplex A(0,0);
+	if(fabs(cosTheta)>1.) return A;
 	return ( (hAGKKn(s,wg,idIn,idOut,mode) + hAZKKn(s,wz,idIn,idOut,hIn,hOut,mode))*sqrt(1.+4.*hIn*hOut*cosTheta) );
 }
 inline dcomplex hAKK(double s, double cosTheta, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
@@ -161,7 +171,7 @@ inline double weightZP(double s, double cosTheta, unsigned int idIn, unsigned in
 
 
 //////////////////////////////////////////////////////////
-inline double hA2SMsumQ(double s, double cosTheta, unsigned int idOut)
+inline double hA2SMsumQ(double cosTheta, double s, unsigned int idOut)
 {
 	double A2 = 0.;
 	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on the incoming flavors
@@ -171,7 +181,7 @@ inline double hA2SMsumQ(double s, double cosTheta, unsigned int idOut)
 	}
 	return A2;
 }
-inline double hA2ZPsumQ(double s, double cosTheta, unsigned int idOut)
+inline double hA2ZPsumQ(double cosTheta, double s, unsigned int idOut)
 {
 	double A2 = 0.;
 	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on the incoming flavors
@@ -181,7 +191,7 @@ inline double hA2ZPsumQ(double s, double cosTheta, unsigned int idOut)
 	}
 	return A2;
 }
-inline double hA2KKsumQ(double s, double cosTheta, unsigned int idOut)
+inline double hA2KKsumQ(double cosTheta, double s, unsigned int idOut)
 {
 	double A2 = 0.;
 	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on the incoming flavors
@@ -193,48 +203,86 @@ inline double hA2KKsumQ(double s, double cosTheta, unsigned int idOut)
 }
 
 
-//////////////////////////////////////////////////////////
-inline double hA2SMtot(double s, unsigned int idOut) // integrate over the angle cosTheta
-{
-	double A2 = 0.;
-	// A2 = INTEGRATE( hA2SMsumQ(s,cosTheta,idOut), dcosTheta );
-	return A2;
-}
-inline double hA2ZPtot(double s, unsigned int idOut) // integrate over the angle cosTheta
-{
-	double A2 = 0.;
-	// A2 = INTEGRATE( hA2ZPsumQ(s,cosTheta,idOut), dcosTheta );
-	return A2;
-}
-inline double hA2KKtot(double s, unsigned int idOut) // integrate over the angle cosTheta
-{
-	double A2 = 0.;
-	// A2 = INTEGRATE( hA2KKsumQ(s,cosTheta,idOut), dcosTheta );
-	return A2;
-}
-
-
-/*
+//////////////////////////////////////////////////////////////////
+// http://homepage.mac.com/sigfpe/Computing/fobjects.html
 template<class F>
-float integrate(const F &f, float x0, float x1)
+double integrate(const F &f, double xMin, double xMax, unsigned int nsegments=100)
 {
-	// . . .
-	// . . . f(x) . . .
-	// . . .
+	double dx        = (xMax-xMin)/((double)nsegments);
+	double h         = dx/3.;
+	double integrand = 0.;
+	double I         = 0.;
+	double x         = xMin;
+	unsigned int i   = 0;
+	
+	while(i<=nsegments) // i=0(1st point),...,i=nsegments(point nth+1)
+	{
+		// calculate the integrand 
+		integrand = f(x);
+
+		// simpson
+		if      (i==0 || i==nsegments)           I+=integrand;
+		else if (i%2==0 && i!=0 && i!=nsegments) I+=2.*integrand;
+		else                                     I+=4.*integrand;
+
+		// propagate x and i
+		x += dx;
+		i++;
+	}
+	return(h*I);
 }
 
-class F
+class ISM
 {
-	float y,z;
+	double s;
+	unsigned int idOut;
 	public:
-		F(float y0,float z0) : y(y0), z(z0) { }
+		ISM(double s0, double idOut0) : s(s0), idOut(idOut0) { }
 		template<class X>
-		X operator()(X x) const
+		X operator()(X cosTheta) const
 		{
-			return x*x+y*y+z*z;
+			return hA2SMsumQ(cosTheta,s,idOut);
+		}
+};
+class IZP
+{
+	double s;
+	unsigned int idOut;
+	public:
+		IZP(double s0, double idOut0) : s(s0), idOut(idOut0) { }
+		template<class X>
+		X operator()(X cosTheta) const
+		{
+			return hA2ZPsumQ(cosTheta,s,idOut);
+		}
+};
+class IKK
+{
+	double s;
+	unsigned int idOut;
+	public:
+		IKK(double s0, double idOut0) : s(s0), idOut(idOut0) { }
+		template<class X>
+		X operator()(X cosTheta) const
+		{
+			return hA2SMsumQ(cosTheta,s,idOut);
 		}
 };
 
+class F
+{
+	double y;
+	double z;
+	public:
+		F(double y0, double z0) : y(y0), z(z0) { }
+		template<class X>
+		X operator()(X x) const
+		{
+			return x*y*z;
+		}
+};
+
+/*
 int main() {
 	. . .
 	. . .

@@ -13,6 +13,12 @@
 #include "rawRooFit.h"
 #include "types.h"
 #include "enums.h"
+#include "couplings.h"
+#include "width.h"
+#include "helicity.h"
+using namespace couplings;
+using namespace width;
+using namespace helicity;
 
 // #include <TROOT.h>
 // #include <TSystem.h>

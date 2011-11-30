@@ -289,7 +289,7 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	///////////////////////////////////////////
-	m_analysis->sMCsampleName = str_mcname; ////
+	m_analysis->sMCsampleName = str_mcname; ///
 	///////////////////////////////////////////
 	
 	m_analysis->setCutFlowFile(str_logspath, run_number_str);
@@ -299,6 +299,10 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	m_analysis->setStyle((TString)basedir+"/../src");
 	
 	book();
+	
+	/////////////////////
+	setFermions(); //////
+	/////////////////////
 
 	if(m_treefile!=NULL) m_treefile->cd();
 }

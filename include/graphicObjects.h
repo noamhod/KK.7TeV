@@ -726,6 +726,10 @@ class graphicObjects// : public utilities
 		vector<int>*   truth_all_partons_mc_pdgId;
 		vector<float>* truth_all_partons_mc_charge;
 		
+		vector<double>* truth_all_vKKwgt;
+		vector<double>* truth_all_vZPwgt;
+		vector<double>* truth_all_vBSMmass;
+		
 		bool recon_all_isValid;
 		int recon_all_vxp_n;
 		vector<float>* recon_all_E;

@@ -493,6 +493,10 @@ void graphicObjects::clearTreeVars()
 	truth_all_partons_mc_pdgId->clear();
 	truth_all_partons_mc_charge->clear();
 	
+	truth_all_vKKwgt->clear();
+	truth_all_vZPwgt->clear();
+	truth_all_vBSMmass->clear();
+	
 	recon_all_E->clear();
 	recon_all_pt->clear();
 	recon_all_m->clear();
@@ -1393,6 +1397,10 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	truth_all_partons_mc_pdgId = new vector<int>;
 	truth_all_partons_mc_charge = new vector<float>;
 	
+	truth_all_vKKwgt = new vector<double>;
+	truth_all_vZPwgt = new vector<double>;
+	truth_all_vBSMmass = new vector<double>;
+	
 	if(tDir_truth!=NULL) tDir_truth->cd();
 	tree_truth = new TTree("truth_tree","truth_tree");
 	tree_truth->SetDirectory(tDir_truth);
@@ -1482,6 +1490,10 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_truth->Branch( "truth_all_partons_mc_barcode", &truth_all_partons_mc_barcode);
 	tree_truth->Branch( "truth_all_partons_mc_pdgId", &truth_all_partons_mc_pdgId);
 	tree_truth->Branch( "truth_all_partons_mc_charge", &truth_all_partons_mc_charge);
+	
+	tree_truth->Branch( "truth_all_vKKwgt", &truth_all_vKKwgt);
+	tree_truth->Branch( "truth_all_vZPwgt", &truth_all_vZPwgt);
+	tree_truth->Branch( "truth_all_vBSMmass", &truth_all_vBSMmass);
 	
 	tree_truth->Branch( "recon_all_isValid",  &recon_all_isValid );
 	tree_truth->Branch( "recon_all_vxp_n",  &recon_all_vxp_n );

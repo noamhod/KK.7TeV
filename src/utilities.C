@@ -109,12 +109,13 @@ string utilities::pickMCinputSampe()
 	mcSamplesMap.insert( make_pair( 305,"AlpgenJimmyWmunuNp5_pt20" ) );
 	
 	mcSamplesMap.insert( make_pair( 400,"Zprime_mumu_SSM250" ) );
-	mcSamplesMap.insert( make_pair( 401,"Zprime_mumu_SSM750" ) );
-	mcSamplesMap.insert( make_pair( 402,"Zprime_mumu_SSM1000" ) );
-	mcSamplesMap.insert( make_pair( 403,"Zprime_mumu_SSM1250" ) );
-	mcSamplesMap.insert( make_pair( 404,"Zprime_mumu_SSM1500" ) );
-	mcSamplesMap.insert( make_pair( 405,"Zprime_mumu_SSM1750" ) );
-	mcSamplesMap.insert( make_pair( 406,"Zprime_mumu_SSM2000" ) );
+	mcSamplesMap.insert( make_pair( 401,"Zprime_mumu_SSM500" ) );
+	mcSamplesMap.insert( make_pair( 402,"Zprime_mumu_SSM750" ) );
+	mcSamplesMap.insert( make_pair( 403,"Zprime_mumu_SSM1000" ) );
+	mcSamplesMap.insert( make_pair( 404,"Zprime_mumu_SSM1250" ) );
+	mcSamplesMap.insert( make_pair( 405,"Zprime_mumu_SSM1500" ) );
+	mcSamplesMap.insert( make_pair( 406,"Zprime_mumu_SSM1750" ) );
+	mcSamplesMap.insert( make_pair( 407,"Zprime_mumu_SSM2000" ) );
 	
 	mcSamplesMap.insert( make_pair( 500,"WW_Herwig" ) );
 	mcSamplesMap.insert( make_pair( 501,"WZ_Herwig" ) );

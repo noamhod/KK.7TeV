@@ -2941,6 +2941,36 @@ void analysisSkeleton::fillTruth()
 		truth_all_partons_mc_barcode->push_back( mc_barcode->at(q) );
 		truth_all_partons_mc_charge->push_back( mc_charge->at(q) );
 	}
+	
+	if(sMCsampleName.find("DYmumu")!=string::npos  ||  sMCsampleName.find("Zmumu")!=string::npos)
+	{
+		// BSM mass range
+		double mMin = 500.;  //130.;
+		double mMax = 2000.; //4130.;
+		double dm   = 250.;  //40.;
+		double MZ = mc_m->at(4)*MeV2GeV;  // the "Z" is always number 4 in the event
+		double S = MZ*MZ;
+		unsigned int idIn = (unsigned int)fabs(mc_pdgId->at(2)); // the incoming quarks are always at the 2 and 3 places in the event
+		unsigned int idOut = 13;
+		TVector3 pQ,pM;
+		unsigned int jq  = (mc_pdgId->at(2)>0) ? 2:3;
+		unsigned int jmu = (mc_pdgId->at(5)>0) ? 5:6;
+		pQ.SetPtEtaPhi(mc_pt->at(jq)*MeV2GeV,mc_eta->at(jq),mc_phi->at(jq));
+		pM.SetPtEtaPhi(mc_pt->at(jmu)*MeV2GeV,mc_eta->at(jmu),mc_phi->at(jmu));
+		double cosTh = pM.Dot(pQ)/(pM.Mag()*pQ.Mag());
+		for(double Mass=mMin ; Mass<=mMax ; Mass+=dm)
+		{
+			if(Mass==1250.) continue;
+			mKK = Mass;
+			mZP = mKK;
+			KKwgt = weightKK(cosTh,S,idIn,idOut);
+			ZPwgt = weightZP(cosTh,S,idIn,idOut);
+			truth_all_vBSMmass->push_back(Mass);
+			truth_all_vKKwgt->push_back(KKwgt);
+			truth_all_vZPwgt->push_back(ZPwgt);
+		}
+	}
+	
 	// truth_all_partons_mc_m->push_back( mc_m->at(2)*MeV2GeV );
 	// truth_all_partons_mc_pt->push_back( mc_pt->at(2)*MeV2GeV );
 	// truth_all_partons_mc_eta->push_back( mc_eta->at(2) );

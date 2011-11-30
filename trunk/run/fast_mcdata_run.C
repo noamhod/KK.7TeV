@@ -1,15 +1,30 @@
-//#include "basicIncludes.h"
-
-#include "../include/types.h"
 #include "../include/rawStd.h"
 #include "../include/rawROOT.h"
+#include "../include/types.h"
 #include "../include/logs.h"
 #include "../include/style.h"
 #include "../include/bins.h"
 #include "../include/histos.h"
 #include "../include/fkinematics.h"
 #include "../include/units.h"
+#include "../include/couplings.h"
+#include "../include/width.h"
+#include "../include/helicity.h"
 
+bool drawGmm = false;
+
+TMapTSTC cGmm;
+TMapTSTC cZprime;
+TMapTSTC cZprimeTemplate;
+TMapTSTC cKKTemplate;
+
+double mZprimeMin = 500.;
+double mZprimeMax = 2000.;
+double dMZprime   = 250.;
+	
+double mGmmMin = 1750.;
+double mGmmMax = 2250.;
+double dMGmm   = 250.;
 
 TFile* file;
 TTree* tree;
@@ -18,6 +33,7 @@ TString tName;
 TPaveText* pvtxt_lumi;
 TPaveText* pvtxt_atlas;
 TLegend*   leg;
+TLegend*   leg_template;
 TText* txt;
 TMapTSP2TCNV  cnvMap;
 TMapTSP2TOBJ  oMap;
@@ -116,6 +132,10 @@ vector<int>*   truth_all_partons_mc_status;
 vector<int>*   truth_all_partons_mc_barcode;
 vector<int>*   truth_all_partons_mc_pdgId;
 vector<float>* truth_all_partons_mc_charge;
+
+vector<double>* truth_all_vKKwgt;
+vector<double>* truth_all_vZPwgt;
+vector<double>* truth_all_vBSMmass;
 
 bool recon_all_isValid;
 int recon_all_vxp_n;
@@ -272,16 +292,43 @@ void text()
 	leg->AddEntry(h1Map["hMassData"],"Data","lep");
 	leg->AddEntry(h1Map["hMassDYmumu"],"DYmumu","f");
 	leg->AddEntry(h1Map["hMassDiboson"],"Diboson","f");
-	leg->AddEntry(h1Map["hMassGmm_01_1750"],"1750 GeV G*","l");
-	leg->AddEntry(h1Map["hMassGmm_01_2000"],"2000 GeV G*","l");
-	leg->AddEntry(h1Map["hMassGmm_01_2250"],"2250 GeV G*","l");
+	if(drawGmm) leg->AddEntry(h1Map["hMassGmm_01_1750"],"1750 GeV G*","l");
+	if(drawGmm) leg->AddEntry(h1Map["hMassGmm_01_2000"],"2000 GeV G*","l");
+	if(drawGmm) leg->AddEntry(h1Map["hMassGmm_01_2250"],"2250 GeV G*","l");
+	leg->AddEntry(h1Map["hMassZprime_SSM1000"],"Z'_{SSM} 1.00 TeV","l");
+	leg->AddEntry(h1Map["hMassZprime_SSM1500"],"Z'_{SSM} 1.50 TeV","l");
+	leg->AddEntry(h1Map["hMassZprime_SSM1750"],"Z'_{SSM} 1.75 TeV","l");
+	leg->AddEntry(h1Map["hMassZprime_SSM2000"],"Z'_{SSM} 2.00 TeV","l");
 }
 
-void draw(TObject* tobj, TString drawopt="", Bool_t logx=!dolog, Bool_t logy=!dolog, Bool_t logz=!dolog)
+void templateText(TString tsMCname, TString tsMClegEntry)
+{
+	if(leg_template==NULL)
+	{
+		leg_template = new TLegend(0.6,0.70,0.7919463,0.87,NULL,"brNDC");
+		leg_template->SetFillStyle(4000); //will be transparent
+		leg_template->SetFillColor(0);
+		leg_template->SetTextFont(42);
+	}
+	else leg_template->Clear();
+	if(!tsMCname.Contains("KK"))
+	{
+		leg_template->AddEntry(h1Map[tsMCname+"_template"],tsMClegEntry+" Template","f");
+		leg_template->AddEntry(h1Map[tsMCname],tsMClegEntry,"l");
+	}
+	else
+	{
+		leg_template->AddEntry(h1Map[tsMCname],tsMClegEntry+" Template","l");
+		leg_template->AddEntry(h1Map["hMassDYmumu"],"DY","f");
+	}
+}
+
+
+void draw(TObject* tobj, TString newname="", TString drawopt="", Bool_t logx=!dolog, Bool_t logy=!dolog, Bool_t logz=!dolog)
 {
 	_DEBUG("draw");
 
-	TString oName = (TString)tobj->GetName();
+	TString oName = (newname=="") ? (TString)tobj->GetName() : newname;
 	TString cName = "c"+oName;
 	cnvMap.insert( make_pair(oName, new TCanvas(cName,cName,600,400)) );
 	if(logx) cnvMap[oName]->SetLogx();
@@ -290,6 +337,7 @@ void draw(TObject* tobj, TString drawopt="", Bool_t logx=!dolog, Bool_t logy=!do
 	cnvMap[oName]->cd();
 	tobj->Draw(drawopt);
 	cnvMap[oName]->RedrawAxis();
+	cnvMap[oName]->Update();
 }
 
 void drawratio(TH1* th1n, TH1* th1d, vector<TString>& vtsMCbgds, TString drawopt_n="", TString drawopt_d="", Bool_t logx=!dolog, Bool_t logy=!dolog)
@@ -387,6 +435,7 @@ void drawon(TString existing_oName, TObject* tobj, TString drawopt="", Int_t pad
 	if(drawopt=="") tobj->Draw("SAMES");
 	else            tobj->Draw(drawopt+" SAMES");
 	cnvMap[existing_oName]->RedrawAxis();
+	cnvMap[existing_oName]->Update();
 }
 
 void drawtxton(TString existing_oName, bool is2d=false)
@@ -397,6 +446,16 @@ void drawtxton(TString existing_oName, bool is2d=false)
 	pvtxt_lumi->Draw("SAMES");
 	pvtxt_atlas->Draw("SAMES");
 	if(!is2d) leg->Draw("SAMES");
+}
+
+void drawtemplatetxton(TString existing_oName)
+{
+	_DEBUG("drawtxton");
+
+	cnvMap[existing_oName]->cd();
+	pvtxt_lumi->Draw("SAMES");
+	pvtxt_atlas->Draw("SAMES");
+	leg_template->DrawClone("SAMES");
 }
 
 void save(TString oDir)
@@ -418,12 +477,19 @@ void save(TString oDir)
 	TString pName = oDir+"/mcdata_histograms.root";
 
 	TFile* f = new TFile(pName,"RECREATE");
+	_INFO("");
 	f->cd();
+	_INFO("");
 	for(TMapTSP2TH1::iterator it=h1Map.begin() ; it!=h1Map.end() ; ++it) it->second->Write();
+	_INFO("");
 	for(TMapTSP2TH2::iterator it=h2Map.begin() ; it!=h2Map.end() ; ++it) it->second->Write();
+	_INFO("");
 	f->Write();
+	_INFO("");
 	f->Close();
+	_INFO("");
 	delete f;
+	_INFO("");
 }
 
 void clearMaps()
@@ -568,6 +634,34 @@ void setDATAtree()
 	tree = (TTree*)file->Get(tName);
 }
 
+void colors()
+{
+	cGmm.insert( make_pair("Gmm_01_1750",kViolet+1) );
+	cGmm.insert( make_pair("Gmm_01_2000",kViolet+6) );
+	cGmm.insert( make_pair("Gmm_01_2250",kViolet+10) );
+	
+	// cZprime.insert( make_pair("Zprime_SSM500",kAzure+0) );
+	// cZprime.insert( make_pair("Zprime_SSM750",kAzure+0) );
+	cZprime.insert( make_pair("Zprime_SSM1000",kAzure+0) );
+	cZprime.insert( make_pair("Zprime_SSM1500",kAzure-2) );
+	cZprime.insert( make_pair("Zprime_SSM1750",kAzure-3) );
+	cZprime.insert( make_pair("Zprime_SSM2000",kAzure-4) );
+	
+	// cZprimeTemplate.insert( make_pair("Zprime_SSM500",kAzure+0) );
+	// cZprimeTemplate.insert( make_pair("Zprime_SSM750",kAzure+0) );
+	cZprimeTemplate.insert( make_pair("Zprime_SSM1000_template",kOrange+10) );
+	cZprimeTemplate.insert( make_pair("Zprime_SSM1500_template",kOrange+8) );
+	cZprimeTemplate.insert( make_pair("Zprime_SSM1750_template",kOrange+5) );
+	cZprimeTemplate.insert( make_pair("Zprime_SSM2000_template",kOrange+3) );
+	
+	// cKKTemplate.insert( make_pair("Zprime_SSM500",kAzure+0) );
+	// cKKTemplate.insert( make_pair("Zprime_SSM750",kAzure+0) );
+	cKKTemplate.insert( make_pair("KK1000_template",kGreen+4) );
+	cKKTemplate.insert( make_pair("KK1500_template",kOrange-1) );
+	cKKTemplate.insert( make_pair("KK1750_template",kOrange-5) );
+	cKKTemplate.insert( make_pair("KK2000_template",kOrange-8) );
+}
+
 void setMCtrees(TString tsMCname)
 {
 	_DEBUG("setMCtrees");
@@ -578,7 +672,7 @@ void setMCtrees(TString tsMCname)
 	
 	if(tsMCname=="DYmumu")
 	{
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Zmumu.root", "mcLocalControl_Zmumu", 5000000, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
+		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Zmumu.root", "mcLocalControl_Zmumu", 4878990, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
 		
 		// setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_75M120.root", "mcLocalControl_DYmumu_75M120", 20000, 7.9862E-01*nb2fb);
 		// setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 20000, 8.5275E-03*nb2fb);
@@ -602,6 +696,7 @@ void setMCtrees(TString tsMCname)
 		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_ZZ_Herwig.root", "mcLocalControl_ZZ_Herwig", 244999,  4.5721E-03*nb2fb*2.1319E-01);
 	}
 	
+	
 	if(tsMCname=="Gmm_01_1750")
 	{
 		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Gmm_01_1750.root", "mcLocalControl_Gmm_01_1750", 10000, 1.6320E-06*nb2fb);
@@ -613,6 +708,31 @@ void setMCtrees(TString tsMCname)
 	if(tsMCname=="Gmm_01_2250")
 	{
 		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Gmm_01_2250.root", "mcLocalControl_Gmm_01_2250", 10000, 2.1381E-07*nb2fb);
+	}
+	
+	// if(tsMCname=="Zprime_SSM500")
+	// {
+		// setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Zprime_SSM500.root", "mcLocalControl_Zprime_SSM500", 20000, 2.6071E-03*nb2fb);
+	// }
+	// if(tsMCname=="Zprime_SSM750")
+	// {
+		// setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Zprime_SSM750.root", "mcLocalControl_Zprime_SSM750", 20000, 4.7349E-04*nb2fb);
+	// }
+	if(tsMCname=="Zprime_SSM1000")
+	{
+		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Zprime_mumu_SSM1000.root", "mcLocalControl_Zprime_SSM1000", 20000, 1.2466E-04*nb2fb);
+	}
+	if(tsMCname=="Zprime_SSM1500")
+	{
+		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Zprime_mumu_SSM1500.root", "mcLocalControl_Zprime_SSM1500", 20000, 1.4380E-05*nb2fb);
+	}
+	if(tsMCname=="Zprime_SSM1750")
+	{
+		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Zprime_mumu_SSM1750.root", "mcLocalControl_Zprime_SSM1750", 20000, 5.6743E-06*nb2fb);
+	}
+	if(tsMCname=="Zprime_SSM2000")
+	{
+		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Zprime_mumu_SSM2000.root", "mcLocalControl_Zprime_SSM2000", 20000, 2.4357E-06*nb2fb);
 	}	
 }
 
@@ -715,6 +835,10 @@ void setMCbranches()
 	tree->SetBranchAddress("truth_all_partons_mc_barcode", &truth_all_partons_mc_barcode);
 	tree->SetBranchAddress("truth_all_partons_mc_pdgId", &truth_all_partons_mc_pdgId);
 	tree->SetBranchAddress("truth_all_partons_mc_charge", &truth_all_partons_mc_charge);
+	
+	tree->SetBranchAddress("truth_all_vKKwgt",   &truth_all_vKKwgt);
+	tree->SetBranchAddress("truth_all_vZPwgt",   &truth_all_vZPwgt);
+	tree->SetBranchAddress("truth_all_vBSMmass", &truth_all_vBSMmass);
 
 	tree->SetBranchAddress("recon_all_isValid", &recon_all_isValid);
 	tree->SetBranchAddress("recon_all_vxp_n", &recon_all_vxp_n);
@@ -837,18 +961,75 @@ void hbook()
 	h1Map.insert( make_pair("hCosThetaLimitBins_Data", new TH1D("hCosThetaLimitBins_Data","Data;cos#theta*;Events",nCosThetaBinsLimit,minCosThetaLimit,maxCosThetaLimit)) );
 	h1Map.insert( make_pair("hCosThetaLimitBins_DYmumu", new TH1D("hCosThetaLimitBins_DYmumu","DYmumu;cos#theta*;Events",nCosThetaBinsLimit,minCosThetaLimit,maxCosThetaLimit)) );
 	h1Map.insert( make_pair("hCosThetaLimitBins_Diboson", new TH1D("hCosThetaLimitBins_Diboson","Diboson;cos#theta*;Events",nCosThetaBinsLimit,minCosThetaLimit,maxCosThetaLimit)) );
-	h1Map.insert( make_pair("hCosThetaLimitBins_Gmm_01_1750", new TH1D("hCosThetaLimitBins_Gmm_01_1750","Gmm_01_1750;cos#theta*;Events",nCosThetaBinsLimit,minCosThetaLimit,maxCosThetaLimit)) );
-	h1Map.insert( make_pair("hCosThetaLimitBins_Gmm_01_2000", new TH1D("hCosThetaLimitBins_Gmm_01_2000","Gmm_01_2000;cos#theta*;Events",nCosThetaBinsLimit,minCosThetaLimit,maxCosThetaLimit)) );
-	h1Map.insert( make_pair("hCosThetaLimitBins_Gmm_01_2250", new TH1D("hCosThetaLimitBins_Gmm_01_2250","Gmm_01_2250;cos#theta*;Events",nCosThetaBinsLimit,minCosThetaLimit,maxCosThetaLimit)) );
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsname  = "hCosThetaLimitBins_Gmm_01_" + (TString)_s(M);
+		TString tstitle = "Gmm_01_" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,tstitle+";cos#theta*;Events",nCosThetaBinsLimit,minCosThetaLimit,maxCosThetaLimit)) );
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsname = "hCosThetaLimitBins_Zprime_SSM" + (TString)_s(M);
+		TString tstitle = "Zprime_SSM" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,tstitle+";cos#theta*;Events",nCosThetaBinsLimit,minCosThetaLimit,maxCosThetaLimit)) );
+	}
 	
 	// no need to draw these
 	h1Map.insert( make_pair("hdEtaLimitBins_Data", new TH1D("hdEtaLimitBins_Data","Data;#Delta#eta;Events",ndEtaBinsLimit,mindEtaLimit,maxdEtaLimit)) );
 	h1Map.insert( make_pair("hdEtaLimitBins_DYmumu", new TH1D("hdEtaLimitBins_DYmumu","DYmumu;#Delta#eta;Events",ndEtaBinsLimit,mindEtaLimit,maxdEtaLimit)) );
 	h1Map.insert( make_pair("hdEtaLimitBins_Diboson", new TH1D("hdEtaLimitBins_Diboson","Diboson;#Delta#eta;Events",ndEtaBinsLimit,mindEtaLimit,maxdEtaLimit)) );
-	h1Map.insert( make_pair("hdEtaLimitBins_Gmm_01_1750", new TH1D("hdEtaLimitBins_Gmm_01_1750","Gmm_01_1750;#Delta#eta;Events",ndEtaBinsLimit,mindEtaLimit,maxdEtaLimit)) );
-	h1Map.insert( make_pair("hdEtaLimitBins_Gmm_01_2000", new TH1D("hdEtaLimitBins_Gmm_01_2000","Gmm_01_2000;#Delta#eta;Events",ndEtaBinsLimit,mindEtaLimit,maxdEtaLimit)) );
-	h1Map.insert( make_pair("hdEtaLimitBins_Gmm_01_2250", new TH1D("hdEtaLimitBins_Gmm_01_2250","Gmm_01_2250;#Delta#eta;Events",ndEtaBinsLimit,mindEtaLimit,maxdEtaLimit)) );
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsname  = "hdEtaLimitBins_Gmm_01_" + (TString)_s(M);
+		TString tstitle = "Gmm_01_" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,tstitle+";#Delta#eta;Events",ndEtaBinsLimit,mindEtaLimit,maxdEtaLimit)) );
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsname = "hdEtaLimitBins_Zprime_SSM" + (TString)_s(M);
+		TString tstitle = "Zprime_SSM" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,tstitle+";#Delta#eta;Events",ndEtaBinsLimit,mindEtaLimit,maxdEtaLimit)) );
+	}
 	
+	
+	/////////////////////////////////////
+	// TEMPLATES
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsMCname = "";
+		TString tsname = "";
+		
+		/// imass
+		tsMCname = "Zprime_SSM" + (TString)_s(M) + "_template";
+		tsname   = "hMassZprime_SSM" + (TString)_s(M) + "_template";
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprimeTemplate[tsMCname],cZprimeTemplate[tsMCname],-1);
+		
+		tsMCname = "KK" + (TString)_s(M) + "_template";
+		tsname   = "hMassKK" + (TString)_s(M) + "_template";
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cKKTemplate[tsMCname],-1,-1);
+		
+		/// pT leading
+		tsMCname = "Zprime_SSM" + (TString)_s(M) + "_template";
+		tsname   = "hpTLeadingZprime_SSM" + (TString)_s(M) + "_template";
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprimeTemplate[tsMCname],cZprimeTemplate[tsMCname],-1);
+		
+		tsMCname = "KK" + (TString)_s(M) + "_template";
+		tsname   = "hpTLeadingKK" + (TString)_s(M) + "_template";
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cKKTemplate[tsMCname],-1,-1);
+	}
+	
+	/////////////////////////////////////
 	h1Map.insert( make_pair("hMassMCsum", new TH1D("hMassMCsum",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
 	setlogx(h1Map["hMassMCsum"]);
 	graphics(h1Map["hMassMCsum"],  20,0.8,  -1,  -1,-1,  -1,-1,kRed);
@@ -861,15 +1042,23 @@ void hbook()
 	h1Map.insert( make_pair("hMassDiboson", new TH1D("hMassDiboson",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
 	setlogx(h1Map["hMassDiboson"]);
 	graphics(h1Map["hMassDiboson"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	h1Map.insert( make_pair("hMassGmm_01_1750", new TH1D("hMassGmm_01_1750",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
-	setlogx(h1Map["hMassGmm_01_1750"]);
-	graphics(h1Map["hMassGmm_01_1750"],  -1,-1,  -1,  1,2,  kViolet+1,-1,-1);
-	h1Map.insert( make_pair("hMassGmm_01_2000", new TH1D("hMassGmm_01_2000",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
-	setlogx(h1Map["hMassGmm_01_2000"]);
-	graphics(h1Map["hMassGmm_01_2000"],  -1,-1,  -1,  1,2,  kViolet+6,-1,-1);
-	h1Map.insert( make_pair("hMassGmm_01_2250", new TH1D("hMassGmm_01_2250",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
-	setlogx(h1Map["hMassGmm_01_2250"]);
-	graphics(h1Map["hMassGmm_01_2250"],  -1,-1,  -1,  1,2,  kViolet+10,-1,-1);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsMCname = "Gmm_01_" + (TString)_s(M);
+		TString tsname = "hMassGmm_01_" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsMCname = "Zprime_SSM" + (TString)_s(M);
+		TString tsname = "hMassZprime_SSM" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
+	}
 	
 	
 	h1Map.insert( make_pair("hNvxpMCsum", new TH1D("hNvxpMCsum",";N_{vertices};Events",35,1.,36.)) );
@@ -880,12 +1069,21 @@ void hbook()
 	graphics(h1Map["hNvxpDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
 	h1Map.insert( make_pair("hNvxpDiboson", new TH1D("hNvxpDiboson",";N_{vertices};Events",35,1.,36.)) );
 	graphics(h1Map["hNvxpDiboson"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	h1Map.insert( make_pair("hNvxpGmm_01_1750", new TH1D("hNvxpGmm_01_1750",";N_{vertices};Events",35,1.,36.)) );
-	graphics(h1Map["hNvxpGmm_01_1750"],  -1,-1,  -1,  1,2,  kViolet+1,-1,-1);
-	h1Map.insert( make_pair("hNvxpGmm_01_2000", new TH1D("hNvxpGmm_01_2000",";N_{vertices};Events",35,1.,36.)) );
-	graphics(h1Map["hNvxpGmm_01_2000"],  -1,-1,  -1,  1,2,  kViolet+6,-1,-1);
-	h1Map.insert( make_pair("hNvxpGmm_01_2250", new TH1D("hNvxpGmm_01_2250",";N_{vertices};Events",35,1.,36.)) );
-	graphics(h1Map["hNvxpGmm_01_2250"],  -1,-1,  -1,  1,2,  kViolet+10,-1,-1);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsMCname = "Gmm_01_" + (TString)_s(M);
+		TString tsname = "hNvxpGmm_01_" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";N_{vertices};Events",35,1.,36.)) );
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsMCname = "Zprime_SSM" + (TString)_s(M);
+		TString tsname = "hNvxpZprime_SSM" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";N_{vertices};Events",35,1.,36.)) );
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
+	}
 	
 	h1Map.insert( make_pair("hNvxpMCsum_with_puwgt", new TH1D("hNvxpMCsum_with_puwgt",";N_{vertices};Events",35,1.,36.)) );
 	graphics(h1Map["hNvxpMCsum_with_puwgt"],  20,0.8,  -1,  -1,-1,  -1,-1,kRed);
@@ -895,12 +1093,21 @@ void hbook()
 	graphics(h1Map["hNvxpDYmumu_with_puwgt"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
 	h1Map.insert( make_pair("hNvxpDiboson_with_puwgt", new TH1D("hNvxpDiboson_with_puwgt",";N_{vertices};Events",35,1.,36.)) );
 	graphics(h1Map["hNvxpDiboson_with_puwgt"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	h1Map.insert( make_pair("hNvxpGmm_01_1750_with_puwgt", new TH1D("hNvxpGmm_01_1750_with_puwgt",";N_{vertices};Events",35,1.,36.)) );
-	graphics(h1Map["hNvxpGmm_01_1750_with_puwgt"],  -1,-1,  -1,  1,2,  kViolet+1,-1,-1);
-	h1Map.insert( make_pair("hNvxpGmm_01_2000_with_puwgt", new TH1D("hNvxpGmm_01_2000_with_puwgt",";N_{vertices};Events",35,1.,36.)) );
-	graphics(h1Map["hNvxpGmm_01_2000_with_puwgt"],  -1,-1,  -1,  1,2,  kViolet+6,-1,-1);
-	h1Map.insert( make_pair("hNvxpGmm_01_2250_with_puwgt", new TH1D("hNvxpGmm_01_2250_with_puwgt",";N_{vertices};Events",35,1.,36.)) );
-	graphics(h1Map["hNvxpGmm_01_2250_with_puwgt"],  -1,-1,  -1,  1,2,  kViolet+10,-1,-1);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsMCname = "Gmm_01_" + (TString)_s(M);
+		TString tsname = "hNvxpGmm_01_" + (TString)_s(M) + "_with_puwgt";
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";N_{vertices};Events",35,1.,36.)) );
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsMCname = "Zprime_SSM" + (TString)_s(M);
+		TString tsname = "hNvxpZprime_SSM" + (TString)_s(M) + "_with_puwgt";
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";N_{vertices};Events",35,1.,36.)) );
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
+	}
 	
 	h1Map.insert( make_pair("hyQMCsum", new TH1D("hyQMCsum",";y_{Q};Events",nyQbins,minyQ,maxyQ)) );
 	setlogx(h1Map["hyQMCsum"]);
@@ -914,15 +1121,23 @@ void hbook()
 	h1Map.insert( make_pair("hyQDiboson", new TH1D("hyQDiboson",";y_{Q};Events",nyQbins,minyQ,maxyQ)) );
 	setlogx(h1Map["hyQDiboson"]);
 	graphics(h1Map["hyQDiboson"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	h1Map.insert( make_pair("hyQGmm_01_1750", new TH1D("hyQGmm_01_1750",";y_{Q};Events",nyQbins,minyQ,maxyQ)) );
-	setlogx(h1Map["hyQGmm_01_1750"]);
-	graphics(h1Map["hyQGmm_01_1750"],  -1,-1,  -1,  1,2,  kViolet+1,-1,-1);
-	h1Map.insert( make_pair("hyQGmm_01_2000", new TH1D("hyQGmm_01_2000",";y_{Q};Events",nyQbins,minyQ,maxyQ)) );
-	setlogx(h1Map["hyQGmm_01_2000"]);
-	graphics(h1Map["hyQGmm_01_2000"],  -1,-1,  -1,  1,2,  kViolet+6,-1,-1);
-	h1Map.insert( make_pair("hyQGmm_01_2250", new TH1D("hyQGmm_01_2250",";y_{Q};Events",nyQbins,minyQ,maxyQ)) );
-	setlogx(h1Map["hyQGmm_01_2250"]);
-	graphics(h1Map["hyQGmm_01_2250"],  -1,-1,  -1,  1,2,  kViolet+10,-1,-1);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsMCname = "Gmm_01_" + (TString)_s(M);
+		TString tsname = "hyQGmm_01_" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";y_{Q};Events",nyQbins,minyQ,maxyQ)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsMCname = "Zprime_SSM" + (TString)_s(M);
+		TString tsname = "hyQZprime_SSM" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";y_{Q};Events",nyQbins,minyQ,maxyQ)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
+	}
 	
 	h1Map.insert( make_pair("hQTMCsum", new TH1D("hQTMCsum",";Q_{T} GeV;Events",nlogptbins,logptbins)) );
 	setlogx(h1Map["hQTMCsum"]);
@@ -936,15 +1151,23 @@ void hbook()
 	h1Map.insert( make_pair("hQTDiboson", new TH1D("hQTDiboson",";Q_{T} GeV;Events",nlogptbins,logptbins)) );
 	setlogx(h1Map["hQTDiboson"]);
 	graphics(h1Map["hQTDiboson"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	h1Map.insert( make_pair("hQTGmm_01_1750", new TH1D("hQTGmm_01_1750",";Q_{T} GeV;Events",nlogptbins,logptbins)) );
-	setlogx(h1Map["hQTGmm_01_1750"]);
-	graphics(h1Map["hQTGmm_01_1750"],  -1,-1,  -1,  1,2,  kViolet+1,-1,-1);
-	h1Map.insert( make_pair("hQTGmm_01_2000", new TH1D("hQTGmm_01_2000",";Q_{T} GeV;Events",nlogptbins,logptbins)) );
-	setlogx(h1Map["hQTGmm_01_2000"]);
-	graphics(h1Map["hQTGmm_01_2000"],  -1,-1,  -1,  1,2,  kViolet+6,-1,-1);
-	h1Map.insert( make_pair("hQTGmm_01_2250", new TH1D("hQTGmm_01_2250",";Q_{T} GeV;Events",nlogptbins,logptbins)) );
-	setlogx(h1Map["hQTGmm_01_2250"]);
-	graphics(h1Map["hQTGmm_01_2250"],  -1,-1,  -1,  1,2,  kViolet+10,-1,-1);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsMCname = "Gmm_01_" + (TString)_s(M);
+		TString tsname = "hQTGmm_01_" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";Q_{T} GeV;Events",nlogptbins,logptbins)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsMCname = "Zprime_SSM" + (TString)_s(M);
+		TString tsname = "hQTZprime_SSM" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";Q_{T} GeV;Events",nlogptbins,logptbins)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
+	}
 	
 	h1Map.insert( make_pair("hEtaLeadingMCsum", new TH1D("hEtaLeadingMCsum",";#eta_{#mu}^{leading};Events",etalogicnbins,etalogicbins)) );
 	setlogx(h1Map["hEtaLeadingMCsum"]);
@@ -958,15 +1181,23 @@ void hbook()
 	h1Map.insert( make_pair("hEtaLeadingDiboson", new TH1D("hEtaLeadingDiboson",";#eta_{#mu}^{leading};Events",etalogicnbins,etalogicbins)) );
 	setlogx(h1Map["hEtaLeadingDiboson"]);
 	graphics(h1Map["hEtaLeadingDiboson"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	h1Map.insert( make_pair("hEtaLeadingGmm_01_1750", new TH1D("hEtaLeadingGmm_01_1750",";#eta_{#mu}^{leading};Events",etalogicnbins,etalogicbins)) );
-	setlogx(h1Map["hEtaLeadingGmm_01_1750"]);
-	graphics(h1Map["hEtaLeadingGmm_01_1750"],  -1,-1,  -1,  1,2,  kViolet+1,-1,-1);
-	h1Map.insert( make_pair("hEtaLeadingGmm_01_2000", new TH1D("hEtaLeadingGmm_01_2000",";#eta_{#mu}^{leading};Events",etalogicnbins,etalogicbins)) );
-	setlogx(h1Map["hEtaLeadingGmm_01_2000"]);
-	graphics(h1Map["hEtaLeadingGmm_01_2000"],  -1,-1,  -1,  1,2,  kViolet+6,-1,-1);
-	h1Map.insert( make_pair("hEtaLeadingGmm_01_2250", new TH1D("hEtaLeadingGmm_01_2250",";#eta_{#mu}^{leading};Events",etalogicnbins,etalogicbins)) );
-	setlogx(h1Map["hEtaLeadingGmm_01_2250"]);
-	graphics(h1Map["hEtaLeadingGmm_01_2250"],  -1,-1,  -1,  1,2,  kViolet+10,-1,-1);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsMCname = "Gmm_01_" + (TString)_s(M);
+		TString tsname = "hEtaLeadingGmm_01_" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";#eta_{#mu}^{leading};Events",etalogicnbins,etalogicbins)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsMCname = "Zprime_SSM" + (TString)_s(M);
+		TString tsname = "hEtaLeadingZprime_SSM" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";#eta_{#mu}^{leading};Events",etalogicnbins,etalogicbins)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
+	}
 	
 	h1Map.insert( make_pair("hEtaSubleadingMCsum", new TH1D("hEtaSubleadingMCsum",";#eta_{#mu}^{subleading};Events",etalogicnbins,etalogicbins)) );
 	setlogx(h1Map["hEtaSubleadingMCsum"]);
@@ -980,15 +1211,23 @@ void hbook()
 	h1Map.insert( make_pair("hEtaSubleadingDiboson", new TH1D("hEtaSubleadingDiboson",";#eta_{#mu}^{subleading};Events",etalogicnbins,etalogicbins)) );
 	setlogx(h1Map["hEtaSubleadingDiboson"]);
 	graphics(h1Map["hEtaSubleadingDiboson"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	h1Map.insert( make_pair("hEtaSubleadingGmm_01_1750", new TH1D("hEtaSubleadingGmm_01_1750",";#eta_{#mu}^{subleading};Events",etalogicnbins,etalogicbins)) );
-	setlogx(h1Map["hEtaSubleadingGmm_01_1750"]);
-	graphics(h1Map["hEtaSubleadingGmm_01_1750"],  -1,-1,  -1,  1,2,  kViolet+1,-1,-1);
-	h1Map.insert( make_pair("hEtaSubleadingGmm_01_2000", new TH1D("hEtaSubleadingGmm_01_2000",";#eta_{#mu}^{subleading};Events",etalogicnbins,etalogicbins)) );
-	setlogx(h1Map["hEtaSubleadingGmm_01_2000"]);
-	graphics(h1Map["hEtaSubleadingGmm_01_2000"],  -1,-1,  -1,  1,2,  kViolet+6,-1,-1);
-	h1Map.insert( make_pair("hEtaSubleadingGmm_01_2250", new TH1D("hEtaSubleadingGmm_01_2250",";#eta_{#mu}^{subleading};Events",etalogicnbins,etalogicbins)) );
-	setlogx(h1Map["hEtaSubleadingGmm_01_2250"]);
-	graphics(h1Map["hEtaSubleadingGmm_01_2250"],  -1,-1,  -1,  1,2,  kViolet+10,-1,-1);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsMCname = "Gmm_01_" + (TString)_s(M);
+		TString tsname = "hEtaSubleadingGmm_01_" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";#eta_{#mu}^{subleading};Events",etalogicnbins,etalogicbins)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsMCname = "Zprime_SSM" + (TString)_s(M);
+		TString tsname = "hEtaSubleadingZprime_SSM" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";#eta_{#mu}^{subleading};Events",etalogicnbins,etalogicbins)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
+	}
 	
 	h1Map.insert( make_pair("hPhiLeadingMCsum", new TH1D("hPhiLeadingMCsum",";#phi_{#mu}^{leading};Events",nphibins,phimin,phimax)) );
 	setlogx(h1Map["hPhiLeadingMCsum"]);
@@ -1002,15 +1241,23 @@ void hbook()
 	h1Map.insert( make_pair("hPhiLeadingDiboson", new TH1D("hPhiLeadingDiboson",";#phi_{#mu}^{leading};Events",nphibins,phimin,phimax)) );
 	setlogx(h1Map["hPhiLeadingDiboson"]);
 	graphics(h1Map["hPhiLeadingDiboson"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	h1Map.insert( make_pair("hPhiLeadingGmm_01_1750", new TH1D("hPhiLeadingGmm_01_1750",";#phi_{#mu}^{leading};Events",nphibins,phimin,phimax)) );
-	setlogx(h1Map["hPhiLeadingGmm_01_1750"]);
-	graphics(h1Map["hPhiLeadingGmm_01_1750"],  -1,-1,  -1,  1,2,  kViolet+1,-1,-1);
-	h1Map.insert( make_pair("hPhiLeadingGmm_01_2000", new TH1D("hPhiLeadingGmm_01_2000",";#phi_{#mu}^{leading};Events",nphibins,phimin,phimax)) );
-	setlogx(h1Map["hPhiLeadingGmm_01_2000"]);
-	graphics(h1Map["hPhiLeadingGmm_01_2000"],  -1,-1,  -1,  1,2,  kViolet+6,-1,-1);
-	h1Map.insert( make_pair("hPhiLeadingGmm_01_2250", new TH1D("hPhiLeadingGmm_01_2250",";#phi_{#mu}^{leading};Events",nphibins,phimin,phimax)) );
-	setlogx(h1Map["hPhiLeadingGmm_01_2250"]);
-	graphics(h1Map["hPhiLeadingGmm_01_2250"],  -1,-1,  -1,  1,2,  kViolet+10,-1,-1);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsMCname = "Gmm_01_" + (TString)_s(M);
+		TString tsname = "hPhiLeadingGmm_01_" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";#phi_{#mu}^{leading};Events",nphibins,phimin,phimax)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsMCname = "Zprime_SSM" + (TString)_s(M);
+		TString tsname = "hPhiLeadingZprime_SSM" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";#phi_{#mu}^{leading};Events",nphibins,phimin,phimax)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
+	}
 	
 	h1Map.insert( make_pair("hPhiSubleadingMCsum", new TH1D("hPhiSubleadingMCsum",";#phi_{#mu}^{subleading};Events",nphibins,phimin,phimax)) );
 	setlogx(h1Map["hPhiSubleadingMCsum"]);
@@ -1024,15 +1271,23 @@ void hbook()
 	h1Map.insert( make_pair("hPhiSubleadingDiboson", new TH1D("hPhiSubleadingDiboson",";#phi_{#mu}^{subleading};Events",nphibins,phimin,phimax)) );
 	setlogx(h1Map["hPhiSubleadingDiboson"]);
 	graphics(h1Map["hPhiSubleadingDiboson"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	h1Map.insert( make_pair("hPhiSubleadingGmm_01_1750", new TH1D("hPhiSubleadingGmm_01_1750",";#phi_{#mu}^{subleading};Events",nphibins,phimin,phimax)) );
-	setlogx(h1Map["hPhiSubleadingGmm_01_1750"]);
-	graphics(h1Map["hPhiSubleadingGmm_01_1750"],  -1,-1,  -1,  1,2,  kViolet+1,-1,-1);
-	h1Map.insert( make_pair("hPhiSubleadingGmm_01_2000", new TH1D("hPhiSubleadingGmm_01_2000",";#phi_{#mu}^{subleading};Events",nphibins,phimin,phimax)) );
-	setlogx(h1Map["hPhiSubleadingGmm_01_2000"]);
-	graphics(h1Map["hPhiSubleadingGmm_01_2000"],  -1,-1,  -1,  1,2,  kViolet+6,-1,-1);
-	h1Map.insert( make_pair("hPhiSubleadingGmm_01_2250", new TH1D("hPhiSubleadingGmm_01_2250",";#phi_{#mu}^{subleading};Events",nphibins,phimin,phimax)) );
-	setlogx(h1Map["hPhiSubleadingGmm_01_2250"]);
-	graphics(h1Map["hPhiSubleadingGmm_01_2250"],  -1,-1,  -1,  1,2,  kViolet+10,-1,-1);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsMCname = "Gmm_01_" + (TString)_s(M);
+		TString tsname = "hPhiSubleadingGmm_01_" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";#phi_{#mu}^{subleading};Events",nphibins,phimin,phimax)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsMCname = "Zprime_SSM" + (TString)_s(M);
+		TString tsname = "hPhiSubleadingZprime_SSM" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";#phi_{#mu}^{subleading};Events",nphibins,phimin,phimax)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
+	}
 	
 	h1Map.insert( make_pair("hpTLeadingMCsum", new TH1D("hpTLeadingMCsum",";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
 	setlogx(h1Map["hpTLeadingMCsum"]);
@@ -1046,15 +1301,23 @@ void hbook()
 	h1Map.insert( make_pair("hpTLeadingDiboson", new TH1D("hpTLeadingDiboson",";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
 	setlogx(h1Map["hpTLeadingDiboson"]);
 	graphics(h1Map["hpTLeadingDiboson"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	h1Map.insert( make_pair("hpTLeadingGmm_01_1750", new TH1D("hpTLeadingGmm_01_1750",";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
-	setlogx(h1Map["hpTLeadingGmm_01_1750"]);
-	graphics(h1Map["hpTLeadingGmm_01_1750"],  -1,-1,  -1,  1,2,  kViolet+1,-1,-1);
-	h1Map.insert( make_pair("hpTLeadingGmm_01_2000", new TH1D("hpTLeadingGmm_01_2000",";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
-	setlogx(h1Map["hpTLeadingGmm_01_2000"]);
-	graphics(h1Map["hpTLeadingGmm_01_2000"],  -1,-1,  -1,  1,2,  kViolet+6,-1,-1);
-	h1Map.insert( make_pair("hpTLeadingGmm_01_2250", new TH1D("hpTLeadingGmm_01_2250",";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
-	setlogx(h1Map["hpTLeadingGmm_01_2250"]);
-	graphics(h1Map["hpTLeadingGmm_01_2250"],  -1,-1,  -1,  1,2,  kViolet+10,-1,-1);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsMCname = "Gmm_01_" + (TString)_s(M);
+		TString tsname = "hpTLeadingGmm_01_" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsMCname = "Zprime_SSM" + (TString)_s(M);
+		TString tsname = "hpTLeadingZprime_SSM" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
+	}
 	
 	h1Map.insert( make_pair("hpTSubleadingMCsum", new TH1D("hpTSubleadingMCsum",";p_{T}^{subleading} GeV;Events",nlogptbins,logptbins)) );
 	setlogx(h1Map["hpTSubleadingMCsum"]);
@@ -1068,33 +1331,58 @@ void hbook()
 	h1Map.insert( make_pair("hpTSubleadingDiboson", new TH1D("hpTSubleadingDiboson",";p_{T}^{subleading} GeV;Events",nlogptbins,logptbins)) );
 	setlogx(h1Map["hpTSubleadingDiboson"]);
 	graphics(h1Map["hpTSubleadingDiboson"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	h1Map.insert( make_pair("hpTSubleadingGmm_01_1750", new TH1D("hpTSubleadingGmm_01_1750",";p_{T}^{subleading} GeV;Events",nlogptbins,logptbins)) );
-	setlogx(h1Map["hpTSubleadingGmm_01_1750"]);
-	graphics(h1Map["hpTSubleadingGmm_01_1750"],  -1,-1,  -1,  1,2,  kViolet+1,-1,-1);
-	h1Map.insert( make_pair("hpTSubleadingGmm_01_2000", new TH1D("hpTSubleadingGmm_01_2000",";p_{T}^{subleading} GeV;Events",nlogptbins,logptbins)) );
-	setlogx(h1Map["hpTSubleadingGmm_01_2000"]);
-	graphics(h1Map["hpTSubleadingGmm_01_2000"],  -1,-1,  -1,  1,2,  kViolet+6,-1,-1);
-	h1Map.insert( make_pair("hpTSubleadingGmm_01_2250", new TH1D("hpTSubleadingGmm_01_2250",";p_{T}^{subleading} GeV;Events",nlogptbins,logptbins)) );
-	setlogx(h1Map["hpTSubleadingGmm_01_2250"]);
-	graphics(h1Map["hpTSubleadingGmm_01_2250"],  -1,-1,  -1,  1,2,  kViolet+10,-1,-1);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsMCname = "Gmm_01_" + (TString)_s(M);
+		TString tsname = "hpTSubleadingGmm_01_" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";p_{T}^{subleading} GeV;Events",nlogptbins,logptbins)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsMCname = "Zprime_SSM" + (TString)_s(M);
+		TString tsname = "hpTSubleadingZprime_SSM" + (TString)_s(M);
+		h1Map.insert( make_pair(tsname, new TH1D(tsname,";p_{T}^{subleading} GeV;Events",nlogptbins,logptbins)) );
+		setlogx(h1Map[tsname]);
+		graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
+	}
 	
 	
 	TString baseName = "hMass_1d_full";
 	h1Map.insert( make_pair(baseName+"_Data", new TH1D(baseName+"_Data", "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 	h1Map.insert( make_pair(baseName+"_DYmumu", new TH1D(baseName+"_DYmumu", "DY#rightarrow#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 	h1Map.insert( make_pair(baseName+"_Diboson", new TH1D(baseName+"_Diboson", "Diboson#rightarrow#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-	h1Map.insert( make_pair(baseName+"_Gmm_01_1750", new TH1D(baseName+"_Gmm_01_1750", "1750 GeV G*#rightarrow#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-	h1Map.insert( make_pair(baseName+"_Gmm_01_2000", new TH1D(baseName+"_Gmm_01_2000", "2000 GeV G*#rightarrow#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-	h1Map.insert( make_pair(baseName+"_Gmm_01_2250", new TH1D(baseName+"_Gmm_01_2250", "2250 GeV G*#rightarrow#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsname  = "_Gmm_01_" + (TString)_s(M);
+		h1Map.insert( make_pair(baseName+tsname, new TH1D(baseName+tsname, (TString)_s(M)+" GeV G*#rightarrow#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsname = "_Zprime_SSM" + (TString)_s(M);
+		h1Map.insert( make_pair(baseName+tsname, new TH1D(baseName+tsname, (TString)_s(M)+" GeV Z'_{SSM}#rightarrow#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+	}
+	
 	for(int i=1 ; i<=nCosThetaBinsLimit ; i++)
 	{
 		baseName = "hMass_cosThSlice_"+(TString)_s(i);
 		h1Map.insert( make_pair(baseName+"_Data", new TH1D(baseName+"_Data", "#mu#mu mass in cos#theta* slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 		h1Map.insert( make_pair(baseName+"_DYmumu", new TH1D(baseName+"_DYmumu", "DY#rightarrow#mu#mu mass in cos#theta* slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 		h1Map.insert( make_pair(baseName+"_Diboson", new TH1D(baseName+"_Diboson", "Diboson#rightarrow#mu#mu mass in cos#theta* slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		h1Map.insert( make_pair(baseName+"_Gmm_01_1750", new TH1D(baseName+"_Gmm_01_1750", "1750 GeV G*#rightarrow#mu#mu mass in cos#theta* slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		h1Map.insert( make_pair(baseName+"_Gmm_01_2000", new TH1D(baseName+"_Gmm_01_2000", "2000 GeV G*#rightarrow#mu#mu mass in cos#theta* slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		h1Map.insert( make_pair(baseName+"_Gmm_01_2250", new TH1D(baseName+"_Gmm_01_2250", "2250 GeV G*#rightarrow#mu#mu mass in cos#theta* slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+		for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+		{
+			TString tsname  = "_Gmm_01_" + (TString)_s(M);
+			h1Map.insert( make_pair(baseName+tsname, new TH1D(baseName+tsname, (TString)_s(M)+" GeV G*#rightarrow#mu#mu mass in cos#theta* slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+		}
+		for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+		{
+			if(M==1250.) continue;
+			TString tsname = "_Zprime_SSM" + (TString)_s(M);
+			h1Map.insert( make_pair(baseName+tsname, new TH1D(baseName+tsname, (TString)_s(M)+" GeV Z'_{SSM}#rightarrow#mu#mu mass in cos#theta* slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+		}
 	}
 	for(int i=1 ; i<=ndEtaBinsLimit ; i++)
 	{
@@ -1102,9 +1390,17 @@ void hbook()
 		h1Map.insert( make_pair(baseName+"_Data", new TH1D(baseName+"_Data", "#mu#mu mass in #Delta#eta slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 		h1Map.insert( make_pair(baseName+"_DYmumu", new TH1D(baseName+"_DYmumu", "DY#rightarrow#mu#mu mass in #Delta#eta slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 		h1Map.insert( make_pair(baseName+"_Diboson", new TH1D(baseName+"_Diboson", "Diboson#rightarrow#mu#mu mass in #Delta#eta slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		h1Map.insert( make_pair(baseName+"_Gmm_01_1750", new TH1D(baseName+"_Gmm_01_1750", "1750 GeV G*#rightarrow#mu#mu mass in #Delta#eta slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		h1Map.insert( make_pair(baseName+"_Gmm_01_2000", new TH1D(baseName+"_Gmm_01_2000", "2000 GeV G*#rightarrow#mu#mu mass in #Delta#eta slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		h1Map.insert( make_pair(baseName+"_Gmm_01_2250", new TH1D(baseName+"_Gmm_01_2250", "2250 GeV G*#rightarrow#mu#mu mass in #Delta#eta slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+		for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+		{
+			TString tsname  = "_Gmm_01_" + (TString)_s(M);
+			h1Map.insert( make_pair(baseName+tsname, new TH1D(baseName+tsname, (TString)_s(M)+" GeV G*#rightarrow#mu#mu mass in #Delta#eta slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+		}
+		for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+		{
+			if(M==1250.) continue;
+			TString tsname = "_Zprime_SSM" + (TString)_s(M);
+			h1Map.insert( make_pair(baseName+tsname, new TH1D(baseName+tsname, (TString)_s(M)+" GeV Z'_{SSM}#rightarrow#mu#mu mass in #Delta#eta slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+		}
 	}
 	
 	
@@ -1122,12 +1418,19 @@ void hbook()
 	setlogx(h2Map["hMassCosThetaCSDYmumu"]);
 	h2Map.insert( make_pair("hMassCosThetaCSDiboson", new TH2D("hMassCosThetaCSDiboson",";m_{#mu#mu} GeV;cos(#theta*);Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nFullCosThetaBins,minFullCosTheta,maxFullCosTheta)) );
 	setlogx(h2Map["hMassCosThetaCSDiboson"]);
-	h2Map.insert( make_pair("hMassCosThetaCSGmm_01_1750", new TH2D("hMassCosThetaCSGmm_01_1750",";m_{#mu#mu} GeV;cos(#theta*);Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nFullCosThetaBins,minFullCosTheta,maxFullCosTheta)) );
-	setlogx(h2Map["hMassCosThetaCSGmm_01_1750"]);
-	h2Map.insert( make_pair("hMassCosThetaCSGmm_01_2000", new TH2D("hMassCosThetaCSGmm_01_2000",";m_{#mu#mu} GeV;cos(#theta*);Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nFullCosThetaBins,minFullCosTheta,maxFullCosTheta)) );
-	setlogx(h2Map["hMassCosThetaCSGmm_01_2000"]);
-	h2Map.insert( make_pair("hMassCosThetaCSGmm_01_2250", new TH2D("hMassCosThetaCSGmm_01_2250",";m_{#mu#mu} GeV;cos(#theta*);Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nFullCosThetaBins,minFullCosTheta,maxFullCosTheta)) );
-	setlogx(h2Map["hMassCosThetaCSGmm_01_2250"]);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsname = "hMassCosThetaCSGmm_01_" + (TString)_s(M);
+		h2Map.insert( make_pair(tsname, new TH2D(tsname,";m_{#mu#mu} GeV;cos(#theta*);Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nFullCosThetaBins,minFullCosTheta,maxFullCosTheta)) );
+		setlogx(h2Map[tsname]);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsname = "hMassCosThetaCSZprime_SSM" + (TString)_s(M);
+		h2Map.insert( make_pair(tsname, new TH2D(tsname,";m_{#mu#mu} GeV;cos(#theta*);Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nFullCosThetaBins,minFullCosTheta,maxFullCosTheta)) );
+		setlogx(h2Map[tsname]);
+	}
 	
 	h2Map.insert( make_pair("hMassyQMCsum", new TH2D("hMassyQMCsum",";m_{#mu#mu} GeV;y_{Q};Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nfullyQbins,minfullyQ,maxfullyQ)) );
 	setlogx(h2Map["hMassyQMCsum"]);
@@ -1142,12 +1445,19 @@ void hbook()
 	setlogx(h2Map["hMassyQDYmumu"]);
 	h2Map.insert( make_pair("hMassyQDiboson", new TH2D("hMassyQDiboson",";m_{#mu#mu} GeV;y_{Q};Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nfullyQbins,minfullyQ,maxfullyQ)) );
 	setlogx(h2Map["hMassyQDiboson"]);
-	h2Map.insert( make_pair("hMassyQGmm_01_1750", new TH2D("hMassyQGmm_01_1750",";m_{#mu#mu} GeV;y_{Q};Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nfullyQbins,minfullyQ,maxfullyQ)) );
-	setlogx(h2Map["hMassyQGmm_01_1750"]);
-	h2Map.insert( make_pair("hMassyQGmm_01_2000", new TH2D("hMassyQGmm_01_2000",";m_{#mu#mu} GeV;y_{Q};Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nfullyQbins,minfullyQ,maxfullyQ)) );
-	setlogx(h2Map["hMassyQGmm_01_2000"]);
-	h2Map.insert( make_pair("hMassyQGmm_01_2250", new TH2D("hMassyQGmm_01_2250",";m_{#mu#mu} GeV;y_{Q};Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nfullyQbins,minfullyQ,maxfullyQ)) );
-	setlogx(h2Map["hMassyQGmm_01_2250"]);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsname = "hMassyQGmm_01_" + (TString)_s(M);
+		h2Map.insert( make_pair(tsname, new TH2D(tsname,";m_{#mu#mu} GeV;y_{Q};Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nfullyQbins,minfullyQ,maxfullyQ)) );
+		setlogx(h2Map[tsname]);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsname = "hMassyQZprime_SSM" + (TString)_s(M);
+		h2Map.insert( make_pair(tsname, new TH2D(tsname,";m_{#mu#mu} GeV;y_{Q};Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nfullyQbins,minfullyQ,maxfullyQ)) );
+		setlogx(h2Map[tsname]);
+	}
 }
 
 float getDataMCratio()
@@ -1174,11 +1484,11 @@ void hscale2Zpeak()
 	
 	// Scale(h1Map["hNvxpDiboson"],ratio_nopileup);
 	// Scale(h1Map["hNvxpDiboson"],ratio);
-	
+
 	Scale(h1Map["hNvxpMCsum_with_puwgt"],ratio);
 	Scale(h1Map["hNvxpDYmumu_with_puwgt"],ratio);
 	Scale(h1Map["hNvxpDiboson_with_puwgt"],ratio);
-	
+
 	Scale(h1Map["hMassMCsum"],ratio);
 	Scale(h1Map["hyQMCsum"],ratio);
 	Scale(h1Map["hQTMCsum"],ratio);
@@ -1188,7 +1498,7 @@ void hscale2Zpeak()
 	Scale(h1Map["hPhiSubleadingMCsum"],ratio);
 	Scale(h1Map["hpTLeadingMCsum"],ratio);
 	Scale(h1Map["hpTSubleadingMCsum"],ratio);
-	
+
 	Scale(h1Map["hMassDYmumu"],ratio);
 	Scale(h1Map["hyQDYmumu"],ratio);
 	Scale(h1Map["hQTDYmumu"],ratio);
@@ -1198,7 +1508,7 @@ void hscale2Zpeak()
 	Scale(h1Map["hPhiSubleadingDYmumu"],ratio);
 	Scale(h1Map["hpTLeadingDYmumu"],ratio);
 	Scale(h1Map["hpTSubleadingDYmumu"],ratio);
-	
+
 	Scale(h1Map["hMassDiboson"],ratio);
 	Scale(h1Map["hyQDiboson"],ratio);
 	Scale(h1Map["hQTDiboson"],ratio);
@@ -1208,73 +1518,117 @@ void hscale2Zpeak()
 	Scale(h1Map["hPhiSubleadingDiboson"],ratio);
 	Scale(h1Map["hpTLeadingDiboson"],ratio);
 	Scale(h1Map["hpTSubleadingDiboson"],ratio);
+
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsname = "Gmm_01_" + (TString)_s(M);
+		Scale(h1Map["hMass"+tsname],ratio);
+		Scale(h1Map["hyQ"+tsname],ratio);
+		Scale(h1Map["hQT"+tsname],ratio);
+		Scale(h1Map["hEtaLeading"+tsname],ratio);
+		Scale(h1Map["hEtaSubleading"+tsname],ratio);
+		Scale(h1Map["hPhiLeading"+tsname],ratio);
+		Scale(h1Map["hPhiSubleading"+tsname],ratio);
+		Scale(h1Map["hpTLeading"+tsname],ratio);
+		Scale(h1Map["hpTSubleading"+tsname],ratio);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsname = "Zprime_SSM" + (TString)_s(M);
+		Scale(h1Map["hMass"+tsname],ratio);
+		Scale(h1Map["hyQ"+tsname],ratio);
+		Scale(h1Map["hQT"+tsname],ratio);
+		Scale(h1Map["hEtaLeading"+tsname],ratio);
+		Scale(h1Map["hEtaSubleading"+tsname],ratio);
+		Scale(h1Map["hPhiLeading"+tsname],ratio);
+		Scale(h1Map["hPhiSubleading"+tsname],ratio);
+		Scale(h1Map["hpTLeading"+tsname],ratio);
+		Scale(h1Map["hpTSubleading"+tsname],ratio);
+	}
 	
-	Scale(h1Map["hMassGmm_01_1750"],ratio);
-	Scale(h1Map["hyQGmm_01_1750"],ratio);
-	Scale(h1Map["hQTGmm_01_1750"],ratio);
-	Scale(h1Map["hEtaLeadingGmm_01_1750"],ratio);
-	Scale(h1Map["hEtaSubleadingGmm_01_1750"],ratio);
-	Scale(h1Map["hPhiLeadingGmm_01_1750"],ratio);
-	Scale(h1Map["hPhiSubleadingGmm_01_1750"],ratio);
-	Scale(h1Map["hpTLeadingGmm_01_1750"],ratio);
-	Scale(h1Map["hpTSubleadingGmm_01_1750"],ratio);
+	/////////////////////////////////////
+	// TEMPLATES
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsname = "";
+		
+		/// imass
+		tsname = "Zprime_SSM" + (TString)_s(M) + "_template";
+		Scale(h1Map["hMass"+tsname],ratio);
+		tsname = "KK" + (TString)_s(M) + "_template";
+		Scale(h1Map["hMass"+tsname],ratio);
+		
+		/// pTleading
+		tsname = "Zprime_SSM" + (TString)_s(M) + "_template";
+		Scale(h1Map["hpTLeading"+tsname],ratio);
+		tsname = "KK" + (TString)_s(M) + "_template";
+		Scale(h1Map["hpTLeading"+tsname],ratio);
+	}
 	
-	Scale(h1Map["hMassGmm_01_2000"],ratio);
-	Scale(h1Map["hyQGmm_01_2000"],ratio);
-	Scale(h1Map["hQTGmm_01_2000"],ratio);
-	Scale(h1Map["hEtaLeadingGmm_01_2000"],ratio);
-	Scale(h1Map["hEtaSubleadingGmm_01_2000"],ratio);
-	Scale(h1Map["hPhiLeadingGmm_01_2000"],ratio);
-	Scale(h1Map["hPhiSubleadingGmm_01_2000"],ratio);
-	Scale(h1Map["hpTLeadingGmm_01_2000"],ratio);
-	Scale(h1Map["hpTSubleadingGmm_01_2000"],ratio);
-	
-	Scale(h1Map["hMassGmm_01_2250"],ratio);
-	Scale(h1Map["hyQGmm_01_2250"],ratio);
-	Scale(h1Map["hQTGmm_01_2250"],ratio);
-	Scale(h1Map["hEtaLeadingGmm_01_2250"],ratio);
-	Scale(h1Map["hEtaSubleadingGmm_01_2250"],ratio);
-	Scale(h1Map["hPhiLeadingGmm_01_2250"],ratio);
-	Scale(h1Map["hPhiSubleadingGmm_01_2250"],ratio);
-	Scale(h1Map["hpTLeadingGmm_01_2250"],ratio);
-	Scale(h1Map["hpTSubleadingGmm_01_2250"],ratio);
 	
 	for(int i=1 ; i<=nCosThetaBinsLimit ; i++)
 	{
 		TString baseName = "hMass_cosThSlice_"+(TString)_s(i);
 		Scale(h1Map[baseName+"_DYmumu"],ratio);
 		Scale(h1Map[baseName+"_Diboson"],ratio);
-		Scale(h1Map[baseName+"_Gmm_01_1750"],ratio);
-		Scale(h1Map[baseName+"_Gmm_01_2000"],ratio);
-		Scale(h1Map[baseName+"_Gmm_01_2250"],ratio);
+		for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+		{
+			TString tsname = "_Gmm_01_" + (TString)_s(M);
+			Scale(h1Map[baseName+tsname],ratio);
+		}
+
+		for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+		{
+			if(M==1250.) continue;
+			TString tsname = "_Zprime_SSM" + (TString)_s(M);
+			Scale(h1Map[baseName+tsname],ratio);
+		}
 	}
+
 	for(int i=1 ; i<=ndEtaBinsLimit ; i++)
 	{
 		TString baseName = "hMass_dEtaSlice_"+(TString)_s(i);
 		Scale(h1Map[baseName+"_DYmumu"],ratio);
 		Scale(h1Map[baseName+"_Diboson"],ratio);
-		Scale(h1Map[baseName+"_Gmm_01_1750"],ratio);
-		Scale(h1Map[baseName+"_Gmm_01_2000"],ratio);
-		Scale(h1Map[baseName+"_Gmm_01_2250"],ratio);
+
+		for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+		{
+			TString tsname = "_Gmm_01_" + (TString)_s(M);
+			Scale(h1Map[baseName+tsname],ratio);
+		}
+
+		for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+		{
+			if(M==1250.) continue;
+			TString tsname = "_Zprime_SSM" + (TString)_s(M);
+			Scale(h1Map[baseName+tsname],ratio);
+		}
 	}
-	
-	
+
 	///// 2d
 	Scale(h2Map["hMassCosThetaCSMCsum"],ratio);
 	Scale(h2Map["hMassyQMCsum"],ratio);
-	
 	Scale(h2Map["hMassCosThetaCSDYmumu"],ratio);
 	Scale(h2Map["hMassyQDYmumu"],ratio);
-	
 	Scale(h2Map["hMassCosThetaCSDiboson"],ratio);
 	Scale(h2Map["hMassyQDiboson"],ratio);
 	
-	Scale(h2Map["hMassCosThetaCSGmm_01_1750"],ratio);
-	Scale(h2Map["hMassyQGmm_01_1750"],ratio);
-	Scale(h2Map["hMassCosThetaCSGmm_01_2000"],ratio);
-	Scale(h2Map["hMassyQGmm_01_2000"],ratio);
-	Scale(h2Map["hMassCosThetaCSGmm_01_2250"],ratio);
-	Scale(h2Map["hMassyQGmm_01_2250"],ratio);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsname = "Gmm_01_" + (TString)_s(M);
+		Scale(h2Map["hMassCosThetaCS"+tsname],ratio);
+		Scale(h2Map["hMassyQ"+tsname],ratio);
+	}
+
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsname = "Zprime_SSM" + (TString)_s(M);
+		Scale(h2Map["hMassCosThetaCS"+tsname],ratio);
+		Scale(h2Map["hMassyQ"+tsname],ratio);
+	}
 }
 
 void hMCsumall(TString tsMCname)
@@ -1305,13 +1659,67 @@ void hdraw()
 	vector<TString> vtsMCbgds;
 	vector<TString> vtsMCsigs;
 	
+	////////////////////////////////////////
+	// TEMPLATES
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsname = "";
+		TString tsnameTpt = "";
+		
+		/// imass
+		tsname = "hMassZprime_SSM" + (TString)_s(M);
+		tsnameTpt = tsname + "_template";
+		setMinMax(h1Map[tsnameTpt],h1Map[tsname],true);
+		draw(h1Map[tsnameTpt], "", "", dolog, dolog);
+		drawon(tsnameTpt, h1Map[tsname]);
+		templateText(tsname, (TString)_s(M)+" GeV Z'_{SSM}");
+		drawtemplatetxton(tsnameTpt);
+		
+		tsname = "hMassDYmumu";
+		tsnameTpt = "hMassKK" + (TString)_s(M) + "_template";
+		setMinMax(h1Map[tsname],h1Map[tsnameTpt],true);
+		draw(h1Map[tsname], tsnameTpt, "", dolog, dolog);
+		drawon(tsnameTpt, h1Map[tsnameTpt]);
+		templateText(tsnameTpt, (TString)_s(M)+" GeV KK");
+		drawtemplatetxton(tsnameTpt);
+		
+		
+		/// pTleading
+		tsname = "hpTLeadingZprime_SSM" + (TString)_s(M);
+		tsnameTpt = tsname + "_template";
+		setMinMax(h1Map[tsnameTpt],h1Map[tsname],true);
+		draw(h1Map[tsnameTpt], "", "", dolog, dolog);
+		drawon(tsnameTpt, h1Map[tsname]);
+		templateText(tsname, (TString)_s(M)+" GeV Z'_{SSM}");
+		drawtemplatetxton(tsnameTpt);
+		
+		tsname = "hpTLeadingDYmumu";
+		tsnameTpt = "hpTLeadingKK" + (TString)_s(M) + "_template";
+		setMinMax(h1Map[tsname],h1Map[tsnameTpt],true);
+		draw(h1Map[tsname], tsnameTpt, "", dolog, dolog);
+		drawon(tsnameTpt, h1Map[tsnameTpt]);
+		templateText(tsnameTpt, (TString)_s(M)+" GeV KK");
+		drawtemplatetxton(tsnameTpt);
+	}
+	
+	
+	///////////////////////////////////
 	vtsMCbgds.clear();
 	setMinMax(h1Map["hMassDYmumu"],h1Map["hMassData"],true);
-	draw(h1Map["hMassDYmumu"], "", dolog, dolog);
+	draw(h1Map["hMassDYmumu"], "", "", dolog, dolog);
 	drawon("hMassDYmumu", h1Map["hMassDiboson"]);
-	drawon("hMassDYmumu", h1Map["hMassGmm_01_1750"]);
-	drawon("hMassDYmumu", h1Map["hMassGmm_01_2000"]);
-	drawon("hMassDYmumu", h1Map["hMassGmm_01_2250"]);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsname = "hMassGmm_01_" + (TString)_s(M);
+		if(drawGmm) drawon("hMassDYmumu", h1Map[tsname]);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsname = "hMassZprime_SSM" + (TString)_s(M);
+		drawon("hMassDYmumu", h1Map[tsname]);
+	}
 	drawon("hMassDYmumu", h1Map["hMassData"], "e1x1");
 	drawtxton("hMassDYmumu");
 	// drawratio(h1Map["hMassData"], h1Map["hMassDYmumu"], "e1x1", "", dolog, dolog);
@@ -1323,9 +1731,17 @@ void hdraw()
 	setMinMax(h1Map["hNvxpDYmumu"],h1Map["hNvxpData"]);
 	draw(h1Map["hNvxpDYmumu"]);
 	drawon("hNvxpDYmumu", h1Map["hNvxpDiboson"]);
-	drawon("hNvxpDYmumu", h1Map["hNvxpGmm_01_1750"]);
-	drawon("hNvxpDYmumu", h1Map["hNvxpGmm_01_2000"]);
-	drawon("hNvxpDYmumu", h1Map["hNvxpGmm_01_2250"]);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsname = "hNvxpGmm_01_" + (TString)_s(M);
+		if(drawGmm) drawon("hNvxpDYmumu", h1Map[tsname]);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsname = "hNvxpZprime_SSM" + (TString)_s(M);
+		drawon("hNvxpDYmumu", h1Map[tsname]);
+	}
 	drawon("hNvxpDYmumu", h1Map["hNvxpData"], "e1x1");
 	drawtxton("hNvxpDYmumu");
 	// drawratio(h1Map["hNvxpData"], h1Map["hNvxpDYmumu"], "e1x1");
@@ -1337,9 +1753,17 @@ void hdraw()
 	setMinMax(h1Map["hNvxpDYmumu_with_puwgt"],h1Map["hNvxpData_with_puwgt"]);
 	draw(h1Map["hNvxpDYmumu_with_puwgt"]);
 	drawon("hNvxpDYmumu_with_puwgt", h1Map["hNvxpDiboson_with_puwgt"]);
-	drawon("hNvxpDYmumu_with_puwgt", h1Map["hNvxpGmm_01_1750_with_puwgt"]);
-	drawon("hNvxpDYmumu_with_puwgt", h1Map["hNvxpGmm_01_2000_with_puwgt"]);
-	drawon("hNvxpDYmumu_with_puwgt", h1Map["hNvxpGmm_01_2250_with_puwgt"]);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsname = "hNvxpGmm_01_" + (TString)_s(M) + "_with_puwgt";
+		if(drawGmm) drawon("hNvxpDYmumu_with_puwgt", h1Map[tsname]);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsname = "hNvxpZprime_SSM" + (TString)_s(M) + "_with_puwgt";
+		drawon("hNvxpDYmumu_with_puwgt", h1Map[tsname]);
+	}
 	drawon("hNvxpDYmumu_with_puwgt", h1Map["hNvxpData_with_puwgt"], "e1x1");
 	drawtxton("hNvxpDYmumu_with_puwgt");
 	// drawratio(h1Map["hNvxpData_with_puwgt"], h1Map["hNvxpDYmumu_with_puwgt"], "e1x1");
@@ -1352,9 +1776,17 @@ void hdraw()
 	h1Map["hyQDYmumu"]->SetMinimum(0.);
 	draw(h1Map["hyQDYmumu"]);
 	drawon("hyQDYmumu", h1Map["hyQDiboson"]);
-	drawon("hyQDYmumu", h1Map["hyQGmm_01_1750"]);
-	drawon("hyQDYmumu", h1Map["hyQGmm_01_2000"]);
-	drawon("hyQDYmumu", h1Map["hyQGmm_01_2250"]);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsname = "hyQGmm_01_" + (TString)_s(M);
+		if(drawGmm) drawon("hyQDYmumu", h1Map[tsname]);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsname = "hyQZprime_SSM" + (TString)_s(M);
+		drawon("hyQDYmumu", h1Map[tsname]);
+	}
 	drawon("hyQDYmumu", h1Map["hyQData"], "e1x1");
 	drawtxton("hyQDYmumu");
 	// drawratio(h1Map["hyQData"], h1Map["hyQDYmumu"], "e1x1");
@@ -1364,11 +1796,19 @@ void hdraw()
 	vtsMCbgds.clear();
 	
 	setMinMax(h1Map["hQTDYmumu"],h1Map["hQTData"],true);
-	draw(h1Map["hQTDYmumu"], "", dolog, dolog);
+	draw(h1Map["hQTDYmumu"], "", "", dolog, dolog);
 	drawon("hQTDYmumu", h1Map["hQTDiboson"]);
-	drawon("hQTDYmumu", h1Map["hQTGmm_01_1750"]);
-	drawon("hQTDYmumu", h1Map["hQTGmm_01_2000"]);
-	drawon("hQTDYmumu", h1Map["hQTGmm_01_2250"]);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsname = "hQTGmm_01_" + (TString)_s(M);
+		if(drawGmm) drawon("hQTDYmumu", h1Map[tsname]);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsname = "hQTZprime_SSM" + (TString)_s(M);
+		drawon("hQTDYmumu", h1Map[tsname]);
+	}
 	drawon("hQTDYmumu", h1Map["hQTData"], "e1x1");
 	drawtxton("hQTDYmumu");
 	// drawratio(h1Map["hQTData"], h1Map["hQTDYmumu"], "e1x1", "", dolog, dolog);
@@ -1381,9 +1821,17 @@ void hdraw()
 	h1Map["hEtaLeadingDYmumu"]->SetMinimum(0.);
 	draw(h1Map["hEtaLeadingDYmumu"]);
 	drawon("hEtaLeadingDYmumu", h1Map["hEtaLeadingDiboson"]);
-	drawon("hEtaLeadingDYmumu", h1Map["hEtaLeadingGmm_01_1750"]);
-	drawon("hEtaLeadingDYmumu", h1Map["hEtaLeadingGmm_01_2000"]);
-	drawon("hEtaLeadingDYmumu", h1Map["hEtaLeadingGmm_01_2250"]);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsname = "hEtaLeadingGmm_01_" + (TString)_s(M);
+		if(drawGmm) drawon("hEtaLeadingDYmumu", h1Map[tsname]);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsname = "hEtaLeadingZprime_SSM" + (TString)_s(M);
+		drawon("hEtaLeadingDYmumu", h1Map[tsname]);
+	}
 	drawon("hEtaLeadingDYmumu", h1Map["hEtaLeadingData"], "e1x1");
 	drawtxton("hEtaLeadingDYmumu");
 	// drawratio(h1Map["hEtaLeadingData"], h1Map["hEtaLeadingDYmumu"], "e1x1");
@@ -1396,9 +1844,17 @@ void hdraw()
 	h1Map["hEtaSubleadingDYmumu"]->SetMinimum(0.);
 	draw(h1Map["hEtaSubleadingDYmumu"]);
 	drawon("hEtaSubleadingDYmumu", h1Map["hEtaSubleadingDiboson"]);
-	drawon("hEtaSubleadingDYmumu", h1Map["hEtaSubleadingGmm_01_1750"]);
-	drawon("hEtaSubleadingDYmumu", h1Map["hEtaSubleadingGmm_01_2000"]);
-	drawon("hEtaSubleadingDYmumu", h1Map["hEtaSubleadingGmm_01_2250"]);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsname = "hEtaSubleadingGmm_01_" + (TString)_s(M);
+		if(drawGmm) drawon("hEtaSubleadingDYmumu", h1Map[tsname]);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsname = "hEtaSubleadingZprime_SSM" + (TString)_s(M);
+		drawon("hEtaSubleadingDYmumu", h1Map[tsname]);
+	}
 	drawon("hEtaSubleadingDYmumu", h1Map["hEtaSubleadingData"], "e1x1");
 	drawtxton("hEtaSubleadingDYmumu");
 	// drawratio(h1Map["hEtaSubleadingData"], h1Map["hEtaSubleadingDYmumu"], "e1x1");
@@ -1411,9 +1867,17 @@ void hdraw()
 	h1Map["hPhiLeadingDYmumu"]->SetMinimum(0.);
 	draw(h1Map["hPhiLeadingDYmumu"]);
 	drawon("hPhiLeadingDYmumu", h1Map["hPhiLeadingDiboson"]);
-	drawon("hPhiLeadingDYmumu", h1Map["hPhiLeadingGmm_01_1750"]);
-	drawon("hPhiLeadingDYmumu", h1Map["hPhiLeadingGmm_01_2000"]);
-	drawon("hPhiLeadingDYmumu", h1Map["hPhiLeadingGmm_01_2250"]);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsname = "hPhiLeadingGmm_01_" + (TString)_s(M);
+		if(drawGmm) drawon("hPhiLeadingDYmumu", h1Map[tsname]);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsname = "hPhiLeadingZprime_SSM" + (TString)_s(M);
+		drawon("hPhiLeadingDYmumu", h1Map[tsname]);
+	}
 	drawon("hPhiLeadingDYmumu", h1Map["hPhiLeadingData"], "e1x1");
 	drawtxton("hPhiLeadingDYmumu");
 	// drawratio(h1Map["hPhiLeadingData"], h1Map["hPhiLeadingDYmumu"], "e1x1");
@@ -1426,9 +1890,17 @@ void hdraw()
 	h1Map["hPhiSubleadingDYmumu"]->SetMinimum(0.);
 	draw(h1Map["hPhiSubleadingDYmumu"]);
 	drawon("hPhiSubleadingDYmumu", h1Map["hPhiSubleadingDiboson"]);
-	drawon("hPhiSubleadingDYmumu", h1Map["hPhiSubleadingGmm_01_1750"]);
-	drawon("hPhiSubleadingDYmumu", h1Map["hPhiSubleadingGmm_01_2000"]);
-	drawon("hPhiSubleadingDYmumu", h1Map["hPhiSubleadingGmm_01_2250"]);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsname = "hPhiSubleadingGmm_01_" + (TString)_s(M);
+		if(drawGmm) drawon("hPhiSubleadingDYmumu", h1Map[tsname]);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsname = "hPhiSubleadingZprime_SSM" + (TString)_s(M);
+		drawon("hPhiSubleadingDYmumu", h1Map[tsname]);
+	}
 	drawon("hPhiSubleadingDYmumu", h1Map["hPhiSubleadingData"], "e1x1");
 	drawtxton("hPhiSubleadingDYmumu");
 	// drawratio(h1Map["hPhiSubleadingData"], h1Map["hPhiSubleadingDYmumu"], "e1x1");
@@ -1438,11 +1910,19 @@ void hdraw()
 	vtsMCbgds.clear();
 	
 	setMinMax(h1Map["hpTLeadingDYmumu"],h1Map["hpTLeadingData"],true);
-	draw(h1Map["hpTLeadingDYmumu"], "", dolog, dolog);
+	draw(h1Map["hpTLeadingDYmumu"], "", "", dolog, dolog);
 	drawon("hpTLeadingDYmumu", h1Map["hpTLeadingDiboson"]);
-	drawon("hpTLeadingDYmumu", h1Map["hpTLeadingGmm_01_1750"]);
-	drawon("hpTLeadingDYmumu", h1Map["hpTLeadingGmm_01_2000"]);
-	drawon("hpTLeadingDYmumu", h1Map["hpTLeadingGmm_01_2250"]);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsname = "hpTLeadingGmm_01_" + (TString)_s(M);
+		if(drawGmm) drawon("hpTLeadingDYmumu", h1Map[tsname]);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsname = "hpTLeadingZprime_SSM" + (TString)_s(M);
+		drawon("hpTLeadingDYmumu", h1Map[tsname]);
+	}
 	drawon("hpTLeadingDYmumu", h1Map["hpTLeadingData"], "e1x1");
 	drawtxton("hpTLeadingDYmumu");
 	// drawratio(h1Map["hpTLeadingData"], h1Map["hpTLeadingDYmumu"], "e1x1", "", dolog, dolog);
@@ -1452,11 +1932,19 @@ void hdraw()
 	vtsMCbgds.clear();
 	
 	setMinMax(h1Map["hpTSubleadingDYmumu"],h1Map["hpTSubleadingData"],true);
-	draw(h1Map["hpTSubleadingDYmumu"], "", dolog, dolog);
+	draw(h1Map["hpTSubleadingDYmumu"], "", "", dolog, dolog);
 	drawon("hpTSubleadingDYmumu", h1Map["hpTSubleadingDiboson"]);
-	drawon("hpTSubleadingDYmumu", h1Map["hpTSubleadingGmm_01_1750"]);
-	drawon("hpTSubleadingDYmumu", h1Map["hpTSubleadingGmm_01_2000"]);
-	drawon("hpTSubleadingDYmumu", h1Map["hpTSubleadingGmm_01_2250"]);
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
+	{
+		TString tsname = "hpTSubleadingGmm_01_" + (TString)_s(M);
+		if(drawGmm) drawon("hpTSubleadingDYmumu", h1Map[tsname]);
+	}
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+	{
+		if(M==1250.) continue;
+		TString tsname = "hpTSubleadingZprime_SSM" + (TString)_s(M);
+		drawon("hpTSubleadingDYmumu", h1Map[tsname]);
+	}
 	drawon("hpTSubleadingDYmumu", h1Map["hpTSubleadingData"], "e1x1");
 	drawtxton("hpTSubleadingDYmumu");
 	// drawratio(h1Map["hpTSubleadingData"], h1Map["hpTSubleadingDYmumu"], "e1x1", "", dolog, dolog);
@@ -1469,29 +1957,29 @@ void hdraw()
 	for(int i=1 ; i<=nCosThetaBinsLimit ; i++)
 	{
 		TString baseName = "hMass_cosThSlice_"+(TString)_s(i);
-		draw(h1Map[baseName+"_Data"], "", !dolog, dolog);
-		draw(h1Map[baseName+"_DYmumu"], "", !dolog, dolog);
-		draw(h1Map[baseName+"_Diboson"], "", !dolog, dolog);
-		draw(h1Map[baseName+"_Gmm_01_1750"], "", !dolog, dolog);
-		draw(h1Map[baseName+"_Gmm_01_2000"], "", !dolog, dolog);
-		draw(h1Map[baseName+"_Gmm_01_2250"], "", !dolog, dolog);
+		draw(h1Map[baseName+"_Data"], "", "", !dolog, dolog);
+		draw(h1Map[baseName+"_DYmumu"], "", "", !dolog, dolog);
+		draw(h1Map[baseName+"_Diboson"], "", "", !dolog, dolog);
+		draw(h1Map[baseName+"_Gmm_01_1750"], "", "", !dolog, dolog);
+		draw(h1Map[baseName+"_Gmm_01_2000"], "", "", !dolog, dolog);
+		draw(h1Map[baseName+"_Gmm_01_2250"], "", "", !dolog, dolog);
 	}
 	for(int i=1 ; i<=ndEtaBinsLimit ; i++)
 	{
 		TString baseName = "hMass_dEtaSlice_"+(TString)_s(i);
-		draw(h1Map[baseName+"_Data"], "", !dolog, dolog);
-		draw(h1Map[baseName+"_DYmumu"], "", !dolog, dolog);
-		draw(h1Map[baseName+"_Diboson"], "", !dolog, dolog);
-		draw(h1Map[baseName+"_Gmm_01_1750"], "", !dolog, dolog);
-		draw(h1Map[baseName+"_Gmm_01_2000"], "", !dolog, dolog);
-		draw(h1Map[baseName+"_Gmm_01_2250"], "", !dolog, dolog);
+		draw(h1Map[baseName+"_Data"], "", "", !dolog, dolog);
+		draw(h1Map[baseName+"_DYmumu"], "", "", !dolog, dolog);
+		draw(h1Map[baseName+"_Diboson"], "", "", !dolog, dolog);
+		draw(h1Map[baseName+"_Gmm_01_1750"], "", "", !dolog, dolog);
+		draw(h1Map[baseName+"_Gmm_01_2000"], "", "", !dolog, dolog);
+		draw(h1Map[baseName+"_Gmm_01_2250"], "", "", !dolog, dolog);
 	}
 	
 	
 	///// 2d
 	bool is2d = true;
 	h2Map["hMassCosThetaCSData"]->SetMinimum( getXYmin(h2Map["hMassCosThetaCSData"]) );
-	draw(h2Map["hMassCosThetaCSData"], "COLZ", dolog, !dolog, dolog);
+	draw(h2Map["hMassCosThetaCSData"], "", "COLZ", dolog, !dolog, dolog);
 	drawon("hMassCosThetaCSData", linMap["hMassCosThetaCS_horline"]);
 	for(int ms=0 ; ms<=nlogmassbins ; ms++)
 	{
@@ -1500,7 +1988,7 @@ void hdraw()
 	drawtxton("hMassCosThetaCSData", is2d);
 	
 	h2Map["hMassCosThetaCSDYmumu"]->SetMinimum( getXYmin(h2Map["hMassCosThetaCSDYmumu"]) );
-	draw(h2Map["hMassCosThetaCSDYmumu"], "COLZ", dolog, !dolog, dolog);
+	draw(h2Map["hMassCosThetaCSDYmumu"], "", "COLZ", dolog, !dolog, dolog);
 	drawon("hMassCosThetaCSDYmumu", linMap["hMassCosThetaCS_horline"]);
 	for(int ms=0 ; ms<=nlogmassbins ; ms++)
 	{
@@ -1509,7 +1997,7 @@ void hdraw()
 	drawtxton("hMassCosThetaCSDYmumu", is2d);
 	
 	h2Map["hMassCosThetaCSDiboson"]->SetMinimum( getXYmin(h2Map["hMassCosThetaCSDiboson"]) );
-	draw(h2Map["hMassCosThetaCSDiboson"], "COLZ", dolog, !dolog, dolog);
+	draw(h2Map["hMassCosThetaCSDiboson"], "", "COLZ", dolog, !dolog, dolog);
 	drawon("hMassCosThetaCSDiboson", linMap["hMassCosThetaCS_horline"]);
 	for(int ms=0 ; ms<=nlogmassbins ; ms++)
 	{
@@ -1517,34 +2005,33 @@ void hdraw()
 	}
 	drawtxton("hMassCosThetaCSDiboson", is2d);
 	
-	h2Map["hMassCosThetaCSGmm_01_1750"]->SetMinimum( getXYmin(h2Map["hMassCosThetaCSGmm_01_1750"]) );
-	draw(h2Map["hMassCosThetaCSGmm_01_1750"], "COLZ", dolog, !dolog, dolog);
-	drawon("hMassCosThetaCSGmm_01_1750", linMap["hMassCosThetaCS_horline"]);
-	for(int ms=0 ; ms<=nlogmassbins ; ms++)
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
 	{
-		drawon("hMassCosThetaCSGmm_01_1750", linMap["hMassCosThetaCS_vertline_"+_s(logmassbins[ms])]);
+		TString tsname = "hMassCosThetaCSGmm_01_" + (TString)_s(M);
+		h2Map[tsname]->SetMinimum( getXYmin(h2Map[tsname]) );
+		draw(h2Map[tsname], "", "COLZ", dolog, !dolog, dolog);
+		drawon(tsname, linMap["hMassCosThetaCS_horline"]);
+		for(int ms=0 ; ms<=nlogmassbins ; ms++)
+		{
+			drawon(tsname, linMap["hMassCosThetaCS_vertline_"+_s(logmassbins[ms])]);
+		}
+		drawtxton(tsname, is2d);
 	}
-	drawtxton("hMassCosThetaCSGmm_01_1750", is2d);
-	
-	h2Map["hMassCosThetaCSGmm_01_2000"]->SetMinimum( getXYmin(h2Map["hMassCosThetaCSGmm_01_2000"]) );
-	draw(h2Map["hMassCosThetaCSGmm_01_2000"], "COLZ", dolog, !dolog, dolog);
-	drawon("hMassCosThetaCSGmm_01_2000", linMap["hMassCosThetaCS_horline"]);
-	for(int ms=0 ; ms<=nlogmassbins ; ms++)
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
 	{
-		drawon("hMassCosThetaCSGmm_01_2000", linMap["hMassCosThetaCS_vertline_"+_s(logmassbins[ms])]);
+		if(M==1250.) continue;
+		TString tsname = "hMassCosThetaCSZprime_SSM" + (TString)_s(M);
+		h2Map[tsname]->SetMinimum( getXYmin(h2Map[tsname]) );
+		draw(h2Map[tsname], "", "COLZ", dolog, !dolog, dolog);
+		drawon(tsname, linMap["hMassCosThetaCS_horline"]);
+		for(int ms=0 ; ms<=nlogmassbins ; ms++)
+		{
+			drawon(tsname, linMap["hMassCosThetaCS_vertline_"+_s(logmassbins[ms])]);
+		}
+		drawtxton(tsname, is2d);
 	}
-	drawtxton("hMassCosThetaCSGmm_01_2000", is2d);
 	
-	h2Map["hMassCosThetaCSGmm_01_2250"]->SetMinimum( getXYmin(h2Map["hMassCosThetaCSGmm_01_2250"]) );
-	draw(h2Map["hMassCosThetaCSGmm_01_2250"], "COLZ", dolog, !dolog, dolog);
-	drawon("hMassCosThetaCSGmm_01_2250", linMap["hMassCosThetaCS_horline"]);
-	for(int ms=0 ; ms<=nlogmassbins ; ms++)
-	{
-		drawon("hMassCosThetaCSGmm_01_2250", linMap["hMassCosThetaCS_vertline_"+_s(logmassbins[ms])]);
-	}
-	drawtxton("hMassCosThetaCSGmm_01_2250", is2d);
-	
-	draw(h2Map["hMassyQData"], "COLZ", dolog, !dolog, dolog);
+	draw(h2Map["hMassyQData"], "", "COLZ", dolog, !dolog, dolog);
 	h2Map["hMassyQData"]->SetMinimum( getXYmin(h2Map["hMassyQData"]) );
 	drawon("hMassyQData", linMap["hMassyQ_horline"]);
 	for(int ms=0 ; ms<=nlogmassbins ; ms++)
@@ -1554,7 +2041,7 @@ void hdraw()
 	drawtxton("hMassyQData", is2d);
 	
 	h2Map["hMassyQDYmumu"]->SetMinimum( getXYmin(h2Map["hMassyQDYmumu"]) );
-	draw(h2Map["hMassyQDYmumu"], "COLZ", dolog, !dolog, dolog);
+	draw(h2Map["hMassyQDYmumu"], "", "COLZ", dolog, !dolog, dolog);
 	drawon("hMassyQDYmumu", linMap["hMassyQ_horline"]);
 	for(int ms=0 ; ms<=nlogmassbins ; ms++)
 	{
@@ -1563,7 +2050,7 @@ void hdraw()
 	drawtxton("hMassyQDYmumu", is2d);
 	
 	h2Map["hMassyQDiboson"]->SetMinimum( getXYmin(h2Map["hMassyQDiboson"]) );
-	draw(h2Map["hMassyQDiboson"], "COLZ", dolog, !dolog, dolog);
+	draw(h2Map["hMassyQDiboson"], "", "COLZ", dolog, !dolog, dolog);
 	drawon("hMassyQDiboson", linMap["hMassyQ_horline"]);
 	for(int ms=0 ; ms<=nlogmassbins ; ms++)
 	{
@@ -1571,32 +2058,32 @@ void hdraw()
 	}
 	drawtxton("hMassyQDiboson", is2d);
 	
-	h2Map["hMassyQGmm_01_1750"]->SetMinimum( getXYmin(h2Map["hMassyQGmm_01_1750"]) );
-	draw(h2Map["hMassyQGmm_01_1750"], "COLZ", dolog, !dolog, dolog);
-	drawon("hMassyQGmm_01_1750", linMap["hMassyQ_horline"]);
-	for(int ms=0 ; ms<=nlogmassbins ; ms++)
-	{
-		drawon("hMassyQGmm_01_1750", linMap["hMassyQ_vertline_"+_s(logmassbins[ms])]);
-	}
-	drawtxton("hMassyQGmm_01_1750", is2d);
 	
-	h2Map["hMassyQGmm_01_2000"]->SetMinimum( getXYmin(h2Map["hMassyQGmm_01_2000"]) );
-	draw(h2Map["hMassyQGmm_01_2000"], "COLZ", dolog, !dolog, dolog);
-	drawon("hMassyQGmm_01_2000", linMap["hMassyQ_horline"]);
-	for(int ms=0 ; ms<=nlogmassbins ; ms++)
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
 	{
-		drawon("hMassyQGmm_01_2000", linMap["hMassyQ_vertline_"+_s(logmassbins[ms])]);
+		TString tsname = "hMassyQGmm_01_" + (TString)_s(M);
+		h2Map[tsname]->SetMinimum( getXYmin(h2Map[tsname]) );
+		draw(h2Map[tsname], "", "COLZ", dolog, !dolog, dolog);
+		drawon(tsname, linMap["hMassyQ_horline"]);
+		for(int ms=0 ; ms<=nlogmassbins ; ms++)
+		{
+			drawon(tsname, linMap["hMassyQ_vertline_"+_s(logmassbins[ms])]);
+		}
+		drawtxton(tsname, is2d);
 	}
-	drawtxton("hMassyQGmm_01_2000", is2d);
-
-	h2Map["hMassyQGmm_01_2250"]->SetMinimum( getXYmin(h2Map["hMassyQGmm_01_2250"]) );
-	draw(h2Map["hMassyQGmm_01_2250"], "COLZ", dolog, !dolog, dolog);
-	drawon("hMassyQGmm_01_2250", linMap["hMassyQ_horline"]);
-	for(int ms=0 ; ms<=nlogmassbins ; ms++)
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
 	{
-		drawon("hMassyQGmm_01_2250", linMap["hMassyQ_vertline_"+_s(logmassbins[ms])]);
+		if(M==1250.) continue;
+		TString tsname = "hMassyQZprime_SSM" + (TString)_s(M);
+		h2Map[tsname]->SetMinimum( getXYmin(h2Map[tsname]) );
+		draw(h2Map[tsname], "", "COLZ", dolog, !dolog, dolog);
+		drawon(tsname, linMap["hMassyQ_horline"]);
+		for(int ms=0 ; ms<=nlogmassbins ; ms++)
+		{
+			drawon(tsname, linMap["hMassyQ_vertline_"+_s(logmassbins[ms])]);
+		}
+		drawtxton(tsname, is2d);
 	}
-	drawtxton("hMassyQGmm_01_2250", is2d);
 }
 
 float dummyPileupWeight(int Nvtx)
@@ -1862,9 +2349,41 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				/////////////////////////////////
 				/// MC histo fill statrs here ///
 				/////////////////////////////////
+				if(tsMCname=="DYmumu") // templates
+				{
+					for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
+					{
+						if(M==1250.) continue;
+						TString tsname_ZP = "";
+						TString tsname_KK = "";
+						double template_weight_ZP = 0.;
+						double template_weight_KK = 0.;
+						for(unsigned int j=0 ; j<truth_all_vBSMmass->size() ; j++)
+						{
+							if(truth_all_vBSMmass->at(j)==M)
+							{
+								template_weight_ZP = truth_all_vZPwgt->at(j);
+								template_weight_KK = truth_all_vKKwgt->at(j);
+								break;
+							}
+						}
+						
+						/// imass
+						tsname_ZP = "hMassZprime_SSM" + (TString)_s(M) + "_template";
+						tsname_KK = "hMassKK"         + (TString)_s(M) + "_template";
+						h1Map[tsname_ZP]->Fill(mass,wgt*event_weight*template_weight_ZP);
+						h1Map[tsname_KK]->Fill(mass,wgt*event_weight*template_weight_KK);
+						
+						/// pT leading
+						tsname_ZP = "hpTLeadingZprime_SSM" + (TString)_s(M) + "_template";
+						tsname_KK = "hpTLeadingKK"         + (TString)_s(M) + "_template";
+						h1Map[tsname_ZP]->Fill(pTLeading,wgt*event_weight*template_weight_ZP);
+						h1Map[tsname_KK]->Fill(pTLeading,wgt*event_weight*template_weight_KK);
+					}
+				}
+				
 				h1Map["hNvxp"+tsMCname]->Fill(recon_all_vxp_n,wgt*event_weight_nopileup);
 				h1Map["hNvxp"+tsMCname+"_with_puwgt"]->Fill(recon_all_vxp_n,wgt*event_weight);
-				
 				h1Map["hMass"+tsMCname]->Fill(mass,wgt*event_weight);
 				h1Map["hyQ"+tsMCname]->Fill(yQ,wgt*event_weight);
 				h1Map["hQT"+tsMCname]->Fill(QT,wgt*event_weight);
@@ -2076,6 +2595,27 @@ void stitchProc(TString sProc)
 	fTemplates->Close();
 }
 
+void runMCproc(TString mcName)
+{
+	for(TMapTSP2TTREE::iterator it=treMap.begin() ; it!=treMap.end() ; ++it)
+	{
+		init(it->second);
+		Int_t N = tree->GetEntriesFast();
+		for(Int_t entry=0 ; entry<N ; entry++)
+		{
+			tree->GetEntry(entry);
+			
+			////////////////////////////////////////////
+			//// blocks of analysis go here ////////////
+			////////////////////////////////////////////
+			if(!truth_all_isValid) continue;
+			// hfill("MC", mcName, wgtMap[it->first]); //////////////////////////////////////////////
+			hfill("MC", mcName, getLumiWeight(it->first,all_RunNumber,all_randomized_decision)); ////
+			/////////////////////////////////////////////////////////////////////////////////////////
+		}
+	}
+}
+
 
 void run()
 {
@@ -2087,7 +2627,12 @@ void run()
 
 	_DEBUG("run");
 	
+	/////////////////////
+	setFermions(); //////
+	/////////////////////
+	
 	style();
+	colors();
 	hbook();
 	text();
 
@@ -2107,7 +2652,7 @@ void run()
 		////////////////////////////////////
 	}
 	
-	
+
 	//---- MCs
 	mcName = "DYmumu";
 	setMCtrees(mcName);
@@ -2135,90 +2680,27 @@ void run()
 	} 
 	hMCsumall(mcName);
 	
-	
 	mcName = "Diboson";
 	setMCtrees(mcName);
-	for(TMapTSP2TTREE::iterator it=treMap.begin() ; it!=treMap.end() ; ++it)
-	{
-		init(it->second);
-		N = tree->GetEntriesFast();
-		for(Int_t entry=0 ; entry<N ; entry++)
-		{
-			tree->GetEntry(entry);
-			
-			////////////////////////////////////////////
-			//// blocks of analysis go here ////////////
-			////////////////////////////////////////////
-			if(!truth_all_isValid) continue;
-			// hfill("MC", mcName, wgtMap[it->first]); //////////////////////////////////////////////
-			hfill("MC", mcName, getLumiWeight(it->first,all_RunNumber,all_randomized_decision)); ////
-			/////////////////////////////////////////////////////////////////////////////////////////
-		}
-	}
+	runMCproc(mcName);
 	hMCsumall(mcName);
 	
-	mcName = "Gmm_01_1750";
-	setMCtrees(mcName);
-	for(TMapTSP2TTREE::iterator it=treMap.begin() ; it!=treMap.end() ; ++it)
+	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
 	{
-		init(it->second);
-		N = tree->GetEntriesFast();
-		for(Int_t entry=0 ; entry<N ; entry++)
-		{
-			tree->GetEntry(entry);
-			
-			////////////////////////////////////////////
-			//// blocks of analysis go here ////////////
-			////////////////////////////////////////////
-			if(!truth_all_isValid) continue;
-			// hfill("MC", mcName, wgtMap[it->first]); //////////////////////////////////////////////
-			hfill("MC", mcName, getLumiWeight(it->first,all_RunNumber,all_randomized_decision)); ////
-			/////////////////////////////////////////////////////////////////////////////////////////
-		}
+		mcName = "Gmm_01_" + (TString)_s(M);
+		setMCtrees(mcName);
+		runMCproc(mcName);
+		//hMCsumall(mcName);
 	}
-	//hMCsumall(mcName);
 	
-	mcName = "Gmm_01_2000";
-	setMCtrees(mcName);
-	for(TMapTSP2TTREE::iterator it=treMap.begin() ; it!=treMap.end() ; ++it)
+	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
 	{
-		init(it->second);
-		N = tree->GetEntriesFast();
-		for(Int_t entry=0 ; entry<N ; entry++)
-		{
-			tree->GetEntry(entry);
-			
-			////////////////////////////////////////////
-			//// blocks of analysis go here ////////////
-			////////////////////////////////////////////
-			if(!truth_all_isValid) continue;
-			// hfill("MC", mcName, wgtMap[it->first]); //////////////////////////////////////////////
-			hfill("MC", mcName, getLumiWeight(it->first,all_RunNumber,all_randomized_decision)); ////
-			/////////////////////////////////////////////////////////////////////////////////////////
-		}
+		if(M==1250.) continue;
+		mcName = "Zprime_SSM" + (TString)_s(M);
+		setMCtrees(mcName);
+		runMCproc(mcName);
+		//hMCsumall(mcName);
 	}
-	//hMCsumall(mcName);
-	
-	mcName = "Gmm_01_2250";
-	setMCtrees(mcName);
-	for(TMapTSP2TTREE::iterator it=treMap.begin() ; it!=treMap.end() ; ++it)
-	{
-		init(it->second);
-		N = tree->GetEntriesFast();
-		for(Int_t entry=0 ; entry<N ; entry++)
-		{
-			tree->GetEntry(entry);
-			
-			////////////////////////////////////////////
-			//// blocks of analysis go here ////////////
-			////////////////////////////////////////////
-			if(!truth_all_isValid) continue;
-			// hfill("MC", mcName, wgtMap[it->first]); //////////////////////////////////////////////
-			hfill("MC", mcName, getLumiWeight(it->first,all_RunNumber,all_randomized_decision)); ////
-			/////////////////////////////////////////////////////////////////////////////////////////
-		}
-	}
-	//hMCsumall(mcName);
 	
 	
 	stitchProc("Data");

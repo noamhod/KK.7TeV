@@ -16,8 +16,8 @@ using namespace couplings;
 namespace width
 {
 
-static double mKK = 1000.; // GeV
-static double mZP = 1000.; // GeV
+static double mKK = 2000.; // GeV
+static double mZP = 2000.; // GeV
 
 inline double wGKK(unsigned int id, unsigned int mode)
 {
@@ -81,6 +81,37 @@ inline double wZP(unsigned int id)
 	}
 	else w = (1./(3.*pi*sq2))*Gmu*Ncf(id)*(mZ2*mass)*(I3f2-2.*(I3f(id)*qf(id)*sw2)+2.*(qf(id)*sw2)*(qf(id)*sw2));
 	
+	return w;
+}
+
+
+
+////////////////////////////////////////////////////////
+inline double wTotGKK(unsigned int mode)
+{
+	double w = 0.;
+	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on all the flavors
+	{
+		w += wGKK(it->first,mode);
+	}
+	return w;
+}
+inline double wTotZKK(unsigned int mode)
+{
+	double w = 0.;
+	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on all the flavors
+	{
+		w += wZKK(it->first,mode);
+	}
+	return w;
+}
+inline double wTotZP()
+{
+	double w = 0.;
+	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on all the flavors
+	{
+		w += wZP(it->first);
+	}
 	return w;
 }
 

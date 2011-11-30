@@ -58,11 +58,12 @@ inline dcomplex hAZP(double s, double cosTheta, unsigned int idIn, unsigned int 
 {
 	dcomplex A(0,0);
 	A = hASM(s,cosTheta,idIn,idOut,hIn,hOut); // the SM term
-	double w = 0.;
+	/* double w = 0.;
 	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on all the flavors
 	{
 		w += wZP(it->first);
-	}
+	} */
+	double w = wTotZP();
 	A += hAZP0(s,cosTheta,w,idIn,idOut,hIn,hOut);
 	return A;
 }
@@ -101,13 +102,15 @@ inline dcomplex hAKK(double s, double cosTheta, unsigned int idIn, unsigned int 
 	A = hASM(s,cosTheta,idIn,idOut,hIn,hOut); // the SM term
 	for(unsigned int n=1 ; n<=nModes ; n++) // the KK tower
 	{
-		double wg = 0.;
+		/* double wg = 0.;
 		double wz = 0.;
 		for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on all the flavors
 		{
 			wg += wGKK(it->first,n);
 			wz += wZKK(it->first,n);
-		}
+		} */
+		double wg = wTotGKK(n);
+		double wz = wTotZKK(n);
 		A += hAKKn(s,cosTheta,wg,wz,idIn,idOut,hIn,hOut,n);
 	}
 	return A;
@@ -115,7 +118,7 @@ inline dcomplex hAKK(double s, double cosTheta, unsigned int idIn, unsigned int 
 
 
 //////////////////////////////////////////////////////
-inline double hA2SM(double s, double cosTheta, unsigned int idIn, unsigned int idOut)
+inline double hA2SM(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
 {
 	dcomplex A(0,0);
 	double A2 = 0.;
@@ -129,7 +132,7 @@ inline double hA2SM(double s, double cosTheta, unsigned int idIn, unsigned int i
 	}
 	return A2;
 }
-inline double hA2ZP(double s, double cosTheta, unsigned int idIn, unsigned int idOut)
+inline double hA2ZP(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
 {
 	dcomplex A(0,0);
 	double A2 = 0.;
@@ -143,7 +146,7 @@ inline double hA2ZP(double s, double cosTheta, unsigned int idIn, unsigned int i
 	}
 	return A2;
 }
-inline double hA2KK(double s, double cosTheta, unsigned int idIn, unsigned int idOut)
+inline double hA2KK(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
 {
 	dcomplex A(0,0);
 	double A2 = 0.;
@@ -160,13 +163,19 @@ inline double hA2KK(double s, double cosTheta, unsigned int idIn, unsigned int i
 
 
 //////////////////////////////////////////////////////////
-inline double weightKK(double s, double cosTheta, unsigned int idIn, unsigned int idOut)
+inline double weightKK(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
 {
-	return hA2KK(s,cosTheta,idIn,idOut)/hA2SM(s,cosTheta,idIn,idOut);
+	if(s<0.)              return 0.;
+	if(fabs(cosTheta)>1.) return 0.;
+	double R = hA2KK(cosTheta,s,idIn,idOut)/hA2SM(cosTheta,s,idIn,idOut);
+	return R;
 }
-inline double weightZP(double s, double cosTheta, unsigned int idIn, unsigned int idOut)
+inline double weightZP(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
 {
-	return hA2ZP(s,cosTheta,idIn,idOut)/hA2SM(s,cosTheta,idIn,idOut);
+	if(s<0.)              return 0.;
+	if(fabs(cosTheta)>1.) return 0.;
+	double R = hA2ZP(cosTheta,s,idIn,idOut)/hA2SM(cosTheta,s,idIn,idOut);
+	return R;
 }
 
 
@@ -235,39 +244,76 @@ double integrate(const F &f, double xMin, double xMax, unsigned int nsegments=10
 class ISM
 {
 	double s;
+	unsigned int idIn;
 	unsigned int idOut;
 	public:
-		ISM(double s0, double idOut0) : s(s0), idOut(idOut0) { }
+		ISM(double s0, unsigned int idIn0, unsigned int idOut0) : s(s0), idIn(idIn0), idOut(idOut0) { }
 		template<class X>
 		X operator()(X cosTheta) const
 		{
-			return hA2SMsumQ(cosTheta,s,idOut);
+			return hA2SM(cosTheta,s,idIn,idOut);
 		}
 };
 class IZP
 {
 	double s;
+	unsigned int idIn;
 	unsigned int idOut;
 	public:
-		IZP(double s0, double idOut0) : s(s0), idOut(idOut0) { }
+		IZP(double s0, unsigned int idIn0, unsigned int idOut0) : s(s0), idIn(idIn0), idOut(idOut0) { }
 		template<class X>
 		X operator()(X cosTheta) const
 		{
-			return hA2ZPsumQ(cosTheta,s,idOut);
+			return hA2ZP(cosTheta,s,idIn,idOut);
 		}
 };
 class IKK
 {
 	double s;
+	unsigned int idIn;
 	unsigned int idOut;
 	public:
-		IKK(double s0, double idOut0) : s(s0), idOut(idOut0) { }
+		IKK(double s0, unsigned int idIn0, unsigned int idOut0) : s(s0), idIn(idIn0), idOut(idOut0) { }
 		template<class X>
 		X operator()(X cosTheta) const
 		{
-			return hA2SMsumQ(cosTheta,s,idOut);
+			return hA2KK(cosTheta,s,idIn,idOut);
 		}
 };
+
+
+/////////////////////////////////////////////////////////////////
+// class IrZP
+// {
+	// double s;
+	// unsigned int idIn;
+	// unsigned int idOut;
+	// public:
+		// IrZP(double s0, unsigned int idIn0, unsigned int idOut0) : s(s0), idIn(idIn0), idOut(idOut0) { }
+		// template<class X>
+		// X operator()(X cosTheta) const
+		// {
+			// return weightZP(cosTheta,s,idIn,idOut);
+		// }
+// };
+// class IrKK
+// {
+	// double s;
+	// unsigned int idIn;
+	// unsigned int idOut;
+	// public:
+		// IrKK(double s0, unsigned int idIn0, unsigned int idOut0) : s(s0), idIn(idIn0), idOut(idOut0) { }
+		// template<class X>
+		// X operator()(X cosTheta) const
+		// {
+			// return weightKK(cosTheta,s,idIn,idOut);
+		// }
+// };
+
+
+
+
+
 
 class F
 {

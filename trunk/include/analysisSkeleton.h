@@ -45,6 +45,9 @@ public:
 	
 	bool alreadyFilled;
 	
+	double KKwgt;
+	double ZPwgt;
+	
 	int tmp_counter_1;
 	int tmp_counter_2;
 	int tmp_counter_3;

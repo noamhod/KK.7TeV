@@ -31,9 +31,9 @@ static const Double_t logimassmin   = 120.;
 static const Double_t logimassmax   = 1500.;
 static Double_t logimassbins[nlogimassbins+1];
 
-static const Int_t    nlogfullimassbins = 60;
+static const Int_t    nlogfullimassbins = 40;
 static const Double_t logfullimassmin   = 70.;
-static const Double_t logfullimassmax   = 2000.;
+static const Double_t logfullimassmax   = 3000.;
 static Double_t logfullimassbins[nlogfullimassbins+1];
 
 static const Int_t    nloglimitimassbins = 50;
@@ -49,12 +49,12 @@ static const Int_t    nlinfullimassbins = 250;
 static const Double_t linfullimassmin   = 70.;
 static const Double_t linfullimassmax   = 2000.;
 
-static const Int_t    nlogptbins = 50;
+static const Int_t    nlogptbins = 40;
 static const Double_t logptmin   = 25.;
-static const Double_t logptmax   = 1000.;
+static const Double_t logptmax   = 1500.;
 static Double_t logptbins[nlogptbins+1];
 
-static const Int_t    nlogqtbins = 50;
+static const Int_t    nlogqtbins = 40;
 static const Double_t logqtmin   = 1.;
 static const Double_t logqtmax   = 1000.;
 static Double_t logqtbins[nlogqtbins+1];

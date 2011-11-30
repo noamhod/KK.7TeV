@@ -20,13 +20,13 @@
 class fermion
 {
 	public:
-		fermion(string name, unsigned int id, double mass, double charge, double I3)
+		fermion(string Name, unsigned int PDGid, double Mass, double Charge, double WeakI3)
 		{
-			this->name = name;
-			this->id = id;
-			this->mass = mass;
-			this->charge = charge;
-			this->I3 = I3;
+			this->name = Name;
+			this->id = PDGid;
+			this->mass = Mass;
+			this->charge = Charge;
+			this->I3 = WeakI3;
 			if(fabs(this->charge)<1.) this->Nc = 3;
 			else                      this->Nc = 1;
 		}
@@ -62,6 +62,7 @@ typedef map<TString, TGraph*>   TMapTSP2TGraph;
 typedef map<TString, TLine*>    TMapTSP2TLINE;
 typedef map<TString, TTree*>    TMapTSP2TTREE;
 typedef map<TString, double>    TMapTSd;
+typedef map<TString, Color_t>   TMapTSTC;
 typedef map<string, TH1D*>      TMapSP2TH1D;
 typedef map<string, TH2D*>      TMapSP2TH2D;
 typedef map<string, TCanvas*>   TMapSP2TCNV;

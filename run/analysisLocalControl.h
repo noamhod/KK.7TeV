@@ -38,8 +38,10 @@ class analysisLocalControl : public chainMaker/*, public utilities*/
 		
 		// locals
 		string m_basedir;
+		string m_dataType;
 		string m_muRecAlgo;
 		string m_pTsmearingType;
+		string m_release;
 		string m_MCPtag;
 		string m_RunType;
 		string m_input;

@@ -148,7 +148,7 @@
       <parameter NAME="nRPCLayer(Xof3)PhiHits" ORDER="9" TYPE="int">1.</parameter>
       <parameter NAME="nTGCLayer(Xof4)PhiHits" ORDER="10" TYPE="int">1.</parameter>
       <parameter NAME="nCSCPhiHits" ORDER="11" TYPE="int">1.</parameter>
-      <parameter NAME="nRPCTGCCSC_LogicSum" ORDER="12" TYPE="int">1.</parameter>
+      <parameter NAME="nRPCTGCCSC_LogicSum" ORDER="12" TYPE="int">2.</parameter>
     </parameters>
     <description>
       This is the MS hits cut cut.

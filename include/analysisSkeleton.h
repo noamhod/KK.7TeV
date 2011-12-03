@@ -14,6 +14,7 @@
 // #include "SmearingClass.cxx"
 
 #include "SmearingClass.h"
+using namespace MuonSmear;
 
 #include "TPileupReweighting.h"
 
@@ -626,7 +627,7 @@ public:
 	void setMC(bool isMC) { AS_isMC = isMC; }
 	void setLoose(bool isloose) { isLoose = isloose; }
 	void setSmearedMCPpT(int nMus);
-	void setMCPpTparameters(string sAlgo, string spTtype, string sDataPath);
+	void setMCPpTparameters(string sDataType, string sAlgo, string spTtype, string sRel, string sDataPath);
 	void setPileupPeriodsIntegral(TString mcRootFileName, vector<TString>& vhNames);
 	float getPileupPeriodsWeight(TString hName);
 	void setPileupParameters(TString dataRootFileName, TString dataRootHistName, TString mcRootFileName, TString mcRootHistName);

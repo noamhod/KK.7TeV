@@ -39,9 +39,15 @@ void analysisSkeleton::setXmlFile(string sXmlPath)
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-void analysisSkeleton::setMCPpTparameters(string sAlgo, string spTtype, string sDataPath)
+void analysisSkeleton::setMCPpTparameters(string sDataType, string sAlgo, string spTtype, string sRel, string sDataPath)
 {
 	_DEBUG("analysisSkeleton::setMCPpTparameters");
+	if(sDataType!="Data11" && sDataType!="Data10")
+	{
+		_ERROR("sDataType string is unrecognized, exitting now");
+		exit(-1);
+	}
+	
 	if(sDataPath=="")
 	{
 		_ERROR("sDataPath string is empty, exitting now");
@@ -59,8 +65,14 @@ void analysisSkeleton::setMCPpTparameters(string sAlgo, string spTtype, string s
 		_ERROR("sAlgo string is unrecognized, exitting now");
 		exit(-1);
 	}
+	
+	if(sRel!="Rel17")
+	{
+		_ERROR("sRel string is unrecognized, exitting now");
+		exit(-1);
+	}
 
-	MCPpTsmearing = new SmearingClass(sAlgo,spTtype,sDataPath);
+	MCPpTsmearing = new SmearingClass(sDataType,sAlgo,spTtype,sRel,sDataPath);
 	MCPpTsmearing->UseScale(1);
 }
 
@@ -84,8 +96,8 @@ void analysisSkeleton::setSmearedMCPpT(int nMus)
 		_DEBUG("");
 		
 		double ptcb  = (double)mu_pt->at(j);
-		//double ptid  = (double)pT(mu_id_qoverp->at(j),mu_id_theta->at(j));
-		//double ptms  = (double)pT(mu_ms_qoverp->at(j),mu_ms_theta->at(j));
+		double ptid  = (double)pT(mu_id_qoverp->at(j),mu_id_theta->at(j));
+		double ptms  = (double)pT(mu_ms_qoverp->at(j),mu_ms_theta->at(j));
 		double ptie  = (double)pT(mu_ie_qoverp->at(j),mu_ie_theta->at(j));
 		double ptme  = (double)pT(mu_me_qoverp->at(j),mu_me_theta->at(j));
 		double etacb = (double)mu_eta->at(j);
@@ -93,7 +105,8 @@ void analysisSkeleton::setSmearedMCPpT(int nMus)
 		_DEBUG("");
 		
 		// MCPpTsmearing->Event(ptms, ptid, ptcb, etacb);
-		MCPpTsmearing->Event(ptme, ptie, ptcb, etacb);
+		// MCPpTsmearing->Event(ptme, ptie, ptcb, etacb);
+		MCPpTsmearing->Event(ptme, ptid, ptcb, etacb);
 		// MCPpTsmearing->Event(ptcb, etacb);
 		
 		_DEBUG("");
@@ -107,6 +120,17 @@ void analysisSkeleton::setSmearedMCPpT(int nMus)
 		mu_MCP_ptid->push_back( MCPpTsmearing->pTID() ); ///////
 		mu_MCP_ptms->push_back( MCPpTsmearing->pTMS() ); ///////
 		///////////////////////////////////////////////////////
+		
+		_INFO("pt = "+_s(mu_pt->at(j))+" -> "+_s(mu_MCP_ptcb->at(j)));
+		
+		float cfms = MCPpTsmearing->ChargeFlipMS();
+		float cfid = MCPpTsmearing->ChargeFlipID();
+		float cfcb = MCPpTsmearing->ChargeFlipCB();
+		if(cfcb==-1.)
+		{
+			_INFO("CHARGE FLIP !");
+			mu_charge->at(j)*=-1.;
+		}
 		
 		_DEBUG("");
 		
@@ -1817,7 +1841,9 @@ void analysisSkeleton::buildMU4Vector(int nMus)
 	for(int j=0 ; j<nMus ; j++)
 	{
 		pmu.push_back( new TLorentzVector() );
-		pmu[j]->SetPtEtaPhiM( mu_pt->at(j)*MeV2TeV, mu_eta->at(j), mu_phi->at(j), muonMass*GeV2TeV);
+		//if(AS_isMC) pmu[j]->SetPtEtaPhiM( fabs(mu_pt->at(j))*MeV2TeV, mu_eta->at(j), mu_phi->at(j), muonMass*GeV2TeV );
+		//else        pmu[j]->SetPtEtaPhiM( mu_pt->at(j)*MeV2TeV, mu_eta->at(j), mu_phi->at(j), muonMass*GeV2TeV );
+		pmu[j]->SetPtEtaPhiM( mu_pt->at(j)*MeV2TeV, mu_eta->at(j), mu_phi->at(j), muonMass*GeV2TeV );
 		// pmu[j]->SetPtEtaPhiE( mu_pt->at(j)*MeV2TeV, mu_eta->at(j), mu_phi->at(j), mu_E->at(j)*MeV2TeV);
 	}
 }

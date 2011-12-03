@@ -24,8 +24,10 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 
 	string sBaseDir;
 	string sRun;
+	string sDataType;
 	string sRec;
 	string spTtype;
+	string sRel;
 	string sMCPtag;
 	string sMCorData;
 	string sIsLoose;
@@ -36,7 +38,7 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	//int    msgLvl;
 	
 	ifstream ifsel( localRunControlFile.c_str() );
-	ifsel >> sBaseDir >> sRun >> sRec >> spTtype >> sMCPtag >> sMCorData >> sIsLoose;
+	ifsel >> sBaseDir >> sRun >> sDataType >> sRec >> spTtype >> sRel >> sMCPtag >> sMCorData >> sIsLoose;
 	
 	if(sBaseDir=="")
 	{
@@ -48,6 +50,11 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 		_ERROR("YOU CHOSE RUN ["+sRun+"], exitting now");
 		exit(-1);
 	}
+	if(sDataType!="Data11"  &&  sDataType!="Data10")
+	{
+		_ERROR("YOU CHOSE DATA TYPE ["+sDataType+"], exitting now");
+		exit(-1);
+	}
 	if(sRec!="staco"  &&  sRec!="muid")
 	{
 		_ERROR("YOU CHOSE REC ALG ["+sRec+"], exitting now");
@@ -56,6 +63,11 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	if(spTtype!="pT"  &&  spTtype!="q_pT")
 	{
 		_ERROR("YOU CHOSE SMEARING TYPE ["+spTtype+"], exitting now");
+		exit(-1);
+	}
+	if(sRel!="Rel17")
+	{
+		_ERROR("YOU CHOSE RELEASE NUMBER ["+sRel+"], exitting now");
 		exit(-1);
 	}
 	size_t found = sMCPtag.find("MuonMomentumCorrections");
@@ -94,8 +106,10 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	
 	m_basedir   = sBaseDir;
 	m_RunType   = sRun; // "grid" OR "local"
+	m_dataType  = sDataType; // "Data11" OR "Data10"
 	m_muRecAlgo = sRec; // "staco" OR "muid"
 	m_pTsmearingType = spTtype; // "pT" OR "q_pT"
+	m_release   = sRel; // "Rel17"
 	m_MCPtag = sMCPtag; // "MuonMomentumCorrections-XX-YY-ZZ"
 	m_isMC      = isMC;
 	m_isLoose   = isLoose;
@@ -103,8 +117,10 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	
 	_INFO("m_basedir="+m_basedir);
 	_INFO("m_RunType="+m_RunType);
+	_INFO("m_dataType="+m_dataType);
 	_INFO("m_muRecAlgo="+m_muRecAlgo);
 	_INFO("m_pTsmearingType="+m_pTsmearingType);
+	_INFO("m_release="+m_release);
 	_INFO("m_MCPtag="+m_MCPtag);
 	_INFO("m_isMC="+_s(m_isMC));
 	_INFO("m_isLoose="+_s(m_isLoose));
@@ -268,7 +284,7 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	if(runs=="SINGLERUN") str_logspath = basedir+"/../run/tmp";
 	_INFO("LOADING FILE -> "+str_logspath);
 	m_analysis->setMC(m_isMC);
-	if(m_isMC) m_analysis->setMCPpTparameters(m_muRecAlgo, m_pTsmearingType, str_mcp);
+	if(m_isMC) m_analysis->setMCPpTparameters(m_dataType, m_muRecAlgo, m_pTsmearingType, m_release, str_mcp);
 	
 	
 	m_analysis->ginitialize();

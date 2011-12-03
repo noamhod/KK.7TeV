@@ -38,7 +38,6 @@ inline double wGKK(unsigned int id, unsigned int mode)
 	return w;
 }
 
-
 inline double wZKK(unsigned int id, unsigned int mode)
 {
 	double w = 0.;

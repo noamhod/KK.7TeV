@@ -112,6 +112,9 @@ void analysisSkeleton::setSmearedMCPpT(int nMus)
 		_DEBUG("");
 		
 		// Set Smeared Pts
+		
+		float orig_ptcb = mu_pt->at(j);
+		
 		///////////////////////////////////////////////////////
 		// First, have to modify the original CB pT ///////////
 		mu_pt->at(j) = MCPpTsmearing->pTCB(); //////////////////
@@ -121,7 +124,7 @@ void analysisSkeleton::setSmearedMCPpT(int nMus)
 		mu_MCP_ptms->push_back( MCPpTsmearing->pTMS() ); ///////
 		///////////////////////////////////////////////////////
 		
-		_INFO("pt = "+_s(mu_pt->at(j))+" -> "+_s(mu_MCP_ptcb->at(j)));
+		//_INFO("pt = "+_s(orig_ptcb)+" -> "+_s(mu_pt->at(j)));
 		
 		float cfms = MCPpTsmearing->ChargeFlipMS();
 		float cfid = MCPpTsmearing->ChargeFlipID();
@@ -145,205 +148,44 @@ void analysisSkeleton::setSmearedMCPpT(int nMus)
 	}
 }
 
-void analysisSkeleton::setPileupPeriodsIntegral(TString mcRootFileName, vector<TString>& vhNames)
-{
-	_DEBUG("analysisSkeleton::setPileupPeriodsIntegral");
-	
-	pileUpPeriodsIntegral = 0.;
-	TFile fTmp(mcRootFileName, "READ");
-	for(unsigned int i=0 ; i<vhNames.size() ; i++)
-	{
-		_DEBUG("getting "+(string)mcRootFileName+":"+(string)vhNames[i]);
-		
-		TH1* hTmp = (TH1*)fTmp.Get(vhNames[i]);
-		pileUpPeriodsIntegral += Integral(hTmp);
-	}
-	fTmp.Close();
-	
-	_DEBUG("pileUpPeriodsIntegral "+_s(pileUpPeriodsIntegral));
-}
-
-float analysisSkeleton::getPileupPeriodsWeight(TString hName)
-{
-	_DEBUG("analysisSkeleton::getPileupPeriodsWeight");
-	
-	// TFile fTmp(m_mcRootFileName, "READ");
-	// TH1* hCurrentPeriod = (TH1*)fTmp.Get(hName);
-	// if(pileUpPeriodsIntegral<=0.)
-	// {
-		// _ERROR("pileUpPeriodsIntegral<=0., exitting now");
-		// exit(-1);
-	// }
-	// float currentPeriodIntegral = Integral(hCurrentPeriod);
-	// if(currentPeriodIntegral<=0.)
-	// {
-		// _ERROR("currentPeriodIntegral<=0., exitting now");
-		// exit(-1);
-	// }
-	// fTmp.Close();
-	// return currentPeriodIntegral/pileUpPeriodsIntegral;
-	
-	
-	//------------------------------------------------------------------------------------
-	
-	//////////////////////////////////////////////////////////////////////////////////////
-	// B->D:   [178044->180481]: 187.91  pb-1 EF_mu22         wL=0.0527434243
-	// E->H:   [180614->184169]: 1015.2  pb-1 EF_mu22         wL=0.284950904
-	// I->K1:  [185353->186493]: 390.364 pb-1 EF_mu22         wL=0.241495049
-			// [186516->186934]: 470.015 pb-1 EF_mu22_medium
-	// Future: [186965->190120]: 1499.23 pb-1 EF_mu22_medium  wL=0.420810622
-	// ----------------------------------------------------------------------
-	// Total:  [178044->190120]: 3562.719 pb-1
-	//////////////////////////////////////////////////////////////////////////////////////
-	if     (hName=="periodBtoD")   return 0.0423497425;
-	else if(hName=="periodEtoH")   return 0.22879814;
-	else if(hName=="periodItoK1")  return 0.0879773023+0.105928446;
-	else if(hName=="periodFuture") return 0.534946369;
-	else
-	{
-		_ERROR("unrecognized hName, exitting now");
-		exit(-1);
-	}
-	
-	
-	//------------------------------------------------------------------------------------
-	
-	
-	//////////////////////////////////////////////////////////////////////////////////////
-	// https://twiki.cern.ch/twiki/bin/viewauth/Atlas/MC11a
-	// w1/sumw=0.0749687
-	// w2/sumw=0.409564
-	// w3/sumw=0.415467
-	// w4/sumw=0.1
-	//////////////////////////////////////////////////////////////////////////////////////
-	// if     (hName=="periodBtoD")   return 0.0749687;
-	// else if(hName=="periodEtoH")   return 0.409564;
-	// else if(hName=="periodItoK1")  return 0.415467;
-	// else if(hName=="periodFuture") return 0.1;
-	// else
-	// {
-		// _ERROR("unrecognized hName, exitting now");
-		// exit(-1);
-	// }
-	
-	return -9999.;
-}
-
 void analysisSkeleton::setPileupParameters(TString dataRootFileName, TString dataRootHistName, TString mcRootFileName, TString mcRootHistName)
 {
 	_DEBUG("analysisSkeleton::setPileupParameters");
 	
-	pileuprw = new Root::TPileupReweighting( "PileupReweightingTool" );
-	
 	m_dataRootFileName = dataRootFileName;
 	m_dataRootHistName = dataRootHistName;
 	m_mcRootFileName   = mcRootFileName;
+	m_mcRootHistName   = mcRootHistName;
 	
-	pileUpLumiWeight = getPileupPeriodsWeight(mcRootHistName);
+	pileuprw = new Root::TPileupReweighting( "PileupReweightingTool" );
 	
-	int isGood = pileuprw->initialize( dataRootFileName, dataRootHistName, mcRootFileName, mcRootHistName );
-	
-	if(isGood!=0)
+	if(doMCPUwrite)
 	{
-		_ERROR("pileup reweighting isGood!=0, exitting now");
-		exit(-1);
-	}
-}
-
-TString analysisSkeleton::setPileupPeriodName(int runNumberFromMC)
-{
-	_DEBUG("analysisSkeleton::setPileupPeriodName");
-
-	TString puPeriodName = "";
-	
-	//////////////////////////////////////////////////////////////////
-	// see:  https://twiki.cern.ch/twiki/bin/viewauth/Atlas/MC11a
-	if     (runNumberFromMC==180164) puPeriodName = "periodBtoD";
-	else if(runNumberFromMC==183003) puPeriodName = "periodEtoH";
-	else if(runNumberFromMC==185649) puPeriodName = "periodItoK1"; // K1=186873:186934
-	else if(runNumberFromMC==185761) puPeriodName = "periodFuture";
-	else
-	{
-		_ERROR("couldn't identify run="+_s(runNumberFromMC)+" exitting now");
-		exit(-1);
-	}
-	//////////////////////////////////////////////////////////////////
-	
-	return puPeriodName;
-}
-
-TString analysisSkeleton::binomialDecision()
-{
-	_DEBUG("analysisSkeleton::binomialDecision");
-
-	Int_t Nmax = 1;
-	Double_t n1 = 390.364; // periodItoK1 with EF_mu22
-	Double_t n2 = 470.015; // periodItoK1 with EF_mu22_medium
-	Double_t p = n2/(n1+n2);
-	Int_t r = randGen->Binomial(Nmax,p);
-	if     (r==0) return "1";
-	else if(r==1) return "2";
-	else
-	{
-		_ERROR("r="+_s(r)+" isnot supported, exitting now");
-		exit(-1);
-	}
-	
-	return "2";
-}
-
-void analysisSkeleton::resetPileupParameters(int runNumberFromMC, string randomized_suffix, bool doIntime)
-{
-	_DEBUG("analysisSkeleton::resetPileupParameters");
-	
-	TString mcRootHistName = setPileupPeriodName(runNumberFromMC);
-	TString dataRootFileName = "";
-	
-	pileUpLumiWeight = getPileupPeriodsWeight(mcRootHistName);
-	
-	if(!doIntime)
-	{
-		if(runNumberFromMC==185649)
-		{
-			if(randomized_suffix=="1" || randomized_suffix=="2")
-			{
-				dataRootFileName  = (TString)base_dir_path+"/../conf/data11_7TeV."+mcRootHistName+"_"+randomized_suffix+".root";  // utilities::checkANDsetFilepath("BASEDIR", "/../conf/"+(string)mcRootHistName+"_"+randomized_suffix+".root");
-			}
-			else
-			{
-				_ERROR("unrecognized randomized_suffix="+randomized_suffix+", exitting now");
-				exit(-1);
-			}
-		}
-		else dataRootFileName = (TString)base_dir_path+"/../conf/data11_7TeV."+mcRootHistName+".root";  // utilities::checkANDsetFilepath("BASEDIR", "/../conf/"+(string)mcRootHistName+".root");
-		
-		
-		int isGood = pileuprw->initialize( dataRootFileName, m_dataRootHistName, m_mcRootFileName, mcRootHistName );
-		if(isGood!=0)
-		{
-			_ERROR("pileup reweighting isGood!=0, exitting now");
-			exit(-1);
-		}
+		pileuprw->AddPeriod(180164, 177986,180481); //associates mc runnumber 180164 with data period 177986 to 180481 (period B-D)
+		pileuprw->AddPeriod(183003, 180614,184169); //period E-H
+		pileuprw->AddPeriod(185649, 185353,186934); //period I-K1. For I-K you would change the last number to 187815
+		pileuprw->AddPeriod(185761, 186935,999999); //everything after K1. If you changed the previous line to I-K, change middle number of this line to 187816
+		pileuprw->initialize();
+		_WARNING("!!! Generating own MC file !!!");
 	}
 	else
 	{
-		if     (runNumberFromMC==180164) dataRootFileName = (TString)base_dir_path+"/../conf/data11_7TeV.intimepileup_periodBtoD.root";
-		else if(runNumberFromMC==183003) dataRootFileName = (TString)base_dir_path+"/../conf/data11_7TeV.intimepileup_periodEtoH.root";
-		else if(runNumberFromMC==185649) dataRootFileName = (TString)base_dir_path+"/../conf/data11_7TeV.intimepileup_periodItoK.root";
-		else if(runNumberFromMC==185761) dataRootFileName = (TString)base_dir_path+"/../conf/data11_7TeV.intimepileup_periodKtoM.root";
-		else
-		{
-			_ERROR("couldn't identify run="+_s(runNumberFromMC)+" exitting now");
-			exit(-1);
-		}
+		pileuprw->AddMCDistribution(mcRootFileName,"MCPileupReweighting");
+		pileuprw->AddDataDistribution(dataRootFileName,"LumiMetaData");
+		// 1: to remove this data from the weight calculations. You should also veto such data events (using isUnrepresentedData(..,..) method)
+		// 2: to leave this data in the calculation. I hope you know what you're doing!!
+		pileuprw->SetUnrepresentedDataAction( (doRemoveData) ? 1 : 2 );
 		
-		int isGood = pileuprw->initialize( dataRootFileName, "intperbx", m_mcRootFileName, mcRootHistName );
-		if(isGood!=0)
-		{
-			_ERROR("pileup reweighting isGood!=0, exitting now");
-			exit(-1);
-		}
+		pileuprw->initialize();
+		correctedMClumi = (doRemoveData) ? pileuprw->getTotalLumiUsed() : -999.;
 	}
+}
+
+void analysisSkeleton::writePileupMCfile()
+{
+	// pileuprw->WriteToFile((base_dir_path+"/"+sMCsampleName).c_str());
+	pileuprw->WriteToFile(sMCPUName.c_str());
+	_INFO("Wrote P.U. file -> "+sMCPUName);
 }
 
 float analysisSkeleton::getPileUpWeight(bool isIntime)
@@ -367,33 +209,7 @@ float analysisSkeleton::getPileUpWeight(bool isIntime)
 	
 	// Get the pileup weight for this event
 	float pileupEventWeight = -1.0;
-	
-	// pileupEventWeight = pileuprw->getPileupWeight(mu);
-	
-	int isGood = pileuprw->getPileupWeight(mu,pileupEventWeight);
-	if(isGood==0)
-	{
-		// Printout message
-		_DEBUG("Event has a mu of "+_s(mu)+" and a resulting pileup weight of "+_s(pileupEventWeight));
-	}
-	else if(isGood==-2)
-	{
-		_ERROR("Data histogram pointer got lost... exiting!");
-		exit(-1);
-	}
-	else if(isGood==-3)
-	{
-		_ERROR("MC histogram pointer got lost... exiting!");
-		exit(-1);
-	}
-	else 
-	{
-		_ERROR("Unrecognized return code... exiting!");
-		exit(-1);
-	}
-	
-	//_INFO("pileupEventWeight="+_s(pileupEventWeight)+", pileUpLumiWeight="+_s(pileUpLumiWeight));
-	
+	pileupEventWeight = pileuprw->getPileupWeight(mu,RunNumber,mc_channel_number);
 	return pileupEventWeight;
 }
 

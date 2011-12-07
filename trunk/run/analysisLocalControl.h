@@ -43,14 +43,14 @@ class analysisLocalControl : public chainMaker/*, public utilities*/
 		string m_pTsmearingType;
 		string m_release;
 		string m_MCPtag;
+		bool m_doPUwriteMC;
+		bool m_doPUremoveData;
 		string m_RunType;
 		string m_input;
 		bool   m_isMC;
 		bool   m_isLoose;
 		int    m_msglvl;
 		
-		vector<TString> m_vhNames;
-
 		// run control
 		Long64_t l64t_nentries;
 		Long64_t l64t_nbytes;

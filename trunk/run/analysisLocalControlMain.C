@@ -12,7 +12,7 @@ void prepare(TString sGRLtag, TString sRunDir="", TString sGdb="") // do not use
 	gROOT->Reset();
 
 	TString sMCPtag = "00-04-01";
-	TString sPRWtag = "00-00-17";
+	TString sPRWtag = "00-01-02";
 	
 	gROOT->ProcessLine(".include "+sRunDir+"../include/");
 	gROOT->ProcessLine(".include "+sRunDir+"../src/");

@@ -28,7 +28,6 @@ public:
 	// basic local vars
 
 	bool AS_isMC;
-	
 	bool isLoose;
 	
 	string base_dir_path;
@@ -39,6 +38,7 @@ public:
 	TString m_dataRootFileName;
 	TString m_dataRootHistName;
 	TString m_mcRootFileName;
+	TString m_mcRootHistName;
 	unsigned int previous_runnumber;
 	float pileUpPeriodsIntegral;
 	float pileUpLumiWeight;
@@ -61,6 +61,10 @@ public:
 	bool isMultiMuonPrint;
 	
 	string sMCsampleName;
+	string sMCPUName;
+	bool doMCPUwrite;
+	bool doRemoveData;
+	double correctedMClumi;
 	
 	TMapii muPairMap;
 	bool passCutFlow;
@@ -628,12 +632,8 @@ public:
 	void setLoose(bool isloose) { isLoose = isloose; }
 	void setSmearedMCPpT(int nMus);
 	void setMCPpTparameters(string sDataType, string sAlgo, string spTtype, string sRel, string sDataPath);
-	void setPileupPeriodsIntegral(TString mcRootFileName, vector<TString>& vhNames);
-	float getPileupPeriodsWeight(TString hName);
 	void setPileupParameters(TString dataRootFileName, TString dataRootHistName, TString mcRootFileName, TString mcRootHistName);
-	TString setPileupPeriodName(int runNumberFromMC);
-	TString binomialDecision();
-	void resetPileupParameters(int runNumberFromMC, string randomized_suffix="2", bool doIntime=false);
+	void writePileupMCfile();
 	float getPileUpWeight(bool isIntime);
 	
 	void setPtCandidatesFile(string sCandFilePath = "", string srunnumber = "");

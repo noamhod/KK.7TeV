@@ -29,6 +29,10 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	string spTtype;
 	string sRel;
 	string sMCPtag;
+	string sPUwriteMC;
+	string sPUremoveData;
+	bool bPUwriteMC;
+	bool bPUremoveData;
 	string sMCorData;
 	string sIsLoose;
 	bool   isMC;
@@ -38,7 +42,7 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	//int    msgLvl;
 	
 	ifstream ifsel( localRunControlFile.c_str() );
-	ifsel >> sBaseDir >> sRun >> sDataType >> sRec >> spTtype >> sRel >> sMCPtag >> sMCorData >> sIsLoose;
+	ifsel >> sBaseDir >> sRun >> sDataType >> sRec >> spTtype >> sRel >> sMCPtag >> sPUwriteMC >> sPUremoveData >> sMCorData >> sIsLoose;
 	
 	if(sBaseDir=="")
 	{
@@ -76,6 +80,18 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 		_ERROR("YOU CHOSE MCP TAG ["+sMCPtag+"], exitting now");
 		exit(-1);
 	}
+	if(sPUwriteMC!="pu_writeMC=true"  &&  sPUwriteMC!="pu_writeMC=false")
+	{
+		_ERROR("YOU CHOSE PU WRITE FLAG ["+sPUwriteMC+"], exitting now");
+		exit(-1);
+	}
+	bPUwriteMC = (sPUwriteMC=="pu_writeMC=true");
+	if(sPUremoveData!="pu_removeData=true"  &&  sPUremoveData!="pu_removeData=false")
+	{
+		_ERROR("YOU CHOSE PU REMOVE DATA FLAT ["+sPUremoveData+"], exitting now");
+		exit(-1);
+	}
+	bPUremoveData = (sPUremoveData=="pu_removeData=true");
 	if(sMCorData!="mc"  &&  sMCorData!="data"  &&  sMCorData!="mcqsub")
 	{
 		_ERROR("ERROR: YOU CHOSE MC/DATA ["+sMCorData+"], exitting now");
@@ -111,6 +127,8 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	m_pTsmearingType = spTtype; // "pT" OR "q_pT"
 	m_release   = sRel; // "Rel17"
 	m_MCPtag = sMCPtag; // "MuonMomentumCorrections-XX-YY-ZZ"
+	m_doPUwriteMC = bPUwriteMC;
+	m_doPUremoveData = bPUremoveData;
 	m_isMC      = isMC;
 	m_isLoose   = isLoose;
 	m_input     = sMCorData;
@@ -122,6 +140,8 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	_INFO("m_pTsmearingType="+m_pTsmearingType);
 	_INFO("m_release="+m_release);
 	_INFO("m_MCPtag="+m_MCPtag);
+	_INFO("m_doPUwriteMC="+_s(m_doPUwriteMC));
+	_INFO("m_doPUremoveData="+_s(m_doPUremoveData));
 	_INFO("m_isMC="+_s(m_isMC));
 	_INFO("m_isLoose="+_s(m_isLoose));
 	_INFO("m_input="+sMCorData);
@@ -178,7 +198,7 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	}
 
 	string str = "";
-	if(runs=="ALLRUNS")   str = basedir+"/../conf/Z_GRL_CURRENT.xml"; // utilities::checkANDsetFilepath("PWD", "/../conf/Z_GRL_CURRENT.xml");	
+	if(runs=="ALLRUNS")   str = basedir+"/../conf/Z_GRL_CURRENT.xml";
 	if(runs=="SINGLERUN") str = basedir+"/../conf/Z_GRL_CURRENT.xml";
 	_INFO("LOADING FILE -> "+str);
 	m_GRL = new GRLinterface();
@@ -189,7 +209,19 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	if(m_input=="mcqsub")
 	{
 		if(run_number_int==106047)                             str_mcname = "Zmumu";
+		if(run_number_int==106044)                             str_mcname = "Wmunu";
 		if(run_number_int>=105477  &&  run_number_int<=105487) str_mcname = "DYmumu";
+		if(run_number_int>=105488  &&  run_number_int<=105498) str_mcname = "DYtautau";
+		if(run_number_int==105200) str_mcname = "T1_McAtNlo_Jimmy";
+		if(run_number_int==105985) str_mcname = "WW_Herwig";
+		if(run_number_int==105986) str_mcname = "ZZ_Herwig";
+		if(run_number_int==105987) str_mcname = "WZ_Herwig";
+		if(run_number_int==107690) str_mcname = "AlpgenJimmyWmunuNp0_pt20";
+		if(run_number_int==107691) str_mcname = "AlpgenJimmyWmunuNp1_pt20";
+		if(run_number_int==107692) str_mcname = "AlpgenJimmyWmunuNp2_pt20";
+		if(run_number_int==107693) str_mcname = "AlpgenJimmyWmunuNp3_pt20";
+		if(run_number_int==107694) str_mcname = "AlpgenJimmyWmunuNp4_pt20";
+		if(run_number_int==107695) str_mcname = "AlpgenJimmyWmunuNp5_pt20";
 	}
 	
 	
@@ -201,36 +233,36 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 		str_mcname = utilities::pickMCinputSampe(); ///
 		//////////////////////////////////////////////
 		
-		str_list = basedir+"/../conf/mc_local_dataset_"+str_mcname+".list"; // utilities::checkANDsetFilepath("PWD", "/../conf/mc_local_dataset_"+str_mcname+".list");
+		str_list = basedir+"/../conf/mc_local_dataset_"+str_mcname+".list";
 		_INFO("LOADING FILE -> "+str_list);
 		str_dir  = "";
 		_INFO("LOADING FILE -> "+str_dir);
-		str_hist = basedir+"/../data/mcLocalControl_"+str_mcname+".root";   // utilities::checkANDsetFilepath("PWD", "/../data/mcLocalControl_"+str_mcname+".root");
+		str_hist = basedir+"/../data/mcLocalControl_"+str_mcname+".root";
 		_INFO("LOADING FILE -> "+str_hist);
-		str_mcp  = basedir+"/../"+m_MCPtag+"/share/";                       // utilities::checkANDsetFilepath("PWD", "/../"+m_MCPtag+"/share/");
+		str_mcp  = basedir+"/../"+m_MCPtag+"/share/";
 		_INFO("LOADING FILE -> "+str_mcp);
 		
 		if(m_RunType!="local_noskim")
 		{
-			if(str_mcname=="mcWZphys_localTests") str_dir = basedir+"/";    // utilities::checkANDsetFilepath("PWD", "/");
+			if(str_mcname=="mcWZphys_localTests") str_dir = basedir+"/";
 			_INFO("LOADING FILE -> "+str_dir);
-			str_tree = basedir+"/../data/mcLocalTree_"+str_mcname+".root";  // utilities::checkANDsetFilepath("PWD", "/../data/mcLocalTree_"+str_mcname+".root");
+			str_tree = basedir+"/../data/mcLocalTree_"+str_mcname+".root";
 			_INFO("LOADING FILE -> "+str_tree);
 		}
 	}
 	else
 	{
-		if(runs=="ALLRUNS")   str_list = basedir+"/../conf/NTUP_SMDILEP_DIMUON_RUNS_CURRENT.list";  // utilities::checkANDsetFilepath("PWD", "/../conf/NTUP_SMDILEP_DIMUON_RUNS_CURRENT.list");
+		if(runs=="ALLRUNS")   str_list = basedir+"/../conf/NTUP_SMDILEP_DIMUON_RUNS_CURRENT.list";
 		if(runs=="SINGLERUN") str_list = basedir+"/../conf/tmp/"+run_number_str+".list";
 		
 		_INFO("LOADING FILE -> "+str_list);
 		
 		str_dir  = "";
 		_INFO("LOADING FILE -> "+str_dir);
-		str_tree = basedir+"/../data/localTree.root";   // utilities::checkANDsetFilepath("PWD", "/../data/localTree.root");
+		str_tree = basedir+"/../data/localTree.root";
 		_INFO("LOADING FILE -> "+str_tree);
 		
-		if(runs=="ALLRUNS")   str_hist = basedir+"/../data/analysisLocalControl.root";   // utilities::checkANDsetFilepath("PWD", "/../data/analysisLocalControl.root");
+		if(runs=="ALLRUNS")   str_hist = basedir+"/../data/analysisLocalControl.root";
 		if(runs=="SINGLERUN") str_hist = basedir+"/../data/tmp/run_"+run_number_str+".root";
 		_INFO("LOADING FILE -> "+str_hist);
 		
@@ -266,7 +298,7 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	
 	
 	string str_events = "";
-	if(runs=="ALLRUNS")   str_events = basedir+"/../run/interestingEvents.dump";  // utilities::checkANDsetFilepath("PWD", "/interestingEvents.dump");
+	if(runs=="ALLRUNS")   str_events = basedir+"/../run/interestingEvents.dump";
 	if(runs=="SINGLERUN") str_events = basedir+"/../run/tmp/interestingEvents_"+run_number_str+".dump";
 	_INFO("LOADING FILE -> "+str_events);
 	m_analysis->setEventDumpFile(str_events, 500.);
@@ -280,33 +312,34 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	
 	
 	string str_logspath = "";
-	if(runs=="ALLRUNS")   str_logspath = basedir+"/../run";  // utilities::checkANDsetFilepath("PWD", "");
+	if(runs=="ALLRUNS")   str_logspath = basedir+"/../run";
 	if(runs=="SINGLERUN") str_logspath = basedir+"/../run/tmp";
 	_INFO("LOADING FILE -> "+str_logspath);
 	m_analysis->setMC(m_isMC);
 	if(m_isMC) m_analysis->setMCPpTparameters(m_dataType, m_muRecAlgo, m_pTsmearingType, m_release, str_mcp);
 	
 	
-	m_analysis->ginitialize();
+	///////////////////////////////////
+	m_analysis->ginitialize(); ////////
+	///////////////////////////////////
 	
-	
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	string str_pileuphist_data = basedir+"/../conf/data11_7TeV.periodBtoD.root"; // this is just a default initializer. it is overriden in analysisSkeleton
-	// string str_pileuphist_data = basedir+"/../conf/CURRENT_iLUMICALC_HISTOGRAMS.root";
-	_INFO("LOADING FILE -> "+str_pileuphist_data);
-	string str_pileuphist_mc   = basedir+"/../conf/muhist_MC11a.root"; // this is just a default initializer. it is overriden in analysisSkeleton
-	_INFO("LOADING FILE -> "+str_pileuphist_mc);
-	m_vhNames.push_back("periodBtoD");
-	m_vhNames.push_back("periodEtoH");
-	m_vhNames.push_back("periodItoK1");
-	m_vhNames.push_back("periodFuture");
-	m_analysis->setPileupPeriodsIntegral((TString)str_pileuphist_mc, m_vhNames);
-	m_analysis->setPileupParameters((TString)str_pileuphist_data, "avgintperbx", (TString)str_pileuphist_mc, "periodBtoD");  // this is just a default initializer. it is overriden in analysisSkeleton
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	///////////////////////////////////////////
 	m_analysis->sMCsampleName = str_mcname; ///
 	///////////////////////////////////////////
+	
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	m_analysis->doMCPUwrite  = m_doPUwriteMC;
+	m_analysis->doRemoveData = m_doPUremoveData;
+	m_analysis->sMCPUName = (m_isMC && m_analysis->doMCPUwrite) ? m_analysis->setMCPUFiles(str_logspath, run_number_str) : "";
+	// string str_pileuphist_data = basedir+"/../conf/data11_7TeV.periodBtoD.root"; // this is just a default initializer. it is overriden in analysisSkeleton
+	string str_pileuphist_data = basedir+"/../conf/CURRENT_iLUMICALC_HISTOGRAMS.root";
+	_INFO("LOADING FILE -> "+str_pileuphist_data);
+	string str_pileuphist_mc   = basedir+"/../conf/pileup_"+str_mcname+".root"; // this is just a default initializer. it is overriden in analysisSkeleton
+	_INFO("LOADING FILE -> "+str_pileuphist_mc);
+	m_analysis->setPileupParameters((TString)str_pileuphist_data, "LumiMetaData", (TString)str_pileuphist_mc, "MCPileupReweighting");
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	m_analysis->setCutFlowFile(str_logspath, run_number_str);
 	m_analysis->setPtCandidatesFile(str_logspath, run_number_str);
@@ -346,7 +379,7 @@ void analysisLocalControl::finalize()
 	//m_histfile->Write();
 	//m_histfile->Close();
 	m_analysis->writeTrees(m_dirAllCuts,m_dirCutProfile,m_dirEff,m_dirTruth);
-	
+	if(m_isMC  &&  m_analysis->doMCPUwrite) m_analysis->writePileupMCfile();
 }
 
 void analysisLocalControl::book()
@@ -421,6 +454,8 @@ void analysisLocalControl::draw()
 	m_analysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
 	
 	m_analysis->printCutFlowNumbers(l64t_nentries);
+	
+	if(!m_doPUwriteMC  &&  m_doPUremoveData) _INFO("correctedMClumi -> "+_s(m_analysis->correctedMClumi));
 }
 
 void analysisLocalControl::fits()

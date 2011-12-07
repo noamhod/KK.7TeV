@@ -22,6 +22,10 @@ void analysis::setAllCandidatesFiles(string sCandFilePath, string srunnumber)
 	string sLogFileName = sCandFilePath+"/candidates_all.run_"+srunnumber+".cnd";//".time_"+getDateHour()+".cnd";
 	fCandidates = new ofstream( sLogFileName.c_str() );
 }
+string analysis::setMCPUFiles(string sPUFilePath, string srunnumber)
+{
+	return sPUFilePath+"/"+sMCsampleName+"_"+srunnumber;
+}
 
 void analysis::execute()
 {
@@ -155,11 +159,10 @@ void analysis::execute()
 	
 	_DEBUG("");
 	
-	(*fCandidates)	<< "Run-LB-Evt-Wgt  "
+	(*fCandidates)	<< "Run-LB-Evt  "
 					<< analysisSkeleton::RunNumber	 << " "
 					<< analysisSkeleton::lbn 		 << " "
 					<< analysisSkeleton::EventNumber
-					// << " " << analysisSkeleton::pileup_weight
 					<< endl;
 
 	_DEBUG("");
@@ -213,47 +216,11 @@ void analysis::setEventVariables()
 	/////////////////////////////////////////////////////////////////////////////////
 	// pileup reweighting, needs to come after setting the lbn //////////////////////
 	analysisSkeleton::pileup_weight       = 1.;
-	analysisSkeleton::randomized_decision = 999;
+	analysisSkeleton::randomized_decision = 999; // obsolete
+	analysisSkeleton::lumi_pileup_weight  = 999; // obsolete
 	bool isIntime = false; // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ??????????
-	unsigned int RunNumber_tmp = m_WZphysD3PD->RunNumber;
 	if(m_isMC)
 	{
-		// this MC period with m_WZphysD3PD->RunNumber==185649, has 2 sub-periods with different luminosities because it
-		// is splitted by different triggers so a different initialization is requiered for each, depending on the
-		// binomialDecision between sub-period "1" and sub-period "2".
-		// If the previous decision was, say "1", and if the current decision will also be "1" so the reinitialzation can
-		// be skipped.
-		// Otherwise, current decision is "2", then it should be done.
-		// This is being taken care of with the modified run number: RunNumber_tmp = m_WZphysD3PD->RunNumber + 1 OR 2
-		string       randomized_suffix_str = "";
-		unsigned int randomized_suffix_int = 999;
-		if(m_WZphysD3PD->RunNumber==185649)
-		{
-			randomized_suffix_str = (string)binomialDecision();
-			randomized_suffix_int = validate_uint(randomized_suffix_str);
-			analysisSkeleton::randomized_decision = randomized_suffix_int;
-			// The next line is CRUCIAL so the run PU tool will be reset if the binomialDecision has changed...
-			RunNumber_tmp = RunNumber_tmp + randomized_suffix_int;
-		}
-		
-		// Now, do the initialization only if the modified run number (RunNumber_tmp) has changed:
-		if(RunNumber_tmp!=analysisSkeleton::previous_runnumber)
-		{
-			// if(pileuprw!=NULL) delete pileuprw;
-			// TString pileuphist_data  = (TString)utilities::checkANDsetFilepath("PWD", "/../conf/CURRENT_iLUMICALC_HISTOGRAMS.root");
-			// TString pileuphist_mc    = (TString)utilities::checkANDsetFilepath("PWD", "/../conf/muhist_MC11a.root");
-			// TString mcRootHistName   = setPileupPeriodName(m_WZphysD3PD->RunNumber);
-			// setPileupParameters(pileuphist_data, "avgintperbx", pileuphist_mc, mcRootHistName);
-		
-			///////////////////////////////////////////////////////////////////////////////////////
-			resetPileupParameters(m_WZphysD3PD->RunNumber, randomized_suffix_str, isIntime); //////
-			///////////////////////////////////////////////////////////////////////////////////////
-			
-			analysisSkeleton::previous_runnumber = RunNumber_tmp;
-		}
-	
-		analysisSkeleton::lumi_pileup_weight = pileUpLumiWeight; // is allocated in setPileupParameters OR in resetPileupParameters
-	
 		analysisSkeleton::pileup_weight = getPileUpWeight(false /*==>!isIntime*/); // will be the out-of-time pileup
 		if(analysisSkeleton::pileup_weight<0.) analysisSkeleton::pileup_weight = 1.;
 		

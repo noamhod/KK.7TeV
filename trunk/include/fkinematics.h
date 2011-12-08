@@ -67,6 +67,11 @@ inline float ySystem(TLorentzVector* pa, TLorentzVector* pb)
 	TLorentzVector pTmp = (*pa)+(*pb);
 	return pTmp.Rapidity();
 }
+inline float etaSystem(TLorentzVector* pa, TLorentzVector* pb)
+{
+	TLorentzVector pTmp = (*pa)+(*pb);
+	return pTmp.PseudoRapidity();
+}
 inline float magBetaSystem(TLorentzVector* pa, TLorentzVector* pb)
 {
 	TLorentzVector pTmp = (*pa)+(*pb);

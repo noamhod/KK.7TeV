@@ -11,15 +11,12 @@
 #include "../include/width.h"
 #include "../include/helicity.h"
 
-bool drawGmm = false;
-Int_t printmod = 5000;
+bool fastDYmumu = false;
+bool drawGmm    = false;
+Int_t printmod  = 5000;
 
 TMapTS2GRPX grpx;
-TMapiTS    grpx_ordered;
-// TMapTSTC cGmm;
-// TMapTSTC cZprime;
-// TMapTSTC cZprimeTemplate;
-// TMapTSTC cKKTemplate;
+TMapiTS     grpx_ordered;
 
 double mZprimeMin = 1000.;
 double mZprimeMax = 2000.;
@@ -244,36 +241,6 @@ TH1D* stitch(vector<TH1D*>& vh, TString name="", TString titles="")
 
 
 ///////////// admin /////////////
-/* void graphics(TH1* th1,
-			  Int_t mrkrstyle=-1, Float_t mrkrsize=-1,
-			  Int_t fillstyle=-1,
-			  Int_t linestyle=-1, Int_t linewidth=-1,
-			  Color_t linecolor=-1, Color_t fillcolor=-1, Color_t mrkrcolor=-1,
-			  Bool_t moreLogLabels=true, Bool_t noexponent=true,
-			  TString title="", TString xtitle="", TString ytitle="")
-{
-	_DEBUG("graphics");
-	
-	if(mrkrstyle>0) th1->SetMarkerStyle(mrkrstyle);
-	if(mrkrsize>0)  th1->SetMarkerSize(mrkrsize);
-	if(fillstyle>0) th1->SetFillStyle(fillstyle);
-	
-	if(linecolor>0) th1->SetLineColor(linecolor);
-	if(fillcolor>0) th1->SetFillColor(fillcolor);
-	if(mrkrcolor>0) th1->SetMarkerColor(mrkrcolor);
-	
-	if(linestyle>0) th1->SetLineStyle(linestyle);
-	if(linewidth>0) th1->SetLineWidth(linewidth);
-	
-	if(moreLogLabels) th1->GetXaxis()->SetMoreLogLabels(); 
-	if(noexponent)    th1->GetXaxis()->SetNoExponent(); 
-	
-	if(title!="")  th1->SetTitle(title);
-	if(xtitle!="") th1->SetXTitle(xtitle);
-	if(ytitle!="") th1->SetYTitle(ytitle);
-} */
-
-
 void graphics(TH1* th1,
 			  Color_t fillcolor=-1, Int_t fillstyle=-1,
 			  Color_t linecolor=-1, Int_t linestyle=-1, Width_t linewidth=-1,
@@ -304,14 +271,14 @@ void graphics(TH1* th1,
 
 void text()
 {
-	pvtxt_atlas = new TPaveText(0.4032663,0.2897141,0.5678392,0.3840259,"brNDC"); // 0.2110553,0.7097902,0.3756281,0.8041958 -> for 2d
+	pvtxt_atlas = new TPaveText(0.4032663,0.75,0.5678392,0.85,"brNDC"); // 0.2110553,0.7097902,0.3756281,0.8041958 -> for 2d
 	//pvtxt_atlas->SetFillColor(0);
 	pvtxt_atlas->SetFillStyle(4000); //will be transparent
 	pvtxt_atlas->SetFillColor(0);
 	pvtxt_atlas->SetTextFont(42);
 	txt = pvtxt_atlas->AddText("#bf{#splitline{#it{ATLAS}}{#scale[0.42]{work in progress}}}");
 	
-	pvtxt_lumi = new TPaveText(0.4032663,0.166,0.5678392,0.2726,"brNDC"); // 0.2110553,0.5926573,0.3756281,0.6993007 -> for 2d
+	pvtxt_lumi = new TPaveText(0.4032663,0.63,0.5678392,0.738,"brNDC"); // 0.2110553,0.5926573,0.3756281,0.6993007 -> for 2d
 	//pvtxt_lumi->SetFillColor(kWhite);
 	pvtxt_lumi->SetFillStyle(4000); //will be transparent
 	pvtxt_lumi->SetFillColor(0);
@@ -323,15 +290,25 @@ void text()
 	leg->SetFillColor(0);
 	leg->SetTextFont(42);
 	leg->AddEntry(h1Map["hMassData"],"Data","lep");
-	leg->AddEntry(h1Map["hMassDYmumu"],"DYmumu","f");
-	leg->AddEntry(h1Map["hMassDiboson"],"Diboson","f");
-	if(drawGmm) leg->AddEntry(h1Map["hMassGmm_01_1750"],"1750 GeV G*","l");
-	if(drawGmm) leg->AddEntry(h1Map["hMassGmm_01_2000"],"2000 GeV G*","l");
-	if(drawGmm) leg->AddEntry(h1Map["hMassGmm_01_2250"],"2250 GeV G*","l");
-	leg->AddEntry(h1Map["hMassZprime_SSM1000"],"Z'_{SSM} 1.00 TeV","l");
-	leg->AddEntry(h1Map["hMassZprime_SSM1500"],"Z'_{SSM} 1.50 TeV","l");
-	leg->AddEntry(h1Map["hMassZprime_SSM1750"],"Z'_{SSM} 1.75 TeV","l");
-	leg->AddEntry(h1Map["hMassZprime_SSM2000"],"Z'_{SSM} 2.00 TeV","l");
+	for(TMapiTS::iterator it=grpx_ordered.begin() ; it!=grpx_ordered.end() ; ++it)
+	{
+		int order    = it->first;
+		TString name = it->second;
+		if(order>=20) continue; // only BGs !
+		
+		leg->AddEntry(h1Map["hMass"+name],grpx[name]->label,"f");
+	}
+	
+	// leg->AddEntry(h1Map["hMassData"],"Data","lep");
+	// leg->AddEntry(h1Map["hMassDYmumu"],"DYmumu","f");
+	// leg->AddEntry(h1Map["hMassDiboson"],"Diboson","f");
+	// if(drawGmm) leg->AddEntry(h1Map["hMassGmm_01_1750"],"1750 GeV G*","l");
+	// if(drawGmm) leg->AddEntry(h1Map["hMassGmm_01_2000"],"2000 GeV G*","l");
+	// if(drawGmm) leg->AddEntry(h1Map["hMassGmm_01_2250"],"2250 GeV G*","l");
+	// leg->AddEntry(h1Map["hMassZprime_SSM1000"],"Z'_{SSM} 1.00 TeV","l");
+	// leg->AddEntry(h1Map["hMassZprime_SSM1500"],"Z'_{SSM} 1.50 TeV","l");
+	// leg->AddEntry(h1Map["hMassZprime_SSM1750"],"Z'_{SSM} 1.75 TeV","l");
+	// leg->AddEntry(h1Map["hMassZprime_SSM2000"],"Z'_{SSM} 2.00 TeV","l");
 }
 
 void templateText(TString tsMCname, TString tsMClegEntry)
@@ -555,47 +532,28 @@ void setDATAtree()
 	tree = (TTree*)file->Get(tName);
 }
 
+int proccount(int& counter)
+{
+	counter = counter+1;
+	return counter;
+}
+
 void samples()
 {
 	_DEBUG("samples");
-/* 	cGmm.insert( make_pair("Gmm_01_1750",kViolet+1) );
-	cGmm.insert( make_pair("Gmm_01_2000",kViolet+6) );
-	cGmm.insert( make_pair("Gmm_01_2250",kViolet+10) );
-	
-	// cZprime.insert( make_pair("Zprime_SSM500",kAzure+0) );
-	// cZprime.insert( make_pair("Zprime_SSM750",kAzure+0) );
-	cZprime.insert( make_pair("Zprime_SSM1000",kAzure+0) );
-	cZprime.insert( make_pair("Zprime_SSM1500",kAzure-2) );
-	cZprime.insert( make_pair("Zprime_SSM1750",kAzure-3) );
-	cZprime.insert( make_pair("Zprime_SSM2000",kAzure-4) );
-	
-	// cZprimeTemplate.insert( make_pair("Zprime_SSM500",kAzure+0) );
-	// cZprimeTemplate.insert( make_pair("Zprime_SSM750",kAzure+0) );
-	cZprimeTemplate.insert( make_pair("Zprime_SSM1000_template",kOrange+10) );
-	cZprimeTemplate.insert( make_pair("Zprime_SSM1500_template",kOrange+8) );
-	cZprimeTemplate.insert( make_pair("Zprime_SSM1750_template",kOrange+5) );
-	cZprimeTemplate.insert( make_pair("Zprime_SSM2000_template",kOrange+3) );
-	
-	// cKKTemplate.insert( make_pair("Zprime_SSM500",kAzure+0) );
-	// cKKTemplate.insert( make_pair("Zprime_SSM750",kAzure+0) );
-	cKKTemplate.insert( make_pair("KK1000_template",kGreen+4) );
-	cKKTemplate.insert( make_pair("KK1500_template",kOrange-1) );
-	cKKTemplate.insert( make_pair("KK1750_template",kOrange-5) );
-	cKKTemplate.insert( make_pair("KK2000_template",kOrange-8) ); */
-	
 	/*GRPX::GRPX(int o, TString l,
 				 Color_t fc, Int_t fs,
 				 Color_t lc, Int_t ls, Int_t lw,
 				 Color_t mc, Int_t mst, Int_t mss,
 				 )*/
 	int counter = 0;
-	grpx.insert( make_pair("DYmumu",   new GRPX(counter,"DY#mu#mu",      kAzure+8,-1,   kBlack,1,1,  -1,-1,-1)));
+	grpx.insert( make_pair("DYmumu",   new GRPX(counter,"#gamma/Z",      kAzure+8,-1,   kBlack,1,1,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["DYmumu"]->order,"DYmumu") );
-	grpx.insert( make_pair("Diboson",  new GRPX(counter++,"Diboson",     kOrange-4,-1,  kBlack,1,1,  -1,-1,-1)));
+	grpx.insert( make_pair("Diboson",  new GRPX(proccount(counter),"Diboson",     kOrange-4,-1,  kBlack,1,1,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Diboson"]->order,"Diboson") );
-	grpx.insert( make_pair("TTbar",    new GRPX(counter++,"t#bar t",     kRed+1,-1,     kBlack,1,1,  -1,-1,-1)));
+	grpx.insert( make_pair("TTbar",    new GRPX(proccount(counter),"t#bar t",     kRed+1,-1,     kBlack,1,1,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["TTbar"]->order,"TTbar") );
-	grpx.insert( make_pair("DYtautau", new GRPX(counter++,"DY#tau#tau",  kRed-5,-1,     kBlack,1,1,  -1,-1,-1)));
+	grpx.insert( make_pair("DYtautau", new GRPX(proccount(counter),"DY#tau#tau",  kRed-5,-1,     kBlack,1,1,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["DYtautau"]->order,"DYtautau") );
 	
 	counter = 20;
@@ -605,39 +563,39 @@ void samples()
 	counter = 100;
 	grpx.insert( make_pair("Zprime_SSM1000",  new GRPX(counter,"1000 GeV Z'_{SSM}",  -1,-1,    kAzure+0,1,2,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Zprime_SSM1000"]->order,"Zprime_SSM1000") );
-	grpx.insert( make_pair("Zprime_SSM1500",  new GRPX(counter++,"1500 GeV Z'_{SSM}",  -1,-1,  kAzure-2,1,2,  -1,-1,-1)));
+	grpx.insert( make_pair("Zprime_SSM1500",  new GRPX(proccount(counter),"1500 GeV Z'_{SSM}",  -1,-1,  kAzure-2,1,2,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Zprime_SSM1500"]->order,"Zprime_SSM1500") );
-	grpx.insert( make_pair("Zprime_SSM1750",  new GRPX(counter++,"1750 GeV Z'_{SSM}",  -1,-1,  kAzure-3,1,2,  -1,-1,-1)));
+	grpx.insert( make_pair("Zprime_SSM1750",  new GRPX(proccount(counter),"1750 GeV Z'_{SSM}",  -1,-1,  kAzure-3,1,2,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Zprime_SSM1750"]->order,"Zprime_SSM1750") );
-	grpx.insert( make_pair("Zprime_SSM2000",  new GRPX(counter++,"2000 GeV Z'_{SSM}",  -1,-1,  kAzure-4,1,2,  -1,-1,-1)));
+	grpx.insert( make_pair("Zprime_SSM2000",  new GRPX(proccount(counter),"2000 GeV Z'_{SSM}",  -1,-1,  kAzure-4,1,2,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Zprime_SSM2000"]->order,"Zprime_SSM2000") );
 	
 	counter = 200;
 	grpx.insert( make_pair("Gmm_01_1750",  new GRPX(counter,"1750 GeV G*",  -1,-1,    kViolet+1,1,2,   -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Gmm_01_1750"]->order,"Gmm_01_1750") );
-	grpx.insert( make_pair("Gmm_01_2000",  new GRPX(counter++,"2000 GeV G*",  -1,-1,  kViolet+6,1,2,   -1,-1,-1)));
+	grpx.insert( make_pair("Gmm_01_2000",  new GRPX(proccount(counter),"2000 GeV G*",  -1,-1,  kViolet+6,1,2,   -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Gmm_01_2000"]->order,"Gmm_01_2000") );
-	grpx.insert( make_pair("Gmm_01_2250",  new GRPX(counter++,"2250 GeV G*",  -1,-1,  kViolet+10,1,2,  -1,-1,-1)));
+	grpx.insert( make_pair("Gmm_01_2250",  new GRPX(proccount(counter),"2250 GeV G*",  -1,-1,  kViolet+10,1,2,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Gmm_01_2250"]->order,"Gmm_01_2250") );
 	
 	counter = 300;
 	grpx.insert( make_pair("Zprime_SSM1000_template",  new GRPX(counter,"1000 GeV Z'_{SSM} template",  -1,-1,    kOrange+10,1,2,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Zprime_SSM1000_template"]->order,"Zprime_SSM1000_template") );
-	grpx.insert( make_pair("Zprime_SSM1500_template",  new GRPX(counter++,"1500 GeV Z'_{SSM} template",  -1,-1,  kOrange+8,1,2,   -1,-1,-1)));
+	grpx.insert( make_pair("Zprime_SSM1500_template",  new GRPX(proccount(counter),"1500 GeV Z'_{SSM} template",  -1,-1,  kOrange+8,1,2,   -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Zprime_SSM1500_template"]->order,"Zprime_SSM1500_template") );
-	grpx.insert( make_pair("Zprime_SSM1750_template",  new GRPX(counter++,"1750 GeV Z'_{SSM} template",  -1,-1,  kOrange+5,1,2,   -1,-1,-1)));
+	grpx.insert( make_pair("Zprime_SSM1750_template",  new GRPX(proccount(counter),"1750 GeV Z'_{SSM} template",  -1,-1,  kOrange+5,1,2,   -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Zprime_SSM1750_template"]->order,"Zprime_SSM1750_template") );
-	grpx.insert( make_pair("Zprime_SSM2000_template",  new GRPX(counter++,"2000 GeV Z'_{SSM} template",  -1,-1,  kOrange+3,1,2,   -1,-1,-1)));
+	grpx.insert( make_pair("Zprime_SSM2000_template",  new GRPX(proccount(counter),"2000 GeV Z'_{SSM} template",  -1,-1,  kOrange+3,1,2,   -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Zprime_SSM2000_template"]->order,"Zprime_SSM2000_template") );
 	
 	counter = 400;
 	grpx.insert( make_pair("KK1000_template",  new GRPX(counter,"1000 GeV KK template",  -1,-1,    kGreen+4,1,2,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["KK1000_template"]->order,"KK1000_template") );
-	grpx.insert( make_pair("KK1500_template",  new GRPX(counter++,"1500 GeV KK template",  -1,-1,  kGreen-1,1,2,   -1,-1,-1)));
+	grpx.insert( make_pair("KK1500_template",  new GRPX(proccount(counter),"1500 GeV KK template",  -1,-1,  kGreen-1,1,2,   -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["KK1500_template"]->order,"KK1500_template") );
-	grpx.insert( make_pair("KK1750_template",  new GRPX(counter++,"1750 GeV KK template",  -1,-1,  kGreen-1,1,2,   -1,-1,-1)));
+	grpx.insert( make_pair("KK1750_template",  new GRPX(proccount(counter),"1750 GeV KK template",  -1,-1,  kGreen-1,1,2,   -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["KK1750_template"]->order,"KK1750_template") );
-	grpx.insert( make_pair("KK2000_template",  new GRPX(counter++,"2000 GeV KK template",  -1,-1,  kGreen-8,1,2,   -1,-1,-1)));
+	grpx.insert( make_pair("KK2000_template",  new GRPX(proccount(counter),"2000 GeV KK template",  -1,-1,  kGreen-8,1,2,   -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["KK2000_template"]->order,"KK2000_template") );
 	
 	counter = 1000;
@@ -654,11 +612,13 @@ void setMCtrees(TString tsMCname)
 	////////////////
 	
 	if(tsMCname=="DYmumu")
-	{
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Zmumu.root", "mcLocalControl_Zmumu", 4878990, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
-		
-		// setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_75M120.root", "mcLocalControl_DYmumu_75M120", 20000, 7.9862E-01*nb2fb);
-		// setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 20000, 8.5275E-03*nb2fb);
+	{	
+		if(fastDYmumu)
+		{
+			setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_75M120.root", "mcLocalControl_DYmumu_75M120", 20000, 7.9862E-01*nb2fb);
+			setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 20000, 8.5275E-03*nb2fb);
+		}
+		else setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Zmumu.root", "mcLocalControl_Zmumu", 4878990, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
 		
 		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_250M400.root", "mcLocalControl_DYmumu_250M400", 20000, 4.1075E-04*nb2fb);
 		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_400M600.root", "mcLocalControl_DYmumu_400M600", 20000, 6.6459E-05*nb2fb);
@@ -954,6 +914,9 @@ void hbook()
 	setLogBins(nlogmassbins,logmassmin,logmassmax,logmassbins);
 	setLogBins(nlogfullimassbins,logfullimassmin,logfullimassmax,logfullimassbins);
 	setLogBins(nloglimitimassbins, loglimitimassmin, loglimitimassmax, loglimitimassbins);
+	setLogBins(nlogofficialimassbins,logofficialimassmin,logofficialimassmax,logofficialimassbins);
+	setSqrtBins(nsqrtofficialptbins, sqrtofficialptmin, sqrtofficialptmax, sqrtofficialptbins);
+	setSqrtBins(nsqrtofficialqtbins, sqrtofficialqtmin, sqrtofficialqtmax, sqrtofficialqtbins);
 	
 	//// lines
 	linMap.insert( make_pair("hMassCosThetaCS_horline", new TLine(linfullimassmin,0.,linfullimassmax,0.)) );
@@ -966,51 +929,6 @@ void hbook()
 	{
 		linMap.insert( make_pair("hMassyQ_vertline_"+_s(logmassbins[ms]), new TLine(logmassbins[ms],minfullyQ,logmassbins[ms],maxfullyQ)) );
 	}
-
-	/* graphics(TH1* th1,
-			  Int_t mrkrstyle=-1, Float_t mrkrsize=-1,
-			  Int_t fillstyle=-1,
-			  Int_t linestyle=-1, Int_t linewidth=-1,
-			  Color_t linecolor=-1, Color_t fillcolor=-1, Color_t mrkrcolor=-1,
-			  Bool_t moreLogLabels=true, Bool_t noexponent=true,
-			  TString title="", TString xtitle="", TString ytitle="") */
-	
-	//// no need to draw these
-	// h1Map.insert( make_pair("hCosThetaLimitBins_Data", new TH1D("hCosThetaLimitBins_Data","Data;cos#theta*;Events",nCosThetaBinsLimit,minCosThetaLimit,maxCosThetaLimit)) );
-	// h1Map.insert( make_pair("hCosThetaLimitBins_DYmumu", new TH1D("hCosThetaLimitBins_DYmumu","DYmumu;cos#theta*;Events",nCosThetaBinsLimit,minCosThetaLimit,maxCosThetaLimit)) );
-	// h1Map.insert( make_pair("hCosThetaLimitBins_Diboson", new TH1D("hCosThetaLimitBins_Diboson","Diboson;cos#theta*;Events",nCosThetaBinsLimit,minCosThetaLimit,maxCosThetaLimit)) );
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsname  = "hCosThetaLimitBins_Gmm_01_" + (TString)_s(M);
-		// TString tstitle = "Gmm_01_" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,tstitle+";cos#theta*;Events",nCosThetaBinsLimit,minCosThetaLimit,maxCosThetaLimit)) );
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "hCosThetaLimitBins_Zprime_SSM" + (TString)_s(M);
-		// TString tstitle = "Zprime_SSM" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,tstitle+";cos#theta*;Events",nCosThetaBinsLimit,minCosThetaLimit,maxCosThetaLimit)) );
-	// }
-	
-	//// no need to draw these
-	// h1Map.insert( make_pair("hdEtaLimitBins_Data", new TH1D("hdEtaLimitBins_Data","Data;#Delta#eta;Events",ndEtaBinsLimit,mindEtaLimit,maxdEtaLimit)) );
-	// h1Map.insert( make_pair("hdEtaLimitBins_DYmumu", new TH1D("hdEtaLimitBins_DYmumu","DYmumu;#Delta#eta;Events",ndEtaBinsLimit,mindEtaLimit,maxdEtaLimit)) );
-	// h1Map.insert( make_pair("hdEtaLimitBins_Diboson", new TH1D("hdEtaLimitBins_Diboson","Diboson;#Delta#eta;Events",ndEtaBinsLimit,mindEtaLimit,maxdEtaLimit)) );
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsname  = "hdEtaLimitBins_Gmm_01_" + (TString)_s(M);
-		// TString tstitle = "Gmm_01_" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,tstitle+";#Delta#eta;Events",ndEtaBinsLimit,mindEtaLimit,maxdEtaLimit)) );
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "hdEtaLimitBins_Zprime_SSM" + (TString)_s(M);
-		// TString tstitle = "Zprime_SSM" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,tstitle+";#Delta#eta;Events",ndEtaBinsLimit,mindEtaLimit,maxdEtaLimit)) );
-	// }
-	
 	
 	/* graphics(TH1* th1,
 			  Color_t fillcolor=-1, Int_t fillstyle=-1,
@@ -1029,13 +947,15 @@ void hbook()
 		
 		if(name.Contains("_template")  ||  (name.Contains("Zprime") && !name.Contains("template")))
 		{
-			h1Map.insert( make_pair("hMass"+name+"_truth", new TH1D("hMass"+name+"_truth",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
+			// h1Map.insert( make_pair("hMass"+name+"_truth", new TH1D("hMass"+name+"_truth",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
+			h1Map.insert( make_pair("hMass"+name+"_truth", new TH1D("hMass"+name+"_truth",";m_{#mu#mu} GeV;Events",nlogofficialimassbins,logofficialimassbins)) );
 			setlogx(h1Map["hMass"+name+"_truth"]);
 			graphics(h1Map["hMass"+name+"_truth"],
 					 grpx[name]->filcolor,grpx[name]->filstyle,
 					 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 					 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-			h1Map.insert( make_pair("hpTLeading"+name+"_truth", new TH1D("hpTLeading"+name+"_truth",";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
+			// h1Map.insert( make_pair("hpTLeading"+name+"_truth", new TH1D("hpTLeading"+name+"_truth",";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
+			h1Map.insert( make_pair("hpTLeading"+name+"_truth", new TH1D("hpTLeading"+name+"_truth",";p_{T}^{leading} GeV;Events",nsqrtofficialptbins,sqrtofficialptbins)) );
 			setlogx(h1Map["hpTLeading"+name+"_truth"]);
 			graphics(h1Map["hpTLeading"+name+"_truth"],
 					 grpx[name]->filcolor,grpx[name]->filstyle,
@@ -1045,25 +965,29 @@ void hbook()
 		
 		if(name=="DYmumu")
 		{
-			h1Map.insert( make_pair("hMass"+name+"_truth", new TH1D("hMass"+name+"_truth",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
+			// h1Map.insert( make_pair("hMass"+name+"_truth", new TH1D("hMass"+name+"_truth",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
+			h1Map.insert( make_pair("hMass"+name+"_truth", new TH1D("hMass"+name+"_truth",";m_{#mu#mu} GeV;Events",nlogofficialimassbins,logofficialimassbins)) );
 			setlogx(h1Map["hMass"+name+"_truth"]);
 			graphics(h1Map["hMass"+name+"_truth"],
 					 grpx[name]->filcolor,grpx[name]->filstyle,
 					 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 					 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);				 
-			h1Map.insert( make_pair("hMass"+name+"_noEWkfactor", new TH1D("hMass"+name+"_noEWkfactor",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
+			// h1Map.insert( make_pair("hMass"+name+"_noEWkfactor", new TH1D("hMass"+name+"_noEWkfactor",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
+			h1Map.insert( make_pair("hMass"+name+"_noEWkfactor", new TH1D("hMass"+name+"_noEWkfactor",";m_{#mu#mu} GeV;Events",nlogofficialimassbins,logofficialimassbins)) );
 			setlogx(h1Map["hMass"+name+"_noEWkfactor"]);
 			graphics(h1Map["hMass"+name+"_noEWkfactor"],
 					 grpx[name]->filcolor,grpx[name]->filstyle,
 					 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 					 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-			h1Map.insert( make_pair("hpTLeading"+name+"_truth", new TH1D("hpTLeading"+name+"_truth",";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
+			// h1Map.insert( make_pair("hpTLeading"+name+"_truth", new TH1D("hpTLeading"+name+"_truth",";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
+			h1Map.insert( make_pair("hpTLeading"+name+"_truth", new TH1D("hpTLeading"+name+"_truth",";p_{T}^{leading} GeV;Events",nsqrtofficialptbins,sqrtofficialptbins)) );
 			setlogx(h1Map["hpTLeading"+name+"_truth"]);
 			graphics(h1Map["hpTLeading"+name+"_truth"],
 					 grpx[name]->filcolor,grpx[name]->filstyle,
 					 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 					 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-			h1Map.insert( make_pair("hpTLeading"+name+"_noEWkfactor", new TH1D("hpTLeading"+name+"_noEWkfactor",";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
+			// h1Map.insert( make_pair("hpTLeading"+name+"_noEWkfactor", new TH1D("hpTLeading"+name+"_noEWkfactor",";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
+			h1Map.insert( make_pair("hpTLeading"+name+"_noEWkfactor", new TH1D("hpTLeading"+name+"_noEWkfactor",";p_{T}^{leading} GeV;Events",nsqrtofficialptbins,sqrtofficialptbins)) );
 			setlogx(h1Map["hpTLeading"+name+"_noEWkfactor"]);
 			graphics(h1Map["hpTLeading"+name+"_noEWkfactor"],
 					 grpx[name]->filcolor,grpx[name]->filstyle,
@@ -1071,85 +995,6 @@ void hbook()
 					 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
 		}
 	}
-	
-	/////////////////////////////////////
-	// TEMPLATES
-	// h1Map.insert( make_pair("hMassDYmumu_truth", new TH1D("hMassDYmumu_truth",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
-	// setlogx(h1Map["hMassDYmumu_truth"]);
-	// graphics(h1Map["hMassDYmumu_truth"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
-	// h1Map.insert( make_pair("hMassDYmumu_noEWkfactor", new TH1D("hMassDYmumu_noEWkfactor",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
-	// setlogx(h1Map["hMassDYmumu_noEWkfactor"]);
-	// graphics(h1Map["hMassDYmumu_noEWkfactor"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
-	
-	// h1Map.insert( make_pair("hpTLeadingDYmumu_truth", new TH1D("hpTLeadingDYmumu_truth",";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
-	// setlogx(h1Map["hpTLeadingDYmumu_truth"]);
-	// graphics(h1Map["hpTLeadingDYmumu_truth"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
-	// h1Map.insert( make_pair("hpTLeadingDYmumu_noEWkfactor", new TH1D("hpTLeadingDYmumu_noEWkfactor",";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
-	// setlogx(h1Map["hpTLeadingDYmumu_noEWkfactor"]);
-	// graphics(h1Map["hpTLeadingDYmumu_noEWkfactor"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsMCname = "";
-		// TString tsname = "";
-		// TString tsTname = "";
-		
-		//// imass
-		// tsMCname = "Zprime_SSM" + (TString)_s(M) + "_template";
-		// tsname   = "hMassZprime_SSM" + (TString)_s(M) + "_template";
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprimeTemplate[tsMCname],cZprimeTemplate[tsMCname],-1);
-		
-		// tsTname = "Zprime_SSM" + (TString)_s(M) + "_template";
-		// tsMCname = "Zprime_SSM" + (TString)_s(M) + "_template_truth";
-		// tsname   = "hMassZprime_SSM" + (TString)_s(M) + "_template_truth";
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,"Truth;m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprimeTemplate[tsTname],cZprimeTemplate[tsTname],-1);
-		
-		// tsMCname = "KK" + (TString)_s(M) + "_template";
-		// tsname   = "hMassKK" + (TString)_s(M) + "_template";
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cKKTemplate[tsMCname],-1,-1);
-		
-		// tsTname = "KK" + (TString)_s(M) + "_template";
-		// tsMCname = "KK" + (TString)_s(M) + "_template_truth";
-		// tsname   = "hMassKK" + (TString)_s(M) + "_template_truth";
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,"Truth;m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cKKTemplate[tsTname],-1,-1);
-		
-		//// pT leading
-		// tsMCname = "Zprime_SSM" + (TString)_s(M) + "_template";
-		// tsname   = "hpTLeadingZprime_SSM" + (TString)_s(M) + "_template";
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprimeTemplate[tsMCname],cZprimeTemplate[tsMCname],-1);
-		
-		// tsTname = "Zprime_SSM" + (TString)_s(M) + "_template";
-		// tsMCname = "Zprime_SSM" + (TString)_s(M) + "_template_truth";
-		// tsname   = "hpTLeadingZprime_SSM" + (TString)_s(M) + "_template_truth";
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,"Truth;p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprimeTemplate[tsTname],cZprimeTemplate[tsTname],-1);
-		
-		// tsMCname = "KK" + (TString)_s(M) + "_template";
-		// tsname   = "hpTLeadingKK" + (TString)_s(M) + "_template";
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cKKTemplate[tsMCname],-1,-1);
-		
-		// tsTname = "KK" + (TString)_s(M) + "_template";
-		// tsMCname = "KK" + (TString)_s(M) + "_template_truth";
-		// tsname   = "hpTLeadingKK" + (TString)_s(M) + "_template_truth";
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,"Truth;p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cKKTemplate[tsTname],-1,-1);
-	// }
-	
-	/////////////////////////////////////
 	
 	for(TMapTS2GRPX::iterator it=grpx.begin() ; it!=grpx.end() ; ++it)
 	{
@@ -1166,7 +1011,14 @@ void hbook()
 				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
 		
-		h1Map.insert( make_pair("hMass"+name, new TH1D("hMass"+name,";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
+		h1Map.insert( make_pair("hMassNumbers"+name, new TH1D("hMassNumbers"+name,";m_{#mu#mu} GeV;Events",imasslogicnbins,imasslogicbins)) );
+		setlogx(h1Map["hMassNumbers"+name]);
+		graphics(h1Map["hMassNumbers"+name],
+				 grpx[name]->filcolor,grpx[name]->filstyle,
+				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
+				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
+		// h1Map.insert( make_pair("hMass"+name, new TH1D("hMass"+name,";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
+		h1Map.insert( make_pair("hMass"+name, new TH1D("hMass"+name,";m_{#mu#mu} GeV;Events",nlogofficialimassbins,logofficialimassbins)) );
 		setlogx(h1Map["hMass"+name]);
 		graphics(h1Map["hMass"+name],
 				 grpx[name]->filcolor,grpx[name]->filstyle,
@@ -1180,46 +1032,60 @@ void hbook()
 				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
 				 
-		h1Map.insert( make_pair("hQT"+name, new TH1D("hQT"+name,";Q_{T} GeV;Events",nlogptbins,logptbins)) );
+		// h1Map.insert( make_pair("hQT"+name, new TH1D("hQT"+name,";Q_{T} GeV;Events",nlogqtbins,logqtbins)) );
+		h1Map.insert( make_pair("hQT"+name, new TH1D("hQT"+name,";Q_{T} GeV;Events",nsqrtofficialqtbins,sqrtofficialqtbins)) );
 		setlogx(h1Map["hQT"+name]);
 		graphics(h1Map["hQT"+name],
 				 grpx[name]->filcolor,grpx[name]->filstyle,
 				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
+		
+		h1Map.insert( make_pair("hEtaQ"+name, new TH1D("hEtaQ"+name,";#eta_{Q};Events",netaQbins,etaQmin,etaQmax)) );
+		setlogx(h1Map["hEtaQ"+name]);
+		graphics(h1Map["hEtaQ"+name],
+				 grpx[name]->filcolor,grpx[name]->filstyle,
+				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
+				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
 				 
-		h1Map.insert( make_pair("hEtaLeading"+name, new TH1D("hEtaLeading"+name,";#eta_{#mu}^{leading};Events",etalogicnbins,etalogicbins)) );
+		// h1Map.insert( make_pair("hEtaLeading"+name, new TH1D("hEtaLeading"+name,";#eta_{#mu}^{leading};Events",etalogicnbins,etalogicbins)) );
+		h1Map.insert( make_pair("hEtaLeading"+name, new TH1D("hEtaLeading"+name,";#eta_{#mu}^{leading};Events",nEtabins,Etamin,Etamax)) );
 		setlogx(h1Map["hEtaLeading"+name]);
 		graphics(h1Map["hEtaLeading"+name],
 				 grpx[name]->filcolor,grpx[name]->filstyle,
 				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-		h1Map.insert( make_pair("hEtaSubleading"+name, new TH1D("hEtaSubleading"+name,";#eta_{#mu}^{leading};Events",etalogicnbins,etalogicbins)) );
+		// h1Map.insert( make_pair("hEtaSubleading"+name, new TH1D("hEtaSubleading"+name,";#eta_{#mu}^{leading};Events",etalogicnbins,etalogicbins)) );
+		h1Map.insert( make_pair("hEtaSubleading"+name, new TH1D("hEtaSubleading"+name,";#eta_{#mu}^{leading};Events",nEtabins,Etamin,Etamax)) );
 		setlogx(h1Map["hEtaSubleading"+name]);
 		graphics(h1Map["hEtaSubleading"+name],
 				 grpx[name]->filcolor,grpx[name]->filstyle,
 				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
 				 
-		h1Map.insert( make_pair("hPhiLeading"+name, new TH1D("hPhiLeading"+name,";#phi_{#mu}^{leading};Events",nphibins,phimin,phimax)) );
+		// h1Map.insert( make_pair("hPhiLeading"+name, new TH1D("hPhiLeading"+name,";#phi_{#mu}^{leading};Events",nphibins,phimin,phimax)) );
+		h1Map.insert( make_pair("hPhiLeading"+name, new TH1D("hPhiLeading"+name,";#phi_{#mu}^{leading};Events",nPhibins,Phimin,Phimax)) );
 		setlogx(h1Map["hPhiLeading"+name]);
 		graphics(h1Map["hPhiLeading"+name],
 				 grpx[name]->filcolor,grpx[name]->filstyle,
 				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-		h1Map.insert( make_pair("hPhiSubleading"+name, new TH1D("hPhiSubleading"+name,";#phi_{#mu}^{leading};Events",nphibins,phimin,phimax)) );
+		// h1Map.insert( make_pair("hPhiSubleading"+name, new TH1D("hPhiSubleading"+name,";#phi_{#mu}^{leading};Events",nphibins,phimin,phimax)) );
+		h1Map.insert( make_pair("hPhiSubleading"+name, new TH1D("hPhiSubleading"+name,";#phi_{#mu}^{leading};Events",nPhibins,Phimin,Phimax)) );
 		setlogx(h1Map["hPhiSubleading"+name]);
 		graphics(h1Map["hPhiSubleading"+name],
 				 grpx[name]->filcolor,grpx[name]->filstyle,
 				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
 		
-		h1Map.insert( make_pair("hpTLeading"+name, new TH1D("hpTLeading"+name,";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
+		// h1Map.insert( make_pair("hpTLeading"+name, new TH1D("hpTLeading"+name,";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
+		h1Map.insert( make_pair("hpTLeading"+name, new TH1D("hpTLeading"+name,";p_{T}^{leading} GeV;Events",nsqrtofficialptbins,sqrtofficialptbins)) );
 		setlogx(h1Map["hpTLeading"+name]);
 		graphics(h1Map["hpTLeading"+name],
 				 grpx[name]->filcolor,grpx[name]->filstyle,
 				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-		h1Map.insert( make_pair("hpTSubleading"+name, new TH1D("hpTSubleading"+name,";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
+		// h1Map.insert( make_pair("hpTSubleading"+name, new TH1D("hpTSubleading"+name,";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
+		h1Map.insert( make_pair("hpTSubleading"+name, new TH1D("hpTSubleading"+name,";p_{T}^{leading} GeV;Events",nsqrtofficialptbins,sqrtofficialptbins)) );
 		setlogx(h1Map["hpTSubleading"+name]);
 		graphics(h1Map["hpTSubleading"+name],
 				 grpx[name]->filcolor,grpx[name]->filstyle,
@@ -1256,444 +1122,15 @@ void hbook()
 		h2Map.insert( make_pair("hMassyQ"+name, new TH2D("hMassyQ"+name,";m_{#mu#mu} GeV;y_{Q};Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nfullyQbins,minfullyQ,maxfullyQ)) );
 		setlogx(h2Map["hMassyQ"+name]);
 	}
-	
-	
-	// h1Map.insert( make_pair("hMassMCsum", new TH1D("hMassMCsum",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
-	// setlogx(h1Map["hMassMCsum"]);
-	// graphics(h1Map["hMassMCsum"],  20,0.8,  -1,  -1,-1,  -1,-1,kRed);
-	// h1Map.insert( make_pair("hMassData", new TH1D("hMassData",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
-	// setlogx(h1Map["hMassData"]);
-	// graphics(h1Map["hMassData"],  24,0.8);
-	// h1Map.insert( make_pair("hMassDYmumu", new TH1D("hMassDYmumu",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
-	// setlogx(h1Map["hMassDYmumu"]);
-	// graphics(h1Map["hMassDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
-	// h1Map.insert( make_pair("hMassDiboson", new TH1D("hMassDiboson",";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
-	// setlogx(h1Map["hMassDiboson"]);
-	// graphics(h1Map["hMassDiboson"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsMCname = "Gmm_01_" + (TString)_s(M);
-		// TString tsname = "hMassGmm_01_" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsMCname = "Zprime_SSM" + (TString)_s(M);
-		// TString tsname = "hMassZprime_SSM" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
-		
-		// tsMCname = "Zprime_SSM" + (TString)_s(M) + "_truth";
-		// tsname = "hMassZprime_SSM" + (TString)_s(M) + "_truth";
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";m_{#mu#mu} GeV;Events",nlogfullimassbins,logfullimassbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
-	// }
-	
-	
-	// h1Map.insert( make_pair("hNvxpMCsum", new TH1D("hNvxpMCsum",";N_{vertices};Events",35,1.,36.)) );
-	// graphics(h1Map["hNvxpMCsum"],  20,0.8,  -1,  -1,-1,  -1,-1,kRed);
-	// h1Map.insert( make_pair("hNvxpData", new TH1D("hNvxpData",";N_{vertices};Events",35,1.,36.)) );
-	// graphics(h1Map["hNvxpData"],  24,0.8);
-	// h1Map.insert( make_pair("hNvxpDYmumu", new TH1D("hNvxpDYmumu",";N_{vertices};Events",35,1.,36.)) );
-	// graphics(h1Map["hNvxpDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
-	// h1Map.insert( make_pair("hNvxpDiboson", new TH1D("hNvxpDiboson",";N_{vertices};Events",35,1.,36.)) );
-	// graphics(h1Map["hNvxpDiboson"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsMCname = "Gmm_01_" + (TString)_s(M);
-		// TString tsname = "hNvxpGmm_01_" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";N_{vertices};Events",35,1.,36.)) );
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsMCname = "Zprime_SSM" + (TString)_s(M);
-		// TString tsname = "hNvxpZprime_SSM" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";N_{vertices};Events",35,1.,36.)) );
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
-	// }
-	
-	// h1Map.insert( make_pair("hNvxpMCsum_with_puwgt", new TH1D("hNvxpMCsum_with_puwgt",";N_{vertices};Events",35,1.,36.)) );
-	// graphics(h1Map["hNvxpMCsum_with_puwgt"],  20,0.8,  -1,  -1,-1,  -1,-1,kRed);
-	// h1Map.insert( make_pair("hNvxpData_with_puwgt", new TH1D("hNvxpData_with_puwgt",";N_{vertices};Events",35,1.,36.)) );
-	// graphics(h1Map["hNvxpData_with_puwgt"],  24,0.8);
-	// h1Map.insert( make_pair("hNvxpDYmumu_with_puwgt", new TH1D("hNvxpDYmumu_with_puwgt",";N_{vertices};Events",35,1.,36.)) );
-	// graphics(h1Map["hNvxpDYmumu_with_puwgt"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
-	// h1Map.insert( make_pair("hNvxpDiboson_with_puwgt", new TH1D("hNvxpDiboson_with_puwgt",";N_{vertices};Events",35,1.,36.)) );
-	// graphics(h1Map["hNvxpDiboson_with_puwgt"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsMCname = "Gmm_01_" + (TString)_s(M);
-		// TString tsname = "hNvxpGmm_01_" + (TString)_s(M) + "_with_puwgt";
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";N_{vertices};Events",35,1.,36.)) );
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsMCname = "Zprime_SSM" + (TString)_s(M);
-		// TString tsname = "hNvxpZprime_SSM" + (TString)_s(M) + "_with_puwgt";
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";N_{vertices};Events",35,1.,36.)) );
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
-	// }
-	
-	// h1Map.insert( make_pair("hyQMCsum", new TH1D("hyQMCsum",";y_{Q};Events",nyQbins,minyQ,maxyQ)) );
-	// setlogx(h1Map["hyQMCsum"]);
-	// graphics(h1Map["hyQMCsum"],  20,0.8,  -1,  -1,-1,  -1,-1,kRed);
-	// h1Map.insert( make_pair("hyQData", new TH1D("hyQData",";y_{Q};Events",nyQbins,minyQ,maxyQ)) );
-	// setlogx(h1Map["hyQData"]);
-	// graphics(h1Map["hyQData"],  24,0.8);
-	// h1Map.insert( make_pair("hyQDYmumu", new TH1D("hyQDYmumu",";y_{Q};Events",nyQbins,minyQ,maxyQ)) );
-	// setlogx(h1Map["hyQDYmumu"]);
-	// graphics(h1Map["hyQDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
-	// h1Map.insert( make_pair("hyQDiboson", new TH1D("hyQDiboson",";y_{Q};Events",nyQbins,minyQ,maxyQ)) );
-	// setlogx(h1Map["hyQDiboson"]);
-	// graphics(h1Map["hyQDiboson"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsMCname = "Gmm_01_" + (TString)_s(M);
-		// TString tsname = "hyQGmm_01_" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";y_{Q};Events",nyQbins,minyQ,maxyQ)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsMCname = "Zprime_SSM" + (TString)_s(M);
-		// TString tsname = "hyQZprime_SSM" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";y_{Q};Events",nyQbins,minyQ,maxyQ)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
-	// }
-	
-	// h1Map.insert( make_pair("hQTMCsum", new TH1D("hQTMCsum",";Q_{T} GeV;Events",nlogptbins,logptbins)) );
-	// setlogx(h1Map["hQTMCsum"]);
-	// graphics(h1Map["hQTMCsum"],  20,0.8,  -1,  -1,-1,  -1,-1,kRed);
-	// h1Map.insert( make_pair("hQTData", new TH1D("hQTData",";Q_{T} GeV;Events",nlogptbins,logptbins)) );
-	// setlogx(h1Map["hQTData"]);
-	// graphics(h1Map["hQTData"],  24,0.8);
-	// h1Map.insert( make_pair("hQTDYmumu", new TH1D("hQTDYmumu",";Q_{T} GeV;Events",nlogptbins,logptbins)) );
-	// setlogx(h1Map["hQTDYmumu"]);
-	// graphics(h1Map["hQTDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
-	// h1Map.insert( make_pair("hQTDiboson", new TH1D("hQTDiboson",";Q_{T} GeV;Events",nlogptbins,logptbins)) );
-	// setlogx(h1Map["hQTDiboson"]);
-	// graphics(h1Map["hQTDiboson"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsMCname = "Gmm_01_" + (TString)_s(M);
-		// TString tsname = "hQTGmm_01_" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";Q_{T} GeV;Events",nlogptbins,logptbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsMCname = "Zprime_SSM" + (TString)_s(M);
-		// TString tsname = "hQTZprime_SSM" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";Q_{T} GeV;Events",nlogptbins,logptbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
-	// }
-	
-	// h1Map.insert( make_pair("hEtaLeadingMCsum", new TH1D("hEtaLeadingMCsum",";#eta_{#mu}^{leading};Events",etalogicnbins,etalogicbins)) );
-	// setlogx(h1Map["hEtaLeadingMCsum"]);
-	// graphics(h1Map["hEtaLeadingMCsum"],  20,0.8,  -1,  -1,-1,  -1,-1,kRed);
-	// h1Map.insert( make_pair("hEtaLeadingData", new TH1D("hEtaLeadingData",";#eta_{#mu}^{leading};Events",etalogicnbins,etalogicbins)) );
-	// setlogx(h1Map["hEtaLeadingData"]);
-	// graphics(h1Map["hEtaLeadingData"],  24,0.8);
-	// h1Map.insert( make_pair("hEtaLeadingDYmumu", new TH1D("hEtaLeadingDYmumu",";#eta_{#mu}^{leading};Events",etalogicnbins,etalogicbins)) );
-	// setlogx(h1Map["hEtaLeadingDYmumu"]);
-	// graphics(h1Map["hEtaLeadingDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
-	// h1Map.insert( make_pair("hEtaLeadingDiboson", new TH1D("hEtaLeadingDiboson",";#eta_{#mu}^{leading};Events",etalogicnbins,etalogicbins)) );
-	// setlogx(h1Map["hEtaLeadingDiboson"]);
-	// graphics(h1Map["hEtaLeadingDiboson"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsMCname = "Gmm_01_" + (TString)_s(M);
-		// TString tsname = "hEtaLeadingGmm_01_" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";#eta_{#mu}^{leading};Events",etalogicnbins,etalogicbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsMCname = "Zprime_SSM" + (TString)_s(M);
-		// TString tsname = "hEtaLeadingZprime_SSM" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";#eta_{#mu}^{leading};Events",etalogicnbins,etalogicbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
-	// }
-	
-	// h1Map.insert( make_pair("hEtaSubleadingMCsum", new TH1D("hEtaSubleadingMCsum",";#eta_{#mu}^{subleading};Events",etalogicnbins,etalogicbins)) );
-	// setlogx(h1Map["hEtaSubleadingMCsum"]);
-	// graphics(h1Map["hEtaSubleadingMCsum"],  20,0.8,  -1,  -1,-1,  -1,-1,kRed);
-	// h1Map.insert( make_pair("hEtaSubleadingData", new TH1D("hEtaSubleadingData",";#eta_{#mu}^{subleading};Events",etalogicnbins,etalogicbins)) );
-	// setlogx(h1Map["hEtaSubleadingData"]);
-	// graphics(h1Map["hEtaSubleadingData"],  24,0.8);
-	// h1Map.insert( make_pair("hEtaSubleadingDYmumu", new TH1D("hEtaSubleadingDYmumu",";#eta_{#mu}^{subleading};Events",etalogicnbins,etalogicbins)) );
-	// setlogx(h1Map["hEtaSubleadingDYmumu"]);
-	// graphics(h1Map["hEtaSubleadingDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
-	// h1Map.insert( make_pair("hEtaSubleadingDiboson", new TH1D("hEtaSubleadingDiboson",";#eta_{#mu}^{subleading};Events",etalogicnbins,etalogicbins)) );
-	// setlogx(h1Map["hEtaSubleadingDiboson"]);
-	// graphics(h1Map["hEtaSubleadingDiboson"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsMCname = "Gmm_01_" + (TString)_s(M);
-		// TString tsname = "hEtaSubleadingGmm_01_" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";#eta_{#mu}^{subleading};Events",etalogicnbins,etalogicbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsMCname = "Zprime_SSM" + (TString)_s(M);
-		// TString tsname = "hEtaSubleadingZprime_SSM" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";#eta_{#mu}^{subleading};Events",etalogicnbins,etalogicbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
-	// }
-	
-	// h1Map.insert( make_pair("hPhiLeadingMCsum", new TH1D("hPhiLeadingMCsum",";#phi_{#mu}^{leading};Events",nphibins,phimin,phimax)) );
-	// setlogx(h1Map["hPhiLeadingMCsum"]);
-	// graphics(h1Map["hPhiLeadingMCsum"],  20,0.8,  -1,  -1,-1,  -1,-1,kRed);
-	// h1Map.insert( make_pair("hPhiLeadingData", new TH1D("hPhiLeadingData",";#phi_{#mu}^{leading};Events",nphibins,phimin,phimax)) );
-	// setlogx(h1Map["hPhiLeadingData"]);
-	// graphics(h1Map["hPhiLeadingData"],  24,0.8);
-	// h1Map.insert( make_pair("hPhiLeadingDYmumu", new TH1D("hPhiLeadingDYmumu",";#phi_{#mu}^{leading};Events",nphibins,phimin,phimax)) );
-	// setlogx(h1Map["hPhiLeadingDYmumu"]);
-	// graphics(h1Map["hPhiLeadingDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
-	// h1Map.insert( make_pair("hPhiLeadingDiboson", new TH1D("hPhiLeadingDiboson",";#phi_{#mu}^{leading};Events",nphibins,phimin,phimax)) );
-	// setlogx(h1Map["hPhiLeadingDiboson"]);
-	// graphics(h1Map["hPhiLeadingDiboson"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsMCname = "Gmm_01_" + (TString)_s(M);
-		// TString tsname = "hPhiLeadingGmm_01_" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";#phi_{#mu}^{leading};Events",nphibins,phimin,phimax)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsMCname = "Zprime_SSM" + (TString)_s(M);
-		// TString tsname = "hPhiLeadingZprime_SSM" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";#phi_{#mu}^{leading};Events",nphibins,phimin,phimax)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
-	// }
-	
-	// h1Map.insert( make_pair("hPhiSubleadingMCsum", new TH1D("hPhiSubleadingMCsum",";#phi_{#mu}^{subleading};Events",nphibins,phimin,phimax)) );
-	// setlogx(h1Map["hPhiSubleadingMCsum"]);
-	// graphics(h1Map["hPhiSubleadingMCsum"],  20,0.8,  -1,  -1,-1,  -1,-1,kRed);
-	// h1Map.insert( make_pair("hPhiSubleadingData", new TH1D("hPhiSubleadingData",";#phi_{#mu}^{subleading};Events",nphibins,phimin,phimax)) );
-	// setlogx(h1Map["hPhiSubleadingData"]);
-	// graphics(h1Map["hPhiSubleadingData"],  24,0.8);
-	// h1Map.insert( make_pair("hPhiSubleadingDYmumu", new TH1D("hPhiSubleadingDYmumu",";#phi_{#mu}^{subleading};Events",nphibins,phimin,phimax)) );
-	// setlogx(h1Map["hPhiSubleadingDYmumu"]);
-	// graphics(h1Map["hPhiSubleadingDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
-	// h1Map.insert( make_pair("hPhiSubleadingDiboson", new TH1D("hPhiSubleadingDiboson",";#phi_{#mu}^{subleading};Events",nphibins,phimin,phimax)) );
-	// setlogx(h1Map["hPhiSubleadingDiboson"]);
-	// graphics(h1Map["hPhiSubleadingDiboson"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsMCname = "Gmm_01_" + (TString)_s(M);
-		// TString tsname = "hPhiSubleadingGmm_01_" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";#phi_{#mu}^{subleading};Events",nphibins,phimin,phimax)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsMCname = "Zprime_SSM" + (TString)_s(M);
-		// TString tsname = "hPhiSubleadingZprime_SSM" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";#phi_{#mu}^{subleading};Events",nphibins,phimin,phimax)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
-	// }
-	
-	// h1Map.insert( make_pair("hpTLeadingMCsum", new TH1D("hpTLeadingMCsum",";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
-	// setlogx(h1Map["hpTLeadingMCsum"]);
-	// graphics(h1Map["hpTLeadingMCsum"],  20,0.8,  -1,  -1,-1,  -1,-1,kRed);
-	// h1Map.insert( make_pair("hpTLeadingData", new TH1D("hpTLeadingData",";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
-	// setlogx(h1Map["hpTLeadingData"]);
-	// graphics(h1Map["hpTLeadingData"],  24,0.8);
-	// h1Map.insert( make_pair("hpTLeadingDYmumu", new TH1D("hpTLeadingDYmumu",";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
-	// setlogx(h1Map["hpTLeadingDYmumu"]);
-	// graphics(h1Map["hpTLeadingDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
-	// h1Map.insert( make_pair("hpTLeadingDiboson", new TH1D("hpTLeadingDiboson",";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
-	// setlogx(h1Map["hpTLeadingDiboson"]);
-	// graphics(h1Map["hpTLeadingDiboson"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsMCname = "Gmm_01_" + (TString)_s(M);
-		// TString tsname = "hpTLeadingGmm_01_" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsMCname = "Zprime_SSM" + (TString)_s(M);
-		// TString tsname = "hpTLeadingZprime_SSM" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
-		
-		// tsMCname = "Zprime_SSM" + (TString)_s(M) + "_truth";
-		// tsname = "hpTLeadingZprime_SSM" + (TString)_s(M) + "_truth";
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";p_{T}^{leading} GeV;Events",nlogptbins,logptbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
-	// }
-	
-	// h1Map.insert( make_pair("hpTSubleadingMCsum", new TH1D("hpTSubleadingMCsum",";p_{T}^{subleading} GeV;Events",nlogptbins,logptbins)) );
-	// setlogx(h1Map["hpTSubleadingMCsum"]);
-	// graphics(h1Map["hpTSubleadingMCsum"],  20,0.8,  -1,  -1,-1,  -1,-1,kRed);
-	// h1Map.insert( make_pair("hpTSubleadingData", new TH1D("hpTSubleadingData",";p_{T}^{subleading} GeV;Events",nlogptbins,logptbins)) );
-	// setlogx(h1Map["hpTSubleadingData"]);
-	// graphics(h1Map["hpTSubleadingData"],  24,0.8);
-	// h1Map.insert( make_pair("hpTSubleadingDYmumu", new TH1D("hpTSubleadingDYmumu",";p_{T}^{subleading} GeV;Events",nlogptbins,logptbins)) );
-	// setlogx(h1Map["hpTSubleadingDYmumu"]);
-	// graphics(h1Map["hpTSubleadingDYmumu"],  -1,-1,  -1,  -1,-1,  kAzure+8,kAzure+8,-1);
-	// h1Map.insert( make_pair("hpTSubleadingDiboson", new TH1D("hpTSubleadingDiboson",";p_{T}^{subleading} GeV;Events",nlogptbins,logptbins)) );
-	// setlogx(h1Map["hpTSubleadingDiboson"]);
-	// graphics(h1Map["hpTSubleadingDiboson"],  -1,-1,  -1,  -1,-1,  kOrange-4,kOrange-4,-1);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsMCname = "Gmm_01_" + (TString)_s(M);
-		// TString tsname = "hpTSubleadingGmm_01_" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";p_{T}^{subleading} GeV;Events",nlogptbins,logptbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cGmm[tsMCname],-1,-1);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsMCname = "Zprime_SSM" + (TString)_s(M);
-		// TString tsname = "hpTSubleadingZprime_SSM" + (TString)_s(M);
-		// h1Map.insert( make_pair(tsname, new TH1D(tsname,";p_{T}^{subleading} GeV;Events",nlogptbins,logptbins)) );
-		// setlogx(h1Map[tsname]);
-		// graphics(h1Map[tsname],  -1,-1,  -1,  1,2,  cZprime[tsMCname],-1,-1);
-	// }
-	
-	
-	// TString baseName = "hMass_1d_full";
-	// h1Map.insert( make_pair(baseName+"_Data", new TH1D(baseName+"_Data", "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-	// h1Map.insert( make_pair(baseName+"_DYmumu", new TH1D(baseName+"_DYmumu", "DY#rightarrow#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-	// h1Map.insert( make_pair(baseName+"_Diboson", new TH1D(baseName+"_Diboson", "Diboson#rightarrow#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsname  = "_Gmm_01_" + (TString)_s(M);
-		// h1Map.insert( make_pair(baseName+tsname, new TH1D(baseName+tsname, (TString)_s(M)+" GeV G*#rightarrow#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "_Zprime_SSM" + (TString)_s(M);
-		// h1Map.insert( make_pair(baseName+tsname, new TH1D(baseName+tsname, (TString)_s(M)+" GeV Z'_{SSM}#rightarrow#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-	// }
-	
-	// for(int i=1 ; i<=nCosThetaBinsLimit ; i++)
-	// {
-		// baseName = "hMass_cosThSlice_"+(TString)_s(i);
-		// h1Map.insert( make_pair(baseName+"_Data", new TH1D(baseName+"_Data", "#mu#mu mass in cos#theta* slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		// h1Map.insert( make_pair(baseName+"_DYmumu", new TH1D(baseName+"_DYmumu", "DY#rightarrow#mu#mu mass in cos#theta* slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		// h1Map.insert( make_pair(baseName+"_Diboson", new TH1D(baseName+"_Diboson", "Diboson#rightarrow#mu#mu mass in cos#theta* slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-		// {
-			// TString tsname  = "_Gmm_01_" + (TString)_s(M);
-			// h1Map.insert( make_pair(baseName+tsname, new TH1D(baseName+tsname, (TString)_s(M)+" GeV G*#rightarrow#mu#mu mass in cos#theta* slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		// }
-		// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-		// {
-			// if(M==1250.) continue;
-			// TString tsname = "_Zprime_SSM" + (TString)_s(M);
-			// h1Map.insert( make_pair(baseName+tsname, new TH1D(baseName+tsname, (TString)_s(M)+" GeV Z'_{SSM}#rightarrow#mu#mu mass in cos#theta* slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		// }
-	// }
-	// for(int i=1 ; i<=ndEtaBinsLimit ; i++)
-	// {
-		// baseName = "hMass_dEtaSlice_"+(TString)_s(i);
-		// h1Map.insert( make_pair(baseName+"_Data", new TH1D(baseName+"_Data", "#mu#mu mass in #Delta#eta slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		// h1Map.insert( make_pair(baseName+"_DYmumu", new TH1D(baseName+"_DYmumu", "DY#rightarrow#mu#mu mass in #Delta#eta slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		// h1Map.insert( make_pair(baseName+"_Diboson", new TH1D(baseName+"_Diboson", "Diboson#rightarrow#mu#mu mass in #Delta#eta slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-		// {
-			// TString tsname  = "_Gmm_01_" + (TString)_s(M);
-			// h1Map.insert( make_pair(baseName+tsname, new TH1D(baseName+tsname, (TString)_s(M)+" GeV G*#rightarrow#mu#mu mass in #Delta#eta slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		// }
-		// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-		// {
-			// if(M==1250.) continue;
-			// TString tsname = "_Zprime_SSM" + (TString)_s(M);
-			// h1Map.insert( make_pair(baseName+tsname, new TH1D(baseName+tsname, (TString)_s(M)+" GeV Z'_{SSM}#rightarrow#mu#mu mass in #Delta#eta slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		// }
-	// }
-	
-	
-	///// 2d /////
-	// h2Map.insert( make_pair("hMassCosThetaCSMCsum", new TH2D("hMassCosThetaCSMCsum",";m_{#mu#mu} GeV;cos(#theta*);Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nFullCosThetaBins,minFullCosTheta,maxFullCosTheta)) );
-	// setlogx(h2Map["hMassCosThetaCSMCsum"]);
-	// h2Map.insert( make_pair("hMassCosThetaCSData", new TH2D("hMassCosThetaCSData",";m_{#mu#mu} GeV;cos(#theta*);Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nFullCosThetaBins,minFullCosTheta,maxFullCosTheta)) );
-	// setlogx(h2Map["hMassCosThetaCSData"]);
-	// h2Map.insert( make_pair("hMassCosThetaCSDYmumu", new TH2D("hMassCosThetaCSDYmumu",";m_{#mu#mu} GeV;cos(#theta*);Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nFullCosThetaBins,minFullCosTheta,maxFullCosTheta)) );
-	// setlogx(h2Map["hMassCosThetaCSDYmumu"]);
-	// h2Map.insert( make_pair("hMassCosThetaCSDiboson", new TH2D("hMassCosThetaCSDiboson",";m_{#mu#mu} GeV;cos(#theta*);Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nFullCosThetaBins,minFullCosTheta,maxFullCosTheta)) );
-	// setlogx(h2Map["hMassCosThetaCSDiboson"]);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsname = "hMassCosThetaCSGmm_01_" + (TString)_s(M);
-		// h2Map.insert( make_pair(tsname, new TH2D(tsname,";m_{#mu#mu} GeV;cos(#theta*);Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nFullCosThetaBins,minFullCosTheta,maxFullCosTheta)) );
-		// setlogx(h2Map[tsname]);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "hMassCosThetaCSZprime_SSM" + (TString)_s(M);
-		// h2Map.insert( make_pair(tsname, new TH2D(tsname,";m_{#mu#mu} GeV;cos(#theta*);Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nFullCosThetaBins,minFullCosTheta,maxFullCosTheta)) );
-		// setlogx(h2Map[tsname]);
-	// }
-	
-	// h2Map.insert( make_pair("hMassyQMCsum", new TH2D("hMassyQMCsum",";m_{#mu#mu} GeV;y_{Q};Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nfullyQbins,minfullyQ,maxfullyQ)) );
-	// setlogx(h2Map["hMassyQMCsum"]);
-	// h2Map.insert( make_pair("hMassyQData", new TH2D("hMassyQData",";m_{#mu#mu} GeV;y_{Q};Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nfullyQbins,minfullyQ,maxfullyQ)) );
-	// setlogx(h2Map["hMassyQData"]);
-	// h2Map.insert( make_pair("hMassyQDYmumu", new TH2D("hMassyQDYmumu",";m_{#mu#mu} GeV;y_{Q};Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nfullyQbins,minfullyQ,maxfullyQ)) );
-	// setlogx(h2Map["hMassyQDYmumu"]);
-	// h2Map.insert( make_pair("hMassyQDiboson", new TH2D("hMassyQDiboson",";m_{#mu#mu} GeV;y_{Q};Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nfullyQbins,minfullyQ,maxfullyQ)) );
-	// setlogx(h2Map["hMassyQDiboson"]);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsname = "hMassyQGmm_01_" + (TString)_s(M);
-		// h2Map.insert( make_pair(tsname, new TH2D(tsname,";m_{#mu#mu} GeV;y_{Q};Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nfullyQbins,minfullyQ,maxfullyQ)) );
-		// setlogx(h2Map[tsname]);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "hMassyQZprime_SSM" + (TString)_s(M);
-		// h2Map.insert( make_pair(tsname, new TH2D(tsname,";m_{#mu#mu} GeV;y_{Q};Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nfullyQbins,minfullyQ,maxfullyQ)) );
-		// setlogx(h2Map[tsname]);
-	// }
 }
 
 float getDataMCratio()
 {
-	float ratio = (nMCall70to110>0.) ? nData70to110/nMCall70to110 : 1.;
-	_INFO("DATA/MC in 70 to 110 GeV is: "+_s(ratio,8));
+	float ratio = -999.;
+	ratio = (nMCall70to110>0.) ? nData70to110/nMCall70to110 : 1.;
+	_INFO("counting ratio  -> DATA/MC in "+_s(imasslogicbins[0])+" to "+_s(imasslogicbins[1])+" GeV is: "+_s(ratio,8));
+	ratio = h1Map["hMassNumbersData"]->GetBinContent(1)/h1Map["hMassNumbersMCsum"]->GetBinContent(1);
+	_INFO("histogram ratio -> DATA/MC in "+_s(imasslogicbins[0])+" to "+_s(imasslogicbins[1])+" GeV is: "+_s(ratio,8));
 	return ratio;
 }
 
@@ -1708,21 +1145,19 @@ void hscale2Zpeak()
 {
 	float ratio          = getDataMCratio();
 	float ratio_nopileup = getDataMCratioNoPileup();
-	
-	// Scale(h1Map["hNvxpDYmumu"],ratio_nopileup);
-	// Scale(h1Map["hNvxpDYmumu"],ratio);
-	
-	// Scale(h1Map["hNvxpDiboson"],ratio_nopileup);
-	// Scale(h1Map["hNvxpDiboson"],ratio);
 
 	for(TMapTS2GRPX::iterator it=grpx.begin() ; it!=grpx.end() ; ++it)
 	{
 		TString name = it->first;
 		
+		if(name.Contains("Data")) continue;
+		
 		Scale(h1Map["hNvxp"+name+"_with_puwgt"],ratio);
+		Scale(h1Map["hMassNumbers"+name],ratio);
 		Scale(h1Map["hMass"+name],ratio);
 		Scale(h1Map["hyQ"+name],ratio);
 		Scale(h1Map["hQT"+name],ratio);
+		Scale(h1Map["hEtaQ"+name],ratio);
 		Scale(h1Map["hEtaLeading"+name],ratio);
 		Scale(h1Map["hEtaSubleading"+name],ratio);
 		Scale(h1Map["hPhiLeading"+name],ratio);
@@ -1744,164 +1179,17 @@ void hscale2Zpeak()
 		Scale(h2Map["hMassCosThetaCS"+name],ratio);
 		Scale(h2Map["hMassyQ"+name],ratio);
 	}
-	
-	
-	// Scale(h1Map["hNvxpMCsum_with_puwgt"],ratio);
-	// Scale(h1Map["hNvxpDYmumu_with_puwgt"],ratio);
-	// Scale(h1Map["hNvxpDiboson_with_puwgt"],ratio);
-
-	// Scale(h1Map["hMassMCsum"],ratio);
-	// Scale(h1Map["hyQMCsum"],ratio);
-	// Scale(h1Map["hQTMCsum"],ratio);
-	// Scale(h1Map["hEtaLeadingMCsum"],ratio);
-	// Scale(h1Map["hEtaSubleadingMCsum"],ratio);
-	// Scale(h1Map["hPhiLeadingMCsum"],ratio);
-	// Scale(h1Map["hPhiSubleadingMCsum"],ratio);
-	// Scale(h1Map["hpTLeadingMCsum"],ratio);
-	// Scale(h1Map["hpTSubleadingMCsum"],ratio);
-
-	// Scale(h1Map["hMassDYmumu"],ratio);
-	// Scale(h1Map["hMassDYmumu"],ratio);
-	// Scale(h1Map["hyQDYmumu"],ratio);
-	// Scale(h1Map["hQTDYmumu"],ratio);
-	// Scale(h1Map["hEtaLeadingDYmumu"],ratio);
-	// Scale(h1Map["hEtaSubleadingDYmumu"],ratio);
-	// Scale(h1Map["hPhiLeadingDYmumu"],ratio);
-	// Scale(h1Map["hPhiSubleadingDYmumu"],ratio);
-	// Scale(h1Map["hpTLeadingDYmumu"],ratio);
-	// Scale(h1Map["hpTSubleadingDYmumu"],ratio);
-
-	// Scale(h1Map["hMassDiboson"],ratio);
-	// Scale(h1Map["hyQDiboson"],ratio);
-	// Scale(h1Map["hQTDiboson"],ratio);
-	// Scale(h1Map["hEtaLeadingDiboson"],ratio);
-	// Scale(h1Map["hEtaSubleadingDiboson"],ratio);
-	// Scale(h1Map["hPhiLeadingDiboson"],ratio);
-	// Scale(h1Map["hPhiSubleadingDiboson"],ratio);
-	// Scale(h1Map["hpTLeadingDiboson"],ratio);
-	// Scale(h1Map["hpTSubleadingDiboson"],ratio);
-
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsname = "Gmm_01_" + (TString)_s(M);
-		// Scale(h1Map["hMass"+tsname],ratio);
-		// Scale(h1Map["hyQ"+tsname],ratio);
-		// Scale(h1Map["hQT"+tsname],ratio);
-		// Scale(h1Map["hEtaLeading"+tsname],ratio);
-		// Scale(h1Map["hEtaSubleading"+tsname],ratio);
-		// Scale(h1Map["hPhiLeading"+tsname],ratio);
-		// Scale(h1Map["hPhiSubleading"+tsname],ratio);
-		// Scale(h1Map["hpTLeading"+tsname],ratio);
-		// Scale(h1Map["hpTSubleading"+tsname],ratio);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "Zprime_SSM" + (TString)_s(M);
-		// Scale(h1Map["hMass"+tsname],ratio);
-		// Scale(h1Map["hyQ"+tsname],ratio);
-		// Scale(h1Map["hQT"+tsname],ratio);
-		// Scale(h1Map["hEtaLeading"+tsname],ratio);
-		// Scale(h1Map["hEtaSubleading"+tsname],ratio);
-		// Scale(h1Map["hPhiLeading"+tsname],ratio);
-		// Scale(h1Map["hPhiSubleading"+tsname],ratio);
-		// Scale(h1Map["hpTLeading"+tsname],ratio);
-		// Scale(h1Map["hpTSubleading"+tsname],ratio);
-	// }
-	
-	/////////////////////////////////////
-	//// TEMPLATES
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "";
-		
-		//// imass
-		// tsname = "Zprime_SSM" + (TString)_s(M) + "_template";
-		// Scale(h1Map["hMass"+tsname],ratio);
-		// tsname = "KK" + (TString)_s(M) + "_template";
-		// Scale(h1Map["hMass"+tsname],ratio);
-		
-		//// pTleading
-		// tsname = "Zprime_SSM" + (TString)_s(M) + "_template";
-		// Scale(h1Map["hpTLeading"+tsname],ratio);
-		// tsname = "KK" + (TString)_s(M) + "_template";
-		// Scale(h1Map["hpTLeading"+tsname],ratio);
-	// }
-	
-	
-	// for(int i=1 ; i<=nCosThetaBinsLimit ; i++)
-	// {
-		// TString baseName = "hMass_cosThSlice_"+(TString)_s(i);
-		// Scale(h1Map[baseName+"_DYmumu"],ratio);
-		// Scale(h1Map[baseName+"_Diboson"],ratio);
-		// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-		// {
-			// TString tsname = "_Gmm_01_" + (TString)_s(M);
-			// Scale(h1Map[baseName+tsname],ratio);
-		// }
-
-		// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-		// {
-			// if(M==1250.) continue;
-			// TString tsname = "_Zprime_SSM" + (TString)_s(M);
-			// Scale(h1Map[baseName+tsname],ratio);
-		// }
-	// }
-
-	// for(int i=1 ; i<=ndEtaBinsLimit ; i++)
-	// {
-		// TString baseName = "hMass_dEtaSlice_"+(TString)_s(i);
-		// Scale(h1Map[baseName+"_DYmumu"],ratio);
-		// Scale(h1Map[baseName+"_Diboson"],ratio);
-
-		// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-		// {
-			// TString tsname = "_Gmm_01_" + (TString)_s(M);
-			// Scale(h1Map[baseName+tsname],ratio);
-		// }
-
-		// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-		// {
-			// if(M==1250.) continue;
-			// TString tsname = "_Zprime_SSM" + (TString)_s(M);
-			// Scale(h1Map[baseName+tsname],ratio);
-		// }
-	// }
-
-	///// 2d
-	// Scale(h2Map["hMassCosThetaCSMCsum"],ratio);
-	// Scale(h2Map["hMassyQMCsum"],ratio);
-	// Scale(h2Map["hMassCosThetaCSDYmumu"],ratio);
-	// Scale(h2Map["hMassyQDYmumu"],ratio);
-	// Scale(h2Map["hMassCosThetaCSDiboson"],ratio);
-	// Scale(h2Map["hMassyQDiboson"],ratio);
-	
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsname = "Gmm_01_" + (TString)_s(M);
-		// Scale(h2Map["hMassCosThetaCS"+tsname],ratio);
-		// Scale(h2Map["hMassyQ"+tsname],ratio);
-	// }
-
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "Zprime_SSM" + (TString)_s(M);
-		// Scale(h2Map["hMassCosThetaCS"+tsname],ratio);
-		// Scale(h2Map["hMassyQ"+tsname],ratio);
-	// }
 }
 
 void hMCsumall(TString tsMCname)
 {
 	h1Map["hNvxpMCsum"]->Add(h1Map["hNvxp"+tsMCname]);
-	
 	h1Map["hNvxpMCsum_with_puwgt"]->Add(h1Map["hNvxp"+tsMCname+"_with_puwgt"]);
-	
+	h1Map["hMassNumbersMCsum"]->Add(h1Map["hMassNumbers"+tsMCname]);
 	h1Map["hMassMCsum"]->Add(h1Map["hMass"+tsMCname]);
 	h1Map["hyQMCsum"]->Add(h1Map["hyQ"+tsMCname]);
 	h1Map["hQTMCsum"]->Add(h1Map["hQT"+tsMCname]);
+	h1Map["hEtaQMCsum"]->Add(h1Map["hEtaQ"+tsMCname]);
 	h1Map["hEtaLeadingMCsum"]->Add(h1Map["hEtaLeading"+tsMCname]);
 	h1Map["hEtaSubleadingMCsum"]->Add(h1Map["hEtaSubleading"+tsMCname]);
 	h1Map["hPhiLeadingMCsum"]->Add(h1Map["hPhiLeading"+tsMCname]);
@@ -1921,7 +1209,7 @@ void hbgdraw(TString type, TString sufx="", bool dologx=false, bool dology=false
 	{
 		int order    = it->first;
 		TString name = it->second;
-		if(order>100) continue; // only backgrounds and data
+		if(order>20) continue; // only backgrounds and data
 		if(order==0)
 		{
 			vtsMCbgds.clear();
@@ -1943,9 +1231,6 @@ void hbgdraw(TString type, TString sufx="", bool dologx=false, bool dology=false
 void hdraw()
 {
 	_DEBUG("hdraw");
-
-	// vector<TString> vtsMCbgds;
-	// vector<TString> vtsMCsigs;
 	
 	for(TMapTS2GRPX::iterator it=grpx.begin() ; it!=grpx.end() ; ++it)
 	{
@@ -2019,96 +1304,20 @@ void hdraw()
 			}
 		}
 	}
-	
-	////////////////////////////////////////
-	// TEMPLATES
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "";
-		// TString tsnameTpt = "";
-
-		//// imass
-		// tsname = "hMassZprime_SSM" + (TString)_s(M);
-		// tsnameTpt = tsname + "_template";
-		// setMinMax(h1Map[tsnameTpt],h1Map[tsname],true);
-		// draw(h1Map[tsnameTpt], "", "", dolog, dolog);
-		// drawon(tsnameTpt, h1Map[tsname]);
-		// templateText(tsname, (TString)_s(M)+" GeV Z'_{SSM}");
-		// drawtemplatetxton(tsnameTpt);
-
-		// tsname = "hMassZprime_SSM" + (TString)_s(M) + "_truth";
-		// tsnameTpt = "hMassZprime_SSM" + (TString)_s(M) + "_template_truth";
-		// setMinMax(h1Map[tsnameTpt],h1Map[tsname],true);
-		// draw(h1Map[tsnameTpt], "", "", dolog, dolog);
-		// drawon(tsnameTpt, h1Map[tsname]);
-		// templateText(tsname, (TString)_s(M)+" GeV Z'_{SSM}");
-		// drawtemplatetxton(tsnameTpt);
-
-		// tsname = "hMassDYmumu_noEWkfactor";
-		// tsnameTpt = "hMassKK" + (TString)_s(M) + "_template";
-		// setMinMax(h1Map[tsname],h1Map[tsnameTpt],true);
-		// draw(h1Map[tsname], tsnameTpt, "", dolog, dolog);
-		// drawon(tsnameTpt, h1Map[tsnameTpt]);
-		// templateText(tsnameTpt, (TString)_s(M)+" GeV KK");
-		// drawtemplatetxton(tsnameTpt);
-
-		// tsname = "hMassDYmumu_truth";
-		// tsnameTpt = "hMassKK" + (TString)_s(M) + "_template_truth";
-		// setMinMax(h1Map[tsname],h1Map[tsnameTpt],true);
-		// draw(h1Map[tsname], tsnameTpt, "", dolog, dolog);
-		// drawon(tsnameTpt, h1Map[tsnameTpt]);
-		// templateText(tsnameTpt, (TString)_s(M)+" GeV KK");
-		// drawtemplatetxton(tsnameTpt);
-
-		/// pTleading
-		// tsname = "hpTLeadingZprime_SSM" + (TString)_s(M);
-		// tsnameTpt = tsname + "_template";
-		// setMinMax(h1Map[tsnameTpt],h1Map[tsname],true);
-		// draw(h1Map[tsnameTpt], "", "", dolog, dolog);
-		// drawon(tsnameTpt, h1Map[tsname]);
-		// templateText(tsname, (TString)_s(M)+" GeV Z'_{SSM}");
-		// drawtemplatetxton(tsnameTpt);
-
-		// tsname = "hpTLeadingZprime_SSM" + (TString)_s(M) + "_truth";
-		// tsnameTpt = "hpTLeadingZprime_SSM" + (TString)_s(M) + "_template_truth";
-		// setMinMax(h1Map[tsnameTpt],h1Map[tsname],true);
-		// draw(h1Map[tsnameTpt], "", "", dolog, dolog);
-		// drawon(tsnameTpt, h1Map[tsname]);
-		// templateText(tsname, (TString)_s(M)+" GeV Z'_{SSM}");
-		// drawtemplatetxton(tsnameTpt);
-
-		// tsname = "hpTLeadingDYmumu_noEWkfactor";
-		// tsnameTpt = "hpTLeadingKK" + (TString)_s(M) + "_template";
-		// setMinMax(h1Map[tsname],h1Map[tsnameTpt],true);
-		// draw(h1Map[tsname], tsnameTpt, "", dolog, dolog);
-		// drawon(tsnameTpt, h1Map[tsnameTpt]);
-		// templateText(tsnameTpt, (TString)_s(M)+" GeV KK");
-		// drawtemplatetxton(tsnameTpt);
-
-		// tsname = "hpTLeadingDYmumu_truth";
-		// tsnameTpt = "hpTLeadingKK" + (TString)_s(M) + "_template_truth";
-		// setMinMax(h1Map[tsname],h1Map[tsnameTpt],true);
-		// draw(h1Map[tsname], tsnameTpt, "", dolog, dolog);
-		// drawon(tsnameTpt, h1Map[tsnameTpt]);
-		// templateText(tsnameTpt, (TString)_s(M)+" GeV KK");
-		// drawtemplatetxton(tsnameTpt);
-	// }
-	
-	///////////////////////////////////
 
 	hbgdraw("hNvxp");
 	hbgdraw("hNvxp","_with_puwgt");
-	
+	hbgdraw("hMassNumbers","",dolog,dolog);
 	hbgdraw("hMass","",dolog,dolog);
 	hbgdraw("hyQ");
-	hbgdraw("hQT");
+	hbgdraw("hQT","",dolog,dolog);
+	hbgdraw("hEtaQ");
 	hbgdraw("hEtaLeading");
 	hbgdraw("hEtaSubleading");
 	hbgdraw("hPhiLeading");
 	hbgdraw("hPhiSubleading");
-	hbgdraw("hpTLeading");
-	hbgdraw("hpTSubleading");
+	hbgdraw("hpTLeading","",dolog,dolog);
+	hbgdraw("hpTSubleading","",dolog,dolog);
 	
 	//////////////////////////////////////////////////////////////
 	/*
@@ -2150,7 +1359,6 @@ void hdraw()
 		for(int ms=0 ; ms<=nlogmassbins ; ms++) drawon(type+name, linMap[type+"_vertline_"+_s(logmassbins[ms])]);
 		drawtxton(type+name, is2d);
 		
-		
 		type = "hMassyQ";
 		draw(h2Map[type+name], "", "COLZ", dolog, !dolog, dolog);
 		h2Map[type+name]->SetMinimum( getXYmin(h2Map[type+name]) );
@@ -2158,390 +1366,6 @@ void hdraw()
 		for(int ms=0 ; ms<=nlogmassbins ; ms++) drawon(type+name, linMap[type+"_vertline_"+_s(logmassbins[ms])]);
 		drawtxton(type+name, is2d);
 	}
-	
-	// vtsMCbgds.clear();
-	// setMinMax(h1Map["hMassDYmumu"],h1Map["hMassData"],true);
-	// draw(h1Map["hMassDYmumu"], "", "", dolog, dolog);
-	// drawon("hMassDYmumu", h1Map["hMassDiboson"]);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsname = "hMassGmm_01_" + (TString)_s(M);
-		// if(drawGmm) drawon("hMassDYmumu", h1Map[tsname]);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "hMassZprime_SSM" + (TString)_s(M);
-		// drawon("hMassDYmumu", h1Map[tsname]);
-	// }
-	// drawon("hMassDYmumu", h1Map["hMassData"], "e1x1");
-	// drawtxton("hMassDYmumu");
-	//// drawratio(h1Map["hMassData"], h1Map["hMassDYmumu"], "e1x1", "", dolog, dolog);
-	// vtsMCbgds.push_back("hMassDYmumu");
-	// vtsMCbgds.push_back("hMassDiboson");
-	// drawratio(h1Map["hMassData"], h1Map["hMassMCsum"], vtsMCbgds, "e1x1", "", dolog, dolog);
-	// vtsMCbgds.clear();
-	
-	// setMinMax(h1Map["hNvxpDYmumu"],h1Map["hNvxpData"]);
-	// draw(h1Map["hNvxpDYmumu"]);
-	// drawon("hNvxpDYmumu", h1Map["hNvxpDiboson"]);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsname = "hNvxpGmm_01_" + (TString)_s(M);
-		// if(drawGmm) drawon("hNvxpDYmumu", h1Map[tsname]);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "hNvxpZprime_SSM" + (TString)_s(M);
-		// drawon("hNvxpDYmumu", h1Map[tsname]);
-	// }
-	// drawon("hNvxpDYmumu", h1Map["hNvxpData"], "e1x1");
-	// drawtxton("hNvxpDYmumu");
-	//// drawratio(h1Map["hNvxpData"], h1Map["hNvxpDYmumu"], "e1x1");
-	// vtsMCbgds.push_back("hNvxpDYmumu");
-	// vtsMCbgds.push_back("hNvxpDiboson");
-	// drawratio(h1Map["hNvxpData"], h1Map["hNvxpMCsum"], vtsMCbgds, "e1x1");
-	// vtsMCbgds.clear();
-	
-	// setMinMax(h1Map["hNvxpDYmumu_with_puwgt"],h1Map["hNvxpData_with_puwgt"]);
-	// draw(h1Map["hNvxpDYmumu_with_puwgt"]);
-	// drawon("hNvxpDYmumu_with_puwgt", h1Map["hNvxpDiboson_with_puwgt"]);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsname = "hNvxpGmm_01_" + (TString)_s(M) + "_with_puwgt";
-		// if(drawGmm) drawon("hNvxpDYmumu_with_puwgt", h1Map[tsname]);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "hNvxpZprime_SSM" + (TString)_s(M) + "_with_puwgt";
-		// drawon("hNvxpDYmumu_with_puwgt", h1Map[tsname]);
-	// }
-	// drawon("hNvxpDYmumu_with_puwgt", h1Map["hNvxpData_with_puwgt"], "e1x1");
-	// drawtxton("hNvxpDYmumu_with_puwgt");
-	//// drawratio(h1Map["hNvxpData_with_puwgt"], h1Map["hNvxpDYmumu_with_puwgt"], "e1x1");
-	// vtsMCbgds.push_back("hNvxpDYmumu_with_puwgt");
-	// vtsMCbgds.push_back("hNvxpDiboson_with_puwgt");
-	// drawratio(h1Map["hNvxpData_with_puwgt"], h1Map["hNvxpMCsum_with_puwgt"], vtsMCbgds, "e1x1");
-	// vtsMCbgds.clear();
-	
-	// setMinMax(h1Map["hyQDYmumu"],h1Map["hyQData"],true);
-	// h1Map["hyQDYmumu"]->SetMinimum(0.);
-	// draw(h1Map["hyQDYmumu"]);
-	// drawon("hyQDYmumu", h1Map["hyQDiboson"]);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsname = "hyQGmm_01_" + (TString)_s(M);
-		// if(drawGmm) drawon("hyQDYmumu", h1Map[tsname]);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "hyQZprime_SSM" + (TString)_s(M);
-		// drawon("hyQDYmumu", h1Map[tsname]);
-	// }
-	// drawon("hyQDYmumu", h1Map["hyQData"], "e1x1");
-	// drawtxton("hyQDYmumu");
-	//// drawratio(h1Map["hyQData"], h1Map["hyQDYmumu"], "e1x1");
-	// vtsMCbgds.push_back("hyQDYmumu");
-	// vtsMCbgds.push_back("hyQDiboson");
-	// drawratio(h1Map["hyQData"], h1Map["hyQMCsum"], vtsMCbgds, "e1x1");
-	// vtsMCbgds.clear();
-	
-	
-	// setMinMax(h1Map["hQTDYmumu"],h1Map["hQTData"],true);
-	// draw(h1Map["hQTDYmumu"], "", "", dolog, dolog);
-	// drawon("hQTDYmumu", h1Map["hQTDiboson"]);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsname = "hQTGmm_01_" + (TString)_s(M);
-		// if(drawGmm) drawon("hQTDYmumu", h1Map[tsname]);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "hQTZprime_SSM" + (TString)_s(M);
-		// drawon("hQTDYmumu", h1Map[tsname]);
-	// }
-	// drawon("hQTDYmumu", h1Map["hQTData"], "e1x1");
-	// drawtxton("hQTDYmumu");
-	//// drawratio(h1Map["hQTData"], h1Map["hQTDYmumu"], "e1x1", "", dolog, dolog);
-	// vtsMCbgds.push_back("hQTDYmumu");
-	// vtsMCbgds.push_back("hQTDiboson");
-	// drawratio(h1Map["hQTData"], h1Map["hQTMCsum"], vtsMCbgds, "e1x1", "", dolog, dolog);
-	// vtsMCbgds.clear();
-	
-	// setMinMax(h1Map["hEtaLeadingDYmumu"],h1Map["hEtaLeadingData"]);
-	// h1Map["hEtaLeadingDYmumu"]->SetMinimum(0.);
-	// draw(h1Map["hEtaLeadingDYmumu"]);
-	// drawon("hEtaLeadingDYmumu", h1Map["hEtaLeadingDiboson"]);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsname = "hEtaLeadingGmm_01_" + (TString)_s(M);
-		// if(drawGmm) drawon("hEtaLeadingDYmumu", h1Map[tsname]);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "hEtaLeadingZprime_SSM" + (TString)_s(M);
-		// drawon("hEtaLeadingDYmumu", h1Map[tsname]);
-	// }
-	// drawon("hEtaLeadingDYmumu", h1Map["hEtaLeadingData"], "e1x1");
-	// drawtxton("hEtaLeadingDYmumu");
-	////drawratio(h1Map["hEtaLeadingData"], h1Map["hEtaLeadingDYmumu"], "e1x1");
-	// vtsMCbgds.push_back("hEtaLeadingDYmumu");
-	// vtsMCbgds.push_back("hEtaLeadingDiboson");
-	// drawratio(h1Map["hEtaLeadingData"], h1Map["hEtaLeadingMCsum"], vtsMCbgds, "e1x1");
-	// vtsMCbgds.clear();
-	
-	// setMinMax(h1Map["hEtaSubleadingDYmumu"],h1Map["hEtaSubleadingData"]);
-	// h1Map["hEtaSubleadingDYmumu"]->SetMinimum(0.);
-	// draw(h1Map["hEtaSubleadingDYmumu"]);
-	// drawon("hEtaSubleadingDYmumu", h1Map["hEtaSubleadingDiboson"]);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsname = "hEtaSubleadingGmm_01_" + (TString)_s(M);
-		// if(drawGmm) drawon("hEtaSubleadingDYmumu", h1Map[tsname]);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "hEtaSubleadingZprime_SSM" + (TString)_s(M);
-		// drawon("hEtaSubleadingDYmumu", h1Map[tsname]);
-	// }
-	// drawon("hEtaSubleadingDYmumu", h1Map["hEtaSubleadingData"], "e1x1");
-	// drawtxton("hEtaSubleadingDYmumu");
-	////drawratio(h1Map["hEtaSubleadingData"], h1Map["hEtaSubleadingDYmumu"], "e1x1");
-	// vtsMCbgds.push_back("hEtaSubleadingDYmumu");
-	// vtsMCbgds.push_back("hEtaSubleadingDiboson");
-	// drawratio(h1Map["hEtaSubleadingData"], h1Map["hEtaSubleadingMCsum"], vtsMCbgds, "e1x1");
-	// vtsMCbgds.clear();
-
-	
-	// setMinMax(h1Map["hPhiLeadingDYmumu"],h1Map["hPhiLeadingData"]);
-	// h1Map["hPhiLeadingDYmumu"]->SetMinimum(0.);
-	// draw(h1Map["hPhiLeadingDYmumu"]);
-	// drawon("hPhiLeadingDYmumu", h1Map["hPhiLeadingDiboson"]);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsname = "hPhiLeadingGmm_01_" + (TString)_s(M);
-		// if(drawGmm) drawon("hPhiLeadingDYmumu", h1Map[tsname]);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "hPhiLeadingZprime_SSM" + (TString)_s(M);
-		// drawon("hPhiLeadingDYmumu", h1Map[tsname]);
-	// }
-	// drawon("hPhiLeadingDYmumu", h1Map["hPhiLeadingData"], "e1x1");
-	// drawtxton("hPhiLeadingDYmumu");
-	////drawratio(h1Map["hPhiLeadingData"], h1Map["hPhiLeadingDYmumu"], "e1x1");
-	// vtsMCbgds.push_back("hPhiLeadingDYmumu");
-	// vtsMCbgds.push_back("hPhiLeadingDiboson");
-	// drawratio(h1Map["hPhiLeadingData"], h1Map["hPhiLeadingMCsum"], vtsMCbgds, "e1x1");
-	// vtsMCbgds.clear();
-	
-	// setMinMax(h1Map["hPhiSubleadingDYmumu"],h1Map["hPhiSubleadingData"]);
-	// h1Map["hPhiSubleadingDYmumu"]->SetMinimum(0.);
-	// draw(h1Map["hPhiSubleadingDYmumu"]);
-	// drawon("hPhiSubleadingDYmumu", h1Map["hPhiSubleadingDiboson"]);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsname = "hPhiSubleadingGmm_01_" + (TString)_s(M);
-		// if(drawGmm) drawon("hPhiSubleadingDYmumu", h1Map[tsname]);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "hPhiSubleadingZprime_SSM" + (TString)_s(M);
-		// drawon("hPhiSubleadingDYmumu", h1Map[tsname]);
-	// }
-	// drawon("hPhiSubleadingDYmumu", h1Map["hPhiSubleadingData"], "e1x1");
-	// drawtxton("hPhiSubleadingDYmumu");
-	////drawratio(h1Map["hPhiSubleadingData"], h1Map["hPhiSubleadingDYmumu"], "e1x1");
-	// vtsMCbgds.push_back("hPhiSubleadingDYmumu");
-	// vtsMCbgds.push_back("hPhiSubleadingDiboson");
-	// drawratio(h1Map["hPhiSubleadingData"], h1Map["hPhiSubleadingMCsum"], vtsMCbgds, "e1x1");
-	// vtsMCbgds.clear();
-	
-	// setMinMax(h1Map["hpTLeadingDYmumu"],h1Map["hpTLeadingData"],true);
-	// draw(h1Map["hpTLeadingDYmumu"], "", "", dolog, dolog);
-	// drawon("hpTLeadingDYmumu", h1Map["hpTLeadingDiboson"]);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsname = "hpTLeadingGmm_01_" + (TString)_s(M);
-		// if(drawGmm) drawon("hpTLeadingDYmumu", h1Map[tsname]);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "hpTLeadingZprime_SSM" + (TString)_s(M);
-		// drawon("hpTLeadingDYmumu", h1Map[tsname]);
-	// }
-	// drawon("hpTLeadingDYmumu", h1Map["hpTLeadingData"], "e1x1");
-	// drawtxton("hpTLeadingDYmumu");
-	////drawratio(h1Map["hpTLeadingData"], h1Map["hpTLeadingDYmumu"], "e1x1", "", dolog, dolog);
-	// vtsMCbgds.push_back("hpTLeadingDYmumu");
-	// vtsMCbgds.push_back("hpTLeadingDiboson");
-	// drawratio(h1Map["hpTLeadingData"], h1Map["hpTLeadingMCsum"], vtsMCbgds, "e1x1", "", dolog, dolog);
-	// vtsMCbgds.clear();
-
-	
-	// setMinMax(h1Map["hpTSubleadingDYmumu"],h1Map["hpTSubleadingData"],true);
-	// draw(h1Map["hpTSubleadingDYmumu"], "", "", dolog, dolog);
-	// drawon("hpTSubleadingDYmumu", h1Map["hpTSubleadingDiboson"]);
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsname = "hpTSubleadingGmm_01_" + (TString)_s(M);
-		// if(drawGmm) drawon("hpTSubleadingDYmumu", h1Map[tsname]);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "hpTSubleadingZprime_SSM" + (TString)_s(M);
-		// drawon("hpTSubleadingDYmumu", h1Map[tsname]);
-	// }
-	// drawon("hpTSubleadingDYmumu", h1Map["hpTSubleadingData"], "e1x1");
-	// drawtxton("hpTSubleadingDYmumu");
-	////drawratio(h1Map["hpTSubleadingData"], h1Map["hpTSubleadingDYmumu"], "e1x1", "", dolog, dolog);
-	// vtsMCbgds.push_back("hpTSubleadingDYmumu");
-	// vtsMCbgds.push_back("hpTSubleadingDiboson");
-	// drawratio(h1Map["hpTSubleadingData"], h1Map["hpTSubleadingMCsum"], vtsMCbgds, "e1x1", "", dolog, dolog);
-	// vtsMCbgds.clear();
-	
-
-	// for(int i=1 ; i<=nCosThetaBinsLimit ; i++)
-	// {
-		// TString baseName = "hMass_cosThSlice_"+(TString)_s(i);
-		// draw(h1Map[baseName+"_Data"], "", "", !dolog, dolog);
-		// draw(h1Map[baseName+"_DYmumu"], "", "", !dolog, dolog);
-		// draw(h1Map[baseName+"_Diboson"], "", "", !dolog, dolog);
-		// draw(h1Map[baseName+"_Gmm_01_1750"], "", "", !dolog, dolog);
-		// draw(h1Map[baseName+"_Gmm_01_2000"], "", "", !dolog, dolog);
-		// draw(h1Map[baseName+"_Gmm_01_2250"], "", "", !dolog, dolog);
-	// }
-	// for(int i=1 ; i<=ndEtaBinsLimit ; i++)
-	// {
-		// TString baseName = "hMass_dEtaSlice_"+(TString)_s(i);
-		// draw(h1Map[baseName+"_Data"], "", "", !dolog, dolog);
-		// draw(h1Map[baseName+"_DYmumu"], "", "", !dolog, dolog);
-		// draw(h1Map[baseName+"_Diboson"], "", "", !dolog, dolog);
-		// draw(h1Map[baseName+"_Gmm_01_1750"], "", "", !dolog, dolog);
-		// draw(h1Map[baseName+"_Gmm_01_2000"], "", "", !dolog, dolog);
-		// draw(h1Map[baseName+"_Gmm_01_2250"], "", "", !dolog, dolog);
-	// }
-	
-
-	///// 2d
-	// bool is2d = true;
-	// h2Map["hMassCosThetaCSData"]->SetMinimum( getXYmin(h2Map["hMassCosThetaCSData"]) );
-	// draw(h2Map["hMassCosThetaCSData"], "", "COLZ", dolog, !dolog, dolog);
-	// drawon("hMassCosThetaCSData", linMap["hMassCosThetaCS_horline"]);
-	// for(int ms=0 ; ms<=nlogmassbins ; ms++)
-	// {
-		// drawon("hMassCosThetaCSData", linMap["hMassCosThetaCS_vertline_"+_s(logmassbins[ms])]);
-	// }
-	// drawtxton("hMassCosThetaCSData", is2d);
-	
-	// h2Map["hMassCosThetaCSDYmumu"]->SetMinimum( getXYmin(h2Map["hMassCosThetaCSDYmumu"]) );
-	// draw(h2Map["hMassCosThetaCSDYmumu"], "", "COLZ", dolog, !dolog, dolog);
-	// drawon("hMassCosThetaCSDYmumu", linMap["hMassCosThetaCS_horline"]);
-	// for(int ms=0 ; ms<=nlogmassbins ; ms++)
-	// {
-		// drawon("hMassCosThetaCSDYmumu", linMap["hMassCosThetaCS_vertline_"+_s(logmassbins[ms])]);
-	// }
-	// drawtxton("hMassCosThetaCSDYmumu", is2d);
-	
-	// h2Map["hMassCosThetaCSDiboson"]->SetMinimum( getXYmin(h2Map["hMassCosThetaCSDiboson"]) );
-	// draw(h2Map["hMassCosThetaCSDiboson"], "", "COLZ", dolog, !dolog, dolog);
-	// drawon("hMassCosThetaCSDiboson", linMap["hMassCosThetaCS_horline"]);
-	// for(int ms=0 ; ms<=nlogmassbins ; ms++)
-	// {
-		// drawon("hMassCosThetaCSDiboson", linMap["hMassCosThetaCS_vertline_"+_s(logmassbins[ms])]);
-	// }
-	// drawtxton("hMassCosThetaCSDiboson", is2d);
-	
-	
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsname = "hMassCosThetaCSGmm_01_" + (TString)_s(M);
-		// h2Map[tsname]->SetMinimum( getXYmin(h2Map[tsname]) );
-		// draw(h2Map[tsname], "", "COLZ", dolog, !dolog, dolog);
-		// drawon(tsname, linMap["hMassCosThetaCS_horline"]);
-		// for(int ms=0 ; ms<=nlogmassbins ; ms++)
-		// {
-			// drawon(tsname, linMap["hMassCosThetaCS_vertline_"+_s(logmassbins[ms])]);
-		// }
-		// drawtxton(tsname, is2d);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "hMassCosThetaCSZprime_SSM" + (TString)_s(M);
-		// h2Map[tsname]->SetMinimum( getXYmin(h2Map[tsname]) );
-		// draw(h2Map[tsname], "", "COLZ", dolog, !dolog, dolog);
-		// drawon(tsname, linMap["hMassCosThetaCS_horline"]);
-		// for(int ms=0 ; ms<=nlogmassbins ; ms++)
-		// {
-			// drawon(tsname, linMap["hMassCosThetaCS_vertline_"+_s(logmassbins[ms])]);
-		// }
-		// drawtxton(tsname, is2d);
-	// }
-	
-	// draw(h2Map["hMassyQData"], "", "COLZ", dolog, !dolog, dolog);
-	// h2Map["hMassyQData"]->SetMinimum( getXYmin(h2Map["hMassyQData"]) );
-	// drawon("hMassyQData", linMap["hMassyQ_horline"]);
-	// for(int ms=0 ; ms<=nlogmassbins ; ms++)
-	// {
-		// drawon("hMassyQData", linMap["hMassyQ_vertline_"+_s(logmassbins[ms])]);
-	// }
-	// drawtxton("hMassyQData", is2d);
-	
-	// h2Map["hMassyQDYmumu"]->SetMinimum( getXYmin(h2Map["hMassyQDYmumu"]) );
-	// draw(h2Map["hMassyQDYmumu"], "", "COLZ", dolog, !dolog, dolog);
-	// drawon("hMassyQDYmumu", linMap["hMassyQ_horline"]);
-	// for(int ms=0 ; ms<=nlogmassbins ; ms++)
-	// {
-		// drawon("hMassyQDYmumu", linMap["hMassyQ_vertline_"+_s(logmassbins[ms])]);
-	// }
-	// drawtxton("hMassyQDYmumu", is2d);
-	
-	// h2Map["hMassyQDiboson"]->SetMinimum( getXYmin(h2Map["hMassyQDiboson"]) );
-	// draw(h2Map["hMassyQDiboson"], "", "COLZ", dolog, !dolog, dolog);
-	// drawon("hMassyQDiboson", linMap["hMassyQ_horline"]);
-	// for(int ms=0 ; ms<=nlogmassbins ; ms++)
-	// {
-		// drawon("hMassyQDiboson", linMap["hMassyQ_vertline_"+_s(logmassbins[ms])]);
-	// }
-	// drawtxton("hMassyQDiboson", is2d);
-	
-	
-	// for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	// {
-		// TString tsname = "hMassyQGmm_01_" + (TString)_s(M);
-		// h2Map[tsname]->SetMinimum( getXYmin(h2Map[tsname]) );
-		// draw(h2Map[tsname], "", "COLZ", dolog, !dolog, dolog);
-		// drawon(tsname, linMap["hMassyQ_horline"]);
-		// for(int ms=0 ; ms<=nlogmassbins ; ms++)
-		// {
-			// drawon(tsname, linMap["hMassyQ_vertline_"+_s(logmassbins[ms])]);
-		// }
-		// drawtxton(tsname, is2d);
-	// }
-	// for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	// {
-		// if(M==1250.) continue;
-		// TString tsname = "hMassyQZprime_SSM" + (TString)_s(M);
-		// h2Map[tsname]->SetMinimum( getXYmin(h2Map[tsname]) );
-		// draw(h2Map[tsname], "", "COLZ", dolog, !dolog, dolog);
-		// drawon(tsname, linMap["hMassyQ_horline"]);
-		// for(int ms=0 ; ms<=nlogmassbins ; ms++)
-		// {
-			// drawon(tsname, linMap["hMassyQ_vertline_"+_s(logmassbins[ms])]);
-		// }
-		// drawtxton(tsname, is2d);
-	// }
 }
 
 void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
@@ -2551,6 +1375,7 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 	float mass = 0.;
 	float yQ   = 0.;
 	float QT   = 0.;
+	float etaQ = 0.;
 	float cosThetaCS = 0.;
 	float cosThetaHE = 0.;
 	float dr1  = 0.;
@@ -2589,8 +1414,6 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 			
 			(*tv3mutrua) = tlvmutrua->Vect();
 			(*tv3mutrub) = tlvmutrub->Vect();
-			// tlvmutruaBoosted = K->Boost(tlvmutrua,tlvmutrub,tlvmutrua);
-			// tlvmutrubBoosted = K->Boost(tlvmutrua,tlvmutrub,tlvmutrub);
 			tlvmutruaBoosted = fkinematics::Boost(tlvmutrua,tlvmutrub,tlvmutrua);
 			tlvmutrubBoosted = fkinematics::Boost(tlvmutrua,tlvmutrub,tlvmutrub);
 			(*tv3mutruaBoosted) = tlvmutruaBoosted->Vect();
@@ -2658,8 +1481,6 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				iamuonrec = (imuonrec==0) ? 1 : 0;
 				
 				tlvtmp->SetPtEtaPhiM(recon_all_pt->at(imuonrec), recon_all_eta->at(imuonrec), recon_all_phi->at(imuonrec), muonMass);
-				// dr1 = K->dR(tlvtmp,tlvmutrua);
-				// dr2 = K->dR(tlvtmp,tlvmutrub);
 				dr1 = fkinematics::dR(tlvtmp,tlvmutrua);
 				dr2 = fkinematics::dR(tlvtmp,tlvmutrub);
 				imuonrec  = (dr1<=dr2) ? imuonrec : iamuonrec;
@@ -2670,8 +1491,6 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				tlvmurecb->SetPtEtaPhiM(recon_all_pt->at(iamuonrec), recon_all_eta->at(iamuonrec), recon_all_phi->at(iamuonrec), muonMass);
 				(*tv3mureca) = tlvmureca->Vect();
 				(*tv3murecb) = tlvmurecb->Vect();
-				// tlvmurecaBoosted = K->Boost(tlvmureca,tlvmurecb,tlvmureca);
-				// tlvmurecbBoosted = K->Boost(tlvmureca,tlvmurecb,tlvmurecb);
 				tlvmurecaBoosted = fkinematics::Boost(tlvmureca,tlvmurecb,tlvmureca);
 				tlvmurecbBoosted = fkinematics::Boost(tlvmureca,tlvmurecb,tlvmurecb);
 				(*tv3murecaBoosted) = tlvmurecaBoosted->Vect();
@@ -2691,6 +1510,7 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				mass          = fkinematics::imass(tlvmureca,tlvmurecb);
 				yQ            = fkinematics::ySystem(tlvmureca,tlvmurecb);
 				QT            = fkinematics::QT(tlvmureca,tlvmurecb);
+				etaQ          = fkinematics::etaSystem(tlvmureca,tlvmurecb);
 				cosThetaCS    = fkinematics::cosThetaCollinsSoper(tlvmureca,ca,tlvmurecb,cb);
 				cosThetaHE    = fkinematics::cosThetaBoost(tlvmureca,ca,tlvmurecb,cb);
 				etaLeading    = recon_all_eta->at(0);
@@ -2728,9 +1548,11 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				noEWkfactor_weight = event_weight/all_EW_kfactor_weight;
 				
 				// for the Z peak normalization
-				if(mass>=70.  &&  mass<=110.) nMCall70to110          += 1.*wgt*event_weight;
-				if(mass>=70.  &&  mass<=110.) nMCall70to110_nopileup += 1.*wgt*event_weight_nopileup;
-
+				if(grpx[tsMCname]->order <= 20) // sum only backgrounds
+				{
+					if(mass>=imasslogicbins[0]  &&  mass<=imasslogicbins[1]) nMCall70to110          += 1.*wgt*event_weight;
+					if(mass>=imasslogicbins[0]  &&  mass<=imasslogicbins[1]) nMCall70to110_nopileup += 1.*wgt*event_weight_nopileup;
+				}
 				/////////////////////////////////
 				/// MC histo fill statrs here ///
 				/////////////////////////////////
@@ -2778,9 +1600,11 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				_DEBUG("");
 				h1Map["hNvxp"+tsMCname]->Fill(recon_all_vxp_n,wgt*event_weight_nopileup);
 				h1Map["hNvxp"+tsMCname+"_with_puwgt"]->Fill(recon_all_vxp_n,wgt*event_weight);
+				h1Map["hMassNumbers"+tsMCname]->Fill(mass,wgt*event_weight);
 				h1Map["hMass"+tsMCname]->Fill(mass,wgt*event_weight);
 				h1Map["hyQ"+tsMCname]->Fill(yQ,wgt*event_weight);
 				h1Map["hQT"+tsMCname]->Fill(QT,wgt*event_weight);
+				h1Map["hEtaQ"+tsMCname]->Fill(etaQ,wgt*event_weight);
 				h1Map["hEtaLeading"+tsMCname]->Fill(etaLeading,wgt*event_weight);
 				h1Map["hEtaSubleading"+tsMCname]->Fill(etaSubleading,wgt*event_weight);
 				h1Map["hPhiLeading"+tsMCname]->Fill(phiLeading,wgt*event_weight);
@@ -2837,6 +1661,7 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 		mass          = fkinematics::imass(tlvmureca,tlvmurecb);
 		yQ            = fkinematics::ySystem(tlvmureca,tlvmurecb);
 		QT            = fkinematics::QT(tlvmureca,tlvmurecb);
+		etaQ          = fkinematics::etaSystem(tlvmureca,tlvmurecb);
 		cosThetaCS    = fkinematics::cosThetaCollinsSoper(tlvmureca,ca,tlvmurecb,cb);
 		cosThetaHE    = fkinematics::cosThetaBoost(tlvmureca,ca,tlvmurecb,cb);
 		etaLeading    = eta->at(0);
@@ -2849,7 +1674,7 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 		slice_cost = h1Map["hCosThetaLimitBins_DYmumu"]->FindBin(cosThetaCS);
 		slice_deta = h1Map["hdEtaLimitBins_DYmumu"]->FindBin(dEta);
 		
-		if(mass>=70.  &&  mass<=110.) nData70to110 += 1.;
+		if(mass>=imasslogicbins[0]  &&  mass<=imasslogicbins[1]) nData70to110 += 1.;
 		
 		_DEBUG("");
 		
@@ -2858,17 +1683,17 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 		///////////////////////////////////
 		h1Map["hNvxpData"]->Fill(vxp_n);
 		h1Map["hNvxpData_with_puwgt"]->Fill(vxp_n);
-		
+		h1Map["hMassNumbersData"]->Fill(mass);
 		h1Map["hMassData"]->Fill(mass);
 		h1Map["hyQData"]->Fill(yQ);
 		h1Map["hQTData"]->Fill(QT);
+		h1Map["hEtaQData"]->Fill(etaQ);
 		h1Map["hEtaLeadingData"]->Fill(etaLeading);
 		h1Map["hEtaSubleadingData"]->Fill(etaSubleading);
 		h1Map["hPhiLeadingData"]->Fill(phiLeading);
 		h1Map["hPhiSubleadingData"]->Fill(phiSubleading);
 		h1Map["hpTLeadingData"]->Fill(pTLeading);
 		h1Map["hpTSubleadingData"]->Fill(pTSubleading);
-				
 		h1Map["hMass_1d_full_Data"]->Fill(mass*GeV2TeV); // for the 1d limit
 		
 		// for the 2d limit
@@ -2992,6 +1817,11 @@ void stitchProc(TString sProc)
 	fTemplates->Close();
 }
 
+void monitor(TString name, Int_t entry, Int_t N)
+{
+	if(entry%printmod==0) cout << name << ": progress " << setprecision(2) << fixed << (float)entry/(float)N*100. << "%\r" << flush;
+}
+
 void runMCproc(TString mcName)
 {
 	for(TMapTSP2TTREE::iterator it=treMap.begin() ; it!=treMap.end() ; ++it)
@@ -3017,12 +1847,44 @@ void runMCproc(TString mcName)
 			hfill("MC", mcName, getFlatLumiWeight(it->first)); ////
 			///////////////////////////////////////////////////////
 			
-			if(entry%printmod==0) cout << mcName << ": progress " << setprecision(2) << fixed << (float)entry/(float)N*100. << "%\r" << flush;
+			monitor(mcName,entry,N);
 		}
 		_INFO((string)it->first+": done.");
 	}
 }
 
+void printMassBins()
+{
+	vector<Double_t> vN(imasslogicnbins,0.);
+	cout << "\t" << "bins ";
+	for(int bin=0 ; bin<(int)imasslogicnbins ; bin++)
+	{
+		cout << setprecision(0) << fixed << imasslogicbins[bin] << "-" << imasslogicbins[bin+1] << "  ";
+	}
+	cout << endl;
+	cout << "--------------------------------------" << endl;
+	for(TMapiTS::iterator it=grpx_ordered.begin() ; it!=grpx_ordered.end() ; ++it)
+	{
+		int order    = it->first;
+		TString name = it->second;
+		if(order>20  &&  !name.Contains("MCsum")) continue; // only backgrounds, total bg's and data
+		cout << "\t" << name << "  ";
+		for(Int_t bin=1 ; bin<=h1Map["hMassNumbers"+name]->GetNbinsX() ; bin++)
+		{
+			Double_t N = h1Map["hMassNumbers"+name]->GetBinContent(bin);
+			if(!name.Contains("Data") &&  !name.Contains("MCsum")) vN[bin-1]+=N;
+			cout << setprecision(2) << fixed << N << "  ";
+		}
+		cout << endl;
+	}
+	cout << "--------------------------------------" << endl;
+	cout << "\t" << "total bg  ";
+	for(int bin=0 ; bin<(int)imasslogicnbins ; bin++)
+	{
+		cout << setprecision(2) << fixed << vN[bin] << "  ";
+	}
+	cout << endl;
+}
 
 void run()
 {
@@ -3043,12 +1905,10 @@ void run()
 	hbook();
 	text();
 
-	Int_t N = 0;
-	TString mcName = "";
 	
-	// data
+	//// data
 	init();
-	N = tree->GetEntriesFast();
+	Int_t N = tree->GetEntriesFast();
 	for(Int_t entry=0 ; entry<N ; entry++)
 	{
 		tree->GetEntry(entry);
@@ -3058,7 +1918,7 @@ void run()
 		hfill("DATA"); /////////////////////
 		////////////////////////////////////
 		
-		if(entry%printmod==0) cout << "Data: progress " << setprecision(2) << fixed << (float)entry/(float)N*100. << "%\r" << flush;
+		monitor("Data",entry,N);
 	}
 	_INFO("Data: done.");
 	
@@ -3078,45 +1938,18 @@ void run()
 		_INFO((string)name+" -> finished");
 	}
 	
-	/* mcName = "DYmumu";
-	setMCtrees(mcName);
-	runMCproc(mcName);
-	hMCsumall(mcName);
-	
-	mcName = "Diboson";
-	setMCtrees(mcName);
-	runMCproc(mcName);
-	hMCsumall(mcName);
-	
-	for(double M=mGmmMin ; M<=mGmmMax ; M+=dMGmm)
-	{
-		mcName = "Gmm_01_" + (TString)_s(M);
-		setMCtrees(mcName);
-		runMCproc(mcName);
-		//hMCsumall(mcName);
-	}
-	
-	for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-	{
-		if(M==1250.) continue;
-		mcName = "Zprime_SSM" + (TString)_s(M);
-		setMCtrees(mcName);
-		runMCproc(mcName);
-		//hMCsumall(mcName);
-	} */
-	
-	
 	//--- for the 2d imass-angular distribution
 	stitchProc("Data");
 	stitchProc("DYmumu");
 	stitchProc("Diboson");
-	stitchProc("DYtautau");
-	stitchProc("TTbar");
+	// stitchProc("DYtautau");
+	// stitchProc("TTbar");
 	stitchProc("Gmm");
 	
 	
 	// finalize
-	hscale2Zpeak();
+	hscale2Zpeak(); // must come before hdraw.
 	hdraw();
 	save("plots");
+	printMassBins();
 }

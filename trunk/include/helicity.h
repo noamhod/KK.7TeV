@@ -10,15 +10,22 @@
 
 #include "couplings.h"
 #include "width.h"
+#include "kFactors.h"
 
 using namespace couplings;
 using namespace width;
+using namespace kFactors;
 
 namespace helicity
 {
 
 static const unsigned int nModes  = 100;
+static bool dokFactors = true;
 
+void setkFactors(bool dokF)
+{
+	dokFactors = dokF;
+}
 
 //////////////////////////////////////////////////////////
 inline dcomplex hAG0(double s, unsigned int idIn, unsigned int idOut)
@@ -39,7 +46,9 @@ inline dcomplex hASM(double s, double cosTheta, unsigned int idIn, unsigned int 
 {
 	dcomplex A(0,0);
 	if(fabs(cosTheta)>1.) return A;
-	return( (hAG0(s,idIn,idOut) + hAZ0(s,idIn,idOut,hIn,hOut))*sqrt(1.+4.*hIn*hOut*cosTheta) );
+	double mass = sqrt(s);
+	double sqrtkF = (dokFactors) ? sqrt(ElectroWeak(mass,"NNLO/LO*")) : 1.;
+	return( sqrtkF*(hAG0(s,idIn,idOut) + hAZ0(s,idIn,idOut,hIn,hOut))*sqrt(1.+4.*hIn*hOut*cosTheta) );
 }
 
 
@@ -241,39 +250,39 @@ double integrate(const F &f, double xMin, double xMax, unsigned int nsegments=10
 	return(h*I);
 }
 
-class ISM
+class template_hA2SM
 {
 	double s;
 	unsigned int idIn;
 	unsigned int idOut;
 	public:
-		ISM(double s0, unsigned int idIn0, unsigned int idOut0) : s(s0), idIn(idIn0), idOut(idOut0) { }
+		template_hA2SM(double s0, unsigned int idIn0, unsigned int idOut0) : s(s0), idIn(idIn0), idOut(idOut0) { }
 		template<class X>
 		X operator()(X cosTheta) const
 		{
 			return hA2SM(cosTheta,s,idIn,idOut);
 		}
 };
-class IZP
+class template_hA2ZP
 {
 	double s;
 	unsigned int idIn;
 	unsigned int idOut;
 	public:
-		IZP(double s0, unsigned int idIn0, unsigned int idOut0) : s(s0), idIn(idIn0), idOut(idOut0) { }
+		template_hA2ZP(double s0, unsigned int idIn0, unsigned int idOut0) : s(s0), idIn(idIn0), idOut(idOut0) { }
 		template<class X>
 		X operator()(X cosTheta) const
 		{
 			return hA2ZP(cosTheta,s,idIn,idOut);
 		}
 };
-class IKK
+class template_hA2KK
 {
 	double s;
 	unsigned int idIn;
 	unsigned int idOut;
 	public:
-		IKK(double s0, unsigned int idIn0, unsigned int idOut0) : s(s0), idIn(idIn0), idOut(idOut0) { }
+		template_hA2KK(double s0, unsigned int idIn0, unsigned int idOut0) : s(s0), idIn(idIn0), idOut(idOut0) { }
 		template<class X>
 		X operator()(X cosTheta) const
 		{

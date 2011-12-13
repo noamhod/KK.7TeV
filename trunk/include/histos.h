@@ -137,6 +137,7 @@ void setlogx(TH2* h)
 void saveas(TCanvas* c, TString name)
 {
 	c->SaveAs(name+".png");
+	c->SaveAs(name+".pdf");
 	c->SaveAs(name+".eps");
 	c->SaveAs(name+".C");
 	c->SaveAs(name+".root");

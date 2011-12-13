@@ -208,8 +208,7 @@ float analysisSkeleton::getPileUpWeight(bool isIntime)
 	else         mu = averageIntPerXing;
 	
 	// Get the pileup weight for this event
-	float pileupEventWeight = -1.0;
-	pileupEventWeight = pileuprw->getPileupWeight(mu,RunNumber,mc_channel_number);
+	float pileupEventWeight = pileupEventWeight = pileuprw->getPileupWeight(mu,RunNumber,mc_channel_number);
 	return pileupEventWeight;
 }
 

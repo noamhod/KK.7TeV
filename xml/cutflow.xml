@@ -270,8 +270,7 @@
     </description>
   </obj>
   
-<!--
-   <obj NAME="isLooseNoTight" FLAG="on">
+  <obj NAME="isLooseNoTight" FLAG="on">
     <order>24</order>
     <phase>selection</phase>
     <skip>false</skip>
@@ -284,7 +283,6 @@
       The loose muon must not be tight.
     </description>
   </obj>
--->
  
   <obj NAME="oppositeChargeCandidates" FLAG="on">
     <order>101</order>

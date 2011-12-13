@@ -3,21 +3,23 @@
 #include "../include/enums.h"
 #include "../include/logs.h"
 #include "../include/style.h"
-//#include "../include/bins.h"
+#include "../include/bins.h"
 #include "../include/histos.h"
-//#include "../include/fkinematics.h"
+#include "../include/fkinematics.h"
 #include "../include/units.h"
 #include "../include/couplings.h"
 #include "../include/width.h"
 #include "../include/helicity.h"
+#include "../include/kFactors.h"
 
 using namespace couplings;
 using namespace width;
 using namespace helicity;
+using namespace kFactors;
 
 void hamp()
 {
-	msglvl[DBG] = VISUAL;
+	msglvl[DBG] = SILENT;
 	msglvl[INF] = VISUAL;
 	msglvl[WRN] = VISUAL;
 	msglvl[ERR] = VISUAL;
@@ -25,9 +27,10 @@ void hamp()
 
 	style();
 
-	/////////////////////
-	setFermions(); //////
-	/////////////////////
+	///////////////////////
+	setFermions(); ////////
+	setkFactors(false); ///
+	///////////////////////
 	
 	TString mBSM = (TString)_s(mKK*GeV2TeV);
 	
@@ -120,9 +123,9 @@ void hamp()
 		Int_t bin = 0;
 		unsigned int nsegments = 100;
 		
-		ISM fSM(s,idIn,idOut);
-		IZP fZP(s,idIn,idOut);
-		IKK fKK(s,idIn,idOut);
+		template_hA2SM fSM(s,idIn,idOut);
+		template_hA2ZP fZP(s,idIn,idOut);
+		template_hA2KK fKK(s,idIn,idOut);
 		IFA2KK = integrate(fKK,0.,+1.,nsegments);
 		IFA2ZP = integrate(fZP,0.,+1.,nsegments);
 		IFA2SM = integrate(fSM,0.,+1.,nsegments);

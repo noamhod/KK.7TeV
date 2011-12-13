@@ -1,7 +1,8 @@
-#include <basicIncludes.h>
-
+// #include <basicIncludes.h>
 #ifndef KFACTORS_H
 #define KFACTORS_H
+
+#include "logs.h"
 
 namespace kFactors
 {

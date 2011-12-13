@@ -1,9 +1,9 @@
 //#include <basicIncludes.h>
-#include <TH1.h>
-#include <TMath.h>
-
 #ifndef BINS_H
 #define BINS_H
+
+#include <TH1.h>
+#include <TMath.h>
 
 static void setLogBins(Int_t nbins, Double_t min, Double_t max, Double_t* xpoints)
 {

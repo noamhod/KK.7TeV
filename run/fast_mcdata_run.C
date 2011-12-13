@@ -11,6 +11,9 @@
 #include "../include/width.h"
 #include "../include/helicity.h"
 
+TString ntupledir = "/data/hod/2011/NTUPLE_tmp";
+bool doDYtautau = false;
+
 bool fastDYmumu = false;
 bool drawGmm    = false;
 Int_t printmod  = 5000;
@@ -526,7 +529,7 @@ void setDATAtree()
 {
 	_DEBUG("setDATAtree");
 	
-	fName = "/data/hod/2011/NTUPLE/analysisLocalControl.root";
+	fName = ntupledir+"/analysisLocalControl.root";
 	tName = "allCuts/allCuts_tree";
 	file = new TFile(fName,"READ");
 	tree = (TTree*)file->Get(tName);
@@ -553,8 +556,11 @@ void samples()
 	grpx_ordered.insert( make_pair(grpx["Diboson"]->order,"Diboson") );
 	grpx.insert( make_pair("TTbar",    new GRPX(proccount(counter),"t#bar t",     kRed+1,-1,     kBlack,1,1,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["TTbar"]->order,"TTbar") );
-	grpx.insert( make_pair("DYtautau", new GRPX(proccount(counter),"DY#tau#tau",  kRed-5,-1,     kBlack,1,1,  -1,-1,-1)));
-	grpx_ordered.insert( make_pair(grpx["DYtautau"]->order,"DYtautau") );
+	if(doDYtautau)
+	{
+		grpx.insert( make_pair("DYtautau", new GRPX(proccount(counter),"DY#tau#tau",  kRed-5,-1,     kBlack,1,1,  -1,-1,-1)));
+		grpx_ordered.insert( make_pair(grpx["DYtautau"]->order,"DYtautau") );
+	}
 	
 	counter = 20;
 	grpx.insert( make_pair("Data", new GRPX(counter,"Data",   -1,-1,  -1,-1,-1,  kBlack,24,0.8)));
@@ -610,85 +616,89 @@ void setMCtrees(TString tsMCname)
 	////////////////
 	clearMaps(); ///
 	////////////////
+
 	
 	if(tsMCname=="DYmumu")
 	{	
 		if(fastDYmumu)
 		{
-			setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_75M120.root", "mcLocalControl_DYmumu_75M120", 20000, 7.9862E-01*nb2fb);
-			setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 20000, 8.5275E-03*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYmumu_75M120.root", "mcLocalControl_DYmumu_75M120", 20000, 7.9862E-01*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 20000, 8.5275E-03*nb2fb);
 		}
-		else setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Zmumu.root", "mcLocalControl_Zmumu", 4878990, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
+		else setMCtree(ntupledir+"/mcLocalControl_Zmumu.root", "mcLocalControl_Zmumu", 4878990, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
 		
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_250M400.root", "mcLocalControl_DYmumu_250M400", 20000, 4.1075E-04*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_400M600.root", "mcLocalControl_DYmumu_400M600", 20000, 6.6459E-05*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_600M800.root", "mcLocalControl_DYmumu_600M800", 20000, 1.1002E-05*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_800M1000.root", "mcLocalControl_DYmumu_800M1000", 20000, 2.6516E-06*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_1000M1250.root", "mcLocalControl_DYmumu_1000M1250", 20000, 8.9229E-07*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_1250M1500.root", "mcLocalControl_DYmumu_1250M1500", 20000, 2.3957E-07*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_1500M1750.root", "mcLocalControl_DYmumu_1500M1750", 20000, 7.3439E-08*nb2fb);    // !!!!!!!!!!!
-		// setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_1500M1750.root", "mcLocalControl_DYmumu_1500M1750", 99999, 7.3439E-08*nb2fb); // !!!!!!!!!!! 
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_1750M2000.root", "mcLocalControl_DYmumu_1750M2000", 20000, 2.4614E-08*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_M2000.root", "mcLocalControl_DYmumu_M2000", 20000, 1.4001E-08*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYmumu_250M400.root", "mcLocalControl_DYmumu_250M400", 20000, 4.1075E-04*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYmumu_400M600.root", "mcLocalControl_DYmumu_400M600", 20000, 6.6459E-05*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYmumu_600M800.root", "mcLocalControl_DYmumu_600M800", 20000, 1.1002E-05*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYmumu_800M1000.root", "mcLocalControl_DYmumu_800M1000", 20000, 2.6516E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYmumu_1000M1250.root", "mcLocalControl_DYmumu_1000M1250", 20000, 8.9229E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYmumu_1250M1500.root", "mcLocalControl_DYmumu_1250M1500", 20000, 2.3957E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYmumu_1500M1750.root", "mcLocalControl_DYmumu_1500M1750", 20000, 7.3439E-08*nb2fb);    // !!!!!!!!!!!
+		// setMCtree(ntupledir+"/mcLocalControl_DYmumu_1500M1750.root", "mcLocalControl_DYmumu_1500M1750", 99999, 7.3439E-08*nb2fb); // !!!!!!!!!!! 
+		setMCtree(ntupledir+"/mcLocalControl_DYmumu_1750M2000.root", "mcLocalControl_DYmumu_1750M2000", 20000, 2.4614E-08*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYmumu_M2000.root", "mcLocalControl_DYmumu_M2000", 20000, 1.4001E-08*nb2fb);
 	}
 	
 	if(tsMCname=="DYtautau")
 	{
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYtautau_75M120.root", "mcLocalControl_DYtautau_75M120", 20000, 7.9494E-01*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYtautau_120M250.root", "mcLocalControl_DYtautau_120M250", 20000, 8.6656E-03*nb2fb); // !!!!!!!! XS is taken rom MC10
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYtautau_250M400.root", "mcLocalControl_DYtautau_250M400", 20000, 4.0995E-04*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYtautau_400M600.root", "mcLocalControl_DYtautau_400M600", 20000, 6.6406E-05*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYtautau_600M800.root", "mcLocalControl_DYtautau_600M800", 20000, 1.1002E-05*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYtautau_800M1000.root", "mcLocalControl_DYtautau_800M1000", 20000, 2.6510E-06*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYtautau_1000M1250.root", "mcLocalControl_DYtautau_1000M1250", 20000, 8.9229E-07*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYtautau_1250M1500.root", "mcLocalControl_DYtautau_1250M1500", 20000, 2.3996E-07*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYtautau_1500M1750.root", "mcLocalControl_DYtautau_1500M1750", 20000, 7.3305E-08*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYtautau_1750M2000.root", "mcLocalControl_DYtautau_1750M2000", 20000, 2.4613E-08*nb2fb);
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_DYtautau_M2000.root", "mcLocalControl_DYtautau_M2000", 20000, 1.4001E-08*nb2fb);
+		if(doDYtautau)
+		{
+			setMCtree(ntupledir+"/mcLocalControl_DYtautau_75M120.root", "mcLocalControl_DYtautau_75M120", 20000, 7.9494E-01*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYtautau_120M250.root", "mcLocalControl_DYtautau_120M250", 20000, 8.6656E-03*nb2fb); // !!!!!!!! XS is taken rom MC10
+			setMCtree(ntupledir+"/mcLocalControl_DYtautau_250M400.root", "mcLocalControl_DYtautau_250M400", 20000, 4.0995E-04*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYtautau_400M600.root", "mcLocalControl_DYtautau_400M600", 20000, 6.6406E-05*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYtautau_600M800.root", "mcLocalControl_DYtautau_600M800", 20000, 1.1002E-05*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYtautau_800M1000.root", "mcLocalControl_DYtautau_800M1000", 20000, 2.6510E-06*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYtautau_1000M1250.root", "mcLocalControl_DYtautau_1000M1250", 20000, 8.9229E-07*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYtautau_1250M1500.root", "mcLocalControl_DYtautau_1250M1500", 20000, 2.3996E-07*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYtautau_1500M1750.root", "mcLocalControl_DYtautau_1500M1750", 20000, 7.3305E-08*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYtautau_1750M2000.root", "mcLocalControl_DYtautau_1750M2000", 20000, 2.4613E-08*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYtautau_M2000.root", "mcLocalControl_DYtautau_M2000", 20000, 1.4001E-08*nb2fb);
+		}
 	}
 	
 	if(tsMCname=="TTbar")
 	{
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_T1_McAtNlo_Jimmy.root", "mcLocalControl_T1_McAtNlo_Jimmy", 999500, 1.4562E-01*nb2fb*5.4259E-01);
+		setMCtree(ntupledir+"/mcLocalControl_T1_McAtNlo_Jimmy.root", "mcLocalControl_T1_McAtNlo_Jimmy", 999500, 1.4562E-01*nb2fb*5.4259E-01);
 	}
 	
 	if(tsMCname=="Diboson")
 	{
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_WW_Herwig.root", "mcLocalControl_WW_Herwig", 2442266, 3.1106E-02*nb2fb*3.8947E-01);
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_WZ_Herwig.root", "mcLocalControl_WZ_Herwig", 239949,  1.1485E-02*nb2fb*3.1043E-01);
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_ZZ_Herwig.root", "mcLocalControl_ZZ_Herwig", 244999,  4.5721E-03*nb2fb*2.1319E-01);
+		setMCtree(ntupledir+"/mcLocalControl_WW_Herwig.root", "mcLocalControl_WW_Herwig", 2442266, 3.1106E-02*nb2fb*3.8947E-01);
+		setMCtree(ntupledir+"/mcLocalControl_WZ_Herwig.root", "mcLocalControl_WZ_Herwig", 239949,  1.1485E-02*nb2fb*3.1043E-01);
+		setMCtree(ntupledir+"/mcLocalControl_ZZ_Herwig.root", "mcLocalControl_ZZ_Herwig", 244999,  4.5721E-03*nb2fb*2.1319E-01);
 	}
 	
 	
 	if(tsMCname=="Gmm_01_1750")
 	{
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Gmm_01_1750.root", "mcLocalControl_Gmm_01_1750", 10000, 1.6320E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Gmm_01_1750.root", "mcLocalControl_Gmm_01_1750", 10000, 1.6320E-06*nb2fb);
 	}
 	if(tsMCname=="Gmm_01_2000")
 	{
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Gmm_01_2000.root", "mcLocalControl_Gmm_01_2000", 10000, 5.8721E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Gmm_01_2000.root", "mcLocalControl_Gmm_01_2000", 10000, 5.8721E-07*nb2fb);
 	}
 	if(tsMCname=="Gmm_01_2250")
 	{
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Gmm_01_2250.root", "mcLocalControl_Gmm_01_2250", 10000, 2.1381E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Gmm_01_2250.root", "mcLocalControl_Gmm_01_2250", 10000, 2.1381E-07*nb2fb);
 	}
 	
 
 	if(tsMCname=="Zprime_SSM1000")
 	{
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Zprime_mumu_SSM1000.root", "mcLocalControl_Zprime_SSM1000", 20000, 1.2466E-04*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1000.root", "mcLocalControl_Zprime_SSM1000", 20000, 1.2466E-04*nb2fb);
 	}
 	if(tsMCname=="Zprime_SSM1500")
 	{
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Zprime_mumu_SSM1500.root", "mcLocalControl_Zprime_SSM1500", 20000, 1.4380E-05*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1500.root", "mcLocalControl_Zprime_SSM1500", 20000, 1.4380E-05*nb2fb);
 	}
 	if(tsMCname=="Zprime_SSM1750")
 	{
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Zprime_mumu_SSM1750.root", "mcLocalControl_Zprime_SSM1750", 20000, 5.6743E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1750.root", "mcLocalControl_Zprime_SSM1750", 20000, 5.6743E-06*nb2fb);
 	}
 	if(tsMCname=="Zprime_SSM2000")
 	{
-		setMCtree("/data/hod/2011/NTUPLE/mcLocalControl_Zprime_mumu_SSM2000.root", "mcLocalControl_Zprime_SSM2000", 20000, 2.4357E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM2000.root", "mcLocalControl_Zprime_SSM2000", 20000, 2.4357E-06*nb2fb);
 	}	
 }
 
@@ -1611,10 +1621,8 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				h1Map["hPhiSubleading"+tsMCname]->Fill(phiSubleading,wgt*event_weight);
 				h1Map["hpTLeading"+tsMCname]->Fill(pTLeading,wgt*event_weight);
 				h1Map["hpTSubleading"+tsMCname]->Fill(pTSubleading,wgt*event_weight);
-				
-				_DEBUG("");
-				
 				h1Map["hMass_1d_full_"+tsMCname]->Fill(mass*GeV2TeV,wgt*event_weight); // for the 1d limit
+				
 				// for the 2d limit
 				if(slice_cost<=h1Map["hCosThetaLimitBins_DYmumu"]->GetNbinsX() && slice_cost>0)
 				{
@@ -1733,6 +1741,41 @@ void init(TTree* t=NULL)
 		setMCbranches();
 		_DEBUG("successfully fetched MC tree");
 	}
+}
+
+void writeKKtemplates()
+{
+	// remember old dir
+	TDirectory* olddir = gDirectory;
+	TFile* fTemplates = new TFile("plots/KK_templates.root", "RECREATE");
+	olddir->cd();
+	TObjArray* templates = new TObjArray;
+
+	unsigned int itemplate = 0;
+	for(TMapiTS::iterator it=grpx_ordered.begin() ; it!=grpx_ordered.end() ; ++it)
+	{
+		int order     = it->first;
+		TString name  = it->second;
+		TString title = grpx[name]->label+";m_{#mu#mu} TeV;Events";
+		if(!name.Contains("KK"))             continue;
+		
+		templates->Add( (TH1D*)h1Map["hMass_1d_full_"+name]->Clone("") );
+		templates->At(itemplate)->Print();
+		
+		itemplate++;
+	}
+	
+	fTemplates->cd();
+	
+	templates->SetOwner(kTRUE);
+	templates->Write("template", TObject::kSingleKey);
+	
+	fTemplates->cd();
+	TH1D* hBGsum = (TH1D*)h1Map["hMass_1d_full_MCsum"]->Clone("");
+	hBGsum->Write();
+	
+	fTemplates->Write();
+	fTemplates->Close();
 }
 
 
@@ -1949,6 +1992,7 @@ void run()
 	
 	// finalize
 	hscale2Zpeak(); // must come before hdraw.
+	writeKKtemplates();
 	hdraw();
 	save("plots");
 	printMassBins();

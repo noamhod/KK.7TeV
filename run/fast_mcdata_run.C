@@ -11,7 +11,8 @@
 #include "../include/width.h"
 #include "../include/helicity.h"
 
-TString ntupledir = "/data/hod/2011/NTUPLE_tmp";
+//TString ntupledir = "/data/hod/2011/NTUPLE_tmp";
+TString ntupledir = "/srv01/tau/hod/z0analysis-tests/z0analysis-r170/data";
 bool doDYtautau = false;
 
 bool fastDYmumu = false;
@@ -21,7 +22,7 @@ Int_t printmod  = 5000;
 TMapTS2GRPX grpx;
 TMapiTS     grpx_ordered;
 
-double mZprimeMin = 1000.;
+double mZprimeMin = 500.;
 double mZprimeMax = 2000.;
 double dMZprime   = 250.;
 	
@@ -567,7 +568,11 @@ void samples()
 	grpx_ordered.insert( make_pair(grpx["Data"]->order,"Data") );
 	
 	counter = 100;
-	grpx.insert( make_pair("Zprime_SSM1000",  new GRPX(counter,"1000 GeV Z'_{SSM}",  -1,-1,    kAzure+0,1,2,  -1,-1,-1)));
+	grpx.insert( make_pair("Zprime_SSM500",  new GRPX(counter,"500 GeV Z'_{SSM}",  -1,-1,    kAzure+0,1,2,  -1,-1,-1)));
+	grpx_ordered.insert( make_pair(grpx["Zprime_SSM500"]->order,"Zprime_SSM500") );
+	grpx.insert( make_pair("Zprime_SSM750",  new GRPX(proccount(counter),"750 GeV Z'_{SSM}",  -1,-1,  kAzure-2,1,2,  -1,-1,-1)));
+	grpx_ordered.insert( make_pair(grpx["Zprime_SSM750"]->order,"Zprime_SSM750") );
+	grpx.insert( make_pair("Zprime_SSM1000",  new GRPX(proccount(counter),"1000 GeV Z'_{SSM}",  -1,-1,  kAzure-2,1,2,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Zprime_SSM1000"]->order,"Zprime_SSM1000") );
 	grpx.insert( make_pair("Zprime_SSM1500",  new GRPX(proccount(counter),"1500 GeV Z'_{SSM}",  -1,-1,  kAzure-2,1,2,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Zprime_SSM1500"]->order,"Zprime_SSM1500") );
@@ -585,8 +590,12 @@ void samples()
 	grpx_ordered.insert( make_pair(grpx["Gmm_01_2250"]->order,"Gmm_01_2250") );
 	
 	counter = 300;
-	grpx.insert( make_pair("Zprime_SSM1000_template",  new GRPX(counter,"1000 GeV Z'_{SSM} template",  -1,-1,    kOrange+10,1,2,  -1,-1,-1)));
-	grpx_ordered.insert( make_pair(grpx["Zprime_SSM1000_template"]->order,"Zprime_SSM1000_template") );
+	grpx.insert( make_pair("Zprime_SSM500_template",  new GRPX(counter,"500 GeV Z'_{SSM} template",  -1,-1,    kOrange+10,1,2,  -1,-1,-1)));
+	grpx_ordered.insert( make_pair(grpx["Zprime_SSM500_template"]->order,"Zprime_SSM500_template") );
+	grpx.insert( make_pair("Zprime_SSM750_template",  new GRPX(proccount(counter),"750 GeV Z'_{SSM} template",  -1,-1,  kOrange+8,1,2,   -1,-1,-1)));
+        grpx_ordered.insert( make_pair(grpx["Zprime_SSM750_template"]->order,"Zprime_SSM750_template") );
+	grpx.insert( make_pair("Zprime_SSM1000_template",  new GRPX(proccount(counter),"1000 GeV Z'_{SSM} template",  -1,-1,  kOrange+8,1,2,   -1,-1,-1)));
+        grpx_ordered.insert( make_pair(grpx["Zprime_SSM1000_template"]->order,"Zprime_SSM1000_template") );
 	grpx.insert( make_pair("Zprime_SSM1500_template",  new GRPX(proccount(counter),"1500 GeV Z'_{SSM} template",  -1,-1,  kOrange+8,1,2,   -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Zprime_SSM1500_template"]->order,"Zprime_SSM1500_template") );
 	grpx.insert( make_pair("Zprime_SSM1750_template",  new GRPX(proccount(counter),"1750 GeV Z'_{SSM} template",  -1,-1,  kOrange+5,1,2,   -1,-1,-1)));
@@ -595,8 +604,12 @@ void samples()
 	grpx_ordered.insert( make_pair(grpx["Zprime_SSM2000_template"]->order,"Zprime_SSM2000_template") );
 	
 	counter = 400;
-	grpx.insert( make_pair("KK1000_template",  new GRPX(counter,"1000 GeV KK template",  -1,-1,    kGreen+4,1,2,  -1,-1,-1)));
-	grpx_ordered.insert( make_pair(grpx["KK1000_template"]->order,"KK1000_template") );
+	grpx.insert( make_pair("KK500_template",  new GRPX(counter,"500 GeV KK template",  -1,-1,    kGreen+4,1,2,  -1,-1,-1)));
+	grpx_ordered.insert( make_pair(grpx["KK500_template"]->order,"KK500_template") );
+	grpx.insert( make_pair("KK750_template",  new GRPX(proccount(counter),"750 GeV KK template",  -1,-1,  kGreen-1,1,2,   -1,-1,-1)));
+        grpx_ordered.insert( make_pair(grpx["KK750_template"]->order,"KK750_template") );
+	grpx.insert( make_pair("KK1000_template",  new GRPX(proccount(counter),"1000 GeV KK template",  -1,-1,  kGreen-1,1,2,   -1,-1,-1)));
+        grpx_ordered.insert( make_pair(grpx["KK1000_template"]->order,"KK1000_template") );
 	grpx.insert( make_pair("KK1500_template",  new GRPX(proccount(counter),"1500 GeV KK template",  -1,-1,  kGreen-1,1,2,   -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["KK1500_template"]->order,"KK1500_template") );
 	grpx.insert( make_pair("KK1750_template",  new GRPX(proccount(counter),"1750 GeV KK template",  -1,-1,  kGreen-1,1,2,   -1,-1,-1)));
@@ -684,6 +697,14 @@ void setMCtrees(TString tsMCname)
 	}
 	
 
+	if(tsMCname=="Zprime_SSM500")
+	{
+		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM500.root", "mcLocalControl_Zprime_SSM500", 20000, 2.6071E-03*nb2fb);
+	}
+	if(tsMCname=="Zprime_SSM750")
+	{
+		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM750.root", "mcLocalControl_Zprime_SSM750", 20000, 4.7349E-04*nb2fb);
+	}
 	if(tsMCname=="Zprime_SSM1000")
 	{
 		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1000.root", "mcLocalControl_Zprime_SSM1000", 20000, 1.2466E-04*nb2fb);
@@ -1197,6 +1218,7 @@ void hMCsumall(TString tsMCname)
 	h1Map["hNvxpMCsum_with_puwgt"]->Add(h1Map["hNvxp"+tsMCname+"_with_puwgt"]);
 	h1Map["hMassNumbersMCsum"]->Add(h1Map["hMassNumbers"+tsMCname]);
 	h1Map["hMassMCsum"]->Add(h1Map["hMass"+tsMCname]);
+	h1Map["hMass_1d_full_MCsum"]->Add(h1Map["hMass_1d_full_"+tsMCname]);
 	h1Map["hyQMCsum"]->Add(h1Map["hyQ"+tsMCname]);
 	h1Map["hQTMCsum"]->Add(h1Map["hQT"+tsMCname]);
 	h1Map["hEtaQMCsum"]->Add(h1Map["hEtaQ"+tsMCname]);
@@ -1590,14 +1612,18 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 								break;
 							}
 						}
-						
+
 						/// imass
 						tsname_ZP = "hMassZprime_SSM" + (TString)_s(M) + "_template";
 						tsname_KK = "hMassKK"         + (TString)_s(M) + "_template";
 						h1Map[tsname_ZP]->Fill(mass,wgt*noEWkfactor_weight*template_weight_ZP);
 						h1Map[tsname_KK]->Fill(mass,wgt*noEWkfactor_weight*template_weight_KK);
 						
-						_DEBUG("");
+						/// imass
+						tsname_ZP = "hMass_1d_full_Zprime_SSM" + (TString)_s(M) + "_template";
+						tsname_KK = "hMass_1d_full_KK"         + (TString)_s(M) + "_template";
+						h1Map[tsname_ZP]->Fill(mass*GeV2TeV,wgt*noEWkfactor_weight*template_weight_ZP); // for the 1d limit
+						h1Map[tsname_KK]->Fill(mass*GeV2TeV,wgt*noEWkfactor_weight*template_weight_KK); // for the 1d limit
 						
 						/// pT leading
 						tsname_ZP = "hpTLeadingZprime_SSM" + (TString)_s(M) + "_template";
@@ -1607,7 +1633,6 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 					}
 				}
 				
-				_DEBUG("");
 				h1Map["hNvxp"+tsMCname]->Fill(recon_all_vxp_n,wgt*event_weight_nopileup);
 				h1Map["hNvxp"+tsMCname+"_with_puwgt"]->Fill(recon_all_vxp_n,wgt*event_weight);
 				h1Map["hMassNumbers"+tsMCname]->Fill(mass,wgt*event_weight);
@@ -1756,9 +1781,11 @@ void writeKKtemplates()
 	{
 		int order     = it->first;
 		TString name  = it->second;
-		TString title = grpx[name]->label+";m_{#mu#mu} TeV;Events";
-		if(!name.Contains("KK"))             continue;
 		
+		TString title = grpx[name]->label+";m_{#mu#mu} TeV;Events";
+
+		if(!name.Contains("KK")) continue;
+
 		templates->Add( (TH1D*)h1Map["hMass_1d_full_"+name]->Clone("") );
 		templates->At(itemplate)->Print();
 		
@@ -1772,7 +1799,9 @@ void writeKKtemplates()
 	
 	fTemplates->cd();
 	TH1D* hBGsum = (TH1D*)h1Map["hMass_1d_full_MCsum"]->Clone("");
+	TH1D* hData  = (TH1D*)h1Map["hMass_1d_full_Data"]->Clone("");
 	hBGsum->Write();
+	hData->Write();
 	
 	fTemplates->Write();
 	fTemplates->Close();
@@ -1948,7 +1977,7 @@ void run()
 	hbook();
 	text();
 
-	
+
 	//// data
 	init();
 	Int_t N = tree->GetEntriesFast();
@@ -1964,7 +1993,6 @@ void run()
 		monitor("Data",entry,N);
 	}
 	_INFO("Data: done.");
-	
 
 	//---- MCs
 	for(TMapiTS::iterator it=grpx_ordered.begin() ; it!=grpx_ordered.end() ; ++it)

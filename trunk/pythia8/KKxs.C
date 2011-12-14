@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 	pythia.readString("5000023:mMin = " + sNewLowBound);
 	pythia.readString("5000023:mMax = " + sNewHighBound);
 	pythia.readString("5000023:isResonance = false");
-	pythia.readString("ExtraDimensionsTEV:gmZmode = 3"); // 0=(gm+Z), 1=(gm), 2=(Z), 3=(gm+Z+gmKK+ZKK), 4=(truth_all_mc_m+Z+gmKK), 5=(truth_all_mc_m+Z+ZKK)
+	pythia.readString("ExtraDimensionsTEV:gmZmode = 3"); // 0=(gm+Z), 1=(gm), 2=(Z), 3=(gm+Z+gmKK+ZKK), 4=(Z+gmKK), 5=(Z+ZKK)
 	pythia.readString("ExtraDimensionsTEV:nMax = 100"); // min=0, max=100, default=10
 	pythia.readString("ExtraDimensionsTEV:mStar = " + sNewKKMass);
 	pythia.readString("PhaseSpace:mHatMin = " + sNewLowBound);

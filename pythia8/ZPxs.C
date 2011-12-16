@@ -15,14 +15,13 @@ int main(int argc, char *argv[])
 	// variables...
 	double minPhaseSpace = 70.;
 	double maxPhaseSpace = 7000.;
-	double xsKK    = 0.;
-	double dxsKK   = 0.;
+	double xsZP    = 0.;
+	double dxsZP   = 0.;
 	double mZ0     = 91.18760;
-	double mKK     = validate_double(argv[1]);
+	double mZP     = validate_double(argv[1]);
 	string fname   = argv[2];
 	string channel = argv[3];
 	int nEvents    = validate_int(argv[4]);
-	double mKK1st = sqrt(mKK*mKK+mZ0*mZ0);
 	
 	// Generator.
 	Pythia pythia;
@@ -48,28 +47,28 @@ int main(int argc, char *argv[])
 	pythia.readString("Random:seed = 0");
 
 	// Process selection.
-	if     (channel=="mumu") pythia.readString("ExtraDimensionsTEV:ffbar2mu+mu- = on");
-	else if(channel=="ee")   pythia.readString("ExtraDimensionsTEV:ffbar2e+e-   = on");
-	cout << "KK mass is: " << mKK << endl;
+	pythia.readString("NewGaugeBoson:ffbar2gmZZprime = on");
+        pythia.readString("Zprime:gmZmode = 3"); // only Z'
+
+	cout << "Z' mass is: " << mZP << endl;
 	
 	// set the mass and therefore the width 
-	string sNewKKMass    = _s(mKK);
-	string sNewMass      = _s(mKK1st);
-	string sNewWidth     = _s(mKK1st / 4000. * 240.);
+	string sNewZPMass    = _s(mZP);
+	string sNewWidth     = _s(mZP / 4000. * 140.);
 	string sNewLowBound  = _s(minPhaseSpace);
 	string sNewHighBound = _s(maxPhaseSpace);
-	
-	// Feed in KK state information and other generation specifics.
-	pythia.readString("5000023:m0 = " + sNewMass);
-	pythia.readString("5000023:mWidth = " + sNewWidth);
-	pythia.readString("5000023:mMin = " + sNewLowBound);
-	pythia.readString("5000023:mMax = " + sNewHighBound);
-	pythia.readString("5000023:isResonance = false");
-	pythia.readString("ExtraDimensionsTEV:gmZmode = 6"); // 0=(gm+Z), 1=(gm), 2=(Z), 3=(gm+Z+gmKK+ZKK), 4=(Z+gmKK), 5=(Z+ZKK), 6=(gmKK+ZKK)
-	pythia.readString("ExtraDimensionsTEV:nMax = 10"); // min=0, max=100, default=10
-	pythia.readString("ExtraDimensionsTEV:mStar = " + sNewKKMass);
+	string sIDout        = (channel=="mumu")?"13":"11";
+
+	pythia.readString("32:m0 = " + sNewZPMass);
+	//pythia.readString("32:mWidth = " + sNewWidth);
+	pythia.readString("32:mMin = " + sNewLowBound);
+	pythia.readString("32:mMax = " + sNewHighBound);
 	pythia.readString("PhaseSpace:mHatMin = " + sNewLowBound);
 	pythia.readString("PhaseSpace:mHatMax = " + sNewHighBound);
+	pythia.readString("32:onMode = off"); // switch on the Z'->mu-mu+ decay mode only
+	pythia.readString("32:onIfAny = " + sIDout);
+	pythia.readString("23:onMode = off"); // switch off all of the Z0 decay modes
+	pythia.readString("23:onIfAny = " + sIDout); // switch on the Z0->mu-mu+ decay mode only
 	
 	// Initialize.
 	pythia.init( 2212, 2212, 7000.);
@@ -86,11 +85,11 @@ int main(int argc, char *argv[])
 		if(iEvent%mod==0) cout << "Event: " << iEvent << endl;
 	}
 	
-	xsKK = pythia.info.sigmaGen();
-	dxsKK = pythia.info.sigmaErr();
+	xsZP = pythia.info.sigmaGen();
+	dxsZP = pythia.info.sigmaErr();
 
 	ofstream* f = new ofstream(fname.c_str());
-	(*f) << mKK << "\t" << xsKK << "\t" << dxsKK << endl;
+	(*f) << mZP << "\t" << xsZP << "\t" << dxsZP << endl;
 	f->close();
 	delete f;
 	

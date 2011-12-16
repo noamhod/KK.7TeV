@@ -10,14 +10,27 @@
 #include "../include/couplings.h"
 #include "../include/width.h"
 #include "../include/helicity.h"
+#include "../include/kFactors.h"
 
-//TString ntupledir = "/data/hod/2011/NTUPLE_tmp";
-TString ntupledir = "/srv01/tau/hod/z0analysis-tests/z0analysis-r170/data";
-bool doDYtautau = false;
+using namespace couplings;
+using namespace width;
+using namespace helicity;
+using namespace kFactors;
 
-bool fastDYmumu = false;
-bool drawGmm    = false;
-Int_t printmod  = 5000;
+
+///////////////////////////////////////
+// selectors //////////////////////////
+///////////////////////////////////////
+TString ntupledir      = "/srv01/tau/hod/z0analysis-tests/z0analysis-r170/data"; // "/data/hod/2011/NTUPLE_tmp";
+bool doData            = true;
+bool doDYtautau        = false;
+bool fastDYmumu        = true;
+bool drawGmm           = false;
+bool doFullKKtemplates = false;
+bool doFullZPtemplates = true;
+Int_t printmod         = 5000;
+///////////////////////////////////////
+
 
 TMapTS2GRPX grpx;
 TMapiTS     grpx_ordered;
@@ -29,6 +42,10 @@ double dMZprime   = 250.;
 double mGmmMin = 1750.;
 double mGmmMax = 2250.;
 double dMGmm   = 250.;
+
+double mKKmmMin = 1000.;
+double mKKmmMax = 5000.;
+double dMKKmm   = 50.;
 
 TFile* file;
 TTree* tree;
@@ -66,6 +83,7 @@ TLorentzVector* tlvb   = new TLorentzVector;
 TLorentzVector* tlvtmp = new TLorentzVector;
 TVector3*       tv3a   = new TVector3;
 TVector3*       tv3b   = new TVector3;
+TVector3*       tv3mu  = new TVector3;
 
 TLorentzVector* tlvmutrua = new TLorentzVector;
 TLorentzVector* tlvmutrub = new TLorentzVector;
@@ -87,6 +105,7 @@ TVector3*       tv3mureca = new TVector3;
 TVector3*       tv3murecb = new TVector3;
 TVector3*       tv3qa  = new TVector3;
 TVector3*       tv3qb  = new TVector3;
+TVector3*       tv3q   = new TVector3;
 
 TVector3*       tv3mutruaBoosted = new TVector3;
 TVector3*       tv3mutrubBoosted = new TVector3;
@@ -961,6 +980,26 @@ void hbook()
 		linMap.insert( make_pair("hMassyQ_vertline_"+_s(logmassbins[ms]), new TLine(logmassbins[ms],minfullyQ,logmassbins[ms],maxfullyQ)) );
 	}
 	
+	//// KK templates for the limit
+	if(doFullKKtemplates || doFullZPtemplates)
+	{
+		for(double M=mKKmmMin ; M<=mKKmmMax ; M+=dMKKmm)
+		{
+			TString massName = (TString)_s(M);
+			
+			if(doFullKKtemplates)
+			{
+				h1Map.insert( make_pair("hMass_template_KK"+massName, new TH1D("hMass_template_KK"+massName, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+				h1Map.insert( make_pair("hMass_truth_template_KK"+massName, new TH1D("hMass_truth_template_KK"+massName, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+			}
+			else if(doFullZPtemplates)
+			{
+				h1Map.insert( make_pair("hMass_template_ZprimeSSM"+massName, new TH1D("hMass_template_ZprimeSSM"+massName, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+				h1Map.insert( make_pair("hMass_truth_template_ZprimeSSM"+massName, new TH1D("hMass_truth_template_ZprimeSSM"+massName, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+			}
+		}
+	}
+	
 	/* graphics(TH1* th1,
 			  Color_t fillcolor=-1, Int_t fillstyle=-1,
 			  Color_t linecolor=-1, Int_t linestyle=-1, Int_t linewidth=-1,
@@ -1176,7 +1215,7 @@ void hscale2Zpeak()
 {
 	float ratio          = getDataMCratio();
 	float ratio_nopileup = getDataMCratioNoPileup();
-
+	
 	for(TMapTS2GRPX::iterator it=grpx.begin() ; it!=grpx.end() ; ++it)
 	{
 		TString name = it->first;
@@ -1186,6 +1225,7 @@ void hscale2Zpeak()
 		Scale(h1Map["hNvxp"+name+"_with_puwgt"],ratio);
 		Scale(h1Map["hMassNumbers"+name],ratio);
 		Scale(h1Map["hMass"+name],ratio);
+		Scale(h1Map["hMass_1d_full_"+name],ratio);
 		Scale(h1Map["hyQ"+name],ratio);
 		Scale(h1Map["hQT"+name],ratio);
 		Scale(h1Map["hEtaQ"+name],ratio);
@@ -1205,6 +1245,25 @@ void hscale2Zpeak()
 		{
 			TString baseName = "hMass_dEtaSlice_"+(TString)_s(i);
 			Scale(h1Map[baseName+"_"+name],ratio);
+		}
+		
+		if(name.Contains("DYmumu")  &&  (doFullKKtemplates || doFullZPtemplates)) // KK tempaltes for the limit
+		{
+			for(double M=mKKmmMin ; M<=mKKmmMax ; M+=dMKKmm)
+			{
+				TString massName = (TString)_s(M);
+				
+				if(doFullKKtemplates)
+				{
+					Scale(h1Map["hMass_template_KK"+massName],ratio);
+					Scale(h1Map["hMass_truth_template_KK"+massName],ratio); // ???????????????????????????????????????????????????????????????????????????
+				}
+				else if(doFullZPtemplates)
+				{
+					Scale(h1Map["hMass_template_ZprimeSSM"+massName],ratio);
+					Scale(h1Map["hMass_truth_template_ZprimeSSM"+massName],ratio); // ???????????????????????????????????????????????????????????????????????????
+				}
+			}
 		}
 		
 		Scale(h2Map["hMassCosThetaCS"+name],ratio);
@@ -1424,10 +1483,21 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 	int   slice_deta = 0;
 	float dEta = 0.;
 	
+	float truth_mass = 0.;
+	float truth_s    = 0.;
+	float truth_cost = 0.;
+	unsigned int truth_idIn = 0;
+	unsigned int idOut      = 13; // muon
+	double KKnoSMoverSM_weight = 0.;
+	double ZPnoSMoverSM_weight = 0.;
+	
 	int imuontru  = -999;
 	int iamuontru = -999;
 	int imuonrec  = -999;
 	int iamuonrec = -999;
+	
+	int iquark  = -999;
+	int iaquark = -999;
 	
 	float event_weight          = 1.;
 	float event_weight_nopileup = 1.;
@@ -1440,10 +1510,8 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 		{
 			imuontru  = (truth_all_mc_pdgId->at(0)>0) ? 0 : 1;
 			iamuontru = (imuontru==0) ? 1 : 0;
-
 			tlvmutrua->SetPtEtaPhiM(truth_all_mc_pt->at(imuontru),  truth_all_mc_eta->at(imuontru),  truth_all_mc_phi->at(imuontru),  muonMass);
 			tlvmutrub->SetPtEtaPhiM(truth_all_mc_pt->at(iamuontru), truth_all_mc_eta->at(iamuontru), truth_all_mc_phi->at(iamuontru), muonMass);
-			
 			(*tv3mutrua) = tlvmutrua->Vect();
 			(*tv3mutrub) = tlvmutrub->Vect();
 			tlvmutruaBoosted = fkinematics::Boost(tlvmutrua,tlvmutrub,tlvmutrua);
@@ -1466,6 +1534,60 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 			_DEBUG("");
 			if(tsMCname=="DYmumu") // templates truth
 			{
+				// (1) take the true quark and the true muon and boost it to the cmf.
+				// (2) calculate cos(theta*) between the muon and the quark
+				// (3) get the quark id
+				// (4) get the mass of the intermediate state (Z)
+				// iquark = (truth_all_partons_mc_pdgId->at(0)>0) ? 0 : 1;
+				// iaquark = (iquark==0) ? 1 : 0;
+				iquark = (truth_all_partons_mc_pdgId->at(2)>0) ? 2 : 3; // incoming partons are written in enties 2 and 3 of the vectors "truth_all_partons_mc_*"
+				iaquark = (iquark==2) ? 3 : 2;
+				tlvqa->SetPtEtaPhiM(truth_all_partons_mc_pt->at(iquark), truth_all_partons_mc_eta->at(iquark), truth_all_partons_mc_phi->at(iquark),truth_all_partons_mc_m->at(iquark));
+				tlvqb->SetPtEtaPhiM(truth_all_partons_mc_pt->at(iaquark), truth_all_partons_mc_eta->at(iaquark), truth_all_partons_mc_phi->at(iaquark),truth_all_partons_mc_m->at(iaquark));
+				(*tv3qa) = tlvqa->Vect();
+				(*tv3qb) = tlvqb->Vect();
+				tlvqaBoosted = fkinematics::Boost(tlvqa,tlvqb,tlvqa);
+				tlvqbBoosted = fkinematics::Boost(tlvqa,tlvqb,tlvqb);
+				(*tv3qaBoosted) = tlvqaBoosted->Vect();
+				(*tv3qbBoosted) = tlvqbBoosted->Vect();
+			
+				// bits for the KK weights
+				tv3q->SetPtEtaPhi(tlvqaBoosted->Pt(),tlvqaBoosted->Eta(),tlvqaBoosted->Phi());
+				tv3mu->SetPtEtaPhi(tlvmutruaBoosted->Pt(),tlvmutruaBoosted->Eta(),tlvmutruaBoosted->Phi());
+				truth_cost = tv3q->Dot((*tv3mu))/(tv3q->Mag()*tv3mu->Mag()); // truth cos(theta*)
+				truth_idIn = truth_all_partons_mc_pdgId->at(iquark);         // truth incoming flavor
+				truth_mass = fkinematics::imass(tlvqa,tlvqb);                // truth gamma/Z mass
+				//truth_mass = truth_all_partons_mc_m->at(4);                // truth gamma/Z mass
+				if(fabs(truth_mass-truth_all_partons_mc_m->at(4))/sqrt(truth_all_partons_mc_m->at(4))>3.)
+				{
+					_WARNING("truth mass mismatch: M(qqbar)="+_s(truth_all_partons_mc_m->at(4))+", M(4->"+_s(truth_all_partons_mc_pdgId->at(4))+")="+_s(truth_mass));
+				}
+				truth_s = truth_mass*truth_mass;
+				
+				// fill and weight the truth histos for the acceptance
+				if(doFullKKtemplates || doFullZPtemplates)
+				{
+					for(double M=mKKmmMin ; M<=mKKmmMax ; M+=dMKKmm)
+					{
+						//////////////////////////////
+						// propagate the KK mass /////
+						mKK = M; /////////////////////
+						mZP = M; /////////////////////
+						//////////////////////////////
+						TString massName   = (TString)_s(M);
+						if(doFullKKtemplates)
+						{
+							KKnoSMoverSM_weight = weightKKnoSM(truth_cost,truth_s,truth_idIn,idOut);
+							h1Map["hMass_truth_template_KK"+massName]->Fill(truth_mass*GeV2TeV,wgt*KKnoSMoverSM_weight); // need to fluctuate this later
+						}
+						else if(doFullZPtemplates)
+						{
+							ZPnoSMoverSM_weight = weightZPnoSM(truth_cost,truth_s,truth_idIn,idOut);
+							h1Map["hMass_truth_template_ZprimeSSM"+massName]->Fill(truth_mass*GeV2TeV,wgt*ZPnoSMoverSM_weight); // need to fluctuate this later
+						}
+					}
+				}
+			
 				/// imass
 				h1Map["hMassDYmumu_truth"]->Fill(mass,wgt);
 				/// pT leading
@@ -1631,6 +1753,30 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 						h1Map[tsname_ZP]->Fill(pTLeading,wgt*noEWkfactor_weight*template_weight_ZP);
 						h1Map[tsname_KK]->Fill(pTLeading,wgt*noEWkfactor_weight*template_weight_KK);
 					}
+					
+					if(doFullKKtemplates || doFullZPtemplates)
+					{
+						for(double M=mKKmmMin ; M<=mKKmmMax ; M+=dMKKmm)
+						{
+							//////////////////////////////
+							// propagate the KK mass /////
+							mKK = M; /////////////////////
+							mZP = M; /////////////////////
+							//////////////////////////////
+							TString massName   = (TString)_s(M);
+							
+							if(doFullKKtemplates)
+							{
+								KKnoSMoverSM_weight = weightKKnoSM(truth_cost,truth_s,truth_idIn,idOut);
+								h1Map["hMass_template_KK"+massName]->Fill(mass*GeV2TeV,wgt*noEWkfactor_weight*KKnoSMoverSM_weight); // need to fluctuate this later
+							}
+							else if(doFullZPtemplates)
+							{
+								ZPnoSMoverSM_weight = weightZPnoSM(truth_cost,truth_s,truth_idIn,idOut);
+								h1Map["hMass_template_ZprimeSSM"+massName]->Fill(mass*GeV2TeV,wgt*noEWkfactor_weight*ZPnoSMoverSM_weight); // need to fluctuate this later
+							}
+						}
+					}
 				}
 				
 				h1Map["hNvxp"+tsMCname]->Fill(recon_all_vxp_n,wgt*event_weight_nopileup);
@@ -1772,30 +1918,71 @@ void writeKKtemplates()
 {
 	// remember old dir
 	TDirectory* olddir = gDirectory;
-	TFile* fTemplates = new TFile("plots/KK_templates.root", "RECREATE");
+	TFile* fTemplates = NULL;
+	if(doFullKKtemplates)      fTemplates = new TFile("plots/KK_templates.root", "RECREATE");
+	else if(doFullZPtemplates) fTemplates = new TFile("plots/ZP_templates.root", "RECREATE");
 	olddir->cd();
-	TObjArray* templates = new TObjArray;
+	TObjArray* templates_KK = new TObjArray;
+	TObjArray* truth_templates_KK = new TObjArray;
+	TObjArray* templates_ZP = new TObjArray;
+	TObjArray* truth_templates_ZP = new TObjArray;
 
 	unsigned int itemplate = 0;
-	for(TMapiTS::iterator it=grpx_ordered.begin() ; it!=grpx_ordered.end() ; ++it)
+	if(doFullKKtemplates)
 	{
-		int order     = it->first;
-		TString name  = it->second;
-		
-		TString title = grpx[name]->label+";m_{#mu#mu} TeV;Events";
-
-		if(!name.Contains("KK")) continue;
-
-		templates->Add( (TH1D*)h1Map["hMass_1d_full_"+name]->Clone("") );
-		templates->At(itemplate)->Print();
-		
-		itemplate++;
+		for(double M=mKKmmMin ; M<=mKKmmMax ; M+=dMKKmm)
+		{
+			TString massName = (TString)_s(M);
+			templates_KK->Add( (TH1D*)h1Map["hMass_template_KK"+massName]->Clone("") );
+			truth_templates_KK->Add( (TH1D*)h1Map["hMass_truth_template_KK"+massName]->Clone("") );
+			itemplate++;
+		}
+	}
+	else if(doFullZPtemplates)
+	{
+		for(double M=mKKmmMin ; M<=mKKmmMax ; M+=dMKKmm)
+		{
+			TString massName = (TString)_s(M);
+			templates_ZP->Add( (TH1D*)h1Map["hMass_template_ZprimeSSM"+massName]->Clone("") );
+			truth_templates_ZP->Add( (TH1D*)h1Map["hMass_truth_template_ZprimeSSM"+massName]->Clone("") );
+			itemplate++;
+		}
+	}
+	else
+	{
+		for(TMapiTS::iterator it=grpx_ordered.begin() ; it!=grpx_ordered.end() ; ++it)
+		{
+			int order     = it->first;
+			TString name  = it->second;
+			TString title = grpx[name]->label+";m_{#mu#mu} TeV;Events";
+			if(!name.Contains("KK")) continue;
+			templates_KK->Add( (TH1D*)h1Map["hMass_1d_full_"+name]->Clone("") );
+			templates_KK->At(itemplate)->Print();
+			itemplate++;
+		}
 	}
 	
 	fTemplates->cd();
 	
-	templates->SetOwner(kTRUE);
-	templates->Write("template", TObject::kSingleKey);
+	if(doFullKKtemplates)
+	{
+		templates_KK->SetOwner(kTRUE);
+		templates_KK->Write("template", TObject::kSingleKey);
+		truth_templates_KK->SetOwner(kTRUE);
+		truth_templates_KK->Write("truth_template", TObject::kSingleKey);
+	}
+	else if(doFullZPtemplates)
+	{
+		templates_ZP->SetOwner(kTRUE);
+		templates_ZP->Write("template", TObject::kSingleKey);
+		truth_templates_ZP->SetOwner(kTRUE);
+		truth_templates_ZP->Write("truth_template", TObject::kSingleKey);
+	}
+	else
+	{
+		templates_KK->SetOwner(kTRUE);
+		templates_KK->Write("template", TObject::kSingleKey);
+	}
 	
 	fTemplates->cd();
 	TH1D* hBGsum = (TH1D*)h1Map["hMass_1d_full_MCsum"]->Clone("");
@@ -1979,21 +2166,24 @@ void run()
 
 
 	//// data
-	init();
-	Int_t N = tree->GetEntriesFast();
-	for(Int_t entry=0 ; entry<N ; entry++)
+	if(doData)
 	{
-		tree->GetEntry(entry);
-		////////////////////////////////////
-		//// blocks of analysis go here ////
-		////////////////////////////////////
-		hfill("DATA"); /////////////////////
-		////////////////////////////////////
-		
-		monitor("Data",entry,N);
+		init();
+		Int_t N = tree->GetEntriesFast();
+		for(Int_t entry=0 ; entry<N ; entry++)
+		{
+			tree->GetEntry(entry);
+			////////////////////////////////////
+			//// blocks of analysis go here ////
+			////////////////////////////////////
+			hfill("DATA"); /////////////////////
+			////////////////////////////////////
+			
+			monitor("Data",entry,N);
+		}
+		_INFO("Data: done.");
 	}
-	_INFO("Data: done.");
-
+	
 	//---- MCs
 	for(TMapiTS::iterator it=grpx_ordered.begin() ; it!=grpx_ordered.end() ; ++it)
 	{

@@ -19,7 +19,7 @@ using namespace kFactors;
 namespace helicity
 {
 
-static const unsigned int nModes  = 100;
+static const unsigned int nModes  = 10; // 100;
 static bool dokFactors = true;
 
 void setkFactors(bool dokF)
@@ -67,6 +67,18 @@ inline dcomplex hAZP(double s, double cosTheta, unsigned int idIn, unsigned int 
 {
 	dcomplex A(0,0);
 	A = hASM(s,cosTheta,idIn,idOut,hIn,hOut); // the SM term
+	/* double w = 0.;
+	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on all the flavors
+	{
+		w += wZP(it->first);
+	} */
+	double w = wTotZP();
+	A += hAZP0(s,cosTheta,w,idIn,idOut,hIn,hOut);
+	return A;
+}
+inline dcomplex hAZPnoSM(double s, double cosTheta, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
+{
+	dcomplex A(0,0);
 	/* double w = 0.;
 	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on all the flavors
 	{
@@ -124,6 +136,24 @@ inline dcomplex hAKK(double s, double cosTheta, unsigned int idIn, unsigned int 
 	}
 	return A;
 }
+inline dcomplex hAKKnoSM(double s, double cosTheta, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
+{
+	dcomplex A(0,0);
+	for(unsigned int n=1 ; n<=nModes ; n++) // the KK tower
+	{
+		/* double wg = 0.;
+		double wz = 0.;
+		for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on all the flavors
+		{
+			wg += wGKK(it->first,n);
+			wz += wZKK(it->first,n);
+		} */
+		double wg = wTotGKK(n);
+		double wz = wTotZKK(n);
+		A += hAKKn(s,cosTheta,wg,wz,idIn,idOut,hIn,hOut,n);
+	}
+	return A;
+}
 
 
 //////////////////////////////////////////////////////
@@ -155,6 +185,20 @@ inline double hA2ZP(double cosTheta, double s, unsigned int idIn, unsigned int i
 	}
 	return A2;
 }
+inline double hA2ZPnoSM(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
+{
+	dcomplex A(0,0);
+	double A2 = 0.;
+	for(double hIn=-f12 ; hIn<=+f12 ; hIn++)
+	{
+		for(double hOut=-f12 ; hOut<=+f12 ; hOut++)
+		{
+			A = hAZPnoSM(s,cosTheta,idIn,idOut,hIn,hOut);
+			A2 += real(A*conj(A));
+		}
+	}
+	return A2;
+}
 inline double hA2KK(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
 {
 	dcomplex A(0,0);
@@ -164,6 +208,20 @@ inline double hA2KK(double cosTheta, double s, unsigned int idIn, unsigned int i
 		for(double hOut=-f12 ; hOut<=+f12 ; hOut++)
 		{
 			A = hAKK(s,cosTheta,idIn,idOut,hIn,hOut);
+			A2 += real(A*conj(A));
+		}
+	}
+	return A2;
+}
+inline double hA2KKnoSM(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
+{
+	dcomplex A(0,0);
+	double A2 = 0.;
+	for(double hIn=-f12 ; hIn<=+f12 ; hIn++)
+	{
+		for(double hOut=-f12 ; hOut<=+f12 ; hOut++)
+		{
+			A = hAKKnoSM(s,cosTheta,idIn,idOut,hIn,hOut);
 			A2 += real(A*conj(A));
 		}
 	}
@@ -179,11 +237,25 @@ inline double weightKK(double cosTheta, double s, unsigned int idIn, unsigned in
 	double R = hA2KK(cosTheta,s,idIn,idOut)/hA2SM(cosTheta,s,idIn,idOut);
 	return R;
 }
+inline double weightKKnoSM(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
+{
+	if(s<0.)              return 0.;
+	if(fabs(cosTheta)>1.) return 0.;
+	double R = hA2KKnoSM(cosTheta,s,idIn,idOut)/hA2SM(cosTheta,s,idIn,idOut);
+	return R;
+}
 inline double weightZP(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
 {
 	if(s<0.)              return 0.;
 	if(fabs(cosTheta)>1.) return 0.;
 	double R = hA2ZP(cosTheta,s,idIn,idOut)/hA2SM(cosTheta,s,idIn,idOut);
+	return R;
+}
+inline double weightZPnoSM(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
+{
+	if(s<0.)              return 0.;
+	if(fabs(cosTheta)>1.) return 0.;
+	double R = hA2ZPnoSM(cosTheta,s,idIn,idOut)/hA2SM(cosTheta,s,idIn,idOut);
 	return R;
 }
 
@@ -209,6 +281,16 @@ inline double hA2ZPsumQ(double cosTheta, double s, unsigned int idOut)
 	}
 	return A2;
 }
+inline double hA2ZPnoSMsumQ(double cosTheta, double s, unsigned int idOut)
+{
+	double A2 = 0.;
+	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on the incoming flavors
+	{
+		unsigned int idIn = it->first;
+		A2 += hA2ZPnoSM(s,cosTheta,idIn,idOut);
+	}
+	return A2;
+}
 inline double hA2KKsumQ(double cosTheta, double s, unsigned int idOut)
 {
 	double A2 = 0.;
@@ -216,6 +298,16 @@ inline double hA2KKsumQ(double cosTheta, double s, unsigned int idOut)
 	{
 		unsigned int idIn = it->first;
 		A2 += hA2KK(s,cosTheta,idIn,idOut);
+	}
+	return A2;
+}
+inline double hA2KKnoSMsumQ(double cosTheta, double s, unsigned int idOut)
+{
+	double A2 = 0.;
+	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on the incoming flavors
+	{
+		unsigned int idIn = it->first;
+		A2 += hA2KKnoSM(s,cosTheta,idIn,idOut);
 	}
 	return A2;
 }
@@ -276,6 +368,19 @@ class template_hA2ZP
 			return hA2ZP(cosTheta,s,idIn,idOut);
 		}
 };
+class template_hA2ZPnoSM
+{
+	double s;
+	unsigned int idIn;
+	unsigned int idOut;
+	public:
+		template_hA2ZPnoSM(double s0, unsigned int idIn0, unsigned int idOut0) : s(s0), idIn(idIn0), idOut(idOut0) { }
+		template<class X>
+		X operator()(X cosTheta) const
+		{
+			return hA2ZPnoSM(cosTheta,s,idIn,idOut);
+		}
+};
 class template_hA2KK
 {
 	double s;
@@ -289,6 +394,20 @@ class template_hA2KK
 			return hA2KK(cosTheta,s,idIn,idOut);
 		}
 };
+class template_hA2KKnoSM
+{
+	double s;
+	unsigned int idIn;
+	unsigned int idOut;
+	public:
+		template_hA2KKnoSM(double s0, unsigned int idIn0, unsigned int idOut0) : s(s0), idIn(idIn0), idOut(idOut0) { }
+		template<class X>
+		X operator()(X cosTheta) const
+		{
+			return hA2KKnoSM(cosTheta,s,idIn,idOut);
+		}
+};
+
 
 
 /////////////////////////////////////////////////////////////////

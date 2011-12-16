@@ -15,13 +15,16 @@ include FileUtils
 workdir = "/srv01/tau/hod/z0analysis-tests/z0analysis-r170/pythia8";
 thisdir = Dir.getwd();
 Dir.chdir(workdir);
-mKKmin      = 500;  # 130;  # GeV
-dm          = 250;  # 40;   # GeV
-mKKmax      = 2000; # 4130; # GeV
+mKKmin      = 130;  # 500;  # GeV
+dm          = 40;   # 250;  # GeV
+mKKmax      = 6130; # 2000; # GeV
 nMassPoints = (mKKmax-mKKmin)/dm;
+channel     = "mumu";
+theory      = "ZP";
+nEvents     = 1000;
 
 def clean(workdir="")
-	#%x(rm -f #{workdir}/tmp/*)
+	%x(rm -f #{workdir}/tmp/*.dat)
 	%x(rm -f #{workdir}/tmp/err/*)
 	%x(rm -f #{workdir}/tmp/out/*)
 end
@@ -51,19 +54,19 @@ def wait(interval=5)
 	puts "!!!---merging (after #{iteration} iterations [#{seconds} seconds])---!!!"
 end
 
-def find_substring(string="", prefix="")	
+def find_substring(string="", prefix="",channel="")	
 	string = string.gsub("#{prefix}/xs_", '');
-	string = string.gsub(".dat", '');
+	string = string.gsub("_#{channel}.dat", '');
 	return string;
 end
 
-def search_directory(path="",pattern=".dat")
+def search_directory(path="",pattern="",channel="")
 	# see: http://rosettacode.org/wiki/Walk_a_directory/Recursively
 	hashmap = Hash.new
 	Find.find(path) do |entry|
 		if File.file?(entry) and entry[pattern]
 			filepath = entry.to_s()
-			number   = find_substring(filepath,path)
+			number   = find_substring(filepath,path,channel)
 			lines    = IO.readlines(filepath)
 			first    = lines.first.gsub("\n", '');
 			hashmap[Float(number)] = first
@@ -74,10 +77,10 @@ def search_directory(path="",pattern=".dat")
 	return hashmap
 end
 
-def make_list(workdir="")	
+def make_list(workdir="", channel="",theory="")
 	files = Hash.new
-	files = search_directory("#{workdir}/tmp",".dat");
-	listfilename = "#{workdir}/xs_merged.list"
+	files = search_directory("#{workdir}/tmp","_#{channel}.dat",channel);
+	listfilename = "#{workdir}/xs_#{theory}_#{channel}_merged.list"
 	listfile = File.open(listfilename,'w')
 	files.each {|key,val|
 		listfile.puts "#{val}\n"
@@ -85,7 +88,7 @@ def make_list(workdir="")
 	listfile.close
 end
 
-def submitjob(jobname="", mKK="", workdir="")
+def submitjob(jobname="", mKK="", workdir="", channel="", theory="", nEvents=1000)
 	jobfile = File.open(jobname, 'w') { |f| 
 		f.puts "#!/bin/bash"
 		f.puts "echo   \"host = $HOSTNAME\""
@@ -101,23 +104,24 @@ def submitjob(jobname="", mKK="", workdir="")
 		f.puts "export PATH=$PATH:$LHAPDF/bin"
 		f.puts "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LHAPDF/lib"
 		f.puts "export LHAPATH=$LHAPDF/share/lhapdf"
-		f.puts "#{workdir}/KKxs #{mKK} #{workdir}/tmp/xs_#{mKK}.dat"
+		f.puts "#{workdir}/#{theory}xs #{mKK} #{workdir}/tmp/xs_#{mKK}_#{channel}.dat #{channel} #{nEvents}"
 	}
 	
 	%x(qsub -q S -e #{workdir}/tmp/err -o #{workdir}/tmp/out #{jobname})
 	puts "sent --> #{jobname}"
 end
 
+#=begin
 clean(workdir);
-
 (0..nMassPoints).each do |j|
-	mKK = j*dm+mKKmin
+	mKK = j*dm+mKKmin;
 	# puts "mKK = #{mKK}"
-	jobname = "#{workdir}/tmp/job_#{mKK}.sh"
-	submitjob(jobname, mKK.to_s(), workdir)
+	jobname = "#{workdir}/tmp/job_#{mKK}_#{channel}.sh";
+	submitjob(jobname, mKK.to_s(), workdir, channel, theory, nEvents);
 end
+wait(30);                    # wait 30 seconds
+#=end
 
-wait(10);           # wait 10 seconds
-make_list(workdir); # merge the xs values to one list
+make_list(workdir,channel,theory); # merge the xs values to one list
 
 Dir.chdir(thisdir); 

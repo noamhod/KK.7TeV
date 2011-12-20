@@ -2621,6 +2621,7 @@ void analysisSkeleton::fillTruth()
 		bool isTop      = false;
 		bool isZprime   = false;
 		bool isGraviton = false;
+		bool isKK       = false;
 		for(int mom=0 ; mom<(int)mc_parent_index->at(t).size() ; mom++) // has to come out of Z^0 / Z' / W / gamma
 		{
 			int imom = mc_parent_index->at(t)[mom];
@@ -2672,6 +2673,12 @@ void analysisSkeleton::fillTruth()
 				intermediate_index.push_back(imom);
 				break;
 			}
+			if(mc_pdgId->at(imom)==PDTKK)
+			{
+				isKK = true;
+				intermediate_index.push_back(imom);
+				break;
+			}
 			if(mc_pdgId->at(imom)*mc_pdgId->at(imom)==PDTMU*PDTMU  ||  mc_pdgId->at(imom)*mc_pdgId->at(imom)==PDTTAU*PDTTAU)
 			{
 				for(int mom1=0 ; mom1<(int)mc_parent_index->at(imom).size() ; mom1++)
@@ -2693,7 +2700,7 @@ void analysisSkeleton::fillTruth()
 				if(isZ||isW) break;
 			}
 		}
-		if(!isZ && !isGamma && !isW && !isChm && !isBot && !isTop && !isZprime && !isGraviton) 
+		if(!isZ && !isGamma && !isW && !isChm && !isBot && !isTop && !isZprime && !isGraviton && !isKK) 
 		{
 			// for(int mom=0 ; mom<(int)mc_parent_index->at(t).size() ; mom++)
 			// {

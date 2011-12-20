@@ -4,7 +4,8 @@ require 'MCQSUB'
 
 mcname = 'ZZ_Herwig'
 insets  = [
-			mcname+'/mc11_7TeV.105986.ZZ_Herwig.merge.NTUP_SMWZ.e825_s1310_s1300_r2730_r2700_p716/'
+			# mcname+'/mc11_7TeV.105986.ZZ_Herwig.merge.NTUP_SMWZ.e825_s1310_s1300_r2730_r2700_p716/'
+			mcname+'/mc11_7TeV.105986.ZZ_Herwig.merge.NTUP_SMWZ.e825_s1310_s1300_r2730_r2700_p716_tid525340_00/'
 		  ]
 outlist=[]
 runnumbers = Array.new
@@ -18,7 +19,8 @@ x.set_mcname(mcname)
 x.set_maxlistsize(4)
 x.set_nmcjobs(0)
 x.set_rootdir("/srv01/tau/hod/root528c/root")
-x.set_sourcedir("/storage/t3_data/hod/2011/MC11b")
+#x.set_sourcedir("/storage/t3_data/hod/2011/MC11b")
+x.set_sourcedir("/tmp/hod")
 x.set_targetdir("/srv01/tau/hod/z0analysis-tests/z0analysis-r170/data/tmp")
 x.set_macrodir("/srv01/tau/hod/z0analysis-tests/z0analysis-r170/run/tmp")
 x.set_jobdir("/srv01/tau/hod/z0analysis-tests/z0analysis-r170/scripts/tmp")

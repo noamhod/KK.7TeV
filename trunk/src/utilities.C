@@ -130,9 +130,43 @@ string utilities::pickMCinputSampe()
 
 	mcSamplesMap.insert( make_pair( 800,"DYmumu_75M120_2011" ) );
 
-	mcSamplesMap.insert( make_pair( 900,"Gmm_01_1750" ) );	
+	mcSamplesMap.insert( make_pair( 900,"Gmm_01_1750" ) );
 	mcSamplesMap.insert( make_pair( 901,"Gmm_01_2000" ) );	
-	mcSamplesMap.insert( make_pair( 902,"Gmm_01_2250" ) );	
+	mcSamplesMap.insert( make_pair( 902,"Gmm_01_2250" ) );
+
+	mcSamplesMap.insert( make_pair( 1000,"Pythia6_DYmumu_75M120" ) );
+	mcSamplesMap.insert( make_pair( 1001,"Pythia6_DYmumu_120M250" ) );
+	mcSamplesMap.insert( make_pair( 1002,"Pythia6_DYmumu_250M400" ) );
+	mcSamplesMap.insert( make_pair( 1003,"Pythia6_DYmumu_400M600" ) );
+	mcSamplesMap.insert( make_pair( 1004,"Pythia6_DYmumu_600M800" ) );
+	mcSamplesMap.insert( make_pair( 1005,"Pythia6_DYmumu_800M1000" ) );
+	mcSamplesMap.insert( make_pair( 1006,"Pythia6_DYmumu_1000M1250" ) );
+	mcSamplesMap.insert( make_pair( 1007,"Pythia6_DYmumu_1250M1500" ) );
+	mcSamplesMap.insert( make_pair( 1008,"Pythia6_DYmumu_1500M1750" ) );
+	mcSamplesMap.insert( make_pair( 1009,"Pythia6_DYmumu_1750M2000" ) );
+	mcSamplesMap.insert( make_pair( 1010,"Pythia6_DYmumu_2000M2250" ) );
+	mcSamplesMap.insert( make_pair( 1011,"Pythia6_DYmumu_2250M2500" ) );
+	mcSamplesMap.insert( make_pair( 1012,"Pythia6_DYmumu_2500M2750" ) );
+	mcSamplesMap.insert( make_pair( 1013,"Pythia6_DYmumu_2750M3000" ) );
+	mcSamplesMap.insert( make_pair( 1014,"Pythia6_DYmumu_M3000" ) );
+
+	mcSamplesMap.insert( make_pair( 1100,"Pythia8_ExtraDimsTEV_m2000_mumu_120M450" ) );
+	mcSamplesMap.insert( make_pair( 1101,"Pythia8_ExtraDimsTEV_m2000_mumu_450M850" ) );
+	mcSamplesMap.insert( make_pair( 1102,"Pythia8_ExtraDimsTEV_m2000_mumu_850M1300" ) );
+	mcSamplesMap.insert( make_pair( 1103,"Pythia8_ExtraDimsTEV_m2000_mumu_1300M1800" ) );
+	mcSamplesMap.insert( make_pair( 1104,"Pythia8_ExtraDimsTEV_m2000_mumu_1800M2300" ) );
+	mcSamplesMap.insert( make_pair( 1105,"Pythia8_ExtraDimsTEV_m2000_mumu_2300M2800" ) );
+	mcSamplesMap.insert( make_pair( 1106,"Pythia8_ExtraDimsTEV_m2000_mumu_2800M3300" ) );
+	mcSamplesMap.insert( make_pair( 1107,"Pythia8_ExtraDimsTEV_m2000_mumu_M3300" ) );
+	
+	mcSamplesMap.insert( make_pair( 1200,"Pythia8_ZprimeSSM_m2000_mumu_120M450" ) );
+	mcSamplesMap.insert( make_pair( 1201,"Pythia8_ZprimeSSM_m2000_mumu_450M850" ) );
+	mcSamplesMap.insert( make_pair( 1202,"Pythia8_ZprimeSSM_m2000_mumu_850M1300" ) );
+	mcSamplesMap.insert( make_pair( 1203,"Pythia8_ZprimeSSM_m2000_mumu_1300M1800" ) );
+	mcSamplesMap.insert( make_pair( 1204,"Pythia8_ZprimeSSM_m2000_mumu_1800M2300" ) );
+	mcSamplesMap.insert( make_pair( 1205,"Pythia8_ZprimeSSM_m2000_mumu_2300M2800" ) );
+	mcSamplesMap.insert( make_pair( 1206,"Pythia8_ZprimeSSM_m2000_mumu_2800M3300" ) );
+	mcSamplesMap.insert( make_pair( 1207,"Pythia8_ZprimeSSM_m2000_mumu_M3300" ) );
 	
 	cout << "PICK AN MC CHANNEL FORM THE LIST:" << endl;
 	for(TMapis::iterator it=mcSamplesMap.begin() ; it!=mcSamplesMap.end() ; it++)

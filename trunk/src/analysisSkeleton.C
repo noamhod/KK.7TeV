@@ -2783,6 +2783,8 @@ void analysisSkeleton::fillTruth()
 		truth_all_partons_mc_charge->push_back( mc_charge->at(q) );
 	}
 	
+	
+	/*
 	if(sMCsampleName.find("DYmumu")!=string::npos  ||  sMCsampleName.find("Zmumu")!=string::npos)
 	{
 		// BSM mass range
@@ -2811,6 +2813,7 @@ void analysisSkeleton::fillTruth()
 			truth_all_vZPwgt->push_back(ZPwgt);
 		}
 	}
+	*/
 	
 	// truth_all_partons_mc_m->push_back( mc_m->at(2)*MeV2GeV );
 	// truth_all_partons_mc_pt->push_back( mc_pt->at(2)*MeV2GeV );

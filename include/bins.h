@@ -45,9 +45,9 @@ static const Double_t logfullimassmin   = 70.;
 static const Double_t logfullimassmax   = 3000.;
 static Double_t logfullimassbins[nlogfullimassbins+1];
 
-static const Int_t    nloglimitimassbins = 100;//56;
-static const Double_t loglimitimassmin   = 0.07;
-static const Double_t loglimitimassmax   = 6.;//3.;
+static const Int_t    nloglimitimassbins = 56;//70;//56;
+static const Double_t loglimitimassmin   = 0.07;//0.07;
+static const Double_t loglimitimassmax   = 3.0;//5.2;//3.;
 static Double_t loglimitimassbins[nloglimitimassbins+1];
 
 static const Int_t    nlinlimitimassbins = 50;

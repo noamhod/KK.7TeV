@@ -3,7 +3,7 @@
 # http://lowfatlinux.com/linux-sort.html
 # http://stackoverflow.com/questions/2232/calling-bash-commands-from-ruby
 
-tag = "p756"
+tag = "p716"
 type = "NTUP_SMWZ"
 campaign = "mc11_7TeV"
 

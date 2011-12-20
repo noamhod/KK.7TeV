@@ -216,8 +216,8 @@ void analysis::setEventVariables()
 	/////////////////////////////////////////////////////////////////////////////////
 	// pileup reweighting, needs to come after setting the lbn //////////////////////
 	analysisSkeleton::pileup_weight       = 1.;
-	analysisSkeleton::randomized_decision = 999; // obsolete
-	analysisSkeleton::lumi_pileup_weight  = 999; // obsolete
+	analysisSkeleton::randomized_decision = 1.; // obsolete
+	analysisSkeleton::lumi_pileup_weight  = 1.; // obsolete
 	bool isIntime = false; // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ??????????
 	if(m_isMC)
 	{

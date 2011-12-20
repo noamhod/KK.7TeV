@@ -118,9 +118,10 @@ void acctimeseff()
 	
 	_INFO("BSM averaged acceptance = "+_s(average)+" +- "+_s(sigma));
 	
-	TF1* accMM= new TF1("accMM","pol1",minPoleMass,maxPoleMass);
-	// accMM->SetParameters(0.455201,-0.0114039);
-	accMM->SetParameters(0.4,-0.0114039);
+	// TF1* accMM= new TF1("accMM","pol1",minPoleMass,maxPoleMass);
+	// accMM->SetParameters(0.4,-0.0114039);
+	TF1* accMM = new TF1("accMM","pol6",minPoleMass,maxPoleMass/* 0.07,3.07 */);
+    accMM->SetParameters(0.248482,0.613077,-0.960227,0.774202,-0.339321,0.0756178,-0.00670578);
 	accMM->SetLineColor(kRed);
 	accMM->SetLineWidth(1);
 	

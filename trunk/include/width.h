@@ -16,8 +16,16 @@ using namespace couplings;
 namespace width
 {
 
+static const double mKKinit = 2000.; // GeV
+static const double mZPinit = 2000.; // GeV
+
 static double mKK = 2000.; // GeV
 static double mZP = 2000.; // GeV
+
+void setKKmass(double m) { mKK = m; }
+void setZPmass(double m) { mZP = m; }
+void resetKKmass() { mKK = mKKinit; }
+void resetZPmass() { mZP = mZPinit; }
 
 inline double wGKK(unsigned int id, unsigned int mode)
 {

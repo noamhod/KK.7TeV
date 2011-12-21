@@ -9,7 +9,8 @@ double Sum(TH1* h, bool addUunderFlow=false, bool addOverFlow=false)
 		I += h->GetBinContent(i);
 	}
 	if(addUunderFlow) I+=h->GetBinContent(0);
-	if(addOverFlow)   I+=h->GetBinContent(h->GetNbinsX()+1);
+	//if(addOverFlow)   I+=h->GetBinContent(h->GetNbinsX()+1);
+	cout << "h->GetBinContent(" << h->GetNbinsX()+1 << ") = " << h->GetBinContent(h->GetNbinsX()+1) << endl;
 	return I;
 }
 
@@ -225,6 +226,17 @@ void saveas(TCanvas* c, TString name)
 	c->SaveAs(name+".eps");
 	c->SaveAs(name+".C");
 	c->SaveAs(name+".root");
+}
+
+void savemultipdf(TCanvas* c, TString fullpath, unsigned int state)
+{
+	switch(state)
+	{
+		case 0: fullpath += "("; break;
+		case 2: fullpath += ")"; break;
+		default: break;
+	}
+	c->SaveAs(fullpath);
 }
 
 #endif

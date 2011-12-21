@@ -20,6 +20,8 @@ namespace helicity
 {
 
 static const unsigned int nModes  = 10; // 100;
+static const double    min_weight = 0.;
+static const double    max_weight = 1.e+5;
 static bool dokFactors = true;
 
 void setkFactors(bool dokF)
@@ -230,33 +232,52 @@ inline double hA2KKnoSM(double cosTheta, double s, unsigned int idIn, unsigned i
 
 
 //////////////////////////////////////////////////////////
+inline void validateinput(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
+{
+	if(s<0.)              { _ERROR("s<0., exitting now.");              exit(-1); }
+	if(fabs(cosTheta)>1.) { _ERROR("fabs(cosTheta)>1., exitting now."); exit(-1); }
+	if(idIn==0)           { _ERROR("idIn<0, exitting now.");            exit(-1); }
+	if(idOut==0)          { _ERROR("idOut<0, exitting now.");           exit(-1); }
+}
+inline void validateoutput(double N, double D)
+{
+	double R = N/D;
+	if(std::isinf(R)) { _ERROR("value is infinity -> "+_s(N)+"/"+_s(D)+", exitting now.");     exit(-1); }
+	if(std::isnan(R)) { _ERROR("value is not a number -> "+_s(N)+"/"+_s(D)+", exitting now."); exit(-1); }
+	if(R<=min_weight) { _WARNING("value too small or negative -> "+_s(N)+"/"+_s(D)); }
+	if(R>max_weight)  { _WARNING("value is too large -> "+_s(N)+"/"+_s(D)); }
+}
 inline double weightKK(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
 {
-	if(s<0.)              return 0.;
-	if(fabs(cosTheta)>1.) return 0.;
-	double R = hA2KK(cosTheta,s,idIn,idOut)/hA2SM(cosTheta,s,idIn,idOut);
-	return R;
+	validateinput(cosTheta,s,idIn,idOut);
+	double N = hA2KK(cosTheta,s,idIn,idOut);
+	double D = hA2SM(cosTheta,s,idIn,idOut);
+	validateoutput(N,D);
+	return N/D;
 }
 inline double weightKKnoSM(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
 {
-	if(s<0.)              return 0.;
-	if(fabs(cosTheta)>1.) return 0.;
-	double R = hA2KKnoSM(cosTheta,s,idIn,idOut)/hA2SM(cosTheta,s,idIn,idOut);
-	return R;
+	validateinput(cosTheta,s,idIn,idOut);
+	double N = hA2KKnoSM(cosTheta,s,idIn,idOut);
+	double D = hA2SM(cosTheta,s,idIn,idOut);
+	validateoutput(N,D);
+	return N/D;
 }
 inline double weightZP(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
 {
-	if(s<0.)              return 0.;
-	if(fabs(cosTheta)>1.) return 0.;
-	double R = hA2ZP(cosTheta,s,idIn,idOut)/hA2SM(cosTheta,s,idIn,idOut);
-	return R;
+	validateinput(cosTheta,s,idIn,idOut);
+	double N = hA2ZP(cosTheta,s,idIn,idOut);
+	double D = hA2SM(cosTheta,s,idIn,idOut);
+	validateoutput(N,D);
+	return N/D;
 }
 inline double weightZPnoSM(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
 {
-	if(s<0.)              return 0.;
-	if(fabs(cosTheta)>1.) return 0.;
-	double R = hA2ZPnoSM(cosTheta,s,idIn,idOut)/hA2SM(cosTheta,s,idIn,idOut);
-	return R;
+	validateinput(cosTheta,s,idIn,idOut);
+	double N = hA2ZPnoSM(cosTheta,s,idIn,idOut);
+	double D = hA2SM(cosTheta,s,idIn,idOut);
+	validateoutput(N,D);
+	return N/D;
 }
 
 
@@ -264,7 +285,7 @@ inline double weightZPnoSM(double cosTheta, double s, unsigned int idIn, unsigne
 inline double hA2SMsumQ(double cosTheta, double s, unsigned int idOut)
 {
 	double A2 = 0.;
-	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on the incoming flavors
+	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on the incoming flavors ==> meaningless without PDFs
 	{
 		unsigned int idIn = it->first;
 		A2 += hA2SM(s,cosTheta,idIn,idOut);
@@ -274,7 +295,7 @@ inline double hA2SMsumQ(double cosTheta, double s, unsigned int idOut)
 inline double hA2ZPsumQ(double cosTheta, double s, unsigned int idOut)
 {
 	double A2 = 0.;
-	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on the incoming flavors
+	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on the incoming flavors ==> meaningless without PDFs
 	{
 		unsigned int idIn = it->first;
 		A2 += hA2ZP(s,cosTheta,idIn,idOut);
@@ -284,7 +305,7 @@ inline double hA2ZPsumQ(double cosTheta, double s, unsigned int idOut)
 inline double hA2ZPnoSMsumQ(double cosTheta, double s, unsigned int idOut)
 {
 	double A2 = 0.;
-	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on the incoming flavors
+	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on the incoming flavors ==> meaningless without PDFs
 	{
 		unsigned int idIn = it->first;
 		A2 += hA2ZPnoSM(s,cosTheta,idIn,idOut);
@@ -294,7 +315,7 @@ inline double hA2ZPnoSMsumQ(double cosTheta, double s, unsigned int idOut)
 inline double hA2KKsumQ(double cosTheta, double s, unsigned int idOut)
 {
 	double A2 = 0.;
-	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on the incoming flavors
+	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on the incoming flavors ==> meaningless without PDFs
 	{
 		unsigned int idIn = it->first;
 		A2 += hA2KK(s,cosTheta,idIn,idOut);
@@ -304,7 +325,7 @@ inline double hA2KKsumQ(double cosTheta, double s, unsigned int idOut)
 inline double hA2KKnoSMsumQ(double cosTheta, double s, unsigned int idOut)
 {
 	double A2 = 0.;
-	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on the incoming flavors
+	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on the incoming flavors ==> meaningless without PDFs
 	{
 		unsigned int idIn = it->first;
 		A2 += hA2KKnoSM(s,cosTheta,idIn,idOut);

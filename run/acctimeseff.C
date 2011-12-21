@@ -101,6 +101,8 @@ void acctimeseff()
 		Double_t sum_rec = Sum(hRec_chop,false,true); // add also overflow
 		Double_t sum_tru = Sum(hTru,true,true); // add also underflow and overflow
 		
+		_INFO("sum_rec="+_s(sum_rec)+", sum_tru="+_s(sum_tru));
+		
 		actimesef[t]    = (sum_tru>0.) ? sum_rec/sum_tru : -1.;
 		actimeseferr[t] = (sum_tru>0.) ? binomialError(sum_rec,sum_tru) : 0.;
 		bsmmass[t]      = 0.04*t + 0.13;// [TeV/c^2];
@@ -110,7 +112,7 @@ void acctimeseff()
 		hActimesEf->SetBinError(bin,actimeseferr[t]);
 		
 		TString name = (TString)hRec->GetName();
-		//savecnv(name, hRec, hRec_chop, hTru);
+		savecnv(name, hRec, hRec_chop, hTru);
 	}
 	
 	double sigma   = 0.;

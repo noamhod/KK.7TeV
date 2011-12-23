@@ -22,11 +22,18 @@ namespace helicity
 static const unsigned int nModes  = 10; // 100;
 static const double    min_weight = 0.;
 static const double    max_weight = 1.e+5;
-static bool dokFactors = true;
+static bool dokFactors = false;
 
 void setkFactors(bool dokF)
 {
 	dokFactors = dokF;
+}
+
+inline bool isnaninf(double x)
+{
+	if(std::isinf(x)) { _WARNING("value is infinity");     return true; }
+	if(std::isnan(x)) { _WARNING("value is not a number"); return true; }
+	return false;
 }
 
 //////////////////////////////////////////////////////////
@@ -50,7 +57,10 @@ inline dcomplex hASM(double s, double cosTheta, unsigned int idIn, unsigned int 
 	if(fabs(cosTheta)>1.) return A;
 	double mass = sqrt(s);
 	double sqrtkF = (dokFactors) ? sqrt(ElectroWeak(mass,"NNLO/LO*")) : 1.;
-	return( sqrtkF*(hAG0(s,idIn,idOut) + hAZ0(s,idIn,idOut,hIn,hOut))*sqrt(1.+4.*hIn*hOut*cosTheta) );
+	if(isnaninf(sqrtkF)) { _WARNING("k-factor is nan/inf"); }
+	A = sqrtkF*(hAG0(s,idIn,idOut) + hAZ0(s,idIn,idOut,hIn,hOut))*sqrt(1.+4.*hIn*hOut*cosTheta);
+	if(isnaninf(real(A*conj(A)))) { _WARNING("|hASM|^2 is nan/inf"); }
+	return A;
 }
 
 

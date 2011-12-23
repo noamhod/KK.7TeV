@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE objects PUBLIC "" "montecarlo.dtd" []>
+<objects>
+<!--
+  The montecarlo names and values
+-->
+  <obj NAME="DYmumu_75M120" FLAG="on">
+    <number>150000</number>
+    <internalnumber>1</internalnumber>
+    <isbinned>true</isbinned>
+    <dir>/data/hod/D3PDfin/rel16/DYmumu/muid/</dir>
+    <nfiles>2</nfiles>
+    <files>
+      <file>mcLocalControl_DYmumu_75M120.1.root</file>
+      <file>mcLocalControl_DYmumu_75M120.2.root</file>
+    </files>
+    <nevents>19996</nevents>
+    <crosssection>817.05</crosssection>
+    <crosssectionerr>0.05</crosssectionerr>
+    <br>1</br>
+    <geneff>1</geneff>
+    <nkfactors>2</nkfactors>
+    <kfactors>
+      <kfactor MINRANGE="0." MAXRANGE="100.">1.25</kfactor>
+      <kfactor MINRANGE="100." MAXRANGE="150.">1.25</kfactor>
+    </kfactors>
+    <mcweight>1</mcweight>
+    <pileup>1</pileup>
+    <smearing>1</smearing>
+    <color>1</color>
+    <linestyle>1</linestyle>
+    <fillstyle>1</fillstyle>
+    <description>
+      The values are in pb
+    </description>
+  </obj>
+
+</objects>

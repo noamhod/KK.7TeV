@@ -84,7 +84,9 @@ inline dcomplex hAZP(double s, double cosTheta, unsigned int idIn, unsigned int 
 	{
 		w += wZP(it->first);
 	} */
-	double w = wTotZP();
+	
+	// double w = wTotZP();
+	double w = wTotZPsimple();
 	A += hAZP0(s,cosTheta,w,idIn,idOut,hIn,hOut);
 	return A;
 }
@@ -96,7 +98,9 @@ inline dcomplex hAZPnoSM(double s, double cosTheta, unsigned int idIn, unsigned 
 	{
 		w += wZP(it->first);
 	} */
-	double w = wTotZP();
+	
+	// double w = wTotZP();
+	double w = wTotZPsimple();
 	A += hAZP0(s,cosTheta,w,idIn,idOut,hIn,hOut);
 	return A;
 }

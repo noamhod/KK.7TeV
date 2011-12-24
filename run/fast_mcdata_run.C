@@ -22,15 +22,18 @@ using namespace kFactors;
 // selectors //////////////////////////
 ///////////////////////////////////////
 TString ntupledir      = "/srv01/tau/hod/z0analysis-tests/z0analysis-r170/data"; // "/data/hod/2011/NTUPLE";
-bool doData            = true;
+bool doData            = false;
 bool doDYtautau        = false;
 bool fastDYmumu        = true;
 bool largeDYmumu       = false;
 bool drawGmm           = false;
 bool doFullKKtemplates = false;
-bool doFullZPtemplates = false;
+bool doFullZPtemplates = true;
 Int_t printmod         = 5000;
 Bool_t dolog           = true;
+bool dopileup          = true;
+bool doEWkfactor       = true;
+bool doQCDkfactor      = true;
 ///////////////////////////////////////
 
 double mZprimeMin = 500.;
@@ -197,7 +200,6 @@ float pileup_weight;
 float EW_kfactor_weight;
 float QCD_kfactor_weight;
 float mcevent_weight;
-float total_weight;
 
 int vxp_n;
 vector<float>* E;
@@ -233,40 +235,6 @@ float EtaSum;
 ////////////////////////////////
 
 
-TH1D* stitch(vector<TH1D*>& vh, TString name="", TString titles="")
-{
-	const unsigned int vhsize   = vh.size();
-	const unsigned int nbins    = vh[0]->GetNbinsX();
-	const unsigned int nlogbins = vhsize*nbins;
-	
-	Double_t xlogbins[nlogbins+1];
-	unsigned int j = 0;
-	xlogbins[j] = vh[0]->GetBinLowEdge(1);
-	for(unsigned int i=0 ; i<vhsize ; i++)
-	{
-		Double_t offset = i*(vh[0]->GetBinLowEdge(nbins)+vh[0]->GetBinWidth(nbins));
-		for(unsigned int b=1 ; b<=nbins ; b++)
-		{
-			j++;
-			xlogbins[j] = vh[0]->GetBinLowEdge(b)+vh[0]->GetBinWidth(b) + offset;
-		}
-	}
-	
-	TH1D* hStitched = new TH1D(name, titles, nlogbins, xlogbins);
-	
-	Int_t noffsetbins = vh[0]->GetNbinsX();
-	for(unsigned int i=0 ; i<vhsize ; i++)
-	{
-		for(int b=1 ; b<=vh[i]->GetNbinsX() ; b++)
-		{
-			Int_t bin = b + (Int_t)(i*noffsetbins);
-			hStitched->SetBinContent(bin, vh[i]->GetBinContent(b));
-		}
-	}
-	return hStitched;
-}
-
-
 ///////////// admin /////////////
 void graphics(TH1* th1,
 			  Color_t fillcolor=-1, Int_t fillstyle=-1,
@@ -298,6 +266,8 @@ void graphics(TH1* th1,
 
 void text()
 {
+	_DEBUG("text");
+
 	pvtxt_atlas = new TPaveText(0.4032663,0.75,0.5678392,0.85,"brNDC"); // 0.2110553,0.7097902,0.3756281,0.8041958 -> for 2d
 	//pvtxt_atlas->SetFillColor(0);
 	pvtxt_atlas->SetFillStyle(4000); //will be transparent
@@ -322,41 +292,70 @@ void text()
 		int order    = it->first;
 		TString name = it->second;
 		if(order>=20) continue; // only BGs !
-		
+		if(name=="DYtautau") continue; // DYtautau is part of DYmumu
 		leg->AddEntry(h1Map["hMass"+name],grpx[name]->label,"f");
 	}
-	
-	// leg->AddEntry(h1Map["hMassData"],"Data","lep");
-	// leg->AddEntry(h1Map["hMassDYmumu"],"DYmumu","f");
-	// leg->AddEntry(h1Map["hMassDiboson"],"Diboson","f");
-	// if(drawGmm) leg->AddEntry(h1Map["hMassGmm_01_1750"],"1750 GeV G*","l");
-	// if(drawGmm) leg->AddEntry(h1Map["hMassGmm_01_2000"],"2000 GeV G*","l");
-	// if(drawGmm) leg->AddEntry(h1Map["hMassGmm_01_2250"],"2250 GeV G*","l");
-	// leg->AddEntry(h1Map["hMassZprime_SSM1000"],"Z'_{SSM} 1.00 TeV","l");
-	// leg->AddEntry(h1Map["hMassZprime_SSM1500"],"Z'_{SSM} 1.50 TeV","l");
-	// leg->AddEntry(h1Map["hMassZprime_SSM1750"],"Z'_{SSM} 1.75 TeV","l");
-	// leg->AddEntry(h1Map["hMassZprime_SSM2000"],"Z'_{SSM} 2.00 TeV","l");
 }
 
-void templateText(TString tsMCname, TString tsMClegEntry)
+TString getTemplateName(TString tsZPname, TString newName="")
 {
+	_DEBUG("getTemplateName");
+	
+	TString name = tsZPname;
+	if(newName=="KK") name.ReplaceAll("Zprime_SSM",10,"KK",2);
+	name.Append("_template");
+	return name;
+}
+
+TString getTemplateBareTitle(TString tsZPname)
+{
+	_DEBUG("getTemplateBareTitle");
+	
+	TString name = tsZPname;
+	name.ReplaceAll("Zprime_SSM",10,"",0);
+	return name;
+}
+
+void templateText(TString tsMCname, bool isTruth, Bool_t isTmplate=false)
+{
+	_DEBUG("templateText");
+	
 	if(leg_template==NULL)
 	{
-		leg_template = new TLegend(0.6,0.70,0.7919463,0.87,NULL,"brNDC");
+		leg_template = new TLegend(0.60,0.70,0.85,0.87,NULL,"brNDC");
 		leg_template->SetFillStyle(4000); //will be transparent
 		leg_template->SetFillColor(0);
 		leg_template->SetTextFont(42);
 	}
 	else leg_template->Clear();
-	if(!tsMCname.Contains("KK"))
+	
+	TString ZPname         = tsMCname;
+	TString KKtemplateName = getTemplateName(tsMCname,"KK");
+	TString ZPtemplateName = getTemplateName(tsMCname);
+	TString massNmae = getTemplateBareTitle(tsMCname);
+	
+	TString legTitle = "";
+	
+	legTitle = "DY "+(isTruth)?"tru":"rec";
+	leg_template->AddEntry(h1Map["hMassDYmumu_truth"],legTitle,"f");
+	
+	if(isTmplate)
 	{
-		leg_template->AddEntry(h1Map[tsMCname+"_template"],tsMClegEntry+" Template","f");
-		leg_template->AddEntry(h1Map[tsMCname],tsMClegEntry,"l");
+		legTitle = "Z'_{SSM} "+massNmae+" GeV Pythia6 ";
+		legTitle += (isTruth)?"tru":"rec";
+		leg_template->AddEntry(h1Map["hMass"+ZPname],legTitle,"f");         // doesn't matter if it is pT or mass truth sice they have the same graphic properties
+		legTitle = "Z'_{SSM} "+massNmae+" GeV Template ";
+		legTitle += (isTruth)?"tru":"rec";
+		leg_template->AddEntry(h1Map["hMass"+ZPtemplateName],legTitle,"l"); // doesn't matter if it is pT or mass truth sice they have the same graphic properties
+		legTitle = "#gamma_{KK}/Z_{KK} "+massNmae+" GeV Template ";
+		legTitle += (isTruth)?"tru":"rec";
+		leg_template->AddEntry(h1Map["hMass"+KKtemplateName],legTitle,"l"); // doesn't matter if it is pT or mass truth sice they have the same graphic properties
 	}
 	else
 	{
-		leg_template->AddEntry(h1Map[tsMCname],tsMClegEntry+" Template","l");
-		leg_template->AddEntry(h1Map["hMassDYmumu"],"DY","f");
+		legTitle = "Z'_{SSM} "+massNmae+" GeV Pythia8 ";
+		legTitle += (isTruth)?"tru":"rec";
+		leg_template->AddEntry(h1Map[tsMCname],legTitle,"f");
 	}
 }
 
@@ -467,9 +466,10 @@ void drawon(TString existing_oName, TObject* tobj, TString drawopt="", Int_t pad
 {
 	_DEBUG("drawon");
 	_DEBUG("existing_oName = "+(string)existing_oName);
-
+	
 	if(padNumber<1) cnvMap[existing_oName]->cd();
 	else            cnvMap[existing_oName]->cd(padNumber);
+	
 	if(drawopt=="") tobj->Draw("SAMES");
 	else            tobj->Draw(drawopt+" SAMES");
 	cnvMap[existing_oName]->RedrawAxis();
@@ -501,23 +501,44 @@ void save(TString oDir)
 	_DEBUG("save");
 
 	_INFO("save all canvases");
+	TString pdfName = oDir+"/mcdata_histograms";
+	if(!dopileup)     pdfName += "_nopileup";
+	if(!doEWkfactor)  pdfName += "_noEWkFactor";
+	if(!doQCDkfactor) pdfName += "_noQCDkFactor";
+	pdfName += ".pdf";
+	unsigned int mapcount = 0;
+	unsigned int mapsize  = cnvMap.size();
 	for(TMapTSP2TCNV::iterator it=cnvMap.begin() ; it!=cnvMap.end() ; ++it)
 	{
+		mapcount++;
 		TString pName = oDir+"/mcdata_"+it->first;
+		if(!dopileup)     pName += "_nopileup";
+		if(!doEWkfactor)  pName += "_noEWkFactor";
+		if(!doQCDkfactor) pName += "_noQCDkFactor";
 		it->second->SaveAs(pName+".png");
 		it->second->SaveAs(pName+".eps");
 		it->second->SaveAs(pName+".pdf");
 		it->second->SaveAs(pName+".root");
 		it->second->SaveAs(pName+".C");
+		
+		pName = pdfName;
+		if(it==cnvMap.begin()) pName = pdfName+"(";
+		if(mapcount==mapsize)  pName = pdfName+")";
+		it->second->SetTitle(it->first);
+		it->second->SaveAs(pName);
+		it->second->SetTitle("");
 	}
 	
 	_INFO("save all histograms (to a single .root file)");
-	TString pName = oDir+"/mcdata_histograms.root";
-
+	TString pName = oDir+"/mcdata_histograms";
+	if(!dopileup)     pName += "_nopileup";
+	if(!doEWkfactor)  pName += "_noEWkFactor";
+	if(!doQCDkfactor) pName += "_noQCDkFactor";
+	pName += ".root";
 	TFile* f = new TFile(pName,"RECREATE");
 	f->cd();
-	for(TMapTSP2TH1::iterator it=h1Map.begin() ; it!=h1Map.end() ; ++it) {it->second->Write();}
-	for(TMapTSP2TH2::iterator it=h2Map.begin() ; it!=h2Map.end() ; ++it) {it->second->Write();}
+	for(TMapTSP2TH1::iterator it=h1Map.begin() ; it!=h1Map.end() ; ++it) {_INFO("XXX: "+(string)it->first); it->second->Write();}
+	for(TMapTSP2TH2::iterator it=h2Map.begin() ; it!=h2Map.end() ; ++it) {_INFO("XXX: "+(string)it->first); it->second->Write();}
 	f->Write();
 	f->Close();
 	delete f;
@@ -542,6 +563,29 @@ void setMCtree(TString fPath, TString name, Double_t N, Double_t sigma)
 	_DEBUG("setMCtree");
 	
 	file = new TFile(fPath,"READ");
+	
+	/*
+	if(name=="mcLocalControl_Zmumu")
+	{
+		TFile* fZmumu = new TFile(ntupledir+"/mcLocalControl_Zmumu.root", "READ");
+		TEventList* elist;
+		TTree* ztree = (TTree*)fZmumu->Get("truth/truth_tree");
+		ztree->SetEventList(0);
+		ztree->Draw(">>elist","truth_all_Mhat<=250.");
+		elist = (TEventList*)gDirectory->Get("elist");
+		Double_t Ntru = elist->GetN();
+		ztree->SetEventList(elist);
+		_INFO("Ntru(m<=250 GeV) = "+_s(Ntru)+", Ninput="+_s(N));
+		if(N!=Ntru)
+		{
+			_WARNING("setting N to N="+_s(Ntru)+" to get the correct luminosity");
+			N = Ntru;
+		}
+		
+		treMap.insert( make_pair(name, (TTree*)ztree->Clone("")) );
+	}
+	else treMap.insert( make_pair(name, (TTree*)file->Get("truth/truth_tree")->Clone("")) );
+	*/
 	treMap.insert( make_pair(name, (TTree*)file->Get("truth/truth_tree")->Clone("")) );
 	flatLumiWgtMap.insert( make_pair(name, luminosity/(N/sigma)) );
 	mcNeventsMap.insert( make_pair(name, N) );
@@ -578,7 +622,7 @@ void samples()
 	grpx_ordered.insert( make_pair(grpx["DYmumu"]->order,"DYmumu") );
 	grpx.insert( make_pair("Diboson",  new GRPX(proccount(counter),"Diboson",     kOrange-4,-1,  kBlack,1,1,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Diboson"]->order,"Diboson") );
-	grpx.insert( make_pair("TTbar",    new GRPX(proccount(counter),"t#bar t",     kRed+1,-1,     kBlack,1,1,  -1,-1,-1)));
+	grpx.insert( make_pair("TTbar",    new GRPX(proccount(counter),"t#bar{t}",     kRed+1,-1,     kBlack,1,1,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["TTbar"]->order,"TTbar") );
 	if(doDYtautau)
 	{
@@ -591,59 +635,59 @@ void samples()
 	grpx_ordered.insert( make_pair(grpx["Data"]->order,"Data") );
 	
 	counter = 100;
-	grpx.insert( make_pair("Zprime_SSM500",  new GRPX(counter,"500 GeV Z'_{SSM}",  -1,-1,    kAzure+0,1,2,  -1,-1,-1)));
+	grpx.insert( make_pair("Zprime_SSM500",  new GRPX(counter,"500 GeV Z'_{SSM}",  kAzure+0,-1,    kBlack,1,1,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Zprime_SSM500"]->order,"Zprime_SSM500") );
-	grpx.insert( make_pair("Zprime_SSM750",  new GRPX(proccount(counter),"750 GeV Z'_{SSM}",  -1,-1,  kAzure-2,1,2,  -1,-1,-1)));
+	grpx.insert( make_pair("Zprime_SSM750",  new GRPX(proccount(counter),"750 GeV Z'_{SSM}",  kAzure-2,-1,  kBlack,1,1,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Zprime_SSM750"]->order,"Zprime_SSM750") );
-	grpx.insert( make_pair("Zprime_SSM1000",  new GRPX(proccount(counter),"1000 GeV Z'_{SSM}",  -1,-1,  kAzure-2,1,2,  -1,-1,-1)));
+	grpx.insert( make_pair("Zprime_SSM1000",  new GRPX(proccount(counter),"1000 GeV Z'_{SSM}",  kAzure-2,-1,  kBlack,1,1,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Zprime_SSM1000"]->order,"Zprime_SSM1000") );
-	grpx.insert( make_pair("Zprime_SSM1500",  new GRPX(proccount(counter),"1500 GeV Z'_{SSM}",  -1,-1,  kAzure-2,1,2,  -1,-1,-1)));
+	grpx.insert( make_pair("Zprime_SSM1500",  new GRPX(proccount(counter),"1500 GeV Z'_{SSM}",  kAzure-2,-1,  kBlack,1,1,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Zprime_SSM1500"]->order,"Zprime_SSM1500") );
-	grpx.insert( make_pair("Zprime_SSM1750",  new GRPX(proccount(counter),"1750 GeV Z'_{SSM}",  -1,-1,  kAzure-3,1,2,  -1,-1,-1)));
+	grpx.insert( make_pair("Zprime_SSM1750",  new GRPX(proccount(counter),"1750 GeV Z'_{SSM}",  kAzure-3,-1,  kBlack,1,1,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Zprime_SSM1750"]->order,"Zprime_SSM1750") );
-	grpx.insert( make_pair("Zprime_SSM2000",  new GRPX(proccount(counter),"2000 GeV Z'_{SSM}",  -1,-1,  kAzure-4,1,2,  -1,-1,-1)));
+	grpx.insert( make_pair("Zprime_SSM2000",  new GRPX(proccount(counter),"2000 GeV Z'_{SSM}",  kAzure-4,-1,  kBlack,1,1,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Zprime_SSM2000"]->order,"Zprime_SSM2000") );
 	
 	counter = 200;
-	grpx.insert( make_pair("Gmm_01_1750",  new GRPX(counter,"1750 GeV G*",  -1,-1,    kViolet+1,1,2,   -1,-1,-1)));
+	grpx.insert( make_pair("Gmm_01_1750",  new GRPX(counter,"1750 GeV G*",  kViolet+1,-1,    kBlack,1,1,   -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Gmm_01_1750"]->order,"Gmm_01_1750") );
-	grpx.insert( make_pair("Gmm_01_2000",  new GRPX(proccount(counter),"2000 GeV G*",  -1,-1,  kViolet+6,1,2,   -1,-1,-1)));
+	grpx.insert( make_pair("Gmm_01_2000",  new GRPX(proccount(counter),"2000 GeV G*",  kViolet+6,-1,  kBlack,1,1,   -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Gmm_01_2000"]->order,"Gmm_01_2000") );
-	grpx.insert( make_pair("Gmm_01_2250",  new GRPX(proccount(counter),"2250 GeV G*",  -1,-1,  kViolet+10,1,2,  -1,-1,-1)));
+	grpx.insert( make_pair("Gmm_01_2250",  new GRPX(proccount(counter),"2250 GeV G*",  kViolet+10,-1,  kBlack,1,1,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Gmm_01_2250"]->order,"Gmm_01_2250") );
 	
-	counter = 300;
-	grpx.insert( make_pair("Zprime_SSM500_template",  new GRPX(counter,"500 GeV Z'_{SSM} template",  -1,-1,    kOrange+10,1,2,  -1,-1,-1)));
-	grpx_ordered.insert( make_pair(grpx["Zprime_SSM500_template"]->order,"Zprime_SSM500_template") );
-	grpx.insert( make_pair("Zprime_SSM750_template",  new GRPX(proccount(counter),"750 GeV Z'_{SSM} template",  -1,-1,  kOrange+8,1,2,   -1,-1,-1)));
-	grpx_ordered.insert( make_pair(grpx["Zprime_SSM750_template"]->order,"Zprime_SSM750_template") );
-	grpx.insert( make_pair("Zprime_SSM1000_template",  new GRPX(proccount(counter),"1000 GeV Z'_{SSM} template",  -1,-1,  kOrange+8,1,2,   -1,-1,-1)));
-	grpx_ordered.insert( make_pair(grpx["Zprime_SSM1000_template"]->order,"Zprime_SSM1000_template") );
-	grpx.insert( make_pair("Zprime_SSM1500_template",  new GRPX(proccount(counter),"1500 GeV Z'_{SSM} template",  -1,-1,  kOrange+8,1,2,   -1,-1,-1)));
-	grpx_ordered.insert( make_pair(grpx["Zprime_SSM1500_template"]->order,"Zprime_SSM1500_template") );
-	grpx.insert( make_pair("Zprime_SSM1750_template",  new GRPX(proccount(counter),"1750 GeV Z'_{SSM} template",  -1,-1,  kOrange+5,1,2,   -1,-1,-1)));
-	grpx_ordered.insert( make_pair(grpx["Zprime_SSM1750_template"]->order,"Zprime_SSM1750_template") );
-	grpx.insert( make_pair("Zprime_SSM2000_template",  new GRPX(proccount(counter),"2000 GeV Z'_{SSM} template",  -1,-1,  kOrange+3,1,2,   -1,-1,-1)));
-	grpx_ordered.insert( make_pair(grpx["Zprime_SSM2000_template"]->order,"Zprime_SSM2000_template") );
+	// counter = 300;
+	// grpx.insert( make_pair("Zprime_SSM500_template",  new GRPX(counter,"500 GeV Z'_{SSM} template",  -1,-1,    kOrange+10,1,2,  -1,-1,-1)));
+	// grpx_ordered.insert( make_pair(grpx["Zprime_SSM500_template"]->order,"Zprime_SSM500_template") );
+	// grpx.insert( make_pair("Zprime_SSM750_template",  new GRPX(proccount(counter),"750 GeV Z'_{SSM} template",  -1,-1,  kOrange+8,1,2,   -1,-1,-1)));
+	// grpx_ordered.insert( make_pair(grpx["Zprime_SSM750_template"]->order,"Zprime_SSM750_template") );
+	// grpx.insert( make_pair("Zprime_SSM1000_template",  new GRPX(proccount(counter),"1000 GeV Z'_{SSM} template",  -1,-1,  kOrange+8,1,2,   -1,-1,-1)));
+	// grpx_ordered.insert( make_pair(grpx["Zprime_SSM1000_template"]->order,"Zprime_SSM1000_template") );
+	// grpx.insert( make_pair("Zprime_SSM1500_template",  new GRPX(proccount(counter),"1500 GeV Z'_{SSM} template",  -1,-1,  kOrange+8,1,2,   -1,-1,-1)));
+	// grpx_ordered.insert( make_pair(grpx["Zprime_SSM1500_template"]->order,"Zprime_SSM1500_template") );
+	// grpx.insert( make_pair("Zprime_SSM1750_template",  new GRPX(proccount(counter),"1750 GeV Z'_{SSM} template",  -1,-1,  kOrange+5,1,2,   -1,-1,-1)));
+	// grpx_ordered.insert( make_pair(grpx["Zprime_SSM1750_template"]->order,"Zprime_SSM1750_template") );
+	// grpx.insert( make_pair("Zprime_SSM2000_template",  new GRPX(proccount(counter),"2000 GeV Z'_{SSM} template",  -1,-1,  kOrange+3,1,2,   -1,-1,-1)));
+	// grpx_ordered.insert( make_pair(grpx["Zprime_SSM2000_template"]->order,"Zprime_SSM2000_template") );
 	
-	counter = 400;
-	grpx.insert( make_pair("KK500_template",  new GRPX(counter,"500 GeV KK template",  -1,-1,    kGreen+4,1,2,  -1,-1,-1)));
-	grpx_ordered.insert( make_pair(grpx["KK500_template"]->order,"KK500_template") );
-	grpx.insert( make_pair("KK750_template",  new GRPX(proccount(counter),"750 GeV KK template",  -1,-1,  kGreen-1,1,2,   -1,-1,-1)));
-	grpx_ordered.insert( make_pair(grpx["KK750_template"]->order,"KK750_template") );
-	grpx.insert( make_pair("KK1000_template",  new GRPX(proccount(counter),"1000 GeV KK template",  -1,-1,  kGreen-1,1,2,   -1,-1,-1)));
-	grpx_ordered.insert( make_pair(grpx["KK1000_template"]->order,"KK1000_template") );
-	grpx.insert( make_pair("KK1500_template",  new GRPX(proccount(counter),"1500 GeV KK template",  -1,-1,  kGreen-1,1,2,   -1,-1,-1)));
-	grpx_ordered.insert( make_pair(grpx["KK1500_template"]->order,"KK1500_template") );
-	grpx.insert( make_pair("KK1750_template",  new GRPX(proccount(counter),"1750 GeV KK template",  -1,-1,  kGreen-1,1,2,   -1,-1,-1)));
-	grpx_ordered.insert( make_pair(grpx["KK1750_template"]->order,"KK1750_template") );
-	grpx.insert( make_pair("KK2000_template",  new GRPX(proccount(counter),"2000 GeV KK template",  -1,-1,  kGreen-8,1,2,   -1,-1,-1)));
-	grpx_ordered.insert( make_pair(grpx["KK2000_template"]->order,"KK2000_template") );
+	// counter = 400;
+	// grpx.insert( make_pair("KK500_template",  new GRPX(counter,"500 GeV KK template",  -1,-1,    kGreen+4,1,2,  -1,-1,-1)));
+	// grpx_ordered.insert( make_pair(grpx["KK500_template"]->order,"KK500_template") );
+	// grpx.insert( make_pair("KK750_template",  new GRPX(proccount(counter),"750 GeV KK template",  -1,-1,  kGreen-1,1,2,   -1,-1,-1)));
+	// grpx_ordered.insert( make_pair(grpx["KK750_template"]->order,"KK750_template") );
+	// grpx.insert( make_pair("KK1000_template",  new GRPX(proccount(counter),"1000 GeV KK template",  -1,-1,  kGreen-1,1,2,   -1,-1,-1)));
+	// grpx_ordered.insert( make_pair(grpx["KK1000_template"]->order,"KK1000_template") );
+	// grpx.insert( make_pair("KK1500_template",  new GRPX(proccount(counter),"1500 GeV KK template",  -1,-1,  kGreen-1,1,2,   -1,-1,-1)));
+	// grpx_ordered.insert( make_pair(grpx["KK1500_template"]->order,"KK1500_template") );
+	// grpx.insert( make_pair("KK1750_template",  new GRPX(proccount(counter),"1750 GeV KK template",  -1,-1,  kGreen-1,1,2,   -1,-1,-1)));
+	// grpx_ordered.insert( make_pair(grpx["KK1750_template"]->order,"KK1750_template") );
+	// grpx.insert( make_pair("KK2000_template",  new GRPX(proccount(counter),"2000 GeV KK template",  -1,-1,  kGreen-8,1,2,   -1,-1,-1)));
+	// grpx_ordered.insert( make_pair(grpx["KK2000_template"]->order,"KK2000_template") );
 	
 	counter = 500;
-	grpx.insert( make_pair("ZprimeSSM_m2000",  new GRPX(counter,"2 TeV Z'_{SSM} with interference", -1,-1,    kMagenta+1,1,2,  -1,-1,-1)));
-	grpx_ordered.insert( make_pair(grpx["ZprimeSSM_m2000"]->order,"ZprimeSSM_m2000") );
-	grpx.insert( make_pair("ExtraDimsTEV_m2000",  new GRPX(proccount(counter),"2 TeV #gamma_{KK}/Z_{KK} with interference", -1,-1,  kMagenta-1,1,2,   -1,-1,-1)));
+	grpx.insert( make_pair("Zprime_SSM_m2000",  new GRPX(counter,"2 TeV Z'_{SSM} with interference", kMagenta+1,-1,    kBlack,1,1,  -1,-1,-1)));
+	grpx_ordered.insert( make_pair(grpx["Zprime_SSM_m2000"]->order,"Zprime_SSM_m2000") );
+	grpx.insert( make_pair("ExtraDimsTEV_m2000",  new GRPX(proccount(counter),"2 TeV #gamma_{KK}/Z_{KK} with interference", kMagenta-1,-1,  kBlack,1,1,   -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["ExtraDimsTEV_m2000"]->order,"ExtraDimsTEV_m2000") );
 	
 	counter = 1000;
@@ -709,6 +753,7 @@ void setMCtrees(TString tsMCname)
 		}
 	}
 	
+	/*
 	if(tsMCname=="DYtautau")
 	{
 		if(doDYtautau)
@@ -734,9 +779,9 @@ void setMCtrees(TString tsMCname)
 	
 	if(tsMCname=="Diboson")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_WW_Herwig.root", "mcLocalControl_WW_Herwig", 2442266, 17487. /*AMI: 3.1106E-02*nb2fb*3.8947E-01*/);
-		setMCtree(ntupledir+"/mcLocalControl_WZ_Herwig.root", "mcLocalControl_WZ_Herwig", 239949,  5743.  /* AMI: 1.1485E-02*nb2fb*3.1043E-01*/);
-		setMCtree(ntupledir+"/mcLocalControl_ZZ_Herwig.root", "mcLocalControl_ZZ_Herwig", 244999,  1271.  /* AMI: 4.5721E-03*nb2fb*2.1319E-01*/);
+		setMCtree(ntupledir+"/mcLocalControl_WW_Herwig.root", "mcLocalControl_WW_Herwig", 2442266, 17487.); // AMI: 3.1106E-02*nb2fb*3.8947E-01
+		setMCtree(ntupledir+"/mcLocalControl_WZ_Herwig.root", "mcLocalControl_WZ_Herwig", 239949,  5743.); // AMI: 1.1485E-02*nb2fb*3.1043E-01
+		setMCtree(ntupledir+"/mcLocalControl_ZZ_Herwig.root", "mcLocalControl_ZZ_Herwig", 244999,  1271.); // AMI: 4.5721E-03*nb2fb*2.1319E-01
 	}
 	
 	
@@ -752,6 +797,7 @@ void setMCtrees(TString tsMCname)
 	{
 		setMCtree(ntupledir+"/mcLocalControl_Gmm_01_2250.root", "mcLocalControl_Gmm_01_2250", 10000, 2.1381E-07*nb2fb);
 	}
+	*/
 	
 
 	if(tsMCname=="Zprime_SSM500")
@@ -779,7 +825,7 @@ void setMCtrees(TString tsMCname)
 		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM2000.root", "mcLocalControl_Zprime_SSM2000", 20000, 2.4357E-06*nb2fb);
 	}
 	
-	if(tsMCname=="ZprimeSSM_m2000")
+	if(tsMCname=="Zprime_SSM_m2000")
 	{
 		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_120M450.root",   "mcLocalControl_Pythia8_ZprimeSSM_m2000_120M450",   40000, 7.9574E-03*nb2fb);
 		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_450M850.root",   "mcLocalControl_Pythia8_ZprimeSSM_m2000_450M850",   10000, 3.8040E-05 *nb2fb);
@@ -968,7 +1014,6 @@ void setDATAbranches()
 	tree->SetBranchAddress( "EW_kfactor_weight", &EW_kfactor_weight );
 	tree->SetBranchAddress( "QCD_kfactor_weight", &QCD_kfactor_weight );
 	tree->SetBranchAddress( "mcevent_weight", &mcevent_weight );
-	tree->SetBranchAddress( "total_weight",   &total_weight );
 	
 	tree->SetBranchAddress("vxp_n", &vxp_n);
 	
@@ -1042,7 +1087,7 @@ void hbook()
 		linMap.insert( make_pair("hMassyQ_vertline_"+_s(logmassbins[ms]), new TLine(logmassbins[ms],minfullyQ,logmassbins[ms],maxfullyQ)) );
 	}
 	
-	//// KK templates for the limit
+	//// KK/ZP templates for the limit
 	if(doFullKKtemplates || doFullZPtemplates)
 	{
 		for(double M=mKKmmMin ; M<=mKKmmMax ; M+=dMKKmm)
@@ -1052,16 +1097,12 @@ void hbook()
 			if(doFullKKtemplates)
 			{
 				h1Map.insert( make_pair("hMass_template_KK"+massName, new TH1D("hMass_template_KK"+massName, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-				h1Map.insert( make_pair("hMass_template_KK"+massName+"_nopileup", new TH1D("hMass_template_KK"+massName+"_nopileup", "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 				h1Map.insert( make_pair("hMass_truth_template_KK"+massName, new TH1D("hMass_truth_template_KK"+massName, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-				h1Map.insert( make_pair("hMass_truth_template_KK"+massName+"_nopileup", new TH1D("hMass_truth_template_KK"+massName+"_nopileup", "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 			}
 			else if(doFullZPtemplates)
 			{
-				h1Map.insert( make_pair("hMass_template_ZprimeSSM"+massName, new TH1D("hMass_template_ZprimeSSM"+massName, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-				h1Map.insert( make_pair("hMass_template_ZprimeSSM"+massName+"_nopileup", new TH1D("hMass_template_ZprimeSSM"+massName+"_nopileup", "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-				h1Map.insert( make_pair("hMass_truth_template_ZprimeSSM"+massName, new TH1D("hMass_truth_template_ZprimeSSM"+massName, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-				h1Map.insert( make_pair("hMass_truth_template_ZprimeSSM"+massName+"_nopileup", new TH1D("hMass_truth_template_ZprimeSSM"+massName+"_nopileup", "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+				h1Map.insert( make_pair("hMass_template_Zprime_SSM"+massName, new TH1D("hMass_template_Zprime_SSM"+massName, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+				h1Map.insert( make_pair("hMass_truth_template_Zprime_SSM"+massName, new TH1D("hMass_truth_template_Zprime_SSM"+massName, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 			}
 		}
 	}
@@ -1081,89 +1122,97 @@ void hbook()
 		//Templates: skip all but DYmumu and the templates ////
 		///////////////////////////////////////////////////////
 		
-		if(name.Contains("_template")  ||  ((name.Contains("Zprime") || name.Contains("ExtraDimsTEV")) && !name.Contains("template")))
+		// For the truth information of the DYmumu Z' and the templates
+		if(name=="DYmumu" || name.Contains("Zprime") || name.Contains("ExtraDimsTEV"))
 		{
-			h1Map.insert( make_pair("hMass"+name+"_truth", new TH1D("hMass"+name+"_truth",";m_{#mu#mu} GeV;Events",nlogofficialimassbins,logofficialimassbins)) );
-			setlogx(h1Map["hMass"+name+"_truth"]);
-			graphics(h1Map["hMass"+name+"_truth"],
-					 grpx[name]->filcolor,grpx[name]->filstyle,
-					 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
-					 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-			h1Map.insert( make_pair("hMass"+name+"_truth_nopileup", new TH1D("hMass"+name+"_truth_nopileup",";m_{#mu#mu} GeV;Events",nlogofficialimassbins,logofficialimassbins)) );
-			setlogx(h1Map["hMass"+name+"_truth_nopileup"]);
-			graphics(h1Map["hMass"+name+"_truth_nopileup"],
-					 grpx[name]->filcolor,grpx[name]->filstyle,
-					 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
-					 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-			h1Map.insert( make_pair("hpTLeading"+name+"_truth", new TH1D("hpTLeading"+name+"_truth",";p_{T}^{leading} GeV;Events",nsqrtofficialptbins,sqrtofficialptbins)) );
-			setlogx(h1Map["hpTLeading"+name+"_truth"]);
-			graphics(h1Map["hpTLeading"+name+"_truth"],
-					 grpx[name]->filcolor,grpx[name]->filstyle,
-					 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
-					 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-			h1Map.insert( make_pair("hpTLeading"+name+"_truth_nopileup", new TH1D("hpTLeading"+name+"_truth_nopileup",";p_{T}^{leading} GeV;Events",nsqrtofficialptbins,sqrtofficialptbins)) );
-			setlogx(h1Map["hpTLeading"+name+"_truth_nopileup"]);
-			graphics(h1Map["hpTLeading"+name+"_truth_nopileup"],
-					 grpx[name]->filcolor,grpx[name]->filstyle,
-					 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
-					 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-		}
-		
-		if(name=="DYmumu")
-		{
-			h1Map.insert( make_pair("hMass_1d_full_"+name+"_truth", new TH1D("hMass_1d_full_"+name+"_truth", "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-			h1Map.insert( make_pair("hMass_1d_full_"+name+"_truth_nopileup", new TH1D("hMass_1d_full_"+name+"_truth_nopileup", "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		
-			h1Map.insert( make_pair("hMass"+name+"_truth", new TH1D("hMass"+name+"_truth",";m_{#mu#mu} GeV;Events",nlogofficialimassbins,logofficialimassbins)) );
-			setlogx(h1Map["hMass"+name+"_truth"]);
-			graphics(h1Map["hMass"+name+"_truth"],
-					 grpx[name]->filcolor,grpx[name]->filstyle,
-					 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
-					 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-			h1Map.insert( make_pair("hMass"+name+"_truth_nopileup", new TH1D("hMass"+name+"_truth_nopileup",";m_{#mu#mu} GeV;Events",nlogofficialimassbins,logofficialimassbins)) );
-			setlogx(h1Map["hMass"+name+"_truth_nopileup"]);
-			graphics(h1Map["hMass"+name+"_truth_nopileup"],
-					 grpx[name]->filcolor,grpx[name]->filstyle,
-					 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
-					 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);				 
-			h1Map.insert( make_pair("hMass"+name+"_noEWkfactor", new TH1D("hMass"+name+"_noEWkfactor",";m_{#mu#mu} GeV;Events",nlogofficialimassbins,logofficialimassbins)) );
-			setlogx(h1Map["hMass"+name+"_noEWkfactor"]);
-			graphics(h1Map["hMass"+name+"_noEWkfactor"],
-					 grpx[name]->filcolor,grpx[name]->filstyle,
-					 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
-					 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-			h1Map.insert( make_pair("hpTLeading"+name+"_truth", new TH1D("hpTLeading"+name+"_truth",";p_{T}^{leading} GeV;Events",nsqrtofficialptbins,sqrtofficialptbins)) );
-			setlogx(h1Map["hpTLeading"+name+"_truth"]);
-			graphics(h1Map["hpTLeading"+name+"_truth"],
-					 grpx[name]->filcolor,grpx[name]->filstyle,
-					 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
-					 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-			h1Map.insert( make_pair("hpTLeading"+name+"_truth_nopileup", new TH1D("hpTLeading"+name+"_truth_nopileup",";p_{T}^{leading} GeV;Events",nsqrtofficialptbins,sqrtofficialptbins)) );
-			setlogx(h1Map["hpTLeading"+name+"_truth_nopileup"]);
-			graphics(h1Map["hpTLeading"+name+"_truth_nopileup"],
-					 grpx[name]->filcolor,grpx[name]->filstyle,
-					 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
-					 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-			h1Map.insert( make_pair("hpTLeading"+name+"_noEWkfactor", new TH1D("hpTLeading"+name+"_noEWkfactor",";p_{T}^{leading} GeV;Events",nsqrtofficialptbins,sqrtofficialptbins)) );
-			setlogx(h1Map["hpTLeading"+name+"_noEWkfactor"]);
-			graphics(h1Map["hpTLeading"+name+"_noEWkfactor"],
-					 grpx[name]->filcolor,grpx[name]->filstyle,
-					 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
-					 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
+			int mtypemax = (name.Contains("_m2000") || name=="DYmumu") ? 1 : 3; // don't need to loop on the pyhtia8 samples
+			for(int mtype=0 ; mtype<mtypemax ; mtype++)
+			{
+				TString mname = "";
+				Color_t mfillcolor = -1;
+				Int_t   mfillstyle = -1;
+				Color_t mlinecolor = -1;
+				Int_t   mlinestyle = -1;
+				Int_t   mlinewidth = -1;
+				Color_t mmrkrcolor = -1;
+				Int_t   mmrkrstyle = -1;
+				Float_t mmrkrsize  = -1;
+				
+				if(mtype==0) // official pythia6 Z's -OR- official pythia8 Z' / KK
+				{
+					mname = name;
+					mfillcolor = grpx[name]->filcolor;
+					mfillstyle = grpx[name]->filstyle;
+					mlinecolor = grpx[name]->lincolor;
+					mlinestyle = grpx[name]->linstyle;
+					mlinewidth = grpx[name]->linwidth;
+					mmrkrcolor = grpx[name]->mrkcolor;
+					mmrkrstyle = grpx[name]->mrkstyle;
+					mmrkrsize  = grpx[name]->mrksize;
+				}
+				if(mtype==1) // template Z'
+				{
+					mname = getTemplateName(name);
+					mfillcolor = -1;
+					mfillstyle = -1;
+					mlinecolor = kOrange + 10;
+					mlinestyle = +1;
+					mlinewidth = +1;
+					mmrkrcolor = -1;
+					mmrkrstyle = -1;
+					mmrkrsize  = -1;
+				}
+				if(mtype==2) // template KK
+				{
+					mname = getTemplateName(name,"KK");
+					mfillcolor = -1;
+					mfillstyle = -1;
+					mlinecolor = kOrange + 3;
+					mlinestyle = +1;
+					mlinewidth = +1;
+					mmrkrcolor = -1;
+					mmrkrstyle = -1;
+					mmrkrsize  = -1;
+				}
+				
+				h1Map.insert( make_pair("hMass"+mname+"_truth", new TH1D("hMass"+mname+"_truth",";m_{#mu#mu} GeV;Events",nlogofficialimassbins,logofficialimassbins)) );
+				setlogx(h1Map["hMass"+mname+"_truth"]);
+				graphics(h1Map["hMass"+mname+"_truth"],mfillcolor,mfillstyle,mlinecolor,mlinestyle,mlinewidth,mmrkrcolor,mmrkrstyle,mmrkrsize);
+				
+				h1Map.insert( make_pair("hpTLeading"+mname+"_truth", new TH1D("hpTLeading"+mname+"_truth",";p_{T}^{leading} GeV;Events",nsqrtofficialptbins,sqrtofficialptbins)) );
+				setlogx(h1Map["hpTLeading"+mname+"_truth"]);
+				graphics(h1Map["hpTLeading"+mname+"_truth"],mfillcolor,mfillstyle,mlinecolor,mlinestyle,mlinewidth,mmrkrcolor,mmrkrstyle,mmrkrsize);
+				
+				h1Map.insert( make_pair("hMass_limit_"+mname+"_truth", new TH1D("hMass_limit_"+mname+"_truth", "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+				
+				if(mtype>0) // templates
+				{
+					h1Map.insert( make_pair("hMass"+mname, new TH1D("hMass"+mname,";m_{#mu#mu} GeV;Events",nlogofficialimassbins,logofficialimassbins)) );
+					setlogx(h1Map["hMass"+mname]);
+					graphics(h1Map["hMass"+mname],mfillcolor,mfillstyle,mlinecolor,mlinestyle,mlinewidth,mmrkrcolor,mmrkrstyle,mmrkrsize);
+					
+					h1Map.insert( make_pair("hpTLeading"+mname, new TH1D("hpTLeading"+mname,";p_{T}^{leading} GeV;Events",nsqrtofficialptbins,sqrtofficialptbins)) );
+					setlogx(h1Map["hpTLeading"+mname]);
+					graphics(h1Map["hpTLeading"+mname],mfillcolor,mfillstyle,mlinecolor,mlinestyle,mlinewidth,mmrkrcolor,mmrkrstyle,mmrkrsize);
+					
+					h1Map.insert( make_pair("hMass_limit_"+mname, new TH1D("hMass_limit_"+mname, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+				}
+			}
 		}
 	}
 	
+	// For the truth information of all the models
 	for(TMapTS2GRPX::iterator it=grpx.begin() ; it!=grpx.end() ; ++it)
 	{
 		TString name = it->first;
 		
-		h1Map.insert( make_pair("hNvxp"+name, new TH1D("hNvxp"+name,";N_{vertices};Events",35,1.,36.)) );
-		graphics(h1Map["hNvxp"+name],
+		h1Map.insert( make_pair("hNvxp_no_puwgt"+name, new TH1D("hNvxp_no_puwgt"+name,";N_{vertices};Events",35,1.,36.)) );
+		graphics(h1Map["hNvxp_no_puwgt"+name],
 				 grpx[name]->filcolor,grpx[name]->filstyle,
 				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-		h1Map.insert( make_pair("hNvxp"+name+"_with_puwgt", new TH1D("hNvxp"+name+"_with_puwgt",";N_{vertices};Events",35,1.,36.)) );
-		graphics(h1Map["hNvxp"+name+"_with_puwgt"],
+		h1Map.insert( make_pair("hNvxp_with_puwgt"+name, new TH1D("hNvxp_with_puwgt"+name,";N_{vertices};Events",35,1.,36.)) );
+		graphics(h1Map["hNvxp_with_puwgt"+name],
 				 grpx[name]->filcolor,grpx[name]->filstyle,
 				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
@@ -1174,21 +1223,9 @@ void hbook()
 				 grpx[name]->filcolor,grpx[name]->filstyle,
 				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-		h1Map.insert( make_pair("hMassNumbers"+name+"_nopileup", new TH1D("hMassNumbers"+name+"_nopileup",";m_{#mu#mu} GeV;Events",imasslogicnbins,imasslogicbins)) );
-		setlogx(h1Map["hMassNumbers"+name+"_nopileup"]);
-		graphics(h1Map["hMassNumbers"+name+"_nopileup"],
-				 grpx[name]->filcolor,grpx[name]->filstyle,
-				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
-				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
 		h1Map.insert( make_pair("hMass"+name, new TH1D("hMass"+name,";m_{#mu#mu} GeV;Events",nlogofficialimassbins,logofficialimassbins)) );
 		setlogx(h1Map["hMass"+name]);
 		graphics(h1Map["hMass"+name],
-				 grpx[name]->filcolor,grpx[name]->filstyle,
-				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
-				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-		h1Map.insert( make_pair("hMass"+name+"_nopileup", new TH1D("hMass"+name+"_nopileup",";m_{#mu#mu} GeV;Events",nlogofficialimassbins,logofficialimassbins)) );
-		setlogx(h1Map["hMass"+name+"_nopileup"]);
-		graphics(h1Map["hMass"+name+"_nopileup"],
 				 grpx[name]->filcolor,grpx[name]->filstyle,
 				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
@@ -1254,28 +1291,7 @@ void hbook()
 				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
 		
 		//// flat 1d
-		h1Map.insert( make_pair("hMass_1d_full_"+name, new TH1D("hMass_1d_full_"+name, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		h1Map.insert( make_pair("hMass_1d_full_"+name+"_nopileup", new TH1D("hMass_1d_full_"+name+"_nopileup", "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		
-		//// cos(theta*) slices
-		for(int i=1 ; i<=nCosThetaBinsLimit ; i++)
-		{
-			TString baseName = "hMass_cosThSlice_"+(TString)_s(i)+"_";
-			h1Map.insert( make_pair(baseName+name, new TH1D(baseName+name, "#mu#mu mass in cos#theta* slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		}
-		//// dEta slices
-		for(int i=1 ; i<=ndEtaBinsLimit ; i++)
-		{
-			TString baseName = "hMass_dEtaSlice_"+(TString)_s(i)+"_";
-			h1Map.insert( make_pair(baseName+name, new TH1D(baseName+name, "#mu#mu mass in #Delta#eta slice "+(TString)_s(i)+";m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		}
-		
-		//// no need to draw these
-		h1Map.insert( make_pair("hCosThetaLimitBins_"+name, new TH1D("hCosThetaLimitBins_"+name,name+";cos#theta*;Events",nCosThetaBinsLimit,minCosThetaLimit,maxCosThetaLimit)) );
-		//// no need to draw these
-		h1Map.insert( make_pair("hdEtaLimitBins_"+name, new TH1D("hdEtaLimitBins_"+name,name+";#Delta#eta;Events",ndEtaBinsLimit,mindEtaLimit,maxdEtaLimit)) );
-		
-		
+		h1Map.insert( make_pair("hMass_limit_"+name, new TH1D("hMass_limit_"+name, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 		
 		//// 2d
 		h2Map.insert( make_pair("hMassCosThetaCS"+name, new TH2D("hMassCosThetaCS"+name,";m_{#mu#mu} GeV;cos(#theta*);Events",nlinfullimassbins,linfullimassmin,linfullimassmax, nFullCosThetaBins,minFullCosTheta,maxFullCosTheta)) );
@@ -1317,39 +1333,34 @@ void hscale2Zpeak()
 		
 		if(name.Contains("Data")) continue;
 		
-		Scale(h1Map["hNvxp"+name],ratio_nopileup);
-		Scale(h1Map["hNvxp"+name+"_with_puwgt"],ratio);
+		Scale(h1Map["hNvxp_no_puwgt"+name],ratio_nopileup);
+		Scale(h1Map["hNvxp_with_puwgt"+name],ratio);
 		
 		Scale(h1Map["hMassNumbers"+name],ratio);
-		Scale(h1Map["hMassNumbers"+name+"_nopileup"],ratio_nopileup);
-		
 		Scale(h1Map["hMass"+name],ratio);
-		Scale(h1Map["hMass"+name+"_nopileup"],ratio_nopileup);
+		Scale(h1Map["hMass_limit_"+name],ratio);
 		
-		Scale(h1Map["hMass_1d_full_"+name],ratio);
-		Scale(h1Map["hMass_1d_full_"+name+"_nopileup"],ratio_nopileup);
-		
-		if(name=="DYmumu"/* name.Contains("DYmumu") */)
+		if(name=="DYmumu" || name.Contains("Zprime") || name.Contains("ExtraDimsTEV"))
 		{
-			Scale(h1Map["hMass"+name+"_truth"],ratio);
-			Scale(h1Map["hMass"+name+"_truth_nopileup"],ratio_nopileup);
-			Scale(h1Map["hMass"+name+"_noEWkfactor"],ratio);
-			
-			Scale(h1Map["hpTLeading"+name+"_truth"],ratio);
-			Scale(h1Map["hpTLeading"+name+"_truth_nopileup"],ratio_nopileup);
-			Scale(h1Map["hpTLeading"+name+"_noEWkfactor"],ratio);
-			
-			Scale(h1Map["hMass_1d_full_"+name+"_truth"],ratio);
-			Scale(h1Map["hMass_1d_full_"+name+"_truth_nopileup"],ratio_nopileup);
-		}
-		
-		if(name.Contains("_template")  ||  ((name.Contains("Zprime") || name.Contains("ExtraDimsTEV")) && !name.Contains("template")))
-		{
-			Scale(h1Map["hMass"+name+"_truth"],ratio);
-			Scale(h1Map["hMass"+name+"_truth_nopileup"],ratio_nopileup);
-			
-			Scale(h1Map["hpTLeading"+name+"_truth"],ratio);
-			Scale(h1Map["hpTLeading"+name+"_truth_nopileup"],ratio_nopileup);
+			int mtypemax = (name.Contains("_m2000") || name=="DYmumu") ? 1 : 3; // don't need to loop on the pyhtia8 samples
+			for(int mtype=0 ; mtype<mtypemax ; mtype++)
+			{
+				TString mname = "";
+				if(mtype==0) mname = name; // official pythia6 Z's -OR- official pythia8 Z' / KK
+				if(mtype==1) mname = getTemplateName(name); // template Z'
+				if(mtype==2) mname = getTemplateName(name,"KK"); // template KK
+				
+				Scale(h1Map["hMass"+mname+"_truth"],ratio);
+				Scale(h1Map["hpTLeading"+mname+"_truth"],ratio);
+				Scale(h1Map["hMass_limit_"+mname+"_truth"],ratio);
+				
+				if(mtype>0) // the templates
+				{
+					Scale(h1Map["hMass"+mname],ratio);
+					Scale(h1Map["hpTLeading"+mname],ratio);
+					Scale(h1Map["hMass_limit_"+mname],ratio);
+				}
+			}
 		}
 		
 		//// KK templates for the limit
@@ -1361,16 +1372,12 @@ void hscale2Zpeak()
 				if(doFullKKtemplates)
 				{
 					Scale(h1Map["hMass_template_KK"+massName],ratio);
-					Scale(h1Map["hMass_template_KK"+massName+"_nopileup"],ratio_nopileup);
 					Scale(h1Map["hMass_truth_template_KK"+massName],ratio);
-					Scale(h1Map["hMass_truth_template_KK"+massName+"_nopileup"],ratio_nopileup);
 				}
 				else if(doFullZPtemplates)
 				{
-					Scale(h1Map["hMass_template_ZprimeSSM"+massName],ratio);
-					Scale(h1Map["hMass_template_ZprimeSSM"+massName+"_nopileup"],ratio_nopileup);
-					Scale(h1Map["hMass_truth_template_ZprimeSSM"+massName],ratio);
-					Scale(h1Map["hMass_truth_template_ZprimeSSM"+massName+"_nopileup"],ratio_nopileup);
+					Scale(h1Map["hMass_template_Zprime_SSM"+massName],ratio);
+					Scale(h1Map["hMass_truth_template_Zprime_SSM"+massName],ratio);
 				}
 			}
 		}
@@ -1385,20 +1392,6 @@ void hscale2Zpeak()
 		Scale(h1Map["hpTLeading"+name],ratio);
 		Scale(h1Map["hpTSubleading"+name],ratio);
 		
-		for(int i=1 ; i<=nCosThetaBinsLimit ; i++)
-		{
-			TString baseName = "hMass_cosThSlice_"+(TString)_s(i);
-			Scale(h1Map[baseName+"_"+name],ratio);
-		}
-		for(int i=1 ; i<=ndEtaBinsLimit ; i++)
-		{
-			TString baseName = "hMass_dEtaSlice_"+(TString)_s(i);
-			Scale(h1Map[baseName+"_"+name],ratio);
-		}
-		
-		Scale(h1Map["hCosThetaLimitBins_"+name],ratio);
-		Scale(h1Map["hdEtaLimitBins_"+name],ratio);
-		
 		Scale(h2Map["hMassCosThetaCS"+name],ratio);
 		Scale(h2Map["hMassyQ"+name],ratio);
 	}
@@ -1406,16 +1399,11 @@ void hscale2Zpeak()
 
 void hMCsumall(TString tsMCname)
 {
-	h1Map["hNvxpMCsum"]->Add(h1Map["hNvxp"+tsMCname]);
-	h1Map["hNvxpMCsum_with_puwgt"]->Add(h1Map["hNvxp"+tsMCname+"_with_puwgt"]);
-	
+	h1Map["hNvxp_no_puwgtMCsum"]->Add(h1Map["hNvxp_no_puwgt"+tsMCname]);
+	h1Map["hNvxp_with_puwgtMCsum"]->Add(h1Map["hNvxp_with_puwgt"+tsMCname]);
 	h1Map["hMassNumbersMCsum"]->Add(h1Map["hMassNumbers"+tsMCname]);
-	h1Map["hMassNumbersMCsum_nopileup"]->Add(h1Map["hMassNumbers"+tsMCname+"_nopileup"]);
-	h1Map["hMassMCsum"]->Add(h1Map["hMass"+tsMCname]);
-	h1Map["hMassMCsum_nopileup"]->Add(h1Map["hMass"+tsMCname+"_nopileup"]);
-	
-	h1Map["hMass_1d_full_MCsum"]->Add(h1Map["hMass_1d_full_"+tsMCname]);
-	
+	h1Map["hMassMCsum"]->Add(h1Map["hMass"+tsMCname]);	
+	h1Map["hMass_limit_MCsum"]->Add(h1Map["hMass_limit_"+tsMCname]);
 	h1Map["hyQMCsum"]->Add(h1Map["hyQ"+tsMCname]);
 	h1Map["hQTMCsum"]->Add(h1Map["hQT"+tsMCname]);
 	h1Map["hEtaQMCsum"]->Add(h1Map["hEtaQ"+tsMCname]);
@@ -1465,161 +1453,89 @@ void hdraw()
 	{
 		TString name = it->first;
 		
-		//////////////////////////////////////////////////////////////////////
-		if(!name.Contains("hMass")  ||  !name.Contains("hpT")) continue; /////
-		//////////////////////////////////////////////////////////////////////
-		
-		/*
-		if((name.Contains("Zprime") && !name.Contains("_template")  &&  !name.Contains("m2000")))
+		TString objname = "";
+		TString refname = "";
+		if(name.Contains("Zprime")  || name.Contains("ExtraDimsTEV")) // both are drawn on top of the DYmumu
 		{
-			// name already contains the "Zprime" string 
-			if(name.Contains("hMass"))
+			_INFO("drawing -> "+(string)name);
+			
+			if(name.Contains("_m2000"))
 			{
-				setMinMax(h1Map["hMass"+name+"_tempalte"],h1Map["hMass"+name],true);
-				draw(h1Map["hMass"+name+"_tempalte"], "", "", dolog, dolog);
-				drawon("hMass"+name+"_tempalte", h1Map["hMass"+name]);
-				templateText("hMass"+name+"_tempalte", grpx[name]->label);
-				drawtemplatetxton("hMass"+name+"_tempalte");
-				
-				setMinMax(h1Map["hMass"+name+"_tempalte_nopileup"],h1Map["hMass"+name+"_nopileup"],true);
-				draw(h1Map["hMass"+name+"_tempalte_nopileup"], "", "", dolog, dolog);
-				drawon("hMass"+name+"_tempalte_nopileup", h1Map["hMass"+name+"_nopileup"]);
-				templateText("hMass"+name+"_tempalte_nopileup", grpx[name]->label);
-				drawtemplatetxton("hMass"+name+"_tempalte_nopileup");
-				
-				setMinMax(h1Map["hMass"+name+"_tempalte_truth"],h1Map["hMass"+name+"_truth"],true);
-				draw(h1Map["hMass"+name+"_tempalte_truth"], "", "", dolog, dolog);
-				drawon("hMass"+name+"_tempalte_truth", h1Map[name+"_truth"]);
-				templateText("hMass"+name+"_tempalte_truth", grpx[name]->label);
-				drawtemplatetxton("hMass"+name+"_tempalte_truth");
-				
-				setMinMax(h1Map["hMass"+name+"_tempalte_truth"],h1Map["hMass"+name+"_truth_nopileup"],true);
-				draw(h1Map["hMass"+name+"_tempalte_truth_nopileup"], "", "", dolog, dolog);
-				drawon("hMass"+name+"_tempalte_truth_nopileup", h1Map[name+"_truth_nopileup"]);
-				templateText("hMass"+name+"_tempalte_truth_nopileup", grpx[name]->label);
-				drawtemplatetxton("hMass"+name+"_tempalte_truth_nopileup");
+				_INFO("name -> "+(string)name);
+			
+				for(int t=0 ; t<2 ; t++)
+				{
+					objname = "hMass"+name;
+					if(t==0) objname += "_truth";
+					refname = "hMassDYmumu";
+					if(t==0) refname += "_truth";
+					setMinMax(h1Map[refname],h1Map[objname],true);
+					draw(h1Map[refname], objname, "", dolog, dolog); // the canvas will be named with the 2nd argument
+					drawon(objname, h1Map[objname]);
+					templateText(name, (t==0)?true:false, false);
+					drawtemplatetxton(objname);
+					_INFO("drawn -> "+(string)objname);
+					
+					objname = "hpTLeading"+name;
+					if(t==0) objname += "_truth";
+					refname = "hpTLeadingDYmumu";
+					if(t==0) refname += "_truth";
+					setMinMax(h1Map[refname],h1Map[objname],true);
+					draw(h1Map[refname], objname, "", dolog, dolog); // the canvas will be named with the 2nd argument
+					drawon(objname, h1Map[objname]);
+					templateText(name, (t==0)?true:false, false);
+					drawtemplatetxton(objname);
+					_INFO("drawn -> "+(string)objname);
+				}
 			}
-			if(name.Contains("hpT"))
+			else // if(!name.Contains("_m2000")) then this is the regular Zprime's and the corresponding Z'/KK templates - all are drawn on top of the DYmumu
 			{
-				setMinMax(h1Map["hpT"+name+"_tempalte"],h1Map["hpT"+name],true);
-				draw(h1Map["hpT"+name+"_tempalte"], "", "", dolog, dolog);
-				drawon("hpT"+name+"_tempalte", h1Map["hpT"+name]);
-				templateText("hpT"+name+"_tempalte", grpx[name]->label);
-				drawtemplatetxton("hpT"+name+"_tempalte");
-				
-				setMinMax(h1Map["hpT"+name+"_tempalte_nopileup"],h1Map["hpT"+name+"_nopileup"],true);
-				draw(h1Map["hpT"+name+"_tempalte_nopileup"], "", "", dolog, dolog);
-				drawon("hpT"+name+"_tempalte_nopileup", h1Map["hpT"+name+"_nopileup"]);
-				templateText("hpT"+name+"_tempalte_nopileup", grpx[name]->label);
-				drawtemplatetxton("hpT"+name+"_tempalte_nopileup");
-				
-				setMinMax(h1Map["hpT"+name+"_tempalte_truth"],h1Map["hpT"+name+"_truth"],true);
-				draw(h1Map["hpT"+name+"_tempalte_truth"], "", "", dolog, dolog);
-				drawon("hpT"+name+"_tempalte_truth", h1Map[name+"_truth"]);
-				templateText("hpT"+name+"_tempalte_truth", grpx[name]->label);
-				drawtemplatetxton("hpT"+name+"_tempalte_truth");
-				
-				setMinMax(h1Map["hpT"+name+"_tempalte_truth_nopileup"],h1Map["hpT"+name+"_truth_nopileup"],true);
-				draw(h1Map["hpT"+name+"_tempalte_truth_nopileup"], "", "", dolog, dolog);
-				drawon("hpT"+name+"_tempalte_truth_nopileup", h1Map[name+"_truth_nopileup"]);
-				templateText("hpT"+name+"_tempalte_truth_nopileup", grpx[name]->label);
-				drawtemplatetxton("hpT"+name+"_tempalte_truth_nopileup");
+				_INFO("name -> "+(string)name);
+			
+				TString massName = getTemplateBareTitle(name);
+			
+				for(int t=0 ; t<2 ; t++)
+				{
+					objname = "hMass_"+massName+"_templates";
+					if(t==0) objname += "_truth";
+					refname = "hMassDYmumu";
+					if(t==0) refname += "_truth";
+					draw(h1Map[refname], objname, "", dolog, dolog);
+					for(int mtype=0 ; mtype<3 ; mtype++)
+					{
+						TString hname = "hMass";
+						if(mtype==0) hname += name; // official pythia6 Z's
+						if(mtype==1) hname += getTemplateName(name); // template Z'
+						if(mtype==2) hname += getTemplateName(name,"KK"); // template KK
+						drawon(objname, h1Map[hname]);
+					}
+					templateText(name, (t==0)?true:false, true);
+					drawtemplatetxton(objname);
+					_INFO("drawn -> "+(string)objname);
+					
+					objname = "hpTLeading"+massName+"_templates";
+					if(t==0) objname += "_truth";
+					refname = "hpTLeadingDYmumu";
+					if(t==0) refname += "_truth";
+					draw(h1Map[refname], objname, "", dolog, dolog);
+					for(int mtype=0 ; mtype<3 ; mtype++)
+					{
+						TString hname = "hpTLeading";
+						if(mtype==0) hname += name; // official pythia6 Z's
+						if(mtype==1) hname += getTemplateName(name); // template Z'
+						if(mtype==2) hname += getTemplateName(name,"KK"); // template KK
+						drawon(objname, h1Map[hname]);
+					}
+					templateText(name, (t==0)?true:false, true);
+					drawtemplatetxton(objname);
+					_INFO("drawn -> "+(string)objname);
+				}
 			}
 		}
-		
-		if(name.Contains("KK") && !name.Contains("_template")  &&  !name.Contains("m2000"))
-		{
-			if(name.Contains("hMass"))
-			{
-				setMinMax(h1Map["hMassDYmumu_noEWkfactor"],h1Map["hMass"+name],true);
-				draw(h1Map["hMassDYmumu_noEWkfactor"], "hMass"+name+"_tempalte", "", dolog, dolog);
-				drawon("hMass"+name+"_tempalte", h1Map["hMass"+name+"_tempalte"]);
-				templateText("hMass"+name+"_tempalte", grpx[name]->label);
-				drawtemplatetxton("hMass"+name+"_tempalte");
-				
-				setMinMax(h1Map["hMassDYmumu_noEWkfactor"],h1Map["hMass"+name+"_nopileup"],true);
-				draw(h1Map["hMassDYmumu_noEWkfactor"], "hMass"+name+"_tempalte_nopileup", "", dolog, dolog);
-				drawon("hMass"+name+"_tempalte_nopileup", h1Map["hMass"+name+"_tempalte_nopileup"]);
-				templateText("hMass"+name+"_tempalte_nopileup", grpx[name]->label);
-				drawtemplatetxton("hMass"+name+"_tempalte_nopileup");
-				
-				setMinMax(h1Map["hMassDYmumu_truth"],h1Map["hMass"+name],true);
-				draw(h1Map["hMassDYmumu_truth"], "hMass"+name+"_tempalte_truth", "", dolog, dolog);
-				drawon("hMass"+name+"_tempalte_truth", h1Map["hMass"+name+"_tempalte_truth"]);
-				templateText("hMass"+name+"_tempalte_truth", grpx[name]->label);
-				drawtemplatetxton("hMass"+name+"_tempalte_truth");
-				
-				setMinMax(h1Map["hMassDYmumu_truth_nopileup"],h1Map["hMass"+name+"_nopileup_nopileup"],true);
-				draw(h1Map["hMassDYmumu_truth_nopileup"], "hMass"+name+"_tempalte_truth_nopileup", "", dolog, dolog);
-				drawon("hMass"+name+"_tempalte_truth_nopileup", h1Map["hMass"+name+"_tempalte_truth_nopileup"]);
-				templateText("hMass"+name+"_tempalte_truth_nopileup", grpx[name]->label);
-				drawtemplatetxton("hMass"+name+"_tempalte_truth_nopileup");
-			}
-			if(name.Contains("hpT"))
-			{
-				setMinMax(h1Map["hpTDYmumu_noEWkfactor"],h1Map["hpT"+name],true);
-				draw(h1Map["hpTDYmumu_noEWkfactor"], "hpT"+name+"_tempalte", "", dolog, dolog);
-				drawon("hpT"+name+"_tempalte", h1Map["hpT"+name+"_tempalte"]);
-				templateText("hpT"+name+"_tempalte", grpx[name]->label);
-				drawtemplatetxton("hpT"+name+"_tempalte");
-				
-				setMinMax(h1Map["hpTDYmumu_noEWkfactor"],h1Map["hpT"+name+"_nopileup"],true);
-				draw(h1Map["hpTDYmumu_noEWkfactor"], "hpT"+name+"_tempalte_nopileup", "", dolog, dolog);
-				drawon("hpT"+name+"_tempalte_nopileup", h1Map["hpT"+name+"_tempalte_nopileup"]);
-				templateText("hpT"+name+"_tempalte_nopileup", grpx[name]->label);
-				drawtemplatetxton("hpT"+name+"_tempalte_nopileup");
-				
-				setMinMax(h1Map["hpTDYmumu_truth"],h1Map["hpT"+name],true);
-				draw(h1Map["hpTDYmumu_truth"], "hpT"+name+"_tempalte_truth", "", dolog, dolog);
-				drawon("hpT"+name+"_tempalte_truth", h1Map["hpT"+name+"_tempalte_truth"]);
-				templateText("hpT"+name+"_tempalte_truth", grpx[name]->label);
-				drawtemplatetxton("hpT"+name+"_tempalte_truth");
-				
-				setMinMax(h1Map["hpTDYmumu_truth_nopileup"],h1Map["hpT"+name+"_nopileup"],true);
-				draw(h1Map["hpTDYmumu_truth_nopileup"], "hpT"+name+"_tempalte_truth_nopileup", "", dolog, dolog);
-				drawon("hpT"+name+"_tempalte_truth_nopileup", h1Map["hpT"+name+"_tempalte_truth_nopileup"]);
-				templateText("hpT"+name+"_tempalte_truth_nopileup", grpx[name]->label);
-				drawtemplatetxton("hpT"+name+"_tempalte_truth_nopileup");
-			}
-		}
-		*/
-		
-		if(name.Contains("m2000"))
-		{
-			if(name.Contains("hMass"))
-			{
-				setMinMax(h1Map["hMassDYmumu"],h1Map["hMass"+name],true);
-				draw(h1Map["hMassDYmumu"], "hMass"+name, "", dolog, dolog);
-				drawon("hMass"+name, h1Map["hMass"+name]);
-				templateText("hMass"+name, grpx[name]->label);
-				//drawtemplatetxton("hMass"+name);
-				
-				setMinMax(h1Map["hMassDYmumu_truth"],h1Map["hMass"+name+"_truth"],true);
-				draw(h1Map["hMassDYmumu_truth"], "hMass"+name+"_truth", "", dolog, dolog);
-				drawon("hMass"+name+"_truth", h1Map["hMass"+name+"_truth"]);
-				templateText("hMass"+name+"_truth", grpx[name]->label);
-				//drawtemplatetxton("hMass"+name+"_truth");
-				
-				setMinMax(h1Map["hMassDYmumu_nopileup"],h1Map["hMass"+name+"_nopileup"],true);
-				draw(h1Map["hMassDYmumu_nopileup"], "hMass"+name+"_nopileup", "", dolog, dolog);
-				drawon("hMass"+name+"_nopileup", h1Map["hMass"+name+"_nopileup"]);
-				templateText("hMass"+name+"_nopileup", grpx[name]->label);
-				//drawtemplatetxton("hMass"+name+"_nopileup");
-				
-				setMinMax(h1Map["hMassDYmumu_truth_nopileup"],h1Map["hMass"+name+"_truth_nopileup"],true);
-				draw(h1Map["hMassDYmumu_truth_nopileup"], "hMass"+name+"_truth_nopileup", "", dolog, dolog);
-				drawon("hMass"+name+"_truth_nopileup", h1Map["hMass"+name+"_truth_nopileup"]);
-				templateText("hMass"+name+"_truth_nopileup", grpx[name]->label);
-				//drawtemplatetxton("hMass"+name+"_truth_nopileup");
-				
-				// here also the hMass_1d_ ... ???
-			}
-		}
-		
 	}
 
-	hbgdraw("hNvxp");
-	hbgdraw("hNvxp","_with_puwgt");
+	hbgdraw("hNvxp_no_puwgt");
+	hbgdraw("hNvxp_with_puwgt");
 	hbgdraw("hMassNumbers","",dolog,dolog);
 	hbgdraw("hMass","",dolog,dolog);
 	hbgdraw("hyQ");
@@ -1631,31 +1547,6 @@ void hdraw()
 	hbgdraw("hPhiSubleading");
 	hbgdraw("hpTLeading","",dolog,dolog);
 	hbgdraw("hpTSubleading","",dolog,dolog);
-	
-	//////////////////////////////////////////////////////////////
-	/*
-	for(int i=1 ; i<=nCosThetaBinsLimit ; i++)
-	{
-		TString baseName = "hMass_cosThSlice_"+(TString)_s(i);
-		draw(h1Map[baseName+"_Data"], "", "", !dolog, dolog);
-		draw(h1Map[baseName+"_DYmumu"], "", "", !dolog, dolog);
-		draw(h1Map[baseName+"_Diboson"], "", "", !dolog, dolog);
-		draw(h1Map[baseName+"_Gmm_01_1750"], "", "", !dolog, dolog);
-		draw(h1Map[baseName+"_Gmm_01_2000"], "", "", !dolog, dolog);
-		draw(h1Map[baseName+"_Gmm_01_2250"], "", "", !dolog, dolog);
-	}
-	for(int i=1 ; i<=ndEtaBinsLimit ; i++)
-	{
-		TString baseName = "hMass_dEtaSlice_"+(TString)_s(i);
-		draw(h1Map[baseName+"_Data"], "", "", !dolog, dolog);
-		draw(h1Map[baseName+"_DYmumu"], "", "", !dolog, dolog);
-		draw(h1Map[baseName+"_Diboson"], "", "", !dolog, dolog);
-		draw(h1Map[baseName+"_Gmm_01_1750"], "", "", !dolog, dolog);
-		draw(h1Map[baseName+"_Gmm_01_2000"], "", "", !dolog, dolog);
-		draw(h1Map[baseName+"_Gmm_01_2250"], "", "", !dolog, dolog);
-	}
-	*/
-	//////////////////////////////////////////////////////////////
 	
 	
 	///// 2d
@@ -1701,8 +1592,6 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 	float phiSubleading = 0.;
 	float pTLeading = 0.;
 	float pTSubleading = 0.;
-	int   slice_cost = 0;
-	int   slice_deta = 0;
 	float dEta = 0.;
 	
 	float truth_mass = 0.;
@@ -1710,6 +1599,8 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 	float truth_cost = 0.;
 	unsigned int truth_idIn = 0;
 	unsigned int idOut      = 13; // muon
+	double KKoverSM_weight     = 0.;
+	double ZPoverSM_weight     = 0.;
 	double KKnoSMoverSM_weight = 0.;
 	double ZPnoSMoverSM_weight = 0.;
 	
@@ -1721,37 +1612,38 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 	int iquark  = -999;
 	int iaquark = -999;
 	
-	float event_weight                 = 1.;
-	float event_weight_nopileup        = 1.;
-	float event_weight_noEWkF          = 1.;
-	float event_weight_noEWkF_nopileup = 1.;
+	float event_weight_backgrounds = 1.;
+	float event_weight_signals     = 1.;
 	
 	if(tsRunType=="MC")
 	{
 		/////////////////////////
 		/// weights handeling ///
 		/////////////////////////
-		event_weight          = 1.;
-		event_weight_nopileup = 1.;
-		event_weight_noEWkF    = 1.;
-		event_weight_noEWkF_nopileup = 1.;
 		
 		// all weights
-		event_weight = all_EW_kfactor_weight  *
-					   all_QCD_kfactor_weight *
-					   all_mcevent_weight     *
-					   all_pileup_weight; // out-of-time-pileup
+		event_weight_backgrounds = 1.;
+		event_weight_signals     = 1.;
 		
-		// all weights but without pileup
-		event_weight_nopileup = event_weight/all_pileup_weight;
-		
-		// all weights but without EW k-factor
-		event_weight_noEWkF = event_weight/all_EW_kfactor_weight;
-		
-		// all weights but without EW k-factor and without pileup
-		event_weight_noEWkF_nopileup = event_weight_noEWkF/all_pileup_weight;
+		bool isDY       = (tsMCname.Contains("DY")) ? true:false;
+		bool isEWSignal = (tsMCname.Contains("Zprime") || tsMCname.Contains("ExtraDimsTEV")) ? true:false;
+		bool isGSignal  = (tsMCname.Contains("Gmm")) ? true:false;
 	
+		event_weight_backgrounds = all_mcevent_weight;
+		event_weight_backgrounds *= (dopileup)             ? all_pileup_weight      : 1.;
+		event_weight_backgrounds *= (doEWkfactor  && isDY) ? all_EW_kfactor_weight  : 1.;
+		event_weight_backgrounds *= (doQCDkfactor && isDY) ? all_QCD_kfactor_weight : 1.;
+		
+		event_weight_signals = all_mcevent_weight;
+		event_weight_signals *= (dopileup)                   ? all_pileup_weight      : 1.;
+		event_weight_signals *= (doQCDkfactor && !isGSignal) ? all_QCD_kfactor_weight : 1.;
+		
+		float event_weight = 1.;
+		if(isEWSignal || isGSignal) event_weight = event_weight_signals;
+		else                        event_weight = event_weight_backgrounds;
+		float event_weight_nopileup = (!dopileup) ? event_weight : event_weight/all_pileup_weight;
 	
+		_DEBUG("");
 	
 		if(truth_all_isValid)
 		{
@@ -1770,29 +1662,8 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 			pTLeading     = truth_all_mc_pt->at(imuontru);
 			
 			_DEBUG("");
-			if(tsMCname.Contains("Zprime") && !tsMCname.Contains("template")  &&  !tsMCname.Contains("m2000"))
-			{
-				/// imass
-				h1Map["hMass"+tsMCname+"_truth"]->Fill(mass,wgt*event_weight_noEWkF);
-				/// pT leading
-				h1Map["hpTLeading"+tsMCname+"_truth"]->Fill(pTLeading,wgt*event_weight_noEWkF);
-			}
 			
-			_DEBUG("");
-			if(tsMCname.Contains("m2000"))
-			{
-				/// imass
-				h1Map["hMass"+tsMCname+"_truth"]->Fill(mass,wgt*event_weight_noEWkF);
-				h1Map["hMass"+tsMCname+"_truth_nopileup"]->Fill(mass,wgt*event_weight_noEWkF_nopileup);
-				//_INFO((string)tsMCname+" -> mass="+_s(mass)+", wgt="+_s(wgt*event_weight_noEWkF_nopileup));
-				/// pT leading
-				h1Map["hpTLeading"+tsMCname+"_truth"]->Fill(pTLeading,wgt*event_weight_noEWkF);
-				h1Map["hpTLeading"+tsMCname+"_truth_nopileup"]->Fill(pTLeading,wgt*event_weight_noEWkF_nopileup);
-			}
-			
-
-			_DEBUG("");
-			if(tsMCname=="DYmumu") // templates truth
+			if(tsMCname=="DYmumu") // the templates
 			{
 				// (1) take the true quark and the true muon and boost it to the cmf.
 				// (2) calculate cos(theta*) between the muon and the quark
@@ -1823,82 +1694,75 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 					_WARNING("truth mass mismatch: M(qqbar)="+_s(truth_all_partons_mc_m->at(4))+", M(4->"+_s(truth_all_partons_mc_pdgId->at(4))+")="+_s(truth_mass));
 				}
 				truth_s = truth_mass*truth_mass;
-				
-				// fill and weight the truth histos for the acceptance
-				if(doFullKKtemplates || doFullZPtemplates)
+			}
+			
+			_DEBUG("");
+			
+			if(tsMCname=="DYmumu" || tsMCname.Contains("Zprime") || tsMCname.Contains("ExtraDimsTEV"))
+			{
+				// the official samples
+				h1Map["hMass"+tsMCname+"_truth"]->Fill(mass,wgt*event_weight);
+				h1Map["hpTLeading"+tsMCname+"_truth"]->Fill(pTLeading,wgt*event_weight);
+				h1Map["hMass_limit_"+tsMCname+"_truth"]->Fill(mass*GeV2TeV,wgt*event_weight);
+			
+				// the templates
+				if(tsMCname=="DYmumu")
 				{
-					for(double M=mKKmmMin ; M<=mKKmmMax ; M+=dMKKmm)
+					// simple templates (at the official Z' points)
+					for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
 					{
+						if(M==1250.) continue;
 						//////////////////////////////
 						// propagate the KK mass /////
 						setKKmass(M); ////////////////
 						setZPmass(M); ////////////////
 						//////////////////////////////
-						TString massName   = (TString)_s(M);
-						if(doFullKKtemplates)
-						{
-							KKnoSMoverSM_weight = weightKKnoSM(truth_cost,truth_s,truth_idIn,idOut);
-							h1Map["hMass_truth_template_KK"+massName]->Fill(truth_mass*GeV2TeV,wgt*event_weight_noEWkF*KKnoSMoverSM_weight); // need to fluctuate this later
-							h1Map["hMass_truth_template_KK"+massName+"_nopileup"]->Fill(truth_mass*GeV2TeV,wgt*event_weight_noEWkF_nopileup*KKnoSMoverSM_weight); // need to fluctuate this later
-							maxKKwgt = (KKnoSMoverSM_weight>maxKKwgt) ? KKnoSMoverSM_weight : maxKKwgt;
-						}
-						else if(doFullZPtemplates)
-						{
-							ZPnoSMoverSM_weight = weightZPnoSM(truth_cost,truth_s,truth_idIn,idOut);
-							h1Map["hMass_truth_template_ZprimeSSM"+massName]->Fill(truth_mass*GeV2TeV,wgt*event_weight_noEWkF*ZPnoSMoverSM_weight); // need to fluctuate this later
-							h1Map["hMass_truth_template_ZprimeSSM"+massName+"_nopileup"]->Fill(truth_mass*GeV2TeV,wgt*event_weight_noEWkF_nopileup*ZPnoSMoverSM_weight); // need to fluctuate this later
-							maxZPwgt = (ZPnoSMoverSM_weight>maxZPwgt) ? ZPnoSMoverSM_weight : maxZPwgt;
-						}
-					}
-				}
-			
-				/// imass limits
-				h1Map["hMass_1d_full_DYmumu_truth"]->Fill(mass*GeV2TeV,wgt*event_weight);
-				h1Map["hMass_1d_full_DYmumu_truth_nopileup"]->Fill(mass*GeV2TeV,wgt*event_weight_nopileup);
-				
-				/// imass
-				h1Map["hMassDYmumu_truth"]->Fill(mass,wgt*event_weight);
-				h1Map["hMassDYmumu_truth_nopileup"]->Fill(mass,wgt*event_weight_nopileup);
-				
-				/// pT leading
-				h1Map["hpTLeadingDYmumu_truth"]->Fill(pTLeading,wgt*event_weight);
-				h1Map["hpTLeadingDYmumu_truth_nopileup"]->Fill(pTLeading,wgt*event_weight_nopileup);
+						TString massName = (TString)_s(M);
+						
+						KKoverSM_weight = weightKK(truth_cost,truth_s,truth_idIn,idOut);
+						ZPoverSM_weight = weightZP(truth_cost,truth_s,truth_idIn,idOut);
+						
+						h1Map["hMassKK"+massName+"_template_truth"]->Fill(truth_mass,wgt*event_weight_signals*KKoverSM_weight); // need to fluctuate this later
+						h1Map["hMassZprime_SSM"+massName+"_template_truth"]->Fill(truth_mass,wgt*event_weight_signals*ZPoverSM_weight); // need to fluctuate this later
 
-				_DEBUG("");
-				
-				for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
-				{
-					if(M==1250.) continue;
-					TString tsname_ZP = "";
-					TString tsname_KK = "";
-					double template_weight_ZP = 0.;
-					double template_weight_KK = 0.;
-					for(unsigned int j=0 ; j<truth_all_vBSMmass->size() ; j++)
+						h1Map["hMass_limit_KK"+massName+"_template_truth"]->Fill(truth_mass*GeV2TeV,wgt*event_weight_signals*KKoverSM_weight);
+						h1Map["hMass_limit_Zprime_SSM"+massName+"_template_truth"]->Fill(truth_mass*GeV2TeV,wgt*event_weight_signals*ZPoverSM_weight);
+
+						h1Map["hpTLeadingKK"+massName+"_template_truth"]->Fill(pTLeading,wgt*event_weight_signals*KKoverSM_weight); // need to fluctuate this later
+						h1Map["hpTLeadingZprime_SSM"+massName+"_template_truth"]->Fill(pTLeading,wgt*event_weight_signals*ZPoverSM_weight); // need to fluctuate this later
+					}
+					
+					// limit templates
+					if(doFullKKtemplates || doFullZPtemplates)
 					{
-						if(truth_all_vBSMmass->at(j)==M)
+						for(double M=mKKmmMin ; M<=mKKmmMax ; M+=dMKKmm)
 						{
-							template_weight_ZP = truth_all_vZPwgt->at(j);
-							template_weight_KK = truth_all_vKKwgt->at(j);
-							break;
+							//////////////////////////////
+							// propagate the KK mass /////
+							setKKmass(M); ////////////////
+							setZPmass(M); ////////////////
+							//////////////////////////////
+							TString massName   = (TString)_s(M);
+							
+							_DEBUG("massName="+(string)massName);
+							
+							if(doFullKKtemplates)
+							{
+								KKnoSMoverSM_weight = weightKKnoSM(truth_cost,truth_s,truth_idIn,idOut);
+								h1Map["hMass_truth_template_KK"+massName]->Fill(truth_mass*GeV2TeV,wgt*event_weight_signals*KKnoSMoverSM_weight); // need to fluctuate this later
+								maxKKwgt = (KKnoSMoverSM_weight>maxKKwgt) ? KKnoSMoverSM_weight : maxKKwgt;
+							}
+							else if(doFullZPtemplates)
+							{
+								ZPnoSMoverSM_weight = weightZPnoSM(truth_cost,truth_s,truth_idIn,idOut);
+								h1Map["hMass_truth_template_Zprime_SSM"+massName]->Fill(truth_mass*GeV2TeV,wgt*event_weight_signals*ZPnoSMoverSM_weight); // need to fluctuate this later
+								maxZPwgt = (ZPnoSMoverSM_weight>maxZPwgt) ? ZPnoSMoverSM_weight : maxZPwgt;
+							}
 						}
 					}
-
-					/// imass
-					tsname_ZP = "hMassZprime_SSM" + (TString)_s(M) + "_template_truth";
-					tsname_KK = "hMassKK"         + (TString)_s(M) + "_template_truth";
-					h1Map[tsname_ZP]->Fill(mass,wgt*event_weight_noEWkF*template_weight_ZP);
-					h1Map[tsname_KK]->Fill(mass,wgt*event_weight_noEWkF*template_weight_KK);
-					
-					/// pT leading
-					tsname_ZP = "hpTLeadingZprime_SSM" + (TString)_s(M) + "_template_truth";
-					tsname_KK = "hpTLeadingKK"         + (TString)_s(M) + "_template_truth";
-					h1Map[tsname_ZP]->Fill(pTLeading,wgt*event_weight_noEWkF*template_weight_ZP);
-					h1Map[tsname_KK]->Fill(pTLeading,wgt*event_weight_noEWkF*template_weight_KK);
-					
-					_DEBUG("");
 				}
 			}
-
+			
 			_DEBUG("");
 			if(recon_all_isValid)
 			{
@@ -1945,8 +1809,6 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				pTLeading     = recon_all_pt->at(0);
 				pTSubleading  = recon_all_pt->at(1);
 				dEta          = fabs(etaLeading-etaSubleading);
-				slice_cost    = h1Map["hCosThetaLimitBins_DYmumu"]->FindBin(cosThetaCS);
-				slice_deta    = h1Map["hdEtaLimitBins_DYmumu"]->FindBin(dEta);
 				
 				
 				// for the Z peak normalization
@@ -1961,47 +1823,31 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				_DEBUG("");
 				if(tsMCname=="DYmumu") // templates
 				{
-					/// imass
-					h1Map["hMassDYmumu_noEWkfactor"]->Fill(mass,wgt*event_weight_noEWkF);
-					/// pT leading
-					h1Map["hpTLeadingDYmumu_noEWkfactor"]->Fill(pTLeading,wgt*event_weight_noEWkF);
-				
+					// simple templates (at the official Z' points)
 					for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
 					{
 						if(M==1250.) continue;
-						TString tsname_ZP = "";
-						TString tsname_KK = "";
-						double template_weight_ZP = 0.;
-						double template_weight_KK = 0.;
-						for(unsigned int j=0 ; j<truth_all_vBSMmass->size() ; j++)
-						{
-							if(truth_all_vBSMmass->at(j)==M)
-							{
-								template_weight_ZP = truth_all_vZPwgt->at(j);
-								template_weight_KK = truth_all_vKKwgt->at(j);
-								break;
-							}
-						}
-
-						/// imass
-						tsname_ZP = "hMassZprime_SSM" + (TString)_s(M) + "_template";
-						tsname_KK = "hMassKK"         + (TString)_s(M) + "_template";
-						h1Map[tsname_ZP]->Fill(mass,wgt*event_weight_noEWkF*template_weight_ZP);
-						h1Map[tsname_KK]->Fill(mass,wgt*event_weight_noEWkF*template_weight_KK);
+						//////////////////////////////
+						// propagate the KK mass /////
+						setKKmass(M); ////////////////
+						setZPmass(M); ////////////////
+						//////////////////////////////
+						TString massName = (TString)_s(M);
 						
-						/// imass
-						tsname_ZP = "hMass_1d_full_Zprime_SSM" + (TString)_s(M) + "_template";
-						tsname_KK = "hMass_1d_full_KK"         + (TString)_s(M) + "_template";
-						h1Map[tsname_ZP]->Fill(mass*GeV2TeV,wgt*event_weight_noEWkF*template_weight_ZP); // for the 1d limit
-						h1Map[tsname_KK]->Fill(mass*GeV2TeV,wgt*event_weight_noEWkF*template_weight_KK); // for the 1d limit
+						KKoverSM_weight = weightKK(truth_cost,truth_s,truth_idIn,idOut);
+						ZPoverSM_weight = weightZP(truth_cost,truth_s,truth_idIn,idOut);
 						
-						/// pT leading
-						tsname_ZP = "hpTLeadingZprime_SSM" + (TString)_s(M) + "_template";
-						tsname_KK = "hpTLeadingKK"         + (TString)_s(M) + "_template";
-						h1Map[tsname_ZP]->Fill(pTLeading,wgt*event_weight_noEWkF*template_weight_ZP);
-						h1Map[tsname_KK]->Fill(pTLeading,wgt*event_weight_noEWkF*template_weight_KK);
+						h1Map["hMassKK"+massName+"_template"]->Fill(mass,wgt*event_weight_signals*KKoverSM_weight); // need to fluctuate this later
+						h1Map["hMassZprime_SSM"+massName+"_template"]->Fill(mass,wgt*event_weight_signals*ZPoverSM_weight); // need to fluctuate this later
+						
+						h1Map["hpTLeadingKK"+massName+"_template"]->Fill(pTLeading,wgt*event_weight_signals*KKoverSM_weight); // need to fluctuate this later
+						h1Map["hpTLeadingZprime_SSM"+massName+"_template"]->Fill(pTLeading,wgt*event_weight_signals*ZPoverSM_weight); // need to fluctuate this later
+						
+						h1Map["hMass_limit_KK"+massName+"_template"]->Fill(mass*GeV2TeV,wgt*event_weight_signals*KKoverSM_weight); // for the 1d limit
+						h1Map["hMass_limit_Zprime_SSM"+massName+"_template"]->Fill(mass*GeV2TeV,wgt*event_weight_signals*ZPoverSM_weight); // for the 1d limit
 					}
 					
+					// limit templates
 					if(doFullKKtemplates || doFullZPtemplates)
 					{
 						for(double M=mKKmmMin ; M<=mKKmmMax ; M+=dMKKmm)
@@ -2016,60 +1862,38 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 							if(doFullKKtemplates)
 							{
 								KKnoSMoverSM_weight = weightKKnoSM(truth_cost,truth_s,truth_idIn,idOut);
-								h1Map["hMass_template_KK"+massName]->Fill(mass*GeV2TeV,wgt*event_weight_noEWkF*KKnoSMoverSM_weight); // need to fluctuate this later
-								h1Map["hMass_template_KK"+massName+"_nopileup"]->Fill(mass*GeV2TeV,wgt*event_weight_noEWkF_nopileup*KKnoSMoverSM_weight); // need to fluctuate this later
+								h1Map["hMass_template_KK"+massName]->Fill(mass*GeV2TeV,wgt*event_weight_signals*KKnoSMoverSM_weight); // need to fluctuate this later
 							}
 							else if(doFullZPtemplates)
 							{
 								ZPnoSMoverSM_weight = weightZPnoSM(truth_cost,truth_s,truth_idIn,idOut);
-								h1Map["hMass_template_ZprimeSSM"+massName]->Fill(mass*GeV2TeV,wgt*event_weight_noEWkF*ZPnoSMoverSM_weight); // need to fluctuate this later
-								h1Map["hMass_template_ZprimeSSM"+massName+"_nopileup"]->Fill(mass*GeV2TeV,wgt*event_weight_noEWkF_nopileup*ZPnoSMoverSM_weight); // need to fluctuate this later
+								h1Map["hMass_template_Zprime_SSM"+massName]->Fill(mass*GeV2TeV,wgt*event_weight_signals*ZPnoSMoverSM_weight); // need to fluctuate this later
 							}
 						}
 					}
 				}
 				
-				// Signals and bg's that are not DYmumu should not get EW k-factor
-				float current_weight          = (tsMCname=="DYmumu") ? event_weight          : event_weight_noEWkF; // including pileup, QCD and mcevent
-				float current_weight_nopileup = (tsMCname=="DYmumu") ? event_weight_nopileup : event_weight_noEWkF_nopileup;
-				
-				h1Map["hNvxp"+tsMCname]->Fill(recon_all_vxp_n,wgt*current_weight_nopileup);
-				h1Map["hNvxp"+tsMCname+"_with_puwgt"]->Fill(recon_all_vxp_n,wgt*current_weight);
-				h1Map["hMassNumbers"+tsMCname]->Fill(mass,wgt*current_weight);
-				h1Map["hMass"+tsMCname]->Fill(mass,wgt*current_weight);			
-				h1Map["hMass"+tsMCname+"_nopileup"]->Fill(mass,wgt*current_weight_nopileup);
-				h1Map["hyQ"+tsMCname]->Fill(yQ,wgt*current_weight);
-				h1Map["hQT"+tsMCname]->Fill(QT,wgt*current_weight);
-				h1Map["hEtaQ"+tsMCname]->Fill(etaQ,wgt*current_weight);
-				h1Map["hEtaLeading"+tsMCname]->Fill(etaLeading,wgt*current_weight);
-				h1Map["hEtaSubleading"+tsMCname]->Fill(etaSubleading,wgt*current_weight);
-				h1Map["hPhiLeading"+tsMCname]->Fill(phiLeading,wgt*current_weight);
-				h1Map["hPhiSubleading"+tsMCname]->Fill(phiSubleading,wgt*current_weight);
-				h1Map["hpTLeading"+tsMCname]->Fill(pTLeading,wgt*current_weight);
-				//h1Map["hpTLeading"+tsMCname+"_nopileup"]->Fill(pTLeading,wgt*current_weight_nopileup);
-				h1Map["hpTSubleading"+tsMCname]->Fill(pTSubleading,wgt*current_weight);
-				
-				h1Map["hMass_1d_full_"+tsMCname]->Fill(mass*GeV2TeV,wgt*current_weight); // for the 1d limit
-				h1Map["hMass_1d_full_"+tsMCname+"_nopileup"]->Fill(mass*GeV2TeV,wgt*current_weight_nopileup); // for the 1d limit
-				
-				// for the 2d limit
-				if(slice_cost<=h1Map["hCosThetaLimitBins_DYmumu"]->GetNbinsX() && slice_cost>0)
-				{
-					h1Map["hMass_cosThSlice_"+(TString)_s(slice_cost)+"_"+tsMCname]->Fill(mass*GeV2TeV,wgt*current_weight);
-				}
-				if(slice_deta<=h1Map["hdEtaLimitBins_DYmumu"]->GetNbinsX() && slice_deta>0)
-				{
-					h1Map["hMass_dEtaSlice_"+(TString)_s(slice_deta)+"_"+tsMCname]->Fill(mass*GeV2TeV,wgt*current_weight);
-				}
+				h1Map["hNvxp_no_puwgt"+tsMCname]->Fill(recon_all_vxp_n,wgt*event_weight_nopileup);
+				h1Map["hNvxp_with_puwgt"+tsMCname]->Fill(recon_all_vxp_n,wgt*event_weight);
+				h1Map["hMassNumbers"+tsMCname]->Fill(mass,wgt*event_weight);
+				h1Map["hMass"+tsMCname]->Fill(mass,wgt*event_weight);			
+				h1Map["hyQ"+tsMCname]->Fill(yQ,wgt*event_weight);
+				h1Map["hQT"+tsMCname]->Fill(QT,wgt*event_weight);
+				h1Map["hEtaQ"+tsMCname]->Fill(etaQ,wgt*event_weight);
+				h1Map["hEtaLeading"+tsMCname]->Fill(etaLeading,wgt*event_weight);
+				h1Map["hEtaSubleading"+tsMCname]->Fill(etaSubleading,wgt*event_weight);
+				h1Map["hPhiLeading"+tsMCname]->Fill(phiLeading,wgt*event_weight);
+				h1Map["hPhiSubleading"+tsMCname]->Fill(phiSubleading,wgt*event_weight);
+				h1Map["hpTLeading"+tsMCname]->Fill(pTLeading,wgt*event_weight);
+				h1Map["hpTSubleading"+tsMCname]->Fill(pTSubleading,wgt*event_weight);
+				h1Map["hMass_limit_"+tsMCname]->Fill(mass*GeV2TeV,wgt*event_weight); // for the 1d limit
 				
 				_DEBUG("");
 				
-				h1Map["hCosThetaLimitBins_"+tsMCname]->Fill(cosThetaCS,wgt*current_weight);
-				h1Map["hdEtaLimitBins_"+tsMCname]->Fill(dEta,wgt*current_weight);
-				
 				///// 2d
-				h2Map["hMassCosThetaCS"+tsMCname]->Fill(mass,cosThetaCS,wgt*current_weight);
-				h2Map["hMassyQ"+tsMCname]->Fill(mass,yQ,wgt*current_weight);
+				h2Map["hMassCosThetaCS"+tsMCname]->Fill(mass,cosThetaCS,wgt*event_weight);
+				h2Map["hMassyQ"+tsMCname]->Fill(mass,yQ,wgt*event_weight);
+				
 				_DEBUG("");
 			}
 		}
@@ -2108,8 +1932,6 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 		pTLeading     = pt->at(0)*MeV2GeV;
 		pTSubleading  = pt->at(1)*MeV2GeV;
 		dEta  = fabs(etaLeading-etaSubleading);
-		slice_cost = h1Map["hCosThetaLimitBins_DYmumu"]->FindBin(cosThetaCS);
-		slice_deta = h1Map["hdEtaLimitBins_DYmumu"]->FindBin(dEta);
 		
 		if(mass>=imasslogicbins[0]  &&  mass<=imasslogicbins[1]) nData70to110 += 1.;
 		
@@ -2118,8 +1940,8 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 		///////////////////////////////////
 		/// DATA histo fill statrs here ///
 		///////////////////////////////////
-		h1Map["hNvxpData"]->Fill(vxp_n);
-		h1Map["hNvxpData_with_puwgt"]->Fill(vxp_n);
+		h1Map["hNvxp_no_puwgtData"]->Fill(vxp_n);
+		h1Map["hNvxp_with_puwgtData"]->Fill(vxp_n);
 		h1Map["hMassNumbersData"]->Fill(mass);
 		h1Map["hMassData"]->Fill(mass);
 		h1Map["hyQData"]->Fill(yQ);
@@ -2131,20 +1953,7 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 		h1Map["hPhiSubleadingData"]->Fill(phiSubleading);
 		h1Map["hpTLeadingData"]->Fill(pTLeading);
 		h1Map["hpTSubleadingData"]->Fill(pTSubleading);
-		h1Map["hMass_1d_full_Data"]->Fill(mass*GeV2TeV); // for the 1d limit
-		
-		// for the 2d limit
-		if(slice_cost<=h1Map["hCosThetaLimitBins_DYmumu"]->GetNbinsX() && slice_cost>0)
-		{
-			h1Map["hMass_cosThSlice_"+(TString)_s(slice_cost)+"_Data"]->Fill(mass*GeV2TeV);
-		}
-		if(slice_deta<=h1Map["hdEtaLimitBins_DYmumu"]->GetNbinsX() && slice_deta>0)
-		{
-			h1Map["hMass_dEtaSlice_"+(TString)_s(slice_deta)+"_Data"]->Fill(mass*GeV2TeV);
-		}
-		
-		h1Map["hCosThetaLimitBins_Data"]->Fill(cosThetaCS);
-		h1Map["hdEtaLimitBins_Data"]->Fill(dEta);
+		h1Map["hMass_limit_Data"]->Fill(mass*GeV2TeV); // for the 1d limit
 		
 		///// 2d
 		h2Map["hMassCosThetaCSData"]->Fill(mass,cosThetaCS);
@@ -2182,13 +1991,9 @@ void writeKKtemplates()
 	else                       fTemplates = new TFile("plots/XX_templates.root", "RECREATE");
 	olddir->cd();
 	TObjArray* templates_KK = new TObjArray;
-	TObjArray* templates_KK_nopileup = new TObjArray;
 	TObjArray* templates_KK_truth = new TObjArray;
-	TObjArray* templates_KK_truth_nopileup = new TObjArray;
 	TObjArray* templates_ZP = new TObjArray;
-	TObjArray* templates_ZP_nopileup = new TObjArray;
 	TObjArray* templates_ZP_truth = new TObjArray;
-	TObjArray* templates_ZP_truth_nopileup = new TObjArray;
 
 	unsigned int itemplate = 0;
 	if(doFullKKtemplates)
@@ -2197,9 +2002,7 @@ void writeKKtemplates()
 		{
 			TString massName = (TString)_s(M);
 			templates_KK->Add( (TH1D*)h1Map["hMass_template_KK"+massName]->Clone("") );
-			templates_KK_nopileup->Add( (TH1D*)h1Map["hMass_template_KK"+massName+"_nopileup"]->Clone("") );
 			templates_KK_truth->Add( (TH1D*)h1Map["hMass_truth_template_KK"+massName]->Clone("") );
-			templates_KK_truth_nopileup->Add( (TH1D*)h1Map["hMass_truth_template_KK"+massName+"_nopileup"]->Clone("") );
 			itemplate++;
 		}
 	}
@@ -2208,10 +2011,8 @@ void writeKKtemplates()
 		for(double M=mKKmmMin ; M<=mKKmmMax ; M+=dMKKmm)
 		{
 			TString massName = (TString)_s(M);
-			templates_ZP->Add( (TH1D*)h1Map["hMass_template_ZprimeSSM"+massName]->Clone("") );
-			templates_ZP_nopileup->Add( (TH1D*)h1Map["hMass_template_ZprimeSSM"+massName+"_nopileup"]->Clone("") );
-			templates_ZP_truth->Add( (TH1D*)h1Map["hMass_truth_template_ZprimeSSM"+massName]->Clone("") );
-			templates_ZP_truth_nopileup->Add( (TH1D*)h1Map["hMass_truth_template_ZprimeSSM"+massName+"_nopileup"]->Clone("") );
+			templates_ZP->Add( (TH1D*)h1Map["hMass_template_Zprime_SSM"+massName]->Clone("") );
+			templates_ZP_truth->Add( (TH1D*)h1Map["hMass_truth_template_Zprime_SSM"+massName]->Clone("") );
 			itemplate++;
 		}
 	}
@@ -2223,7 +2024,7 @@ void writeKKtemplates()
 			TString name  = it->second;
 			TString title = grpx[name]->label+";m_{#mu#mu} TeV;Events";
 			if(!name.Contains("KK")) continue;
-			templates_KK->Add( (TH1D*)h1Map["hMass_1d_full_"+name]->Clone("") );
+			templates_KK->Add( (TH1D*)h1Map["hMass_limit_"+name]->Clone("") );
 			templates_KK->At(itemplate)->Print();
 			itemplate++;
 		}
@@ -2235,23 +2036,15 @@ void writeKKtemplates()
 	{
 		templates_KK->SetOwner(kTRUE);
 		templates_KK->Write("template", TObject::kSingleKey);
-		templates_KK_nopileup->SetOwner(kTRUE);
-		templates_KK_nopileup->Write("template_nopileup", TObject::kSingleKey);
 		templates_KK_truth->SetOwner(kTRUE);
 		templates_KK_truth->Write("truth_template", TObject::kSingleKey);
-		templates_KK_truth_nopileup->SetOwner(kTRUE);
-		templates_KK_truth_nopileup->Write("truth_nopileup_template", TObject::kSingleKey);
 	}
 	else if(doFullZPtemplates)
 	{
 		templates_ZP->SetOwner(kTRUE);
 		templates_ZP->Write("template", TObject::kSingleKey);
-		templates_ZP_nopileup->SetOwner(kTRUE);
-		templates_ZP_nopileup->Write("template_nopileup", TObject::kSingleKey);
 		templates_ZP_truth->SetOwner(kTRUE);
 		templates_ZP_truth->Write("truth_template", TObject::kSingleKey);
-		templates_ZP_truth_nopileup->SetOwner(kTRUE);
-		templates_ZP_truth_nopileup->Write("truth_nopileup_template", TObject::kSingleKey);
 	}
 	else
 	{
@@ -2260,102 +2053,14 @@ void writeKKtemplates()
 	}
 	
 	fTemplates->cd();
-	TH1D* hDYrec = (TH1D*)h1Map["hMass_1d_full_DYmumu"]->Clone("");
-	TH1D* hDYrec_nopu = (TH1D*)h1Map["hMass_1d_full_DYmumu_nopileup"]->Clone("");
-	TH1D* hDYtru = (TH1D*)h1Map["hMass_1d_full_DYmumu_truth"]->Clone("");
-	TH1D* hDYtru_nopu = (TH1D*)h1Map["hMass_1d_full_DYmumu_truth_nopileup"]->Clone("");
-	TH1D* hBGsum = (TH1D*)h1Map["hMass_1d_full_MCsum"]->Clone("");
-	TH1D* hBGsum_nopu = (TH1D*)h1Map["hMass_1d_full_MCsum_nopileup"]->Clone("");
-	TH1D* hData  = (TH1D*)h1Map["hMass_1d_full_Data"]->Clone("");
-	hDYtru->Write();
-	hDYtru_nopu->Write();
+	TH1D* hDYrec = (TH1D*)h1Map["hMass_limit_DYmumu"]->Clone("");
+	TH1D* hDYtru = (TH1D*)h1Map["hMass_limit_DYmumu_truth"]->Clone("");
+	TH1D* hBGsum = (TH1D*)h1Map["hMass_limit_MCsum"]->Clone("");
+	TH1D* hData  = (TH1D*)h1Map["hMass_limit_Data"]->Clone("");
 	hDYrec->Write();
-	hDYrec_nopu->Write();
+	hDYtru->Write();
 	hBGsum->Write();
-	hBGsum_nopu->Write();
 	hData->Write();
-	
-	fTemplates->Write();
-	fTemplates->Close();
-}
-
-
-void stitchProc(TString sProc)
-{
-	// remember old dir
-	TDirectory* olddir = gDirectory;
-
-	TFile* fTemplates = new TFile("plots/"+sProc+"_templates.root", "RECREATE");
-	
-	olddir->cd();
-	
-	TObjArray* template_cosThetaSlices = new TObjArray;
-	TObjArray* template_dEtaSlices = new TObjArray;
-	
-	TString name   = "";
-	TString titles = "";
-	
-	vector<TString> modelNames;
-	if(sProc=="Gmm")
-	{
-		modelNames.push_back("Gmm_01_1750");
-		modelNames.push_back("Gmm_01_2000");
-		modelNames.push_back("Gmm_01_2250");
-	}
-	else if(sProc=="DYmumu")  modelNames.push_back("DYmumu");
-	else if(sProc=="Diboson") modelNames.push_back("Diboson");
-	else if(sProc=="Data")    modelNames.push_back("Data");
-	
-	for(unsigned int imodel=0 ; imodel<modelNames.size() ; imodel++)
-	{
-		vector<TH1D*> vhMass_cosThetaSlices;
-		vector<TH1D*> vhMass_dEtaSlices;
-		
-		for(int i=1 ; i<=nCosThetaBinsLimit ; i++)
-		{
-			TString baseName = "hMass_cosThSlice_"+(TString)_s(i)+"_"+modelNames[imodel];
-			vhMass_cosThetaSlices.push_back( (TH1D*)h1Map[baseName] );
-		}
-		for(int i=1 ; i<=ndEtaBinsLimit ; i++)
-		{
-			TString baseName = "hMass_dEtaSlice_"+(TString)_s(i)+"_"+modelNames[imodel];
-			vhMass_dEtaSlices.push_back( (TH1D*)h1Map[baseName] );
-		}
-		
-		name   = "mHat_stitchedCosTheta_"+modelNames[imodel]+"_"+(TString)_s(imodel);
-		titles = "mass in stitched cos#theta* slices;Extended m_{#mu#mu} TeV;Events";
-		template_cosThetaSlices->Add( (TH1D*)stitch(vhMass_cosThetaSlices,name,titles)->Clone("") );
-		template_cosThetaSlices->At(imodel)->Print();
-		
-		name   = "mHat_stitcheddEta_"+modelNames[imodel]+"_"+(TString)_s(imodel);
-		titles = "mass in stitched #Delta#eta slices;Extended m_{#mu#mu} TeV;Events";
-		template_dEtaSlices->Add( (TH1D*)stitch(vhMass_dEtaSlices,name,titles)->Clone("") );
-		template_dEtaSlices->At(imodel)->Print();
-		
-		
-		fTemplates->cd();
-		h1Map["hCosThetaLimitBins_"+modelNames[imodel]]->SetMinimum(0.5*h1Map["hCosThetaLimitBins_"+modelNames[imodel]]->GetMinimum());
-		h1Map["hCosThetaLimitBins_"+modelNames[imodel]]->Write();
-		h1Map["hdEtaLimitBins_"+modelNames[imodel]]->SetMinimum(0.5*h1Map["hdEtaLimitBins_"+modelNames[imodel]]->GetMinimum());
-		h1Map["hdEtaLimitBins_"+modelNames[imodel]]->Write();
-		h1Map["hMass_1d_full_"+modelNames[imodel]]->Write();
-		olddir->cd();
-	}
-
-	fTemplates->cd();
-	if(modelNames.size()>1)
-	{
-		template_cosThetaSlices->SetOwner(kTRUE);
-		template_cosThetaSlices->Write("template_cosThetaSlices", TObject::kSingleKey);
-	}
-	else template_cosThetaSlices->At(0)->Write();
-	
-	if(modelNames.size()>1)
-	{
-		template_dEtaSlices->SetOwner(kTRUE);
-		template_dEtaSlices->Write("template_dEtaSlices", TObject::kSingleKey);
-	}
-	else template_dEtaSlices->At(0)->Write();
 	
 	fTemplates->Write();
 	fTemplates->Close();
@@ -2448,9 +2153,10 @@ void run()
 
 	_DEBUG("run");
 	
-	/////////////////////
-	setFermions(); //////
-	/////////////////////
+	///////////////////////
+	setFermions(); ////////
+	setkFactors(false); ///
+	///////////////////////
 	
 	style();
 	samples();
@@ -2492,17 +2198,10 @@ void run()
 		_INFO((string)name+" -> finished");
 	}
 	
-	//--- for the 2d imass-angular distribution
-	stitchProc("Data");
-	stitchProc("DYmumu");
-	stitchProc("Diboson");
-	// stitchProc("DYtautau");
-	// stitchProc("TTbar");
-	stitchProc("Gmm");
-	
 	
 	// finalize
-	hscale2Zpeak(); // must come before hdraw.
+	
+	if(doData && (largeDYmumu && !fastDYmumu)) hscale2Zpeak(); // must come before hdraw.
 	writeKKtemplates();
 	hdraw();
 	save("plots");

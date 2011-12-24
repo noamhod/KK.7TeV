@@ -92,7 +92,6 @@ inline double wZP(unsigned int id)
 }
 
 
-
 ////////////////////////////////////////////////////////
 inline double wTotGKK(unsigned int mode)
 {
@@ -122,6 +121,13 @@ inline double wTotZP()
 	return w;
 }
 
+inline double wTotZPsimple()
+{
+	// from pythia8157/xmldoc/ParticleData.xml (line 338): m0="500.00000" mWidth="14.54029"
+	double mass = mZP;
+	double w = 14.54029*mass/500.;
+	return w;
+}
 
 }
 

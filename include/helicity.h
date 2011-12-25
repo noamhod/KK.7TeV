@@ -79,28 +79,16 @@ inline dcomplex hAZP(double s, double cosTheta, unsigned int idIn, unsigned int 
 {
 	dcomplex A(0,0);
 	A = hASM(s,cosTheta,idIn,idOut,hIn,hOut); // the SM term
-	/* double w = 0.;
-	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on all the flavors
-	{
-		w += wZP(it->first);
-	} */
-	
-	// double w = wTotZP();
-	double w = wTotZPsimple();
+	double w = wTotZP();
+	// double w = wTotZPsimple();
 	A += hAZP0(s,cosTheta,w,idIn,idOut,hIn,hOut);
 	return A;
 }
 inline dcomplex hAZPnoSM(double s, double cosTheta, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
 {
 	dcomplex A(0,0);
-	/* double w = 0.;
-	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on all the flavors
-	{
-		w += wZP(it->first);
-	} */
-	
-	// double w = wTotZP();
-	double w = wTotZPsimple();
+	double w = wTotZP();
+	// double w = wTotZPsimple();
 	A += hAZP0(s,cosTheta,w,idIn,idOut,hIn,hOut);
 	return A;
 }
@@ -139,13 +127,6 @@ inline dcomplex hAKK(double s, double cosTheta, unsigned int idIn, unsigned int 
 	A = hASM(s,cosTheta,idIn,idOut,hIn,hOut); // the SM term
 	for(unsigned int n=1 ; n<=nModes ; n++) // the KK tower
 	{
-		/* double wg = 0.;
-		double wz = 0.;
-		for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on all the flavors
-		{
-			wg += wGKK(it->first,n);
-			wz += wZKK(it->first,n);
-		} */
 		double wg = wTotGKK(n);
 		double wz = wTotZKK(n);
 		A += hAKKn(s,cosTheta,wg,wz,idIn,idOut,hIn,hOut,n);
@@ -157,13 +138,6 @@ inline dcomplex hAKKnoSM(double s, double cosTheta, unsigned int idIn, unsigned 
 	dcomplex A(0,0);
 	for(unsigned int n=1 ; n<=nModes ; n++) // the KK tower
 	{
-		/* double wg = 0.;
-		double wz = 0.;
-		for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) // loop on all the flavors
-		{
-			wg += wGKK(it->first,n);
-			wz += wZKK(it->first,n);
-		} */
 		double wg = wTotGKK(n);
 		double wz = wTotZKK(n);
 		A += hAKKn(s,cosTheta,wg,wz,idIn,idOut,hIn,hOut,n);

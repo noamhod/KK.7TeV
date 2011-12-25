@@ -1,0 +1,36 @@
+https://docs.google.com/viewer?url=http://ftp.rz.tu-bs.de/pub/mirror/ALL_primary_servers/rsync/mirrors.sec.informatik.tu-darmstadt.de/gentoo/distfiles/RooFit_Users_Manual_2.07-29.pdf
+page 25
+
+1. create the class files:
+	root [0] gSystem->Load("libRooFit"); 
+	root [1] RooRealVar x("x","x",0.,7000000);
+	root [2] RooRealVar a("a","a",-1.,-1.e-10);
+	root [3] RooRealVar b("b","b",0.,100.);   
+	root [4] RooClassFactory::makePdf("RooExtendedExponent","x,a,b");
+
+2. edit the files:
+	edit the file RooExtendedExponent.cxx and insert the function
+	expression as return value of the evaluate() method of your class:
+
+	Double_t RooMyPdf::evaluate() const
+	{
+		// ENTER EXPRESSION IN TERMS OF VARIABLE ARGUMENTS HERE
+		return exp(a*x + b);
+	}
+
+3. complie the lib:
+	root [5] .L RooExtendedExponent.cxx++
+
+4. include in the code:
+	#include RooExtendedExponent.h
+	RooRealVar expMeasure("expMeasure", "Exponent measure", -1e-6, -1., -1.e-10);
+	RooRealVar expConstant("expConstant", "Exponent constant", 2., 0., 100.);
+	RooExtendedExponent ExponentBG("ExponentBG", "Exponential BG", imass, expMeasure, expConstant);
+
+5. compile code:
+	gROOT->ProcessLine(".include ../roofit"); // or wherever you put it
+        gSystem->Load("libRooFit");
+        gSystem->Load("../roofit/RooExtendedExponent_cxx.so");
+	...
+
+

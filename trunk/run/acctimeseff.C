@@ -53,7 +53,8 @@ void acctimeseff()
 
 	style();
 	
-	TFile* fTemplates = new TFile("plots/ZP_templates.root","READ");
+	//TFile* fTemplates = new TFile("plots/ZP_templates.root","READ");
+	TFile* fTemplates = new TFile("plots/ZP_templates_nopileup_noEWkFactor.root","READ");
 	
 	TObjArray* toarr_recon = new TObjArray();
 	toarr_recon->Read("template");
@@ -78,6 +79,8 @@ void acctimeseff()
 	TH1D* hActimesEf = new TH1D("hActimesEf","Acceptance #times Efficiency vs. the pole mass;m_{BSM} TeV;Acceptance #times Efficiency",arraysize,minPoleMass,maxPoleMass);
 	hActimesEf->SetMarkerStyle(24);
 	hActimesEf->SetMarkerSize(0.8);
+
+	_INFO("");
 	
 	for(unsigned int t=0 ; t<arraysize ; t++)
 	{
@@ -115,26 +118,30 @@ void acctimeseff()
 		savecnv(name, hRec, hRec_chop, hTru);
 	}
 	
+	_INFO("");
+
 	double sigma   = 0.;
 	double average = getYaverage(hActimesEf,sigma);
 	
 	_INFO("BSM averaged acceptance = "+_s(average)+" +- "+_s(sigma));
 	
-	// TF1* accMM= new TF1("accMM","pol1",minPoleMass,maxPoleMass);
-	// accMM->SetParameters(0.4,-0.0114039);
 	TF1* accMM = new TF1("accMM","pol6",minPoleMass,maxPoleMass/* 0.07,3.07 */);
-    accMM->SetParameters(0.248482,0.613077,-0.960227,0.774202,-0.339321,0.0756178,-0.00670578);
+	accMM->SetParameters(0.248482,0.613077,-0.960227,0.774202,-0.339321,0.0756178,-0.00670578);
 	accMM->SetLineColor(kRed);
 	accMM->SetLineWidth(1);
 	
+	_INFO("");
+
 	c->cd();
 	hActimesEf->SetMinimum(1.e-2);
 	hActimesEf->Draw("e1x0");
 	accMM->Draw("SAMES");
 	saveas(c,"plots/acceptancetimesefficiency");
 	
-	TH1D* hActimesEfDYrec = (TH1D*)fTemplates->Get("hMass_1d_full_DYmumu");
-	TH1D* hActimesEfDYtru = (TH1D*)fTemplates->Get("hMass_1d_full_DYmumu_truth");
+	_INFO("");
+
+	TH1D* hActimesEfDYrec = (TH1D*)fTemplates->Get("hMass_limit_DYmumu");
+	TH1D* hActimesEfDYtru = (TH1D*)fTemplates->Get("hMass_limit_DYmumu_truth");
 	TH1D* hActimesEfDYrec_chop = hChopper(hActimesEfDYrec,9);
 	TH1D* hActimesEfDYtru_chop = hChopper(hActimesEfDYtru,9);
 	double nDYrec = Sum(hActimesEfDYrec_chop,true,true);

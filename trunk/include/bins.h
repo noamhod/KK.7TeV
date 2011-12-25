@@ -66,7 +66,7 @@ static Double_t logofficialimassbins[nlogofficialimassbins+1];
 // official pT
 static const Int_t    nsqrtofficialptbins = 40;
 static const Double_t sqrtofficialptmin   = 25.;
-static const Double_t sqrtofficialptmax   = 1000.;
+static const Double_t sqrtofficialptmax   = 1500.;
 static Double_t sqrtofficialptbins[nsqrtofficialptbins+1];
 // official qT
 static const Int_t    nsqrtofficialqtbins = 40;

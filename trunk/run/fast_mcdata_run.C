@@ -22,18 +22,18 @@ using namespace kFactors;
 // selectors //////////////////////////
 ///////////////////////////////////////
 TString ntupledir      = "/srv01/tau/hod/z0analysis-tests/z0analysis-r170/data"; // "/data/hod/2011/NTUPLE";
-bool doData            = false;
+bool doData            = true;
 bool doDYtautau        = false;
-bool fastDYmumu        = true;
-bool largeDYmumu       = false;
+bool fastDYmumu        = false;
+bool largeDYmumu       = true;
 bool drawGmm           = false;
 bool doFullKKtemplates = false;
 bool doFullZPtemplates = true;
 Int_t printmod         = 5000;
 Bool_t dolog           = true;
-bool dopileup          = true;
-bool doEWkfactor       = true;
-bool doQCDkfactor      = true;
+bool dopileup          = false;
+bool doEWkfactor       = false;
+bool doQCDkfactor      = false;
 ///////////////////////////////////////
 
 double mZprimeMin = 500.;
@@ -316,13 +316,23 @@ TString getTemplateBareTitle(TString tsZPname)
 	return name;
 }
 
+TString getTemplateBareTitlePythia8(TString tsZPname)
+{
+	_DEBUG("getTemplateBareTitle");
+	
+	TString name = "";
+	if(tsZPname.Contains("Zprime")) name = "Z'_{SSM} 2000 GeV Pythia8 ";
+	else                            name = "#gamma_{KK}/Z_{KK} GeV Pythia8 ";
+	return name;
+}
+
 void templateText(TString tsMCname, bool isTruth, Bool_t isTmplate=false)
 {
 	_DEBUG("templateText");
 	
 	if(leg_template==NULL)
 	{
-		leg_template = new TLegend(0.60,0.70,0.85,0.87,NULL,"brNDC");
+		leg_template = new TLegend(0.53,0.70,0.81,0.85,NULL,"brNDC");
 		leg_template->SetFillStyle(4000); //will be transparent
 		leg_template->SetFillColor(0);
 		leg_template->SetTextFont(42);
@@ -332,15 +342,16 @@ void templateText(TString tsMCname, bool isTruth, Bool_t isTmplate=false)
 	TString ZPname         = tsMCname;
 	TString KKtemplateName = getTemplateName(tsMCname,"KK");
 	TString ZPtemplateName = getTemplateName(tsMCname);
-	TString massNmae = getTemplateBareTitle(tsMCname);
 	
 	TString legTitle = "";
 	
-	legTitle = "DY "+(isTruth)?"tru":"rec";
-	leg_template->AddEntry(h1Map["hMassDYmumu_truth"],legTitle,"f");
+	legTitle = "DY ";
+	legTitle += (isTruth)?"tru":"rec";
+	leg_template->AddEntry(h1Map["hMassDYmumu"],legTitle,"f");
 	
 	if(isTmplate)
 	{
+		TString massNmae = getTemplateBareTitle(tsMCname);
 		legTitle = "Z'_{SSM} "+massNmae+" GeV Pythia6 ";
 		legTitle += (isTruth)?"tru":"rec";
 		leg_template->AddEntry(h1Map["hMass"+ZPname],legTitle,"f");         // doesn't matter if it is pT or mass truth sice they have the same graphic properties
@@ -353,9 +364,21 @@ void templateText(TString tsMCname, bool isTruth, Bool_t isTmplate=false)
 	}
 	else
 	{
-		legTitle = "Z'_{SSM} "+massNmae+" GeV Pythia8 ";
+		legTitle = getTemplateBareTitlePythia8(tsMCname);
 		legTitle += (isTruth)?"tru":"rec";
-		leg_template->AddEntry(h1Map[tsMCname],legTitle,"f");
+		leg_template->AddEntry(h1Map["hMass"+tsMCname],legTitle,"f");
+		if(tsMCname.Contains("Zprime"))
+		{
+			legTitle = "Z'_{SSM} 2000 GeV Template ";
+			legTitle += (isTruth)?"tru":"rec";
+			leg_template->AddEntry(h1Map["hMassZprime_SSM2000_template"],legTitle,"l");
+		}
+		else
+		{
+			legTitle = "#gamma_{KK}/Z_{KK} 2000 GeV Template ";
+			legTitle += (isTruth)?"tru":"rec";
+			leg_template->AddEntry(h1Map["hMassKK2000_template"],legTitle,"l");
+		}
 	}
 }
 
@@ -370,6 +393,7 @@ void draw(TObject* tobj, TString newname="", TString drawopt="", Bool_t logx=!do
 	if(logx) cnvMap[oName]->SetLogx();
 	if(logy) cnvMap[oName]->SetLogy();
 	if(logz) cnvMap[oName]->SetLogz();
+	cnvMap[oName]->SetTicks(1,1);
 	cnvMap[oName]->cd();
 	tobj->Draw(drawopt);
 	cnvMap[oName]->RedrawAxis();
@@ -401,6 +425,7 @@ void drawratio(TH1* th1n, TH1* th1d, vector<TString>& vtsMCbgds, TString drawopt
 	tvp_ratio->SetBottomMargin(0.20);
 	tvp_ratio->SetTopMargin(0.012);
 	
+	tvp_hists->SetTicks(1,1);
 	tvp_ratio->SetTicks(1,1);
 
 	TString cloneName_n = th1n->GetName();
@@ -501,11 +526,19 @@ void save(TString oDir)
 	_DEBUG("save");
 
 	_INFO("save all canvases");
+	
 	TString pdfName = oDir+"/mcdata_histograms";
 	if(!dopileup)     pdfName += "_nopileup";
 	if(!doEWkfactor)  pdfName += "_noEWkFactor";
 	if(!doQCDkfactor) pdfName += "_noQCDkFactor";
 	pdfName += ".pdf";
+	
+	TString pdfTempltaesName = oDir+"/mcdata_template_histograms";
+	if(!dopileup)     pdfTempltaesName += "_nopileup";
+	if(!doEWkfactor)  pdfTempltaesName += "_noEWkFactor";
+	if(!doQCDkfactor) pdfTempltaesName += "_noQCDkFactor";
+	pdfTempltaesName += ".pdf";
+	
 	unsigned int mapcount = 0;
 	unsigned int mapsize  = cnvMap.size();
 	for(TMapTSP2TCNV::iterator it=cnvMap.begin() ; it!=cnvMap.end() ; ++it)
@@ -524,9 +557,15 @@ void save(TString oDir)
 		pName = pdfName;
 		if(it==cnvMap.begin()) pName = pdfName+"(";
 		if(mapcount==mapsize)  pName = pdfName+")";
-		it->second->SetTitle(it->first);
 		it->second->SaveAs(pName);
-		it->second->SetTitle("");
+		
+		if( ((it->first.Contains("m2000") || it->first.Contains("Zprime")) && (it->first.Contains("hMass") || it->first.Contains("hpTLeading"))) || it->first.Contains("_templates") )
+		{
+			pName = pdfTempltaesName;
+			if(it==cnvMap.begin()) pName = pdfTempltaesName+"(";
+			if(mapcount==mapsize)  pName = pdfTempltaesName+")";
+			it->second->SaveAs(pName);
+		}
 	}
 	
 	_INFO("save all histograms (to a single .root file)");
@@ -537,8 +576,16 @@ void save(TString oDir)
 	pName += ".root";
 	TFile* f = new TFile(pName,"RECREATE");
 	f->cd();
-	for(TMapTSP2TH1::iterator it=h1Map.begin() ; it!=h1Map.end() ; ++it) {_INFO("XXX: "+(string)it->first); it->second->Write();}
-	for(TMapTSP2TH2::iterator it=h2Map.begin() ; it!=h2Map.end() ; ++it) {_INFO("XXX: "+(string)it->first); it->second->Write();}
+	for(TMapTSP2TH1::iterator it=h1Map.begin() ; it!=h1Map.end() ; ++it)
+	{
+		if(it->second!=NULL) it->second->Write();
+		else _WARNING("This name -> ["+(string)it->first+"] is not in h1Map");
+	}
+	for(TMapTSP2TH2::iterator it=h2Map.begin() ; it!=h2Map.end() ; ++it)
+	{
+		if(it->second!=NULL) it->second->Write();
+		else _WARNING("This name -> ["+(string)it->first+"] is not in h2Map");
+	}
 	f->Write();
 	f->Close();
 	delete f;
@@ -1455,23 +1502,23 @@ void hdraw()
 		
 		TString objname = "";
 		TString refname = "";
+		TString tptname = "";
 		if(name.Contains("Zprime")  || name.Contains("ExtraDimsTEV")) // both are drawn on top of the DYmumu
-		{
-			_INFO("drawing -> "+(string)name);
-			
+		{			
 			if(name.Contains("_m2000"))
 			{
-				_INFO("name -> "+(string)name);
-			
 				for(int t=0 ; t<2 ; t++)
 				{
 					objname = "hMass"+name;
 					if(t==0) objname += "_truth";
 					refname = "hMassDYmumu";
 					if(t==0) refname += "_truth";
+					tptname = (name.Contains("Zprime")) ? "hMassZprime_SSM2000_template" : "hMassKK2000_template";
+					if(t==0) tptname += "_truth";
 					setMinMax(h1Map[refname],h1Map[objname],true);
 					draw(h1Map[refname], objname, "", dolog, dolog); // the canvas will be named with the 2nd argument
 					drawon(objname, h1Map[objname]);
+					drawon(objname, h1Map[tptname]);
 					templateText(name, (t==0)?true:false, false);
 					drawtemplatetxton(objname);
 					_INFO("drawn -> "+(string)objname);
@@ -1480,12 +1527,14 @@ void hdraw()
 					if(t==0) objname += "_truth";
 					refname = "hpTLeadingDYmumu";
 					if(t==0) refname += "_truth";
+					tptname = (name.Contains("Zprime")) ? "hpTLeadingZprime_SSM2000_template" : "hpTLeadingKK2000_template";
+					if(t==0) tptname += "_truth";
 					setMinMax(h1Map[refname],h1Map[objname],true);
 					draw(h1Map[refname], objname, "", dolog, dolog); // the canvas will be named with the 2nd argument
 					drawon(objname, h1Map[objname]);
+					drawon(objname, h1Map[tptname]);
 					templateText(name, (t==0)?true:false, false);
 					drawtemplatetxton(objname);
-					_INFO("drawn -> "+(string)objname);
 				}
 			}
 			else // if(!name.Contains("_m2000")) then this is the regular Zprime's and the corresponding Z'/KK templates - all are drawn on top of the DYmumu
@@ -1507,6 +1556,8 @@ void hdraw()
 						if(mtype==0) hname += name; // official pythia6 Z's
 						if(mtype==1) hname += getTemplateName(name); // template Z'
 						if(mtype==2) hname += getTemplateName(name,"KK"); // template KK
+						
+						if(t==0) hname += "_truth";
 						drawon(objname, h1Map[hname]);
 					}
 					templateText(name, (t==0)?true:false, true);
@@ -1524,6 +1575,8 @@ void hdraw()
 						if(mtype==0) hname += name; // official pythia6 Z's
 						if(mtype==1) hname += getTemplateName(name); // template Z'
 						if(mtype==2) hname += getTemplateName(name,"KK"); // template KK
+						
+						if(t==0) hname += "_truth";
 						drawon(objname, h1Map[hname]);
 					}
 					templateText(name, (t==0)?true:false, true);
@@ -1722,11 +1775,11 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 						KKoverSM_weight = weightKK(truth_cost,truth_s,truth_idIn,idOut);
 						ZPoverSM_weight = weightZP(truth_cost,truth_s,truth_idIn,idOut);
 						
-						h1Map["hMassKK"+massName+"_template_truth"]->Fill(truth_mass,wgt*event_weight_signals*KKoverSM_weight); // need to fluctuate this later
-						h1Map["hMassZprime_SSM"+massName+"_template_truth"]->Fill(truth_mass,wgt*event_weight_signals*ZPoverSM_weight); // need to fluctuate this later
+						h1Map["hMassKK"+massName+"_template_truth"]->Fill(mass,wgt*event_weight_signals*KKoverSM_weight); // need to fluctuate this later
+						h1Map["hMassZprime_SSM"+massName+"_template_truth"]->Fill(mass,wgt*event_weight_signals*ZPoverSM_weight); // need to fluctuate this later
 
-						h1Map["hMass_limit_KK"+massName+"_template_truth"]->Fill(truth_mass*GeV2TeV,wgt*event_weight_signals*KKoverSM_weight);
-						h1Map["hMass_limit_Zprime_SSM"+massName+"_template_truth"]->Fill(truth_mass*GeV2TeV,wgt*event_weight_signals*ZPoverSM_weight);
+						h1Map["hMass_limit_KK"+massName+"_template_truth"]->Fill(mass*GeV2TeV,wgt*event_weight_signals*KKoverSM_weight);
+						h1Map["hMass_limit_Zprime_SSM"+massName+"_template_truth"]->Fill(mass*GeV2TeV,wgt*event_weight_signals*ZPoverSM_weight);
 
 						h1Map["hpTLeadingKK"+massName+"_template_truth"]->Fill(pTLeading,wgt*event_weight_signals*KKoverSM_weight); // need to fluctuate this later
 						h1Map["hpTLeadingZprime_SSM"+massName+"_template_truth"]->Fill(pTLeading,wgt*event_weight_signals*ZPoverSM_weight); // need to fluctuate this later
@@ -1749,13 +1802,13 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 							if(doFullKKtemplates)
 							{
 								KKnoSMoverSM_weight = weightKKnoSM(truth_cost,truth_s,truth_idIn,idOut);
-								h1Map["hMass_truth_template_KK"+massName]->Fill(truth_mass*GeV2TeV,wgt*event_weight_signals*KKnoSMoverSM_weight); // need to fluctuate this later
+								h1Map["hMass_truth_template_KK"+massName]->Fill(mass*GeV2TeV,wgt*event_weight_signals*KKnoSMoverSM_weight); // need to fluctuate this later
 								maxKKwgt = (KKnoSMoverSM_weight>maxKKwgt) ? KKnoSMoverSM_weight : maxKKwgt;
 							}
 							else if(doFullZPtemplates)
 							{
 								ZPnoSMoverSM_weight = weightZPnoSM(truth_cost,truth_s,truth_idIn,idOut);
-								h1Map["hMass_truth_template_Zprime_SSM"+massName]->Fill(truth_mass*GeV2TeV,wgt*event_weight_signals*ZPnoSMoverSM_weight); // need to fluctuate this later
+								h1Map["hMass_truth_template_Zprime_SSM"+massName]->Fill(mass*GeV2TeV,wgt*event_weight_signals*ZPnoSMoverSM_weight); // need to fluctuate this later
 								maxZPwgt = (ZPnoSMoverSM_weight>maxZPwgt) ? ZPnoSMoverSM_weight : maxZPwgt;
 							}
 						}
@@ -1986,9 +2039,18 @@ void writeKKtemplates()
 	// remember old dir
 	TDirectory* olddir = gDirectory;
 	TFile* fTemplates = NULL;
-	if(doFullKKtemplates)      fTemplates = new TFile("plots/KK_templates.root", "RECREATE");
-	else if(doFullZPtemplates) fTemplates = new TFile("plots/ZP_templates.root", "RECREATE");
-	else                       fTemplates = new TFile("plots/XX_templates.root", "RECREATE");
+	
+	TString fTemplatesName = "plots/";
+	if(doFullKKtemplates)      fTemplatesName += "KK";
+	else if(doFullZPtemplates) fTemplatesName += "ZP";
+	else                       fTemplatesName += "XX";
+	fTemplatesName += "_templates";
+	if(!dopileup)     fTemplatesName += "_nopileup";
+	if(!doEWkfactor)  fTemplatesName += "_noEWkFactor";
+	if(!doQCDkfactor) fTemplatesName += "_noQCDkFactor";
+	fTemplatesName += ".root";
+	fTemplates = new TFile(fTemplatesName, "RECREATE");
+	
 	olddir->cd();
 	TObjArray* templates_KK = new TObjArray;
 	TObjArray* templates_KK_truth = new TObjArray;

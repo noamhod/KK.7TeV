@@ -24,8 +24,8 @@ BosonPtReweightingTool* ZpTrw = new BosonPtReweightingTool("PythiaMC11",true);
 ///////////////////////////////////////
 // selectors //////////////////////////
 ///////////////////////////////////////
-bool doData             = true;
-bool doScale2Zpeak      = true;
+bool doData             = false;
+bool doScale2Zpeak      = false;
 bool doDYtautau         = false;
 bool fastDYmumu         = false;
 bool largeDYmumu        = true;
@@ -33,9 +33,9 @@ bool drawGmm            = false;
 bool doFullKKtemplates  = false;
 bool doFullZPtemplates  = true;
 bool dopileup           = false;
-bool doEWkfactor        = true;
-bool doEWkfactorSig     = true;
-bool doQCDkfactor       = true;
+bool doEWkfactor        = false;
+bool doEWkfactorSig     = false;
+bool doQCDkfactor       = false;
 bool doZpT              = true;
 TString fileNmaeSuffix()
 {
@@ -791,7 +791,7 @@ void setMCtrees(TString tsMCname)
 	
 	if(tsMCname=="TTbar")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_T1_McAtNlo_Jimmy.root", "mcLocalControl_T1_McAtNlo_Jimmy", 999500, 1.4562E-01*nb2fb*5.4259E-01);
+		setMCtree(ntupledir+"/mcLocalControl_T1_McAtNlo_Jimmy.root", "mcLocalControl_T1_McAtNlo_Jimmy", 999500, 89.4*pb2fb); // AMI: 1.4562E-01*nb2fb*5.4259E-01
 	}
 	
 	

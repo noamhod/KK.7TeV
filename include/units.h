@@ -29,6 +29,7 @@ static const float TeV2GeV = 1.e+3;
 
 static const double mb2fb = 1.e12;
 static const double nb2fb = 1.e+6;
+static const double pb2fb = 1.e+3;
 static const double nb2mb = 1.e-6;
 
 static const float muonMass = 0.105658367; // GeV

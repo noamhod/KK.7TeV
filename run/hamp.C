@@ -102,6 +102,13 @@ void hamp()
 	{
 		TString quark = (q==0) ? "d-quark" : "u-quark";
 	
+		resetKKmass(); // important !
+		resetZPmass(); // important !
+		
+		// setFgZP(0.1,-0.1);  // important !
+		// setFgGKK(0.1,+0.1); // important !
+		// setFgZKK(1.5,-1.5); // important !
+	
 		wgtMaxZP = 0.;
 		wgtMaxKK = 0.;
 	

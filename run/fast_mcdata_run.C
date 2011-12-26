@@ -17,24 +17,46 @@ using namespace width;
 using namespace helicity;
 using namespace kFactors;
 
+#define BosonPtReweightingTool_cxx
+#include "BosonPtReweightingTool.C"
+BosonPtReweightingTool* ZpTrw = new BosonPtReweightingTool("PythiaMC11",true);
 
 ///////////////////////////////////////
 // selectors //////////////////////////
 ///////////////////////////////////////
-TString ntupledir      = "/srv01/tau/hod/z0analysis-tests/z0analysis-r170/data"; // "/data/hod/2011/NTUPLE";
-bool doData            = true;
-bool doDYtautau        = false;
-bool fastDYmumu        = false;
-bool largeDYmumu       = true;
-bool drawGmm           = false;
-bool doFullKKtemplates = false;
-bool doFullZPtemplates = true;
-Int_t printmod         = 5000;
-Bool_t dolog           = true;
-bool dopileup          = false;
-bool doEWkfactor       = false;
-bool doQCDkfactor      = false;
+bool doData             = true;
+bool doScale2Zpeak      = true;
+bool doDYtautau         = false;
+bool fastDYmumu         = false;
+bool largeDYmumu        = true;
+bool drawGmm            = false;
+bool doFullKKtemplates  = false;
+bool doFullZPtemplates  = true;
+bool dopileup           = false;
+bool doEWkfactor        = true;
+bool doEWkfactorSig     = true;
+bool doQCDkfactor       = true;
+bool doZpT              = true;
+TString fileNmaeSuffix()
+{
+	TString name = "";
+	if(!doData)         name += "_noData";
+	if(!doScale2Zpeak)  name += "_noZpeak";
+	if(fastDYmumu)      name += "_fastDY";
+	if(!largeDYmumu)    name += "_smallDY";
+	if(!dopileup)       name += "_noPUrw";
+	if(!doEWkfactor)    name += "_noEWkF";
+	if(!doEWkfactorSig) name += "_noEWkFsig";
+	if(!doQCDkfactor)   name += "_noQCDkF";
+	if(!doZpT)          name += "_noZpTrw";
+	return name;
+}
 ///////////////////////////////////////
+
+// other parameters
+TString ntupledir = "/srv01/tau/hod/z0analysis-tests/z0analysis-r170/data"; // "/data/hod/2011/NTUPLE";
+Int_t printmod    = 5000;
+Bool_t dolog      = true;
 
 double mZprimeMin = 500.;
 double mZprimeMax = 2000.;
@@ -58,7 +80,7 @@ float nMCall70to110          = 0;
 float nMCall70to110_nopileup = 0;
 float nData70to110           = 0;
 
-
+int nMaxBGs = 0;
 
 TFile* file;
 TTree* tree;
@@ -291,7 +313,7 @@ void text()
 	{
 		int order    = it->first;
 		TString name = it->second;
-		if(order>=20) continue; // only BGs !
+		if(order>=nMaxBGs)   continue; // only BGs !
 		if(name=="DYtautau") continue; // DYtautau is part of DYmumu
 		leg->AddEntry(h1Map["hMass"+name],grpx[name]->label,"f");
 	}
@@ -332,7 +354,7 @@ void templateText(TString tsMCname, bool isTruth, Bool_t isTmplate=false)
 	
 	if(leg_template==NULL)
 	{
-		leg_template = new TLegend(0.53,0.70,0.81,0.85,NULL,"brNDC");
+		leg_template = new TLegend(0.57,0.70,0.83,0.85,NULL,"brNDC");
 		leg_template->SetFillStyle(4000); //will be transparent
 		leg_template->SetFillColor(0);
 		leg_template->SetTextFont(42);
@@ -528,15 +550,11 @@ void save(TString oDir)
 	_INFO("save all canvases");
 	
 	TString pdfName = oDir+"/mcdata_histograms";
-	if(!dopileup)     pdfName += "_nopileup";
-	if(!doEWkfactor)  pdfName += "_noEWkFactor";
-	if(!doQCDkfactor) pdfName += "_noQCDkFactor";
+	pdfName += fileNmaeSuffix();
 	pdfName += ".pdf";
 	
 	TString pdfTempltaesName = oDir+"/mcdata_template_histograms";
-	if(!dopileup)     pdfTempltaesName += "_nopileup";
-	if(!doEWkfactor)  pdfTempltaesName += "_noEWkFactor";
-	if(!doQCDkfactor) pdfTempltaesName += "_noQCDkFactor";
+	pdfTempltaesName += fileNmaeSuffix();
 	pdfTempltaesName += ".pdf";
 	
 	unsigned int mapcount = 0;
@@ -545,9 +563,7 @@ void save(TString oDir)
 	{
 		mapcount++;
 		TString pName = oDir+"/mcdata_"+it->first;
-		if(!dopileup)     pName += "_nopileup";
-		if(!doEWkfactor)  pName += "_noEWkFactor";
-		if(!doQCDkfactor) pName += "_noQCDkFactor";
+		pName += fileNmaeSuffix();
 		it->second->SaveAs(pName+".png");
 		it->second->SaveAs(pName+".eps");
 		it->second->SaveAs(pName+".pdf");
@@ -570,9 +586,7 @@ void save(TString oDir)
 	
 	_INFO("save all histograms (to a single .root file)");
 	TString pName = oDir+"/mcdata_histograms";
-	if(!dopileup)     pName += "_nopileup";
-	if(!doEWkfactor)  pName += "_noEWkFactor";
-	if(!doQCDkfactor) pName += "_noQCDkFactor";
+	pName += fileNmaeSuffix();
 	pName += ".root";
 	TFile* f = new TFile(pName,"RECREATE");
 	f->cd();
@@ -610,29 +624,6 @@ void setMCtree(TString fPath, TString name, Double_t N, Double_t sigma)
 	_DEBUG("setMCtree");
 	
 	file = new TFile(fPath,"READ");
-	
-	/*
-	if(name=="mcLocalControl_Zmumu")
-	{
-		TFile* fZmumu = new TFile(ntupledir+"/mcLocalControl_Zmumu.root", "READ");
-		TEventList* elist;
-		TTree* ztree = (TTree*)fZmumu->Get("truth/truth_tree");
-		ztree->SetEventList(0);
-		ztree->Draw(">>elist","truth_all_Mhat<=250.");
-		elist = (TEventList*)gDirectory->Get("elist");
-		Double_t Ntru = elist->GetN();
-		ztree->SetEventList(elist);
-		_INFO("Ntru(m<=250 GeV) = "+_s(Ntru)+", Ninput="+_s(N));
-		if(N!=Ntru)
-		{
-			_WARNING("setting N to N="+_s(Ntru)+" to get the correct luminosity");
-			N = Ntru;
-		}
-		
-		treMap.insert( make_pair(name, (TTree*)ztree->Clone("")) );
-	}
-	else treMap.insert( make_pair(name, (TTree*)file->Get("truth/truth_tree")->Clone("")) );
-	*/
 	treMap.insert( make_pair(name, (TTree*)file->Get("truth/truth_tree")->Clone("")) );
 	flatLumiWgtMap.insert( make_pair(name, luminosity/(N/sigma)) );
 	mcNeventsMap.insert( make_pair(name, N) );
@@ -677,9 +668,16 @@ void samples()
 		grpx_ordered.insert( make_pair(grpx["DYtautau"]->order,"DYtautau") );
 	}
 	
+	
 	counter = 20;
 	grpx.insert( make_pair("Data", new GRPX(counter,"Data",   -1,-1,  -1,-1,-1,  kBlack,24,0.8)));
 	grpx_ordered.insert( make_pair(grpx["Data"]->order,"Data") );
+	
+	////////////////////////////
+	// 1->19 are backgrounds ///
+	// 20 is data //////////////
+	nMaxBGs = 20; //////////////
+	////////////////////////////
 	
 	counter = 100;
 	grpx.insert( make_pair("Zprime_SSM500",  new GRPX(counter,"500 GeV Z'_{SSM}",  kAzure+0,-1,    kBlack,1,1,  -1,-1,-1)));
@@ -703,41 +701,13 @@ void samples()
 	grpx.insert( make_pair("Gmm_01_2250",  new GRPX(proccount(counter),"2250 GeV G*",  kViolet+10,-1,  kBlack,1,1,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Gmm_01_2250"]->order,"Gmm_01_2250") );
 	
-	// counter = 300;
-	// grpx.insert( make_pair("Zprime_SSM500_template",  new GRPX(counter,"500 GeV Z'_{SSM} template",  -1,-1,    kOrange+10,1,2,  -1,-1,-1)));
-	// grpx_ordered.insert( make_pair(grpx["Zprime_SSM500_template"]->order,"Zprime_SSM500_template") );
-	// grpx.insert( make_pair("Zprime_SSM750_template",  new GRPX(proccount(counter),"750 GeV Z'_{SSM} template",  -1,-1,  kOrange+8,1,2,   -1,-1,-1)));
-	// grpx_ordered.insert( make_pair(grpx["Zprime_SSM750_template"]->order,"Zprime_SSM750_template") );
-	// grpx.insert( make_pair("Zprime_SSM1000_template",  new GRPX(proccount(counter),"1000 GeV Z'_{SSM} template",  -1,-1,  kOrange+8,1,2,   -1,-1,-1)));
-	// grpx_ordered.insert( make_pair(grpx["Zprime_SSM1000_template"]->order,"Zprime_SSM1000_template") );
-	// grpx.insert( make_pair("Zprime_SSM1500_template",  new GRPX(proccount(counter),"1500 GeV Z'_{SSM} template",  -1,-1,  kOrange+8,1,2,   -1,-1,-1)));
-	// grpx_ordered.insert( make_pair(grpx["Zprime_SSM1500_template"]->order,"Zprime_SSM1500_template") );
-	// grpx.insert( make_pair("Zprime_SSM1750_template",  new GRPX(proccount(counter),"1750 GeV Z'_{SSM} template",  -1,-1,  kOrange+5,1,2,   -1,-1,-1)));
-	// grpx_ordered.insert( make_pair(grpx["Zprime_SSM1750_template"]->order,"Zprime_SSM1750_template") );
-	// grpx.insert( make_pair("Zprime_SSM2000_template",  new GRPX(proccount(counter),"2000 GeV Z'_{SSM} template",  -1,-1,  kOrange+3,1,2,   -1,-1,-1)));
-	// grpx_ordered.insert( make_pair(grpx["Zprime_SSM2000_template"]->order,"Zprime_SSM2000_template") );
-	
-	// counter = 400;
-	// grpx.insert( make_pair("KK500_template",  new GRPX(counter,"500 GeV KK template",  -1,-1,    kGreen+4,1,2,  -1,-1,-1)));
-	// grpx_ordered.insert( make_pair(grpx["KK500_template"]->order,"KK500_template") );
-	// grpx.insert( make_pair("KK750_template",  new GRPX(proccount(counter),"750 GeV KK template",  -1,-1,  kGreen-1,1,2,   -1,-1,-1)));
-	// grpx_ordered.insert( make_pair(grpx["KK750_template"]->order,"KK750_template") );
-	// grpx.insert( make_pair("KK1000_template",  new GRPX(proccount(counter),"1000 GeV KK template",  -1,-1,  kGreen-1,1,2,   -1,-1,-1)));
-	// grpx_ordered.insert( make_pair(grpx["KK1000_template"]->order,"KK1000_template") );
-	// grpx.insert( make_pair("KK1500_template",  new GRPX(proccount(counter),"1500 GeV KK template",  -1,-1,  kGreen-1,1,2,   -1,-1,-1)));
-	// grpx_ordered.insert( make_pair(grpx["KK1500_template"]->order,"KK1500_template") );
-	// grpx.insert( make_pair("KK1750_template",  new GRPX(proccount(counter),"1750 GeV KK template",  -1,-1,  kGreen-1,1,2,   -1,-1,-1)));
-	// grpx_ordered.insert( make_pair(grpx["KK1750_template"]->order,"KK1750_template") );
-	// grpx.insert( make_pair("KK2000_template",  new GRPX(proccount(counter),"2000 GeV KK template",  -1,-1,  kGreen-8,1,2,   -1,-1,-1)));
-	// grpx_ordered.insert( make_pair(grpx["KK2000_template"]->order,"KK2000_template") );
-	
-	counter = 500;
+	counter = 300;
 	grpx.insert( make_pair("Zprime_SSM_m2000",  new GRPX(counter,"2 TeV Z'_{SSM} with interference", kMagenta+1,-1,    kBlack,1,1,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Zprime_SSM_m2000"]->order,"Zprime_SSM_m2000") );
 	grpx.insert( make_pair("ExtraDimsTEV_m2000",  new GRPX(proccount(counter),"2 TeV #gamma_{KK}/Z_{KK} with interference", kMagenta-1,-1,  kBlack,1,1,   -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["ExtraDimsTEV_m2000"]->order,"ExtraDimsTEV_m2000") );
 	
-	counter = 1000;
+	counter = 400;
 	grpx.insert( make_pair("MCsum", new GRPX(counter,"#Sum MC",  -1,-1,  -1,-1,-1,  kRed,  20,0.8)));
 	grpx_ordered.insert( make_pair(grpx["MCsum"]->order,"MCsum") );
 }
@@ -773,12 +743,11 @@ void setMCtrees(TString tsMCname)
 			setMCtree(ntupledir+"/mcLocalControl_DYmumu_1750M2000.root", "mcLocalControl_DYmumu_1750M2000", 20000, 2.4614E-08*nb2fb);
 			setMCtree(ntupledir+"/mcLocalControl_DYmumu_M2000.root", "mcLocalControl_DYmumu_M2000", 20000, 1.4001E-08*nb2fb);
 		}
-
 		else
 		{
 			if(fastDYmumu)
 			{
-				setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_75M120.root", "mcLocalControl_Pythia6_DYmumu_75M120",   100000, 7.9836E-01*nb2fb);
+				setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_75M120.root", "mcLocalControl_Pythia6_DYmumu_75M120",   100000, 7.9836E-01*nb2fb); // ok
 				// setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_120M250.root", "mcLocalControl_Pythia6_DYmumu_120M250", 100000, 8.5304E-03*nb2fb);
 				setMCtree(ntupledir+"/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 20000, 8.5275E-03*nb2fb); // this is the old DY !!!!!!
 			}
@@ -796,11 +765,11 @@ void setMCtrees(TString tsMCname)
 			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2250M2500.root", "mcLocalControl_Pythia6_DYmumu_2250M2500", 100000, 3.2232E-09*nb2fb);
 			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2500M2750.root", "mcLocalControl_Pythia6_DYmumu_2500M2750", 100000, 1.2073E-09*nb2fb);
 			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2750M3000.root", "mcLocalControl_Pythia6_DYmumu_2750M3000", 100000, 4.4763E-10*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_M3000.root",     "mcLocalControl_Pythia6_DYmumu_M3000",     100000, 2.5586E-10*nb2fb);
+			// setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_M3000.root",     "mcLocalControl_Pythia6_DYmumu_M3000",     100000, 2.5586E-10*nb2fb); // this is taken out because the EW k-factors are valid only below 3 TeV
 		}
 	}
 	
-	/*
+	
 	if(tsMCname=="DYtautau")
 	{
 		if(doDYtautau)
@@ -819,16 +788,18 @@ void setMCtrees(TString tsMCname)
 		}
 	}
 	
+	
 	if(tsMCname=="TTbar")
 	{
 		setMCtree(ntupledir+"/mcLocalControl_T1_McAtNlo_Jimmy.root", "mcLocalControl_T1_McAtNlo_Jimmy", 999500, 1.4562E-01*nb2fb*5.4259E-01);
 	}
 	
+	
 	if(tsMCname=="Diboson")
 	{
 		setMCtree(ntupledir+"/mcLocalControl_WW_Herwig.root", "mcLocalControl_WW_Herwig", 2442266, 17487.); // AMI: 3.1106E-02*nb2fb*3.8947E-01
-		setMCtree(ntupledir+"/mcLocalControl_WZ_Herwig.root", "mcLocalControl_WZ_Herwig", 239949,  5743.); // AMI: 1.1485E-02*nb2fb*3.1043E-01
-		setMCtree(ntupledir+"/mcLocalControl_ZZ_Herwig.root", "mcLocalControl_ZZ_Herwig", 244999,  1271.); // AMI: 4.5721E-03*nb2fb*2.1319E-01
+		setMCtree(ntupledir+"/mcLocalControl_WZ_Herwig.root", "mcLocalControl_WZ_Herwig", 239949,  5743.);  // AMI: 1.1485E-02*nb2fb*3.1043E-01
+		setMCtree(ntupledir+"/mcLocalControl_ZZ_Herwig.root", "mcLocalControl_ZZ_Herwig", 244999,  1271.);  // AMI: 4.5721E-03*nb2fb*2.1319E-01
 	}
 	
 	
@@ -844,7 +815,6 @@ void setMCtrees(TString tsMCname)
 	{
 		setMCtree(ntupledir+"/mcLocalControl_Gmm_01_2250.root", "mcLocalControl_Gmm_01_2250", 10000, 2.1381E-07*nb2fb);
 	}
-	*/
 	
 
 	if(tsMCname=="Zprime_SSM500")
@@ -1521,7 +1491,6 @@ void hdraw()
 					drawon(objname, h1Map[tptname]);
 					templateText(name, (t==0)?true:false, false);
 					drawtemplatetxton(objname);
-					_INFO("drawn -> "+(string)objname);
 					
 					objname = "hpTLeading"+name;
 					if(t==0) objname += "_truth";
@@ -1562,7 +1531,6 @@ void hdraw()
 					}
 					templateText(name, (t==0)?true:false, true);
 					drawtemplatetxton(objname);
-					_INFO("drawn -> "+(string)objname);
 					
 					objname = "hpTLeading"+massName+"_templates";
 					if(t==0) objname += "_truth";
@@ -1581,7 +1549,6 @@ void hdraw()
 					}
 					templateText(name, (t==0)?true:false, true);
 					drawtemplatetxton(objname);
-					_INFO("drawn -> "+(string)objname);
 				}
 			}
 		}
@@ -1665,39 +1632,19 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 	int iquark  = -999;
 	int iaquark = -999;
 	
+	unsigned int truXid = 0;
+	double truXmass  = 0.;
+	double truXpT    = 0.;
+	double ZpTweight = 1.;
+	
+	double kFQCD_NNLOvLOss = 1.;
+	double kFEW_NNLOvLOs   = 1.;
+	
 	float event_weight_backgrounds = 1.;
 	float event_weight_signals     = 1.;
 	
 	if(tsRunType=="MC")
 	{
-		/////////////////////////
-		/// weights handeling ///
-		/////////////////////////
-		
-		// all weights
-		event_weight_backgrounds = 1.;
-		event_weight_signals     = 1.;
-		
-		bool isDY       = (tsMCname.Contains("DY")) ? true:false;
-		bool isEWSignal = (tsMCname.Contains("Zprime") || tsMCname.Contains("ExtraDimsTEV")) ? true:false;
-		bool isGSignal  = (tsMCname.Contains("Gmm")) ? true:false;
-	
-		event_weight_backgrounds = all_mcevent_weight;
-		event_weight_backgrounds *= (dopileup)             ? all_pileup_weight      : 1.;
-		event_weight_backgrounds *= (doEWkfactor  && isDY) ? all_EW_kfactor_weight  : 1.;
-		event_weight_backgrounds *= (doQCDkfactor && isDY) ? all_QCD_kfactor_weight : 1.;
-		
-		event_weight_signals = all_mcevent_weight;
-		event_weight_signals *= (dopileup)                   ? all_pileup_weight      : 1.;
-		event_weight_signals *= (doQCDkfactor && !isGSignal) ? all_QCD_kfactor_weight : 1.;
-		
-		float event_weight = 1.;
-		if(isEWSignal || isGSignal) event_weight = event_weight_signals;
-		else                        event_weight = event_weight_backgrounds;
-		float event_weight_nopileup = (!dopileup) ? event_weight : event_weight/all_pileup_weight;
-	
-		_DEBUG("");
-	
 		if(truth_all_isValid)
 		{
 			imuontru  = (truth_all_mc_pdgId->at(0)>0) ? 0 : 1;
@@ -1710,7 +1657,6 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 			tlvmutrubBoosted = fkinematics::Boost(tlvmutrua,tlvmutrub,tlvmutrub);
 			(*tv3mutruaBoosted) = tlvmutruaBoosted->Vect();
 			(*tv3mutrubBoosted) = tlvmutrubBoosted->Vect();
-			
 			mass          = fkinematics::imass(tlvmutrua,tlvmutrub);
 			pTLeading     = truth_all_mc_pt->at(imuontru);
 			
@@ -1747,9 +1693,56 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 					_WARNING("truth mass mismatch: M(qqbar)="+_s(truth_all_partons_mc_m->at(4))+", M(4->"+_s(truth_all_partons_mc_pdgId->at(4))+")="+_s(truth_mass));
 				}
 				truth_s = truth_mass*truth_mass;
+				
+				// X = Z/Z'/ZKK are always at index 4.
+				truXid   = truth_all_partons_mc_pdgId->at(4);
+				truXmass = truth_all_partons_mc_m->at(4)*GeV2MeV;
+				truXpT   = truth_all_partons_mc_pt->at(4)*GeV2MeV;
 			}
 			
 			_DEBUG("");
+			
+			
+			/////////////////////////
+			/// weights handeling ///
+			/////////////////////////
+			ZpTweight = (
+						 (tsMCname=="DYmumu" || tsMCname.Contains("Zprime") || tsMCname.Contains("ExtraDimsTEV"))  &&
+						 (truXid==PDTZ || truXid==PDTZPRIME0 || truXid==PDTKK)
+						 ) ? ZpTrw->GetWeightZee(truXpT,truXmass) : 1.; 
+			// _INFO("truXid="+_s(truXid));
+			// _INFO("truXmass="+_s(truXmass));
+			// _INFO("truXpT="+_s(truXpT));
+			// _INFO("ZpTweight="+_s(ZpTweight));
+			if(isnaninf(ZpTweight)) _FATAL("ZpTweight is nan or inf -> "+_s(ZpTweight)+": in truXid="+_s(truXid)+", truXmass="+_s(truXmass)+" MeV, truXpT="+_s(truXpT)+" MeV");
+			
+			//// kFactors:			
+			kFQCD_NNLOvLOss = (tsMCname=="DYmumu"          ||
+							   tsMCname.Contains("Zprime") ||
+							   tsMCname.Contains("ExtraDimsTEV")) ? QCD(mass,"NNLO/LO**") : 1.;
+			kFEW_NNLOvLOs = (tsMCname=="DYmumu") ? ElectroWeak(mass) : 1.;
+			
+			//// all weights
+			bool isDY       = (tsMCname.Contains("DY")) ? true:false;
+			bool isEWSignal = (tsMCname.Contains("Zprime") || tsMCname.Contains("ExtraDimsTEV")) ? true:false;
+			bool isGSignal  = (tsMCname.Contains("Gmm")) ? true:false;
+		
+			event_weight_backgrounds = all_mcevent_weight;
+			event_weight_backgrounds *= (dopileup)             ? all_pileup_weight : 1.;
+			event_weight_backgrounds *= (doEWkfactor  && isDY) ? kFEW_NNLOvLOs     : 1.;
+			event_weight_backgrounds *= (doQCDkfactor && isDY) ? kFQCD_NNLOvLOss   : 1.;
+			event_weight_backgrounds *= (doZpT)                ? ZpTweight         : 1.;
+			
+			event_weight_signals = all_mcevent_weight;
+			event_weight_signals *= (dopileup)                   ? all_pileup_weight : 1.;
+			event_weight_signals *= (doQCDkfactor && isEWSignal) ? kFQCD_NNLOvLOss   : 1.;
+			event_weight_signals *= (doZpT)                      ? ZpTweight         : 1.;
+			
+			float event_weight = (isEWSignal || isGSignal) ? event_weight_signals : event_weight_backgrounds;
+			float event_weight_nopileup = (!dopileup) ? event_weight : event_weight/all_pileup_weight;
+		
+			_DEBUG("");
+			
 			
 			if(tsMCname=="DYmumu" || tsMCname.Contains("Zprime") || tsMCname.Contains("ExtraDimsTEV"))
 			{
@@ -2034,8 +2027,10 @@ void init(TTree* t=NULL)
 	}
 }
 
-void writeKKtemplates()
+void writeTemplates()
 {
+	_DEBUG("writeTemplates");
+
 	// remember old dir
 	TDirectory* olddir = gDirectory;
 	TFile* fTemplates = NULL;
@@ -2045,9 +2040,7 @@ void writeKKtemplates()
 	else if(doFullZPtemplates) fTemplatesName += "ZP";
 	else                       fTemplatesName += "XX";
 	fTemplatesName += "_templates";
-	if(!dopileup)     fTemplatesName += "_nopileup";
-	if(!doEWkfactor)  fTemplatesName += "_noEWkFactor";
-	if(!doQCDkfactor) fTemplatesName += "_noQCDkFactor";
+	fTemplatesName += fileNmaeSuffix();
 	fTemplatesName += ".root";
 	fTemplates = new TFile(fTemplatesName, "RECREATE");
 	
@@ -2082,7 +2075,6 @@ void writeKKtemplates()
 	{
 		for(TMapiTS::iterator it=grpx_ordered.begin() ; it!=grpx_ordered.end() ; ++it)
 		{
-			//int order     = it->first;
 			TString name  = it->second;
 			TString title = grpx[name]->label+";m_{#mu#mu} TeV;Events";
 			if(!name.Contains("KK")) continue;
@@ -2148,13 +2140,9 @@ void runMCproc(TString mcName)
 			////////////////////////////////////////////
 			if(mcName=="DYmumu"                   &&
 			   it->first=="mcLocalControl_Zmumu"  &&
-			   truth_all_isValid                  && 
-			   recon_all_isValid                  && 
 			   truth_all_Mhat>250.) continue;
 			
-			
 			if(!truth_all_isValid) continue;
-			// hfill("MC", mcName, flatLumiWgtMap[it->first]); ////
 			hfill("MC", mcName, getFlatLumiWeight(it->first)); ////
 			///////////////////////////////////////////////////////
 			
@@ -2215,10 +2203,17 @@ void run()
 
 	_DEBUG("run");
 	
-	///////////////////////
-	setFermions(); ////////
-	setkFactors(false); ///
-	///////////////////////
+	///////////////////////////////////////////////
+	// theoretical stuff... ///////////////////////
+	setFermions(); ////////////////////////////////
+	setkFactors(doEWkfactor && doEWkfactorSig); ///
+	resetKKmass();/////////////////////////////////
+	resetZPmass(); ////////////////////////////////
+	setFgZP(1.0,0.0); /////////////////////////////
+	setFgGKK(1.0,0.0); ////////////////////////////
+	setFgZKK(1.0,0.0); ////////////////////////////
+	///////////////////////////////////////////////
+	
 	
 	style();
 	samples();
@@ -2234,37 +2229,31 @@ void run()
 		for(Int_t entry=0 ; entry<N ; entry++)
 		{
 			tree->GetEntry(entry);
-			////////////////////////////////////
-			//// blocks of analysis go here ////
-			////////////////////////////////////
-			hfill("DATA"); /////////////////////
-			////////////////////////////////////
-			
+			hfill("DATA");			
 			monitor("Data",entry,N);
 		}
 		_INFO("Data: done.");
 	}
+	
 	
 	//---- MCs
 	for(TMapiTS::iterator it=grpx_ordered.begin() ; it!=grpx_ordered.end() ; ++it)
 	{
 		int order    = it->first;
 		TString name = it->second;
+		if(name=="Data")  continue; // data is handeled separately
+		if(name=="MCsum") continue; // MCsum is handeled separately
 		_INFO((string)name+" -> starting");
-		if(name=="Data")              continue; // data is handeled separately
-		if(name=="MCsum")             continue; // MCsum is handeled separately
-		if(name.Contains("template")) continue; // templates are made out of the DYmumu
 		setMCtrees(name);
 		runMCproc(name);
-		if(order<20) hMCsumall(name); // sum only BGs
+		if(order<nMaxBGs) hMCsumall(name); // sum only BGs (order==nMaxBGs is data)
 		_INFO((string)name+" -> finished");
 	}
 	
 	
 	// finalize
-	
-	if(doData && (largeDYmumu && !fastDYmumu)) hscale2Zpeak(); // must come before hdraw.
-	writeKKtemplates();
+	if(doData && doScale2Zpeak) hscale2Zpeak(); // must come before hdraw.
+	writeTemplates();
 	hdraw();
 	save("plots");
 	printNumbers();

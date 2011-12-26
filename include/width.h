@@ -18,7 +18,6 @@ namespace width
 
 static const double mKKinit = 2000.; // GeV
 static const double mZPinit = 2000.; // GeV
-
 static double mKK = 2000.; // GeV
 static double mZP = 2000.; // GeV
 
@@ -46,6 +45,7 @@ inline double wGKK2ttbar(unsigned int id, unsigned int mode)
 
 	// GKK->ttbar
 	double w = 2. * Ncf(id)*(alphaEM/6.) * mass * 2.*qf2 * sqrt( 1. - 4.*mf2/m2) * (1. + 2.*mf2/m2); // top is not massless !!!
+	w *= (doScale) ? fgGKK2() : 1.;
 	
 	return w;
 }
@@ -67,12 +67,13 @@ inline double wZKK2ttbar(unsigned int id, unsigned int mode)
 	double mf2 = mf(id)*mf(id);
 	
 	// ZKK->ttbar
-	double w = 2.*
+	double w =  2.*
 				(1./(24.*pi*sq2))*
 				Gmu*Ncf(id)*
 				(mZ2*mass)*
 				sqrt(1.-4.*mf2/m2)*
 				(1.-4.*mf2/m2+(2.*I3f(id)-4.*qf(id)*sw2)*(2.*I3f(id)-4.*qf(id)*sw2)*(1.+2.*mf2/m2)); // top is not massless !!!
+	w *= (doScale) ? fgZKK2() : 1.;
 	
 	return w;
 }
@@ -93,12 +94,13 @@ inline double wZP2ttbar(unsigned int id)
 	double mf2 = mf(id)*mf(id);
 	
 	// Z'->ttbar
-	double w = 2.*
+	double w =  2.*
 				(1./(24.*pi*sq2))*
 				Gmu*Ncf(id)*
 				(mZ2*mass)*
 				sqrt(1.-4.*mf2/m2)*
 				(1.-4.*mf2/m2+(2.*I3f(id)-4.*qf(id)*sw2)*(2.*I3f(id)-4.*qf(id)*sw2)*(1.+2.*mf2/m2)); // top is not massless !!!
+	w *= (doScale) ? fgZP2() : 1.;
 	
 	return w;
 }
@@ -113,7 +115,11 @@ inline double wGKK2ffbar(unsigned int id, unsigned int mode)
 
 	// GKK->ffbar
 	if(id==PDTTOP) w = wGKK2ttbar(PDTTOP,mode); // ttbar
-	else           w = Ncf(id)*(alphaEM/6.) * mass * 4.*(qf(id)*qf(id)); // all the rest
+	else
+	{
+		w = Ncf(id)*(alphaEM/6.) * mass * 4.*(qf(id)*qf(id)); // all the rest
+		w *= (doScale) ? fgGKK2() : 1.;
+	}
 	
 	return w;
 }
@@ -127,7 +133,11 @@ inline double wZKK2ffbar(unsigned int id, unsigned int mode)
 	
 	// ZKK->ffbar
 	if(id==PDTTOP) w = wZKK2ttbar(PDTTOP,mode); // ttbar
-	else           w = 2.*(1./(3.*pi*sq2))*Gmu*Ncf(id)*(mZ2*mass)*(I3f2-2.*(I3f(id)*qf(id)*sw2)+2.*(qf(id)*sw2)*(qf(id)*sw2)); // all the rest
+	else
+	{
+		w = 2.*(1./(3.*pi*sq2))*Gmu*Ncf(id)*(mZ2*mass)*(I3f2-2.*(I3f(id)*qf(id)*sw2)+2.*(qf(id)*sw2)*(qf(id)*sw2)); // all the rest
+		w *= (doScale) ? fgZKK2() : 1.;
+	}
 	
 	return w;
 }
@@ -140,7 +150,11 @@ inline double wZP2ffbar(unsigned int id)
 	
 	// Z'->ffbar
 	if(id==PDTTOP) w = wZP2ttbar(PDTTOP); // ttbar
-	else           w = (1./(6.*pi*sq2))*Gmu*Ncf(id)*(mZ2*mass)*(I3f2-2.*(I3f(id)*qf(id)*sw2)+2.*(qf(id)*sw2)*(qf(id)*sw2)); // all the rest
+	else
+	{
+		w = (1./(6.*pi*sq2))*Gmu*Ncf(id)*(mZ2*mass)*(I3f2-2.*(I3f(id)*qf(id)*sw2)+2.*(qf(id)*sw2)*(qf(id)*sw2)); // all the rest
+		w *= (doScale) ? fgZP2() : 1.;
+	}
 	
 	return w;
 }
@@ -163,7 +177,7 @@ inline double wTotZKK(unsigned int mode)
 	// loop on all the flavors
 	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) w += wZKK2ffbar(it->first,mode);
 	*/
-	w = 2. * wZ0 * mass/mZ0;
+	w = fgZKK2() * 2. * wZ0 * mass/mZ0;
 	if(mass>=2.*mf(PDTTOP)) w += wZKK2ttbar(PDTTOP,mode);
 	return w;
 }
@@ -175,7 +189,7 @@ inline double wTotZP()
 	// loop on all the flavors
 	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) w += wZP2ffbar(it->first);
 	*/
-	w = wZ0 * mass/mZ0;
+	w = fgZP2() * wZ0 * mass/mZ0;
 	if(mass>=2.*mf(PDTTOP)) w += wZP2ttbar(PDTTOP);
 	return w;
 }

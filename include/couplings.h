@@ -21,6 +21,8 @@
 namespace couplings
 {
 
+static bool doScale = false;
+
 ui2fermion ui2f;
 s2fermion  s2f;
 
@@ -60,6 +62,33 @@ inline double I3f(unsigned int id)   { return ui2f[id]->I3; }
 inline double qf(unsigned int id)    { return ui2f[id]->charge; }
 
 
+//////////////////////////////////////////////////////////////////////////////////
+// KK scale factor couplings:
+// This should affect the type of the couplings (complex) and the widths which
+// are proportional to (|fgX*gL|^2+|fgX*gR|^2) ~ |fgX|^2*(|gL|^2+|gR|^2)  
+
+static const dcomplex fgZPinit(1.,0.);
+static const dcomplex fgGKKinit(1.,0.);
+static const dcomplex fgZKKinit(1.,0.);
+static dcomplex fgZP(1.,0.);
+static dcomplex fgGKK(1.,0.);
+static dcomplex fgZKK(1.,0.);
+inline void setFgZP(double re, double im)  { fgZP  = dcomplex(re,im); }
+inline void setFgGKK(double re, double im) { fgGKK = dcomplex(re,im); }
+inline void setFgZKK(double re, double im) { fgZKK = dcomplex(re,im); }
+inline double fgZP2()  { return real(fgZP*conj(fgZP)); }
+inline double fgGKK2() { return real(fgGKK*conj(fgGKK)); }
+inline double fgZKK2() { return real(fgZKK*conj(fgZKK)); }
+inline void resetfgZP()  { fgZP  = fgZPinit; }
+inline void resetfgGKK() { fgGKK = fgGKKinit; }
+inline void resetfgZKK() { fgZKK = fgZKKinit; }
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// regular couplings
+
+// SM
+inline double gG(unsigned int id)  { return qf(id); }
 inline double gZL(unsigned int id) { return -qf(id)*sw2/sqrt(sw2*cw2); }
 inline double gZR(unsigned int id) { return (I3f(id)-qf(id)*sw2)/sqrt(sw2*cw2); }
 inline double gZH(unsigned int id, double h)
@@ -69,6 +98,14 @@ inline double gZH(unsigned int id, double h)
 	else { cerr << "unknown helicity: " << h << endl; exit(-1); }
 	return 0.;
 }
+
+// ZP (real methods for ZP are like for Z0)
+inline dcomplex fgZPL(unsigned int id)           { return fgZP*gZL(id); }
+inline dcomplex fgZPR(unsigned int id)           { return fgZP*gZR(id); }
+inline dcomplex fgZPH(unsigned int id, double h) { return fgZP*gZH(id,h); }
+
+// KK
+inline double qGKK(unsigned int id)  { return sq2*gG(id); }
 inline double gZKKR(unsigned int id) { return sq2*gZR(id); }
 inline double gZKKL(unsigned int id) { return sq2*gZL(id); }
 inline double gZKKH(unsigned int id, double h)
@@ -78,9 +115,12 @@ inline double gZKKH(unsigned int id, double h)
 	else { cerr << "unknown helicity: " << h << endl; exit(-1); }
 	return 0.;
 }
+inline dcomplex fgZKKR(unsigned int id)           { return fgZKK*gZKKR(id); }
+inline dcomplex fgZKKL(unsigned int id)           { return fgZKK*gZKKL(id); }
+inline dcomplex fgZKKH(unsigned int id, double h) { return fgZKK*gZKKH(id,h); }
+inline dcomplex fqGKK(unsigned int id)            { return fgGKK*qGKK(id); }
 
-inline double gG(unsigned int id)   { return qf(id); }
-inline double gGKK(unsigned int id) { return sq2*gG(id); }
+
 
 }
 

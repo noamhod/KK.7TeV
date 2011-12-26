@@ -10,7 +10,6 @@ double Sum(TH1* h, bool addUunderFlow=false, bool addOverFlow=false)
 	}
 	if(addUunderFlow) I+=h->GetBinContent(0);
 	if(addOverFlow)   I+=h->GetBinContent(h->GetNbinsX()+1);
-	cout << "h->GetBinContent(" << h->GetNbinsX()+1 << ") = " << h->GetBinContent(h->GetNbinsX()+1) << endl;
 	return I;
 }
 

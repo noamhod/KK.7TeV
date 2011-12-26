@@ -241,15 +241,15 @@ void analysis::setEventVariables()
 		if(sMCsampleName.find("DYmumu")!=string::npos  ||  sMCsampleName.find("Zmumu")!=string::npos)
 		{
 			double truth_mass = kFactors::getTruthMass(m_WZphysD3PD->mc_pdgId, m_WZphysD3PD->mc_m, PDTZ)*MeV2GeV;
-			analysisSkeleton::EW_kfactor_weight = kFactors::ElectroWeak(truth_mass, "NNLO/LO*");
-			analysisSkeleton::QCD_kfactor_weight = kFactors::QCD(truth_mass, "NNLO/LO*");
+			analysisSkeleton::EW_kfactor_weight = kFactors::ElectroWeak(truth_mass);
+			analysisSkeleton::QCD_kfactor_weight = kFactors::QCD(truth_mass, "NNLO/LO**");
 		}
 		
 		// apply ONLY QCD corrections to the Z'
 		if(sMCsampleName.find("Zprime_mumu")!=string::npos)
 		{
 			double truth_mass = kFactors::getTruthMass(m_WZphysD3PD->mc_pdgId, m_WZphysD3PD->mc_m, PDTZPRIME0)*MeV2GeV;
-			analysisSkeleton::QCD_kfactor_weight = kFactors::QCD(truth_mass, "NNLO/LO*");
+			analysisSkeleton::QCD_kfactor_weight = kFactors::QCD(truth_mass, "NNLO/LO**");
 		}
 		
 		// do not apply to any other sample !!!

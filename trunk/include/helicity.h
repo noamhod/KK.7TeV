@@ -19,22 +19,22 @@ using namespace kFactors;
 namespace helicity
 {
 
-static const unsigned int nModes  = 10; // 100;
-static const double    min_weight = 0.;
-static const double    max_weight = 1.e+5;
-static bool dokFactors = false;
+static const unsigned int nModes     = 10; // 100;
+static const double       min_weight = 1.e-30;
+static const double       max_weight = 1.e+10;
+static bool               dokFactors = false;
 
 void setkFactors(bool dokF)
 {
 	dokFactors = dokF;
 }
 
-inline bool isnaninf(double x)
+/* inline bool isnaninf(double x)
 {
 	if(std::isinf(x)) { _WARNING("value is infinity");     return true; }
 	if(std::isnan(x)) { _WARNING("value is not a number"); return true; }
 	return false;
-}
+} */
 
 //////////////////////////////////////////////////////////
 inline dcomplex hAG0(double s, unsigned int idIn, unsigned int idOut)
@@ -56,7 +56,7 @@ inline dcomplex hASM(double s, double cosTheta, unsigned int idIn, unsigned int 
 	dcomplex A(0,0);
 	if(fabs(cosTheta)>1.) return A;
 	double mass = sqrt(s);
-	double sqrtkF = (dokFactors) ? sqrt(ElectroWeak(mass,"NNLO/LO*")) : 1.;
+	double sqrtkF = (dokFactors) ? sqrt(ElectroWeak(mass)) : 1.;
 	if(isnaninf(sqrtkF)) { _WARNING("k-factor is nan/inf"); }
 	A = sqrtkF*(hAG0(s,idIn,idOut) + hAZ0(s,idIn,idOut,hIn,hOut))*sqrt(1.+4.*hIn*hOut*cosTheta);
 	if(isnaninf(real(A*conj(A)))) { _WARNING("|hASM|^2 is nan/inf"); }
@@ -72,7 +72,10 @@ inline dcomplex hAZP0(double s, double cosTheta, double w, unsigned int idIn, un
 	if(fabs(cosTheta)>1.) return A;
 	double mass = mZP;
 	double m2 = mass*mass;
-	A = (gZH(idIn,hIn)*gZH(idOut,hOut)/(s-m2 + Im*s*(w/mass)) )*sqrt(1.+4.*hIn*hOut*cosTheta);
+	dcomplex gIn  = (doScale) ? fgZPH(idIn,hIn)   : gZH(idIn,hIn);
+	dcomplex gOut = (doScale) ? fgZPH(idOut,hOut) : gZH(idOut,hOut);
+	// A = (gZH(idIn,hIn)*gZH(idOut,hOut)/(s-m2 + Im*s*(w/mass)) )*sqrt(1.+4.*hIn*hOut*cosTheta);
+	A = (gIn*gOut/(s-m2 + Im*s*(w/mass)) )*sqrt(1.+4.*hIn*hOut*cosTheta);
 	return A;
 }
 inline dcomplex hAZP(double s, double cosTheta, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
@@ -102,7 +105,10 @@ inline dcomplex hAGKKn(double s, double w, unsigned int idIn, unsigned int idOut
 	double mKKn2 = (mode*mKK)*(mode*mKK);
 	double mass = sqrt(0. + mKKn2);
 	double m2 = mass*mass;
-	A = gGKK(idIn)*gGKK(idOut)/(s-m2 + Im*s*(w/mass));
+	dcomplex gIn  = (doScale) ? fqGKK(idIn)  : qGKK(idIn);
+	dcomplex gOut = (doScale) ? fqGKK(idOut) : qGKK(idOut);
+	// A = qGKK(idIn)*qGKK(idOut)/(s-m2 + Im*s*(w/mass));
+	A = gIn*gOut/(s-m2 + Im*s*(w/mass));
 	return A;
 }
 inline dcomplex hAZKKn(double s, double w, unsigned int idIn, unsigned int idOut, double hIn, double hOut, unsigned int mode)
@@ -112,7 +118,10 @@ inline dcomplex hAZKKn(double s, double w, unsigned int idIn, unsigned int idOut
 	double mKKn2 = (mode*mKK)*(mode*mKK);
 	double mass = sqrt(mZ2 + mKKn2);
 	double m2 = mass*mass;
-	A = gZKKH(idIn,hIn)*gZKKH(idOut,hOut)/(s-m2 + Im*s*(w/mass));
+	dcomplex gIn  = (doScale) ? fgZKKH(idIn,hIn)   : gZKKH(idIn,hIn);
+	dcomplex gOut = (doScale) ? fgZKKH(idOut,hOut) : gZKKH(idOut,hOut);
+	// A = gZKKH(idIn,hIn)*gZKKH(idOut,hOut)/(s-m2 + Im*s*(w/mass));
+	A = gIn*gOut/(s-m2 + Im*s*(w/mass));
 	return A;
 }
 inline dcomplex hAKKn(double s, double cosTheta, double wg, double wz, unsigned int idIn, unsigned int idOut, double hIn, double hOut, unsigned int mode)

@@ -66,8 +66,13 @@ string log(const char* file, int line, int type, int level, string message)
 	
 	os << stype << file << " +" << line << ": " << message;
 	
-	if(type==ERR || type==FAT) // ERRORS & FATALS are always shown !
+	if(type==ERR) // ERRORS are always shown !
 	{
+		cout << os.str() << endl;
+	}
+	else if(type==FAT) // FATALS are always shown !
+	{
+		os << "\n   exitting now !\n";
 		cout << os.str() << endl;
 	}
 	else if(msglvl[type]==VISUAL)
@@ -83,6 +88,16 @@ string log(const char* file, int line, int type, int level, string message)
 #define _INFO(x)    log(__FILE__, __LINE__, INF, VISUAL, (x)) // for INFO VISUAL
 #define _WARNING(x) log(__FILE__, __LINE__, WRN, VISUAL, (x)) // for WARNING VISUAL
 #define _ERROR(x)   log(__FILE__, __LINE__, ERR, VISUAL, (x)) // for ERROR VISUAL
+#define _FATAL(x)   {log(__FILE__, __LINE__, FAT, VISUAL, (x)); exit(-1);} // for FATAL VISUAL
+
+
+inline bool isnaninf(double x)
+{
+	if(std::isinf(x)) { _WARNING("value is infinity");     return true; }
+	if(std::isnan(x)) { _WARNING("value is not a number"); return true; }
+	return false;
+}
+
 
 static inline double validate_double(string str)
 {

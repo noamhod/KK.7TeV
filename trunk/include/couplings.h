@@ -22,6 +22,10 @@ namespace couplings
 {
 
 static bool doScale = false;
+void setCouplingsScale(bool doscale)
+{
+	doScale = doscale;
+}
 
 ui2fermion ui2f;
 s2fermion  s2f;

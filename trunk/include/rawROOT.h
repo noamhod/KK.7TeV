@@ -42,6 +42,7 @@
 #include <TObjArray.h>
 #include <TClonesArray.h>
 #include <TCollection.h>
+#include <THStack.h>
 
 #endif
 

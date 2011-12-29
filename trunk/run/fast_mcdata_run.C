@@ -27,8 +27,8 @@ BosonPtReweightingTool* ZpTrw = new BosonPtReweightingTool("PythiaMC11",true);
 bool doData             = false;
 bool doScale2Zpeak      = false;
 bool doDYtautau         = false;
-bool fastDYmumu         = false;
-bool largeDYmumu        = true;
+bool fastDYmumu         = true;
+bool largeDYmumu        = false;
 bool drawGmm            = false;
 bool doFullKKtemplates  = false;
 bool doFullZPtemplates  = true;
@@ -36,19 +36,21 @@ bool dopileup           = false;
 bool doEWkfactor        = false;
 bool doEWkfactorSig     = false;
 bool doQCDkfactor       = false;
-bool doZpT              = true;
+bool doZpT              = false;
+bool doCouplingsScale   = false;
 TString fileNmaeSuffix()
 {
 	TString name = "";
-	if(!doData)         name += "_noData";
-	if(!doScale2Zpeak)  name += "_noZpeak";
-	if(fastDYmumu)      name += "_fastDY";
-	if(!largeDYmumu)    name += "_smallDY";
-	if(!dopileup)       name += "_noPUrw";
-	if(!doEWkfactor)    name += "_noEWkF";
-	if(!doEWkfactorSig) name += "_noEWkFsig";
-	if(!doQCDkfactor)   name += "_noQCDkF";
-	if(!doZpT)          name += "_noZpTrw";
+	if(!doData)           name += "_noData";
+	if(!doScale2Zpeak)    name += "_noZpeak";
+	if(fastDYmumu)        name += "_fastDY";
+	if(!largeDYmumu)      name += "_smallDY";
+	if(!dopileup)         name += "_noPUrw";
+	if(!doEWkfactor)      name += "_noEWkF";
+	if(!doEWkfactorSig)   name += "_noEWkFsig";
+	if(!doQCDkfactor)     name += "_noQCDkF";
+	if(!doZpT)            name += "_noZpTrw";
+	if(!doCouplingsScale) name += "_noCoupScale";
 	return name;
 }
 ///////////////////////////////////////
@@ -1706,14 +1708,12 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 			/////////////////////////
 			/// weights handeling ///
 			/////////////////////////
+			
+			//// ZpT reweighting
 			ZpTweight = (
 						 (tsMCname=="DYmumu" || tsMCname.Contains("Zprime") || tsMCname.Contains("ExtraDimsTEV"))  &&
 						 (truXid==PDTZ || truXid==PDTZPRIME0 || truXid==PDTKK)
 						 ) ? ZpTrw->GetWeightZee(truXpT,truXmass) : 1.; 
-			// _INFO("truXid="+_s(truXid));
-			// _INFO("truXmass="+_s(truXmass));
-			// _INFO("truXpT="+_s(truXpT));
-			// _INFO("ZpTweight="+_s(ZpTweight));
 			if(isnaninf(ZpTweight)) _FATAL("ZpTweight is nan or inf -> "+_s(ZpTweight)+": in truXid="+_s(truXid)+", truXmass="+_s(truXmass)+" MeV, truXpT="+_s(truXpT)+" MeV");
 			
 			//// kFactors:			
@@ -2209,9 +2209,10 @@ void run()
 	setkFactors(doEWkfactor && doEWkfactorSig); ///
 	resetKKmass();/////////////////////////////////
 	resetZPmass(); ////////////////////////////////
-	setFgZP(1.0,0.0); /////////////////////////////
-	setFgGKK(1.0,0.0); ////////////////////////////
-	setFgZKK(1.0,0.0); ////////////////////////////
+	setCouplingsScale(doCouplingsScale); //////////
+	resetfgZP(); //////////////////////////////////
+	resetfgGKK(); /////////////////////////////////
+	resetfgZKK(); /////////////////////////////////
 	///////////////////////////////////////////////
 	
 	

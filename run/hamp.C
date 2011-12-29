@@ -144,9 +144,9 @@ void hamp()
 		h1AsymKKnoSM[q]->SetLineColor(kRed);
 		h1AsymKKnoSM[q]->SetLineStyle(5);
 		
-		h1wGKK.push_back( new TH1D("h1wGKK_"+quark,quark+" Z'_{SSM}(blue) and KK #gamma(red)/Z(green);pole mass GeV;#Gamma_{tot}", Nm,mMin,mMax) );
-		h1wZKK.push_back( new TH1D("h1wZKK_"+quark,quark+" Z'_{SSM}(blue) and KK #gamma(red)/Z(green);pole mass GeV;#Gamma_{tot}", Nm,mMin,mMax) );
-		h1wZP.push_back( new TH1D("h1wZP_"+quark,  quark+" Z'_{SSM}(blue) and KK #gamma(red)/Z(green);pole mass GeV;#Gamma_{tot}", Nm,mMin,mMax) );
+		h1wGKK.push_back( new TH1D("h1wGKK_"+quark,"Z'_{SSM}(blue) and KK #gamma(red)/Z(green);pole mass GeV;#Gamma_{tot}", Nm,mMin,mMax) );
+		h1wZKK.push_back( new TH1D("h1wZKK_"+quark,"Z'_{SSM}(blue) and KK #gamma(red)/Z(green);pole mass GeV;#Gamma_{tot}", Nm,mMin,mMax) );
+		h1wZP.push_back( new TH1D("h1wZP_"+quark,  "Z'_{SSM}(blue) and KK #gamma(red)/Z(green);pole mass GeV;#Gamma_{tot}", Nm,mMin,mMax) );
 		h1wZP[q]->SetLineColor(kBlue);
 		h1wZP[q]->SetLineStyle(3);
 		h1wGKK[q]->SetLineColor(kRed);

@@ -28,16 +28,12 @@ void resetZPmass() { mZP = mZPinit; }
 
 inline double wGKK2ttbar(unsigned int id, unsigned int mode)
 {
-	if(id!=PDTTOP)
-	{
-		_ERROR("id!=top, exitting now.");
-		exit(-1);
-	}
+	if(id!=PDTTOP) _FATAL("id!=top");
 
 	double mKKn2 = (mode*mKK)*(mode*mKK);
-	double mass = sqrt(0. + mKKn2);
+	double mass = sqrt(0. + mKKn2); // photon0 is massless
 	
-	if(mass>=2.*mf(id)) return 0.; // mass threshold
+	if(mass<2.*mf(id)) return 0.; // 2tops mass threshold
 	
 	double m2 = mass*mass;
 	double mf2 = mf(id)*mf(id);
@@ -45,26 +41,24 @@ inline double wGKK2ttbar(unsigned int id, unsigned int mode)
 
 	// GKK->ttbar
 	double w = 2. * Ncf(id)*(alphaEM/6.) * mass * 2.*qf2 * sqrt( 1. - 4.*mf2/m2) * (1. + 2.*mf2/m2); // top is not massless !!!
-	w *= (doScale) ? fgGKK2() : 1.;
-	
-	return w;
+	return w; // no scale factor included here
 }
 
 inline double wZKK2ttbar(unsigned int id, unsigned int mode)
 {
-	if(id!=PDTTOP)
-	{
-		_ERROR("id!=top, exitting now.");
-		exit(-1);
-	}
+	if(id!=PDTTOP) _FATAL("id!=top");
 
 	double mKKn2 = (mode*mKK)*(mode*mKK);
 	double mass = sqrt(mZ2 + mKKn2);
 	
-	if(mass>=2.*mf(id)) return 0.; // mass threshold
+	if(mass<2.*mf(id)) return 0.; // 2tops mass threshold
 	
 	double m2 = mass*mass;
 	double mf2 = mf(id)*mf(id);
+	double gL = gZL(id);
+	double gL2 = gL*gL;
+	double gR = gZR(id);
+	double gR2 = gR*gR;
 	
 	// ZKK->ttbar
 	double w =  2.*
@@ -73,36 +67,38 @@ inline double wZKK2ttbar(unsigned int id, unsigned int mode)
 				(mZ2*mass)*
 				sqrt(1.-4.*mf2/m2)*
 				(1.-4.*mf2/m2+(2.*I3f(id)-4.*qf(id)*sw2)*(2.*I3f(id)-4.*qf(id)*sw2)*(1.+2.*mf2/m2)); // top is not massless !!!
-	w *= (doScale) ? fgZKK2() : 1.;
-	
-	return w;
+	/* double w = 2.*
+				Ncf(id)*(alphaEM*3./6.)*
+				mass*sqrt(1.-4.*mf2/m2)*
+				((gL2+gR2)+(mf2/m2)*(6.*gL*gR-gL2-gR2)); */
+	return w; // no scale factor included here
 }
 
 inline double wZP2ttbar(unsigned int id)
 {
-	if(id!=PDTTOP)
-	{
-		_ERROR("id!=top, exitting now.");
-		exit(-1);
-	}
+	if(id!=PDTTOP) _FATAL("id!=top");
 
 	double mass = mZP;
+	
+	if(mass<2.*mf(id)) return 0.; // 2tops mass threshold
+	
 	double m2 = mass*mass;
-	
-	if(mass>=2.*mf(id)) return 0.; // mass threshold
-	
 	double mf2 = mf(id)*mf(id);
+	double gL = gZL(id);
+	double gL2 = gL*gL;
+	double gR = gZR(id);
+	double gR2 = gR*gR;
 	
 	// Z'->ttbar
-	double w =  2.*
-				(1./(24.*pi*sq2))*
+	double w = (1./(24.*pi*sq2))*
 				Gmu*Ncf(id)*
 				(mZ2*mass)*
 				sqrt(1.-4.*mf2/m2)*
 				(1.-4.*mf2/m2+(2.*I3f(id)-4.*qf(id)*sw2)*(2.*I3f(id)-4.*qf(id)*sw2)*(1.+2.*mf2/m2)); // top is not massless !!!
-	w *= (doScale) ? fgZP2() : 1.;
-	
-	return w;
+	/* double w = Ncf(id)*(alphaEM*3./6.)*
+				mass*sqrt(1.-4.*mf2/m2)*
+				((gL2+gR2)+(mf2/m2)*(6.*gL*gR-gL2-gR2)); */
+	return w; // no scale factor included here
 }
 
 
@@ -111,20 +107,19 @@ inline double wGKK2ffbar(unsigned int id, unsigned int mode)
 {
 	double w = 0.;
 	double mKKn2 = (mode*mKK)*(mode*mKK);
-	double mass = sqrt(0. + mKKn2);
+	double mass = sqrt(0. + mKKn2); // photon0 is massless
 
 	// GKK->ffbar
 	if(id==PDTTOP) w = wGKK2ttbar(PDTTOP,mode); // ttbar
 	else
 	{
 		w = Ncf(id)*(alphaEM/6.) * mass * 4.*(qf(id)*qf(id)); // all the rest
-		w *= (doScale) ? fgGKK2() : 1.;
 	}
-	
+	if(doScale) w *= fgGKK2();
 	return w;
 }
 
-inline double wZKK2ffbar(unsigned int id, unsigned int mode)
+/* inline double wZKK2ffbar(unsigned int id, unsigned int mode)
 {
 	double w = 0.;
 	double mKKn2 = (mode*mKK)*(mode*mKK);
@@ -136,9 +131,8 @@ inline double wZKK2ffbar(unsigned int id, unsigned int mode)
 	else
 	{
 		w = 2.*(1./(3.*pi*sq2))*Gmu*Ncf(id)*(mZ2*mass)*(I3f2-2.*(I3f(id)*qf(id)*sw2)+2.*(qf(id)*sw2)*(qf(id)*sw2)); // all the rest
-		w *= (doScale) ? fgZKK2() : 1.;
 	}
-	
+	if(doScale) w *= fgZKK2();
 	return w;
 }
 
@@ -153,11 +147,10 @@ inline double wZP2ffbar(unsigned int id)
 	else
 	{
 		w = (1./(6.*pi*sq2))*Gmu*Ncf(id)*(mZ2*mass)*(I3f2-2.*(I3f(id)*qf(id)*sw2)+2.*(qf(id)*sw2)*(qf(id)*sw2)); // all the rest
-		w *= (doScale) ? fgZP2() : 1.;
 	}
-	
+	if(doScale) w *= fgZP2();
 	return w;
-}
+} */
 
 
 ////////////////////////////////////////////////////////
@@ -166,6 +159,7 @@ inline double wTotGKK(unsigned int mode)
 	double w = 0.;
 	// loop on all the flavors
 	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) w += wGKK2ffbar(it->first,mode);
+	if(doScale) w *= fgGKK2();
 	return w;
 }
 inline double wTotZKK(unsigned int mode)
@@ -177,8 +171,8 @@ inline double wTotZKK(unsigned int mode)
 	// loop on all the flavors
 	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) w += wZKK2ffbar(it->first,mode);
 	*/
-	w = fgZKK2() * 2. * wZ0 * mass/mZ0;
-	if(mass>=2.*mf(PDTTOP)) w += wZKK2ttbar(PDTTOP,mode);
+	w = 2.*wZ0*mass/mZ0 + wZKK2ttbar(PDTTOP,mode);
+	if(doScale) w *= fgZKK2();
 	return w;
 }
 inline double wTotZP()
@@ -189,8 +183,8 @@ inline double wTotZP()
 	// loop on all the flavors
 	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) w += wZP2ffbar(it->first);
 	*/
-	w = fgZP2() * wZ0 * mass/mZ0;
-	if(mass>=2.*mf(PDTTOP)) w += wZP2ttbar(PDTTOP);
+	w = wZ0*mass/mZ0 + wZP2ttbar(PDTTOP);
+	if(doScale) w *= fgZP2();
 	return w;
 }
 

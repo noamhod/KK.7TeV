@@ -34,6 +34,7 @@ typedef map<TString, int>       TMapTSi;
 typedef map<TString, TString>   TMapTSTS;
 typedef map<TString, TH1*>      TMapTSP2TH1;
 typedef map<TString, TH2*>      TMapTSP2TH2;
+typedef map<TString, THStack*>  TMapTSP2THS;
 typedef map<TString, TGraph*>   TMapTSP2TGraph;
 typedef map<TString, TLine*>    TMapTSP2TLINE;
 typedef map<TString, TTree*>    TMapTSP2TTREE;

@@ -215,7 +215,7 @@ void setlogx(TH2* h)
 	h->GetXaxis()->SetNoExponent();
 }
 
-void saveas(TCanvas* c, TString name)
+void saveas(TCanvas* c, TString name, Bool_t savesource=false)
 {
 	c->RedrawAxis();
 	c->Update();
@@ -223,8 +223,8 @@ void saveas(TCanvas* c, TString name)
 	c->SaveAs(name+".png");
 	c->SaveAs(name+".pdf");
 	c->SaveAs(name+".eps");
-	c->SaveAs(name+".C");
 	c->SaveAs(name+".root");
+	if(savesource) c->SaveAs(name+".C");
 }
 
 void savemultipdf(TCanvas* c, TString fullpath, unsigned int state)
@@ -236,6 +236,98 @@ void savemultipdf(TCanvas* c, TString fullpath, unsigned int state)
 		default: break;
 	}
 	c->SaveAs(fullpath);
+}
+
+TCanvas* stackratio(TString name,
+					TH1D* hNumerator, THStack* hsDenominator, TList* hlSignals,
+					TLegend* leg=NULL, TPaveText* pvtxt_lumi=NULL, TPaveText* pvtxt_atlas=NULL,
+					TString ratioLabel="Ratio", TString drawopt_n="",
+					Bool_t logx=false, Bool_t logy=false)
+{	
+	TCanvas* cnv = new TCanvas(name,name,600,550);
+	TH1D* htmp;
+	
+	cnv->Divide(1,2);
+	TVirtualPad* tvp_hists = cnv->cd(1);
+	TVirtualPad* tvp_ratio = cnv->cd(2);
+	
+	if(logx) tvp_ratio->SetLogx();
+	if(logx) tvp_hists->SetLogx();
+	if(logy) tvp_hists->SetLogy();
+	
+	tvp_hists->SetPad(0.00, 0.35, 1.00, 1.00);
+	tvp_ratio->SetPad(0.00, 0.00, 1.00, 0.35);
+
+	tvp_hists->SetBottomMargin(0.012);
+	tvp_ratio->SetBottomMargin(0.20);
+	tvp_ratio->SetTopMargin(0.012);
+	
+	tvp_hists->SetTicks(1,1);
+	tvp_ratio->SetTicks(1,1);
+	
+	// sum the original stacked histos
+	TH1D* hDenominator = (TH1D*)hNumerator->Clone("tmp");
+	hDenominator->Reset();
+	TIter next_bg((TList*)hsDenominator->GetHists());
+	while( htmp=(TH1D*)next_bg() )
+	{
+		cout << "Adding " << ((TH1D*)htmp)->GetName() << endl;
+		hDenominator->Add(htmp);
+	}
+	
+	TString cloneName_n = hNumerator->GetName();
+	TString cloneName_d = hDenominator->GetName();
+	TH1D* th1n_tmp = (TH1D*)hNumerator->Clone(cloneName_n+"_th1n_tmp");
+	TH1D* th1d_tmp = (TH1D*)hDenominator->Clone(cloneName_d+"_th1d_tmp");
+	th1n_tmp->Sumw2();
+	th1d_tmp->Sumw2();
+
+	TH1D* hr = (TH1D*)hNumerator->Clone(); // Clone(name)
+	TString sXtitle = (TString)hNumerator->GetXaxis()->GetTitle();
+	// TString sTitle = "#frac{Data}{#sum MC#times wgt};"+sXtitle+";Ratio";
+	TString sTitle = ";"+sXtitle+";"+ratioLabel;
+	hr->SetTitle(sTitle);
+	hr->Divide(th1n_tmp,th1d_tmp,1.,1.,"B");
+
+	hr->GetXaxis()->SetLabelSize(0.075);
+	hr->GetYaxis()->SetLabelSize(0.075);
+	hr->GetXaxis()->SetTitleSize(0.075);
+	hr->GetYaxis()->SetTitleSize(0.075);
+	hr->SetTitleSize(0.075);
+	hr->SetTitleSize(0.075);
+	hr->GetYaxis()->SetTitleOffset(0.5);
+	hr->SetMinimum(0.);
+	hr->SetMaximum(+2.);
+	
+	if(logx) setlogx(hr);
+	
+	TLine* line = new TLine(hr->GetXaxis()->GetXmin(),1.,hr->GetXaxis()->GetXmax(),1.);
+
+	tvp_hists->cd();
+	hsDenominator->Draw(); // Draw("nostack");
+	hNumerator->Draw(drawopt_n+"SAMES");
+	TIter next_sig(hlSignals);
+	while( htmp=(TH1D*)next_sig() )
+	{
+		cout << "Drawing " << ((TH1D*)htmp)->GetName() << endl;
+		htmp->Draw("SAMES");
+	}
+	if(pvtxt_lumi!=NULL)  pvtxt_lumi->Draw("SAMES");
+	if(pvtxt_atlas!=NULL) pvtxt_atlas->Draw("SAMES");
+	if(leg!=NULL)         leg->Draw("SAMES");
+	tvp_hists->Update();
+	tvp_hists->RedrawAxis();
+
+	tvp_ratio->cd();
+	tvp_ratio->SetGridy();
+	hr->Draw("epx0");
+	line->Draw("SAMES");
+	tvp_ratio->Update();
+	tvp_ratio->RedrawAxis();
+	
+	cnv->Update();
+	
+	return cnv;
 }
 
 #endif

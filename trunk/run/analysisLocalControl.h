@@ -48,6 +48,7 @@ class analysisLocalControl : public chainMaker/*, public utilities*/
 		string m_RunType;
 		string m_input;
 		bool   m_isMC;
+		bool   m_isQCD;
 		bool   m_isLoose;
 		int    m_msglvl;
 		

@@ -70,7 +70,7 @@ static const Double_t sqrtofficialptmax   = 1500.;
 static Double_t sqrtofficialptbins[nsqrtofficialptbins+1];
 // official qT
 static const Int_t    nsqrtofficialqtbins = 40;
-static const Double_t sqrtofficialqtmin   = 0.1;
+static const Double_t sqrtofficialqtmin   = 0.5;
 static const Double_t sqrtofficialqtmax   = 1000.;
 static Double_t sqrtofficialqtbins[nsqrtofficialqtbins+1];
 // official etaQ

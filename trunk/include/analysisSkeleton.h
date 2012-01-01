@@ -28,6 +28,7 @@ public:
 	// basic local vars
 
 	bool AS_isMC;
+	bool AS_isQCD;
 	bool isLoose;
 	
 	string base_dir_path;
@@ -629,6 +630,7 @@ public:
 	~analysisSkeleton();
 	
 	void setMC(bool isMC) { AS_isMC = isMC; }
+	void setQCD(bool isQCD) { AS_isQCD = isQCD; }
 	void setLoose(bool isloose) { isLoose = isloose; }
 	void setSmearedMCPpT(int nMus);
 	void setMCPpTparameters(string sDataType, string sAlgo, string spTtype, string sRel, string sDataPath);

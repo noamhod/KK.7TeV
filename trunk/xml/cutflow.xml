@@ -193,7 +193,7 @@
     <skip>false</skip>
     <nparameters>1</nparameters>
     <parameters>
-      <parameter NAME="ratiomax" ORDER="1" TYPE="float">0.05</parameter>
+      <parameter NAME="ratiomax" ORDER="1" TYPE="float">100000000000.00</parameter>
     </parameters>
     <description>
       This is the isolation cut (use "mu_ptcone30" and "mu_pt").
@@ -207,7 +207,7 @@
     <skip>false</skip>
     <nparameters>1</nparameters>
     <parameters>
-      <parameter NAME="ratiomax" ORDER="1" TYPE="float">0.05</parameter>
+      <parameter NAME="ratiomin" ORDER="1" TYPE="float">0.1</parameter>
     </parameters>
     <description>
       This is the anti isolation cut (use "mu_ptcone30" and "mu_pt").
@@ -215,13 +215,29 @@
     </description>
   </obj>
   
-  <obj NAME="eTantiIsolation30" FLAG="on">
+  <obj NAME="constrainedAntiIsolation30" FLAG="on">
     <order>20</order>
+    <phase>selection</phase>
+    <skip>false</skip>
+    <nparameters>2</nparameters>
+    <parameters>
+      <parameter NAME="ratiomin" ORDER="1" TYPE="float">0.1</parameter>
+      <parameter NAME="ratiomax" ORDER="2" TYPE="float">1.0</parameter>
+    </parameters>
+    <description>
+      This is the constrained anti isolation cut (use "mu_ptcone30" and "mu_pt").
+      Track sum pT in 0.3 cone relative to muon pT(CB) is greater than 0.05 (mu_ptcone30/mu_pt \gt 0.05)
+	  but is also less than 1.0
+    </description>
+  </obj>
+  
+  <obj NAME="eTantiIsolation30" FLAG="on">
+    <order>21</order>
     <phase>selection</phase>
     <skip>false</skip>
     <nparameters>1</nparameters>
     <parameters>
-      <parameter NAME="ratiomax" ORDER="1" TYPE="float">20</parameter>
+      <parameter NAME="ratiomin" ORDER="1" TYPE="float">20</parameter>
     </parameters>
     <description>
       This is the anti isolation cut (use "mu_etcone30").
@@ -230,12 +246,12 @@
   </obj>
 
   <obj NAME="antid0" FLAG="on">
-    <order>21</order>
+    <order>22</order>
     <phase>selection</phase>
     <skip>false</skip>
     <nparameters>1</nparameters>
     <parameters>
-      <parameter NAME="d0max" ORDER="1" TYPE="float">0.002</parameter>
+      <parameter NAME="d0min" ORDER="1" TYPE="float">0.002</parameter>
     </parameters>
     <description>
       This is the d0 cut (use "mu_d0_exPV").
@@ -244,12 +260,12 @@
   </obj>
 
   <obj NAME="antiz0" FLAG="on">
-    <order>22</order>
+    <order>23</order>
     <phase>selection</phase>
     <skip>false</skip>
     <nparameters>1</nparameters>
     <parameters>
-      <parameter NAME="z0" ORDER="1" TYPE="float">0.01</parameter>
+      <parameter NAME="z0min" ORDER="1" TYPE="float">0.01</parameter>
     </parameters>
     <description>
       This is the z0 cut (use "mu_z0_exPV").
@@ -258,7 +274,7 @@
   </obj>
   
   <obj NAME="didmuTrigger" FLAG="on">
-    <order>23</order>
+    <order>24</order>
     <phase>selection</phase>
     <skip>false</skip>
     <nparameters>1</nparameters>
@@ -271,7 +287,7 @@
   </obj>
   
   <obj NAME="isLooseNoTight" FLAG="on">
-    <order>24</order>
+    <order>25</order>
     <phase>selection</phase>
     <skip>false</skip>
     <nparameters>2</nparameters>

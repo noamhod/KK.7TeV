@@ -34,15 +34,17 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	bool bPUwriteMC;
 	bool bPUremoveData;
 	string sMCorData;
+	string sIsQCD;
 	string sIsLoose;
 	bool   isMC;
+	bool   isQCD;
 	bool   isLoose;
 	string sMsgTyp;
 	string sMsgLvl;
 	//int    msgLvl;
 	
 	ifstream ifsel( localRunControlFile.c_str() );
-	ifsel >> sBaseDir >> sRun >> sDataType >> sRec >> spTtype >> sRel >> sMCPtag >> sPUwriteMC >> sPUremoveData >> sMCorData >> sIsLoose;
+	ifsel >> sBaseDir >> sRun >> sDataType >> sRec >> spTtype >> sRel >> sMCPtag >> sPUwriteMC >> sPUremoveData >> sMCorData >> sIsQCD >> sIsLoose;
 	
 	if(sBaseDir=="")
 	{
@@ -98,6 +100,12 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 		exit(-1);
 	}
 	isMC = (sMCorData=="mc" || sMCorData=="mcqsub") ? true : false;
+	if(sIsQCD!="QCD=yes"  &&  sIsQCD!="QCD=no")
+	{
+		_ERROR("ERROR: YOU CHOSE QCD=yes/no ["+sIsQCD+"], exitting now");
+		exit(-1);
+	}
+	isQCD = (sIsQCD=="QCD=yes") ? true : false;
 	if(sIsLoose!="tight"  &&  sIsLoose!="loose")
 	{
 		_ERROR("ERROR: YOU CHOSE isLoose ["+sIsLoose+"], exitting now");
@@ -130,6 +138,7 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	m_doPUwriteMC = bPUwriteMC;
 	m_doPUremoveData = bPUremoveData;
 	m_isMC      = isMC;
+	m_isQCD     = isQCD;
 	m_isLoose   = isLoose;
 	m_input     = sMCorData;
 	
@@ -143,6 +152,7 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	_INFO("m_doPUwriteMC="+_s(m_doPUwriteMC));
 	_INFO("m_doPUremoveData="+_s(m_doPUremoveData));
 	_INFO("m_isMC="+_s(m_isMC));
+	_INFO("m_isQCD="+m_isQCD);
 	_INFO("m_isLoose="+_s(m_isLoose));
 	_INFO("m_input="+sMCorData);
 	
@@ -316,6 +326,7 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	if(runs=="SINGLERUN") str_logspath = basedir+"/../run/tmp";
 	_INFO("LOADING FILE -> "+str_logspath);
 	m_analysis->setMC(m_isMC);
+	m_analysis->setQCD(m_isQCD);
 	if(m_isMC) m_analysis->setMCPpTparameters(m_dataType, m_muRecAlgo, m_pTsmearingType, m_release, str_mcp);
 	
 	
@@ -330,15 +341,18 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	m_analysis->doMCPUwrite  = m_doPUwriteMC;
-	m_analysis->doRemoveData = m_doPUremoveData;
-	m_analysis->sMCPUName = (m_isMC && m_analysis->doMCPUwrite) ? m_analysis->setMCPUFiles(str_logspath, run_number_str) : "";
-	// string str_pileuphist_data = basedir+"/../conf/data11_7TeV.periodBtoD.root"; // this is just a default initializer. it is overriden in analysisSkeleton
-	string str_pileuphist_data = basedir+"/../conf/CURRENT_iLUMICALC_HISTOGRAMS.root";
-	_INFO("LOADING FILE -> "+str_pileuphist_data);
-	string str_pileuphist_mc   = basedir+"/../conf/pileup_"+str_mcname+".root"; // this is just a default initializer. it is overriden in analysisSkeleton
-	_INFO("LOADING FILE -> "+str_pileuphist_mc);
-	m_analysis->setPileupParameters((TString)str_pileuphist_data, "LumiMetaData", (TString)str_pileuphist_mc, "MCPileupReweighting");
+	if(m_isMC)
+	{
+		m_analysis->doMCPUwrite  = m_doPUwriteMC;
+		m_analysis->doRemoveData = m_doPUremoveData;
+		m_analysis->sMCPUName = (m_isMC && m_analysis->doMCPUwrite) ? m_analysis->setMCPUFiles(str_logspath, run_number_str) : "";
+		// string str_pileuphist_data = basedir+"/../conf/data11_7TeV.periodBtoD.root"; // this is just a default initializer. it is overriden in analysisSkeleton
+		string str_pileuphist_data = basedir+"/../conf/CURRENT_iLUMICALC_HISTOGRAMS.root";
+		_INFO("LOADING FILE -> "+str_pileuphist_data);
+		string str_pileuphist_mc = basedir+"/../conf/pileup_"+str_mcname+".root"; // this is just a default initializer. it is overriden in analysisSkeleton
+		_INFO("LOADING FILE -> "+str_pileuphist_mc);
+		m_analysis->setPileupParameters((TString)str_pileuphist_data, "LumiMetaData", (TString)str_pileuphist_mc, "MCPileupReweighting");
+	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	m_analysis->setCutFlowFile(str_logspath, run_number_str);
@@ -487,7 +501,7 @@ void analysisLocalControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 	l64t_nbytes = 0;
 	l64t_nb = 0;
 
-	l64t_mod = 100000;
+	l64t_mod = 10000;
 
 	l64t_startEvent = startEvent;
 	l64t_stopEvent = l64t_nentries;
@@ -518,7 +532,7 @@ void analysisLocalControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 			/////////////////////////////////////////////////
 		}
 		
-		if(l64t_jentry%100000==0)   cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_WZphysD3PD->RunNumber << "\tlumiblock=" << m_WZphysD3PD->lbn << endl;
+		if(l64t_jentry%l64t_mod==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_WZphysD3PD->RunNumber << "\tlumiblock=" << m_WZphysD3PD->lbn << endl;
 		if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries);
 		
 		if(l64t_jentry%1000==0)
@@ -565,7 +579,7 @@ void analysisLocalControl::loop(int RunNumber)
 	l64t_nbytes = 0;
 	l64t_nb = 0;
 
-	l64t_mod = 100000;
+	l64t_mod = 10000;
 
 	for (l64t_jentry=0 ; l64t_jentry<l64t_nentries ; l64t_jentry++)
 	{
@@ -622,145 +636,143 @@ void analysisLocalControl::loop(int RunNumber)
 
 void analysisLocalControl::loop(string sPeriodStart, string sPeriodEnd, Long64_t l64t_initialGuess)
 {
-	_DEBUG("analysisLocalControl::loop(string sPeriodStart, string sPeriodEnd, Long64_t l64t_initialGuess)");
+        _DEBUG("analysisLocalControl::loop(string sPeriodStart, string sPeriodEnd, Long64_t l64t_initialGuess)");
 
-	if (m_WZphysD3PD->fChain == 0)  return;
+        if (m_WZphysD3PD->fChain == 0)  return;
 
-	l64t_nentries = m_WZphysD3PD->fChain->GetEntriesFast();
-	l64t_nbytes = 0;
-	l64t_nb = 0;
+        l64t_nentries = m_WZphysD3PD->fChain->GetEntriesFast();
+        l64t_nbytes = 0;
+        l64t_nb = 0;
 
-	l64t_mod = 100000;
+        l64t_mod = 10000;
 
-	int firstRunInRange = 0;
-	int lastRunInRange  = 0;
-	for(TMapis::iterator it=m_analysis->m_firstrun2periodMap->begin() ; it!=m_analysis->m_firstrun2periodMap->end() ; it++)
-	{
-		if(it->second==sPeriodStart)
-		{
-			firstRunInRange = it->first;
-			cout << "start loop in run# = " << firstRunInRange << endl;
-			break;
-		}
-	}
-	for(TMapis::iterator it=m_analysis->m_lastrun2periodMap->begin() ; it!=m_analysis->m_lastrun2periodMap->end() ; it++)
-	{
-		if(it->second==sPeriodEnd)
-		{
-			lastRunInRange = it->first;
-			cout << "end loop in run# = " << lastRunInRange << endl;
-			break;
-		}
-	}
-	if(lastRunInRange==0 || firstRunInRange==0)
-	{
-		cout << "ERROR in analysisLocalControl::loop(string sPeriodName): didn't find period with name = " << lastRunInRange << " or " << firstRunInRange << endl;
-		cout << "exitting now" << endl;
-		exit(-1);
-	}
-	
-	// bisection
-	Long64_t l64t_a = 0;
-	//Long64_t l64t_b = l64t_nentries;
-	Long64_t l64t_b = l64t_initialGuess; //190000000 initial guess (should be bigger than firstRunInRange)
-	Long64_t l64t_jmid = 0;
-	Long64_t l64t_imid = 0;
-	int run = 0;
-	int iterations = 0;
-	cout << "iteration[" << iterations << "] : run=" << run << ", a=" << l64t_a << ", b=" << l64t_b << ", mid=" << l64t_jmid << endl;
-	while(run!=firstRunInRange)
-	{
-		iterations++;
-		l64t_jmid = l64t_a + (Long64_t)((long double)(l64t_b-l64t_a)/2.);
-		l64t_imid = m_WZphysD3PD->LoadTree(l64t_jmid);
-		
-		if(m_RunType!="local_noskim")
-		{
-			m_WZphysD3PD->fChain->GetEntry(l64t_jmid);
-		}
-		else
-		{
-			/////////////////////////////////////////////////
-			// read only the minimal set of branches ////////
-			//GetEntryMinimal(l64t_ientry); /////////////////
-			//m_WZphysD3PD->GetEntryMinimal(l64t_ientry); /////
-			l64t_nb = m_WZphysD3PD->fChain->GetEntry(l64t_jentry);
-			l64t_nbytes += l64t_nb;
-			/////////////////////////////////////////////////
-		}
-		
-		run = m_WZphysD3PD->RunNumber;
-		cout << "iteration[" << iterations << "] : run=" << run << ", a=" << l64t_a << ", b=" << l64t_b << ", mid=" << l64t_jmid << endl;
-		if(run<firstRunInRange) l64t_a = l64t_jmid;
-		if(run>firstRunInRange) l64t_b = l64t_jmid;
-		if(run==firstRunInRange) {cout << "found first run in range=" << firstRunInRange << endl; break;}
-		if(l64t_a==l64t_b || (l64t_b-l64t_a)==1) {cout << "l64t_a==l64t_b || (l64t_b-l64t_a)==1, exitting now" << endl; exit(-1);}
-	}
-	// now go back to the first file in the firstRunInRange
-	cout << "looking for first event in run " << firstRunInRange << endl;
-	while(run==firstRunInRange)
-	{
-		l64t_imid = m_WZphysD3PD->LoadTree(l64t_jmid);
-		m_WZphysD3PD->fChain->GetEntry(l64t_jmid);
-		run = m_WZphysD3PD->RunNumber;
-		if(run!=firstRunInRange)
-		{
-			l64t_jmid++;
-			break;
-		}
-		l64t_jmid--;
-	}
-	
-	for (l64t_jentry=l64t_jmid ; l64t_jentry<l64t_nentries ; l64t_jentry++)
-	{
-		l64t_ientry = m_WZphysD3PD->LoadTree(l64t_jentry);
-		if (l64t_ientry < 0) break;
-		
-		if(m_RunType!="local_noskim")
-		{
-			l64t_nb = m_WZphysD3PD->fChain->GetEntry(l64t_jentry);
-			l64t_nbytes += l64t_nb;
-		}
-		else
-		{
-			/////////////////////////////////////////////////
-			// read only the minimal set of branches ////////
-			//GetEntryMinimal(l64t_ientry); /////////////////
-			//m_WZphysD3PD->GetEntryMinimal(l64t_ientry); /////
-			l64t_nb = m_WZphysD3PD->fChain->GetEntry(l64t_jentry);
-			l64t_nbytes += l64t_nb;
-			/////////////////////////////////////////////////
-		}
-		
-		// if (Cut(l64t_ientry) < 0) continue;
-		
-		if(l64t_jentry%100000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_WZphysD3PD->RunNumber << "\tlumiblock=" << m_WZphysD3PD->lbn << endl;
-		
-		////////////////////////////////////////////////////////////////////
-		if((int)m_WZphysD3PD->RunNumber < firstRunInRange) continue; ///////
-		if((int)m_WZphysD3PD->RunNumber > lastRunInRange)  break; //////////
-		////////////////////////////////////////////////////////////////////
-		
-		if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries);
-		
-		if(l64t_jentry%1000==0)
-		{
-			gSystem->GetProcInfo(&pi);
-			vResMemory.push_back((double)pi.fMemResident);
-			vVirMemory.push_back((double)pi.fMemVirtual);
-			vEntries.push_back((int)l64t_jentry);
-		}
-		
-		analyze();
-	}
-	
-	fits();
-	
-	draw();
-	
-	finalize();
-	
-	utilities::stopTimer(true);
+        int firstRunInRange = 0;
+        int lastRunInRange  = 0;
+        for(TMapis::iterator it=m_analysis->m_firstrun2periodMap->begin() ; it!=m_analysis->m_firstrun2periodMap->end() ; it++)
+        {
+                if(it->second==sPeriodStart)
+                {
+                        firstRunInRange = it->first;
+                        cout << "start loop in run# = " << firstRunInRange << endl;
+                        break;
+                }
+        }
+        for(TMapis::iterator it=m_analysis->m_lastrun2periodMap->begin() ; it!=m_analysis->m_lastrun2periodMap->end() ; it++)
+        {
+                if(it->second==sPeriodEnd)
+                {
+                        lastRunInRange = it->first;
+                        cout << "end loop in run# = " << lastRunInRange << endl;
+                        break;
+                }
+        }
+        if(lastRunInRange==0 || firstRunInRange==0)
+        {
+                cout << "ERROR in analysisLocalControl::loop(string sPeriodName): didn't find period with name = " << lastRunInRange << " or " << firstRunInRange << endl;
+                cout << "exitting now" << endl;
+                exit(-1);
+        }
+        
+        // bisection
+        Long64_t l64t_a = 0;
+        //Long64_t l64t_b = l64t_nentries;
+        Long64_t l64t_b = l64t_initialGuess; //190000000 initial guess (should be bigger than firstRunInRange)
+        Long64_t l64t_jmid = 0;
+        Long64_t l64t_imid = 0;
+        int run = 0;
+        int iterations = 0;
+        cout << "iteration[" << iterations << "] : run=" << run << ", a=" << l64t_a << ", b=" << l64t_b << ", mid=" << l64t_jmid << endl;
+        while(run!=firstRunInRange)
+        {
+                iterations++;
+                l64t_jmid = l64t_a + (Long64_t)((long double)(l64t_b-l64t_a)/2.);
+                l64t_imid = m_WZphysD3PD->LoadTree(l64t_jmid);
+                
+                if(m_RunType!="local_noskim")
+                {
+                        m_WZphysD3PD->fChain->GetEntry(l64t_jmid);
+                }
+                else
+                {
+                        /////////////////////////////////////////////////
+                        // read only the minimal set of branches ////////
+                        //GetEntryMinimal(l64t_ientry); /////////////////
+                        //m_WZphysD3PD->GetEntryMinimal(l64t_ientry); /////
+                        l64t_nb = m_WZphysD3PD->fChain->GetEntry(l64t_jentry);
+                        l64t_nbytes += l64t_nb;
+                        /////////////////////////////////////////////////
+                }
+                
+                run = m_WZphysD3PD->RunNumber;
+                cout << "iteration[" << iterations << "] : run=" << run << ", a=" << l64t_a << ", b=" << l64t_b << ", mid=" << l64t_jmid << endl;
+                if(run<firstRunInRange) l64t_a = l64t_jmid;
+                if(run>firstRunInRange) l64t_b = l64t_jmid;
+                if(run==firstRunInRange) {cout << "found first run in range=" << firstRunInRange << endl; break;}
+                if(l64t_a==l64t_b || (l64t_b-l64t_a)==1) {cout << "l64t_a==l64t_b || (l64t_b-l64t_a)==1, exitting now" << endl; exit(-1);}
+        }
+        // now go back to the first file in the firstRunInRange
+        cout << "looking for first event in run " << firstRunInRange << endl;
+        while(run==firstRunInRange)
+        {
+                l64t_imid = m_WZphysD3PD->LoadTree(l64t_jmid);
+                m_WZphysD3PD->fChain->GetEntry(l64t_jmid);
+                run = m_WZphysD3PD->RunNumber;
+                if(run!=firstRunInRange)
+                {
+                        l64t_jmid++;
+                        break;
+                }
+                l64t_jmid--;
+        }
+        
+        for (l64t_jentry=l64t_jmid ; l64t_jentry<l64t_nentries ; l64t_jentry++)
+        {
+                l64t_ientry = m_WZphysD3PD->LoadTree(l64t_jentry);
+                if (l64t_ientry < 0) break;
+                
+                if(m_RunType!="local_noskim")
+                {
+                        l64t_nb = m_WZphysD3PD->fChain->GetEntry(l64t_jentry);
+                        l64t_nbytes += l64t_nb;
+                }
+                else
+                {
+                        /////////////////////////////////////////////////
+                        // read only the minimal set of branches ////////
+                        //GetEntryMinimal(l64t_ientry); /////////////////
+                        //m_WZphysD3PD->GetEntryMinimal(l64t_ientry); /////
+                        l64t_nb = m_WZphysD3PD->fChain->GetEntry(l64t_jentry);
+                        l64t_nbytes += l64t_nb;
+                        /////////////////////////////////////////////////
+                }
+                
+                // if (Cut(l64t_ientry) < 0) continue;
+                
+                if(l64t_jentry%100000==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_WZphysD3PD->RunNumber << "\tlumiblock=" << m_WZphysD3PD->lbn << endl;
+                
+                ////////////////////////////////////////////////////////////////////
+                if((int)m_WZphysD3PD->RunNumber < firstRunInRange) continue; ///////
+                if((int)m_WZphysD3PD->RunNumber > lastRunInRange)  break; //////////
+                ////////////////////////////////////////////////////////////////////
+                
+                if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries);
+                
+                if(l64t_jentry%1000==0)
+                {
+                        gSystem->GetProcInfo(&pi);
+                        vResMemory.push_back((double)pi.fMemResident);
+                        vVirMemory.push_back((double)pi.fMemVirtual);
+                        vEntries.push_back((int)l64t_jentry);
+                }
+                
+                analyze();
+        }
+        
+        fits();
+        
+        draw();
+        
+        finalize();
+        
+        utilities::stopTimer(true);
 }
-
-

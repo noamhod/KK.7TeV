@@ -183,6 +183,6 @@ void hstack()
 		signals->Add(hKKtemplate);
 		signals->Add(hZPtemplate);
 	}
-	TCanvas* cR = (TCanvas*)(stackratio(name,hData,backgounds,signals,leg,pvtxt_lumi,pvtxt_atlas,"Data/#sumMC","epx0",isLogxy,isLogxy))->Clone("");
+	TCanvas* cR = (TCanvas*)(stackratio(name,hData,backgounds,signals,leg,pvtxt_lumi,pvtxt_atlas,"Data/#SigmaMC","epx0",isLogxy,isLogxy))->Clone("");
 	saveas(cR,"plots/"+name, false);
 }

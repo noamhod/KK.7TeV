@@ -62,6 +62,8 @@ public:
 	inline bool isolationXXCut( float isolationCutVal, string sIsoValName, float pTmu, float pTcone );
 	inline bool isolationXXCut( float isolationCutVal, string sIsoValName, float qOp, float theta, float pTcone );
 	
+	inline bool constrainedAntiIsolationXXCut( float minIsolationCutVal, float maxIsolationCutVal, string sIsoValName, float pTmu, float pTcone );
+	
 	inline bool antiIsolationXXCut( float isolationCutVal, string sIsoValName, float pTmu, float pTcone );
 	
 	inline bool eTisolationXXCut( float isolationCutVal, string sIsoValName, float eTcone );

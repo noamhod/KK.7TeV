@@ -10,6 +10,7 @@
 
 #include "couplings.h"
 #include "enums.h"
+#include "logs.h"
 
 using namespace couplings;
 

@@ -24,11 +24,11 @@ BosonPtReweightingTool* ZpTrw = new BosonPtReweightingTool("PythiaMC11",true);
 ///////////////////////////////////////
 // selectors //////////////////////////
 ///////////////////////////////////////
-bool doData             = false;
-bool doScale2Zpeak      = false;
+bool doData             = true;
+bool doScale2Zpeak      = true;
 bool doDYtautau         = false;
-bool fastDYmumu         = true;
-bool largeDYmumu        = false;
+bool fastDYmumu         = false;
+bool largeDYmumu        = true;
 bool drawGmm            = false;
 bool doFullKKtemplates  = false;
 bool doFullZPtemplates  = true;
@@ -36,8 +36,9 @@ bool dopileup           = false;
 bool doEWkfactor        = false;
 bool doEWkfactorSig     = false;
 bool doQCDkfactor       = false;
-bool doZpT              = false;
+bool doZpT              = true;
 bool doCouplingsScale   = false;
+bool doRemoveHighMass   = true;
 TString fileNmaeSuffix()
 {
 	TString name = "";
@@ -51,6 +52,7 @@ TString fileNmaeSuffix()
 	if(!doQCDkfactor)     name += "_noQCDkF";
 	if(!doZpT)            name += "_noZpTrw";
 	if(!doCouplingsScale) name += "_noCoupScale";
+	if(!doRemoveHighMass) name += "_noHighMass";
 	return name;
 }
 ///////////////////////////////////////
@@ -767,7 +769,7 @@ void setMCtrees(TString tsMCname)
 			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2250M2500.root", "mcLocalControl_Pythia6_DYmumu_2250M2500", 100000, 3.2232E-09*nb2fb);
 			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2500M2750.root", "mcLocalControl_Pythia6_DYmumu_2500M2750", 100000, 1.2073E-09*nb2fb);
 			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2750M3000.root", "mcLocalControl_Pythia6_DYmumu_2750M3000", 100000, 4.4763E-10*nb2fb);
-			// setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_M3000.root",     "mcLocalControl_Pythia6_DYmumu_M3000",     100000, 2.5586E-10*nb2fb); // this is taken out because the EW k-factors are valid only below 3 TeV
+			if(doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_M3000.root", "mcLocalControl_Pythia6_DYmumu_M3000", 100000, 2.5586E-10*nb2fb); // this is taken out because the EW k-factors are valid only below 3 TeV
 		}
 	}
 	
@@ -846,26 +848,26 @@ void setMCtrees(TString tsMCname)
 	
 	if(tsMCname=="Zprime_SSM_m2000")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_120M450.root",   "mcLocalControl_Pythia8_ZprimeSSM_m2000_120M450",   40000, 7.9574E-03*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_450M850.root",   "mcLocalControl_Pythia8_ZprimeSSM_m2000_450M850",   10000, 3.8040E-05 *nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_850M1300.root",  "mcLocalControl_Pythia8_ZprimeSSM_m2000_850M1300",  10000, 1.7327E-06*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_1300M1800.root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_1300M1800", 10000, 1.5144E-07*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_1800M2300.root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_1800M2300", 10000, 1.0133E-06*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_2300M2800.root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_2300M2800", 10000, 1.1455E-08*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_2800M3300.root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_2800M3300", 10000, 7.0524E-10*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_M3300.root",     "mcLocalControl_Pythia8_ZprimeSSM_m2000_M3300",     10000, 6.6724E-11*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_120M450.root",   "mcLocalControl_Pythia8_ZprimeSSM_m2000_120M450",   40000, 0.00926176*nb2fb);// 7.9574E-03*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_450M850.root",   "mcLocalControl_Pythia8_ZprimeSSM_m2000_450M850",   10000, 4.61608E-05*nb2fb);// 3.8040E-05 *nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_850M1300.root",  "mcLocalControl_Pythia8_ZprimeSSM_m2000_850M1300",  10000, 2.20599E-06*nb2fb);// 1.7327E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_1300M1800.root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_1300M1800", 10000, 2.07705E-07*nb2fb);// 1.5144E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_1800M2300.root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_1800M2300", 10000, 1.46265E-06*nb2fb);// 1.0133E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_2300M2800.root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_2300M2800", 10000, 1.94916E-08*nb2fb);// 1.1455E-08*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_2800M3300.root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_2800M3300", 10000, 1.4684E-09*nb2fb);// 7.0524E-10*nb2fb);
+		if(doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_M3300.root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_M3300", 10000, 1.69363E-10*nb2fb);// 6.6724E-11*nb2fb);
 	}
 
 	if(tsMCname=="ExtraDimsTEV_m2000")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_120M450.root",   "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_120M450",   40000, 7.7227E-03*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_450M850.root",   "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_450M850",   10000, 2.1906E-05*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_850M1300.root",  "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_850M1300",  10000, 2.0058E-07*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_1300M1800.root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_1300M1800", 10000, 1.3579E-06*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_1800M2300.root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_1800M2300", 10000, 9.4190E-06*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_2300M2800.root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_2300M2800", 10000, 4.7462E-08*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_2800M3300.root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_2800M3300", 10000, 2.9864E-10*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_M3300.root",     "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_M3300",     10000, 3.2102E-09*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_120M450.root",   "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_120M450",   40000, 0.00898959*nb2fb);// 7.7227E-03*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_450M850.root",   "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_450M850",   10000, 2.66544E-05*nb2fb);// 2.1906E-05*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_850M1300.root",  "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_850M1300",  10000, 2.56013E-07*nb2fb);// 2.0058E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_1300M1800.root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_1300M1800", 10000, 1.89361E-06*nb2fb);// 1.3579E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_1800M2300.root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_1800M2300", 10000, 1.47063E-05*nb2fb);// 9.4190E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_2300M2800.root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_2300M2800", 10000, 8.47227E-08*nb2fb);// 4.7462E-08*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_2800M3300.root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_2800M3300", 10000, 6.53577E-10*nb2fb);// 2.9864E-10*nb2fb);
+		if(doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_M3300.root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_M3300", 10000, 9.45194E-09*nb2fb);// 3.2102E-09*nb2fb);
 	}
 }
 

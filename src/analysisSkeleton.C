@@ -2901,6 +2901,37 @@ void analysisSkeleton::fillRecon()
 	recon_all_pz->push_back(mu_pz->at(bi)*MeV2GeV);
 	recon_all_charge->push_back(mu_charge->at(ai));
 	recon_all_charge->push_back(mu_charge->at(bi));
+	recon_all_ptcone20->push_back( mu_ptcone20->at(ai) );
+	recon_all_ptcone20->push_back( mu_ptcone20->at(bi) );
+	recon_all_ptcone30->push_back( mu_ptcone30->at(ai) );
+	recon_all_ptcone30->push_back( mu_ptcone30->at(bi) );
+	recon_all_ptcone40->push_back( mu_ptcone40->at(ai) );
+	recon_all_ptcone40->push_back( mu_ptcone40->at(bi) );
+	recon_all_etcone20->push_back( mu_etcone20->at(ai) );
+	recon_all_etcone20->push_back( mu_etcone20->at(bi) );
+	recon_all_etcone30->push_back( mu_etcone30->at(ai) );
+	recon_all_etcone30->push_back( mu_etcone30->at(bi) );
+	recon_all_etcone40->push_back( mu_etcone40->at(ai) );
+	recon_all_etcone40->push_back( mu_etcone40->at(bi) );
+	recon_all_nucone20->push_back( mu_nucone20->at(ai) );
+	recon_all_nucone20->push_back( mu_nucone20->at(bi) );
+	recon_all_nucone30->push_back( mu_nucone30->at(ai) );
+	recon_all_nucone30->push_back( mu_nucone30->at(bi) );
+	recon_all_nucone40->push_back( mu_nucone40->at(ai) );
+	recon_all_nucone40->push_back( mu_nucone40->at(bi) );
+	recon_all_allauthor->push_back( mu_allauthor->at(ai) );
+	recon_all_allauthor->push_back( mu_allauthor->at(bi) );
+	recon_all_author->push_back( mu_author->at(ai) );
+	recon_all_author->push_back( mu_author->at(bi) );
+	recon_all_beta->push_back( mu_beta->at(ai) );
+	recon_all_beta->push_back( mu_beta->at(bi) );
+	recon_all_isMuonLikelihood->push_back( mu_isMuonLikelihood->at(ai) );
+	recon_all_isMuonLikelihood->push_back( mu_isMuonLikelihood->at(bi) );
+	recon_all_matchchi2->push_back( mu_matchchi2->at(ai) );
+	recon_all_matchchi2->push_back( mu_matchchi2->at(bi) );
+	recon_all_matchndof->push_back( mu_matchndof->at(ai) );
+	recon_all_matchndof->push_back( mu_matchndof->at(bi) );
+	
 	recon_all_y->push_back(y(pmu[ai]));
 	recon_all_y->push_back(y(pmu[bi]));
 	recon_all_id->push_back((mu_charge->at(ai)<0.) ? PDTMU : -1*PDTMU);
@@ -3306,13 +3337,25 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip, bool isloose)
 			}
 		}
 		
-		else if(sorderedcutname=="isolation30"  &&  !bSkipCut)
+		else if(sorderedcutname=="isolation30" && !AS_isQCD  &&  !bSkipCut)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
 				thisMuPass = ( isolationXXCut((*m_cutFlowMapSVD)[sorderedcutname][0],"isolation30",mu_pt->at(mu), mu_ptcone30->at(mu)) ) ? true : false;
 				//thisMuPass = ( isolationXXCut((*m_cutFlowMapSVD)[sorderedcutname][0],"isolation30",
 				//mu_me_qoverp->at(mu), mu_me_theta->at(mu), mu_ptcone30->at(mu)) ) ? true : false;
+				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
+				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
+			}
+		}
+		
+		else if(sorderedcutname=="constrainedAntiIsolation30" && AS_isQCD  &&  !bSkipCut)
+		{
+			float cutval1  = (*m_cutFlowMapSVD)[sorderedcutname][0];
+			float cutval2  = (*m_cutFlowMapSVD)[sorderedcutname][1];
+			for(int mu=0 ; mu<muSize ; mu++)
+			{
+				thisMuPass = ( constrainedAntiIsolationXXCut(cutval1,cutval2,"isolation30",mu_pt->at(mu), mu_ptcone30->at(mu)) ) ? true : false;
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
 			}

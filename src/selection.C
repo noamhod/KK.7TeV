@@ -226,6 +226,15 @@ inline bool selection::isolationXXCut( float isolationCutVal, string sIsoValName
 	return ( isolation < isolationCutVal ) ? true : false;
 }
 
+inline bool selection::constrainedAntiIsolationXXCut( float minIsolationCutVal, float maxIsolationCutVal, string sIsoValName, float pTmu, float pTcone )
+{
+	// track sum pT in 0.XX cone relative to muon pT less than YYY
+	float isolation = (pTmu==0) ? 999 : pTcone/pTmu;
+	
+	if(b_print) cout << "in isolationXXCut: isolation(" << sIsoValName << ")=" << isolation << endl;
+	return (isolation>minIsolationCutVal  &&  isolation<maxIsolationCutVal) ? true : false;
+}
+
 inline bool selection::antiIsolationXXCut( float isolationCutVal, string sIsoValName, float pTmu, float pTcone )
 {
 	// track sum pT in 0.XX cone relative to muon pT more than YYY

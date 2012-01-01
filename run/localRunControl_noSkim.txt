@@ -2,7 +2,8 @@
 local_noskim
 Data11	muid	q_pT	Rel17	MuonMomentumCorrections-00-04-01
 pu_writeMC=false	pu_removeData=false
-mcqsub
+mc
+QCD=no
 tight
 DBG SILENT
 INF VISUAL

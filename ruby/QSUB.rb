@@ -359,9 +359,9 @@ class QSUB
 			cutindex = 0
 			checkrun = 0
 			lines.each do |line|
-				logd.info "line -> #{line}"
+				#logd.info "line -> #{line}"
 				words = parse_line(line)
-				logd.info "words -> #{words}"
+				#logd.info "words -> #{words}"
 				if(!words) then next end
 				if(words.length>0) then
 					if(words[2]=="all"  and Integer(words[3])==0) then

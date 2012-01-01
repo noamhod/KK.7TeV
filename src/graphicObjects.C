@@ -509,6 +509,21 @@ void graphicObjects::clearTreeVars()
 	recon_all_y->clear();
 	recon_all_id->clear();
 	recon_all_theta->clear();
+	recon_all_ptcone20->clear();
+	recon_all_ptcone30->clear();
+	recon_all_ptcone40->clear();
+	recon_all_etcone20->clear();
+	recon_all_etcone30->clear();
+	recon_all_etcone40->clear();
+	recon_all_nucone20->clear();
+	recon_all_nucone30->clear();
+	recon_all_nucone40->clear();
+	recon_all_allauthor->clear();
+	recon_all_author->clear();
+	recon_all_beta->clear();
+	recon_all_isMuonLikelihood->clear();
+	recon_all_matchchi2->clear();
+	recon_all_matchndof->clear();
 	recon_all_isValid    = false;
 	recon_all_vxp_n      = -999;
 	recon_all_Mhat       = 0.;
@@ -1351,6 +1366,21 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	recon_all_y = new vector<float>;
 	recon_all_id = new vector<int>;
 	recon_all_theta = new vector<float>;
+	recon_all_ptcone20 = new vector<float>;
+	recon_all_ptcone30 = new vector<float>;
+	recon_all_ptcone40 = new vector<float>;
+	recon_all_etcone20 = new vector<float>;
+	recon_all_etcone30 = new vector<float>;
+	recon_all_etcone40 = new vector<float>;
+	recon_all_nucone20 = new vector<float>;
+	recon_all_nucone30 = new vector<float>;
+	recon_all_nucone40 = new vector<float>;
+	recon_all_allauthor = new vector<unsigned short>;
+	recon_all_author = new vector<int>;
+	recon_all_beta = new vector<float>;
+	recon_all_isMuonLikelihood = new vector<float>;
+	recon_all_matchchi2 = new vector<float>;
+	recon_all_matchndof = new vector<int>;
 	
 	
 	// muonTruth
@@ -1509,6 +1539,21 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_truth->Branch( "recon_all_y", &recon_all_y );
 	tree_truth->Branch( "recon_all_id", &recon_all_id );
 	tree_truth->Branch( "recon_all_theta", &recon_all_theta );
+	tree_truth->Branch( "recon_all_ptcone20", &recon_all_ptcone20 );
+	tree_truth->Branch( "recon_all_ptcone30", &recon_all_ptcone30 );
+	tree_truth->Branch( "recon_all_ptcone40", &recon_all_ptcone40 );
+	tree_truth->Branch( "recon_all_etcone20", &recon_all_etcone20 );
+	tree_truth->Branch( "recon_all_etcone30", &recon_all_etcone30 );
+	tree_truth->Branch( "recon_all_etcone40", &recon_all_etcone40 );
+	tree_truth->Branch( "recon_all_nucone20", &recon_all_nucone20 );
+	tree_truth->Branch( "recon_all_nucone30", &recon_all_nucone30 );
+	tree_truth->Branch( "recon_all_nucone40", &recon_all_nucone40 );
+	tree_truth->Branch( "recon_all_allauthor", &recon_all_allauthor );
+	tree_truth->Branch( "recon_all_author", &recon_all_author );
+	tree_truth->Branch( "recon_all_beta", &recon_all_beta );
+	tree_truth->Branch( "recon_all_isMuonLikelihood", &recon_all_isMuonLikelihood );
+	tree_truth->Branch( "recon_all_matchchi2", &recon_all_matchchi2 );
+	tree_truth->Branch( "recon_all_matchndof", &recon_all_matchndof );
 	tree_truth->Branch( "recon_all_Mhat", &recon_all_Mhat );
 	tree_truth->Branch( "recon_all_CosThetaCS", &recon_all_CosThetaCS );
 	tree_truth->Branch( "recon_all_CosThetaHE", &recon_all_CosThetaHE );

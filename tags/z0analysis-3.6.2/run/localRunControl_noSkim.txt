@@ -1,0 +1,10 @@
+/srv01/tau/hod/z0analysis-tests/z0analysis-r170/run
+local_noskim
+Data11	muid	q_pT	Rel17	MuonMomentumCorrections-00-04-01
+pu_writeMC=false	pu_removeData=false
+mcqsub
+QCD=no
+tight
+DBG SILENT
+INF VISUAL
+WRN VISUAL

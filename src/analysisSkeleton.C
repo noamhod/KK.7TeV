@@ -161,23 +161,26 @@ void analysisSkeleton::setPileupParameters(TString dataRootFileName, TString dat
 	
 	if(doMCPUwrite)
 	{
-		pileuprw->AddPeriod(180164, 177986,180481); //associates mc runnumber 180164 with data period 177986 to 180481 (period B-D)
+		/* pileuprw->AddPeriod(180164, 177986,180481); //associates mc runnumber 180164 with data period 177986 to 180481 (period B-D)
 		pileuprw->AddPeriod(183003, 180614,184169); //period E-H
 		pileuprw->AddPeriod(185649, 185353,186934); //period I-K1. For I-K you would change the last number to 187815
-		pileuprw->AddPeriod(185761, 186935,999999); //everything after K1. If you changed the previous line to I-K, change middle number of this line to 187816
-		pileuprw->initialize();
+		pileuprw->AddPeriod(185761, 186935,999999); //everything after K1. If you changed the previous line to I-K, change middle number of this line to 187816 */
+		pileuprw->UsePeriodConfig("MC11a"); //for MC11b change the string to "MC11b"
+		pileuprw->Initialize();
 		_WARNING("!!! Generating own MC file !!!");
 	}
 	else
 	{
-		pileuprw->AddMCDistribution(mcRootFileName,"MCPileupReweighting");
+		/* pileuprw->AddMCDistribution(mcRootFileName,"MCPileupReweighting");
 		pileuprw->AddDataDistribution(dataRootFileName,"LumiMetaData");
 		// 1: to remove this data from the weight calculations. You should also veto such data events (using isUnrepresentedData(..,..) method)
-		// 2: to leave this data in the calculation. I hope you know what you're doing!!
+		// 2: to leave this data in the calculation. I hope you know what you're doing!! */
+		pileuprw->MergeMCRunNumbers(185649,185761); // MC11a ??????
+		pileuprw->AddConfigFile(mcRootFileName);
+		pileuprw->AddLumiCalcFile(dataRootFileName); 
 		pileuprw->SetUnrepresentedDataAction( (doRemoveData) ? 1 : 2 );
-		
-		pileuprw->initialize();
-		correctedMClumi = (doRemoveData) ? pileuprw->getTotalLumiUsed() : -999.;
+		pileuprw->Initialize();
+		// correctedMClumi = (doRemoveData) ? pileuprw->getTotalLumiUsed() : -999.;
 	}
 }
 
@@ -192,6 +195,8 @@ float analysisSkeleton::getPileUpWeight(bool isIntime)
 {
 	_DEBUG("analysisSkeleton::getPileUpWeight");
 
+	if(doMCPUwrite) pileuprw->Fill(RunNumber,mc_channel_number,mcevent_weight/* mcevt_weight[0][0] */,averageIntPerXing);
+	
 	// Get the mu value for this event
 	
 	// one should use the actualIntPerXing variable.
@@ -208,7 +213,9 @@ float analysisSkeleton::getPileUpWeight(bool isIntime)
 	else         mu = averageIntPerXing;
 	
 	// Get the pileup weight for this event
-	float pileupEventWeight = pileupEventWeight = pileuprw->getPileupWeight(mu,RunNumber,mc_channel_number);
+	float pileupEventWeight = 1.;
+	if(!doMCPUwrite) pileupEventWeight = pileuprw->GetCombinedWeight(RunNumber,mc_channel_number,mu);
+	
 	return pileupEventWeight;
 }
 
@@ -3508,11 +3515,23 @@ inline bool analysisSkeleton::singleLooseSelection(TMapsb& cutsToSkip)
 			}
 		}
 		
-		else if(sorderedcutname=="antiIsolation30"  &&  !bSkipCut)
+/* 		else if(sorderedcutname=="antiIsolation30"  &&  !bSkipCut)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
 				thisMuPass = ( antiIsolationXXCut((*m_cutFlowMapSVD)[sorderedcutname][0],"isolation30",mu_pt->at(mu), mu_ptcone30->at(mu)) ) ? true : false;
+				muLooseQAflags[mu] = (!muQAflags[mu]  &&  thisMuPass) ? true : false;
+				if(thisMuPass  &&  muLooseQAflags[mu]) nMusPassed++;
+			}
+		} */
+		
+		else if(sorderedcutname=="constrainedAntiIsolation30"  &&  !bSkipCut)
+		{
+			float cutval1  = (*m_cutFlowMapSVD)[sorderedcutname][0];
+			float cutval2  = (*m_cutFlowMapSVD)[sorderedcutname][1];
+			for(int mu=0 ; mu<muSize ; mu++)
+			{
+				thisMuPass = ( constrainedAntiIsolationXXCut(cutval1,cutval2,"isolation30",mu_pt->at(mu), mu_ptcone30->at(mu)) ) ? true : false;
 				muLooseQAflags[mu] = (!muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muLooseQAflags[mu]) nMusPassed++;
 			}

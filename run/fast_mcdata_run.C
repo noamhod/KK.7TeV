@@ -25,24 +25,26 @@ BosonPtReweightingTool* ZpTrw = new BosonPtReweightingTool("PythiaMC11",true);
 // selectors //////////////////////////
 ///////////////////////////////////////
 bool doData             = true;
+bool doQCD              = true;
 bool doScale2Zpeak      = true;
-bool doDYtautau         = false;
+bool doDYtautau         = true;
 bool fastDYmumu         = false;
 bool largeDYmumu        = true;
-bool drawGmm            = false;
 bool doFullKKtemplates  = false;
 bool doFullZPtemplates  = true;
-bool dopileup           = false;
-bool doEWkfactor        = false;
+bool dopileup           = true;
+bool doEWkfactor        = true;
 bool doEWkfactorSig     = false;
-bool doQCDkfactor       = false;
+bool doQCDkfactor       = true;
 bool doZpT              = true;
 bool doCouplingsScale   = false;
 bool doRemoveHighMass   = true;
+bool doIsolation        = false; // should be true for the histogram of the null-isolation-cut only !!!
 TString fileNmaeSuffix()
 {
 	TString name = "";
 	if(!doData)           name += "_noData";
+	if(!doQCD)            name += "_noQCD";
 	if(!doScale2Zpeak)    name += "_noZpeak";
 	if(fastDYmumu)        name += "_fastDY";
 	if(!largeDYmumu)      name += "_smallDY";
@@ -53,12 +55,13 @@ TString fileNmaeSuffix()
 	if(!doZpT)            name += "_noZpTrw";
 	if(!doCouplingsScale) name += "_noCoupScale";
 	if(!doRemoveHighMass) name += "_noHighMass";
+	if(doIsolation)       name += "_noIso";
 	return name;
 }
 ///////////////////////////////////////
 
 // other parameters
-TString ntupledir = "/srv01/tau/hod/z0analysis-tests/z0analysis-r170/data"; // "/data/hod/2011/NTUPLE";
+TString ntupledir = (!doIsolation) ? "/data/hod/2011/NTUPLE" : "/data/hod/2011/NTUPLE/noisolation";
 Int_t printmod    = 5000;
 Bool_t dolog      = true;
 
@@ -208,6 +211,23 @@ vector<float>* recon_all_charge;
 vector<float>* recon_all_y;
 vector<int>*   recon_all_id;
 vector<float>* recon_all_theta;
+
+vector<float>* recon_all_ptcone20;
+vector<float>* recon_all_ptcone30;
+vector<float>* recon_all_ptcone40;
+vector<float>* recon_all_etcone20;
+vector<float>* recon_all_etcone30;
+vector<float>* recon_all_etcone40;
+vector<float>* recon_all_nucone20;
+vector<float>* recon_all_nucone30;
+vector<float>* recon_all_nucone40;
+vector<unsigned short>* recon_all_allauthor;
+vector<int>*   recon_all_author;
+vector<float>* recon_all_beta;
+vector<float>* recon_all_isMuonLikelihood;
+vector<float>* recon_all_matchchi2;
+vector<int>*   recon_all_matchndof;
+
 float recon_all_Mhat;
 float recon_all_CosThetaCS;
 float recon_all_CosThetaHE;
@@ -237,9 +257,6 @@ vector<float>* px;
 vector<float>* py;
 vector<float>* pz;
 vector<float>* charge;
-vector<unsigned short>* allauthor;
-vector<int>* author;
-vector<float>* beta;
 vector<float>* me_d0;
 vector<float>* me_z0;
 vector<float>* me_phi;
@@ -250,6 +267,21 @@ vector<float>* ie_z0;
 vector<float>* ie_phi;
 vector<float>* ie_theta;
 vector<float>* ie_qoverp;
+vector<unsigned short>* allauthor;
+vector<int>* author;
+vector<float>* beta;
+vector<float>* isMuonLikelihood;
+vector<float>* matchchi2;
+vector<int>* matchndof;
+vector<float>* etcone20;
+vector<float>* etcone30;
+vector<float>* etcone40;
+vector<float>* nucone20;
+vector<float>* nucone30;
+vector<float>* nucone40;
+vector<float>* ptcone20;
+vector<float>* ptcone30;
+vector<float>* ptcone40;
 float Mhat;
 float CosThetaCS;
 float CosThetaHE;
@@ -507,7 +539,7 @@ void drawratio(TH1* th1n, TH1* th1d, vector<TString>& vtsMCbgds, TString drawopt
 	tvp_hists->RedrawAxis();
 
 	tvp_ratio->cd();
-	hr->Draw("e1x1");
+	hr->Draw("epx0");
 	linMap[lName]->Draw("SAMES");
 	cnvMap[hName]->Update();
 	tvp_ratio->RedrawAxis();
@@ -629,17 +661,18 @@ void setMCtree(TString fPath, TString name, Double_t N, Double_t sigma)
 	
 	file = new TFile(fPath,"READ");
 	treMap.insert( make_pair(name, (TTree*)file->Get("truth/truth_tree")->Clone("")) );
+	if(name.Contains("Pythia8")) _INFO((string)name+" -> N="+_s((int)treMap[name]->GetEntries()));
 	flatLumiWgtMap.insert( make_pair(name, luminosity/(N/sigma)) );
 	mcNeventsMap.insert( make_pair(name, N) );
 	mcSigmaMap.insert( make_pair(name, sigma) );
 	pathMap.insert( make_pair(name, fPath) );
 }
 
-void setDATAtree()
+void setDATAtree(TString name="Data")
 {
 	_DEBUG("setDATAtree");
-	
-	fName = ntupledir+"/analysisLocalControl.root";
+	if(name=="Data")     fName = ntupledir+"/analysisLocalControl.root";
+	else if(name=="QCD") fName = ntupledir+"/analysisLocalControl_QCD.root";
 	tName = "allCuts/allCuts_tree";
 	file = new TFile(fName,"READ");
 	tree = (TTree*)file->Get(tName);
@@ -662,7 +695,7 @@ void samples()
 	int counter = 0;
 	grpx.insert( make_pair("DYmumu",   new GRPX(counter,"#gamma/Z",      kAzure+8,-1,   kBlack,1,1,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["DYmumu"]->order,"DYmumu") );
-	grpx.insert( make_pair("Diboson",  new GRPX(proccount(counter),"Diboson",     kOrange-4,-1,  kBlack,1,1,  -1,-1,-1)));
+	grpx.insert( make_pair("Diboson",  new GRPX(proccount(counter),"Diboson",     kOrange+1,-1,  kBlack,1,1,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Diboson"]->order,"Diboson") );
 	grpx.insert( make_pair("TTbar",    new GRPX(proccount(counter),"t#bar{t}",     kRed+1,-1,     kBlack,1,1,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["TTbar"]->order,"TTbar") );
@@ -671,10 +704,15 @@ void samples()
 		grpx.insert( make_pair("DYtautau", new GRPX(proccount(counter),"DY#tau#tau",  kRed-5,-1,     kBlack,1,1,  -1,-1,-1)));
 		grpx_ordered.insert( make_pair(grpx["DYtautau"]->order,"DYtautau") );
 	}
+	if(doQCD)
+	{
+		grpx.insert( make_pair("QCD", new GRPX(proccount(counter),"QCD",  kYellow-9,-1,     kBlack,1,1,  -1,-1,-1)));
+		grpx_ordered.insert( make_pair(grpx["QCD"]->order,"QCD") );
+	}
 	
 	
 	counter = 20;
-	grpx.insert( make_pair("Data", new GRPX(counter,"Data",   -1,-1,  -1,-1,-1,  kBlack,24,0.8)));
+	grpx.insert( make_pair("Data", new GRPX(counter,"Data",   -1,-1,  kBlack,1,2,  kBlack,20,0.8)));
 	grpx_ordered.insert( make_pair(grpx["Data"]->order,"Data") );
 	
 	////////////////////////////
@@ -697,13 +735,13 @@ void samples()
 	grpx.insert( make_pair("Zprime_SSM2000",  new GRPX(proccount(counter),"2000 GeV Z'_{SSM}",  kAzure-4,-1,  kBlack,1,1,  -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Zprime_SSM2000"]->order,"Zprime_SSM2000") );
 	
-	counter = 200;
+	/* counter = 200;
 	grpx.insert( make_pair("Gmm_01_1750",  new GRPX(counter,"1750 GeV G*",  kViolet+1,-1,    kBlack,1,1,   -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Gmm_01_1750"]->order,"Gmm_01_1750") );
 	grpx.insert( make_pair("Gmm_01_2000",  new GRPX(proccount(counter),"2000 GeV G*",  kViolet+6,-1,  kBlack,1,1,   -1,-1,-1)));
 	grpx_ordered.insert( make_pair(grpx["Gmm_01_2000"]->order,"Gmm_01_2000") );
 	grpx.insert( make_pair("Gmm_01_2250",  new GRPX(proccount(counter),"2250 GeV G*",  kViolet+10,-1,  kBlack,1,1,  -1,-1,-1)));
-	grpx_ordered.insert( make_pair(grpx["Gmm_01_2250"]->order,"Gmm_01_2250") );
+	grpx_ordered.insert( make_pair(grpx["Gmm_01_2250"]->order,"Gmm_01_2250") ); */
 	
 	counter = 300;
 	grpx.insert( make_pair("Zprime_SSM_m2000",  new GRPX(counter,"2 TeV Z'_{SSM} with interference", kMagenta+1,-1,    kBlack,1,1,  -1,-1,-1)));
@@ -724,7 +762,7 @@ void setMCtrees(TString tsMCname)
 	clearMaps(); ///
 	////////////////
 
-	
+
 	if(tsMCname=="DYmumu")
 	{
 		if(!largeDYmumu)
@@ -751,9 +789,9 @@ void setMCtrees(TString tsMCname)
 		{
 			if(fastDYmumu)
 			{
-				setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_75M120.root", "mcLocalControl_Pythia6_DYmumu_75M120",   100000, 7.9836E-01*nb2fb); // ok
-				// setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_120M250.root", "mcLocalControl_Pythia6_DYmumu_120M250", 100000, 8.5304E-03*nb2fb);
-				setMCtree(ntupledir+"/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 20000, 8.5275E-03*nb2fb); // this is the old DY !!!!!!
+				setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_75M120.root",  "mcLocalControl_Pythia6_DYmumu_75M120",  100000, 7.9836E-01*nb2fb); // ok
+				setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_120M250.root", "mcLocalControl_Pythia6_DYmumu_120M250", 100000, 8.5304E-03*nb2fb);
+				// setMCtree(ntupledir+"/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 20000, 8.5275E-03*nb2fb); // this is the old DY !!!!!!
 			}
 			else setMCtree(ntupledir+"/mcLocalControl_Zmumu.root", "mcLocalControl_Zmumu", 4878990, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
 			
@@ -769,7 +807,7 @@ void setMCtrees(TString tsMCname)
 			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2250M2500.root", "mcLocalControl_Pythia6_DYmumu_2250M2500", 100000, 3.2232E-09*nb2fb);
 			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2500M2750.root", "mcLocalControl_Pythia6_DYmumu_2500M2750", 100000, 1.2073E-09*nb2fb);
 			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2750M3000.root", "mcLocalControl_Pythia6_DYmumu_2750M3000", 100000, 4.4763E-10*nb2fb);
-			if(doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_M3000.root", "mcLocalControl_Pythia6_DYmumu_M3000", 100000, 2.5586E-10*nb2fb); // this is taken out because the EW k-factors are valid only below 3 TeV
+			if(!doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_M3000.root", "mcLocalControl_Pythia6_DYmumu_M3000", 100000, 2.5586E-10*nb2fb); // this is taken out because the EW k-factors are valid only below 3 TeV
 		}
 	}
 	
@@ -805,8 +843,18 @@ void setMCtrees(TString tsMCname)
 		setMCtree(ntupledir+"/mcLocalControl_WZ_Herwig.root", "mcLocalControl_WZ_Herwig", 239949,  5743.);  // AMI: 1.1485E-02*nb2fb*3.1043E-01
 		setMCtree(ntupledir+"/mcLocalControl_ZZ_Herwig.root", "mcLocalControl_ZZ_Herwig", 244999,  1271.);  // AMI: 4.5721E-03*nb2fb*2.1319E-01
 	}
+
+	
+	/*
+	if(tsMCname=="jjmu15X")
+	{
+		setMCtree(ntupledir+"/mcLocalControl_PythiaB_ccmu15X.root", "mcLocalControl_PythiaB_ccmu15X", 1499697, 0.0E-02*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_PythiaB_bbmu15X.root", "mcLocalControl_PythiaB_bbmu15X", 239949,  0.0E-02*nb2fb);
+	}
+	*/
 	
 	
+	/* 
 	if(tsMCname=="Gmm_01_1750")
 	{
 		setMCtree(ntupledir+"/mcLocalControl_Gmm_01_1750.root", "mcLocalControl_Gmm_01_1750", 10000, 1.6320E-06*nb2fb);
@@ -819,6 +867,7 @@ void setMCtrees(TString tsMCname)
 	{
 		setMCtree(ntupledir+"/mcLocalControl_Gmm_01_2250.root", "mcLocalControl_Gmm_01_2250", 10000, 2.1381E-07*nb2fb);
 	}
+	*/
 	
 
 	if(tsMCname=="Zprime_SSM500")
@@ -855,7 +904,7 @@ void setMCtrees(TString tsMCname)
 		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_1800M2300.root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_1800M2300", 10000, 1.46265E-06*nb2fb);// 1.0133E-06*nb2fb);
 		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_2300M2800.root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_2300M2800", 10000, 1.94916E-08*nb2fb);// 1.1455E-08*nb2fb);
 		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_2800M3300.root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_2800M3300", 10000, 1.4684E-09*nb2fb);// 7.0524E-10*nb2fb);
-		if(doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_M3300.root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_M3300", 10000, 1.69363E-10*nb2fb);// 6.6724E-11*nb2fb);
+		if(!doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_M3300.root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_M3300", 10000, 1.69363E-10*nb2fb);// 6.6724E-11*nb2fb);
 	}
 
 	if(tsMCname=="ExtraDimsTEV_m2000")
@@ -867,7 +916,7 @@ void setMCtrees(TString tsMCname)
 		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_1800M2300.root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_1800M2300", 10000, 1.47063E-05*nb2fb);// 9.4190E-06*nb2fb);
 		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_2300M2800.root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_2300M2800", 10000, 8.47227E-08*nb2fb);// 4.7462E-08*nb2fb);
 		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_2800M3300.root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_2800M3300", 10000, 6.53577E-10*nb2fb);// 2.9864E-10*nb2fb);
-		if(doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_M3300.root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_M3300", 10000, 9.45194E-09*nb2fb);// 3.2102E-09*nb2fb);
+		if(!doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_M3300.root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_M3300", 10000, 9.45194E-09*nb2fb);// 3.2102E-09*nb2fb);
 	}
 }
 
@@ -905,6 +954,23 @@ void setMCbranches()
 	recon_all_y = 0;
 	recon_all_id = 0;
 	recon_all_theta = 0;
+	
+	recon_all_ptcone20 = 0;
+	recon_all_ptcone30 = 0;
+	recon_all_ptcone40 = 0;
+	recon_all_etcone20 = 0;
+	recon_all_etcone30 = 0;
+	recon_all_etcone40 = 0;
+	recon_all_nucone20 = 0;
+	recon_all_nucone30 = 0;
+	recon_all_nucone40 = 0;
+	recon_all_allauthor = 0;
+	recon_all_author = 0;
+	recon_all_beta = 0;
+	recon_all_isMuonLikelihood = 0;
+	recon_all_matchchi2 = 0;
+	recon_all_matchndof = 0;
+
 	
 	E = 0;
 	pt = 0;
@@ -986,6 +1052,21 @@ void setMCbranches()
 	tree->SetBranchAddress("recon_all_py", &recon_all_py);
 	tree->SetBranchAddress("recon_all_pz", &recon_all_pz);
 	tree->SetBranchAddress("recon_all_charge", &recon_all_charge);
+	tree->SetBranchAddress("recon_all_ptcone20", &recon_all_ptcone20);
+	tree->SetBranchAddress("recon_all_ptcone30", &recon_all_ptcone30);
+	tree->SetBranchAddress("recon_all_ptcone40", &recon_all_ptcone40);
+	tree->SetBranchAddress("recon_all_etcone20", &recon_all_etcone20);
+	tree->SetBranchAddress("recon_all_etcone30", &recon_all_etcone30);
+	tree->SetBranchAddress("recon_all_etcone40", &recon_all_etcone40);
+	tree->SetBranchAddress("recon_all_nucone20", &recon_all_nucone20);
+	tree->SetBranchAddress("recon_all_nucone30", &recon_all_nucone30);
+	tree->SetBranchAddress("recon_all_nucone40", &recon_all_nucone40);
+	tree->SetBranchAddress("recon_all_allauthor", &recon_all_allauthor);
+	tree->SetBranchAddress("recon_all_author", &recon_all_author);
+	tree->SetBranchAddress("recon_all_beta", &recon_all_beta);
+	tree->SetBranchAddress("recon_all_isMuonLikelihood", &recon_all_isMuonLikelihood);
+	tree->SetBranchAddress("recon_all_matchchi2", &recon_all_matchchi2);
+	tree->SetBranchAddress("recon_all_matchndof", &recon_all_matchndof);
 	tree->SetBranchAddress("recon_all_y", &recon_all_y);
 	tree->SetBranchAddress("recon_all_id", &recon_all_id);
 	tree->SetBranchAddress("recon_all_theta", &recon_all_theta);
@@ -1025,6 +1106,22 @@ void setDATAbranches()
 	ie_theta = 0;
 	ie_qoverp = 0;
 	
+	allauthor = 0;
+	author = 0;
+	beta = 0;
+	isMuonLikelihood = 0;
+	matchchi2 = 0;
+	matchndof = 0;
+	etcone20 = 0;
+	etcone30 = 0;
+	etcone40 = 0;
+	nucone20 = 0;
+	nucone30 = 0;
+	nucone40 = 0;
+	ptcone20 = 0;
+	ptcone30 = 0;
+	ptcone40 = 0;
+	
 	tree->SetBranchAddress( "actualIntPerXing",  &actualIntPerXing );
 	tree->SetBranchAddress( "averageIntPerXing", &averageIntPerXing );
 	tree->SetBranchAddress( "mc_channel_number", &mc_channel_number );
@@ -1060,6 +1157,21 @@ void setDATAbranches()
 	tree->SetBranchAddress("ie_phi", &ie_phi);
 	tree->SetBranchAddress("ie_theta", &ie_theta);
 	tree->SetBranchAddress("ie_qoverp", &ie_qoverp);
+	tree->SetBranchAddress("allauthor", &allauthor);
+	tree->SetBranchAddress("author", &author);
+	tree->SetBranchAddress("beta", &beta);
+	tree->SetBranchAddress("isMuonLikelihood", &isMuonLikelihood);
+	tree->SetBranchAddress("matchchi2", &matchchi2);
+	tree->SetBranchAddress("matchndof", &matchndof);
+	tree->SetBranchAddress("etcone20", &etcone20);
+	tree->SetBranchAddress("etcone30", &etcone30);
+	tree->SetBranchAddress("etcone40", &etcone40);
+	tree->SetBranchAddress("nucone20", &nucone20);
+	tree->SetBranchAddress("nucone30", &nucone30);
+	tree->SetBranchAddress("nucone40", &nucone40);
+	tree->SetBranchAddress("ptcone20", &ptcone20);
+	tree->SetBranchAddress("ptcone30", &ptcone30);
+	tree->SetBranchAddress("ptcone40", &ptcone40);
 	tree->SetBranchAddress("Mhat", &Mhat);
 	tree->SetBranchAddress("CosThetaCS", &CosThetaCS);
 	tree->SetBranchAddress("CosThetaHE", &CosThetaHE);
@@ -1251,6 +1363,14 @@ void hbook()
 				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
 				 
+		if(doIsolation) h1Map.insert( make_pair("hIsolation"+name, new TH1D("hIsolation"+name,";#Sigmap_{T}^{trk}/p_{T}^{#mu};Events",nisofullbins,isofullmin,isofullmax)) );
+		else            h1Map.insert( make_pair("hIsolation"+name, new TH1D("hIsolation"+name,";#Sigmap_{T}^{trk}/p_{T}^{#mu};Events",nisobins,isomin,isomax)) );
+		setlogx(h1Map["hIsolation"+name]);
+		graphics(h1Map["hIsolation"+name],
+				 grpx[name]->filcolor,grpx[name]->filstyle,
+				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
+				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
+				 
 		h1Map.insert( make_pair("hyQ"+name, new TH1D("hyQ"+name,";y_{Q};Events",nyQbins,minyQ,maxyQ)) );
 		setlogx(h1Map["hyQ"+name]);
 		graphics(h1Map["hyQ"+name],
@@ -1352,7 +1472,10 @@ void hscale2Zpeak()
 	{
 		TString name = it->first;
 		
-		if(name.Contains("Data")) continue;
+		/////////////////////////////////////////////
+		if(name.Contains("Data")) continue; /////////
+		if(name.Contains("QCD"))  continue; /////////
+		/////////////////////////////////////////////
 		
 		Scale(h1Map["hNvxp_no_puwgt"+name],ratio_nopileup);
 		Scale(h1Map["hNvxp_with_puwgt"+name],ratio);
@@ -1403,6 +1526,7 @@ void hscale2Zpeak()
 			}
 		}
 		
+		Scale(h1Map["hIsolation"+name],ratio);
 		Scale(h1Map["hyQ"+name],ratio);
 		Scale(h1Map["hQT"+name],ratio);
 		Scale(h1Map["hEtaQ"+name],ratio);
@@ -1418,13 +1542,41 @@ void hscale2Zpeak()
 	}
 }
 
+void hMCsumDY(TString tsMCname)
+{
+	if(!tsMCname.Contains("DYtautau")) return; // DYtautau is part of DYmumu
+
+	h1Map["hNvxp_no_puwgtDYmumu"]->Add(h1Map["hNvxp_no_puwgtDYtautau"]);
+	h1Map["hNvxp_with_puwgtDYmumu"]->Add(h1Map["hNvxp_with_puwgtDYtautau"]);
+	h1Map["hMassNumbersDYmumu"]->Add(h1Map["hMassNumbersDYtautau"]);
+	h1Map["hMassDYmumu"]->Add(h1Map["hMassDYtautau"]);	
+	h1Map["hMass_limit_DYmumu"]->Add(h1Map["hMass_limit_DYtautau"]);
+	h1Map["hIsolationDYmumu"]->Add(h1Map["hIsolationDYtautau"]);
+	h1Map["hyQDYmumu"]->Add(h1Map["hyQDYtautau"]);
+	h1Map["hQTDYmumu"]->Add(h1Map["hQTDYtautau"]);
+	h1Map["hEtaQDYmumu"]->Add(h1Map["hEtaQDYtautau"]);
+	h1Map["hEtaLeadingDYmumu"]->Add(h1Map["hEtaLeadingDYtautau"]);
+	h1Map["hEtaSubleadingDYmumu"]->Add(h1Map["hEtaSubleadingDYtautau"]);
+	h1Map["hPhiLeadingDYmumu"]->Add(h1Map["hPhiLeadingDYtautau"]);
+	h1Map["hPhiSubleadingDYmumu"]->Add(h1Map["hPhiSubleadingDYtautau"]);
+	h1Map["hpTLeadingDYmumu"]->Add(h1Map["hpTLeadingDYtautau"]);
+	h1Map["hpTSubleadingDYmumu"]->Add(h1Map["hpTSubleadingDYtautau"]);
+	
+	///// 2d
+	h2Map["hMassCosThetaCSDYmumu"]->Add(h2Map["hMassCosThetaCSDYtautau"]);
+	h2Map["hMassyQDYmumu"]->Add(h2Map["hMassyQDYtautau"]);
+}
+
 void hMCsumall(TString tsMCname)
 {
+	if(tsMCname.Contains("DYtautau")) return; // DYtautau is part of DYmumu
+
 	h1Map["hNvxp_no_puwgtMCsum"]->Add(h1Map["hNvxp_no_puwgt"+tsMCname]);
 	h1Map["hNvxp_with_puwgtMCsum"]->Add(h1Map["hNvxp_with_puwgt"+tsMCname]);
 	h1Map["hMassNumbersMCsum"]->Add(h1Map["hMassNumbers"+tsMCname]);
 	h1Map["hMassMCsum"]->Add(h1Map["hMass"+tsMCname]);	
 	h1Map["hMass_limit_MCsum"]->Add(h1Map["hMass_limit_"+tsMCname]);
+	h1Map["hIsolationMCsum"]->Add(h1Map["hIsolation"+tsMCname]);
 	h1Map["hyQMCsum"]->Add(h1Map["hyQ"+tsMCname]);
 	h1Map["hQTMCsum"]->Add(h1Map["hQT"+tsMCname]);
 	h1Map["hEtaQMCsum"]->Add(h1Map["hEtaQ"+tsMCname]);
@@ -1440,29 +1592,34 @@ void hMCsumall(TString tsMCname)
 	h2Map["hMassyQMCsum"]->Add(h2Map["hMassyQ"+tsMCname]);
 }
 
-void hbgdraw(TString type, TString sufx="", bool dologx=false, bool dology=false)
+void hbgdraw(TString type, bool dologx=false, bool dology=false)
 {
 	vector<TString> vtsMCbgds;
 	for(TMapiTS::iterator it=grpx_ordered.begin() ; it!=grpx_ordered.end() ; ++it)
 	{
 		int order    = it->first;
 		TString name = it->second;
-		if(order>20) continue; // only backgrounds and data
+		
+		if(order>20)                  continue; // only backgrounds and data
+		if(name.Contains("DYtautau")) continue; // DYtautau is part of DYmumu
+		
 		if(order==0)
 		{
 			vtsMCbgds.clear();
-			setMinMax(h1Map[type+name+sufx],h1Map[type+"Data"+sufx],true);
-			draw(h1Map[type+name+sufx], "", "", dologx, dology);
+			setMinMax(h1Map[type+name],h1Map[type+"Data"],true);
+			draw(h1Map[type+name], "", "", dologx, dology);
 		}
+		
 		if(name!="Data")
 		{
-			drawon(type+grpx_ordered[0]+sufx, h1Map[type+name+sufx]);
-			vtsMCbgds.push_back(type+name+sufx);
+			drawon(type+grpx_ordered[0], h1Map[type+name]);
+			vtsMCbgds.push_back(type+name);
 		}
-		else drawon(type+grpx_ordered[0]+sufx, h1Map[type+"Data"+sufx], "e1x1");
+		else { drawon(type+grpx_ordered[0], h1Map[type+"Data"], "epx0"); _INFO("");}
 	}
-	drawtxton(type+grpx_ordered[0]+sufx);
-	drawratio(h1Map[type+"Data"+sufx], h1Map[type+"MCsum"+sufx], vtsMCbgds, "e1x1", "", dologx, dology);
+	
+	drawtxton(type+grpx_ordered[0]);
+	drawratio(h1Map[type+"Data"], h1Map[type+"MCsum"], vtsMCbgds, "epx0", "", dologx, dology);
 	vtsMCbgds.clear();
 }
 
@@ -1557,21 +1714,25 @@ void hdraw()
 			}
 		}
 	}
+	
+	_INFO("");
 
 	hbgdraw("hNvxp_no_puwgt");
 	hbgdraw("hNvxp_with_puwgt");
-	hbgdraw("hMassNumbers","",dolog,dolog);
-	hbgdraw("hMass","",dolog,dolog);
+	hbgdraw("hMassNumbers",dolog,dolog);
+	hbgdraw("hMass",dolog,dolog);
+	hbgdraw("hIsolation",!dolog,dolog);
 	hbgdraw("hyQ");
-	hbgdraw("hQT","",dolog,dolog);
+	hbgdraw("hQT",dolog,dolog);
 	hbgdraw("hEtaQ");
 	hbgdraw("hEtaLeading");
 	hbgdraw("hEtaSubleading");
 	hbgdraw("hPhiLeading");
 	hbgdraw("hPhiSubleading");
-	hbgdraw("hpTLeading","",dolog,dolog);
-	hbgdraw("hpTSubleading","",dolog,dolog);
+	hbgdraw("hpTLeading",dolog,dolog);
+	hbgdraw("hpTSubleading",dolog,dolog);
 	
+	_INFO("");
 	
 	///// 2d
 	bool is2d = true;
@@ -1594,6 +1755,8 @@ void hdraw()
 		for(int ms=0 ; ms<=nlogmassbins ; ms++) drawon(type+name, linMap[type+"_vertline_"+_s(logmassbins[ms])]);
 		drawtxton(type+name, is2d);
 	}
+	
+	_INFO("");
 }
 
 void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
@@ -1617,6 +1780,8 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 	float pTLeading = 0.;
 	float pTSubleading = 0.;
 	float dEta = 0.;
+	float iso30Leading = 0.;
+	float iso30Subleading = 0.;
 	
 	float truth_mass = 0.;
 	float truth_s    = 0.;
@@ -1857,6 +2022,8 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				pTLeading     = recon_all_pt->at(0);
 				pTSubleading  = recon_all_pt->at(1);
 				dEta          = fabs(etaLeading-etaSubleading);
+				iso30Leading    = (recon_all_pt->at(0)!=0.) ? recon_all_ptcone30->at(0)/recon_all_pt->at(0) : -999.;
+				iso30Subleading = (recon_all_pt->at(1)!=0.) ? recon_all_ptcone30->at(1)/recon_all_pt->at(1) : -999.;
 				
 				
 				// for the Z peak normalization
@@ -1925,6 +2092,8 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				h1Map["hNvxp_with_puwgt"+tsMCname]->Fill(recon_all_vxp_n,wgt*event_weight);
 				h1Map["hMassNumbers"+tsMCname]->Fill(mass,wgt*event_weight);
 				h1Map["hMass"+tsMCname]->Fill(mass,wgt*event_weight);			
+				h1Map["hIsolation"+tsMCname]->Fill(iso30Leading,wgt*event_weight);
+				h1Map["hIsolation"+tsMCname]->Fill(iso30Subleading,wgt*event_weight); // same histogram for isolation !
 				h1Map["hyQ"+tsMCname]->Fill(yQ,wgt*event_weight);
 				h1Map["hQT"+tsMCname]->Fill(QT,wgt*event_weight);
 				h1Map["hEtaQ"+tsMCname]->Fill(etaQ,wgt*event_weight);
@@ -1946,8 +2115,10 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 			}
 		}
 	}
-	else if(tsRunType=="DATA")
+	else if(tsRunType=="Data" || tsRunType=="QCD")
 	{
+		wgt = (tsRunType=="QCD") ? 0.0006 : 1.;
+	
 		imuonrec  = (charge->at(0)<0.) ? 0 : 1;
 		iamuonrec = (imuonrec==0) ? 1 : 0;
 		
@@ -1980,46 +2151,59 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 		pTLeading     = pt->at(0)*MeV2GeV;
 		pTSubleading  = pt->at(1)*MeV2GeV;
 		dEta  = fabs(etaLeading-etaSubleading);
+		iso30Leading    = (pt->at(0)!=0.) ? ptcone30->at(0)/pt->at(0) : -999.;
+		iso30Subleading = (pt->at(1)!=0.) ? ptcone30->at(1)/pt->at(1) : -999.;
 		
 		if(mass>=imasslogicbins[0]  &&  mass<=imasslogicbins[1]) nData70to110 += 1.;
 		
 		_DEBUG("");
-		
 		///////////////////////////////////
 		/// DATA histo fill statrs here ///
 		///////////////////////////////////
-		h1Map["hNvxp_no_puwgtData"]->Fill(vxp_n);
-		h1Map["hNvxp_with_puwgtData"]->Fill(vxp_n);
-		h1Map["hMassNumbersData"]->Fill(mass);
-		h1Map["hMassData"]->Fill(mass);
-		h1Map["hyQData"]->Fill(yQ);
-		h1Map["hQTData"]->Fill(QT);
-		h1Map["hEtaQData"]->Fill(etaQ);
-		h1Map["hEtaLeadingData"]->Fill(etaLeading);
-		h1Map["hEtaSubleadingData"]->Fill(etaSubleading);
-		h1Map["hPhiLeadingData"]->Fill(phiLeading);
-		h1Map["hPhiSubleadingData"]->Fill(phiSubleading);
-		h1Map["hpTLeadingData"]->Fill(pTLeading);
-		h1Map["hpTSubleadingData"]->Fill(pTSubleading);
-		h1Map["hMass_limit_Data"]->Fill(mass*GeV2TeV); // for the 1d limit
+		h1Map["hNvxp_no_puwgt"+tsRunType]->Fill(vxp_n,wgt);
+		h1Map["hNvxp_with_puwgt"+tsRunType]->Fill(vxp_n,wgt);
+		h1Map["hMassNumbers"+tsRunType]->Fill(mass,wgt);
+		h1Map["hMass"+tsRunType]->Fill(mass,wgt);
+		h1Map["hIsolation"+tsRunType]->Fill(iso30Leading,wgt);
+		h1Map["hIsolation"+tsRunType]->Fill(iso30Subleading,wgt); // same histo for isolation
+		h1Map["hyQ"+tsRunType]->Fill(yQ,wgt);
+		h1Map["hQT"+tsRunType]->Fill(QT,wgt);
+		h1Map["hEtaQ"+tsRunType]->Fill(etaQ,wgt);
+		h1Map["hEtaLeading"+tsRunType]->Fill(etaLeading,wgt);
+		h1Map["hEtaSubleading"+tsRunType]->Fill(etaSubleading,wgt);
+		h1Map["hPhiLeading"+tsRunType]->Fill(phiLeading,wgt);
+		h1Map["hPhiSubleading"+tsRunType]->Fill(phiSubleading,wgt);
+		h1Map["hpTLeading"+tsRunType]->Fill(pTLeading,wgt);
+		h1Map["hpTSubleading"+tsRunType]->Fill(pTSubleading,wgt);
+		h1Map["hMass_limit_"+tsRunType]->Fill(mass*GeV2TeV,wgt); // for the 1d limit
 		
 		///// 2d
-		h2Map["hMassCosThetaCSData"]->Fill(mass,cosThetaCS);
-		h2Map["hMassyQData"]->Fill(mass,yQ);
+		h2Map["hMassCosThetaCS"+tsRunType]->Fill(mass,cosThetaCS,wgt);
+		h2Map["hMassyQ"+tsRunType]->Fill(mass,yQ,wgt);
 		
 		_DEBUG("");
 	}
 }
 
-void init(TTree* t=NULL)
+void init(TTree* t=NULL, TString name="")
 {
 	_DEBUG("init");
 
-	if(t==NULL) // data
+	if(t==NULL && name !="") // data or QCD
 	{
-		setDATAtree();
-		setDATAbranches();
-		_DEBUG("successfully fetched data tree");
+		if(name=="Data")
+		{
+			setDATAtree("Data");
+			setDATAbranches();
+			_DEBUG("successfully fetched data tree");
+		}
+		else if(name=="QCD")
+		{
+			setDATAtree("QCD");
+			setDATAbranches();
+			_DEBUG("successfully fetched QCD tree");
+		}
+		else _FATAL("name should be Data or QCD");
 	}
 	else // mc
 	{
@@ -2169,6 +2353,7 @@ void printMassBins()
 		int order    = it->first;
 		TString name = it->second;
 		if(order>20  &&  !name.Contains("MCsum")) continue; // only backgrounds, total bg's and data
+		if(name.Contains("DYtautau"))             continue; // DYtautau is part of DYmumu
 		cout << "\t" << name << "  ";
 		for(Int_t bin=1 ; bin<=h1Map["hMassNumbers"+name]->GetNbinsX() ; bin++)
 		{
@@ -2227,15 +2412,29 @@ void run()
 	//// data
 	if(doData)
 	{
-		init();
+		init(NULL,"Data");
 		Int_t N = tree->GetEntriesFast();
 		for(Int_t entry=0 ; entry<N ; entry++)
 		{
 			tree->GetEntry(entry);
-			hfill("DATA");			
+			hfill("Data");			
 			monitor("Data",entry,N);
 		}
 		_INFO("Data: done.");
+	}
+	
+	//// QCD
+	if(doQCD)
+	{
+		init(NULL,"QCD");
+		Int_t N = tree->GetEntriesFast();
+		for(Int_t entry=0 ; entry<N ; entry++)
+		{
+			tree->GetEntry(entry);
+			hfill("QCD");			
+			monitor("QCD",entry,N);
+		}
+		_INFO("QCD: done.");
 	}
 	
 	
@@ -2244,15 +2443,21 @@ void run()
 	{
 		int order    = it->first;
 		TString name = it->second;
-		if(name=="Data")  continue; // data is handeled separately
-		if(name=="MCsum") continue; // MCsum is handeled separately
+		if(name=="Data")     continue; // data is handeled separately
+		if(name=="QCD")      continue; // QCD is handeled separately
+		if(name=="MCsum")    continue; // MCsum is handeled separately
+
 		_INFO((string)name+" -> starting");
 		setMCtrees(name);
 		runMCproc(name);
-		if(order<nMaxBGs) hMCsumall(name); // sum only BGs (order==nMaxBGs is data)
 		_INFO((string)name+" -> finished");
+		
+		if(name.Contains("DYtautau")) hMCsumDY(name); // DYtautau is part of DYmumu
+		if(order<nMaxBGs && !name.Contains("DYtautau")) hMCsumall(name); // sum only BGs (order==nMaxBGs is data) and skip DYtautau that is included in DYmumu
+		
 	}
-	
+	hMCsumall("QCD");
+	_INFO("summing -> QCD");
 	
 	// finalize
 	if(doData && doScale2Zpeak) hscale2Zpeak(); // must come before hdraw.

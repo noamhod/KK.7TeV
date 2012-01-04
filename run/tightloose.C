@@ -120,7 +120,7 @@ static void setLogBins(Int_t nbins, Double_t min, Double_t max, Double_t* xpoint
 	for(Int_t i=1 ; i<=nbins ; i++) xpoints[i] = TMath::Power( 10,(logmin + i*logbinwidth) );
 }
 
-void test()
+void tightloose()
 {	
 	style();
 	setLogBins(nlogfullimassbins,logfullimassmin,logfullimassmax,logfullimassbins);

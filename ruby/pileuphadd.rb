@@ -51,8 +51,19 @@ mcarray =
 	'../conf/pileup_WZ_Herwig.root',
 	'../conf/pileup_ZZ_Herwig.root',
 
+	'../conf/pileup_AlpgenJimmyWmunuNp0_pt20',
+	'../conf/pileup_AlpgenJimmyWmunuNp1_pt20',
+	'../conf/pileup_AlpgenJimmyWmunuNp2_pt20',
+	'../conf/pileup_AlpgenJimmyWmunuNp3_pt20',
+	'../conf/pileup_AlpgenJimmyWmunuNp4_pt20',
+	'../conf/pileup_AlpgenJimmyWmunuNp5_pt20',
+
 	'../conf/pileup_Zprime_mumu_SSM500.root',
 	'../conf/pileup_Zprime_mumu_SSM750.root',
+	'../conf/pileup_Zprime_mumu_SSM1000.root',
+	'../conf/pileup_Zprime_mumu_SSM1500.root',
+	'../conf/pileup_Zprime_mumu_SSM1750.root',
+	'../conf/pileup_Zprime_mumu_SSM2000.root',
 
 	'../conf/pileup_Pythia8_ExtraDimsTEV_m2000_mumu_120M450.root',
 	'../conf/pileup_Pythia8_ExtraDimsTEV_m2000_mumu_450M850.root',

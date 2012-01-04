@@ -18,11 +18,11 @@ void cutFlowHandler::incrementNallEvents()
 	nAllEvents++;
 }
 
-void cutFlowHandler::printCutFlowNumbers(Long64_t chainEntries)
+void cutFlowHandler::printCutFlowNumbers(Long64_t chainEntries, string name)
 {
 	if(false) cout << "chainEntries = " << chainEntries << endl;
 	cout << "+--------------------------------------------------------------------------" << endl;
-	cout << "|                          print cut flow numbers                          " << endl;
+	cout << "|                 " << name << " cut flow numbers                          " << endl;
 	cout << "|.........................................................................." << endl;
 	cout << "| processed: all " << nAllEvents << endl;
 	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
@@ -37,7 +37,7 @@ void cutFlowHandler::printCutFlowNumbers(Long64_t chainEntries)
 	
 	// to file:
 	(*file) << "+--------------------------------------------------------------------------" << endl;
-	(*file) << "|                          print cut flow numbers                          " << endl;
+	(*file) << "|                 " << name << " cut flow numbers                          " << endl;
 	(*file) << "|.........................................................................." << endl;
 	(*file) << "| processed: all " << nAllEvents << endl;
 	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)

@@ -494,7 +494,7 @@ public:
 	vector<double>*  mcevt_pdf_scale;
 	vector<double>*  mcevt_pdf1;
 	vector<double>*  mcevt_pdf2;
-	vector<double>*  mcevt_weight;
+	vector<vector<double> >*  mcevt_weight;
 	
 	//MC
 	int            mc_n;

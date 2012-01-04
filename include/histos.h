@@ -107,6 +107,11 @@ TH1D* hZeroize(TH1D* h, int bins2zeroize)
 
 double getYmin(TH1* h)
 {
+	if(h==NULL)
+	{
+		_ERROR("Histogram is null, getYmin(TH1* h) returning 0.001");
+		return 0.01;
+	}
 	double min = 1.e20;
 	double binval = 0.;
 	for(int b=1 ; b<=h->GetNbinsX() ; b++)
@@ -148,6 +153,30 @@ void setMinMax(TH1* h1, TH1* h2, bool isLog=false)
 	else      max *= 1.05;
 	h1->SetMaximum(max);
 	h2->SetMaximum(max);
+}
+
+void setMinMax(vector<TH1D*> h, bool isLog=false)
+{
+	Double_t min = +1.e40;
+	Double_t max = -1.e40;
+	Double_t tmp = 0.;
+	
+	for(unsigned int i=0 ; i<h.size() ; i++)
+	{
+		tmp = getYmin(h[i]);
+		min = (tmp<min) ? tmp : min;
+	}
+	min *= 0.01;
+	h[0]->SetMinimum(min);
+	
+	for(unsigned int i=0 ; i<h.size() ; i++)
+	{
+		tmp = h[i]->GetMaximum();
+		max = (tmp>max) ? tmp : max;
+	}
+	if(isLog) max *= 1.5;
+	else      max *= 1.05;
+	h[0]->SetMaximum(max);
 }
 
 void setMinMax(TH2* h1, TH2* h2, bool isLog=false)

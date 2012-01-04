@@ -11,11 +11,13 @@
 #include "../include/width.h"
 #include "../include/helicity.h"
 #include "../include/kFactors.h"
+#include "../include/lhapdf.h"
 
 using namespace couplings;
 using namespace width;
 using namespace helicity;
 using namespace kFactors;
+using namespace lhapdf;
 
 const unsigned int fstQrk = 1;
 const unsigned int lstQrk = 2;

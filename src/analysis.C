@@ -24,7 +24,10 @@ void analysis::setAllCandidatesFiles(string sCandFilePath, string srunnumber)
 }
 string analysis::setMCPUFiles(string sPUFilePath, string srunnumber)
 {
-	return sPUFilePath+"/"+sMCsampleName+"_"+srunnumber;
+	string name = sPUFilePath+"/pileup_"+sMCsampleName;
+	if(srunnumber!="0") name += "_"+srunnumber;
+	name += ".root";
+	return name;
 }
 
 void analysis::execute()
@@ -216,7 +219,6 @@ void analysis::setEventVariables()
 	/////////////////////////////////////////////////////////////////////////////////
 	// pileup reweighting, needs to come after setting the lbn //////////////////////
 	analysisSkeleton::pileup_weight       = 1.;
-	analysisSkeleton::randomized_decision = 1.; // obsolete
 	analysisSkeleton::lumi_pileup_weight  = 1.; // obsolete
 	bool isIntime = false; // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ??????????
 	if(m_isMC)
@@ -256,16 +258,16 @@ void analysis::setEventVariables()
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	
-	////////////////////////////////////////////////////////////////////////////////////
-	analysisSkeleton::mcevent_weight = 1.; /////////////////////////////////////////////
-	if(m_isMC)                                    //////////////////////////////////////
-	{                                             //////////////////////////////////////
-		if(m_WZphysD3PD->mcevt_weight->size()>=1) //////////////////////////////////////
-		{                                         //////////////////////////////////////
-			analysisSkeleton::mcevent_weight = m_WZphysD3PD->mcevt_weight->at(0)[0]; ///
-		}                                         //////////////////////////////////////
-	}                                             //////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////
+	analysisSkeleton::mcevent_weight = 1.; /////////////////////////////////////////////////
+	if(m_isMC)                                    //////////////////////////////////////////
+	{                                             //////////////////////////////////////////
+		if(m_WZphysD3PD->mcevt_weight->size()>=1) //////////////////////////////////////////
+		{                                         //////////////////////////////////////////
+			analysisSkeleton::mcevent_weight = m_WZphysD3PD->mcevt_weight->at(0)[0]; ///////
+		}                                         //////////////////////////////////////////
+	}                                             //////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////
 	
 	analysisSkeleton::total_weight = analysisSkeleton::pileup_weight*
 									 analysisSkeleton::lumi_pileup_weight*
@@ -327,7 +329,7 @@ void analysis::setEventVariables()
 		analysisSkeleton::mcevt_pdf_scale = m_WZphysD3PD->mcevt_pdf_scale;
 		analysisSkeleton::mcevt_pdf1 = m_WZphysD3PD->mcevt_pdf1;
 		analysisSkeleton::mcevt_pdf2 = m_WZphysD3PD->mcevt_pdf2;
-		// analysisSkeleton::mcevt_weight = m_WZphysD3PD->mcevt_weight;
+		analysisSkeleton::mcevt_weight = m_WZphysD3PD->mcevt_weight;
 		
 		// MC
 		analysisSkeleton::mc_n = m_WZphysD3PD->mc_n;

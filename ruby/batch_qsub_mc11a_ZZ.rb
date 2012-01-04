@@ -27,7 +27,7 @@ x.set_prefix(mcname+"/mc11_7TeV.",6)
 x.set_secondprefix("._",6)
 x.set_grltag("00-00-96")
 x.set_mcptag("00-04-01")
-x.set_prwtag("00-01-02")
+x.set_prwtag("00-02-00")
 
 x.check_variables
 x.batch_qsub(insets,runnumbers,true)

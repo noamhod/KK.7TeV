@@ -80,6 +80,9 @@ void hstack()
 	hMCsum->Reset();
 	hMCsum->SetName("h"+htype+"MCsum"+truth);
 	
+	TH1D* hQCD   = (TH1D*)fhistos->Get("h"+htype+"QCD"+truth)->Clone();
+	backgounds->Add(hQCD);
+	hMCsum->Add(hQCD);
 	TH1D* hTTbar   = (TH1D*)fhistos->Get("h"+htype+"TTbar"+truth)->Clone();
 	backgounds->Add(hTTbar);
 	hMCsum->Add(hTTbar);
@@ -120,6 +123,7 @@ void hstack()
 	leg->AddEntry(hDY,"#gamma/Z","f");
 	leg->AddEntry(hDiboson,"Diboson","f");
 	leg->AddEntry(hTTbar,"t#bar{t}","f");
+	leg->AddEntry(hQCD,"QCD","f");
 	if(hKKtemplate!=NULL) leg->AddEntry(hKKtemplate,"#gamma_{KK}/Z_{KK} 2 TeV Template","l");
 	if(hZPtemplate!=NULL) leg->AddEntry(hZPtemplate,"Z'_{SSM} 2 TeV Template","l");
 
@@ -158,14 +162,19 @@ void hstack()
 	TString name = "hstack_"+htype+"_"+ftype;
 
 	c->cd();
+	if(htype.Contains("Isolation")) backgounds->SetMinimum(1.);
 	backgounds->Draw(); // Draw("nostack");
-	bool isLogxy = (htype.Contains("Mass") || htype.Contains("pT") || htype.Contains("QT")) ? true : false;
-	if(isLogxy)
+	bool isLogx = (htype.Contains("Mass") || htype.Contains("pT") || htype.Contains("QT")) ? true : false;
+	if(isLogx)
 	{
-		c->SetLogy();
 		c->SetLogx();
 		backgounds->GetXaxis()->SetMoreLogLabels();
 		backgounds->GetXaxis()->SetNoExponent();
+	}
+	bool isLogy = (htype.Contains("Mass") || htype.Contains("pT") || htype.Contains("QT") || htype.Contains("Isolation")) ? true : false;
+	if(isLogy)
+	{
+		c->SetLogy();
 	}
 	if(hKKtemplate!=NULL) hKKtemplate->Draw("SAMES");
 	if(hZPtemplate!=NULL) hZPtemplate->Draw("SAMES");
@@ -183,6 +192,6 @@ void hstack()
 		signals->Add(hKKtemplate);
 		signals->Add(hZPtemplate);
 	}
-	TCanvas* cR = (TCanvas*)(stackratio(name,hData,backgounds,signals,leg,pvtxt_lumi,pvtxt_atlas,"Data/#SigmaMC","epx0",isLogxy,isLogxy))->Clone("");
+	TCanvas* cR = (TCanvas*)(stackratio(name,hData,backgounds,signals,leg,pvtxt_lumi,pvtxt_atlas,"Data/#SigmaMC","epx0",isLogx,isLogy))->Clone("");
 	saveas(cR,"plots/"+name, false);
 }

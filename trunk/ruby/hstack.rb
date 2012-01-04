@@ -3,8 +3,11 @@
 workdir = "../run";
 thisdir = Dir.getwd();
 Dir.chdir(workdir);
-
 root = "$ROOTSYS/bin/root.exe -b -l -q"
+
+#noPUrw_noEWkFsig_noCoupScale
+#       noEWkFsig_noCoupScale
+
 inlist =
 [
 	"#{root} hstack.C+ --ftype=noPUrw_noEWkFsig_noCoupScale --htype=Nvxp_no_puwgt   --istru=0",
@@ -20,6 +23,7 @@ inlist =
 	"#{root} hstack.C+ --ftype=noPUrw_noEWkFsig_noCoupScale --htype=PhiSubleading   --istru=0",
 	"#{root} hstack.C+ --ftype=noPUrw_noEWkFsig_noCoupScale --htype=QT              --istru=0",
 	"#{root} hstack.C+ --ftype=noPUrw_noEWkFsig_noCoupScale --htype=yQ              --istru=0",
+	"#{root} hstack.C+ --ftype=noPUrw_noEWkFsig_noCoupScale --htype=Isolation       --istru=0",
 ]
 outlist = []
 

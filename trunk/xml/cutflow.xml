@@ -193,7 +193,7 @@
     <skip>false</skip>
     <nparameters>1</nparameters>
     <parameters>
-      <parameter NAME="ratiomax" ORDER="1" TYPE="float">100000000000.00</parameter>
+      <parameter NAME="ratiomax" ORDER="1" TYPE="float">0.05</parameter>
     </parameters>
     <description>
       This is the isolation cut (use "mu_ptcone30" and "mu_pt").

@@ -349,7 +349,7 @@ class MCQSUB
 				f.puts "echo   \"host = $HOSTNAME\""
 			}
 
-			%x(qsub -q S -e #{rundirregular}/tmp/err -o #{rundirregular}/tmp/out #{jobname}) ################################################################
+			%x(qsub -q HEP -e #{rundirregular}/tmp/err -o #{rundirregular}/tmp/out #{jobname}) ################################################################
 			logd.info "sent --> #{dataset}"
 			
 		##########	
@@ -398,7 +398,7 @@ class MCQSUB
 					f.puts "echo   \"host = $HOSTNAME\""
 				}
 
-				%x(qsub -q S -e #{rundirregular}/tmp/err -o #{rundirregular}/tmp/out #{jobname})
+				%x(qsub -q HEP -e #{rundirregular}/tmp/err -o #{rundirregular}/tmp/out #{jobname})
 				logd.info "sent --> job(#{i}/#{njobs})"
 			end
 		end
@@ -422,8 +422,8 @@ class MCQSUB
 			qsub(datasetdir,dataset,isMC)
 		}
 		
-		%x(qstat | grep hod)
-		logd.info "USE \'qstat | grep hod\' to monitor the jobs"
+		%x(qstat -u hod | grep #{mcname})
+		logd.info "USE: qstat -u hod | grep #{mcname} to monitor the jobs"
 	end
 	
 	def get_txtlogfiles(inlist=[], sPrefix="", sSuffix="",isMC=false)
@@ -618,8 +618,16 @@ class MCQSUB
 		# http://stackoverflow.com/questions/2279210/timer-in-ruby-performance
 		iteration=0
 		repeat_every(interval) do
-			logd.info "... waiting[#{iteration}]"
-			%x(qstat | grep hod > /dev/null)
+			shortname = mcname.gsub("PythiaB","");
+			shortname = shortname.gsub("Pythia","");
+			shortname = shortname.gsub("no_filter","");
+			shortname = shortname.gsub("Herwig","");
+			shortname = shortname.gsub("Herwig","");
+			shortname = shortname.gsub("McAtNlo_Jimmy","");
+			shortname = shortname.gsub("_","");
+			
+			logd.info "... waiting[#{iteration}] -> searching for: #{shortname} (#{mcname})"
+			%x(qstat -u hod | grep #{shortname} > /dev/null)
 			if($?!=0) then
 				break
 			end

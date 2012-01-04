@@ -11,10 +11,12 @@
 #include "couplings.h"
 #include "width.h"
 #include "kFactors.h"
+#include "integrals.h"
 
 using namespace couplings;
 using namespace width;
 using namespace kFactors;
+using namespace integrals;
 
 namespace helicity
 {
@@ -323,7 +325,7 @@ inline double hA2KKnoSMsumQ(double cosTheta, double s, unsigned int idOut)
 	return A2;
 }
 
-
+/* 
 //////////////////////////////////////////////////////////////////
 // http://homepage.mac.com/sigfpe/Computing/fobjects.html
 template<class F>
@@ -351,7 +353,7 @@ double integrate(const F &f, double xMin, double xMax, unsigned int nsegments=10
 		i++;
 	}
 	return(h*I);
-}
+} */
 
 class template_hA2SM
 {
@@ -454,7 +456,7 @@ class template_hA2KKnoSM
 
 
 
-class F
+/* class F
 {
 	double y;
 	double z;
@@ -465,7 +467,7 @@ class F
 		{
 			return x*y*z;
 		}
-};
+}; */
 
 /*
 int main() {

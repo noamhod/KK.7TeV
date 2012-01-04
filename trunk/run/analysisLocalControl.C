@@ -232,6 +232,8 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 		if(run_number_int==107693) str_mcname = "AlpgenJimmyWmunuNp3_pt20";
 		if(run_number_int==107694) str_mcname = "AlpgenJimmyWmunuNp4_pt20";
 		if(run_number_int==107695) str_mcname = "AlpgenJimmyWmunuNp5_pt20";
+		if(run_number_int==106059) str_mcname = "PythiaB_ccmu15X";
+		if(run_number_int==108405) str_mcname = "PythiaB_bbmu15X";
 	}
 	
 	
@@ -467,7 +469,7 @@ void analysisLocalControl::draw()
 	
 	m_analysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
 	
-	m_analysis->printCutFlowNumbers(l64t_nentries);
+	m_analysis->printCutFlowNumbers(l64t_nentries, m_analysis->sMCsampleName);
 	
 	if(!m_doPUwriteMC  &&  m_doPUremoveData) _INFO("correctedMClumi -> "+_s(m_analysis->correctedMClumi));
 }
@@ -533,7 +535,7 @@ void analysisLocalControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		}
 		
 		if(l64t_jentry%l64t_mod==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_WZphysD3PD->RunNumber << "\tlumiblock=" << m_WZphysD3PD->lbn << endl;
-		if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries);
+		if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries, m_analysis->sMCsampleName);
 		
 		if(l64t_jentry%1000==0)
 		{
@@ -611,7 +613,7 @@ void analysisLocalControl::loop(int RunNumber)
 		if((int)m_WZphysD3PD->RunNumber > RunNumber) break; //////////
 		//////////////////////////////////////////////////////
 		
-		if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries);
+		if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries, m_analysis->sMCsampleName);
 		
 		if(l64t_jentry%1000==0)
 		{
@@ -755,7 +757,7 @@ void analysisLocalControl::loop(string sPeriodStart, string sPeriodEnd, Long64_t
                 if((int)m_WZphysD3PD->RunNumber > lastRunInRange)  break; //////////
                 ////////////////////////////////////////////////////////////////////
                 
-                if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries);
+                if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries, m_analysis->sMCsampleName);
                 
                 if(l64t_jentry%1000==0)
                 {

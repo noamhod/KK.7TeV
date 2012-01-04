@@ -51,6 +51,8 @@ static const double Gmu     = 0.0000116633980690699; // GeV^-2
 
 static const double GeV2mb  = 0.38937930419;      // 1/GeV^2 to mb (mili-barn) conversion constant
 static const double GeV2nb  = 1e6*0.38937930419;  // 1/GeV^2 to nb (nano-barn) conversion constant
+static const double GeV2pb  = 1e9*0.38937930419;  // 1/GeV^2 to pb (pico-barn) conversion constant
+static const double GeV2fb  = 1e12*0.38937930419;  // 1/GeV^2 to fb (femto-barn) conversion constant
 /*-----------------------------------------------------------------------------------------*/
 /*                                                   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 /* [1] == (hbar*c)^2 = 0.38937930419 [GeV^2 * mb] -> !!! [1/GeV^2] = 0.38937930419[mb] !!! */

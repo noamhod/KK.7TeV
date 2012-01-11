@@ -21,6 +21,7 @@ inlist =
 	"#{root} hstack.C+ --ftype=noPUrw_noEWkFsig_noCoupScale --htype=EtaSubleading   --istru=0",
 	"#{root} hstack.C+ --ftype=noPUrw_noEWkFsig_noCoupScale --htype=PhiLeading      --istru=0",
 	"#{root} hstack.C+ --ftype=noPUrw_noEWkFsig_noCoupScale --htype=PhiSubleading   --istru=0",
+	"#{root} hstack.C+ --ftype=noPUrw_noEWkFsig_noCoupScale --htype=EtaQ            --istru=0",
 	"#{root} hstack.C+ --ftype=noPUrw_noEWkFsig_noCoupScale --htype=QT              --istru=0",
 	"#{root} hstack.C+ --ftype=noPUrw_noEWkFsig_noCoupScale --htype=yQ              --istru=0",
 	"#{root} hstack.C+ --ftype=noPUrw_noEWkFsig_noCoupScale --htype=Isolation       --istru=0",

@@ -36,7 +36,7 @@ class cutFlowHandler : public XML
 		bool mask();
 		
 		void setCutFlowFile(string sLogFilePath = "", string srunnumber = "");
-		void printCutFlowNumbers(Long64_t chainEntries, string name="");
+		void printCutFlowNumbers(Long64_t chainEntries, string Name="");
 		void incrementNallEvents();
 
 		TMapds*  getCutFlowOrderedMapPtr();

@@ -314,24 +314,6 @@
     </description>
   </obj>
 
-  <!--
-  <obj NAME="TriggerMatching" FLAG="on">
-    <order>102</order>
-    <phase>selection</phase>
-    <skip>true</skip>
-    <nparameters>1</nparameters>
-    <parameters>
-      <parameter NAME="isTriggerMatched" ORDER="1" TYPE="bool">1.</parameter>
-    </parameters>
-    <description>
-      This is the trigger matching requirement cut.
-      At least one of the selected muons from the pair should have triggered.
-      (use: mu_staco_EFCB_index, mu_staco_EFMG_index, trig_EF_trigmuonef_EF_mu22,
-      trig_EF_trigmugirl_EF_mu22_MG, trig_EF_trigmuonef_EF_mu40_MSonly_barrel)
-    </description>
-  </obj>
-  -->
-
   <obj NAME="imass" FLAG="on">
     <order>103</order>
     <phase>selection</phase>

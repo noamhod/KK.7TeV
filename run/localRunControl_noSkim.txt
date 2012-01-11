@@ -5,6 +5,8 @@ pu_writeMC=false	pu_removeData=false
 mcqsub
 QCD=no
 tight
+do2muSelection=no
+doIsolation=no
 DBG SILENT
 INF VISUAL
 WRN VISUAL

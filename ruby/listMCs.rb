@@ -68,13 +68,41 @@ linesarray = linesarray.sort
 ### write the existing and missing sampels to 2 files
 file_existing = File.open("datasets_existing_#{tag}.list", 'w')
 file_missing  = File.open("datasets_missing_#{tag}.list",  'w')
+
+firstline = -5;
+lastline  = -1;
 linesarray.each{ |line|
 	line = line.gsub('\n','')
-	cmd = "dq2-ls -f #{line}"
+	cmd = "dq2-ls -f -H #{line}"
 	result = %x(#{cmd})
 	puts "result = #{result}"
+
+	########### get the size if the dataset
+	file_tmp_name = "datasets_tmp_#{tag}.list"
+	file_tmp      = File.open(file_tmp_name,'w')	
+	file_tmp.puts result
+	file_tmp.close
+	tmplines = IO.readlines(file_tmp_name)[firstline..lastline]
+	datasetsize = ""
+	nfiles = ""
+	if(tmplines!=nil) then
+		tmplines.each do |tmpline|
+			if(tmpline.index("total size:")) then
+				datasetsize = tmpline.gsub("total size:","")
+			end
+			if(tmpline.index("total files:")) then
+				nfiles = tmpline.gsub("total files:","")
+			end	
+		end
+	end
+	#######################################
+	
+
 	if(result!="") then
-		file_existing.puts line
+		line = line.gsub("\n","")
+		datasetsize = datasetsize.gsub("\n","")
+		nfiles      = nfiles.gsub("\n","")
+		file_existing.puts "#{line} -> #{datasetsize} (#{nfiles} files)"
 	elsif
 		file_missing.puts line
 	end

@@ -36,15 +36,19 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	string sMCorData;
 	string sIsQCD;
 	string sIsLoose;
+	string sDo2mu;
+	string sDoIso;
 	bool   isMC;
 	bool   isQCD;
 	bool   isLoose;
+	bool   do2mu;
+	bool   doIso;
 	string sMsgTyp;
 	string sMsgLvl;
 	//int    msgLvl;
 	
 	ifstream ifsel( localRunControlFile.c_str() );
-	ifsel >> sBaseDir >> sRun >> sDataType >> sRec >> spTtype >> sRel >> sMCPtag >> sPUwriteMC >> sPUremoveData >> sMCorData >> sIsQCD >> sIsLoose;
+	ifsel >> sBaseDir >> sRun >> sDataType >> sRec >> spTtype >> sRel >> sMCPtag >> sPUwriteMC >> sPUremoveData >> sMCorData >> sIsQCD >> sIsLoose >> sDo2mu >> sDoIso;
 	
 	if(sBaseDir=="")
 	{
@@ -112,6 +116,18 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 		exit(-1);
 	}
 	isLoose = (sIsLoose=="loose") ? true : false; // false if sIsLoose=="tight"
+	if(sDo2mu!="do2muSelection=yes"  &&  sDo2mu!="do2muSelection=no")
+	{
+		_ERROR("ERROR: YOU CHOSE do2mu ["+sDo2mu+"], exitting now");
+		exit(-1);
+	}
+	do2mu = (sDo2mu=="do2muSelection=yes") ? true : false;
+	if(sDoIso!="doIsolation=yes"  &&  sDoIso!="doIsolation=no")
+	{
+		_ERROR("ERROR: YOU CHOSE doIso ["+sDoIso+"], exitting now");
+		exit(-1);
+	}
+	doIso = (sDoIso=="doIsolation=yes") ? true : false;
 	for(int i=0 ; i<(int)msglvl.size()-2 ; i++)
 	{
 		ifsel >> sMsgTyp >> sMsgLvl;
@@ -140,6 +156,8 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	m_isMC      = isMC;
 	m_isQCD     = isQCD;
 	m_isLoose   = isLoose;
+	m_do2mu     = do2mu;
+	m_doIso     = doIso;
 	m_input     = sMCorData;
 	
 	_INFO("m_basedir="+m_basedir);
@@ -154,6 +172,8 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	_INFO("m_isMC="+_s(m_isMC));
 	_INFO("m_isQCD="+m_isQCD);
 	_INFO("m_isLoose="+_s(m_isLoose));
+	_INFO("m_do2mu="+_s(m_do2mu));
+	_INFO("m_doIso="+_s(m_doIso));
 	_INFO("m_input="+sMCorData);
 	
 	////////////////////////////////////////////////////////
@@ -340,6 +360,11 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	///////////////////////////////////////////
 	m_analysis->sMCsampleName = str_mcname; ///
 	///////////////////////////////////////////
+	
+	//////////////////////////////////////////
+	m_analysis->set2MUselection(m_do2mu); ////
+	m_analysis->setIsolation(m_doIso);    ////
+	//////////////////////////////////////////
 	
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

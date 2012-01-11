@@ -80,9 +80,19 @@ void hstack()
 	hMCsum->Reset();
 	hMCsum->SetName("h"+htype+"MCsum"+truth);
 	
-	TH1D* hQCD   = (TH1D*)fhistos->Get("h"+htype+"QCD"+truth)->Clone();
+	bool isIsolation = (htype.Contains("Isolation")) ? true : false;
+	TString QCD = (isIsolation) ? "jjmu15X" : "QCD";
+	TH1D* hQCD   = (TH1D*)fhistos->Get("h"+htype+QCD+truth)->Clone();
+	if(isIsolation) hQCD->Scale(1./100.);
 	backgounds->Add(hQCD);
 	hMCsum->Add(hQCD);
+	/* TH1D* hWjets = NULL;
+	if(isIsolation)
+	{
+		hWjets = (TH1D*)fhistos->Get("h"+htype+"W+jets"+truth)->Clone();
+		backgounds->Add(hWjets);
+		hMCsum->Add(hWjets);
+	} */
 	TH1D* hTTbar   = (TH1D*)fhistos->Get("h"+htype+"TTbar"+truth)->Clone();
 	backgounds->Add(hTTbar);
 	hMCsum->Add(hTTbar);
@@ -91,11 +101,12 @@ void hstack()
 	hMCsum->Add(hDiboson);
 	TH1D* hDY      = (TH1D*)fhistos->Get("h"+htype+"DYmumu"+truth)->Clone();
 	backgounds->Add(hDY);
-	hMCsum->Add(hDiboson);
+	hMCsum->Add(hDY);
 	
 	TH1D* hData     = (TH1D*)fhistos->Get("h"+htype+"Data")->Clone();
 	hData->SetLineWidth(2);
 	hData->SetMarkerStyle(20);
+	
 	TH1D* hKKtemplate = (TH1D*)fhistos->Get("h"+htype+"KK2000_template"+truth);
 	if(hKKtemplate!=NULL)
 	{
@@ -123,7 +134,8 @@ void hstack()
 	leg->AddEntry(hDY,"#gamma/Z","f");
 	leg->AddEntry(hDiboson,"Diboson","f");
 	leg->AddEntry(hTTbar,"t#bar{t}","f");
-	leg->AddEntry(hQCD,"QCD","f");
+	// leg->AddEntry(hWjets,"W+jets","f");
+	leg->AddEntry(hQCD,QCD,"f");
 	if(hKKtemplate!=NULL) leg->AddEntry(hKKtemplate,"#gamma_{KK}/Z_{KK} 2 TeV Template","l");
 	if(hZPtemplate!=NULL) leg->AddEntry(hZPtemplate,"Z'_{SSM} 2 TeV Template","l");
 
@@ -163,6 +175,7 @@ void hstack()
 
 	c->cd();
 	if(htype.Contains("Isolation")) backgounds->SetMinimum(1.);
+	if(isIsolation) backgounds->SetMinimum(10.);
 	backgounds->Draw(); // Draw("nostack");
 	bool isLogx = (htype.Contains("Mass") || htype.Contains("pT") || htype.Contains("QT")) ? true : false;
 	if(isLogx)

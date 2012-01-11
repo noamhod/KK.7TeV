@@ -485,7 +485,6 @@ class MCQSUB
 		files = get_txtlogfiles(inlist,"RunCutFlow.run_",".cuts",isMC)
 		files.each{|file|
 			lines = IO.readlines(file)[firstline..lastline]
-			#puts lines
 			cutindex = 0
 			checkrun = 0
 			lines.each do |line|
@@ -618,14 +617,19 @@ class MCQSUB
 		# http://stackoverflow.com/questions/2279210/timer-in-ruby-performance
 		iteration=0
 		repeat_every(interval) do
-			shortname = mcname.gsub("PythiaB","");
+			shortname = mcname.gsub("PythiaB_","");
+			shortname = shortname.gsub("mu15X","");
 			shortname = shortname.gsub("Pythia","");
 			shortname = shortname.gsub("no_filter","");
 			shortname = shortname.gsub("Herwig","");
 			shortname = shortname.gsub("Herwig","");
 			shortname = shortname.gsub("McAtNlo_Jimmy","");
 			shortname = shortname.gsub("_","");
-			
+		
+			if(mcname.index("AlpgenJimmy")) then
+				shortname = "AlpgenJimmy";
+			end
+	
 			logd.info "... waiting[#{iteration}] -> searching for: #{shortname} (#{mcname})"
 			%x(qstat -u hod | grep #{shortname} > /dev/null)
 			if($?!=0) then

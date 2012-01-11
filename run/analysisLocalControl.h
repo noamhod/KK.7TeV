@@ -50,6 +50,8 @@ class analysisLocalControl : public chainMaker/*, public utilities*/
 		bool   m_isMC;
 		bool   m_isQCD;
 		bool   m_isLoose;
+		bool   m_do2mu;
+		bool   m_doIso;
 		int    m_msglvl;
 		
 		// run control

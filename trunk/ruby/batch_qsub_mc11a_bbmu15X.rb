@@ -2,10 +2,9 @@
 
 require 'MCQSUB'
 
-mcname = 'WZ_Herwig'
+mcname = 'PythiaB_bbmu15X'
 insets  = [
-			mcname+'/mc11_7TeV.105987.WZ_Herwig.merge.NTUP_SMWZ.e825_s1310_s1300_r2730_r2700_p716/'
-			#mcname+'/mc11_7TeV.105987.WZ_Herwig.merge.NTUP_SMWZ.e825_s1310_s1300_r3043_r2993_p833/'
+			mcname+'/mc11_7TeV.108405.PythiaB_bbmu15X.merge.NTUP_SMWZ.e825_s1310_s1300_r2730_r2780_p756/'
 		  ]
 outlist=[]
 runnumbers = Array.new
@@ -35,5 +34,5 @@ x.batch_qsub(insets,runnumbers,true)
 ### x.merge_candidates(insets,"merged.candidates")
 ### x.merge_cutflow(insets,"merged.cutflow")
 
-x.waitNmerge(5,insets,"merged_#{mcname}",true)
+x.waitNmerge(10,insets,"merged_#{mcname}",true)
 x.finalize()

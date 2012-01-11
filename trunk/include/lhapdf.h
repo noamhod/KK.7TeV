@@ -136,14 +136,8 @@ double rapidityMax(double s)
 double rapidity2Bjorkenx(double s, double y, bool isAnti)
 {
 	if(s<=0) _FATAL("s can not be zero or negative");
-	double yMax = rapidityMax(s);
-	if(fabs(y)>yMax)
-	{
-		// _WARNING("y>yMax -> y="+_s(y)+", yMax="+_s(yMax)+" -> setting y=yMax");
-		// y = (y>0.) ? yMax : -yMax;
-		if((fabs(y)-yMax)/y>0.000001) y = (y>0.) ? 0.9999*yMax : -0.9999*yMax;
-	}
 	double x = (!isAnti) ? sqrt(s/sLHC)*exp(y) : sqrt(s/sLHC)*exp(-y);
+	if(fabs(fabs(x)-1.)<1.e-6) return 1.;
 	if(x<0. || x>1.) _FATAL("x<0 or x>1  -> in s="+_s(s)+", y="+_s(y,8)+", isAnti="+_s(isAnti)+" -> x="+_s(x,8));
 	return x;
 }
@@ -156,67 +150,15 @@ double rapidity(double x1, double x2)
 
 
 //////////////////////////////////////////////////////////////////////////
-/*
-double simpsonIntegral(int nMaxSegments, double s)
-{
-	
-	Q = sqrt(s);
-	nActualSegments = (int)nMaxSegments;
-	absBoundary = getrapidityBoundaries(s);
-	dy = (2*absBoundary)/nActualSegments;
-	h = dy/3;
-	integrand = 0;
-	I=0;
-	y = -1*absBoundary; // lower y
-	xpdf_q=0;
-	xpdf_qbar=0;
-	flavor_1 = ???;         // flavor of 'q'
-	flavor_2 = -1*flavor_1; // flavor of 'qbar'
-	int i=0;
-	while (y<=absBoundary && i<=nActualSegments)
-	{
-		integrand = 0;
-		
-		// calculate the integrand 
-		x_q = getBjorkenx(s, y, false); // get x_q(s,y)
-		x_qbar = getBjorkenx(s, y, true); // get x_qbar(s,y)
-
-		lha.getlhapdf(x_q, Q, flavor_1, xpdf_q); // get x_q*pdf(q)
-		lha.getlhapdf(x_qbar, Q, flavor_2, xpdf_qbar); // get x_qbar*pdf(qbar)
-		
-		//integrand = ( (xpdf_q/x_q) * (xpdf_qbar/x_qbar) ) / runPrm.sMax;
-		integrand = (xpdf_q*xpdf_qbar) * (1./s);
-
-		// simpson
-		if (i==0 || i==nActualSegments) {I += integrand;}
-		else if (i%2==0 && i!=0 && i!=nActualSegments) {I += 2*integrand;}
-		else {I += 4*integrand;}
-
-		// propagate y and i
-		y += dy;
-		i++;
-	}	
-	return(h*I);
-}
-*/
 inline double pdfintegrand(double y, double s, int f)
 {
 	if(s<=0.) _FATAL("s cannot be zero or negative");
-	double yMax = rapidityMax(s);
-	if( fabs(y)>yMax )
-	{
-		// _WARNING("y>yMax -> y="+_s(y,8)+", yMax="+_s(yMax,8)+" -> setting y=yMax");
-		// y = (y>0.) ? yMax : -yMax;
-		if((fabs(y)-yMax)/y>0.000001) y = (y>0.) ? 0.9999*yMax : -0.9999*yMax;
-	}
-	
 	double Q        = sqrt(s);
 	double xq       = rapidity2Bjorkenx(s,y,false);
 	double xqbar    = rapidity2Bjorkenx(s,y,true);
 	double xpdfq    = xpdf(xq,Q,f);
 	double xpdfqbar = xpdf(xqbar,Q,-f);
-	// double integrand = ((xpdfq/xq)*(xpdfqbar/xqbar))/sLHC;
-	double integrand = (xpdfq*xpdfqbar)/s;
+	double integrand = (xpdfq*xpdfqbar)/s; // = ((xpdfq/xq)*(xpdfqbar/xqbar))/sLHC;
 	return integrand;
 }
 

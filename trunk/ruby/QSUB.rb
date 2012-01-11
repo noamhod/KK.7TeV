@@ -239,7 +239,7 @@ class QSUB
 		fullprefix = sourcedir+"/"+prefix
 		make_list(datasetdir,fullprefix,runnumber)
 		macroname = "#{macrodir}/macro_#{runnumber}.C"
-		jobname   = "#{jobdir}/job_#{runnumber}.sh"
+		jobname   = "#{jobdir}/job_data_#{runnumber}.sh"
 		rundirregular="#{thisdir}/../run"
 		rundir='\"'+"#{thisdir}"+'/../run/\"'
 		grlTag='\"'+"#{grltag}"+'\"'
@@ -276,7 +276,7 @@ class QSUB
 			f.puts "echo   \"host = $HOSTNAME\""
 		}
 
-		%x(qsub -q S -e #{rundirregular}/tmp/err -o #{rundirregular}/tmp/out #{jobname})
+		%x(qsub -q HEP -e #{rundirregular}/tmp/err -o #{rundirregular}/tmp/out #{jobname})
 		logd.info "sent --> #{dataset}"
 	end
 	
@@ -298,8 +298,8 @@ class QSUB
 			qsub(datasetdir,dataset)
 		}
 
-		%x(qstat | grep hod)
-		logd.info "USE \'qstat | grep hod\' to monitor the jobs"
+		%x(qstat -u hod | grep job_data)
+		logd.info "USE \'qstat -u hod | grep job_data\' to monitor the jobs"
 	end
 	
 	def get_txtlogfiles(inlist=[], sPrefix="", sSuffix="")
@@ -480,7 +480,7 @@ class QSUB
 		iteration=0
 		repeat_every(interval) do
 			logd.info "... waiting[#{iteration}]"
-			%x(qstat | grep hod > /dev/null)
+			%x(qstat -u hod | grep job_data > /dev/null)
 			if($?!=0) then
 				break
 			end

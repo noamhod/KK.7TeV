@@ -6,6 +6,7 @@ mcname = 'ZZ_Herwig'
 insets  = [
 			# mcname+'/mc11_7TeV.105986.ZZ_Herwig.merge.NTUP_SMWZ.e825_s1310_s1300_r2730_r2700_p716/'
 			mcname+'/mc11_7TeV.105986.ZZ_Herwig.merge.NTUP_SMWZ.e825_s1310_s1300_r2730_r2700_p716_tid525340_00/'
+			#mcname+'/mc11_7TeV.105986.ZZ_Herwig.merge.NTUP_SMWZ.e825_s1310_s1300_r2920_r2900_p833/'
 		  ]
 outlist=[]
 runnumbers = Array.new

@@ -5,6 +5,7 @@ require 'MCQSUB'
 mcname = 'WW_Herwig'
 insets  = [
 			mcname+'/mc11_7TeV.105985.WW_Herwig.merge.NTUP_SMWZ.e825_s1310_s1300_r2730_r2700_p716/'
+			#mcname+'/mc11_7TeV.105985.WW_Herwig.merge.NTUP_SMWZ.e825_s1310_s1300_r2920_r2900_p833/'
 		  ]
 outlist=[]
 runnumbers = Array.new
@@ -30,6 +31,7 @@ x.set_prwtag("00-02-00")
 
 x.check_variables
 x.batch_qsub(insets,runnumbers,true)
+
 ### x.merge_root(insets,"merged.root")
 ### x.merge_candidates(insets,"merged.candidates")
 ### x.merge_cutflow(insets,"merged.cutflow")

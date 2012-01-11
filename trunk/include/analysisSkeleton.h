@@ -30,6 +30,8 @@ public:
 	bool AS_isMC;
 	bool AS_isQCD;
 	bool isLoose;
+	bool do2MUselection;
+	bool doIsolation;
 	
 	string base_dir_path;
 	SmearingClass* MCPpTsmearing;
@@ -632,6 +634,8 @@ public:
 	void setMC(bool isMC) { AS_isMC = isMC; }
 	void setQCD(bool isQCD) { AS_isQCD = isQCD; }
 	void setLoose(bool isloose) { isLoose = isloose; }
+	void set2MUselection(bool do2mu) { do2MUselection = do2mu; }
+	void setIsolation(bool doIso)    { doIsolation = doIso; }
 	void setSmearedMCPpT(int nMus);
 	void setMCPpTparameters(string sDataType, string sAlgo, string spTtype, string sRel, string sDataPath);
 	void setPileupParameters(TString dataRootFileName, TString dataRootHistName, TString mcRootFileName, TString mcRootHistName);
@@ -666,9 +670,9 @@ public:
 	bool applySingleMuonSelection(bool isloose=false);
 	bool applyDoubleMuonSelection();
 	
-	void fillCutProfile1D();
-	void fillCutProfile2D();
-	void fillCutProfile();
+	// void fillCutProfile1D();
+	// void fillCutProfile2D();
+	// void fillCutProfile();
 	
 	//void fillTagNProbe();
 	inline void fill_tNp();
@@ -676,6 +680,7 @@ public:
 	
 	inline void fillTruth();
 	inline void fillRecon();
+	inline void fillSingleTruthAndRecon(bool passRecon);
 	
 	void applyTagNProbe(TMapsb& cutsToSkip);
 	
@@ -698,6 +703,7 @@ private:
 	inline bool doubleSelection(TMapsb& cutsToSkip);
 	
 	void fillAfterCuts();
+	void fillSingleAfterCuts();
 	void fillBeforeCuts();
 	void fillCutFlow(string sorderedcutname);
 

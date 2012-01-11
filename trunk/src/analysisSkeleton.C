@@ -668,14 +668,366 @@ void analysisSkeleton::printAllProperties(int aii, int bii, int iv)
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
+void analysisSkeleton::fillSingleAfterCuts()
+{
+	graphicObjects::RunNumber = RunNumber;
+	graphicObjects::EventNumber = EventNumber;
+	graphicObjects::timestamp = timestamp;
+	graphicObjects::timestamp_ns = timestamp_ns;
+	graphicObjects::lbn = lbn;
+	graphicObjects::bcid = bcid;
+	
+	graphicObjects::actualIntPerXing  = actualIntPerXing;
+	graphicObjects::averageIntPerXing = averageIntPerXing;
+	if(AS_isMC)
+	{
+		graphicObjects::mc_channel_number = mc_channel_number;
+		graphicObjects::mc_event_number   = mc_event_number;
+		graphicObjects::mc_event_weight   = mc_event_weight;
+
+		graphicObjects::pileup_weight      = pileup_weight;
+		graphicObjects::intime_pileup_weight = intime_pileup_weight;
+		graphicObjects::outoftime_pileup_weight = outoftime_pileup_weight;
+		graphicObjects::lumi_pileup_weight = lumi_pileup_weight;
+		graphicObjects::EW_kfactor_weight  = EW_kfactor_weight;
+		graphicObjects::QCD_kfactor_weight = QCD_kfactor_weight;
+		graphicObjects::mcevent_weight     = mcevent_weight;
+		graphicObjects::total_weight       = total_weight;
+		graphicObjects::randomized_decision = randomized_decision;
+	}
+	
+	graphicObjects::ivxp            = current_ivertex;
+	
+	_DEBUG("");
+
+	// all cuts - vectors
+	graphicObjects::graphicObjects::vxp_n = vxp_n;
+	graphicObjects::vxp_nTracks->push_back(vxp_nTracks->at(current_ivertex));
+	graphicObjects::vxp_type->push_back(vxp_type->at(current_ivertex));
+	graphicObjects::vxp_z->push_back(vxp_z->at(current_ivertex));
+	
+	_DEBUG("");
+	
+	int muSize = (int)mu_pt->size();
+	for(int mu=0 ; mu<muSize ; mu++)
+	{
+		///////////////////////////////////
+		if(!muQAflags[mu]) continue; //////
+		///////////////////////////////////
+		
+		graphicObjects::n = mu_n;
+		graphicObjects::E->push_back(mu_E->at(mu));
+		graphicObjects::pt->push_back(mu_pt->at(mu));
+		graphicObjects::m->push_back(mu_m->at(mu));
+		graphicObjects::eta->push_back(mu_eta->at(mu));
+		graphicObjects::phi->push_back(mu_phi->at(mu));
+		graphicObjects::px->push_back(mu_px->at(mu));
+		graphicObjects::py->push_back(mu_py->at(mu));
+		graphicObjects::pz->push_back(mu_pz->at(mu));
+		graphicObjects::charge->push_back(mu_charge->at(mu));
+		graphicObjects::allauthor->push_back(mu_allauthor->at(mu));
+		graphicObjects::author->push_back(mu_author->at(mu));
+		graphicObjects::beta->push_back(mu_beta->at(mu));
+		graphicObjects::isMuonLikelihood->push_back(mu_isMuonLikelihood->at(mu));
+		
+		_DEBUG("");
+
+		graphicObjects::matchchi2->push_back(mu_matchchi2->at(mu));
+		graphicObjects::matchndof->push_back(mu_matchndof->at(mu));
+		graphicObjects::etcone20->push_back(mu_etcone20->at(mu));
+		graphicObjects::etcone30->push_back(mu_etcone30->at(mu));
+		graphicObjects::etcone40->push_back(mu_etcone40->at(mu));
+		graphicObjects::nucone20->push_back(mu_nucone20->at(mu));
+		graphicObjects::nucone30->push_back(mu_nucone30->at(mu));
+		graphicObjects::nucone40->push_back(mu_nucone40->at(mu));
+		graphicObjects::ptcone20->push_back(mu_ptcone20->at(mu));
+		graphicObjects::ptcone30->push_back(mu_ptcone30->at(mu));
+		graphicObjects::ptcone40->push_back(mu_ptcone40->at(mu));
+		graphicObjects::energyLossPar->push_back(mu_energyLossPar->at(mu));
+		graphicObjects::energyLossErr->push_back(mu_energyLossErr->at(mu));
+		graphicObjects::etCore->push_back(mu_etCore->at(mu));
+
+		_DEBUG("");
+
+		graphicObjects::energyLossType->push_back(mu_energyLossType->at(mu));
+		graphicObjects::caloMuonIdTag->push_back(mu_caloMuonIdTag->at(mu));
+		graphicObjects::caloLRLikelihood->push_back(mu_caloLRLikelihood->at(mu));
+		graphicObjects::bestMatch->push_back(mu_bestMatch->at(mu));
+		graphicObjects::isStandAloneMuon->push_back(mu_isStandAloneMuon->at(mu));
+		graphicObjects::isCombinedMuon->push_back(mu_isCombinedMuon->at(mu));
+		graphicObjects::isLowPtReconstructedMuon->push_back(mu_isLowPtReconstructedMuon->at(mu));
+		graphicObjects::loose->push_back(mu_loose->at(mu));
+		graphicObjects::medium->push_back(mu_medium->at(mu));
+		graphicObjects::tight->push_back(mu_tight->at(mu));
+		graphicObjects::d0_exPV->push_back(mu_d0_exPV->at(mu));
+		graphicObjects::z0_exPV->push_back(mu_z0_exPV->at(mu));
+		graphicObjects::phi_exPV->push_back(mu_phi_exPV->at(mu));
+		graphicObjects::theta_exPV->push_back(mu_theta_exPV->at(mu));
+		graphicObjects::qoverp_exPV->push_back(mu_qoverp_exPV->at(mu));
+		graphicObjects::cb_d0_exPV->push_back(mu_cb_d0_exPV->at(mu));
+		graphicObjects::cb_z0_exPV->push_back(mu_cb_z0_exPV->at(mu));
+		graphicObjects::cb_phi_exPV->push_back(mu_cb_phi_exPV->at(mu));
+		graphicObjects::cb_theta_exPV->push_back(mu_cb_theta_exPV->at(mu));
+		graphicObjects::cb_qoverp_exPV->push_back(mu_cb_qoverp_exPV->at(mu));
+		graphicObjects::id_d0_exPV->push_back(mu_id_d0_exPV->at(mu));
+		graphicObjects::id_z0_exPV->push_back(mu_id_z0_exPV->at(mu));
+
+		_DEBUG("");
+
+		graphicObjects::id_phi_exPV->push_back(mu_id_phi_exPV->at(mu));
+		graphicObjects::id_theta_exPV->push_back(mu_id_theta_exPV->at(mu));
+		graphicObjects::id_qoverp_exPV->push_back(mu_id_qoverp_exPV->at(mu));
+		graphicObjects::me_d0_exPV->push_back(mu_me_d0_exPV->at(mu));
+		graphicObjects::me_z0_exPV->push_back(mu_me_z0_exPV->at(mu));
+		graphicObjects::me_phi_exPV->push_back(mu_me_phi_exPV->at(mu));
+		graphicObjects::me_theta_exPV->push_back(mu_me_theta_exPV->at(mu));
+		graphicObjects::me_qoverp_exPV->push_back(mu_me_qoverp_exPV->at(mu));
+		graphicObjects::ie_d0_exPV->push_back(mu_ie_d0_exPV->at(mu));
+		graphicObjects::ie_z0_exPV->push_back(mu_ie_z0_exPV->at(mu));
+		graphicObjects::ie_phi_exPV->push_back(mu_ie_phi_exPV->at(mu));
+		graphicObjects::ie_theta_exPV->push_back(mu_ie_theta_exPV->at(mu));
+		graphicObjects::ie_qoverp_exPV->push_back(mu_ie_qoverp_exPV->at(mu));
+		//graphicObjects::TileCellEnergyLayer1->push_back(mu_TileCellEnergyLayer1->at(mu));
+		//graphicObjects::TileTimeLayer1->push_back(mu_TileTimeLayer1->at(mu));
+
+		_DEBUG("");
+
+		/*
+		graphicObjects::TileCellRmsNoiseLayer1->push_back(mu_TileCellRmsNoiseLayer1->at(mu));
+		graphicObjects::TileCellSignLayer1->push_back(mu_TileCellSignLayer1->at(mu));
+		graphicObjects::TileCellEnergyLayer2->push_back(mu_TileCellEnergyLayer2->at(mu));
+		graphicObjects::TileTimeLayer2->push_back(mu_TileTimeLayer2->at(mu));
+		graphicObjects::TileCellRmsNoiseLayer2->push_back(mu_TileCellRmsNoiseLayer2->at(mu));
+		graphicObjects::TileCellSignLayer2->push_back(mu_TileCellSignLayer2->at(mu));
+		graphicObjects::TileCellEnergyLayer3->push_back(mu_TileCellEnergyLayer3->at(mu));
+		graphicObjects::TileTimeLayer3->push_back(mu_TileTimeLayer3->at(mu));
+		graphicObjects::TileCellRmsNoiseLayer3->push_back(mu_TileCellRmsNoiseLayer3->at(mu));
+		graphicObjects::TileCellSignLayer3->push_back(mu_TileCellSignLayer3->at(mu));
+		graphicObjects::MSTrkT0_1->push_back(mu_MSTrkT0_1->at(mu));
+		graphicObjects::MSTrkT0_2->push_back(mu_MSTrkT0_2->at(mu));
+		graphicObjects::MSTrkT0_3->push_back(mu_MSTrkT0_3->at(mu));
+		*/
+		graphicObjects::cov_d0_exPV->push_back(mu_cov_d0_exPV->at(mu));
+		graphicObjects::cov_z0_exPV->push_back(mu_cov_z0_exPV->at(mu));
+		graphicObjects::cov_phi_exPV->push_back(mu_cov_phi_exPV->at(mu));
+		graphicObjects::cov_theta_exPV->push_back(mu_cov_theta_exPV->at(mu));
+
+		_DEBUG("");
+
+		graphicObjects::cov_qoverp_exPV->push_back(mu_cov_qoverp_exPV->at(mu));
+		graphicObjects::cov_d0_z0_exPV->push_back(mu_cov_d0_z0_exPV->at(mu));
+		graphicObjects::cov_d0_phi_exPV->push_back(mu_cov_d0_phi_exPV->at(mu));
+
+		_DEBUG("");
+
+		graphicObjects::cov_d0_theta_exPV->push_back(mu_cov_d0_theta_exPV->at(mu));
+		graphicObjects::cov_d0_qoverp_exPV->push_back(mu_cov_d0_qoverp_exPV->at(mu));
+		graphicObjects::cov_z0_phi_exPV->push_back(mu_cov_z0_phi_exPV->at(mu));
+		graphicObjects::cov_z0_theta_exPV->push_back(mu_cov_z0_theta_exPV->at(mu));
+		graphicObjects::cov_z0_qoverp_exPV->push_back(mu_cov_z0_qoverp_exPV->at(mu));
+		graphicObjects::cov_phi_theta_exPV->push_back(mu_cov_phi_theta_exPV->at(mu));
+		graphicObjects::cov_phi_qoverp_exPV->push_back(mu_cov_phi_qoverp_exPV->at(mu));
+		graphicObjects::cov_theta_qoverp_exPV->push_back(mu_cov_theta_qoverp_exPV->at(mu));
+		graphicObjects::id_cov_d0_exPV->push_back(mu_id_cov_d0_exPV->at(mu));
+		graphicObjects::id_cov_z0_exPV->push_back(mu_id_cov_z0_exPV->at(mu));
+		graphicObjects::id_cov_phi_exPV->push_back(mu_id_cov_phi_exPV->at(mu));
+		graphicObjects::id_cov_theta_exPV->push_back(mu_id_cov_theta_exPV->at(mu));
+		graphicObjects::id_cov_qoverp_exPV->push_back(mu_id_cov_qoverp_exPV->at(mu));
+		graphicObjects::id_cov_d0_z0_exPV->push_back(mu_id_cov_d0_z0_exPV->at(mu));
+		graphicObjects::id_cov_d0_phi_exPV->push_back(mu_id_cov_d0_phi_exPV->at(mu));
+		graphicObjects::id_cov_d0_theta_exPV->push_back(mu_id_cov_d0_theta_exPV->at(mu));
+		graphicObjects::id_cov_d0_qoverp_exPV->push_back(mu_id_cov_d0_qoverp_exPV->at(mu));
+		graphicObjects::id_cov_z0_phi_exPV->push_back(mu_id_cov_z0_phi_exPV->at(mu));
+
+		_DEBUG("");
+
+		graphicObjects::id_cov_z0_theta_exPV->push_back(mu_id_cov_z0_theta_exPV->at(mu));
+		graphicObjects::id_cov_z0_qoverp_exPV->push_back(mu_id_cov_z0_qoverp_exPV->at(mu));
+		graphicObjects::id_cov_phi_theta_exPV->push_back(mu_id_cov_phi_theta_exPV->at(mu));
+		graphicObjects::id_cov_phi_qoverp_exPV->push_back(mu_id_cov_phi_qoverp_exPV->at(mu));
+		graphicObjects::id_cov_theta_qoverp_exPV->push_back(mu_id_cov_theta_qoverp_exPV->at(mu));
+		graphicObjects::me_cov_d0_exPV->push_back(mu_me_cov_d0_exPV->at(mu));
+		graphicObjects::me_cov_z0_exPV->push_back(mu_me_cov_z0_exPV->at(mu));
+		graphicObjects::me_cov_phi_exPV->push_back(mu_me_cov_phi_exPV->at(mu));
+		graphicObjects::me_cov_theta_exPV->push_back(mu_me_cov_theta_exPV->at(mu));
+		graphicObjects::me_cov_qoverp_exPV->push_back(mu_me_cov_qoverp_exPV->at(mu));
+		graphicObjects::me_cov_d0_z0_exPV->push_back(mu_me_cov_d0_z0_exPV->at(mu));
+		graphicObjects::me_cov_d0_phi_exPV->push_back(mu_me_cov_d0_phi_exPV->at(mu));
+		graphicObjects::me_cov_d0_theta_exPV->push_back(mu_me_cov_d0_theta_exPV->at(mu));
+		graphicObjects::me_cov_d0_qoverp_exPV->push_back(mu_me_cov_d0_qoverp_exPV->at(mu));
+		graphicObjects::me_cov_z0_phi_exPV->push_back(mu_me_cov_z0_phi_exPV->at(mu));
+		graphicObjects::me_cov_z0_theta_exPV->push_back(mu_me_cov_z0_theta_exPV->at(mu));
+		graphicObjects::me_cov_z0_qoverp_exPV->push_back(mu_me_cov_z0_qoverp_exPV->at(mu));
+		graphicObjects::me_cov_phi_theta_exPV->push_back(mu_me_cov_phi_theta_exPV->at(mu));
+		graphicObjects::me_cov_phi_qoverp_exPV->push_back(mu_me_cov_phi_qoverp_exPV->at(mu));
+		graphicObjects::me_cov_theta_qoverp_exPV->push_back(mu_me_cov_theta_qoverp_exPV->at(mu));
+
+		_DEBUG("");
+
+		graphicObjects::ms_d0->push_back(mu_ms_d0->at(mu));
+		graphicObjects::ms_z0->push_back(mu_ms_z0->at(mu));
+		graphicObjects::ms_phi->push_back(mu_ms_phi->at(mu));
+		graphicObjects::ms_theta->push_back(mu_ms_theta->at(mu));
+		graphicObjects::ms_qoverp->push_back(mu_ms_qoverp->at(mu));
+		graphicObjects::id_d0->push_back(mu_id_d0->at(mu));
+		graphicObjects::id_z0->push_back(mu_id_z0->at(mu));
+		graphicObjects::id_phi->push_back(mu_id_phi->at(mu));
+		graphicObjects::id_theta->push_back(mu_id_theta->at(mu));
+		graphicObjects::id_qoverp->push_back(mu_id_qoverp->at(mu));
+		graphicObjects::me_d0->push_back(mu_me_d0->at(mu));
+		graphicObjects::me_z0->push_back(mu_me_z0->at(mu));
+		graphicObjects::me_phi->push_back(mu_me_phi->at(mu));
+		graphicObjects::me_theta->push_back(mu_me_theta->at(mu));
+		graphicObjects::me_qoverp->push_back(mu_me_qoverp->at(mu));
+		graphicObjects::ie_d0->push_back(mu_ie_d0->at(mu));
+		graphicObjects::ie_z0->push_back(mu_ie_z0->at(mu));
+
+		_DEBUG("");
+
+		graphicObjects::ie_phi->push_back(mu_ie_phi->at(mu));
+		graphicObjects::ie_theta->push_back(mu_ie_theta->at(mu));
+		graphicObjects::ie_qoverp->push_back(mu_ie_qoverp->at(mu));
+		graphicObjects::nOutliersOnTrack->push_back(mu_nOutliersOnTrack->at(mu));
+		graphicObjects::nBLHits->push_back(mu_nBLHits->at(mu));
+		graphicObjects::nPixHits->push_back(mu_nPixHits->at(mu));
+		graphicObjects::nSCTHits->push_back(mu_nSCTHits->at(mu));
+		graphicObjects::nTRTHits->push_back(mu_nTRTHits->at(mu));
+		graphicObjects::nTRTHighTHits->push_back(mu_nTRTHighTHits->at(mu));
+		graphicObjects::nBLSharedHits->push_back(mu_nBLSharedHits->at(mu));
+		graphicObjects::nPixSharedHits->push_back(mu_nPixSharedHits->at(mu));
+		graphicObjects::nPixHoles->push_back(mu_nPixHoles->at(mu));
+		graphicObjects::nSCTSharedHits->push_back(mu_nSCTSharedHits->at(mu));
+		graphicObjects::nSCTHoles->push_back(mu_nSCTHoles->at(mu));
+		graphicObjects::nTRTOutliers->push_back(mu_nTRTOutliers->at(mu));
+		graphicObjects::nTRTHighTOutliers->push_back(mu_nTRTHighTOutliers->at(mu));
+		graphicObjects::nGangedPixels->push_back(mu_nGangedPixels->at(mu));
+		graphicObjects::nPixelDeadSensors->push_back(mu_nPixelDeadSensors->at(mu));
+
+		_DEBUG("");
+
+		graphicObjects::nSCTDeadSensors->push_back(mu_nSCTDeadSensors->at(mu));
+		graphicObjects::nTRTDeadStraws->push_back(mu_nTRTDeadStraws->at(mu));
+		graphicObjects::expectBLayerHit->push_back(mu_expectBLayerHit->at(mu));
+		graphicObjects::nMDTHits->push_back(mu_nMDTHits->at(mu));
+		graphicObjects::nMDTHoles->push_back(mu_nMDTHoles->at(mu));
+		graphicObjects::nCSCEtaHits->push_back(mu_nCSCEtaHits->at(mu));
+		graphicObjects::nCSCEtaHoles->push_back(mu_nCSCEtaHoles->at(mu));
+		graphicObjects::nCSCPhiHits->push_back(mu_nCSCPhiHits->at(mu));
+		graphicObjects::nCSCPhiHoles->push_back(mu_nCSCPhiHoles->at(mu));
+		graphicObjects::nRPCEtaHits->push_back(mu_nRPCEtaHits->at(mu));
+		graphicObjects::nRPCEtaHoles->push_back(mu_nRPCEtaHoles->at(mu));
+		graphicObjects::nRPCPhiHits->push_back(mu_nRPCPhiHits->at(mu));
+		graphicObjects::nRPCPhiHoles->push_back(mu_nRPCPhiHoles->at(mu));
+		graphicObjects::nTGCEtaHits->push_back(mu_nTGCEtaHits->at(mu));
+		graphicObjects::nTGCEtaHoles->push_back(mu_nTGCEtaHoles->at(mu));
+		graphicObjects::nTGCPhiHits->push_back(mu_nTGCPhiHits->at(mu));
+		graphicObjects::nTGCPhiHoles->push_back(mu_nTGCPhiHoles->at(mu));
+		graphicObjects::nMDTBIHits->push_back(mu_nMDTBIHits->at(mu));
+		graphicObjects::nMDTBMHits->push_back(mu_nMDTBMHits->at(mu));
+		graphicObjects::nMDTBOHits->push_back(mu_nMDTBOHits->at(mu));
+
+		_DEBUG("");
+
+		graphicObjects::nMDTBEEHits->push_back(mu_nMDTBEEHits->at(mu));
+		graphicObjects::nMDTBIS78Hits->push_back(mu_nMDTBIS78Hits->at(mu));
+		graphicObjects::nMDTEIHits->push_back(mu_nMDTEIHits->at(mu));
+		graphicObjects::nMDTEMHits->push_back(mu_nMDTEMHits->at(mu));
+		graphicObjects::nMDTEOHits->push_back(mu_nMDTEOHits->at(mu));
+		graphicObjects::nMDTEEHits->push_back(mu_nMDTEEHits->at(mu));
+		graphicObjects::nRPCLayer1EtaHits->push_back(mu_nRPCLayer1EtaHits->at(mu));
+		graphicObjects::nRPCLayer2EtaHits->push_back(mu_nRPCLayer2EtaHits->at(mu));
+		graphicObjects::nRPCLayer3EtaHits->push_back(mu_nRPCLayer3EtaHits->at(mu));
+		graphicObjects::nRPCLayer1PhiHits->push_back(mu_nRPCLayer1PhiHits->at(mu));
+		graphicObjects::nRPCLayer2PhiHits->push_back(mu_nRPCLayer2PhiHits->at(mu));
+		graphicObjects::nRPCLayer3PhiHits->push_back(mu_nRPCLayer3PhiHits->at(mu));
+		graphicObjects::nTGCLayer1EtaHits->push_back(mu_nTGCLayer1EtaHits->at(mu));
+		graphicObjects::nTGCLayer2EtaHits->push_back(mu_nTGCLayer2EtaHits->at(mu));
+		graphicObjects::nTGCLayer3EtaHits->push_back(mu_nTGCLayer3EtaHits->at(mu));
+		graphicObjects::nTGCLayer4EtaHits->push_back(mu_nTGCLayer4EtaHits->at(mu));
+		graphicObjects::nTGCLayer1PhiHits->push_back(mu_nTGCLayer1PhiHits->at(mu));
+		graphicObjects::nTGCLayer2PhiHits->push_back(mu_nTGCLayer2PhiHits->at(mu));
+		graphicObjects::nTGCLayer3PhiHits->push_back(mu_nTGCLayer3PhiHits->at(mu));
+		graphicObjects::nTGCLayer4PhiHits->push_back(mu_nTGCLayer4PhiHits->at(mu));
+
+		_DEBUG("");
+
+		graphicObjects::barrelSectors->push_back(mu_barrelSectors->at(mu));
+		graphicObjects::endcapSectors->push_back(mu_endcapSectors->at(mu));
+		graphicObjects::trackd0->push_back(mu_trackd0->at(mu));
+		graphicObjects::trackz0->push_back(mu_trackz0->at(mu));
+		graphicObjects::trackphi->push_back(mu_trackphi->at(mu));
+		graphicObjects::tracktheta->push_back(mu_tracktheta->at(mu));
+		graphicObjects::trackqoverp->push_back(mu_trackqoverp->at(mu));
+		graphicObjects::trackcov_d0->push_back(mu_trackcov_d0->at(mu));
+		graphicObjects::trackcov_z0->push_back(mu_trackcov_z0->at(mu));
+		graphicObjects::trackcov_phi->push_back(mu_trackcov_phi->at(mu));
+		graphicObjects::trackcov_theta->push_back(mu_trackcov_theta->at(mu));
+		graphicObjects::trackcov_qoverp->push_back(mu_trackcov_qoverp->at(mu));
+		graphicObjects::trackcov_d0_z0->push_back(mu_trackcov_d0_z0->at(mu));
+		graphicObjects::trackcov_d0_phi->push_back(mu_trackcov_d0_phi->at(mu));
+		graphicObjects::trackcov_d0_theta->push_back(mu_trackcov_d0_theta->at(mu));
+		graphicObjects::trackcov_d0_qoverp->push_back(mu_trackcov_d0_qoverp->at(mu));
+		graphicObjects::trackcov_z0_phi->push_back(mu_trackcov_z0_phi->at(mu));
+		graphicObjects::trackcov_z0_theta->push_back(mu_trackcov_z0_theta->at(mu));
+		graphicObjects::trackcov_z0_qoverp->push_back(mu_trackcov_z0_qoverp->at(mu));
+		graphicObjects::trackcov_phi_theta->push_back(mu_trackcov_phi_theta->at(mu));
+		graphicObjects::trackcov_phi_qoverp->push_back(mu_trackcov_phi_qoverp->at(mu));
+		graphicObjects::trackcov_theta_qoverp->push_back(mu_trackcov_theta_qoverp->at(mu));
+		graphicObjects::trackfitchi2->push_back(mu_trackfitchi2->at(mu));
+		graphicObjects::trackfitndof->push_back(mu_trackfitndof->at(mu));
+		graphicObjects::hastrack->push_back(mu_hastrack->at(mu));
+
+		_DEBUG("");
+
+		if(AS_isMC)
+		{
+			graphicObjects::truth_dr->push_back(mu_truth_dr->at(mu));
+			graphicObjects::truth_E->push_back(mu_truth_E->at(mu));
+			graphicObjects::truth_pt->push_back(mu_truth_pt->at(mu));
+			graphicObjects::truth_eta->push_back(mu_truth_eta->at(mu));
+			graphicObjects::truth_phi->push_back(mu_truth_phi->at(mu));
+			graphicObjects::truth_type->push_back(mu_truth_type->at(mu));
+			graphicObjects::truth_status->push_back(mu_truth_status->at(mu));
+			graphicObjects::truth_barcode->push_back(mu_truth_barcode->at(mu));
+			graphicObjects::truth_mothertype->push_back(mu_truth_mothertype->at(mu));
+			graphicObjects::truth_motherbarcode->push_back(mu_truth_motherbarcode->at(mu));
+			graphicObjects::truth_matched->push_back(mu_truth_matched->at(mu));
+		}
+
+		_DEBUG("");
+
+		graphicObjects::EFCB_dr->push_back(mu_EFCB_dr->at(mu));
+		graphicObjects::EFCB_index->push_back(mu_EFCB_index->at(mu));
+		graphicObjects::EFMG_dr->push_back(mu_EFMG_dr->at(mu));
+		graphicObjects::EFMG_index->push_back(mu_EFMG_index->at(mu));
+		graphicObjects::EFME_dr->push_back(mu_EFME_dr->at(mu));
+		graphicObjects::EFME_index->push_back(mu_EFME_index->at(mu));
+		graphicObjects::L2CB_dr->push_back(mu_L2CB_dr->at(mu));
+		graphicObjects::L2CB_index->push_back(mu_L2CB_index->at(mu));
+		graphicObjects::L1_dr->push_back(mu_L1_dr->at(mu));
+		graphicObjects::L1_index->push_back(mu_L1_index->at(mu));
+	}
+	
+	_DEBUG("");
+
+	/////////////////////////////////////////////////////
+	// fill the all cuts tree ///////////////////////////
+	tree_allCuts->Fill(); ///////////////////////////////
+	if(m_allCuts_counter%m_trees_counter_mod==0) ////////
+	{                             ///////////////////////
+		tree_allCuts->FlushBaskets(); ///////////////////
+		//tree_allCuts->Write("", TObject::kOverwrite); ///
+	} ///////////////////////////////////////////////////
+	m_allCuts_counter++; ////////////////////////////////
+	/////////////////////////////////////////////////////
+	
+	_DEBUG("");
+}
+
 
 void analysisSkeleton::fillAfterCuts()
 {
 	_DEBUG("analysisSkeleton::fillAfterCuts");
-	///////////////////////////////////////////////////////////
-	// fill the "allCuts" histograms only after the last cut 
-	// for the final histograms:
-	// i.e., not the curFlow histos
 	
 	int lead_mu     = ai;
 	int sublead_mu  = bi;
@@ -1098,6 +1450,7 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::L2CB_index->push_back(mu_L2CB_index->at(lead_mu));
 	graphicObjects::L1_dr->push_back(mu_L1_dr->at(lead_mu));
 	graphicObjects::L1_index->push_back(mu_L1_index->at(lead_mu));
+	
 	graphicObjects::E->push_back(mu_E->at(sublead_mu));
 	graphicObjects::pt->push_back(mu_pt->at(sublead_mu));
 	graphicObjects::m->push_back(mu_m->at(sublead_mu));
@@ -1729,9 +2082,10 @@ bool analysisSkeleton::applyPreselection()
 bool analysisSkeleton::applySingleMuonSelection(bool isloose)
 {
 	_DEBUG("analysisSkeleton::applySingleMuonSelection");
+	
 	////////////////////////////////////////
 	// fill the NO CUTS items //////////////
-	fillBeforeCuts(); //////////////////////
+	if(do2MUselection) fillBeforeCuts(); ///
 	////////////////////////////////////////
 	
 	inApplySingleSelection = true;
@@ -1739,30 +2093,20 @@ bool analysisSkeleton::applySingleMuonSelection(bool isloose)
 	TMapsb cutsToSkip; // dummy (empty)
 	passCutFlow = singleSelection(cutsToSkip,isloose);
 	
-	
-	// if(passCutFlow)
-	// {
-		// cout << EventNumber << ": PASSED: ";
-		// for(int nQA=0 ; nQA<(int)muQAflags.size() ; nQA++) if(muQAflags[nQA]) cout << nQA << "(iso=" << mu_ptcone30->at(nQA)/mu_pt->at(nQA) << "), ";
-		// cout << endl;
-	// }
+	/////////////////////////////////////////////////////////
+	if(!do2MUselection) /////////////////////////////////////
+	{                   /////////////////////////////////////
+		if(passCutFlow) fillSingleAfterCuts(); //////////////
+		if(AS_isMC) fillSingleTruthAndRecon(passCutFlow); /// this will fill all events (truth_all_* and recon_all_*)
+	} ///////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////
 	
 	iTight = -1;
 	if(isloose)
 	{
 		if(!passCutFlow)
 		{
-			// int ntight = 0;
-			// for(int nQA=0 ; nQA<(int)muQAflags.size() ; nQA++) if(muQAflags[nQA]) ntight++;
-			// cout << EventNumber << ": FAILED: before: ai=" << ai << ", bi=" << bi << ", ntight=" << ntight;
-			// cout << ", itight=";
-			// for(int nQA=0 ; nQA<(int)muQAflags.size() ; nQA++) if(muQAflags[nQA]) cout << nQA << "(iso=" << mu_ptcone30->at(nQA)/mu_pt->at(nQA) << "), ";
-			// cout << endl;
-			
-		
 			int nTight = 0;
-			
-			
 			// find the tight muon
 			for(int nQA=0 ; nQA<(int)muQAflags.size() ; nQA++)
 			{
@@ -1842,7 +2186,7 @@ bool analysisSkeleton::applyDoubleMuonSelection()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-
+/*
 void analysisSkeleton::fillCutProfile1D()
 {
 	_DEBUG("analysisSkeleton::fillCutProfile1D");
@@ -1904,8 +2248,10 @@ void analysisSkeleton::fillCutProfile1D()
 		pass = true;
 		pass = (pass && preselection(snameNoSuffix))    ? true : false;
 		pass = (pass && singleSelection(snameNoSuffix)) ? true : false;
-		pass = (pass && doubleSelection(snameNoSuffix)) ? true : false;
-		
+		if(do2MUselection)
+		{
+			pass = (pass && doubleSelection(snameNoSuffix)) ? true : false;
+		}
 		if(pass)
 		{
 			if     (sname=="GRL")     (*h1map_cutProfile)[sname]->Fill( isGRL );
@@ -2207,8 +2553,10 @@ void analysisSkeleton::fillCutProfile2D()
 		pass = true;
 		pass = (pass && preselection(snameNoSuffix))    ? true : false;
 		pass = (pass && singleSelection(snameNoSuffix)) ? true : false;
-		pass = (pass && doubleSelection(snameNoSuffix)) ? true : false;
-		
+		if(do2MUselection)
+		{
+			pass = (pass && doubleSelection(snameNoSuffix)) ? true : false;
+		}
 		if(pass)
 		{
 			if(sname=="PV")
@@ -2263,6 +2611,7 @@ void analysisSkeleton::fillCutProfile()
 	m_cutsProfile_counter++; ////////////////////////////////
 	/////////////////////////////////////////////////////////
 }
+*/
 
 void analysisSkeleton::fill_tNp()
 {
@@ -2908,18 +3257,18 @@ void analysisSkeleton::fillRecon()
 	recon_all_pz->push_back(mu_pz->at(bi)*MeV2GeV);
 	recon_all_charge->push_back(mu_charge->at(ai));
 	recon_all_charge->push_back(mu_charge->at(bi));
-	recon_all_ptcone20->push_back( mu_ptcone20->at(ai) );
-	recon_all_ptcone20->push_back( mu_ptcone20->at(bi) );
-	recon_all_ptcone30->push_back( mu_ptcone30->at(ai) );
-	recon_all_ptcone30->push_back( mu_ptcone30->at(bi) );
-	recon_all_ptcone40->push_back( mu_ptcone40->at(ai) );
-	recon_all_ptcone40->push_back( mu_ptcone40->at(bi) );
-	recon_all_etcone20->push_back( mu_etcone20->at(ai) );
-	recon_all_etcone20->push_back( mu_etcone20->at(bi) );
-	recon_all_etcone30->push_back( mu_etcone30->at(ai) );
-	recon_all_etcone30->push_back( mu_etcone30->at(bi) );
-	recon_all_etcone40->push_back( mu_etcone40->at(ai) );
-	recon_all_etcone40->push_back( mu_etcone40->at(bi) );
+	recon_all_ptcone20->push_back( mu_ptcone20->at(ai)*MeV2GeV );
+	recon_all_ptcone20->push_back( mu_ptcone20->at(bi)*MeV2GeV );
+	recon_all_ptcone30->push_back( mu_ptcone30->at(ai)*MeV2GeV );
+	recon_all_ptcone30->push_back( mu_ptcone30->at(bi)*MeV2GeV );
+	recon_all_ptcone40->push_back( mu_ptcone40->at(ai)*MeV2GeV );
+	recon_all_ptcone40->push_back( mu_ptcone40->at(bi)*MeV2GeV );
+	recon_all_etcone20->push_back( mu_etcone20->at(ai)*MeV2GeV );
+	recon_all_etcone20->push_back( mu_etcone20->at(bi)*MeV2GeV );
+	recon_all_etcone30->push_back( mu_etcone30->at(ai)*MeV2GeV );
+	recon_all_etcone30->push_back( mu_etcone30->at(bi)*MeV2GeV );
+	recon_all_etcone40->push_back( mu_etcone40->at(ai)*MeV2GeV );
+	recon_all_etcone40->push_back( mu_etcone40->at(bi)*MeV2GeV );
 	recon_all_nucone20->push_back( mu_nucone20->at(ai) );
 	recon_all_nucone20->push_back( mu_nucone20->at(bi) );
 	recon_all_nucone30->push_back( mu_nucone30->at(ai) );
@@ -2966,6 +3315,116 @@ void analysisSkeleton::fillRecon()
 	recon_all_vxp_n = vxp_n;
 	
 	recon_all_isValid = true;
+}
+
+void analysisSkeleton::fillSingleTruthAndRecon(bool passRecon)
+{
+	_DEBUG("analysisSkeleton::fillSingleTruthAndRecon");
+	
+	//////////////////
+	fillTruth(); /////
+	//////////////////
+	
+	/*
+	///////////////////////////////////////////////// truth part
+	// fill this anyway, even if the event itself is not "valid"
+	graphicObjects::all_actualIntPerXing  = actualIntPerXing;
+	graphicObjects::all_averageIntPerXing = averageIntPerXing;
+	graphicObjects::all_mc_channel_number = mc_channel_number;
+	graphicObjects::all_mc_event_number   = mc_event_number;
+	graphicObjects::all_mc_event_weight   = mc_event_weight;
+	graphicObjects::all_RunNumber               = RunNumber;
+	graphicObjects::all_pileup_weight           = pileup_weight;
+	graphicObjects::all_intime_pileup_weight    = intime_pileup_weight;
+	graphicObjects::all_outoftime_pileup_weight = outoftime_pileup_weight;
+	graphicObjects::all_lumi_pileup_weight      = lumi_pileup_weight;
+	graphicObjects::all_EW_kfactor_weight       = EW_kfactor_weight;
+	graphicObjects::all_QCD_kfactor_weight      = QCD_kfactor_weight;
+	graphicObjects::all_mcevent_weight          = mcevent_weight;
+	graphicObjects::all_total_weight            = total_weight;
+	graphicObjects::all_randomized_decision     = randomized_decision;
+	
+	for(int t=0 ; t<(int)mc_pt->size() ; t++)  // MUONS
+	{
+		if(mc_status->at(t)!=1)          continue; // has to be final particle
+		if(fabs(mc_pdgId->at(t))!=PDTMU) continue; // has to be a muon	
+		
+		truth_all_mc_m->push_back( mc_m->at(t)*MeV2GeV );
+		truth_all_mc_pt->push_back( mc_pt->at(t)*MeV2GeV );
+		truth_all_mc_eta->push_back( mc_eta->at(t) );
+		truth_all_mc_phi->push_back( mc_phi->at(t) );
+		truth_all_mc_pdgId->push_back( mc_pdgId->at(t) );
+		truth_all_mc_status->push_back( mc_status->at(t) );
+		truth_all_mc_barcode->push_back( mc_barcode->at(t) );
+		truth_all_mc_charge->push_back( mc_charge->at(t) );
+	}
+	unsigned int qMax = (mc_m->size()<11) ? mc_m->size() : 11;
+	for(unsigned int q=0 ; q<qMax ; q++)  // HARD PROCESS
+	{
+		truth_all_partons_mc_m->push_back( mc_m->at(q)*MeV2GeV );
+		truth_all_partons_mc_pt->push_back( mc_pt->at(q)*MeV2GeV );
+		truth_all_partons_mc_eta->push_back( mc_eta->at(q) );
+		truth_all_partons_mc_phi->push_back( mc_phi->at(q) );
+		truth_all_partons_mc_pdgId->push_back( mc_pdgId->at(q) );
+		truth_all_partons_mc_status->push_back( mc_status->at(q) );
+		truth_all_partons_mc_barcode->push_back( mc_barcode->at(q) );
+		truth_all_partons_mc_charge->push_back( mc_charge->at(q) );
+	}
+	truth_all_isValid = true;
+	*/
+	
+	
+	///////////////////////////////////////////////// recon part
+	if(passRecon)
+	{
+		int muSize = (int)mu_pt->size();
+		for(int mu=0 ; mu<muSize ; mu++)
+		{
+			///////////////////////////////////
+			if(!muQAflags[mu]) continue; //////
+			///////////////////////////////////
+		
+			recon_all_E->push_back(mu_E->at(mu)*MeV2GeV);
+			recon_all_pt->push_back(mu_pt->at(mu)*MeV2GeV);
+			recon_all_m->push_back(mu_m->at(mu)*MeV2GeV);
+			recon_all_eta->push_back(mu_eta->at(mu));
+			recon_all_phi->push_back(mu_phi->at(mu));
+			recon_all_px->push_back(mu_px->at(mu)*MeV2GeV);
+			recon_all_py->push_back(mu_py->at(mu)*MeV2GeV);
+			recon_all_pz->push_back(mu_pz->at(mu)*MeV2GeV);
+			recon_all_charge->push_back(mu_charge->at(mu));
+			recon_all_ptcone20->push_back( mu_ptcone20->at(mu)*MeV2GeV );
+			recon_all_ptcone30->push_back( mu_ptcone30->at(mu)*MeV2GeV );
+			recon_all_ptcone40->push_back( mu_ptcone40->at(mu)*MeV2GeV );
+			recon_all_etcone20->push_back( mu_etcone20->at(mu)*MeV2GeV );
+			recon_all_etcone30->push_back( mu_etcone30->at(mu)*MeV2GeV );
+			recon_all_etcone40->push_back( mu_etcone40->at(mu)*MeV2GeV );
+			recon_all_nucone20->push_back( mu_nucone20->at(mu) );
+			recon_all_nucone30->push_back( mu_nucone30->at(mu) );
+			recon_all_nucone40->push_back( mu_nucone40->at(mu) );
+			recon_all_allauthor->push_back( mu_allauthor->at(mu) );
+			recon_all_author->push_back( mu_author->at(mu) );
+			recon_all_beta->push_back( mu_beta->at(mu) );
+			recon_all_isMuonLikelihood->push_back( mu_isMuonLikelihood->at(mu) );
+			recon_all_matchchi2->push_back( mu_matchchi2->at(mu) );
+			recon_all_matchndof->push_back( mu_matchndof->at(mu) );
+			
+			recon_all_y->push_back(y(pmu[mu]));
+			recon_all_id->push_back((mu_charge->at(mu)<0.) ? PDTMU : -1*PDTMU);
+			recon_all_theta->push_back( pmu[mu]->Theta() );
+		}
+		
+		recon_all_vxp_n = vxp_n;
+		recon_all_isValid = true;
+	}
+	
+	tree_truth->Fill(); ///////////////////////////////
+	if(m_truth_counter%m_trees_counter_mod==0) ////////
+	{                               ////////////////////////
+		tree_truth->FlushBaskets(); ///////////////////
+		//tree_truth->Write("", TObject::kOverwrite); ///
+	} //////////////////////////////////////////////////////
+	m_truth_counter++;
 }
 
 void analysisSkeleton::applyTagNProbe(TMapsb& cutsToSkip)
@@ -3015,8 +3474,10 @@ void analysisSkeleton::applyTruth()
 	// and therefore no fill will be done in the pre-/single-/double-selection calls:
 	didItPass      = (didItPass && preselection("noFills"))    ? true : false;
 	didItPass      = (didItPass && singleSelection("noFills")) ? true : false;
-	didItPass      = (didItPass && doubleSelection("noFills")) ? true : false;
-	
+	if(do2MUselection)
+	{
+		didItPass      = (didItPass && doubleSelection("noFills")) ? true : false;
+	}
 	/////////////////////////////////////////////
 	// fill the recon vars only if passed ///////
 	// but fill the *tree* anyway, also if //////
@@ -3209,6 +3670,8 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip, bool isloose)
 
 	passCutFlow = true;
 	
+	_DEBUG("");
+	
 	for(TMapds::iterator ii=m_cutFlowOrdered->begin() ; ii!=m_cutFlowOrdered->end() ; ++ii)
 	{
 		if(!isloose)
@@ -3223,6 +3686,8 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip, bool isloose)
 		float num = ii->first; ///////////////////////////////////////////////////
 		if(m_cutFlowTypeOrdered->operator[](num)=="preselection") continue; ///////
 		///////////////////////////////////////////////////////////////////////////
+		
+		_DEBUG("");
 		
 		string sorderedcutname = ii->second;
 		nMusPassed = 0;
@@ -3240,6 +3705,8 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip, bool isloose)
 			}
 		}
 		
+		_DEBUG("");
+		
 		
 		if(sorderedcutname=="pT"  &&  !bSkipCut)
 		{
@@ -3249,6 +3716,7 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip, bool isloose)
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
 			}
+			_DEBUG("");
 		}
 		
 		else if(sorderedcutname=="eta"  &&  !bSkipCut)
@@ -3259,6 +3727,7 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip, bool isloose)
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
 			}
+			_DEBUG("");
 		}
 		
 		else if(sorderedcutname=="d0"  &&  !bSkipCut)
@@ -3269,6 +3738,7 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip, bool isloose)
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
 			}
+			_DEBUG("");
 		}
 		
 		else if(sorderedcutname=="z0"  &&  !bSkipCut)
@@ -3279,6 +3749,7 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip, bool isloose)
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
 			}
+			_DEBUG("");
 		}
 		
 		else if(sorderedcutname=="isCombMu"  &&  !bSkipCut)
@@ -3289,6 +3760,7 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip, bool isloose)
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
 			}
+			_DEBUG("");
 		}
 		
 		else if(sorderedcutname=="IDhits"  &&  !bSkipCut)
@@ -3312,6 +3784,7 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip, bool isloose)
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
 			}
+			_DEBUG("");
 		}
 		
 		else if(sorderedcutname=="MShits"  &&  !bSkipCut)
@@ -3342,9 +3815,10 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip, bool isloose)
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
 			}
+			_DEBUG("");
 		}
 		
-		else if(sorderedcutname=="isolation30" && !AS_isQCD  &&  !bSkipCut)
+		else if(sorderedcutname=="isolation30" && !AS_isQCD && doIsolation &&  !bSkipCut)
 		{
 			for(int mu=0 ; mu<muSize ; mu++)
 			{
@@ -3354,9 +3828,10 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip, bool isloose)
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
 			}
+			_DEBUG("");
 		}
 		
-		else if(sorderedcutname=="constrainedAntiIsolation30" && AS_isQCD  &&  !bSkipCut)
+		else if(sorderedcutname=="constrainedAntiIsolation30" && AS_isQCD && doIsolation &&  !bSkipCut)
 		{
 			float cutval1  = (*m_cutFlowMapSVD)[sorderedcutname][0];
 			float cutval2  = (*m_cutFlowMapSVD)[sorderedcutname][1];
@@ -3366,6 +3841,7 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip, bool isloose)
 				muQAflags[mu] = (muQAflags[mu]  &&  thisMuPass) ? true : false;
 				if(thisMuPass  &&  muQAflags[mu]) nMusPassed++;
 			}
+			_DEBUG("");
 		}
 		
 		else
@@ -3374,18 +3850,24 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip, bool isloose)
 			continue;
 		}
 		
+		_DEBUG("");
+		
 		//////////////////////////////////////////////////////////////////////////
 		// increment if passes the cut flow //////////////////////////////////////
-		int nMinMuons = 2; ///////////////////////////////////////////////////////
+		int nMinMuons = (do2MUselection) ? 2 : 1; ////////////////////////////////
 		passCutFlow = (passCutFlow  &&  nMusPassed>=nMinMuons) ? true : false; ///
 		if(!passCutFlow && inApplySingleSelection) throwInfo(sorderedcutname); ///
 		//////////////////////////////////////////////////////////////////////////
+		
+		_DEBUG("");
 		
 		//////////////////////////////////////////////////////////////////////////////////////////////////////
 		// cutFlow ///////////////////////////////////////////////////////////////////////////////////////////
 		if(passCutFlow  &&  !isSkippedCut
 						&&  bDoFill
 						&&  !isloose) fillCutFlow(sorderedcutname);
+		
+		_DEBUG("");
 						
 		if(passCutFlow  &&  !isSkippedCut 
 						&&  sorderedcutname=="pT"
@@ -3398,19 +3880,13 @@ inline bool analysisSkeleton::singleSelection(TMapsb& cutsToSkip, bool isloose)
 						<< EventNumber
 						<< endl;
 		}
+		
+		_DEBUG("");
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 	} // end for(m_cutFlowOrdered)
 	
-	// if(isloose)
-	// {
-		// cout << EventNumber << ": singleSelection -> ";
-		// for(int mu=0 ; mu<muSize ; mu++)
-		// {
-			// cout << mu << ":" << muQAflags[mu] << ", ";
-		// }
-		// cout << endl;
-	// }
+	_DEBUG("singleSelection="+_s(passCutFlow));
 	
 	return passCutFlow;
 }

@@ -56,8 +56,7 @@ void acctimeseff()
 
 	style();
 	
-	TFile* fTemplates = new TFile("plots/ZP_templates.root","READ");
-	//TFile* fTemplates = new TFile("plots/ZP_templates_noPUrw.root","READ");
+	TFile* fTemplates = new TFile("plots/ZP_templates_noEWkFsig_noCoupScale.root","READ");
 	
 	TObjArray* toarr_recon = new TObjArray();
 	toarr_recon->Read("template");
@@ -80,9 +79,16 @@ void acctimeseff()
 	c->cd();
 	c->Draw();
 	
+	TLegend* leg = new TLegend(0.15,0.65,0.45,0.87,NULL,"brNDC");
+	leg->SetFillStyle(4000); //will be transparent
+	leg->SetFillColor(0);
+	leg->SetTextFont(42);
+	
 	TH1D* hActimesEf = new TH1D("hActimesEf","Acceptance #times Efficiency vs. the pole mass;m_{BSM} TeV;Acceptance #times Efficiency",arraysize,minPoleMass-0.02,maxPoleMass+0.02);
-	hActimesEf->SetMarkerStyle(24);
+	hActimesEf->SetLineWidth(1);
+	hActimesEf->SetMarkerStyle(20);
 	hActimesEf->SetMarkerSize(0.8);
+	leg->AddEntry(hActimesEf,"Templates","lep");
 
 	_INFO("");
 	
@@ -95,25 +101,17 @@ void acctimeseff()
 		_DEBUG((string)hTru->GetName());
 		
 		TH1D* hRec_chop = hChopper(hRec,9);
-		// TH1D* hRec_zero = hZeroize(hRec,9);
-		// for(int i=0 ; i<20 ; i++)
-		// {
-			// if(hRec_zero->GetBinContent(i)>0.) { cout << "1st bin = " << hRec_zero->GetBinLowEdge(i) << endl; break; }
-		// }
-		// for(int i=0 ; i<20 ; i++)
-		// {
-			// if(hRec_chop->GetBinContent(i)>0.) { cout << "1st bin = " << hRec_chop->GetBinLowEdge(i) << endl; break; }
-		// }
-		// cout << "last bin = " << hRec_chop->GetBinLowEdge(hRec_chop->GetNbinsX()) + hRec_chop->GetBinWidth(hRec_chop->GetNbinsX()) << endl;
 		
 		Double_t sum_rec = Sum(hRec_chop,false,true); // add also overflow
-		Double_t sum_tru = Sum(hTru,true,true); // add also underflow and overflow
+		Double_t sum_tru = Sum(hTru,true,true);       // add also underflow and overflow
+		
+		// Double_t sum_rec = hRec_chop->GetSumOfWeights() + hRec_chop->GetBinContent(hRec_chop->GetNbinsX()+1); // add also overflow
+		// Double_t sum_tru = hTru->GetSumOfWeights() + hTru->GetBinContent(0) + hTru->GetBinContent(hTru->GetNbinsX()+1);       // add also underflow and overflow
 		
 		_INFO("mass="+_s((0.04*t + 0.13)*1000)+" GeV -> sum_rec="+_s(sum_rec)+", sum_tru="+_s(sum_tru));
 		
 		if(sum_tru<=0. || sum_rec<=0. || isnaninf(sum_tru) || isnaninf(sum_rec))
 		{
-			// _WARNING("sum_rec="+_s(sum_rec)+", sum_tru="+_s(sum_tru)+" -> ignoring point");
 			_FATAL("sum_rec="+_s(sum_rec)+", sum_tru="+_s(sum_tru)+" -> ignoring point");
 			continue;
 		}
@@ -126,7 +124,6 @@ void acctimeseff()
 		hActimesEf->SetBinContent(bin,actimesef[t]);
 		hActimesEf->SetBinError(bin,actimeseferr[t]);
 		
-		// TString name = (TString)hRec->GetName();
 		TString name = "acceptancetimesefficiency_templates_TruRecChop";
 		if(t==0)                pdfmode = 0;
 		else if(t==arraysize-1) pdfmode = 2;
@@ -145,6 +142,7 @@ void acctimeseff()
 	accMM->SetParameters(0.248482,0.613077,-0.960227,0.774202,-0.339321,0.0756178,-0.00670578);
 	accMM->SetLineColor(kRed);
 	accMM->SetLineWidth(1);
+	leg->AddEntry(accMM,"1 fb^{-1} parametrization","l");
 	
 	TF1* fguess = new TF1("fguess","pol6",minPoleMass,maxPoleMass);
 	fguess->SetParameters(0.08145,1.17631,-1.64304,1.07162,-0.33751,0.0449013,-0.00133913);
@@ -164,17 +162,18 @@ void acctimeseff()
 	// func->SetParLimits(4,-1.,+0.0);
 	// func->SetParLimits(5,0.0,+0.5);
 	// func->SetParLimits(6,-0.5,+0.5);
-	hActimesEf->Fit(fitfuncname,"FLLEMQ+"); // "F" If fitting a polN, switch to Minuit fitter (by default, polN functions are fitted by the linear fitter).
-									  // "LL" An improved Log Likelihood fit in case of very low statistics and when bin contents are not integers.
-									  //      Do not use this option if bin contents are large (greater than 100).
-									  // "V"  Verbose mode
-									  // "+"  Add this new fitted function to the list of fitted functions (by default, the previous function is deleted
-									  //      and only the last one is kept)
-									  // "E"  Perform better errors estimation using the Minos technique 
-									  // "M"  Improve fit results
+	hActimesEf->Fit(fitfuncname,"FLLEMV+"); // "F" If fitting a polN, switch to Minuit fitter (by default, polN functions are fitted by the linear fitter).
+											// "LL" An improved Log Likelihood fit in case of very low statistics and when bin contents are not integers.
+											//      Do not use this option if bin contents are large (greater than 100).
+											// "V"  Verbose mode
+											// "+"  Add this new fitted function to the list of fitted functions (by default, the previous function is deleted
+											//      and only the last one is kept)
+											// "E"  Perform better errors estimation using the Minos technique 
+											// "M"  Improve fit results
 	// TF1* func = (TF1*)hActimesEf->GetFunction(fitfunctype);
 	func = (TF1*)hActimesEf->GetFunction(fitfuncname);
 	func->SetLineColor(kBlue);
+	leg->AddEntry(func,"5 fb^{-1} parametrization","l");
 	Int_t npar = func->GetNpar();
 	Double_t chi2 = func->GetChisquare();
 	_INFO("Function has "+_s(npar)+" parameters, Chi^2/NDF = "+_s(func->GetChisquare())+"/"+_s(func->GetNDF())+" = "+_s(func->GetChisquare()/func->GetNDF()));
@@ -189,10 +188,11 @@ void acctimeseff()
 	hActimesEf->SetMaximum(1.0);
 	hActimesEf->GetYaxis()->SetMoreLogLabels();
 	hActimesEf->GetYaxis()->SetNoExponent();
-	hActimesEf->Draw("e1x0");
+	hActimesEf->Draw("epx0");
 	accMM->Draw("SAMES");
 	func->Draw("SAMES");
-	fguess->Draw("SAMES");
+	leg->Draw("SAMES");
+	//fguess->Draw("SAMES");
 	saveas(c,"plots/acceptancetimesefficiency");
 	
 	

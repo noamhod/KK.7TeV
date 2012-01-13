@@ -4,8 +4,11 @@
 #include "../include/logs.h"
 #include "../include/style.h"
 #include "../include/histos.h"
+////////////////////////////////////////////////////////////////////////////////
+// USAGE: broot weights.C++\(\"../data/mcLocalControl_DYmumu_75M120.root\"\) ///
+////////////////////////////////////////////////////////////////////////////////
 
-void weights()
+void weights(TString fname="")
 {
 	msglvl[DBG] = SILENT;
 	msglvl[INF] = VISUAL;
@@ -21,10 +24,18 @@ void weights()
 
 	bool isDY = true;
 
-	TFile* fLoose = NULL;
-	if(isDY) fLoose = new TFile("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_75M120.root","READ");
-	else     fLoose = new TFile("/data/hod/2011/NTUPLE/mcLocalControl_Zprime_mumu_SSM2000.root","READ");
-	TTree* t = (TTree*)fLoose->Get("allCuts/allCuts_tree");
+	TFile* file = NULL;
+	if(fname!="")
+	{
+		_INFO("READING -> "+(string)fname);
+		file = new TFile(fname,"READ");
+	}
+	else
+	{
+		if(isDY) file = new TFile("/data/hod/2011/NTUPLE/mcLocalControl_DYmumu_75M120.root","READ");
+		else     file = new TFile("/data/hod/2011/NTUPLE/mcLocalControl_Zprime_mumu_SSM2000.root","READ");
+	}
+	TTree* t = (TTree*)file->Get("allCuts/allCuts_tree");
 	t->SetBranchAddress("pileup_weight",      &pileup_weight);
 	t->SetBranchAddress("EW_kfactor_weight",  &EW_kfactor_weight);
 	t->SetBranchAddress("QCD_kfactor_weight", &QCD_kfactor_weight);

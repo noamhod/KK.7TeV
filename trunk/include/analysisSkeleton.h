@@ -29,12 +29,16 @@ public:
 
 	bool AS_isMC;
 	bool AS_isQCD;
+	bool AS_doSMR;
 	bool isLoose;
 	bool do2MUselection;
 	bool doIsolation;
+	bool allow3_3st;       // Either 3+3 station muon pairs
+	bool allow3_2st;       //     or 3+2 station muon pairs
 	
 	string base_dir_path;
 	SmearingClass* MCPpTsmearing;
+	
 	
 	TRandom* randGen;
 	Root::TPileupReweighting* pileuprw;
@@ -86,6 +90,7 @@ public:
 	int currentRun;
 	string sPeriod;
 	string sCurrentPeriod;
+	vector<float> mu_sig_diff_qoverp;
 	vector<string>* vTriggers;
 	vector<bool> muQAflags;
 	vector<bool> muLooseQAflags;
@@ -632,6 +637,15 @@ public:
 	~analysisSkeleton();
 	
 	void setMC(bool isMC) { AS_isMC = isMC; }
+	void set3233stations(string s)
+	{
+		allow3_3st = false;
+		allow3_2st = false;
+		if     (s=="MShits=3+3") allow3_3st = true;
+		else if(s=="MShits=3+2") allow3_2st = true;
+		else _FATAL("MS hits can be either 3+3 or 3+2");
+	}
+	void setSmearingFlag(bool doSmearing) { AS_doSMR = doSmearing; }
 	void setQCD(bool isQCD) { AS_isQCD = isQCD; }
 	void setLoose(bool isloose) { isLoose = isloose; }
 	void set2MUselection(bool do2mu) { do2MUselection = do2mu; }

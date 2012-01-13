@@ -271,7 +271,8 @@ TCanvas* stackratio(TString name,
 					TH1D* hNumerator, THStack* hsDenominator, TList* hlSignals,
 					TLegend* leg=NULL, TPaveText* pvtxt_lumi=NULL, TPaveText* pvtxt_atlas=NULL,
 					TString ratioLabel="Ratio", TString drawopt_n="",
-					Bool_t logx=false, Bool_t logy=false)
+					Bool_t logx=false, Bool_t logy=false,
+					Double_t ymin=-1, Double_t ymax=-1)
 {	
 	TCanvas* cnv = new TCanvas(name,name,600,550);
 	TH1D* htmp;
@@ -298,9 +299,11 @@ TCanvas* stackratio(TString name,
 	TH1D* hDenominator = (TH1D*)hNumerator->Clone("tmp");
 	hDenominator->Reset();
 	TIter next_bg((TList*)hsDenominator->GetHists());
-	while( htmp=(TH1D*)next_bg() )
+	while(( htmp=(TH1D*)next_bg() )!= NULL)
 	{
 		cout << "Adding " << ((TH1D*)htmp)->GetName() << endl;
+		if(ymin!=-1) htmp->SetMinimum(ymin);
+		if(ymax!=-1) htmp->SetMaximum(ymax);
 		hDenominator->Add(htmp);
 	}
 	
@@ -333,10 +336,12 @@ TCanvas* stackratio(TString name,
 	TLine* line = new TLine(hr->GetXaxis()->GetXmin(),1.,hr->GetXaxis()->GetXmax(),1.);
 
 	tvp_hists->cd();
+	if(ymin!=-1) hsDenominator->SetMinimum(ymin);
+	if(ymax!=-1) hsDenominator->SetMaximum(ymax);
 	hsDenominator->Draw(); // Draw("nostack");
 	hNumerator->Draw(drawopt_n+"SAMES");
 	TIter next_sig(hlSignals);
-	while( htmp=(TH1D*)next_sig() )
+	while(( htmp=(TH1D*)next_sig() )!=NULL)
 	{
 		cout << "Drawing " << ((TH1D*)htmp)->GetName() << endl;
 		htmp->Draw("SAMES");

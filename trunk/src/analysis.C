@@ -93,9 +93,9 @@ void analysis::execute()
 	_DEBUG("");
 	
 	/////////////////////////////////////////
-	// SMEAR THE MUON PT FOR MC /////////////
-	if(m_isMC) setSmearedMCPpT(nMus); ///////
-	/////////////////////////////////////////
+	// SMEAR THE MUON PT FOR MC /////////////////////////
+	if(m_isMC && AS_doSMR) setSmearedMCPpT(nMus); ///////
+	/////////////////////////////////////////////////////
 	
 	_DEBUG("");
 	
@@ -219,16 +219,15 @@ void analysis::setEventVariables()
 	// pileup reweighting, needs to come after setting the lbn //////////////////////
 	analysisSkeleton::pileup_weight       = 1.;
 	analysisSkeleton::lumi_pileup_weight  = 1.; // obsolete
-	bool isIntime = false; // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ??????????
 	if(m_isMC)
 	{
-		analysisSkeleton::pileup_weight = getPileUpWeight(false /*==>!isIntime*/); // will be the out-of-time pileup
+		analysisSkeleton::pileup_weight = getPileUpWeight(false /*==>!intime*/); // will be the out-of-time pileup
 		if(analysisSkeleton::pileup_weight<0.) analysisSkeleton::pileup_weight = 1.;
 		
-		analysisSkeleton::outoftime_pileup_weight = getPileUpWeight(false /*==>!isIntime*/);  // will be the out-of-time pileup
+		analysisSkeleton::outoftime_pileup_weight = getPileUpWeight(false /*==>!intime*/);  // will be the out-of-time pileup
 		if(analysisSkeleton::outoftime_pileup_weight<0.) analysisSkeleton::outoftime_pileup_weight = 1.;
 		
-		analysisSkeleton::intime_pileup_weight = getPileUpWeight(true /*==>!isIntime*/);  // will be the in-time pileup
+		analysisSkeleton::intime_pileup_weight = getPileUpWeight(true /*==>!intime*/);  // will be the in-time pileup
 		if(analysisSkeleton::intime_pileup_weight<0.) analysisSkeleton::intime_pileup_weight = 1.;
 	}
 	/////////////////////////////////////////////////////////////////////////////////

@@ -103,7 +103,7 @@
       abs(eta) is less than 2.5
     </description>
   </obj>
-
+ 
   <obj NAME="IDhits" FLAG="on">
     <order>14</order>
     <phase>selection</phase>
@@ -131,6 +131,7 @@
     </description>
   </obj>
 
+<!--  
   <obj NAME="MShits" FLAG="on">
     <order>15</order>
     <phase>selection</phase>
@@ -158,6 +159,7 @@
       see: https://twiki.cern.ch/twiki/bin/view/AtlasProtected/CutFlow2011Muons
     </description>
   </obj>
+-->
 
   <obj NAME="d0" FLAG="on">
     <order>16</order>
@@ -299,7 +301,28 @@
       The loose muon must not be tight.
     </description>
   </obj>
- 
+
+  <obj NAME="MShitsPairFormation" FLAG="on">
+    <order>100</order>
+    <phase>selection</phase>
+    <skip>false</skip>
+    <nparameters>8</nparameters>
+    <parameters>
+      <parameter NAME="MuonPhiHitsCut"     ORDER="1" TYPE="float">1.</parameter>
+      <parameter NAME="MuonPhiLayerCut"    ORDER="2" TYPE="float">2.</parameter>
+      <parameter NAME="MuonMDTHitsCut"     ORDER="3" TYPE="float">3.</parameter>
+      <parameter NAME="MuonMomDiffSigCut"  ORDER="4" TYPE="float">5.</parameter>
+      <parameter NAME="MuonPhiHitsCut2"    ORDER="5" TYPE="float">1.</parameter>
+      <parameter NAME="MuonPhiLayerCut2"   ORDER="6" TYPE="float">1.</parameter>
+      <parameter NAME="MuonMDTHitsCut2"    ORDER="7" TYPE="float">5.</parameter>
+      <parameter NAME="MuonMomDiffSigCut2" ORDER="8" TYPE="float">3.</parameter>
+    </parameters>
+    <description>
+      This is the MS hits cut + muon pair formation (highest Sum(pT) with opposite charge).
+    </description>
+  </obj>  
+  
+<!--
   <obj NAME="oppositeChargeCandidates" FLAG="on">
     <order>101</order>
     <phase>selection</phase>
@@ -313,6 +336,7 @@
 	  we look for at least one candidate, before pT sorting.
     </description>
   </obj>
+-->
 
   <obj NAME="imass" FLAG="on">
     <order>103</order>

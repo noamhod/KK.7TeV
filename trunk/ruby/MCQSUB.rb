@@ -477,7 +477,7 @@ class MCQSUB
 	
 	def merge_cutflow(inlist=[], filename="merged.cutflow",isMC=false)
 		lastline=-1
-		firstline=-27 # THIS IS THE NUMBER OF LINES COUNTED FROM BOTTOM, WHERE THE FIRST CUTFLOW LINE APPEARS - maybe should be 50 or some large number
+		firstline=-25 # THIS IS THE NUMBER OF LINES COUNTED FROM BOTTOM, WHERE THE FIRST CUTFLOW LINE APPEARS - maybe should be 50 or some large number
 		types = Array.new
 		names = Array.new
 		evnts = Array.new

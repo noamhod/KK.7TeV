@@ -29,8 +29,11 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	string spTtype;
 	string sRel;
 	string sMCPtag;
+	string sDoSmearing;
+	string sMShits;
 	string sPUwriteMC;
 	string sPUremoveData;
+	bool bDoSmearing;
 	bool bPUwriteMC;
 	bool bPUremoveData;
 	string sMCorData;
@@ -48,97 +51,51 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	//int    msgLvl;
 	
 	ifstream ifsel( localRunControlFile.c_str() );
-	ifsel >> sBaseDir >> sRun >> sDataType >> sRec >> spTtype >> sRel >> sMCPtag >> sPUwriteMC >> sPUremoveData >> sMCorData >> sIsQCD >> sIsLoose >> sDo2mu >> sDoIso;
+	ifsel >> sBaseDir >> sRun >> sDataType >> sRec >> spTtype >> sRel >> sMCPtag >> sDoSmearing >> sPUwriteMC >> sPUremoveData >> sMCorData >> sMShits >> sIsQCD >> sIsLoose >> sDo2mu >> sDoIso;
 	
-	if(sBaseDir=="")
-	{
-		_ERROR("YOU CHOSE EMPTY BASEDIR, exitting now");
-		exit(-1);
-	}
-	if(sRun!="local"  &&  sRun!="local_noskim")
-	{
-		_ERROR("YOU CHOSE RUN ["+sRun+"], exitting now");
-		exit(-1);
-	}
-	if(sDataType!="Data11"  &&  sDataType!="Data10")
-	{
-		_ERROR("YOU CHOSE DATA TYPE ["+sDataType+"], exitting now");
-		exit(-1);
-	}
-	if(sRec!="staco"  &&  sRec!="muid")
-	{
-		_ERROR("YOU CHOSE REC ALG ["+sRec+"], exitting now");
-		exit(-1);
-	}
-	if(spTtype!="pT"  &&  spTtype!="q_pT")
-	{
-		_ERROR("YOU CHOSE SMEARING TYPE ["+spTtype+"], exitting now");
-		exit(-1);
-	}
-	if(sRel!="Rel17")
-	{
-		_ERROR("YOU CHOSE RELEASE NUMBER ["+sRel+"], exitting now");
-		exit(-1);
-	}
+	if(sBaseDir=="") _FATAL("YOU CHOSE EMPTY BASEDIR");
+	
+	if(sRun!="local"  &&  sRun!="local_noskim") _FATAL("YOU CHOSE RUN ["+sRun+"]");
+	
+	if(sDataType!="Data11"  &&  sDataType!="Data10") _FATAL("YOU CHOSE DATA TYPE ["+sDataType+"]");
+	if(sRec!="staco"  &&  sRec!="muid") _FATAL("YOU CHOSE REC ALG ["+sRec+"]");
+	if(spTtype!="pT"  &&  spTtype!="q_pT") _FATAL("YOU CHOSE SMEARING TYPE ["+spTtype+"]");
+	if(sRel!="Rel17") _FATAL("YOU CHOSE RELEASE NUMBER ["+sRel+"]");
 	size_t found = sMCPtag.find("MuonMomentumCorrections");
-	if (found==string::npos)
-	{
-		_ERROR("YOU CHOSE MCP TAG ["+sMCPtag+"], exitting now");
-		exit(-1);
-	}
-	if(sPUwriteMC!="pu_writeMC=true"  &&  sPUwriteMC!="pu_writeMC=false")
-	{
-		_ERROR("YOU CHOSE PU WRITE FLAG ["+sPUwriteMC+"], exitting now");
-		exit(-1);
-	}
+	if (found==string::npos) _FATAL("YOU CHOSE MCP TAG ["+sMCPtag+"]");
+	if(sDoSmearing!="doSmearing=yes" && sDoSmearing!="doSmearing=no") _FATAL("YOU CHOSE SMEARING FLAG ["+sDoSmearing+"]");
+	bDoSmearing = (sDoSmearing=="doSmearing=yes") ? true : false;
+	
+	if(sPUwriteMC!="pu_writeMC=true"  &&  sPUwriteMC!="pu_writeMC=false") _FATAL("YOU CHOSE PU WRITE FLAG ["+sPUwriteMC+"]");
 	bPUwriteMC = (sPUwriteMC=="pu_writeMC=true");
-	if(sPUremoveData!="pu_removeData=true"  &&  sPUremoveData!="pu_removeData=false")
-	{
-		_ERROR("YOU CHOSE PU REMOVE DATA FLAT ["+sPUremoveData+"], exitting now");
-		exit(-1);
-	}
+	if(sPUremoveData!="pu_removeData=true"  &&  sPUremoveData!="pu_removeData=false") _FATAL("YOU CHOSE PU REMOVE DATA FLAT ["+sPUremoveData+"]");
 	bPUremoveData = (sPUremoveData=="pu_removeData=true");
-	if(sMCorData!="mc"  &&  sMCorData!="data"  &&  sMCorData!="mcqsub")
-	{
-		_ERROR("ERROR: YOU CHOSE MC/DATA ["+sMCorData+"], exitting now");
-		exit(-1);
-	}
+	
+	if(sMShits!="MShits=3+3"  &&  sMShits!="MShits=3+2") _FATAL("YOU CHOSE MS HITS ["+sMShits+"]");
+	
+	if(sMCorData!="mc"  &&  sMCorData!="data"  &&  sMCorData!="mcqsub") _FATAL("ERROR: YOU CHOSE MC/DATA ["+sMCorData+"]");
+	
 	isMC = (sMCorData=="mc" || sMCorData=="mcqsub") ? true : false;
-	if(sIsQCD!="QCD=yes"  &&  sIsQCD!="QCD=no")
-	{
-		_ERROR("ERROR: YOU CHOSE QCD=yes/no ["+sIsQCD+"], exitting now");
-		exit(-1);
-	}
+	
+	if(sIsQCD!="QCD=yes"  &&  sIsQCD!="QCD=no") _FATAL("ERROR: YOU CHOSE QCD=yes/no ["+sIsQCD+"]");
 	isQCD = (sIsQCD=="QCD=yes") ? true : false;
-	if(sIsLoose!="tight"  &&  sIsLoose!="loose")
-	{
-		_ERROR("ERROR: YOU CHOSE isLoose ["+sIsLoose+"], exitting now");
-		exit(-1);
-	}
+	
+	if(sIsLoose!="tight"  &&  sIsLoose!="loose") _FATAL("ERROR: YOU CHOSE isLoose ["+sIsLoose+"]");
 	isLoose = (sIsLoose=="loose") ? true : false; // false if sIsLoose=="tight"
-	if(sDo2mu!="do2muSelection=yes"  &&  sDo2mu!="do2muSelection=no")
-	{
-		_ERROR("ERROR: YOU CHOSE do2mu ["+sDo2mu+"], exitting now");
-		exit(-1);
-	}
+	
+	if(sDo2mu!="do2muSelection=yes"  &&  sDo2mu!="do2muSelection=no") _FATAL("ERROR: YOU CHOSE do2mu ["+sDo2mu+"]");
 	do2mu = (sDo2mu=="do2muSelection=yes") ? true : false;
-	if(sDoIso!="doIsolation=yes"  &&  sDoIso!="doIsolation=no")
-	{
-		_ERROR("ERROR: YOU CHOSE doIso ["+sDoIso+"], exitting now");
-		exit(-1);
-	}
+	
+	if(sDoIso!="doIsolation=yes"  &&  sDoIso!="doIsolation=no") _FATAL("ERROR: YOU CHOSE doIso ["+sDoIso+"]");
 	doIso = (sDoIso=="doIsolation=yes") ? true : false;
+	
 	for(int i=0 ; i<(int)msglvl.size()-2 ; i++)
 	{
 		ifsel >> sMsgTyp >> sMsgLvl;
 		if(sMsgTyp!="DBG" && sMsgTyp!="INF" && sMsgTyp!="WRN") _ERROR("ERROR: YOU CHOSE MSGTYP ["+sMsgTyp+"], exitting now");
 		else
 		{
-			if(sMsgLvl!="VISUAL" && sMsgLvl!="SILENT")
-			{
-				_ERROR("ERROR: YOU CHOSE MSGLVL ["+sMsgLvl+"], exitting now");
-				exit(-1);
-			}
+			if(sMsgLvl!="VISUAL" && sMsgLvl!="SILENT") _FATAL("ERROR: YOU CHOSE MSGLVL ["+sMsgLvl+"]");
 		}
 		msglvl[i] = (sMsgLvl=="SILENT") ? SILENT : VISUAL;
 		_INFO("msglvl["+_s(i)+"]="+sMsgLvl);
@@ -150,9 +107,11 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	m_muRecAlgo = sRec; // "staco" OR "muid"
 	m_pTsmearingType = spTtype; // "pT" OR "q_pT"
 	m_release   = sRel; // "Rel17"
-	m_MCPtag = sMCPtag; // "MuonMomentumCorrections-XX-YY-ZZ"
+	m_MCPtag    = sMCPtag; // "MuonMomentumCorrections-XX-YY-ZZ"
+	m_doSmearing  = bDoSmearing;
 	m_doPUwriteMC = bPUwriteMC;
 	m_doPUremoveData = bPUremoveData;
+	m_MShits    = sMShits;
 	m_isMC      = isMC;
 	m_isQCD     = isQCD;
 	m_isLoose   = isLoose;
@@ -167,8 +126,10 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	_INFO("m_pTsmearingType="+m_pTsmearingType);
 	_INFO("m_release="+m_release);
 	_INFO("m_MCPtag="+m_MCPtag);
+	_INFO("m_doSmearing="+_s(m_doSmearing));
 	_INFO("m_doPUwriteMC="+_s(m_doPUwriteMC));
 	_INFO("m_doPUremoveData="+_s(m_doPUremoveData));
+	_INFO("m_MShits="+m_MShits);
 	_INFO("m_isMC="+_s(m_isMC));
 	_INFO("m_isQCD="+m_isQCD);
 	_INFO("m_isLoose="+_s(m_isLoose));
@@ -347,18 +308,30 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	if(runs=="ALLRUNS")   str_logspath = basedir+"/../run";
 	if(runs=="SINGLERUN") str_logspath = basedir+"/../run/tmp";
 	_INFO("LOADING FILE -> "+str_logspath);
-	m_analysis->setMC(m_isMC);
-	m_analysis->setQCD(m_isQCD);
-	if(m_isMC) m_analysis->setMCPpTparameters(m_dataType, m_muRecAlgo, m_pTsmearingType, m_release, str_mcp);
 	
+	///////////////////////////////////////
+	m_analysis->setMC(m_isMC); ////////////
+	///////////////////////////////////////
+	
+	///////////////////////////////////////
+	m_analysis->setQCD(m_isQCD); //////////
+	///////////////////////////////////////
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	if(m_isMC) m_analysis->setSmearingFlag(m_doSmearing); // will turn on/off the smearing operation ////////////
+	if(m_isMC) m_analysis->setMCPpTparameters(m_dataType, m_muRecAlgo, m_pTsmearingType, m_release, str_mcp); ///
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	///////////////////////////////////
 	m_analysis->ginitialize(); ////////
 	///////////////////////////////////
 	
-	
 	///////////////////////////////////////////
 	m_analysis->sMCsampleName = str_mcname; ///
+	///////////////////////////////////////////
+	
+	///////////////////////////////////////////
+	m_analysis->set3233stations(m_MShits); ////
 	///////////////////////////////////////////
 	
 	//////////////////////////////////////////

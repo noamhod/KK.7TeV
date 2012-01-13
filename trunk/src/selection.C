@@ -392,6 +392,205 @@ inline bool selection::nMShitsCut(float nMDTBIMOHitsCutVal, float nMDTEIMOHitsCu
 	return false;
 }
 
+
+inline bool selection::nMShitsCut3233(float MuonPhiHitsCut,    float MuonPhiLayerCut,  float MuonMDTHitsCut,  float MuonMomDiffSigCut,
+									  float MuonPhiHitsCut2,   float MuonPhiLayerCut2, float MuonMDTHitsCut2, float MuonMomDiffSigCut2,
+									  bool allow3_3st, bool allow3_2st, vector<bool>& muQAflags, vector<float>& mu_sig_diff_qoverp,
+									  vector<float>* mu_eta, vector<float>* mu_phi, vector<float>* mu_charge,
+									  vector<int>* mu_nMDTBIHits, vector<int>* mu_nMDTBMHits, vector<int>* mu_nMDTBOHits,
+									  vector<int>* mu_nMDTEIHits, vector<int>* mu_nMDTEMHits, vector<int>* mu_nMDTEOHits,
+									  vector<int>* mu_nMDTBEEHits, vector<int>* mu_nMDTEEHits, vector<int>* mu_nMDTBIS78Hits,
+									  vector<int>* mu_nRPCLayer1PhiHits, vector<int>* mu_nRPCLayer2PhiHits, vector<int>* mu_nRPCLayer3PhiHits,
+									  vector<int>* mu_nTGCLayer1PhiHits, vector<int>* mu_nTGCLayer2PhiHits, vector<int>* mu_nTGCLayer3PhiHits, vector<int>* mu_nTGCLayer4PhiHits,
+									  vector<int>* mu_nCSCEtaHits, vector<int>* mu_nCSCPhiHits,
+									  int& ai, int& bi
+									  )
+{
+	if(allow3_3st && allow3_2st) _FATAL("cannot call 3+3 and 3+2");
+
+	unsigned int muSize = mu_eta->size();
+
+	vector<int> mu_phiSector;
+	vector<int> mu_nStations;
+	vector<int> mu_is3StBarrel;
+	vector<int> mu_is3StEndcap;
+	vector<int> mu_is3St;
+	vector<int> mu_is2StBarrel;
+	vector<int> mu_is2StEndcap;
+	vector<int> mu_is2St;
+	for(unsigned int i=0 ; i<muSize ; i++)
+	{
+		mu_phiSector.push_back(0);
+		mu_nStations.push_back(0);
+		mu_is3StBarrel.push_back(0);
+		mu_is3StEndcap.push_back(0);
+		mu_is3St.push_back(0);
+		mu_is2StBarrel.push_back(0);
+		mu_is2StEndcap.push_back(0);
+		mu_is2St.push_back(0);
+	}
+	
+	for(unsigned int j=0 ; j<muSize ; j++)
+	{
+		if(!muQAflags[j]) continue;
+	
+		mu_phiSector[j] = getPhiSector(mu_phi->at(j));
+
+		// Count nStations
+		mu_nStations[j] =
+		(mu_nMDTBIHits->at(j) >= MuonMDTHitsCut) +
+		(mu_nMDTBMHits->at(j) >= MuonMDTHitsCut) +
+		(mu_nMDTBOHits->at(j) >= MuonMDTHitsCut) +
+		((mu_nMDTEIHits->at(j) >= MuonMDTHitsCut) || (mu_nCSCEtaHits->at(j) >= MuonMDTHitsCut) ) +
+		(mu_nMDTEMHits->at(j) >= MuonMDTHitsCut) +
+		(mu_nMDTEOHits->at(j) >= MuonMDTHitsCut);
+
+		mu_is3StBarrel[j] =
+		(fabs(mu_sig_diff_qoverp[j]) < MuonMomDiffSigCut) &&
+		((mu_nRPCLayer1PhiHits->at(j) >= MuonPhiHitsCut) +
+		(mu_nRPCLayer2PhiHits->at(j) >= MuonPhiHitsCut) +
+		(mu_nRPCLayer3PhiHits->at(j) >= MuonPhiHitsCut) >= MuonPhiLayerCut) &&
+		((mu_nMDTBIHits->at(j) >= MuonMDTHitsCut) +
+		(mu_nMDTBMHits->at(j) >= MuonMDTHitsCut) +
+		(mu_nMDTBOHits->at(j) >= MuonMDTHitsCut) == 3) &&
+		(mu_nMDTEIHits->at(j) == 0) &&
+		(mu_nMDTEMHits->at(j) == 0) &&
+		(mu_nMDTEOHits->at(j) == 0) &&
+		(mu_nCSCEtaHits->at(j) == 0) &&
+		(mu_nMDTBEEHits->at(j) == 0) &&
+		(mu_nMDTEEHits->at(j) == 0) &&
+		(mu_nMDTBIS78Hits->at(j) == 0);
+
+		mu_is3StEndcap[j] =
+		(fabs(mu_sig_diff_qoverp[j]) < MuonMomDiffSigCut) &&
+		((mu_nTGCLayer1PhiHits->at(j) >= MuonPhiHitsCut) +
+		(mu_nTGCLayer2PhiHits->at(j) >= MuonPhiHitsCut) +
+		(mu_nTGCLayer3PhiHits->at(j) >= MuonPhiHitsCut) +
+		(mu_nTGCLayer4PhiHits->at(j) >= MuonPhiHitsCut) +
+		(mu_nCSCPhiHits->at(j)   >= MuonPhiHitsCut) >= MuonPhiLayerCut) &&    
+		(((mu_nMDTEIHits->at(j) >= MuonMDTHitsCut) || (mu_nCSCEtaHits->at(j) >= MuonMDTHitsCut) ) +
+		(mu_nMDTEMHits->at(j) >= MuonMDTHitsCut) +
+		(mu_nMDTEOHits->at(j) >= MuonMDTHitsCut) == 3) &&
+		(mu_nMDTBIHits->at(j) == 0) &&
+		(mu_nMDTBMHits->at(j) == 0) &&
+		(mu_nMDTBOHits->at(j) == 0) &&
+		(mu_nMDTBEEHits->at(j) == 0) &&
+		(mu_nMDTEEHits->at(j) == 0) &&
+		(mu_nMDTBIS78Hits->at(j) == 0);
+
+		mu_is3St[j] = mu_is3StBarrel[j] || mu_is3StEndcap[j];
+		
+		mu_is2StBarrel[j] =
+		!mu_is3St[j] &&
+		(fabs(mu_sig_diff_qoverp[j]) < MuonMomDiffSigCut2) &&
+		((mu_nRPCLayer1PhiHits->at(j) >= MuonPhiHitsCut2) +
+		(mu_nRPCLayer2PhiHits->at(j) >= MuonPhiHitsCut2) +
+		(mu_nRPCLayer3PhiHits->at(j) >= MuonPhiHitsCut2) >= MuonPhiLayerCut2) &&
+		((mu_nMDTBIHits->at(j) >= MuonMDTHitsCut2) +
+		(mu_nMDTBOHits->at(j) >= MuonMDTHitsCut2) == 2) &&
+		(mu_nMDTEIHits->at(j) == 0) &&
+		(mu_nMDTEMHits->at(j) == 0) &&
+		(mu_nMDTEOHits->at(j) == 0) &&
+		(mu_nCSCEtaHits->at(j) == 0) &&
+		(mu_nMDTBEEHits->at(j) == 0) &&
+		(mu_nMDTEEHits->at(j) == 0) &&
+		(mu_nMDTBIS78Hits->at(j) == 0) &&
+		(fabs(mu_eta->at(j)) < 1.00) &&
+		((mu_phiSector[j] % 2 == 0) || (fabs(mu_eta->at(j)) < 0.85)) &&
+		!((mu_phiSector[j] ==  2) && (mu_eta->at(j) > 0.85)) &&
+		!((mu_phiSector[j] == 13) && (mu_eta->at(j) > 0.00) && (mu_eta->at(j) < 0.65));
+		
+		mu_is2StEndcap[j] =
+		!mu_is3St[j] &&
+		(fabs(mu_sig_diff_qoverp[j]) < MuonMomDiffSigCut2) &&
+		((mu_nTGCLayer1PhiHits->at(j) >= MuonPhiHitsCut2) +
+		(mu_nTGCLayer2PhiHits->at(j) >= MuonPhiHitsCut2) +
+		(mu_nTGCLayer3PhiHits->at(j) >= MuonPhiHitsCut2) +
+		(mu_nTGCLayer4PhiHits->at(j) >= MuonPhiHitsCut2) +
+		(mu_nCSCPhiHits->at(j)   >= MuonPhiHitsCut2) >= MuonPhiLayerCut2) &&    
+		((mu_nMDTEIHits->at(j) >= MuonMDTHitsCut2) +
+		(mu_nMDTEMHits->at(j) >= MuonMDTHitsCut2) == 2) &&
+		(mu_nMDTBIHits->at(j) == 0) &&
+		(mu_nMDTBMHits->at(j) == 0) &&
+		(mu_nMDTBOHits->at(j) == 0) &&
+		(mu_nMDTBEEHits->at(j) == 0) &&
+		(mu_nMDTEEHits->at(j) == 0) &&
+		(mu_nMDTBIS78Hits->at(j) == 0) &&
+		(mu_phiSector[j] % 2 == 0) && (fabs(mu_eta->at(j)) > 1.20) && (fabs(mu_eta->at(j)) < 1.40);
+
+		// mu_is2St[j] = mu_is2StBarrel[j] || mu_is2StEndcap[j];
+		mu_is2St[j] = mu_is2StBarrel[j];
+	}
+	
+	//-----Muon-Pair-Formation-----//
+	vector<vector<int> > mupair;
+	// bool allow3_3st = false;       // Either 3+3 station muon pairs
+	// bool allow3_2st = true;        //     or 3+2 station muon pairs
+	bool foundpair3_3st = false;
+	bool foundpair3_2st = false;
+
+	// If there are more than three muons, take the two leading opposite-sign muons
+	// Muons are sorted by pT, in the array of indices mu_index
+	if(muSize>=2)
+	{
+		for(unsigned int i=0 ; i<muSize-1 ; i++)
+		{
+			if(!muQAflags[i]) continue;
+			for(unsigned int j=i+1 ; j<muSize ; j++)
+			{
+				if(!muQAflags[j]) continue;
+				if((mu_charge->at(i)==-mu_charge->at(j)) && (mu_is3St[i] && mu_is3St[j]))
+				{
+					mupair.push_back(vector<int>());
+					mupair[mupair.size()-1].push_back(i);
+					mupair[mupair.size()-1].push_back(j);
+					foundpair3_3st = true;
+					break;
+				}
+			}
+			if(foundpair3_3st) break;
+		}
+		if(!foundpair3_3st)
+		{
+			for(unsigned int i=0 ; i<muSize-1 ; i++)
+			{
+				if(!muQAflags[i]) continue;
+				for(unsigned int j=i+1 ; j<muSize ; j++)
+				{
+					if(!muQAflags[j]) continue;
+					if
+					(
+						(mu_charge->at(i)==-mu_charge->at(j)) && 
+						((mu_is3St[i] && mu_is2St[j]) || (mu_is2St[i] && mu_is3St[j]))
+					)
+					{
+						mupair.push_back(vector<int>());
+						mupair[mupair.size()-1].push_back(i);
+						mupair[mupair.size()-1].push_back(j);
+						foundpair3_2st = true;
+						break;
+					}
+				}
+				if(foundpair3_2st) break;
+			}
+		}
+	}
+	
+	if(allow3_3st && foundpair3_3st)
+	{
+		ai = mupair[0][0];
+		bi = mupair[0][1];
+		return true;
+	}
+	if(allow3_2st && foundpair3_2st)
+	{
+		ai = mupair[0][0];
+		bi = mupair[0][1];
+		return true;
+	}
+	return false;
+}
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 
 #endif

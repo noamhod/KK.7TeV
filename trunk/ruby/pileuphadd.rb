@@ -15,7 +15,7 @@ mcarray =
 	'../conf/pileup_DYmumu_M2000.root',
 
 	'../conf/pileup_Pythia6_DYmumu_75M120.root',
-#        '../conf/pileup_Pythia6_DYmumu_120M250.root',
+	'../conf/pileup_Pythia6_DYmumu_120M250.root',
         '../conf/pileup_Pythia6_DYmumu_250M400.root',
         '../conf/pileup_Pythia6_DYmumu_400M600.root',
         '../conf/pileup_Pythia6_DYmumu_600M800.root',
@@ -51,12 +51,12 @@ mcarray =
 	'../conf/pileup_WZ_Herwig.root',
 	'../conf/pileup_ZZ_Herwig.root',
 
-	'../conf/pileup_AlpgenJimmyWmunuNp0_pt20',
-	'../conf/pileup_AlpgenJimmyWmunuNp1_pt20',
-	'../conf/pileup_AlpgenJimmyWmunuNp2_pt20',
-	'../conf/pileup_AlpgenJimmyWmunuNp3_pt20',
-	'../conf/pileup_AlpgenJimmyWmunuNp4_pt20',
-	'../conf/pileup_AlpgenJimmyWmunuNp5_pt20',
+	'../conf/pileup_AlpgenJimmyWmunuNp0_pt20.root',
+	'../conf/pileup_AlpgenJimmyWmunuNp1_pt20.root',
+	'../conf/pileup_AlpgenJimmyWmunuNp2_pt20.root',
+	'../conf/pileup_AlpgenJimmyWmunuNp3_pt20.root',
+	'../conf/pileup_AlpgenJimmyWmunuNp4_pt20.root',
+	'../conf/pileup_AlpgenJimmyWmunuNp5_pt20.root',
 
 	'../conf/pileup_Zprime_mumu_SSM500.root',
 	'../conf/pileup_Zprime_mumu_SSM750.root',

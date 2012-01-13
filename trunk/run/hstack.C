@@ -80,19 +80,20 @@ void hstack()
 	hMCsum->Reset();
 	hMCsum->SetName("h"+htype+"MCsum"+truth);
 	
-	bool isIsolation = (htype.Contains("Isolation")) ? true : false;
+	bool isIsolation = (htype.Contains("Isolat")) ? true : false;
 	TString QCD = (isIsolation) ? "jjmu15X" : "QCD";
 	TH1D* hQCD   = (TH1D*)fhistos->Get("h"+htype+QCD+truth)->Clone();
-	if(isIsolation) hQCD->Scale(1./100.);
+	// if(isIsolation) hQCD->Scale(1./100.);
+	// if(isIsolation) hQCD->Scale(2.);
 	backgounds->Add(hQCD);
 	hMCsum->Add(hQCD);
-	/* TH1D* hWjets = NULL;
+	TH1D* hWjets = NULL;
 	if(isIsolation)
 	{
 		hWjets = (TH1D*)fhistos->Get("h"+htype+"W+jets"+truth)->Clone();
 		backgounds->Add(hWjets);
 		hMCsum->Add(hWjets);
-	} */
+	}
 	TH1D* hTTbar   = (TH1D*)fhistos->Get("h"+htype+"TTbar"+truth)->Clone();
 	backgounds->Add(hTTbar);
 	hMCsum->Add(hTTbar);
@@ -130,11 +131,11 @@ void hstack()
 	leg->SetFillStyle(4000); //will be transparent
 	leg->SetFillColor(0);
 	leg->SetTextFont(42);
-	leg->AddEntry(hData,"2011 Data","LEP0");
+	leg->AddEntry(hData,"2011 Data","EP0");
 	leg->AddEntry(hDY,"#gamma/Z","f");
 	leg->AddEntry(hDiboson,"Diboson","f");
 	leg->AddEntry(hTTbar,"t#bar{t}","f");
-	// leg->AddEntry(hWjets,"W+jets","f");
+	leg->AddEntry(hWjets,"W+jets","f");
 	leg->AddEntry(hQCD,QCD,"f");
 	if(hKKtemplate!=NULL) leg->AddEntry(hKKtemplate,"#gamma_{KK}/Z_{KK} 2 TeV Template","l");
 	if(hZPtemplate!=NULL) leg->AddEntry(hZPtemplate,"Z'_{SSM} 2 TeV Template","l");
@@ -205,6 +206,14 @@ void hstack()
 		signals->Add(hKKtemplate);
 		signals->Add(hZPtemplate);
 	}
-	TCanvas* cR = (TCanvas*)(stackratio(name,hData,backgounds,signals,leg,pvtxt_lumi,pvtxt_atlas,"Data/#SigmaMC","epx0",isLogx,isLogy))->Clone("");
+	
+	Double_t ymin = (isIsolation) ? 20 : -1;
+	Double_t ymax = -1;
+	ymin = (htype=="MassAntiIsolated") ? 2.e-2 : -1;
+	ymax = (htype=="MassAntiIsolated") ? hQCD->GetMaximum()*1.5 : -1;
+	ymin = (htype=="Mass") ? 1.e-3 : -1;
+	ymax = (htype=="Mass") ? hDY->GetMaximum()*1.5 : -1;
+	
+	TCanvas* cR = (TCanvas*)(stackratio(name,hData,backgounds,signals,leg,pvtxt_lumi,pvtxt_atlas,"Data/#SigmaMC","epx0",isLogx,isLogy,ymin,ymax))->Clone("");
 	saveas(cR,"plots/"+name, false);
 }

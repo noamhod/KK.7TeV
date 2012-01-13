@@ -63,6 +63,12 @@ static const Int_t    nlogofficialimassbins = 56;
 static const Double_t logofficialimassmin   = 70.;
 static const Double_t logofficialimassmax   = 3000.;
 static Double_t logofficialimassbins[nlogofficialimassbins+1];
+
+static const Int_t    nlogisoimassbins = 20;
+static const Double_t logisoimassmin   = 70.;
+static const Double_t logisoimassmax   = 600.;
+static Double_t logisoimassbins[nlogisoimassbins+1];
+
 // official pT
 static const Int_t    nsqrtofficialptbins = 40;
 static const Double_t sqrtofficialptmin   = 25.;

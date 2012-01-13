@@ -27,6 +27,7 @@ to get and make the MCP smearing class:L
 	check the latest tag in:
 		https://svnweb.cern.ch/trac/atlasoff/browser/PhysicsAnalysis/MuonID/MuonIDAnalysis/MuonMomentumCorrections/tags
 		https://twiki.cern.ch/twiki/bin/view/AtlasProtected/MCPAnalysisGuidelinesRel16#AnchorResolutions
+		https://twiki.cern.ch/twiki/bin/view/AtlasProtected/MCPAnalysisGuidelinesRel17MC11a
 	checkout the latest tag:
 		svn co svn+ssh://svn.cern.ch/reps/atlasoff/PhysicsAnalysis/MuonID/MuonIDAnalysis/MuonMomentumCorrections/tags/MuonMomentumCorrections-XX-YY-ZZ
 	cd MuonMomentumCorrections-XX-YY-ZZ/cmt

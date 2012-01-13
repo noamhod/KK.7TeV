@@ -1,12 +1,14 @@
 /srv01/tau/hod/z0analysis-tests/z0analysis-r170/run
 local_noskim
-Data11	muid	q_pT	Rel17	MuonMomentumCorrections-00-04-01
+Data11	muid	q_pT	Rel17	MuonMomentumCorrections-00-05-00
+doSmearing=yes
 pu_writeMC=false	pu_removeData=false
-mcqsub
+data
+MShits=3+3
 QCD=no
 tight
-do2muSelection=no
-doIsolation=no
+do2muSelection=yes
+doIsolation=yes
 DBG SILENT
 INF VISUAL
 WRN VISUAL

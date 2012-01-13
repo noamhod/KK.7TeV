@@ -57,9 +57,9 @@ inline double wZKK2ttbar(unsigned int id, unsigned int mode)
 	double m2 = mass*mass;
 	double mf2 = mf(id)*mf(id);
 	double gL = gZL(id);
-	double gL2 = gL*gL;
+	double gL2 = gL*gL; _DEBUG("gL2="+_s(gL2));
 	double gR = gZR(id);
-	double gR2 = gR*gR;
+	double gR2 = gR*gR; _DEBUG("gR2="+_s(gR2));
 	
 	// ZKK->ttbar
 	double w =  2.*
@@ -86,9 +86,9 @@ inline double wZP2ttbar(unsigned int id)
 	double m2 = mass*mass;
 	double mf2 = mf(id)*mf(id);
 	double gL = gZL(id);
-	double gL2 = gL*gL;
+	double gL2 = gL*gL; _DEBUG("gL2="+_s(gL2));
 	double gR = gZR(id);
-	double gR2 = gR*gR;
+	double gR2 = gR*gR; _DEBUG("gR2="+_s(gR2));
 	
 	// Z'->ttbar
 	double w = (1./(24.*pi*sq2))*

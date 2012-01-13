@@ -74,6 +74,10 @@ void analysisSkeleton::setMCPpTparameters(string sDataType, string sAlgo, string
 
 	MCPpTsmearing = new SmearingClass(sDataType,sAlgo,spTtype,sRel,sDataPath);
 	MCPpTsmearing->UseScale(1);
+	
+	// Optional: enable advanced (charge-dependent) muon scale corrections that result in better data/MC agreement 
+	MCPpTsmearing->RestrictCurvatureCorrections(2.5);
+	MCPpTsmearing->FillScales("KC");
 }
 
 void analysisSkeleton::setSmearedMCPpT(int nMus)
@@ -95,25 +99,25 @@ void analysisSkeleton::setSmearedMCPpT(int nMus)
 		
 		_DEBUG("");
 		
+		double chrg  = (double)mu_charge->at(j);
 		double ptcb  = (double)mu_pt->at(j);
 		double ptid  = (double)pT(mu_id_qoverp->at(j),mu_id_theta->at(j));
-		double ptms  = (double)pT(mu_ms_qoverp->at(j),mu_ms_theta->at(j));
-		double ptie  = (double)pT(mu_ie_qoverp->at(j),mu_ie_theta->at(j));
+		// double ptms  = (double)pT(mu_ms_qoverp->at(j),mu_ms_theta->at(j));
+		// double ptie  = (double)pT(mu_ie_qoverp->at(j),mu_ie_theta->at(j));
 		double ptme  = (double)pT(mu_me_qoverp->at(j),mu_me_theta->at(j));
 		double etacb = (double)mu_eta->at(j);
 		
 		_DEBUG("");
 		
-		// MCPpTsmearing->Event(ptms, ptid, ptcb, etacb);
-		// MCPpTsmearing->Event(ptme, ptie, ptcb, etacb);
-		MCPpTsmearing->Event(ptme, ptid, ptcb, etacb);
-		// MCPpTsmearing->Event(ptcb, etacb);
+		// MCPpTsmearing->Event(ptms, ptid, ptcb, etacb, chrg);
+		// MCPpTsmearing->Event(ptme, ptie, ptcb, etacb, chrg);
+		MCPpTsmearing->Event(ptme, ptid, ptcb, etacb, chrg);
 		
 		_DEBUG("");
 		
 		// Set Smeared Pts
 		
-		float orig_ptcb = mu_pt->at(j);
+		// float orig_ptcb = mu_pt->at(j);
 		
 		///////////////////////////////////////////////////////
 		// First, have to modify the original CB pT ///////////
@@ -126,8 +130,8 @@ void analysisSkeleton::setSmearedMCPpT(int nMus)
 		
 		//_INFO("pt = "+_s(orig_ptcb)+" -> "+_s(mu_pt->at(j)));
 		
-		float cfms = MCPpTsmearing->ChargeFlipMS();
-		float cfid = MCPpTsmearing->ChargeFlipID();
+		// float cfms = MCPpTsmearing->ChargeFlipMS();
+		// float cfid = MCPpTsmearing->ChargeFlipID();
 		float cfcb = MCPpTsmearing->ChargeFlipCB();
 		if(cfcb==-1.)
 		{
@@ -235,6 +239,11 @@ void analysisSkeleton::resetMuQAflags(int nMus)
 	
 	if(muLooseQAflags.size()>0) muLooseQAflags.clear();
 	for(int j=0 ; j<nMus ; j++) muLooseQAflags.push_back(true);
+	
+	if(mu_sig_diff_qoverp.size()>0) mu_sig_diff_qoverp.clear();
+	setMuonMomentumSignificance(mu_sig_diff_qoverp,
+								mu_me_qoverp,mu_id_qoverp,
+								mu_me_cov_qoverp_exPV,mu_id_cov_qoverp_exPV);
 }
 
 string analysisSkeleton::getPeriodName()
@@ -1912,17 +1921,8 @@ void analysisSkeleton::pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vec
 	// so the "rbegin()" points the iterator to the entry
 	// with the largest pT and so on.
 	
-	if(pTtoIndex.size()<2)
-	{
-		_ERROR("in pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* Charge), trying to sort a <2 map. Exitting now !");
-		exit(-1);
-	}
-	
-	if(Charge->size()<2)
-	{
-		_ERROR("in pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* Charge), trying to sort a <2 map [Charge->size()<2]. Exitting now !");
-		exit(-1);
-	}
+	if(pTtoIndex.size()<2) _FATAL("in pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* Charge), trying to sort a <2 map.");
+	if(Charge->size()<2)   _FATAL("in pTSort(TMapdi& pTtoIndex, int& index_a, int& index_b, vector<float>* Charge), trying to sort a <2 map [Charge->size()<2].");
 	
 	/////////////////////////////////////////////////////////////////////////////
 	bool isloose = (iTight>=0 && iTight<(int)mu_pt->size()) ? true : false; /////
@@ -2978,7 +2978,7 @@ void analysisSkeleton::fillTruth()
 		bool isZprime   = false;
 		bool isGraviton = false;
 		bool isKK       = false;
-		for(int mom=0 ; mom<(int)mc_parent_index->at(t).size() ; mom++) // has to come out of Z^0 / Z' / W / gamma
+		for(int mom=0 ; mom<(int)mc_parent_index->at(t).size() ; mom++) // has to come out of Z^0 / Z' / W / gamma /...
 		{
 			int imom = mc_parent_index->at(t)[mom];
 			if(mc_pdgId->at(imom)==PDTZ)
@@ -3095,9 +3095,16 @@ void analysisSkeleton::fillTruth()
 	// SORT BY PT AND FIND THE INDICES OF THE FIRST 2 MUONS (HIGHEST PT).
 	ai_truth = -1;
 	bi_truth = -1;
+	TString tsmcname = (TString)sMCsampleName;
 	if(truth_valid_index>=2  &&  pTtoIndexMapTruth.size()>=2) 
 	{
 		pTSort(pTtoIndexMapTruth, ai_truth, bi_truth, truth_all_mc_charge);
+	}
+	else if(truth_valid_index==1 && pTtoIndexMapTruth.size()==1  &&  tsmcname.Contains("AlpgenJimmy"))
+	{
+		TMapdi::iterator it = pTtoIndexMapTruth.begin();
+		ai_truth = it->second;
+		bi_truth = it->second; // fake so there won't be seg faults...
 	}
 	else
 	{
@@ -3199,7 +3206,13 @@ void analysisSkeleton::fillTruth()
 	/////////////////////////////////////////////////////////////////////////////////
 	
 	// CALCULATE ALL THE 'EVENT-LEVEL' VARIABLES (DI-MUON VARIABLES)
-	if( truth_valid_index>=2  &&  ai_truth>=0  &&  bi_truth>=0  &&  ai_truth!=bi_truth )
+	if(truth_valid_index==1 && pTtoIndexMapTruth.size()==1  &&  tsmcname.Contains("AlpgenJimmy"))
+	{
+		truth_all_isValid = true;
+		// _INFO("tsmcname="+(string)tsmcname+" -> 1mu event");
+		return; // do not calculate the dimuon truth variables
+	}
+	else if( truth_valid_index>=2  &&  ai_truth>=0  &&  bi_truth>=0  &&  ai_truth!=bi_truth )
 	{
 		if( truth_all_mc_charge->at(ai_truth)*truth_all_mc_charge->at(bi_truth) >= 0. ) // now require opposite charge
 		{
@@ -4131,6 +4144,29 @@ inline bool analysisSkeleton::doubleSelection(TMapsb& cutsToSkip)
 				}
 				/////////////////////////////////////////////////////
 			}
+		}
+		
+		else if(sorderedcutname=="MShitsPairFormation"  &&  !bSkipCut)
+		{
+			float cutval1  = (*m_cutFlowMapSVD)[sorderedcutname][0];
+			float cutval2  = (*m_cutFlowMapSVD)[sorderedcutname][1];
+			float cutval3  = (*m_cutFlowMapSVD)[sorderedcutname][2];
+			float cutval4  = (*m_cutFlowMapSVD)[sorderedcutname][3];
+			float cutval5  = (*m_cutFlowMapSVD)[sorderedcutname][4];
+			float cutval6  = (*m_cutFlowMapSVD)[sorderedcutname][5];
+			float cutval7  = (*m_cutFlowMapSVD)[sorderedcutname][6];
+			float cutval8  = (*m_cutFlowMapSVD)[sorderedcutname][7];
+			passCurrentCut = nMShitsCut3233(cutval1,cutval2,cutval3,cutval4,cutval5,cutval6,cutval7,cutval8,
+											allow3_3st, allow3_2st, muQAflags, mu_sig_diff_qoverp,
+											mu_eta, mu_phi, mu_charge,
+											mu_nMDTBIHits, mu_nMDTBMHits, mu_nMDTBOHits,
+											mu_nMDTEIHits, mu_nMDTEMHits, mu_nMDTEOHits,
+											mu_nMDTBEEHits, mu_nMDTEEHits, mu_nMDTBIS78Hits,
+											mu_nRPCLayer1PhiHits, mu_nRPCLayer2PhiHits, mu_nRPCLayer3PhiHits,
+											mu_nTGCLayer1PhiHits, mu_nTGCLayer2PhiHits, mu_nTGCLayer3PhiHits, mu_nTGCLayer4PhiHits,
+											mu_nCSCEtaHits, mu_nCSCPhiHits,
+											ai, bi); // this will set up the ai and bi indices
+			_DEBUG("");
 		}
 
 		else if(sorderedcutname=="imass"  &&  !bSkipCut)

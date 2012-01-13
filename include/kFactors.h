@@ -40,7 +40,7 @@ static double QCD(double mass, string type="NNLO/LO**")
 	return kF;
 }
 
-static double ElectroWeak(double mass, string type="NNLO/LO*")
+static double ElectroWeak(double mass)
 {
 	_DEBUG("kFactor::ElectroWeak");
 	double kF = 1.;
@@ -52,22 +52,6 @@ static double ElectroWeak(double mass, string type="NNLO/LO*")
 	if (96.65 < mass && mass <= 250)  kF *= 0.852 + 0.00233*mass - 0.953e-05*mass*mass + 1.31e-08*mass*mass*mass;
 	else if (250 < mass && mass <= 1750)  kF *= 1.060 - 6.09e-05*mass;
 	else if (1750 < mass)  kF *= 0.931 + 0.000114*mass - 5.71e-08*mass*mass;
-	
-	/*
-	if(type=="NNLO/LO*") // NNLO/2007LOmod
-	{
-		if     (110<mass  && mass<=250)  kF *= 0.852 + 0.00233*mass - 0.953e-05*mass*mass + 1.31e-08*mass*mass*mass;
-		else if(250< mass && mass<=1750) kF *= 1.060 - 6.09e-05*mass;
-		else if(1750<mass)               kF *= 0.931 + 0.000114*mass - 5.71e-08*mass*mass;
-	}
-	else if(type=="NNLO/LO") // NNLO/2008LO
-	{
-		if     (110  < mass && mass <= 250)  kF *= 0.852 + 0.00233*mass - 0.953e-05*mass*mass + 1.31e-08*mass*mass*mass;
-		else if(250  < mass && mass <= 1750) kF *= 1.060 - 6.09e-05*mass;
-		else if(1750 < mass)                 kF *= 0.931 + 0.000114*mass - 5.71e-08*mass*mass;
-	}
-	else _FATAL("type="+type+" is unknown.");
-	*/
 	
 	if(isnaninf(kF)) _FATAL("EW k-factor is nan or inf -> "+_s(kF)+" in mass="+_s(mass));
 	if(kF<0.)        _FATAL("EW k-factor is negative -> "+_s(kF)+" in mass="+_s(mass));

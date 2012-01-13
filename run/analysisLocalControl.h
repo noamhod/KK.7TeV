@@ -43,6 +43,8 @@ class analysisLocalControl : public chainMaker/*, public utilities*/
 		string m_pTsmearingType;
 		string m_release;
 		string m_MCPtag;
+		bool m_doSmearing;
+		string m_MShits;
 		bool m_doPUwriteMC;
 		bool m_doPUremoveData;
 		string m_RunType;

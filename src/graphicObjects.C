@@ -1572,6 +1572,18 @@ void graphicObjects::setCutFlowMapSVDPtr(TMapsvd* cutFlowMapSVD)
 
 void graphicObjects::ginitialize()
 {
+	setLogBins(npbins,pmin,pmax,pbins);
+	setLogBins(nlogptbins,logptmin,logptmax,logptbins);
+	setLogBins(nlogqtbins,logqtmin,logqtmax,logqtbins);
+	setLogBins(nlogmassbins,logmassmin,logmassmax,logmassbins);
+	setLogBins(nlogimassbins,logimassmin,logimassmax,logimassbins);
+	setLogBins(nlogfullimassbins,logfullimassmin,logfullimassmax,logfullimassbins);
+	setLogBins(nloglimitimassbins, loglimitimassmin, loglimitimassmax, loglimitimassbins);
+	setLogBins(nlogofficialimassbins,logofficialimassmin,logofficialimassmax,logofficialimassbins);
+	setLogBins(nlogisoimassbins,logisoimassmin,logisoimassmax,logisoimassbins);
+	setSqrtBins(nsqrtofficialptbins, sqrtofficialptmin, sqrtofficialptmax, sqrtofficialptbins);
+	setSqrtBins(nsqrtofficialqtbins, sqrtofficialqtmin, sqrtofficialqtmax, sqrtofficialqtbins);
+
 	// canvas size
 	canv_x = 602;
 	canv_y = 400;

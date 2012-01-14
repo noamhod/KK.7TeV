@@ -51,7 +51,15 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	//int    msgLvl;
 	
 	ifstream ifsel( localRunControlFile.c_str() );
-	ifsel >> sBaseDir >> sRun >> sDataType >> sRec >> spTtype >> sRel >> sMCPtag >> sDoSmearing >> sPUwriteMC >> sPUremoveData >> sMCorData >> sMShits >> sIsQCD >> sIsLoose >> sDo2mu >> sDoIso;
+	ifsel >> sBaseDir >> sRun
+		  >> sDataType >> sRec >> spTtype >> sRel >> sMCPtag >> sDoSmearing
+		  >> sPUwriteMC >> sPUremoveData
+		  >> sMCorData
+		  >> sMShits
+		  >> sIsQCD
+		  >> sIsLoose
+		  >> sDo2mu
+		  >> sDoIso;
 	
 	if(sBaseDir=="") _FATAL("YOU CHOSE EMPTY BASEDIR");
 	
@@ -218,6 +226,20 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	}
 	
 	
+	string str_selector = "";
+	if(
+		(m_isMC && m_input!="mcqsub")/*-> this is "mc" run*/
+		||
+		(runs=="ALLRUNS")/*-> this is a linear data run (no qsub)*/)
+	{
+		if(m_isQCD)                     str_selector += "_QCD";
+		if     (m_MShits=="MShits=3+3") str_selector += "_33st";
+		else if(m_MShits=="MShits=3+2") str_selector += "_32st";
+		if(m_doSmearing && m_isMC)      str_selector += "_smeared";
+		if(!m_do2mu)                    str_selector += "_no2muSel";
+		if(!m_doIso)                    str_selector += "_noIso";
+	}
+	m_selector = str_selector;
 	
 	if(m_isMC  &&  m_input!="mcqsub")
 	{
@@ -230,7 +252,7 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 		_INFO("LOADING FILE -> "+str_list);
 		str_dir  = "";
 		_INFO("LOADING FILE -> "+str_dir);
-		str_hist = basedir+"/../data/mcLocalControl_"+str_mcname+".root";
+		str_hist = basedir+"/../data/mcLocalControl_"+str_mcname+str_selector+".root";
 		_INFO("LOADING FILE -> "+str_hist);
 		str_mcp  = basedir+"/../"+m_MCPtag+"/share/";
 		_INFO("LOADING FILE -> "+str_mcp);
@@ -255,7 +277,7 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 		str_tree = basedir+"/../data/localTree.root";
 		_INFO("LOADING FILE -> "+str_tree);
 		
-		if(runs=="ALLRUNS")   str_hist = basedir+"/../data/analysisLocalControl.root";
+		if(runs=="ALLRUNS")   str_hist = basedir+"/../data/analysisLocalControl"+str_selector+".root";
 		if(runs=="SINGLERUN") str_hist = basedir+"/../data/tmp/run_"+run_number_str+".root";
 		_INFO("LOADING FILE -> "+str_hist);
 		
@@ -286,13 +308,14 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	m_analysis->setBaseDir(basedir); ////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	
-	m_analysis->setLoose(m_isLoose);
+	////////////////////////////////////
+	m_analysis->setLoose(m_isLoose); ///
+	////////////////////////////////////
 	
 	
 	string str_events = "";
-	if(runs=="ALLRUNS")   str_events = basedir+"/../run/interestingEvents.dump";
-	if(runs=="SINGLERUN") str_events = basedir+"/../run/tmp/interestingEvents_"+run_number_str+".dump";
+	if(runs=="ALLRUNS")   str_events = basedir+"/../run/interestingEvents"+str_selector+".dump";
+	if(runs=="SINGLERUN") str_events = basedir+"/../run/tmp/interestingEvents_"+run_number_str+str_selector+".dump";
 	_INFO("LOADING FILE -> "+str_events);
 	m_analysis->setEventDumpFile(str_events, 500.);
 	
@@ -317,9 +340,17 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	m_analysis->setQCD(m_isQCD); //////////
 	///////////////////////////////////////
 	
+	///////////////////////////////////////////
+	m_analysis->set3233stations(m_MShits); ////
+	///////////////////////////////////////////
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	if(m_isMC) m_analysis->setSmearingFlag(m_doSmearing); // will turn on/off the smearing operation ////////////
-	if(m_isMC) m_analysis->setMCPpTparameters(m_dataType, m_muRecAlgo, m_pTsmearingType, m_release, str_mcp); ///
+	if(m_isMC)
+	{
+		if     (m_analysis->allow3_3st) m_analysis->setMCPpTparameters(m_dataType, m_muRecAlgo, m_pTsmearingType, m_release, str_mcp);
+		else if(m_analysis->allow3_2st) m_analysis->set2stSmearing();
+	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	///////////////////////////////////
@@ -328,10 +359,6 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	
 	///////////////////////////////////////////
 	m_analysis->sMCsampleName = str_mcname; ///
-	///////////////////////////////////////////
-	
-	///////////////////////////////////////////
-	m_analysis->set3233stations(m_MShits); ////
 	///////////////////////////////////////////
 	
 	//////////////////////////////////////////
@@ -355,9 +382,9 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	m_analysis->setCutFlowFile(str_logspath, run_number_str);
-	m_analysis->setPtCandidatesFile(str_logspath, run_number_str);
-	m_analysis->setAllCandidatesFiles(str_logspath, run_number_str);
+	m_analysis->setCutFlowFile(str_logspath, run_number_str, str_selector);
+	m_analysis->setPtCandidatesFile(str_logspath, run_number_str, str_selector);
+	m_analysis->setAllCandidatesFiles(str_logspath, run_number_str, str_selector);
 	
 	m_analysis->setStyle((TString)basedir+"/../src");
 	
@@ -367,6 +394,9 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	setFermions(); //////
 	/////////////////////
 
+	m_procname  = (m_analysis->sMCsampleName=="") ? "data" : m_analysis->sMCsampleName;
+	m_proctitle = m_procname + " -> " + m_selector;
+	
 	if(m_treefile!=NULL) m_treefile->cd();
 }
 
@@ -467,7 +497,7 @@ void analysisLocalControl::draw()
 	
 	m_analysis->drawPerformance( vEntries, vResMemory, vVirMemory, m_dirPerformance );
 	
-	m_analysis->printCutFlowNumbers(l64t_nentries, m_analysis->sMCsampleName);
+	m_analysis->printCutFlowNumbers(l64t_nentries, m_proctitle);
 	
 	if(!m_doPUwriteMC  &&  m_doPUremoveData) _INFO("correctedMClumi -> "+_s(m_analysis->correctedMClumi));
 }
@@ -533,7 +563,7 @@ void analysisLocalControl::loop(Long64_t startEvent, Long64_t stopAfterNevents)
 		}
 		
 		if(l64t_jentry%l64t_mod==0) cout << "jentry=" << l64t_jentry << "\t ientry=" << l64t_ientry << "\trun=" << m_WZphysD3PD->RunNumber << "\tlumiblock=" << m_WZphysD3PD->lbn << endl;
-		if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries, m_analysis->sMCsampleName);
+		if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries, m_proctitle);
 		
 		if(l64t_jentry%1000==0)
 		{
@@ -611,7 +641,7 @@ void analysisLocalControl::loop(int RunNumber)
 		if((int)m_WZphysD3PD->RunNumber > RunNumber) break; //////////
 		//////////////////////////////////////////////////////
 		
-		if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries, m_analysis->sMCsampleName);
+		if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries, m_proctitle);
 		
 		if(l64t_jentry%1000==0)
 		{
@@ -755,7 +785,7 @@ void analysisLocalControl::loop(string sPeriodStart, string sPeriodEnd, Long64_t
                 if((int)m_WZphysD3PD->RunNumber > lastRunInRange)  break; //////////
                 ////////////////////////////////////////////////////////////////////
                 
-                if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries, m_analysis->sMCsampleName);
+                if(l64t_jentry%l64t_mod==0) m_analysis->printCutFlowNumbers(l64t_nentries, m_proctitle);
                 
                 if(l64t_jentry%1000==0)
                 {

@@ -17,9 +17,9 @@ analysis::~analysis()
 	fCandidates->close();
 }
 
-void analysis::setAllCandidatesFiles(string sCandFilePath, string srunnumber)
+void analysis::setAllCandidatesFiles(string sCandFilePath, string srunnumber, string selector)
 {
-	string sLogFileName = sCandFilePath+"/candidates_all.run_"+srunnumber+".cnd";//".time_"+getDateHour()+".cnd";
+	string sLogFileName = sCandFilePath+"/candidates_all.run_"+srunnumber+selector+".cnd";//".time_"+getDateHour()+".cnd";
 	fCandidates = new ofstream( sLogFileName.c_str() );
 }
 string analysis::setMCPUFiles(string sPUFilePath, string srunnumber)
@@ -92,10 +92,14 @@ void analysis::execute()
 	
 	_DEBUG("");
 	
-	/////////////////////////////////////////
-	// SMEAR THE MUON PT FOR MC /////////////////////////
-	if(m_isMC && AS_doSMR) setSmearedMCPpT(nMus); ///////
-	/////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////
+	// SMEAR THE MUON PT FOR MC ///////////////////////////
+	if(m_isMC && AS_doSMR)  ///////////////////////////////
+	{                       ///////////////////////////////
+		if     (allow3_3st) setSmearedMCPpT(nMus); ////////
+		else if(allow3_2st) setSmeared2Stations(nMus); ////
+	}                       ///////////////////////////////
+	///////////////////////////////////////////////////////
 	
 	_DEBUG("");
 	

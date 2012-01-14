@@ -35,7 +35,7 @@ class cutFlowHandler : public XML
 		virtual ~cutFlowHandler() {file->close();}
 		bool mask();
 		
-		void setCutFlowFile(string sLogFilePath = "", string srunnumber = "");
+		void setCutFlowFile(string sLogFilePath = "", string srunnumber = "", string selector = "");
 		void printCutFlowNumbers(Long64_t chainEntries, string Name="");
 		void incrementNallEvents();
 

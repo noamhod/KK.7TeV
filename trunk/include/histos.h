@@ -349,17 +349,17 @@ TCanvas* stackratio(TString name,
 	if(pvtxt_lumi!=NULL)  pvtxt_lumi->Draw("SAMES");
 	if(pvtxt_atlas!=NULL) pvtxt_atlas->Draw("SAMES");
 	if(leg!=NULL)         leg->Draw("SAMES");
-	tvp_hists->Update();
+	// tvp_hists->Update();
 	tvp_hists->RedrawAxis();
 
 	tvp_ratio->cd();
 	tvp_ratio->SetGridy();
 	hr->Draw("epx0");
 	line->Draw("SAMES");
-	tvp_ratio->Update();
+	// tvp_ratio->Update();
 	tvp_ratio->RedrawAxis();
 	
-	cnv->Update();
+	// cnv->Update();
 	
 	return cnv;
 }

@@ -56,6 +56,10 @@ class analysisLocalControl : public chainMaker/*, public utilities*/
 		bool   m_doIso;
 		int    m_msglvl;
 		
+		string m_selector;
+		string m_procname;
+		string m_proctitle;
+		
 		// run control
 		Long64_t l64t_nentries;
 		Long64_t l64t_nbytes;

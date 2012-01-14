@@ -69,24 +69,27 @@ void hstack()
 	// TString suffix = "_noPUrw";
 	// TFile* fhistos = new TFile("plots/mcdata_histograms"+suffix+".root","READ");
 	TString fname = "plots/mcdata_histograms_"+ftype+".root";
+	
 	TFile* fhistos = new TFile(fname,"READ");
 	
 	TString titles = (TString)(((TH1D*)fhistos->Get("h"+htype+"DYmumu"+truth))->GetTitle());
 	titles += ";" + (TString)(((TH1D*)fhistos->Get("h"+htype+"DYmumu"+truth))->GetXaxis()->GetTitle());
 	titles += ";" + (TString)(((TH1D*)fhistos->Get("h"+htype+"DYmumu"+truth))->GetYaxis()->GetTitle());
 	THStack* backgounds = new THStack("hs_"+htype+"_"+ftype,titles);
-	
+		
 	TH1D* hMCsum = (TH1D*)fhistos->Get("h"+htype+"DYmumu"+truth)->Clone();
 	hMCsum->Reset();
 	hMCsum->SetName("h"+htype+"MCsum"+truth);
-	
+		
 	bool isIsolation = (htype.Contains("Isolat")) ? true : false;
 	TString QCD = (isIsolation) ? "jjmu15X" : "QCD";
 	TH1D* hQCD   = (TH1D*)fhistos->Get("h"+htype+QCD+truth)->Clone();
+		
 	// if(isIsolation) hQCD->Scale(1./100.);
 	// if(isIsolation) hQCD->Scale(2.);
 	backgounds->Add(hQCD);
 	hMCsum->Add(hQCD);
+		
 	TH1D* hWjets = NULL;
 	if(isIsolation)
 	{
@@ -94,6 +97,7 @@ void hstack()
 		backgounds->Add(hWjets);
 		hMCsum->Add(hWjets);
 	}
+		
 	TH1D* hTTbar   = (TH1D*)fhistos->Get("h"+htype+"TTbar"+truth)->Clone();
 	backgounds->Add(hTTbar);
 	hMCsum->Add(hTTbar);
@@ -103,11 +107,11 @@ void hstack()
 	TH1D* hDY      = (TH1D*)fhistos->Get("h"+htype+"DYmumu"+truth)->Clone();
 	backgounds->Add(hDY);
 	hMCsum->Add(hDY);
-	
+		
 	TH1D* hData     = (TH1D*)fhistos->Get("h"+htype+"Data")->Clone();
 	hData->SetLineWidth(2);
 	hData->SetMarkerStyle(20);
-	
+		
 	TH1D* hKKtemplate = (TH1D*)fhistos->Get("h"+htype+"KK2000_template"+truth);
 	if(hKKtemplate!=NULL)
 	{
@@ -122,9 +126,7 @@ void hstack()
 		hZPtemplate->SetLineWidth(2);
 		hZPtemplate->SetLineColor(kViolet+2); 
 	}
-	
-	
-	
+		
 	TLegend* leg = NULL;
 	if(hKKtemplate!=NULL && hZPtemplate!=NULL) leg = new TLegend(0.58,0.50,0.82,0.85,NULL,"brNDC");
 	else                                       leg = new TLegend(0.65,0.55,0.82,0.85,NULL,"brNDC");
@@ -139,7 +141,7 @@ void hstack()
 	leg->AddEntry(hQCD,QCD,"f");
 	if(hKKtemplate!=NULL) leg->AddEntry(hKKtemplate,"#gamma_{KK}/Z_{KK} 2 TeV Template","l");
 	if(hZPtemplate!=NULL) leg->AddEntry(hZPtemplate,"Z'_{SSM} 2 TeV Template","l");
-
+	
 	Double_t xtxtmin = 0.;
 	Double_t xtxtmax = 0.;
 	if(hKKtemplate!=NULL && hZPtemplate!=NULL)
@@ -152,26 +154,25 @@ void hstack()
 		xtxtmin = 0.42;
 		xtxtmax = 0.5845729;
 	}
-	
+		
 	TText* txt = NULL;
 	TPaveText* pvtxt_atlas = new TPaveText(xtxtmin,0.75,xtxtmax,0.85,"brNDC");
 	pvtxt_atlas->SetFillStyle(4000); //will be transparent
 	pvtxt_atlas->SetFillColor(0);
 	pvtxt_atlas->SetTextFont(42);
 	txt = pvtxt_atlas->AddText("#bf{#splitline{#it{ATLAS}}{#scale[0.42]{work in progress}}}");
-	
+		
 	TPaveText* pvtxt_lumi = new TPaveText(xtxtmin,0.63,xtxtmax,0.738,"brNDC");
 	pvtxt_lumi->SetFillStyle(4000); //will be transparent
 	pvtxt_lumi->SetFillColor(0);
 	TString sLumi = (TString)_s(luminosity,2);
 	txt = pvtxt_lumi->AddText( "#intLdt~"+ sLumi +" fb^{-1}" );
 	
-	
 	TCanvas* c = new TCanvas("c","c", 600, 400);
 	c->SetTicks(1,1);
 	c->cd();
 	c->Draw();
-	
+		
 	TString name = "hstack_"+htype+"_"+ftype;
 
 	c->cd();
@@ -185,6 +186,7 @@ void hstack()
 		backgounds->GetXaxis()->SetMoreLogLabels();
 		backgounds->GetXaxis()->SetNoExponent();
 	}
+		
 	bool isLogy = (htype.Contains("Mass") || htype.Contains("pT") || htype.Contains("QT") || htype.Contains("Isolation")) ? true : false;
 	if(isLogy)
 	{
@@ -192,12 +194,12 @@ void hstack()
 	}
 	if(hKKtemplate!=NULL) hKKtemplate->Draw("SAMES");
 	if(hZPtemplate!=NULL) hZPtemplate->Draw("SAMES");
+		
 	hData->Draw("epx0 SAMES");
 	leg->Draw("SAMES");
 	pvtxt_atlas->Draw("SAMES");
 	pvtxt_lumi->Draw("SAMES");
 	saveas(c,"plots/"+name);
-	
 	name = name + "_ratio";
 	TList* signals = NULL;
 	if(hKKtemplate!=NULL && hZPtemplate!=NULL)
@@ -206,14 +208,14 @@ void hstack()
 		signals->Add(hKKtemplate);
 		signals->Add(hZPtemplate);
 	}
-	
+		
 	Double_t ymin = (isIsolation) ? 20 : -1;
 	Double_t ymax = -1;
 	ymin = (htype=="MassAntiIsolated") ? 2.e-2 : -1;
 	ymax = (htype=="MassAntiIsolated") ? hQCD->GetMaximum()*1.5 : -1;
 	ymin = (htype=="Mass") ? 1.e-3 : -1;
 	ymax = (htype=="Mass") ? hDY->GetMaximum()*1.5 : -1;
-	
+		
 	TCanvas* cR = (TCanvas*)(stackratio(name,hData,backgounds,signals,leg,pvtxt_lumi,pvtxt_atlas,"Data/#SigmaMC","epx0",isLogx,isLogy,ymin,ymax))->Clone("");
 	saveas(cR,"plots/"+name, false);
 }

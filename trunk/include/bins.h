@@ -25,6 +25,10 @@ static void setSqrtBins(Int_t nbins, Double_t min, Double_t max, Double_t* xpoin
 	for(int i=1 ; i<=nbins ; i++) xpoints[i] = pow(sqrtmin+i*sqrtbinwidth,2);
 }
 
+static const Int_t    ng2bins = 40;
+static const Double_t g2min   = 0.;
+static const Double_t g2max   = 10.;
+
 static const Int_t    npbins = 20;
 static const Double_t pmin   = 1.;
 static const Double_t pmax   = 2000.;

@@ -16,6 +16,9 @@
 #include "SmearingClass.h"
 using namespace MuonSmear;
 
+#define SmearingClassTwoStations_cxx
+#include "SmearingClassTwoStations.cxx"
+
 #include "TPileupReweighting.h"
 
 #ifndef ANALYSISSKELETON_H
@@ -38,6 +41,7 @@ public:
 	
 	string base_dir_path;
 	SmearingClass* MCPpTsmearing;
+	SmearingClassTwoStations* TwoStationsSmearing;
 	
 	
 	TRandom* randGen;
@@ -652,11 +656,13 @@ public:
 	void setIsolation(bool doIso)    { doIsolation = doIso; }
 	void setSmearedMCPpT(int nMus);
 	void setMCPpTparameters(string sDataType, string sAlgo, string spTtype, string sRel, string sDataPath);
+	void set2stSmearing();
+	void setSmeared2Stations(int nMus);
 	void setPileupParameters(TString dataRootFileName, TString dataRootHistName, TString mcRootFileName, TString mcRootHistName);
 	void writePileupMCfile();
 	float getPileUpWeight(bool isIntime);
 	
-	void setPtCandidatesFile(string sCandFilePath = "", string srunnumber = "");
+	void setPtCandidatesFile(string sCandFilePath = "", string srunnumber = "", string selector = "");
 	void setBaseDir(string sBaseDirPath = "");
 	void setEventDumpFile(string sEventDumpFilePath, float massThresholdInGeV=500.);
 	void setXmlFile(string sXmlPath);

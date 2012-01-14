@@ -7,9 +7,9 @@
 
 #include "cutFlowHandler.h"
 
-void cutFlowHandler::setCutFlowFile(string sLogFilePath, string srunnumber)
+void cutFlowHandler::setCutFlowFile(string sLogFilePath, string srunnumber, string selector)
 {	
-	string sLogFileName = sLogFilePath+"/RunCutFlow.run_"+srunnumber+".cuts";//".time_"+getDateHour()+".cuts";
+	string sLogFileName = sLogFilePath+"/RunCutFlow.run_"+srunnumber+selector+".cuts";//".time_"+getDateHour()+".cuts";
 	file = new ofstream( sLogFileName.c_str() );
 }
 

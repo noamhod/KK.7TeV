@@ -42,35 +42,12 @@ void analysisSkeleton::setXmlFile(string sXmlPath)
 void analysisSkeleton::setMCPpTparameters(string sDataType, string sAlgo, string spTtype, string sRel, string sDataPath)
 {
 	_DEBUG("analysisSkeleton::setMCPpTparameters");
-	if(sDataType!="Data11" && sDataType!="Data10")
-	{
-		_ERROR("sDataType string is unrecognized, exitting now");
-		exit(-1);
-	}
+	if(sDataType!="Data11" && sDataType!="Data10") _FATAL("sDataType string is unrecognized");
+	if(sDataPath=="")                              _FATAL("sDataPath string is empty");
 	
-	if(sDataPath=="")
-	{
-		_ERROR("sDataPath string is empty, exitting now");
-		exit(-1);
-	}
-	
-	if(spTtype!="pT"  &&  spTtype!="q_pT")
-	{
-		_ERROR("spTtype string is unrecognized, exitting now");
-		exit(-1);
-	}
-	
-	if(sAlgo!="staco"  &&  sAlgo!="muid")
-	{
-		_ERROR("sAlgo string is unrecognized, exitting now");
-		exit(-1);
-	}
-	
-	if(sRel!="Rel17")
-	{
-		_ERROR("sRel string is unrecognized, exitting now");
-		exit(-1);
-	}
+	if(spTtype!="pT"  &&  spTtype!="q_pT") _FATAL("spTtype string is unrecognized");
+	if(sAlgo!="staco"  &&  sAlgo!="muid")  _FATAL("sAlgo string is unrecognized");
+	if(sRel!="Rel17")                      _FATAL("sRel string is unrecognized");
 
 	MCPpTsmearing = new SmearingClass(sDataType,sAlgo,spTtype,sRel,sDataPath);
 	MCPpTsmearing->UseScale(1);
@@ -79,7 +56,7 @@ void analysisSkeleton::setMCPpTparameters(string sDataType, string sAlgo, string
 	MCPpTsmearing->RestrictCurvatureCorrections(2.5);
 	MCPpTsmearing->FillScales("KC");
 }
-
+	
 void analysisSkeleton::setSmearedMCPpT(int nMus)
 {
 	_DEBUG("analysisSkeleton::setSmearedMCPpT");
@@ -150,6 +127,57 @@ void analysisSkeleton::setSmearedMCPpT(int nMus)
 		// MCPpTsmearing->PTVar(pTMS_smeared, pTID_smeared, pTCB_smeared, THESTRING); 
 		// Valid values for "THESTRING": {"MSLOW", "MSUP", "IDLOW", "IDUP"}
 	}
+}
+
+void analysisSkeleton::set2stSmearing()
+{
+	_DEBUG("analysisSkeleton::set2stSmearing");
+	TwoStationsSmearing = new SmearingClassTwoStations;
+}
+
+void analysisSkeleton::setSmeared2Stations(int nMus)
+{
+	_DEBUG("analysisSkeleton::setSmeared2Stations");
+	_INFO("----------- BEGIN");
+	for(int i=0 ; i<nMus ; i++)
+	{
+		// Get the relative uncertainty on ID and MS track pT at IP
+		float eptMS = fabs(mu_me_cov_qoverp_exPV->at(i)/mu_me_qoverp_exPV->at(i));
+		float eptID = fabs(mu_id_cov_qoverp_exPV->at(i)/mu_id_qoverp_exPV->at(i));
+
+		// Get the pT of the combined, ID and MS tracks at IP
+		float ptcb = 1./fabs(mu_qoverp_exPV->at(i))*sin(mu_theta_exPV->at(i));
+		float ptid = 1./fabs(mu_id_qoverp->at(i))*sin(mu_id_theta->at(i));
+		float ptms = 1./fabs(mu_me_qoverp->at(i))*sin(mu_me_theta->at(i));
+
+		_INFO("mu_me_cov_qoverp_exPV->at("+_s(i)+")="+_s(mu_me_cov_qoverp_exPV->at(i)));
+		_INFO("mu_me_qoverp_exPV->at("+_s(i)+")="+_s(mu_me_qoverp_exPV->at(i)));
+		_INFO("mu_id_cov_qoverp_exPV->at("+_s(i)+")="+_s(mu_id_cov_qoverp_exPV->at(i)));
+		_INFO("mu_id_qoverp_exPV->at("+_s(i)+")="+_s(mu_id_qoverp_exPV->at(i)));
+		_INFO("eptMS="+_s(eptMS));
+		_INFO("eptID="+_s(eptID));
+		_INFO("ptcb="+_s(ptcb));
+		_INFO("ptid="+_s(ptid));
+		_INFO("ptms="+_s(ptms));
+		
+		// Initialize the random numbers, compute the smearing, and retrieve the smeared pT:
+		TwoStationsSmearing->SetTheSeed(EventNumber, i, RunNumber);
+		TwoStationsSmearing->Event(ptms, ptid, ptcb, mu_eta->at(i), eptMS*ptms, eptID*ptid);
+		float ptCBsmeared = TwoStationsSmearing->pTCB();  // Returns a signed smeared pT
+		
+		///////////////////////////////////////////////////////////
+		float orig_ptcb = mu_pt->at(i); ////////////////////////
+		mu_pt->at(i) = fabs(ptCBsmeared); /////////////////////////
+		_INFO("pt="+_s(orig_ptcb)+" -> "+_s(mu_pt->at(i))); ///
+		///////////////////////////////////////////////////////////
+		
+		if(ptCBsmeared<0.)
+		{
+			_INFO("CHARGE FLIP !");
+			mu_charge->at(i)*=-1.;
+		}
+	}
+	_INFO("----------- END");
 }
 
 void analysisSkeleton::setPileupParameters(TString dataRootFileName, TString dataRootHistName, TString mcRootFileName, TString mcRootHistName)
@@ -223,11 +251,11 @@ float analysisSkeleton::getPileUpWeight(bool isIntime)
 	return pileupEventWeight;
 }
 
-void analysisSkeleton::setPtCandidatesFile(string sCandFilePath, string srunnumber)
+void analysisSkeleton::setPtCandidatesFile(string sCandFilePath, string srunnumber, string selector)
 {
 	_DEBUG("analysisSkeleton::setPtCandidatesFile");
 	
-	string sLogFileName = sCandFilePath+"/candidates_pT.run_"+srunnumber+".cnd";//".time_"+getDateHour()+".cnd";
+	string sLogFileName = sCandFilePath+"/candidates_pT.run_"+srunnumber+selector+".cnd";//".time_"+getDateHour()+".cnd";
 	fCand = new ofstream( sLogFileName.c_str() );
 }
 

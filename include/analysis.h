@@ -74,7 +74,7 @@ public:
 	}
 	~analysis();
 	
-	void   setAllCandidatesFiles(string sCandFilePath = "", string srunnumber = "");
+	void   setAllCandidatesFiles(string sCandFilePath = "", string srunnumber = "", string selector = "");
 	string setMCPUFiles(string sPUFilePath = "", string srunnumber = "");
 
 	void setEventVariables();

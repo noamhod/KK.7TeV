@@ -26,9 +26,11 @@ BosonPtReweightingTool* ZpTrw = new BosonPtReweightingTool("PythiaMC11",true);
 ///////////////////////////////////////
 bool doData            = true;
 bool doTemplates       = false;
-bool doQCD             = true;
+bool doQCD             = false;    // must be "false" if doIsolationStudy is "true"
+bool doIsolationStudy  = true;     // must be "false" if doQCD is true
+bool doWjets           = true;     // no need to rename the output files
 bool doScale2Zpeak     = true;
-bool doDYtautau        = true;
+bool doDYtautau        = true;     // no need to rename the output files
 bool fastDYmumu        = false;
 bool largeDYmumu       = true;
 bool doFullKKtemplates = false;
@@ -41,7 +43,13 @@ bool doZpT             = true;
 bool doCouplingsScale  = false;
 bool doRemoveHighMass  = true;
 bool doIsolation       = false; // should be true for the histogram of the null-isolation-cut only !!!
-bool doIsolationStudy  = true;
+void matchFlags()
+{
+	///////////////////////////////
+	doQCD = !doIsolationStudy; ////
+	doWjets = largeDYmumu; ////////
+	///////////////////////////////
+}
 TString fileNmaeSuffix()
 {
 	TString name = "";
@@ -478,7 +486,7 @@ void draw(TObject* tobj, TString newname="", TString drawopt="", Bool_t logx=!do
 
 void drawratio(TH1* th1n, TH1* th1d, vector<TString>& vtsMCbgds, TString drawopt_n="", TString drawopt_d="", Bool_t logx=!dolog, Bool_t logy=!dolog)
 {
-	_DEBUG("draw");
+	_DEBUG("drawratio");
 
 	TString hName = (TString)th1n->GetName();
 	hName = hName+"MCratio";
@@ -568,13 +576,19 @@ void drawon(TString existing_oName, TObject* tobj, TString drawopt="", Int_t pad
 	_DEBUG("drawon");
 	_DEBUG("existing_oName = "+(string)existing_oName);
 	
-	if(padNumber<1) cnvMap[existing_oName]->cd();
-	else            cnvMap[existing_oName]->cd(padNumber);
+	_INFO("existing_oName = "+(string)existing_oName);
+	_INFO("tobj->GetName() = "+(string)tobj->GetName());
 	
-	if(drawopt=="") tobj->Draw("SAMES");
-	else            tobj->Draw(drawopt+" SAMES");
+	if(padNumber<1) { _INFO(""); cnvMap[existing_oName]->cd(); }
+	else            { _INFO(""); cnvMap[existing_oName]->cd(padNumber); }
+	
+	if(drawopt=="") { _INFO(""); tobj->Draw("SAMES"); }
+	else            { _INFO(""); tobj->Draw(drawopt+" SAMES"); }
+	_INFO(""); 
 	cnvMap[existing_oName]->RedrawAxis();
+	_INFO("");
 	cnvMap[existing_oName]->Update();
+	_INFO("");
 }
 
 void drawtxton(TString existing_oName, bool is2d=false)
@@ -726,8 +740,11 @@ void samples()
 		grpx.insert( make_pair("DYtautau", new GRPX(proccount(counter),"DY#tau#tau",  kRed-5,-1,     kBlack,1,1,  -1,-1,-1)));
 		grpx_ordered.insert( make_pair(grpx["DYtautau"]->order,"DYtautau") );
 	}
-	grpx.insert( make_pair("W+jets", new GRPX(proccount(counter),"W+jets",     kGreen+1,-1,     kBlack,1,1,  -1,-1,-1)));
-	grpx_ordered.insert( make_pair(grpx["W+jets"]->order,"W+jets") );
+	if(doWjets)
+	{
+		grpx.insert( make_pair("W+jets", new GRPX(proccount(counter),"W+jets",     kGreen+1,-1,     kBlack,1,1,  -1,-1,-1)));
+		grpx_ordered.insert( make_pair(grpx["W+jets"]->order,"W+jets") );
+	}
 	if(doQCD)
 	{
 		grpx.insert( make_pair("QCD", new GRPX(proccount(counter),"QCD",  kYellow-9,-1,     kBlack,1,1,  -1,-1,-1)));
@@ -842,22 +859,19 @@ void setMCtrees(TString tsMCname)
 	}
 	
 	
-	if(tsMCname=="DYtautau")
+	if(tsMCname=="DYtautau"  && doDYtautau)
 	{
-		if(doDYtautau)
-		{
-			setMCtree(ntupledir+"/mcLocalControl_DYtautau_75M120.root", "mcLocalControl_DYtautau_75M120", 20000, 7.9494E-01*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYtautau_120M250.root", "mcLocalControl_DYtautau_120M250", 20000, 8.5494E-03*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYtautau_250M400.root", "mcLocalControl_DYtautau_250M400", 20000, 4.0995E-04*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYtautau_400M600.root", "mcLocalControl_DYtautau_400M600", 20000, 6.6406E-05*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYtautau_600M800.root", "mcLocalControl_DYtautau_600M800", 20000, 1.1002E-05*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYtautau_800M1000.root", "mcLocalControl_DYtautau_800M1000", 20000, 2.6510E-06*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYtautau_1000M1250.root", "mcLocalControl_DYtautau_1000M1250", 20000, 8.9229E-07*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYtautau_1250M1500.root", "mcLocalControl_DYtautau_1250M1500", 20000, 2.3996E-07*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYtautau_1500M1750.root", "mcLocalControl_DYtautau_1500M1750", 20000, 7.3305E-08*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYtautau_1750M2000.root", "mcLocalControl_DYtautau_1750M2000", 20000, 2.4613E-08*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYtautau_M2000.root", "mcLocalControl_DYtautau_M2000", 20000, 1.4001E-08*nb2fb);
-		}
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_75M120.root", "mcLocalControl_DYtautau_75M120", 20000, 7.9494E-01*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_120M250.root", "mcLocalControl_DYtautau_120M250", 20000, 8.5494E-03*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_250M400.root", "mcLocalControl_DYtautau_250M400", 20000, 4.0995E-04*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_400M600.root", "mcLocalControl_DYtautau_400M600", 20000, 6.6406E-05*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_600M800.root", "mcLocalControl_DYtautau_600M800", 20000, 1.1002E-05*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_800M1000.root", "mcLocalControl_DYtautau_800M1000", 20000, 2.6510E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_1000M1250.root", "mcLocalControl_DYtautau_1000M1250", 20000, 8.9229E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_1250M1500.root", "mcLocalControl_DYtautau_1250M1500", 20000, 2.3996E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_1500M1750.root", "mcLocalControl_DYtautau_1500M1750", 20000, 7.3305E-08*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_1750M2000.root", "mcLocalControl_DYtautau_1750M2000", 20000, 2.4613E-08*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_M2000.root", "mcLocalControl_DYtautau_M2000", 20000, 1.4001E-08*nb2fb);
 	}
 	
 	
@@ -881,7 +895,7 @@ void setMCtrees(TString tsMCname)
 		setMCtree(ntupledir+"/mcLocalControl_PythiaB_bbmu15X.root", "mcLocalControl_PythiaB_bbmu15X", 4492093, 7.39E+04*pb2fb); //http://cdsweb.cern.ch/record/1282370/files/ATL-CAL-PROC-2010-001.pdf?version=3
 	}
 	
-	if(tsMCname=="W+jets")
+	if(tsMCname=="W+jets"  && doWjets)
 	{
 		// setMCtree(ntupledir+"/mcLocalControl_Wmunu.root", "mcLocalControl_Wmunu", 6959806, 8.7017E+00*nb2fb);
 		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp0_pt20.root", "mcLocalControl_AlpgenJimmyWmunuNp0_pt20", 3421954, 6.9324E+00*nb2fb);
@@ -1405,13 +1419,13 @@ void hbook()
 				 grpx[name]->filcolor,grpx[name]->filstyle,
 				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
+				 
 		h1Map.insert( make_pair("hMassAntiIsolated"+name, new TH1D("hMassAntiIsolated"+name,";m_{#mu#mu} GeV;Events",nlogisoimassbins,logisoimassbins)) );
 		setlogx(h1Map["hMassAntiIsolated"+name]);
 		graphics(h1Map["hMassAntiIsolated"+name],
 				 grpx[name]->filcolor,grpx[name]->filstyle,
 				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-				 
 		h1Map.insert( make_pair("hIsolationFull"+name, new TH1D("hIsolationFull"+name,";#Sigmap_{T}^{trk}/p_{T}^{#mu};Events",nisofullbins,isofullmin,isofullmax)) );
 		setlogx(h1Map["hIsolationFull"+name]);
 		graphics(h1Map["hIsolationFull"+name],
@@ -1666,6 +1680,7 @@ void hbgdraw(TString type, bool dologx=false, bool dology=false)
 		if(order==0)
 		{
 			vtsMCbgds.clear();
+			_INFO("$$$$$$$$$$$$4 type+name="+(string)(type+name));
 			setMinMax(h1Map[type+name],h1Map[type+"Data"],true);
 			draw(h1Map[type+name], "", "", dologx, dology);
 		}
@@ -1701,8 +1716,9 @@ void hdraw()
 		TString objname = "";
 		TString refname = "";
 		TString tptname = "";
+		
 		if((name.Contains("Zprime")  || name.Contains("ExtraDimsTEV"))  &&  !doIsolationStudy  &&  doTemplates) // both are drawn on top of the DYmumu
-		{			
+		{
 			if(name.Contains("_m2000"))
 			{
 				for(int t=0 ; t<2 ; t++)
@@ -1779,7 +1795,7 @@ void hdraw()
 					drawtemplatetxton(objname);
 				}
 			}
-		}
+		} // end of templates
 	}
 	
 	if(!doIsolationStudy)
@@ -1849,7 +1865,7 @@ void hdraw()
 	}
 }
 
-void weights(TString tsMCname, float mass=0., unsigned int truXid=0, double truXmass=0., double truXpT=0.)
+void weightsNoPU(TString tsMCname, float mass=0., unsigned int truXid=0, double truXmass=0., double truXpT=0.)
 {
 	//// ZpT reweighting
 	ZpTweight = (
@@ -1863,6 +1879,8 @@ void weights(TString tsMCname, float mass=0., unsigned int truXid=0, double truX
 					   tsMCname.Contains("Zprime") ||
 					   tsMCname.Contains("ExtraDimsTEV")) && mass>0.) ? QCD(mass,"NNLO/LO**") : 1.;
 	kFEW_NNLOvLOs = (tsMCname=="DYmumu" && mass>0.) ? ElectroWeak(mass) : 1.;
+	if(isnaninf(kFQCD_NNLOvLOss)) _FATAL("kFQCD_NNLOvLOss is nan or inf -> "+_s(kFQCD_NNLOvLOss)+": in "+_s(mass)+" GeV");
+	if(isnaninf(kFEW_NNLOvLOs))   _FATAL("kFEW_NNLOvLOs is nan or inf -> "+_s(kFEW_NNLOvLOs)+": in "+_s(mass)+" GeV");
 	
 	//// all weights
 	bool isDY       = (tsMCname.Contains("DY")) ? true:false;
@@ -1870,20 +1888,32 @@ void weights(TString tsMCname, float mass=0., unsigned int truXid=0, double truX
 	bool isGSignal  = (tsMCname.Contains("Gmm")) ? true:false;
 	
 	event_weight_backgrounds = all_mcevent_weight;
-	event_weight_backgrounds *= (dopileup)             ? all_pileup_weight : 1.;
 	event_weight_backgrounds *= (doEWkfactor  && isDY) ? kFEW_NNLOvLOs     : 1.;
 	event_weight_backgrounds *= (doQCDkfactor && isDY) ? kFQCD_NNLOvLOss   : 1.;
 	event_weight_backgrounds *= (doZpT)                ? ZpTweight         : 1.;
+	if(isnaninf(event_weight_backgrounds)) _FATAL("event_weight_backgrounds is nan or inf -> "+_s(event_weight_backgrounds));
 	
 	event_weight_signals = all_mcevent_weight;
-	event_weight_signals *= (dopileup)                   ? all_pileup_weight : 1.;
 	event_weight_signals *= (doQCDkfactor && isEWSignal) ? kFQCD_NNLOvLOss   : 1.;
 	event_weight_signals *= (doZpT)                      ? ZpTweight         : 1.;
+	if(isnaninf(event_weight_signals)) _FATAL("event_weight_signals is nan or inf -> "+_s(event_weight_signals));
 
 	event_weight = (isEWSignal || isGSignal) ? event_weight_signals : event_weight_backgrounds;
-	event_weight_nopileup = (!dopileup) ? event_weight : event_weight/all_pileup_weight;
+	if(isnaninf(event_weight)) _FATAL("event_weight is nan or inf -> "+_s(event_weight));
 }
-
+void weights(TString tsMCname, float mass=0., unsigned int truXid=0, double truXmass=0., double truXpT=0.)
+{
+	//////////////////////////////////////////////////////////
+	//// get the weights without the pileup //////////////////
+	weightsNoPU(tsMCname, mass, truXid, truXmass, truXpT); ///
+	//////////////////////////////////////////////////////////
+	
+	event_weight_nopileup = event_weight;
+	if(isnaninf(event_weight_nopileup)) _FATAL("event_weight_nopileup is nan or inf -> "+_s(event_weight_nopileup));
+	
+	event_weight *= (dopileup) ? all_pileup_weight : 1.;
+	if(isnaninf(event_weight)) _FATAL("event_weight is nan or inf -> "+_s(event_weight));
+}
 
 void hfill_isoStudy(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 {
@@ -1907,7 +1937,7 @@ void hfill_isoStudy(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 	
 	if(tsRunType=="MC")
 	{
-		if(truth_all_isValid)
+		if(truth_all_isValid) // this is needed only for the weights
 		{
 			if(tsMCname=="DYmumu" || tsMCname.Contains("Zprime") || tsMCname.Contains("ExtraDimsTEV"))
 			{
@@ -1929,12 +1959,13 @@ void hfill_isoStudy(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				truXid   = truth_all_partons_mc_pdgId->at(4);
 				truXmass = truth_all_partons_mc_m->at(4)*GeV2MeV;
 				truXpT   = truth_all_partons_mc_pt->at(4)*GeV2MeV;
-			}
+			}			
 		}
+		
 		//////////////////////////////////////////////////////
 		weights(tsMCname, mass, truXid, truXmass, truXpT); ///
 		//////////////////////////////////////////////////////
-	
+			
 		if(recon_all_isValid)
 		{
 			_DEBUG("");			
@@ -1981,10 +2012,10 @@ void hfill_isoStudy(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 			
 			h1Map["hIsolationFull"+tsMCname]->Fill(iso30a,wgt*event_weight_nopileup/*event_weight*/);
 			h1Map["hIsolationLow"+tsMCname]->Fill(iso30a,wgt*event_weight_nopileup/*event_weight*/);
-						
+
 			h1Map["hIsolationFull"+tsMCname]->Fill(iso30b,wgt*event_weight_nopileup/*event_weight*/);
 			h1Map["hIsolationLow"+tsMCname]->Fill(iso30b,wgt*event_weight_nopileup/*event_weight*/);
-						
+			
 			/* for(unsigned int mu=0 ; mu<nMus ; mu++)
 			{
 				iso30 = (recon_all_pt->at(mu)!=0.) ? recon_all_ptcone30->at(mu)/recon_all_pt->at(mu) : -999.;
@@ -2069,8 +2100,8 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 	float etaQ = 0.;
 	float cosThetaCS = 0.;
 	float cosThetaHE = 0.;
-	float dr1  = 0.;
-	float dr2  = 0.;
+	// float dr1  = 0.;
+	// float dr2  = 0.;
 	float ca   = 0.;
 	float cb   = 0.;
 	float etaLeading = 0.;
@@ -2243,7 +2274,7 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 							}
 						}
 					}
-				}
+				} // end of templates 
 			}
 			
 			_DEBUG("");
@@ -2679,7 +2710,7 @@ void run()
 	resetfgZKK(); /////////////////////////////////
 	///////////////////////////////////////////////
 	
-	
+	matchFlags();
 	style();
 	samples();
 	hbook();

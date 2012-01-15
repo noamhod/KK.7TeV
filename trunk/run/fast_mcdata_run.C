@@ -25,9 +25,13 @@ BosonPtReweightingTool* ZpTrw = new BosonPtReweightingTool("PythiaMC11",true);
 // selectors //////////////////////////
 ///////////////////////////////////////
 bool doData            = true;
+bool do33st            = true;
+bool do32st            = false;
+bool doSmearing        = true;     // false is simply the old selection (before 3+3 / 3+2) -> should not be used !
 bool doTemplates       = false;
-bool doQCD             = false;    // must be "false" if doIsolationStudy is "true"
-bool doIsolationStudy  = true;     // must be "false" if doQCD is true
+bool doQCD             = true;     // must be "false" if doIsolationStudy is "true"
+bool doIsolationStudy  = false;    // must be "false" if doQCD is true
+bool doIsolation       = false;    // should be true for the histogram of the null-isolation-cut only !!!
 bool doWjets           = true;     // no need to rename the output files
 bool doScale2Zpeak     = true;
 bool doDYtautau        = true;     // no need to rename the output files
@@ -42,12 +46,12 @@ bool doQCDkfactor      = true;
 bool doZpT             = true;
 bool doCouplingsScale  = false;
 bool doRemoveHighMass  = true;
-bool doIsolation       = false; // should be true for the histogram of the null-isolation-cut only !!!
 void matchFlags()
 {
 	///////////////////////////////
 	doQCD = !doIsolationStudy; ////
-	doWjets = largeDYmumu; ////////
+	//doWjets = largeDYmumu; ////////
+	do32st  = !do33st; ////////////
 	///////////////////////////////
 }
 TString fileNmaeSuffix()
@@ -707,8 +711,12 @@ void setDATAtree(TString name="Data")
 	ntupledir = (!doIsolation)     ? ntupledir_regular    : ntupledir_noisolation;
 	ntupledir = (doIsolationStudy) ? ntupledir_no2munoiso : ntupledir;
 
-	if(name=="Data")     fName = ntupledir+"/analysisLocalControl.root";
-	else if(name=="QCD") fName = ntupledir+"/analysisLocalControl_QCD.root";
+	if(name=="Data")     fName = ntupledir+"/analysisLocalControl";
+	else if(name=="QCD") fName = ntupledir+"/analysisLocalControl_QCD";
+	fName += (do33st && !do32st) ? "_33st" : "";
+	fName += (do32st && !do33st) ? "_32st" : "";
+	fName += ".root";
+	
 	tName = "allCuts/allCuts_tree";
 	file = new TFile(fName,"READ");
 	tree = (TTree*)file->Get(tName);
@@ -811,6 +819,13 @@ void setMCtrees(TString tsMCname)
 
 	ntupledir = (!doIsolation)     ? ntupledir_regular    : ntupledir_noisolation;
 	ntupledir = (doIsolationStudy) ? ntupledir_no2munoiso : ntupledir;
+	
+	TString sNMst = "";
+	sNMst += (do33st && !do32st) ? "_33st" : "";
+	sNMst += (do32st && !do33st) ? "_32st" : "";
+	
+	TString sSMR = "";
+	sSMR += (doSmearing) ? "_smeared" : "";
 
 	if(tsMCname=="DYmumu")
 	{
@@ -818,92 +833,92 @@ void setMCtrees(TString tsMCname)
 		{
 			if(fastDYmumu)
 			{
-				setMCtree(ntupledir+"/mcLocalControl_DYmumu_75M120.root", "mcLocalControl_DYmumu_75M120", 20000, 7.9862E-01*nb2fb);
-				setMCtree(ntupledir+"/mcLocalControl_DYmumu_120M250.root", "mcLocalControl_DYmumu_120M250", 20000, 8.5275E-03*nb2fb);
+				setMCtree(ntupledir+"/mcLocalControl_DYmumu_75M120"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_75M120", 20000, 7.9862E-01*nb2fb);
+				setMCtree(ntupledir+"/mcLocalControl_DYmumu_120M250"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_120M250", 20000, 8.5275E-03*nb2fb);
 			}
-			else setMCtree(ntupledir+"/mcLocalControl_Zmumu.root", "mcLocalControl_Zmumu", 4878990, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
+			else setMCtree(ntupledir+"/mcLocalControl_Zmumu"+sNMst+sSMR+".root", "mcLocalControl_Zmumu", 4878990, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
 			
-			setMCtree(ntupledir+"/mcLocalControl_DYmumu_250M400.root", "mcLocalControl_DYmumu_250M400", 20000, 4.1075E-04*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYmumu_400M600.root", "mcLocalControl_DYmumu_400M600", 20000, 6.6459E-05*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYmumu_600M800.root", "mcLocalControl_DYmumu_600M800", 20000, 1.1002E-05*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYmumu_800M1000.root", "mcLocalControl_DYmumu_800M1000", 20000, 2.6516E-06*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYmumu_1000M1250.root", "mcLocalControl_DYmumu_1000M1250", 20000, 8.9229E-07*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYmumu_1250M1500.root", "mcLocalControl_DYmumu_1250M1500", 20000, 2.3957E-07*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYmumu_1500M1750.root", "mcLocalControl_DYmumu_1500M1750", 20000, 7.3439E-08*nb2fb);    // !!!!!!!!!!!
-			setMCtree(ntupledir+"/mcLocalControl_DYmumu_1750M2000.root", "mcLocalControl_DYmumu_1750M2000", 20000, 2.4614E-08*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYmumu_M2000.root", "mcLocalControl_DYmumu_M2000", 20000, 1.4001E-08*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYmumu_250M400"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_250M400", 20000, 4.1075E-04*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYmumu_400M600"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_400M600", 20000, 6.6459E-05*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYmumu_600M800"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_600M800", 20000, 1.1002E-05*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYmumu_800M1000"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_800M1000", 20000, 2.6516E-06*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYmumu_1000M1250"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_1000M1250", 20000, 8.9229E-07*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYmumu_1250M1500"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_1250M1500", 20000, 2.3957E-07*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYmumu_1500M1750"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_1500M1750", 20000, 7.3439E-08*nb2fb);    // !!!!!!!!!!!
+			setMCtree(ntupledir+"/mcLocalControl_DYmumu_1750M2000"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_1750M2000", 20000, 2.4614E-08*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYmumu_M2000"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_M2000", 20000, 1.4001E-08*nb2fb);
 		}
 		else
 		{
 			if(fastDYmumu)
 			{
-				setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_75M120.root",  "mcLocalControl_Pythia6_DYmumu_75M120",  100000, 7.9836E-01*nb2fb);
-				setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_120M250.root", "mcLocalControl_Pythia6_DYmumu_120M250", 100000, 8.5304E-03*nb2fb);
+				setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_75M120"+sNMst+sSMR+".root",  "mcLocalControl_Pythia6_DYmumu_75M120",  100000, 7.9836E-01*nb2fb);
+				setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_120M250"+sNMst+sSMR+".root", "mcLocalControl_Pythia6_DYmumu_120M250", 100000, 8.5304E-03*nb2fb);
 			}
-			else setMCtree(ntupledir+"/mcLocalControl_Zmumu.root", "mcLocalControl_Zmumu", 4878990, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
+			else setMCtree(ntupledir+"/mcLocalControl_Zmumu"+sNMst+sSMR+".root", "mcLocalControl_Zmumu", 4878990, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
 			
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_250M400.root",   "mcLocalControl_Pythia6_DYmumu_250M400",   100000, 4.1004E-04*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_400M600.root",   "mcLocalControl_Pythia6_DYmumu_400M600",   100000, 6.6393E-05*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_600M800.root",   "mcLocalControl_Pythia6_DYmumu_600M800",   100000, 1.0955E-05*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_800M1000.root",  "mcLocalControl_Pythia6_DYmumu_800M1000",  100000, 2.6470E-06*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_1000M1250.root", "mcLocalControl_Pythia6_DYmumu_1000M1250", 100000, 8.9015E-07*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_1250M1500.root", "mcLocalControl_Pythia6_DYmumu_1250M1500", 100000, 2.3922E-07*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_1500M1750.root", "mcLocalControl_Pythia6_DYmumu_1500M1750", 100000, 7.3439E-08*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_1750M2000.root", "mcLocalControl_Pythia6_DYmumu_1750M2000", 100000, 2.4643E-08*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2000M2250.root", "mcLocalControl_Pythia6_DYmumu_2000M2250", 100000, 8.7619E-09*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2250M2500.root", "mcLocalControl_Pythia6_DYmumu_2250M2500", 100000, 3.2232E-09*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2500M2750.root", "mcLocalControl_Pythia6_DYmumu_2500M2750", 100000, 1.2073E-09*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2750M3000.root", "mcLocalControl_Pythia6_DYmumu_2750M3000", 100000, 4.4763E-10*nb2fb);
-			if(!doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_M3000.root", "mcLocalControl_Pythia6_DYmumu_M3000", 100000, 2.5586E-10*nb2fb); // this is taken out because the EW k-factors are valid only below 3 TeV
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_250M400"+sNMst+sSMR+".root",   "mcLocalControl_Pythia6_DYmumu_250M400",   100000, 4.1004E-04*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_400M600"+sNMst+sSMR+".root",   "mcLocalControl_Pythia6_DYmumu_400M600",   100000, 6.6393E-05*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_600M800"+sNMst+sSMR+".root",   "mcLocalControl_Pythia6_DYmumu_600M800",   100000, 1.0955E-05*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_800M1000"+sNMst+sSMR+".root",  "mcLocalControl_Pythia6_DYmumu_800M1000",  100000, 2.6470E-06*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_1000M1250"+sNMst+sSMR+".root", "mcLocalControl_Pythia6_DYmumu_1000M1250", 100000, 8.9015E-07*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_1250M1500"+sNMst+sSMR+".root", "mcLocalControl_Pythia6_DYmumu_1250M1500", 100000, 2.3922E-07*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_1500M1750"+sNMst+sSMR+".root", "mcLocalControl_Pythia6_DYmumu_1500M1750", 100000, 7.3439E-08*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_1750M2000"+sNMst+sSMR+".root", "mcLocalControl_Pythia6_DYmumu_1750M2000", 100000, 2.4643E-08*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2000M2250"+sNMst+sSMR+".root", "mcLocalControl_Pythia6_DYmumu_2000M2250", 100000, 8.7619E-09*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2250M2500"+sNMst+sSMR+".root", "mcLocalControl_Pythia6_DYmumu_2250M2500", 100000, 3.2232E-09*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2500M2750"+sNMst+sSMR+".root", "mcLocalControl_Pythia6_DYmumu_2500M2750", 100000, 1.2073E-09*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2750M3000"+sNMst+sSMR+".root", "mcLocalControl_Pythia6_DYmumu_2750M3000", 100000, 4.4763E-10*nb2fb);
+			if(!doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_M3000"+sNMst+sSMR+".root", "mcLocalControl_Pythia6_DYmumu_M3000", 100000, 2.5586E-10*nb2fb); // this is taken out because the EW k-factors are valid only below 3 TeV
 		}
 	}
 	
 	
 	if(tsMCname=="DYtautau"  && doDYtautau)
 	{
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_75M120.root", "mcLocalControl_DYtautau_75M120", 20000, 7.9494E-01*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_120M250.root", "mcLocalControl_DYtautau_120M250", 20000, 8.5494E-03*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_250M400.root", "mcLocalControl_DYtautau_250M400", 20000, 4.0995E-04*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_400M600.root", "mcLocalControl_DYtautau_400M600", 20000, 6.6406E-05*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_600M800.root", "mcLocalControl_DYtautau_600M800", 20000, 1.1002E-05*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_800M1000.root", "mcLocalControl_DYtautau_800M1000", 20000, 2.6510E-06*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_1000M1250.root", "mcLocalControl_DYtautau_1000M1250", 20000, 8.9229E-07*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_1250M1500.root", "mcLocalControl_DYtautau_1250M1500", 20000, 2.3996E-07*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_1500M1750.root", "mcLocalControl_DYtautau_1500M1750", 20000, 7.3305E-08*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_1750M2000.root", "mcLocalControl_DYtautau_1750M2000", 20000, 2.4613E-08*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_M2000.root", "mcLocalControl_DYtautau_M2000", 20000, 1.4001E-08*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_75M120"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_75M120", 20000, 7.9494E-01*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_120M250"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_120M250", 20000, 8.5494E-03*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_250M400"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_250M400", 20000, 4.0995E-04*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_400M600"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_400M600", 20000, 6.6406E-05*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_600M800"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_600M800", 20000, 1.1002E-05*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_800M1000"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_800M1000", 20000, 2.6510E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_1000M1250"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_1000M1250", 20000, 8.9229E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_1250M1500"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_1250M1500", 20000, 2.3996E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_1500M1750"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_1500M1750", 20000, 7.3305E-08*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_1750M2000"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_1750M2000", 20000, 2.4613E-08*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_M2000"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_M2000", 20000, 1.4001E-08*nb2fb);
 	}
 	
 	
 	if(tsMCname=="TTbar")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_T1_McAtNlo_Jimmy.root", "mcLocalControl_T1_McAtNlo_Jimmy", 999500, 89.4*pb2fb); // AMI: 1.4562E-01*nb2fb*5.4259E-01
+		setMCtree(ntupledir+"/mcLocalControl_T1_McAtNlo_Jimmy"+sNMst+sSMR+".root", "mcLocalControl_T1_McAtNlo_Jimmy", 999500, 89.4*pb2fb); // AMI: 1.4562E-01*nb2fb*5.4259E-01
 	}
 	
 	
 	if(tsMCname=="Diboson")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_WW_Herwig.root", "mcLocalControl_WW_Herwig", 2442266, 17487.); // AMI: 3.1106E-02*nb2fb*3.8947E-01
-		setMCtree(ntupledir+"/mcLocalControl_WZ_Herwig.root", "mcLocalControl_WZ_Herwig", 239949,  5743.);  // AMI: 1.1485E-02*nb2fb*3.1043E-01
-		setMCtree(ntupledir+"/mcLocalControl_ZZ_Herwig.root", "mcLocalControl_ZZ_Herwig", 244999,  1271.);  // AMI: 4.5721E-03*nb2fb*2.1319E-01
+		setMCtree(ntupledir+"/mcLocalControl_WW_Herwig"+sNMst+sSMR+".root", "mcLocalControl_WW_Herwig", 2442266, 17487.); // AMI: 3.1106E-02*nb2fb*3.8947E-01
+		setMCtree(ntupledir+"/mcLocalControl_WZ_Herwig"+sNMst+sSMR+".root", "mcLocalControl_WZ_Herwig", 239949,  5743.);  // AMI: 1.1485E-02*nb2fb*3.1043E-01
+		setMCtree(ntupledir+"/mcLocalControl_ZZ_Herwig"+sNMst+sSMR+".root", "mcLocalControl_ZZ_Herwig", 244999,  1271.);  // AMI: 4.5721E-03*nb2fb*2.1319E-01
 	}
 
 	
 	if(tsMCname=="jjmu15X"  &&  doIsolationStudy)
 	{
-		setMCtree(ntupledir+"/mcLocalControl_PythiaB_ccmu15X.root", "mcLocalControl_PythiaB_ccmu15X", 1499697, 2.84E+04*pb2fb); //http://cdsweb.cern.ch/record/1282370/files/ATL-CAL-PROC-2010-001.pdf?version=3
-		setMCtree(ntupledir+"/mcLocalControl_PythiaB_bbmu15X.root", "mcLocalControl_PythiaB_bbmu15X", 4492093, 7.39E+04*pb2fb); //http://cdsweb.cern.ch/record/1282370/files/ATL-CAL-PROC-2010-001.pdf?version=3
+		setMCtree(ntupledir+"/mcLocalControl_PythiaB_ccmu15X"+sNMst+sSMR+".root", "mcLocalControl_PythiaB_ccmu15X", 1499697, 2.84E+04*pb2fb); //http://cdsweb.cern.ch/record/1282370/files/ATL-CAL-PROC-2010-001.pdf?version=3
+		setMCtree(ntupledir+"/mcLocalControl_PythiaB_bbmu15X"+sNMst+sSMR+".root", "mcLocalControl_PythiaB_bbmu15X", 4492093, 7.39E+04*pb2fb); //http://cdsweb.cern.ch/record/1282370/files/ATL-CAL-PROC-2010-001.pdf?version=3
 	}
 	
 	if(tsMCname=="W+jets"  && doWjets)
 	{
-		// setMCtree(ntupledir+"/mcLocalControl_Wmunu.root", "mcLocalControl_Wmunu", 6959806, 8.7017E+00*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp0_pt20.root", "mcLocalControl_AlpgenJimmyWmunuNp0_pt20", 3421954, 6.9324E+00*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp1_pt20.root", "mcLocalControl_AlpgenJimmyWmunuNp1_pt20", 2479594, 1.3059E+00*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp2_pt20.root", "mcLocalControl_AlpgenJimmyWmunuNp2_pt20", 3718149, 3.7807E-01*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp3_pt20.root", "mcLocalControl_AlpgenJimmyWmunuNp3_pt20", 988857,  1.0185E-01*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp4_pt20.root", "mcLocalControl_AlpgenJimmyWmunuNp4_pt20", 254950,  2.5720E-02*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp5_pt20.root", "mcLocalControl_AlpgenJimmyWmunuNp5_pt20", 70000,   6.9999E-03*nb2fb);
+		// setMCtree(ntupledir+"/mcLocalControl_Wmunu"+sNMst+sSMR+".root", "mcLocalControl_Wmunu", 6959806, 8.7017E+00*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp0_pt20"+sNMst+sSMR+".root", "mcLocalControl_AlpgenJimmyWmunuNp0_pt20", 3421954, 6.9324E+00*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp1_pt20"+sNMst+sSMR+".root", "mcLocalControl_AlpgenJimmyWmunuNp1_pt20", 2479594, 1.3059E+00*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp2_pt20"+sNMst+sSMR+".root", "mcLocalControl_AlpgenJimmyWmunuNp2_pt20", 3718149, 3.7807E-01*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp3_pt20"+sNMst+sSMR+".root", "mcLocalControl_AlpgenJimmyWmunuNp3_pt20", 988857,  1.0185E-01*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp4_pt20"+sNMst+sSMR+".root", "mcLocalControl_AlpgenJimmyWmunuNp4_pt20", 254950,  2.5720E-02*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp5_pt20"+sNMst+sSMR+".root", "mcLocalControl_AlpgenJimmyWmunuNp5_pt20", 70000,   6.9999E-03*nb2fb);
 	}
 	
 	
@@ -912,66 +927,66 @@ void setMCtrees(TString tsMCname)
 	/* 
 	if(tsMCname=="Gmm_01_1750")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Gmm_01_1750.root", "mcLocalControl_Gmm_01_1750", 10000, 1.6320E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Gmm_01_1750"+sNMst+sSMR+".root", "mcLocalControl_Gmm_01_1750", 10000, 1.6320E-06*nb2fb);
 	}
 	if(tsMCname=="Gmm_01_2000")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Gmm_01_2000.root", "mcLocalControl_Gmm_01_2000", 10000, 5.8721E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Gmm_01_2000"+sNMst+sSMR+".root", "mcLocalControl_Gmm_01_2000", 10000, 5.8721E-07*nb2fb);
 	}
 	if(tsMCname=="Gmm_01_2250")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Gmm_01_2250.root", "mcLocalControl_Gmm_01_2250", 10000, 2.1381E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Gmm_01_2250"+sNMst+sSMR+".root", "mcLocalControl_Gmm_01_2250", 10000, 2.1381E-07*nb2fb);
 	}
 	*/
 	
 
 	if(tsMCname=="Zprime_SSM500")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM500.root", "mcLocalControl_Zprime_SSM500", 20000, 2.6071E-03*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM500"+sNMst+sSMR+".root", "mcLocalControl_Zprime_SSM500", 20000, 2.6071E-03*nb2fb);
 	}
 	if(tsMCname=="Zprime_SSM750")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM750.root", "mcLocalControl_Zprime_SSM750", 20000, 4.7349E-04*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM750"+sNMst+sSMR+".root", "mcLocalControl_Zprime_SSM750", 20000, 4.7349E-04*nb2fb);
 	}
 	if(tsMCname=="Zprime_SSM1000")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1000.root", "mcLocalControl_Zprime_SSM1000", 20000, 1.2466E-04*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1000"+sNMst+sSMR+".root", "mcLocalControl_Zprime_SSM1000", 20000, 1.2466E-04*nb2fb);
 	}
 	if(tsMCname=="Zprime_SSM1500")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1500.root", "mcLocalControl_Zprime_SSM1500", 20000, 1.4380E-05*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1500"+sNMst+sSMR+".root", "mcLocalControl_Zprime_SSM1500", 20000, 1.4380E-05*nb2fb);
 	}
 	if(tsMCname=="Zprime_SSM1750")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1750.root", "mcLocalControl_Zprime_SSM1750", 20000, 5.6743E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1750"+sNMst+sSMR+".root", "mcLocalControl_Zprime_SSM1750", 20000, 5.6743E-06*nb2fb);
 	}
 	if(tsMCname=="Zprime_SSM2000")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM2000.root", "mcLocalControl_Zprime_SSM2000", 20000, 2.4357E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM2000"+sNMst+sSMR+".root", "mcLocalControl_Zprime_SSM2000", 20000, 2.4357E-06*nb2fb);
 	}
 	
 	if(tsMCname=="Zprime_SSM_m2000")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_120M450.root",   "mcLocalControl_Pythia8_ZprimeSSM_m2000_120M450",   40000, 0.00926176*nb2fb);// 7.9574E-03*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_450M850.root",   "mcLocalControl_Pythia8_ZprimeSSM_m2000_450M850",   10000, 4.61608E-05*nb2fb);// 3.8040E-05 *nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_850M1300.root",  "mcLocalControl_Pythia8_ZprimeSSM_m2000_850M1300",  10000, 2.20599E-06*nb2fb);// 1.7327E-06*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_1300M1800.root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_1300M1800", 10000, 2.07705E-07*nb2fb);// 1.5144E-07*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_1800M2300.root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_1800M2300", 10000, 1.46265E-06*nb2fb);// 1.0133E-06*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_2300M2800.root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_2300M2800", 10000, 1.94916E-08*nb2fb);// 1.1455E-08*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_2800M3300.root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_2800M3300", 10000, 1.4684E-09*nb2fb);// 7.0524E-10*nb2fb);
-		if(!doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_M3300.root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_M3300", 10000, 1.69363E-10*nb2fb);// 6.6724E-11*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_120M450"+sNMst+sSMR+".root",   "mcLocalControl_Pythia8_ZprimeSSM_m2000_120M450",   40000, 0.00926176*nb2fb);// 7.9574E-03*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_450M850"+sNMst+sSMR+".root",   "mcLocalControl_Pythia8_ZprimeSSM_m2000_450M850",   10000, 4.61608E-05*nb2fb);// 3.8040E-05 *nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_850M1300"+sNMst+sSMR+".root",  "mcLocalControl_Pythia8_ZprimeSSM_m2000_850M1300",  10000, 2.20599E-06*nb2fb);// 1.7327E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_1300M1800"+sNMst+sSMR+".root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_1300M1800", 10000, 2.07705E-07*nb2fb);// 1.5144E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_1800M2300"+sNMst+sSMR+".root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_1800M2300", 10000, 1.46265E-06*nb2fb);// 1.0133E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_2300M2800"+sNMst+sSMR+".root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_2300M2800", 10000, 1.94916E-08*nb2fb);// 1.1455E-08*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_2800M3300"+sNMst+sSMR+".root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_2800M3300", 10000, 1.4684E-09*nb2fb);// 7.0524E-10*nb2fb);
+		if(!doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_M3300"+sNMst+sSMR+".root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_M3300", 10000, 1.69363E-10*nb2fb);// 6.6724E-11*nb2fb);
 	}
 
 	if(tsMCname=="ExtraDimsTEV_m2000")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_120M450.root",   "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_120M450",   40000, 0.00898959*nb2fb);// 7.7227E-03*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_450M850.root",   "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_450M850",   10000, 2.66544E-05*nb2fb);// 2.1906E-05*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_850M1300.root",  "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_850M1300",  10000, 2.56013E-07*nb2fb);// 2.0058E-07*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_1300M1800.root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_1300M1800", 10000, 1.89361E-06*nb2fb);// 1.3579E-06*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_1800M2300.root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_1800M2300", 10000, 1.47063E-05*nb2fb);// 9.4190E-06*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_2300M2800.root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_2300M2800", 10000, 8.47227E-08*nb2fb);// 4.7462E-08*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_2800M3300.root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_2800M3300", 10000, 6.53577E-10*nb2fb);// 2.9864E-10*nb2fb);
-		if(!doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_M3300.root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_M3300", 10000, 9.45194E-09*nb2fb);// 3.2102E-09*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_120M450"+sNMst+sSMR+".root",   "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_120M450",   40000, 0.00898959*nb2fb);// 7.7227E-03*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_450M850"+sNMst+sSMR+".root",   "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_450M850",   10000, 2.66544E-05*nb2fb);// 2.1906E-05*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_850M1300"+sNMst+sSMR+".root",  "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_850M1300",  10000, 2.56013E-07*nb2fb);// 2.0058E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_1300M1800"+sNMst+sSMR+".root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_1300M1800", 10000, 1.89361E-06*nb2fb);// 1.3579E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_1800M2300"+sNMst+sSMR+".root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_1800M2300", 10000, 1.47063E-05*nb2fb);// 9.4190E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_2300M2800"+sNMst+sSMR+".root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_2300M2800", 10000, 8.47227E-08*nb2fb);// 4.7462E-08*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_2800M3300"+sNMst+sSMR+".root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_2800M3300", 10000, 6.53577E-10*nb2fb);// 2.9864E-10*nb2fb);
+		if(!doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_M3300"+sNMst+sSMR+".root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_M3300", 10000, 9.45194E-09*nb2fb);// 3.2102E-09*nb2fb);
 	}
 }
 
@@ -2147,7 +2162,7 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 	{
 		if(truth_all_isValid)
 		{
-			if(!tsMCname.Contains("AlpgenJimmy")) // there may be only one tru muon in alpgenjimmy
+			if(!tsMCname.Contains("AlpgenJimmy")) // there may be only one tru muon in AlpgenJimmy !!!
 			{
 				imuontru  = (truth_all_mc_pdgId->at(0)>0) ? 0 : 1;
 				iamuontru = (imuontru==0) ? 1 : 0;
@@ -2163,6 +2178,8 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				pTLeading     = truth_all_mc_pt->at(imuontru);
 			}
 			_DEBUG("");
+			
+			if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 			
 			if(tsMCname=="DYmumu") // the templates
 			{
@@ -2202,6 +2219,7 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				truXpT   = truth_all_partons_mc_pt->at(4)*GeV2MeV;
 			}
 			
+			if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 			_DEBUG("");
 			
 			//////////////////////////////////////////////////////
@@ -2209,6 +2227,7 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 			weights(tsMCname, mass, truXid, truXmass, truXpT); ///
 			//////////////////////////////////////////////////////
 			
+			if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 			_DEBUG("");
 			
 			
@@ -2277,11 +2296,17 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				} // end of templates 
 			}
 			
+			if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 			_DEBUG("");
+			
 			if(recon_all_isValid)
 			{
+				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
+				
 				imuonrec  = (recon_all_charge->at(0)<0.) ? 0 : 1;
 				iamuonrec = (imuonrec==0) ? 1 : 0;
+				
+				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 				
 				/*
 				tlvtmp->SetPtEtaPhiM(recon_all_pt->at(imuonrec), recon_all_eta->at(imuonrec), recon_all_phi->at(imuonrec), muonMass);
@@ -2300,8 +2325,12 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				tlvmurecbBoosted = fkinematics::Boost(tlvmureca,tlvmurecb,tlvmurecb);
 				(*tv3murecaBoosted) = tlvmurecaBoosted->Vect();
 				(*tv3murecbBoosted) = tlvmurecbBoosted->Vect();
+				
+				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 			}
 
+			
+			if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 			_DEBUG("");
 			////////////////////////////
 			/// analysis statrs here ///
@@ -2309,15 +2338,22 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 			
 			if(recon_all_isValid  &&  imuonrec>=0. && iamuonrec>=0.  &&  imuonrec!=iamuonrec)
 			{
+				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
+			
 				ca = recon_all_charge->at(imuonrec);
 				cb = recon_all_charge->at(iamuonrec);
 				if(ca*cb>=0.) _WARNING("ca*cb>=0, skipping event");
+				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
+				
 				mass          = fkinematics::imass(tlvmureca,tlvmurecb);
 				yQ            = fkinematics::ySystem(tlvmureca,tlvmurecb);
 				QT            = fkinematics::QT(tlvmureca,tlvmurecb);
 				etaQ          = fkinematics::etaSystem(tlvmureca,tlvmurecb);
 				cosThetaCS    = fkinematics::cosThetaCollinsSoper(tlvmureca,ca,tlvmurecb,cb);
 				cosThetaHE    = fkinematics::cosThetaBoost(tlvmureca,ca,tlvmurecb,cb);
+				
+				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
+				
 				etaLeading    = recon_all_eta->at(0);
 				etaSubleading = recon_all_eta->at(1);
 				phiLeading    = recon_all_phi->at(0);
@@ -2325,20 +2361,31 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				pTLeading     = recon_all_pt->at(0);
 				pTSubleading  = recon_all_pt->at(1);
 				dEta          = fabs(etaLeading-etaSubleading);
+				
+				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
+				
 				iso30Leading    = (recon_all_pt->at(0)!=0.) ? recon_all_ptcone30->at(0)/recon_all_pt->at(0) : -999.;
 				iso30Subleading = (recon_all_pt->at(1)!=0.) ? recon_all_ptcone30->at(1)/recon_all_pt->at(1) : -999.;
 				
+				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 				
 				// for the Z peak normalization
 				if(grpx[tsMCname]->order <= 20) // sum only backgrounds
 				{
+					if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
+				
 					if(mass>=imasslogicbins[0]  &&  mass<=imasslogicbins[1]) nMCall70to110          += 1.*wgt*event_weight;
 					if(mass>=imasslogicbins[0]  &&  mass<=imasslogicbins[1]) nMCall70to110_nopileup += 1.*wgt*event_weight_nopileup;
+					
+					if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 				}
 				/////////////////////////////////
 				/// MC histo fill statrs here ///
 				/////////////////////////////////
+				
+				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 				_DEBUG("");
+				
 				if(tsMCname=="DYmumu"  &&  doTemplates) // templates
 				{
 					// simple templates (at the official Z' points)
@@ -2391,6 +2438,8 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 					}
 				}
 				
+				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
+				
 				h1Map["hNvxp_no_puwgt"+tsMCname]->Fill(recon_all_vxp_n,wgt*event_weight_nopileup);
 				h1Map["hNvxp_with_puwgt"+tsMCname]->Fill(recon_all_vxp_n,wgt*event_weight);
 				h1Map["hMassNumbers"+tsMCname]->Fill(mass,wgt*event_weight);
@@ -2410,15 +2459,22 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				h1Map["hpTSubleading"+tsMCname]->Fill(pTSubleading,wgt*event_weight);
 				h1Map["hMass_limit_"+tsMCname]->Fill(mass*GeV2TeV,wgt*event_weight); // for the 1d limit
 				
+				
+				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 				_DEBUG("");
 				
 				///// 2d
 				h2Map["hMassCosThetaCS"+tsMCname]->Fill(mass,cosThetaCS,wgt*event_weight);
 				h2Map["hMassyQ"+tsMCname]->Fill(mass,yQ,wgt*event_weight);
 				
+				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 				_DEBUG("");
 			}
+			
+			if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 		}
+		
+		if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 	}
 	else if(tsRunType=="Data" || tsRunType=="QCD")
 	{

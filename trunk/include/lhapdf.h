@@ -49,7 +49,7 @@ inline void initset(string name, int subset, bool doprint=false)
 	ispdfinit = true;
 	if(doprint)
 	{
-		const double Q = 10.0;
+		//const double Q = 10.0;
 		cout << "alphas(mZ^0) = " << LHAPDF::alphasPDF(mZ0) << endl;
 		cout << "qcdlam4      = " << LHAPDF::getLam4(subset) << endl;
 		cout << "qcdlam5      = " << LHAPDF::getLam5(subset) << endl;

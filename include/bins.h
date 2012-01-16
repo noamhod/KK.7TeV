@@ -76,7 +76,7 @@ static Double_t logisoimassbins[nlogisoimassbins+1];
 // official pT
 static const Int_t    nsqrtofficialptbins = 40;
 static const Double_t sqrtofficialptmin   = 25.;
-static const Double_t sqrtofficialptmax   = 1500.;
+static const Double_t sqrtofficialptmax   = 1000.;
 static Double_t sqrtofficialptbins[nsqrtofficialptbins+1];
 // official qT
 static const Int_t    nsqrtofficialqtbins = 40;
@@ -175,10 +175,10 @@ static const double minystar   = -3.; // for the chi binning
 static const double maxystar   = +3.; // for the chi binning
 static const int    nystarbins = 30;   // for the chi binning
 
-const int      imasslogicnbins = 11;
+const int      imasslogicnbins = 10;
 const Double_t imasslogicbins[imasslogicnbins+1] =
 {
-	70.,110.,130.,150.,170.,200.,240.,300.,400.,600.,900.,3000.
+	70.,110.,130.,150.,170.,200.,240.,300.,400.,800.,3000.
 };
 
 const int      etalogicnbins = 22;

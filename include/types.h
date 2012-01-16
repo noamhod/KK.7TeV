@@ -32,6 +32,7 @@ typedef map<string, TGraph*>    TMapSP2TGraph;
 typedef map<int, TString>       TMapiTS;
 typedef map<TString, int>       TMapTSi;
 typedef map<TString, TString>   TMapTSTS;
+typedef map<TString, TFile*>    TMapTSP2TF;
 typedef map<TString, TH1*>      TMapTSP2TH1;
 typedef map<TString, TH2*>      TMapTSP2TH2;
 typedef map<TString, THStack*>  TMapTSP2THS;

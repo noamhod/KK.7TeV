@@ -485,8 +485,8 @@ class QSUB
 		end
 		seconds = interval*iteration
 		logd.info "!!!---merging (after #{iteration} iterations [#{seconds} seconds])---!!!"
-		#merge_root(inlist,"#{mergedfilename}.root")
-		#merge_candidates(inlist,"#{mergedfilename}.candidates")
+		merge_root(inlist,"#{mergedfilename}.root")
+		merge_candidates(inlist,"#{mergedfilename}.candidates")
 		merge_cutflow(inlist,"#{mergedfilename}.cutflow")
 	end
 	

@@ -1,6 +1,8 @@
 #ifndef HISTOS_H
 #define HISTOS_H
 
+#include "rawROOT.h"
+
 double Sum(TH1* h, bool addUunderFlow=false, bool addOverFlow=false)
 {
 	double I=0.;
@@ -320,7 +322,8 @@ TCanvas* stackratio(TString name,
 	TString sTitle = ";"+sXtitle+";"+ratioLabel;
 	hr->SetTitle(sTitle);
 	hr->Divide(th1n_tmp,th1d_tmp,1.,1.,"B");
-
+	hr->SetMarkerStyle(20);
+	hr->SetMarkerSize(0.8);
 	hr->GetXaxis()->SetLabelSize(0.075);
 	hr->GetYaxis()->SetLabelSize(0.075);
 	hr->GetXaxis()->SetTitleSize(0.075);
@@ -360,6 +363,142 @@ TCanvas* stackratio(TString name,
 	tvp_ratio->RedrawAxis();
 	
 	// cnv->Update();
+	
+	return cnv;
+}
+
+TGraphAsymmErrors* poisson(TH1D* h)
+{
+	double value = 0;
+	double error_poisson_up   = 0;
+	double error_poisson_down = 0;
+	double y1 = 0;
+	double y2 = 0;
+	double d1 = 0;
+	double d2 = 0;
+	TGraphAsymmErrors *ga = new TGraphAsymmErrors();
+	for(int i=1; i<=h->GetNbinsX(); i++)
+	{
+		value = h->GetBinContent(i);
+		if(value!=0)
+		{ 
+			y1 = value + 1.0;
+			d1 = 1.0 - 1.0/(9.0*y1) + 1.0/(3*TMath::Sqrt(y1));
+			error_poisson_up = y1*d1*d1*d1 - value;
+			y2 = value;
+			d2 = 1.0 - 1.0/(9.0*y2) - 1.0/(3.0*TMath::Sqrt(y2));
+			error_poisson_down = value - y2*d2*d2*d2;
+			ga->SetPoint(i-1, h->GetBinCenter(i), value);
+			ga->SetPointError(i-1, 0, 0, error_poisson_down, error_poisson_up);
+		}
+	}
+	ga->SetMarkerStyle(h->GetMarkerStyle());
+	ga->SetLineWidth(h->GetLineWidth());
+	
+	return ga;
+}
+
+
+TCanvas* stackratio(TString name,
+					TH1D* hNumerator, THStack* hsDenominator, TList* hlSignals,
+					TLegend* leg=NULL, TPaveText* pvtxt_atlas=NULL,
+					TString ratioLabel="Ratio",
+					Bool_t logx=false, Bool_t logy=false,
+					Double_t ymin=-1, Double_t ymax=-1)
+{	
+	TCanvas* cnv = new TCanvas(name,name,600,550);
+	TH1D* htmp;
+	
+	cnv->Divide(1,2);
+	TVirtualPad* tvp_hists = cnv->cd(1);
+	TVirtualPad* tvp_ratio = cnv->cd(2);
+	
+	if(logx) tvp_ratio->SetLogx();
+	if(logx) tvp_hists->SetLogx();
+	if(logy) tvp_hists->SetLogy();
+	
+	tvp_hists->SetPad(0.00, 0.35, 1.00, 1.00);
+	tvp_ratio->SetPad(0.00, 0.00, 1.00, 0.35);
+
+	tvp_hists->SetBottomMargin(0.012);
+	tvp_ratio->SetBottomMargin(0.20);
+	tvp_ratio->SetTopMargin(0.012);
+	
+	tvp_hists->SetTicks(1,1);
+	tvp_ratio->SetTicks(1,1);
+	
+	// poisson graph of the data
+	TGraphAsymmErrors* gaNumerator = (TGraphAsymmErrors*)(poisson(hNumerator))->Clone("");
+	
+	// sum the original stacked histos
+	TH1D* hDenominator = (TH1D*)hNumerator->Clone("tmp");
+	hDenominator->Reset();
+	TIter next_bg((TList*)hsDenominator->GetHists());
+	while(( htmp=(TH1D*)next_bg() )!= NULL)
+	{
+		cout << "Adding " << ((TH1D*)htmp)->GetName() << endl;
+		if(ymin!=-1) htmp->SetMinimum(ymin);
+		if(ymax!=-1) htmp->SetMaximum(ymax);
+		hDenominator->Add(htmp);
+	}
+	
+	TString cloneName_n = hNumerator->GetName();
+	TString cloneName_d = hDenominator->GetName();
+	TH1D* th1n_tmp = (TH1D*)hNumerator->Clone(cloneName_n+"_th1n_tmp");
+	TH1D* th1d_tmp = (TH1D*)hDenominator->Clone(cloneName_d+"_th1d_tmp");
+	th1n_tmp->Sumw2();
+	th1d_tmp->Sumw2();
+
+	TH1D* hr = (TH1D*)hNumerator->Clone(); // Clone(name)
+	TString sXtitle = (TString)hNumerator->GetXaxis()->GetTitle();
+	// TString sTitle = "#frac{Data}{#sum MC#times wgt};"+sXtitle+";Ratio";
+	TString sTitle = ";"+sXtitle+";"+ratioLabel;
+	hr->SetTitle(sTitle);
+	hr->Divide(th1n_tmp,th1d_tmp,1.,1.,"B");
+	hr->SetMarkerStyle(20);
+	hr->SetMarkerSize(0.8);
+	hr->GetXaxis()->SetLabelSize(0.075);
+	hr->GetYaxis()->SetLabelSize(0.075);
+	hr->GetXaxis()->SetTitleSize(0.075);
+	hr->GetYaxis()->SetTitleSize(0.075);
+	hr->SetTitleSize(0.075);
+	hr->SetTitleSize(0.075);
+	hr->GetYaxis()->SetTitleOffset(0.5);
+	hr->SetMinimum(0.);
+	hr->SetMaximum(+2.);
+	
+	if(logx) setlogx(hr);
+	
+	TLine* line = new TLine(hr->GetXaxis()->GetXmin(),1.,hr->GetXaxis()->GetXmax(),1.);
+
+	tvp_hists->cd();
+	if(ymin!=-1) hsDenominator->SetMinimum(ymin);
+	if(ymax!=-1) hsDenominator->SetMaximum(ymax);
+	hsDenominator->Draw(); // Draw("nostack");
+	if(hlSignals->GetSize()!=0)
+	{
+		TIter next_sig(hlSignals);
+		while(( htmp=(TH1D*)next_sig() )!=NULL)
+		{
+			cout << "Drawing " << ((TH1D*)htmp)->GetName() << endl;
+			htmp->Draw("SAMES");
+		}
+	}
+	// hNumerator->Draw(drawopt_n+"SAMES");
+	gaNumerator->Draw("psame");
+	if(pvtxt_atlas!=NULL) pvtxt_atlas->Draw("SAMES");
+	if(leg!=NULL)         leg->Draw("SAMES");
+	tvp_hists->Update();
+	tvp_hists->RedrawAxis();
+
+	tvp_ratio->cd();
+	tvp_ratio->SetGridy();
+	hr->Draw("epx0");
+	line->Draw("SAMES");
+	tvp_ratio->Update();
+	tvp_ratio->RedrawAxis();
+	
+	cnv->Update();
 	
 	return cnv;
 }

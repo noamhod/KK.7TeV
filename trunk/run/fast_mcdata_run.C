@@ -28,7 +28,7 @@ bool doData            = true;
 bool do33st            = true;
 bool do32st            = false;
 bool doSmearing        = true;     // false is simply the old selection (before 3+3 / 3+2) -> should not be used !
-bool doTemplates       = false;
+bool doTemplates       = true;     // must be true if doFullKKtemplates is true or if doFullZPtemplates is true
 bool doQCD             = true;     // must be "false" if doIsolationStudy is "true"
 bool doIsolationStudy  = false;    // must be "false" if doQCD is true
 bool doIsolation       = false;    // should be true for the histogram of the null-isolation-cut only !!!
@@ -37,8 +37,8 @@ bool doScale2Zpeak     = true;
 bool doDYtautau        = true;     // no need to rename the output files
 bool fastDYmumu        = false;
 bool largeDYmumu       = true;
-bool doFullKKtemplates = false;    // will not change anything if doTemplates is "false"
-bool doFullZPtemplates = true;     // will not change anything if doTemplates is "false"
+bool doFullKKtemplates = true;     // will not change anything if doTemplates is "false"
+bool doFullZPtemplates = false;    // will not change anything if doTemplates is "false"
 bool dopileup          = true;
 bool doEWkfactor       = true;
 bool doEWkfactorSig    = false;
@@ -74,6 +74,8 @@ TString fileNmaeSuffix()
 	if(!doRemoveHighMass) name += "_noHighMass";
 	if(doIsolation)       name += "_noIso";
 	if(doIsolationStudy)  name += "_isoStudy";
+	if(doFullZPtemplates) name += "_templateZP";
+	if(doFullKKtemplates) name += "_templateKK";
 	return name;
 }
 ///////////////////////////////////////
@@ -82,7 +84,7 @@ TString fileNmaeSuffix()
 TString ntupledir = "";
 TString ntupledir_regular     = "/data/hod/2011/NTUPLE";
 TString ntupledir_noisolation = "/data/hod/2011/NTUPLE/noisolation";
-TString ntupledir_no2munoiso  = "/data/hod/2011/NTUPLE/no2munoiso";
+// TString ntupledir_no2munoiso  = "/data/hod/2011/NTUPLE/no2munoiso";
 
 Int_t printmod    = 5000;
 Bool_t dolog      = true;
@@ -711,12 +713,14 @@ void setDATAtree(TString name="Data")
 	_DEBUG("setDATAtree");
 	
 	ntupledir = (!doIsolation)     ? ntupledir_regular    : ntupledir_noisolation;
-	ntupledir = (doIsolationStudy) ? ntupledir_no2munoiso : ntupledir;
+	// ntupledir = (doIsolationStudy) ? ntupledir_no2munoiso : ntupledir;
+	ntupledir = (doIsolationStudy) ? ntupledir_noisolation : ntupledir;
 
 	if(name=="Data")     fName = ntupledir+"/analysisLocalControl";
 	else if(name=="QCD") fName = ntupledir+"/analysisLocalControl_QCD";
-	fName += (do33st && !do32st) ? "_33st" : "";
-	fName += (do32st && !do33st) ? "_32st" : "";
+	fName += (do33st && !do32st) ? "_33st"  : "";
+	fName += (do32st && !do33st) ? "_32st"  : "";
+	fName += (doIsolationStudy)  ? "_noIso" : "";
 	fName += ".root";
 	
 	tName = "allCuts/allCuts_tree";
@@ -818,7 +822,8 @@ void setMCtrees(TString tsMCname)
 	////////////////
 
 	ntupledir = (!doIsolation)     ? ntupledir_regular    : ntupledir_noisolation;
-	ntupledir = (doIsolationStudy) ? ntupledir_no2munoiso : ntupledir;
+	// ntupledir = (doIsolationStudy) ? ntupledir_no2munoiso : ntupledir;
+	ntupledir = (doIsolationStudy) ? ntupledir_noisolation : ntupledir;
 	
 	TString sNMst = "";
 	sNMst += (do33st && !do32st) ? "_33st" : "";
@@ -827,94 +832,101 @@ void setMCtrees(TString tsMCname)
 	TString sSMR = "";
 	sSMR += (doSmearing) ? "_smeared" : "";
 	
+	TString sISO = "";
+	sISO += (doIsolationStudy) ? "_noIso" : "";
+	
+	////////////////////////////////////////////
+	TString filesuffix = sNMst+sSMR+sISO; //////
+	////////////////////////////////////////////
+	
 	if(tsMCname=="DYmumu")
 	{
 		if(!largeDYmumu)
 		{
 			if(fastDYmumu)
 			{
-				setMCtree(ntupledir+"/mcLocalControl_DYmumu_75M120"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_75M120", 20000, 7.9862E-01*nb2fb);
-				setMCtree(ntupledir+"/mcLocalControl_DYmumu_120M250"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_120M250", 20000, 8.5275E-03*nb2fb);
+				setMCtree(ntupledir+"/mcLocalControl_DYmumu_75M120"+filesuffix+".root", "mcLocalControl_DYmumu_75M120", 20000, 7.9862E-01*nb2fb);
+				setMCtree(ntupledir+"/mcLocalControl_DYmumu_120M250"+filesuffix+".root", "mcLocalControl_DYmumu_120M250", 20000, 8.5275E-03*nb2fb);
 			}
-			else setMCtree(ntupledir+"/mcLocalControl_Zmumu"+sNMst+sSMR+".root", "mcLocalControl_Zmumu", 4878990, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
+			else setMCtree(ntupledir+"/mcLocalControl_Zmumu"+filesuffix+".root", "mcLocalControl_Zmumu", 4878990, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
 			
-			setMCtree(ntupledir+"/mcLocalControl_DYmumu_250M400"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_250M400", 20000, 4.1075E-04*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYmumu_400M600"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_400M600", 20000, 6.6459E-05*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYmumu_600M800"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_600M800", 20000, 1.1002E-05*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYmumu_800M1000"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_800M1000", 20000, 2.6516E-06*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYmumu_1000M1250"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_1000M1250", 20000, 8.9229E-07*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYmumu_1250M1500"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_1250M1500", 20000, 2.3957E-07*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYmumu_1500M1750"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_1500M1750", 20000, 7.3439E-08*nb2fb);    // !!!!!!!!!!!
-			setMCtree(ntupledir+"/mcLocalControl_DYmumu_1750M2000"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_1750M2000", 20000, 2.4614E-08*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_DYmumu_M2000"+sNMst+sSMR+".root", "mcLocalControl_DYmumu_M2000", 20000, 1.4001E-08*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYmumu_250M400"+filesuffix+".root", "mcLocalControl_DYmumu_250M400", 20000, 4.1075E-04*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYmumu_400M600"+filesuffix+".root", "mcLocalControl_DYmumu_400M600", 20000, 6.6459E-05*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYmumu_600M800"+filesuffix+".root", "mcLocalControl_DYmumu_600M800", 20000, 1.1002E-05*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYmumu_800M1000"+filesuffix+".root", "mcLocalControl_DYmumu_800M1000", 20000, 2.6516E-06*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYmumu_1000M1250"+filesuffix+".root", "mcLocalControl_DYmumu_1000M1250", 20000, 8.9229E-07*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYmumu_1250M1500"+filesuffix+".root", "mcLocalControl_DYmumu_1250M1500", 20000, 2.3957E-07*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYmumu_1500M1750"+filesuffix+".root", "mcLocalControl_DYmumu_1500M1750", 20000, 7.3439E-08*nb2fb);    // !!!!!!!!!!!
+			setMCtree(ntupledir+"/mcLocalControl_DYmumu_1750M2000"+filesuffix+".root", "mcLocalControl_DYmumu_1750M2000", 20000, 2.4614E-08*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_DYmumu_M2000"+filesuffix+".root", "mcLocalControl_DYmumu_M2000", 20000, 1.4001E-08*nb2fb);
 		}
 		else
 		{
 			if(fastDYmumu)
 			{
-				setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_75M120"+sNMst+sSMR+".root",  "mcLocalControl_Pythia6_DYmumu_75M120",  100000, 7.9836E-01*nb2fb);
-				setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_120M250"+sNMst+sSMR+".root", "mcLocalControl_Pythia6_DYmumu_120M250", 100000, 8.5304E-03*nb2fb);
+				setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_75M120"+filesuffix+".root",  "mcLocalControl_Pythia6_DYmumu_75M120",  100000, 7.9836E-01*nb2fb);
+				setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_120M250"+filesuffix+".root", "mcLocalControl_Pythia6_DYmumu_120M250", 100000, 8.5304E-03*nb2fb);
 			}
-			else setMCtree(ntupledir+"/mcLocalControl_Zmumu"+sNMst+sSMR+".root", "mcLocalControl_Zmumu", 4878990, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
+			else setMCtree(ntupledir+"/mcLocalControl_Zmumu"+filesuffix+".root", "mcLocalControl_Zmumu", 4878990, 8.3470E-01*nb2fb); // need to do a cut to keep events only up to 250 GeV
 			
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_250M400"+sNMst+sSMR+".root",   "mcLocalControl_Pythia6_DYmumu_250M400",   100000, 4.1004E-04*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_400M600"+sNMst+sSMR+".root",   "mcLocalControl_Pythia6_DYmumu_400M600",   100000, 6.6393E-05*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_600M800"+sNMst+sSMR+".root",   "mcLocalControl_Pythia6_DYmumu_600M800",   100000, 1.0955E-05*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_800M1000"+sNMst+sSMR+".root",  "mcLocalControl_Pythia6_DYmumu_800M1000",  100000, 2.6470E-06*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_1000M1250"+sNMst+sSMR+".root", "mcLocalControl_Pythia6_DYmumu_1000M1250", 100000, 8.9015E-07*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_1250M1500"+sNMst+sSMR+".root", "mcLocalControl_Pythia6_DYmumu_1250M1500", 100000, 2.3922E-07*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_1500M1750"+sNMst+sSMR+".root", "mcLocalControl_Pythia6_DYmumu_1500M1750", 100000, 7.3439E-08*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_1750M2000"+sNMst+sSMR+".root", "mcLocalControl_Pythia6_DYmumu_1750M2000", 100000, 2.4643E-08*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2000M2250"+sNMst+sSMR+".root", "mcLocalControl_Pythia6_DYmumu_2000M2250", 100000, 8.7619E-09*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2250M2500"+sNMst+sSMR+".root", "mcLocalControl_Pythia6_DYmumu_2250M2500", 100000, 3.2232E-09*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2500M2750"+sNMst+sSMR+".root", "mcLocalControl_Pythia6_DYmumu_2500M2750", 100000, 1.2073E-09*nb2fb);
-			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2750M3000"+sNMst+sSMR+".root", "mcLocalControl_Pythia6_DYmumu_2750M3000", 100000, 4.4763E-10*nb2fb);
-			if(!doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_M3000"+sNMst+sSMR+".root", "mcLocalControl_Pythia6_DYmumu_M3000", 100000, 2.5586E-10*nb2fb); // this is taken out because the EW k-factors are valid only below 3 TeV
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_250M400"+filesuffix+".root",   "mcLocalControl_Pythia6_DYmumu_250M400",   100000, 4.1004E-04*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_400M600"+filesuffix+".root",   "mcLocalControl_Pythia6_DYmumu_400M600",   100000, 6.6393E-05*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_600M800"+filesuffix+".root",   "mcLocalControl_Pythia6_DYmumu_600M800",   100000, 1.0955E-05*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_800M1000"+filesuffix+".root",  "mcLocalControl_Pythia6_DYmumu_800M1000",  100000, 2.6470E-06*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_1000M1250"+filesuffix+".root", "mcLocalControl_Pythia6_DYmumu_1000M1250", 100000, 8.9015E-07*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_1250M1500"+filesuffix+".root", "mcLocalControl_Pythia6_DYmumu_1250M1500", 100000, 2.3922E-07*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_1500M1750"+filesuffix+".root", "mcLocalControl_Pythia6_DYmumu_1500M1750", 100000, 7.3439E-08*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_1750M2000"+filesuffix+".root", "mcLocalControl_Pythia6_DYmumu_1750M2000", 100000, 2.4643E-08*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2000M2250"+filesuffix+".root", "mcLocalControl_Pythia6_DYmumu_2000M2250", 100000, 8.7619E-09*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2250M2500"+filesuffix+".root", "mcLocalControl_Pythia6_DYmumu_2250M2500", 100000, 3.2232E-09*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2500M2750"+filesuffix+".root", "mcLocalControl_Pythia6_DYmumu_2500M2750", 100000, 1.2073E-09*nb2fb);
+			setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2750M3000"+filesuffix+".root", "mcLocalControl_Pythia6_DYmumu_2750M3000", 100000, 4.4763E-10*nb2fb);
+			if(!doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_M3000"+filesuffix+".root", "mcLocalControl_Pythia6_DYmumu_M3000", 100000, 2.5586E-10*nb2fb); // this is taken out because the EW k-factors are valid only below 3 TeV
 		}
 	}
 	
 	if(tsMCname=="DYtautau"  && doDYtautau)
 	{
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_75M120"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_75M120", 20000, 7.9494E-01*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_120M250"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_120M250", 20000, 8.5494E-03*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_250M400"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_250M400", 20000, 4.0995E-04*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_400M600"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_400M600", 20000, 6.6406E-05*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_600M800"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_600M800", 20000, 1.1002E-05*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_800M1000"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_800M1000", 20000, 2.6510E-06*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_1000M1250"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_1000M1250", 20000, 8.9229E-07*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_1250M1500"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_1250M1500", 20000, 2.3996E-07*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_1500M1750"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_1500M1750", 20000, 7.3305E-08*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_1750M2000"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_1750M2000", 20000, 2.4613E-08*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_DYtautau_M2000"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_M2000", 20000, 1.4001E-08*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_75M120"+filesuffix+".root", "mcLocalControl_DYtautau_75M120", 20000, 7.9494E-01*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_120M250"+filesuffix+".root", "mcLocalControl_DYtautau_120M250", 20000, 8.5494E-03*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_250M400"+filesuffix+".root", "mcLocalControl_DYtautau_250M400", 20000, 4.0995E-04*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_400M600"+filesuffix+".root", "mcLocalControl_DYtautau_400M600", 20000, 6.6406E-05*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_600M800"+filesuffix+".root", "mcLocalControl_DYtautau_600M800", 20000, 1.1002E-05*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_800M1000"+filesuffix+".root", "mcLocalControl_DYtautau_800M1000", 20000, 2.6510E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_1000M1250"+filesuffix+".root", "mcLocalControl_DYtautau_1000M1250", 20000, 8.9229E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_1250M1500"+filesuffix+".root", "mcLocalControl_DYtautau_1250M1500", 20000, 2.3996E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_1500M1750"+filesuffix+".root", "mcLocalControl_DYtautau_1500M1750", 20000, 7.3305E-08*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_1750M2000"+filesuffix+".root", "mcLocalControl_DYtautau_1750M2000", 20000, 2.4613E-08*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_DYtautau_M2000"+filesuffix+".root", "mcLocalControl_DYtautau_M2000", 20000, 1.4001E-08*nb2fb);
 	}
 	
 	if(tsMCname=="TTbar")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_T1_McAtNlo_Jimmy"+sNMst+sSMR+".root", "mcLocalControl_T1_McAtNlo_Jimmy", 999500, 89.4*pb2fb); // AMI: 1.4562E-01*nb2fb*5.4259E-01
+		setMCtree(ntupledir+"/mcLocalControl_T1_McAtNlo_Jimmy"+filesuffix+".root", "mcLocalControl_T1_McAtNlo_Jimmy", 999500, 89.4*pb2fb); // AMI: 1.4562E-01*nb2fb*5.4259E-01
 	}
 		
 	if(tsMCname=="Diboson")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_WW_Herwig"+sNMst+sSMR+".root", "mcLocalControl_WW_Herwig", 2442266, 17487.); // AMI: 3.1106E-02*nb2fb*3.8947E-01
-		setMCtree(ntupledir+"/mcLocalControl_WZ_Herwig"+sNMst+sSMR+".root", "mcLocalControl_WZ_Herwig", 239949,  5743.);  // AMI: 1.1485E-02*nb2fb*3.1043E-01
-		setMCtree(ntupledir+"/mcLocalControl_ZZ_Herwig"+sNMst+sSMR+".root", "mcLocalControl_ZZ_Herwig", 244999,  1271.);  // AMI: 4.5721E-03*nb2fb*2.1319E-01
+		setMCtree(ntupledir+"/mcLocalControl_WW_Herwig"+filesuffix+".root", "mcLocalControl_WW_Herwig", 2442266, 17487.); // AMI: 3.1106E-02*nb2fb*3.8947E-01
+		setMCtree(ntupledir+"/mcLocalControl_WZ_Herwig"+filesuffix+".root", "mcLocalControl_WZ_Herwig", 239949,  5743.);  // AMI: 1.1485E-02*nb2fb*3.1043E-01
+		setMCtree(ntupledir+"/mcLocalControl_ZZ_Herwig"+filesuffix+".root", "mcLocalControl_ZZ_Herwig", 244999,  1271.);  // AMI: 4.5721E-03*nb2fb*2.1319E-01
 	}
 
 	if(tsMCname=="jjmu15X"  &&  doIsolationStudy)
 	{
-		setMCtree(ntupledir+"/mcLocalControl_PythiaB_ccmu15X"+sNMst+sSMR+".root", "mcLocalControl_PythiaB_ccmu15X", 1499697, 2.84E+04*pb2fb); //http://cdsweb.cern.ch/record/1282370/files/ATL-CAL-PROC-2010-001.pdf?version=3
-		setMCtree(ntupledir+"/mcLocalControl_PythiaB_bbmu15X"+sNMst+sSMR+".root", "mcLocalControl_PythiaB_bbmu15X", 4492093, 7.39E+04*pb2fb); //http://cdsweb.cern.ch/record/1282370/files/ATL-CAL-PROC-2010-001.pdf?version=3
+		setMCtree(ntupledir+"/mcLocalControl_PythiaB_ccmu15X"+filesuffix+".root", "mcLocalControl_PythiaB_ccmu15X", 1499697, 2.84E+04*pb2fb); //http://cdsweb.cern.ch/record/1282370/files/ATL-CAL-PROC-2010-001.pdf?version=3
+		setMCtree(ntupledir+"/mcLocalControl_PythiaB_bbmu15X"+filesuffix+".root", "mcLocalControl_PythiaB_bbmu15X", 4492093, 7.39E+04*pb2fb); //http://cdsweb.cern.ch/record/1282370/files/ATL-CAL-PROC-2010-001.pdf?version=3
 	}
 	
 	if(tsMCname=="W+jets"  && doWjets)
 	{
-		// setMCtree(ntupledir+"/mcLocalControl_Wmunu"+sNMst+sSMR+".root", "mcLocalControl_Wmunu", 6959806, 8.7017E+00*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp0_pt20"+sNMst+sSMR+".root", "mcLocalControl_AlpgenJimmyWmunuNp0_pt20", 3421954, 6.9324E+00*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp1_pt20"+sNMst+sSMR+".root", "mcLocalControl_AlpgenJimmyWmunuNp1_pt20", 2479594, 1.3059E+00*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp2_pt20"+sNMst+sSMR+".root", "mcLocalControl_AlpgenJimmyWmunuNp2_pt20", 3718149, 3.7807E-01*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp3_pt20"+sNMst+sSMR+".root", "mcLocalControl_AlpgenJimmyWmunuNp3_pt20", 988857,  1.0185E-01*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp4_pt20"+sNMst+sSMR+".root", "mcLocalControl_AlpgenJimmyWmunuNp4_pt20", 254950,  2.5720E-02*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp5_pt20"+sNMst+sSMR+".root", "mcLocalControl_AlpgenJimmyWmunuNp5_pt20", 70000,   6.9999E-03*nb2fb);
+		// setMCtree(ntupledir+"/mcLocalControl_Wmunu"+filesuffix+".root", "mcLocalControl_Wmunu", 6959806, 8.7017E+00*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp0_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp0_pt20", 3421954, 6.9324E+00*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp1_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp1_pt20", 2479594, 1.3059E+00*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp2_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp2_pt20", 3718149, 3.7807E-01*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp3_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp3_pt20", 988857,  1.0185E-01*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp4_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp4_pt20", 254950,  2.5720E-02*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp5_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp5_pt20", 70000,   6.9999E-03*nb2fb);
 	}
 	
 	
@@ -923,66 +935,66 @@ void setMCtrees(TString tsMCname)
 	/* 
 	if(tsMCname=="Gmm_01_1750")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Gmm_01_1750"+sNMst+sSMR+".root", "mcLocalControl_Gmm_01_1750", 10000, 1.6320E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Gmm_01_1750"+filesuffix+".root", "mcLocalControl_Gmm_01_1750", 10000, 1.6320E-06*nb2fb);
 	}
 	if(tsMCname=="Gmm_01_2000")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Gmm_01_2000"+sNMst+sSMR+".root", "mcLocalControl_Gmm_01_2000", 10000, 5.8721E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Gmm_01_2000"+filesuffix+".root", "mcLocalControl_Gmm_01_2000", 10000, 5.8721E-07*nb2fb);
 	}
 	if(tsMCname=="Gmm_01_2250")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Gmm_01_2250"+sNMst+sSMR+".root", "mcLocalControl_Gmm_01_2250", 10000, 2.1381E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Gmm_01_2250"+filesuffix+".root", "mcLocalControl_Gmm_01_2250", 10000, 2.1381E-07*nb2fb);
 	}
 	*/
 	
 
 	if(tsMCname=="Zprime_SSM500")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM500"+sNMst+sSMR+".root", "mcLocalControl_Zprime_SSM500", 20000, 2.6071E-03*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM500"+filesuffix+".root", "mcLocalControl_Zprime_SSM500", 20000, 2.6071E-03*nb2fb);
 	}
 	if(tsMCname=="Zprime_SSM750")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM750"+sNMst+sSMR+".root", "mcLocalControl_Zprime_SSM750", 20000, 4.7349E-04*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM750"+filesuffix+".root", "mcLocalControl_Zprime_SSM750", 20000, 4.7349E-04*nb2fb);
 	}
 	if(tsMCname=="Zprime_SSM1000")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1000"+sNMst+sSMR+".root", "mcLocalControl_Zprime_SSM1000", 20000, 1.2466E-04*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1000"+filesuffix+".root", "mcLocalControl_Zprime_SSM1000", 20000, 1.2466E-04*nb2fb);
 	}
 	if(tsMCname=="Zprime_SSM1500")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1500"+sNMst+sSMR+".root", "mcLocalControl_Zprime_SSM1500", 20000, 1.4380E-05*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1500"+filesuffix+".root", "mcLocalControl_Zprime_SSM1500", 20000, 1.4380E-05*nb2fb);
 	}
 	if(tsMCname=="Zprime_SSM1750")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1750"+sNMst+sSMR+".root", "mcLocalControl_Zprime_SSM1750", 20000, 5.6743E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1750"+filesuffix+".root", "mcLocalControl_Zprime_SSM1750", 20000, 5.6743E-06*nb2fb);
 	}
 	if(tsMCname=="Zprime_SSM2000")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM2000"+sNMst+sSMR+".root", "mcLocalControl_Zprime_SSM2000", 20000, 2.4357E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM2000"+filesuffix+".root", "mcLocalControl_Zprime_SSM2000", 20000, 2.4357E-06*nb2fb);
 	}
 	
 	if(tsMCname=="Zprime_SSM_m2000")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_120M450"+sNMst+sSMR+".root",   "mcLocalControl_Pythia8_ZprimeSSM_m2000_120M450",   40000, 0.00926176*nb2fb);// 7.9574E-03*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_450M850"+sNMst+sSMR+".root",   "mcLocalControl_Pythia8_ZprimeSSM_m2000_450M850",   10000, 4.61608E-05*nb2fb);// 3.8040E-05 *nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_850M1300"+sNMst+sSMR+".root",  "mcLocalControl_Pythia8_ZprimeSSM_m2000_850M1300",  10000, 2.20599E-06*nb2fb);// 1.7327E-06*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_1300M1800"+sNMst+sSMR+".root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_1300M1800", 10000, 2.07705E-07*nb2fb);// 1.5144E-07*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_1800M2300"+sNMst+sSMR+".root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_1800M2300", 10000, 1.46265E-06*nb2fb);// 1.0133E-06*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_2300M2800"+sNMst+sSMR+".root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_2300M2800", 10000, 1.94916E-08*nb2fb);// 1.1455E-08*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_2800M3300"+sNMst+sSMR+".root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_2800M3300", 10000, 1.4684E-09*nb2fb);// 7.0524E-10*nb2fb);
-		if(!doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_M3300"+sNMst+sSMR+".root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_M3300", 10000, 1.69363E-10*nb2fb);// 6.6724E-11*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_120M450"+filesuffix+".root",   "mcLocalControl_Pythia8_ZprimeSSM_m2000_120M450",   40000, 0.00926176*nb2fb);// 7.9574E-03*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_450M850"+filesuffix+".root",   "mcLocalControl_Pythia8_ZprimeSSM_m2000_450M850",   10000, 4.61608E-05*nb2fb);// 3.8040E-05 *nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_850M1300"+filesuffix+".root",  "mcLocalControl_Pythia8_ZprimeSSM_m2000_850M1300",  10000, 2.20599E-06*nb2fb);// 1.7327E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_1300M1800"+filesuffix+".root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_1300M1800", 10000, 2.07705E-07*nb2fb);// 1.5144E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_1800M2300"+filesuffix+".root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_1800M2300", 10000, 1.46265E-06*nb2fb);// 1.0133E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_2300M2800"+filesuffix+".root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_2300M2800", 10000, 1.94916E-08*nb2fb);// 1.1455E-08*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_2800M3300"+filesuffix+".root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_2800M3300", 10000, 1.4684E-09*nb2fb);// 7.0524E-10*nb2fb);
+		if(!doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia8_ZprimeSSM_m2000_mumu_M3300"+filesuffix+".root", "mcLocalControl_Pythia8_ZprimeSSM_m2000_M3300", 10000, 1.69363E-10*nb2fb);// 6.6724E-11*nb2fb);
 	}
 
 	if(tsMCname=="ExtraDimsTEV_m2000")
 	{
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_120M450"+sNMst+sSMR+".root",   "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_120M450",   40000, 0.00898959*nb2fb);// 7.7227E-03*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_450M850"+sNMst+sSMR+".root",   "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_450M850",   10000, 2.66544E-05*nb2fb);// 2.1906E-05*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_850M1300"+sNMst+sSMR+".root",  "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_850M1300",  10000, 2.56013E-07*nb2fb);// 2.0058E-07*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_1300M1800"+sNMst+sSMR+".root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_1300M1800", 10000, 1.89361E-06*nb2fb);// 1.3579E-06*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_1800M2300"+sNMst+sSMR+".root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_1800M2300", 10000, 1.47063E-05*nb2fb);// 9.4190E-06*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_2300M2800"+sNMst+sSMR+".root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_2300M2800", 10000, 8.47227E-08*nb2fb);// 4.7462E-08*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_2800M3300"+sNMst+sSMR+".root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_2800M3300", 10000, 6.53577E-10*nb2fb);// 2.9864E-10*nb2fb);
-		if(!doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_M3300"+sNMst+sSMR+".root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_M3300", 10000, 9.45194E-09*nb2fb);// 3.2102E-09*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_120M450"+filesuffix+".root",   "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_120M450",   40000, 0.00898959*nb2fb);// 7.7227E-03*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_450M850"+filesuffix+".root",   "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_450M850",   10000, 2.66544E-05*nb2fb);// 2.1906E-05*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_850M1300"+filesuffix+".root",  "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_850M1300",  10000, 2.56013E-07*nb2fb);// 2.0058E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_1300M1800"+filesuffix+".root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_1300M1800", 10000, 1.89361E-06*nb2fb);// 1.3579E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_1800M2300"+filesuffix+".root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_1800M2300", 10000, 1.47063E-05*nb2fb);// 9.4190E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_2300M2800"+filesuffix+".root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_2300M2800", 10000, 8.47227E-08*nb2fb);// 4.7462E-08*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_2800M3300"+filesuffix+".root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_2800M3300", 10000, 6.53577E-10*nb2fb);// 2.9864E-10*nb2fb);
+		if(!doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia8_ExtraDimsTEV_m2000_mumu_M3300"+filesuffix+".root", "mcLocalControl_Pythia8_ExtraDimsTEV_m2000_M3300", 10000, 9.45194E-09*nb2fb);// 3.2102E-09*nb2fb);
 	}
 }
 
@@ -1477,7 +1489,7 @@ void hbook()
 				 grpx[name]->filcolor,grpx[name]->filstyle,
 				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-		h1Map.insert( make_pair("hEtaSubleading"+name, new TH1D("hEtaSubleading"+name,";#eta_{#mu}^{leading};Events",nEtabins,Etamin,Etamax)) );
+		h1Map.insert( make_pair("hEtaSubleading"+name, new TH1D("hEtaSubleading"+name,";#eta_{#mu}^{subleading};Events",nEtabins,Etamin,Etamax)) );
 		setlogx(h1Map["hEtaSubleading"+name]);
 		graphics(h1Map["hEtaSubleading"+name],
 				 grpx[name]->filcolor,grpx[name]->filstyle,
@@ -1490,7 +1502,7 @@ void hbook()
 				 grpx[name]->filcolor,grpx[name]->filstyle,
 				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-		h1Map.insert( make_pair("hPhiSubleading"+name, new TH1D("hPhiSubleading"+name,";#phi_{#mu}^{leading};Events",nPhibins,Phimin,Phimax)) );
+		h1Map.insert( make_pair("hPhiSubleading"+name, new TH1D("hPhiSubleading"+name,";#phi_{#mu}^{subleading};Events",nPhibins,Phimin,Phimax)) );
 		setlogx(h1Map["hPhiSubleading"+name]);
 		graphics(h1Map["hPhiSubleading"+name],
 				 grpx[name]->filcolor,grpx[name]->filstyle,
@@ -1503,7 +1515,7 @@ void hbook()
 				 grpx[name]->filcolor,grpx[name]->filstyle,
 				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
-		h1Map.insert( make_pair("hpTSubleading"+name, new TH1D("hpTSubleading"+name,";p_{T}^{leading} GeV;Events",nsqrtofficialptbins,sqrtofficialptbins)) );
+		h1Map.insert( make_pair("hpTSubleading"+name, new TH1D("hpTSubleading"+name,";p_{T}^{subleading} GeV;Events",nsqrtofficialptbins,sqrtofficialptbins)) );
 		setlogx(h1Map["hpTSubleading"+name]);
 		graphics(h1Map["hpTSubleading"+name],
 				 grpx[name]->filcolor,grpx[name]->filstyle,
@@ -1691,26 +1703,21 @@ void hbgdraw(TString type, bool dologx=false, bool dology=false)
 		if(order==0)
 		{
 			vtsMCbgds.clear();
-			_INFO("$$$$$$$$$$$$4 type+name="+(string)(type+name));
 			setMinMax(h1Map[type+name],h1Map[type+"Data"],true);
 			draw(h1Map[type+name], "", "", dologx, dology);
 		}
 		
 		if(name!="Data")
 		{
-			_INFO("type+grpx_ordered[0]="+(string)(type+grpx_ordered[0]));
-			_INFO("type+name="+(string)(type+name));
 			drawon(type+grpx_ordered[0], h1Map[type+name]);
 			vtsMCbgds.push_back(type+name);
 		}
 		else
 		{
-			_INFO("type+grpx_ordered[0]="+(string)(type+grpx_ordered[0]));
 			drawon(type+grpx_ordered[0], h1Map[type+"Data"], "epx0");
 		}
 	}
 	
-	_INFO("type+grpx_ordered[0]="+(string)(type+grpx_ordered[0]));
 	drawtxton(type+grpx_ordered[0]);
 	drawratio(h1Map[type+"Data"], h1Map[type+"MCsum"], vtsMCbgds, "epx0", "", dologx, dology);
 	vtsMCbgds.clear();
@@ -1762,9 +1769,7 @@ void hdraw()
 				}
 			}
 			else // if(!name.Contains("_m2000")) then this is the regular Zprime's and the corresponding Z'/KK templates - all are drawn on top of the DYmumu
-			{
-				_INFO("name -> "+(string)name);
-			
+			{			
 				TString massName = getTemplateBareTitle(name);
 			
 				for(int t=0 ; t<2 ; t++)
@@ -1982,6 +1987,10 @@ void hfill_isoStudy(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 			_DEBUG("");			
 			unsigned int nMus = recon_all_pt->size();
 			
+			////////////////////////////////////////////////////////////////////
+			if(nMus!=2) _FATAL("nMus!=2 (in the null-isolation selection)"); ///
+			////////////////////////////////////////////////////////////////////
+			
 			if(nMus<2) return;
 			else if(nMus==2)
 			{
@@ -2027,22 +2036,29 @@ void hfill_isoStudy(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 			h1Map["hIsolationFull"+tsMCname]->Fill(iso30b,wgt*event_weight_nopileup/*event_weight*/);
 			h1Map["hIsolationLow"+tsMCname]->Fill(iso30b,wgt*event_weight_nopileup/*event_weight*/);
 			
-			/* for(unsigned int mu=0 ; mu<nMus ; mu++)
+			if((iso30a>=0.1 && iso30a<=1.) && (iso30b>=0.1 && iso30b<=1.)) // fill the invariant mass distribution of anti isolated pairs
+			{
+				h1Map["hMassAntiIsolated"+tsMCname]->Fill(mass,wgt*event_weight_nopileup/*event_weight*/);
+			}
+			
+			/*
+			for(unsigned int mu=0 ; mu<nMus ; mu++)
 			{
 				iso30 = (recon_all_pt->at(mu)!=0.) ? recon_all_ptcone30->at(mu)/recon_all_pt->at(mu) : -999.;
 				h1Map["hIsolationFull"+tsMCname]->Fill(iso30,wgt*event_weight);
 				h1Map["hIsolationLow"+tsMCname]->Fill(iso30,wgt*event_weight);
-			} */
-			
-			if((iso30a>0.1 && iso30a<1.) && (iso30b>0.1 && iso30b<1.)) // fill the invariant mass distribution of anti isolated pairs
-			{
-				h1Map["hMassAntiIsolated"+tsMCname]->Fill(mass,wgt*event_weight_nopileup/*event_weight*/);
 			}
+			*/
 		}
 	}
 	else if(tsRunType=="Data")
 	{
 		unsigned int nMus = pt->size();
+		
+		////////////////////////////////////////////////////////////////////
+		if(nMus!=2) _FATAL("nMus!=2 (in the null-isolation selection)"); ///
+		////////////////////////////////////////////////////////////////////
+		
 		if(nMus<2) return;
 		else if(nMus==2)
 		{
@@ -2086,18 +2102,21 @@ void hfill_isoStudy(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 		
 		h1Map["hIsolationFull"+tsRunType]->Fill(iso30b,wgt);
 		h1Map["hIsolationLow"+tsRunType]->Fill(iso30b,wgt);
-		/* for(unsigned int mu=0 ; mu<pt->size() ; mu++)
-		{
-			iso30 = (pt->at(mu)!=0.) ? ptcone30->at(mu)/pt->at(mu) : -999.;
-			h1Map["hIsolationFull"+tsRunType]->Fill(iso30,wgt);
-			h1Map["hIsolationLow"+tsRunType]->Fill(iso30,wgt);
-		} */
 		
-		if((iso30a>0.1 && iso30a<1.) && (iso30b>0.1 && iso30b<1.)) // fill the invariant mass distribution of anti isolated pairs
+		if((iso30a>=0.1 && iso30a<=1.) && (iso30b>=0.1 && iso30b<=1.)) // fill the invariant mass distribution of anti isolated pairs
 		{
 			// wgt = 0.0006;
 			h1Map["hMassAntiIsolated"+tsRunType]->Fill(mass,wgt);
 		}
+		
+		/*
+		for(unsigned int mu=0 ; mu<pt->size() ; mu++)
+		{
+			iso30 = (pt->at(mu)!=0.) ? ptcone30->at(mu)/pt->at(mu) : -999.;
+			h1Map["hIsolationFull"+tsRunType]->Fill(iso30,wgt);
+			h1Map["hIsolationLow"+tsRunType]->Fill(iso30,wgt);
+		}
+		*/
 	}
 }
 
@@ -2232,7 +2251,7 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				h1Map["hMass_limit_"+tsMCname+"_truth"]->Fill(mass*GeV2TeV,wgt*event_weight);
 			
 				// the templates
-				if(tsMCname=="DYmumu")
+				if(tsMCname=="DYmumu"  &&  !doIsolationStudy)
 				{
 					// simple templates (at the official Z' points)
 					for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
@@ -2259,7 +2278,7 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 					}
 					
 					// limit templates
-					if((doFullKKtemplates || doFullZPtemplates) && doTemplates)
+					if((doFullKKtemplates || doFullZPtemplates) && doTemplates  &&  !doIsolationStudy)
 					{
 						for(double M=mKKmmMin ; M<=mKKmmMax ; M+=dMKKmm)
 						{
@@ -2353,7 +2372,7 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				
 				_DEBUG("");
 				
-				if(tsMCname=="DYmumu") // templates
+				if(tsMCname=="DYmumu"  &&  !doIsolationStudy) // templates
 				{
 					// simple templates (at the official Z' points)
 					for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
@@ -2380,7 +2399,7 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 					}
 					
 					// limit templates
-					if((doFullKKtemplates || doFullZPtemplates)  &&  doTemplates)
+					if((doFullKKtemplates || doFullZPtemplates)  &&  doTemplates  &&  !doIsolationStudy)
 					{
 						for(double M=mKKmmMin ; M<=mKKmmMax ; M+=dMKKmm)
 						{
@@ -2785,7 +2804,7 @@ void run()
 	
 	// finalize
 	if(doData && doScale2Zpeak && !doIsolationStudy) hscale2Zpeak(); // must come before hdraw.
-	if(!doIsolationStudy && (doFullKKtemplates || doFullZPtemplates) && doTemplates) writeTemplates();
+	if((doFullKKtemplates || doFullZPtemplates) && doTemplates  &&  !doIsolationStudy) writeTemplates();
 	hdraw();
 	save("plots");
 	if(!doIsolationStudy) printNumbers();

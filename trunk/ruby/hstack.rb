@@ -24,20 +24,22 @@ inlist =
 	"#{root} hstack.C+ --ftype=noTmplts_noEWkFsig_noCoupScale --htype=EtaQ             --istru=0",
 	"#{root} hstack.C+ --ftype=noTmplts_noEWkFsig_noCoupScale --htype=QT               --istru=0",
 	"#{root} hstack.C+ --ftype=noTmplts_noEWkFsig_noCoupScale --htype=yQ               --istru=0",
-	# "#{root} hstack.C+ --ftype=noTmplts_noEWkFsig_noCoupScale --htype=IsolationFull    --istru=0",
-	# "#{root} hstack.C+ --ftype=noTmplts_noEWkFsig_noCoupScale --htype=IsolationLow     --istru=0",
-	# "#{root} hstack.C+ --ftype=noTmplts_noEWkFsig_noCoupScale --htype=MassAntiIsolated --istru=0",
+	"#{root} hstack.C+ --ftype=noTmplts_noQCD_noEWkFsig_noCoupScale_isoStudy --htype=IsolationFull    --istru=0",
+	"#{root} hstack.C+ --ftype=noTmplts_noQCD_noEWkFsig_noCoupScale_isoStudy --htype=IsolationLow     --istru=0",
+	"#{root} hstack.C+ --ftype=noTmplts_noQCD_noEWkFsig_noCoupScale_isoStudy --htype=MassAntiIsolated --istru=0",
 ]
 outlist = []
 
 system(inlist[0]);
 
+=begin
 inlist.each{ |histogram|
 	if(histogram==inlist[0]) then next; end
+
 	histogram_thread = Thread.new(histogram) { |histo|
 		puts "send histo -> #{histo}"
 		system(histo)
-	}
+	}	
 	outlist << histogram_thread
 }
 
@@ -45,6 +47,12 @@ inlist.each{ |histogram|
 outlist.each { |histogram|
 	puts "join histogram -> #{histogram}"
 	histogram.join
+}
+=end
+
+inlist.each{ |histogram|
+	if(histogram==inlist[0]) then next; end
+	system(histogram)
 }
 
 Dir.chdir(thisdir);

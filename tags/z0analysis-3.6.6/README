@@ -1,0 +1,124 @@
+###############################################
+########### HOW TO USE THIS PACKAGE ###########
+###### Noam Tal Hod, naom.com@gmail.com #######
+###############################################
+
+setup your ROOT, Ruby and qsub env
+	export ROOTSYS=$HOME/root528c/root     # root
+	export LD_LIBRARY_PATH=$ROOTSYS/lib:$LD_LIBRARY_PATH
+	export PATH=$ROOTSYS/bin:$PATH
+	export RUBYLIB=$ROOTSYS/lib:$RUBYLIB   # ruby
+	export PBS_SERVER=tau-ce.hep.tau.ac.il # qsub
+
+go to the analysis folder (THIS FOLDER)
+	cd /path/to/here/
+
+to get and make the GRL lib:
+	check the latest tag in:
+		https://svnweb.cern.ch/cern/wsvn/atlasoff/DataQuality/GoodRunsLists/tags/
+	cheout the latest tag:
+		svn co svn+ssh://svn.cern.ch/reps/atlasoff/DataQuality/GoodRunsLists/tags/GoodRunsLists-XX-XX-XX
+	cd GoodRunsLists-XX-XX-XX/cmt
+	make -f Makefile.Standalone
+	the GRL lib is in:
+		GoodRunsLists-XX-XX-XX/StandAlone/libGoodRunsLists.so
+
+to get and make the MCP smearing class:L
+	check the latest tag in:
+		https://svnweb.cern.ch/trac/atlasoff/browser/PhysicsAnalysis/MuonID/MuonIDAnalysis/MuonMomentumCorrections/tags
+		https://twiki.cern.ch/twiki/bin/view/AtlasProtected/MCPAnalysisGuidelinesRel16#AnchorResolutions
+		https://twiki.cern.ch/twiki/bin/view/AtlasProtected/MCPAnalysisGuidelinesRel17MC11a
+	checkout the latest tag:
+		svn co svn+ssh://svn.cern.ch/reps/atlasoff/PhysicsAnalysis/MuonID/MuonIDAnalysis/MuonMomentumCorrections/tags/MuonMomentumCorrections-XX-YY-ZZ
+	cd MuonMomentumCorrections-XX-YY-ZZ/cmt
+	make -f Makefile.Standalone
+	the library is:
+		MuonMomentumCorrections-XX-YY-ZZ/StandAlone/libMuonMomentumCorrections.so
+
+to get the Pilup reweighting lib:
+	check the latest tag in:
+		https://svnweb.cern.ch/trac/atlasoff/browser/PhysicsAnalysis/AnalysisCommon/PileupReweighting/tags
+		https://twiki.cern.ch/twiki/bin/view/AtlasProtected/PileupReweighting
+	checkout the latest tag:
+		svn co svn+ssh://svn.cern.ch/reps/atlasoff/PhysicsAnalysis/AnalysisCommon/PileupReweighting/tags/PileupReweighting-XX-YY-ZZ
+	cd PileupReweighting-XX-YY-ZZ/cmt
+	gmake -f Makefile.Standalone
+	the library is:
+		PileupReweighting-XX-YY-ZZ/Standalone/libPileupReweighting.so
+
+################################
+###### SEE run/RUNREADME #######
+################################
+
+to compile the analysis code:
+	cd ruby
+	ruby compile.rb
+
+to run the analysis code locally (all data / MC):
+	cd run
+	change this configuration file:
+		localRunControl_noSkim.txt
+	start the run with:
+		root -b -l -q full_analysis_run.C
+
+to run the analysis code in qsub
+	cd ruby
+	ruby batch_qsub.rb (for data)
+	?????????????????? (for mc)
+	watch that there are no errors / warnings from one or more of the working nodes
+	see the output:
+		ls -lrt ../data/
+
+AFTER A SUCCESSFUL qsub RUN, to run over a specific data-run locally (with run number XXXXXX):
+	cd run/tmp
+	root -b -q -l macro_XXXXXX.C
+
+to compile and run some graphics:
+	cd run/
+	edit this files: fast_tree_run.C
+			 fast_tree_compile.C (!!! note the "isMC" flag !!!)
+	root -b -q -l fast_tree_compile.C
+	output is in run/plots/
+
+#######################
+### Adding new data ###
+#######################
+to download the new runs:
+	[1] cd ruby
+	[2] edit "batch_dq2get_data_p605.rb" and add the new runs to the list
+	[3] ruby batch_dq2get_data_p605.rb
+	    this will get, validate and make a list of the new sets
+	    the new data should be in "/data/hod/2011/NTUP_SMDILEP_dimuon_p605/"
+	[4] when the download is finished, copy the list from "/data/hod/2011/NTUP_SMDILEP_dimuon_p605/" to "conf/NTUP_SMDILEP_dimuon_p605_runs.list"
+	[5] get the latest production xml file for good run list from: http://atlasdqm.web.cern.ch/atlasdqm/grlgen/CombinedPerf/Muon/Muon_v2/
+	    save it in the "conf/" dir
+	[6] copy the new xml to this name: "Z_GRL_CURRENT.xml"
+	    make sure that all the runs in the new sets appear in the new xml.
+	[7] cd xml/
+	[8] edit "periods.xml" and add the corresponding object / information in the SAME format
+	    make sure that all the runs in the new sets fall in the ranges specified in the xml.
+	[9] if there are new triggers for the new runs, add these trigger bits in:
+	    -- include/WZphysD3PD.h
+	    -- src/analysis.C
+	    -- src/analysisSkeleton.h
+	    -- src/analysisSkeleton.C
+	    whereever it is necessary (look for e.g. "EF_mu18" to find all occurances).
+	[10] conpile the code (if new triggers were introduced)
+	[10] good to go !
+
+
+###########
+### SVN ###
+###########
+svn co:
+	to co the trunk:
+	svn checkout https://z0analysis.googlecode.com/svn/trunk/ z0analysis --username noam.com
+	to co a certain tag:
+	svn checkout https://z0analysis.googlecode.com/svn/tags/z0analysis-X.Y.Z --username noam.com
+
+svn ci:
+	cd scripts
+	source cleanGoodRunsLists.sh
+	cd -
+	svn ci -m "some description"
+	svn cp https://z0analysis.googlecode.com/svn/{trunk,tags/z0analysis-X.Y.Z} -m "some description"

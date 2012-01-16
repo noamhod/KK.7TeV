@@ -37,8 +37,8 @@ bool doScale2Zpeak     = true;
 bool doDYtautau        = true;     // no need to rename the output files
 bool fastDYmumu        = false;
 bool largeDYmumu       = true;
-bool doFullKKtemplates = false;
-bool doFullZPtemplates = true;
+bool doFullKKtemplates = false;    // will not change anything if doTemplates is "false"
+bool doFullZPtemplates = true;     // will not change anything if doTemplates is "false"
 bool dopileup          = true;
 bool doEWkfactor       = true;
 bool doEWkfactorSig    = false;
@@ -48,11 +48,13 @@ bool doCouplingsScale  = false;
 bool doRemoveHighMass  = true;
 void matchFlags()
 {
-	///////////////////////////////
-	doQCD = !doIsolationStudy; ////
-	//doWjets = largeDYmumu; ////////
-	do32st  = !do33st; ////////////
-	///////////////////////////////
+	doQCD = !doIsolationStudy;
+	do32st  = !do33st;
+	if(!doTemplates)
+	{
+		doFullKKtemplates = false;
+		doFullZPtemplates = false;
+	}
 }
 TString fileNmaeSuffix()
 {
@@ -764,7 +766,6 @@ void samples()
 		grpx_ordered.insert( make_pair(grpx["jjmu15X"]->order,"jjmu15X") );
 	}
 	
-	
 	counter = 20;
 	grpx.insert( make_pair("Data", new GRPX(counter,"Data",   -1,-1,  kBlack,1,2,  kBlack,20,0.8)));
 	grpx_ordered.insert( make_pair(grpx["Data"]->order,"Data") );
@@ -816,7 +817,6 @@ void setMCtrees(TString tsMCname)
 	clearMaps(); ///
 	////////////////
 
-
 	ntupledir = (!doIsolation)     ? ntupledir_regular    : ntupledir_noisolation;
 	ntupledir = (doIsolationStudy) ? ntupledir_no2munoiso : ntupledir;
 	
@@ -826,7 +826,7 @@ void setMCtrees(TString tsMCname)
 	
 	TString sSMR = "";
 	sSMR += (doSmearing) ? "_smeared" : "";
-
+	
 	if(tsMCname=="DYmumu")
 	{
 		if(!largeDYmumu)
@@ -873,7 +873,6 @@ void setMCtrees(TString tsMCname)
 		}
 	}
 	
-	
 	if(tsMCname=="DYtautau"  && doDYtautau)
 	{
 		setMCtree(ntupledir+"/mcLocalControl_DYtautau_75M120"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_75M120", 20000, 7.9494E-01*nb2fb);
@@ -889,13 +888,11 @@ void setMCtrees(TString tsMCname)
 		setMCtree(ntupledir+"/mcLocalControl_DYtautau_M2000"+sNMst+sSMR+".root", "mcLocalControl_DYtautau_M2000", 20000, 1.4001E-08*nb2fb);
 	}
 	
-	
 	if(tsMCname=="TTbar")
 	{
 		setMCtree(ntupledir+"/mcLocalControl_T1_McAtNlo_Jimmy"+sNMst+sSMR+".root", "mcLocalControl_T1_McAtNlo_Jimmy", 999500, 89.4*pb2fb); // AMI: 1.4562E-01*nb2fb*5.4259E-01
 	}
-	
-	
+		
 	if(tsMCname=="Diboson")
 	{
 		setMCtree(ntupledir+"/mcLocalControl_WW_Herwig"+sNMst+sSMR+".root", "mcLocalControl_WW_Herwig", 2442266, 17487.); // AMI: 3.1106E-02*nb2fb*3.8947E-01
@@ -903,7 +900,6 @@ void setMCtrees(TString tsMCname)
 		setMCtree(ntupledir+"/mcLocalControl_ZZ_Herwig"+sNMst+sSMR+".root", "mcLocalControl_ZZ_Herwig", 244999,  1271.);  // AMI: 4.5721E-03*nb2fb*2.1319E-01
 	}
 
-	
 	if(tsMCname=="jjmu15X"  &&  doIsolationStudy)
 	{
 		setMCtree(ntupledir+"/mcLocalControl_PythiaB_ccmu15X"+sNMst+sSMR+".root", "mcLocalControl_PythiaB_ccmu15X", 1499697, 2.84E+04*pb2fb); //http://cdsweb.cern.ch/record/1282370/files/ATL-CAL-PROC-2010-001.pdf?version=3
@@ -1293,7 +1289,7 @@ void hbook()
 	}
 	
 	//// KK/ZP templates for the limit
-	if(doFullKKtemplates || doFullZPtemplates)
+	if((doFullKKtemplates || doFullZPtemplates) && doTemplates)
 	{
 		for(double M=mKKmmMin ; M<=mKKmmMax ; M+=dMKKmm)
 		{
@@ -1591,7 +1587,7 @@ void hscale2Zpeak()
 		}
 		
 		//// KK templates for the limit
-		if(name=="DYmumu" && (doFullKKtemplates || doFullZPtemplates))
+		if(name=="DYmumu" && (doFullKKtemplates || doFullZPtemplates) && doTemplates)
 		{
 			for(double M=mKKmmMin ; M<=mKKmmMax ; M+=dMKKmm)
 			{
@@ -1732,7 +1728,7 @@ void hdraw()
 		TString refname = "";
 		TString tptname = "";
 		
-		if((name.Contains("Zprime")  || name.Contains("ExtraDimsTEV"))  &&  !doIsolationStudy  &&  doTemplates) // both are drawn on top of the DYmumu
+		if((name.Contains("Zprime")  || name.Contains("ExtraDimsTEV"))  &&  !doIsolationStudy) // both are drawn on top of the DYmumu
 		{
 			if(name.Contains("_m2000"))
 			{
@@ -2162,7 +2158,7 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 	{
 		if(truth_all_isValid)
 		{
-			if(!tsMCname.Contains("AlpgenJimmy")) // there may be only one tru muon in AlpgenJimmy !!!
+			if(!tsMCname.Contains("W+jets")) // there may be only one tru muon in AlpgenJimmy !!!
 			{
 				imuontru  = (truth_all_mc_pdgId->at(0)>0) ? 0 : 1;
 				iamuontru = (imuontru==0) ? 1 : 0;
@@ -2178,8 +2174,6 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				pTLeading     = truth_all_mc_pt->at(imuontru);
 			}
 			_DEBUG("");
-			
-			if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 			
 			if(tsMCname=="DYmumu") // the templates
 			{
@@ -2219,7 +2213,6 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				truXpT   = truth_all_partons_mc_pt->at(4)*GeV2MeV;
 			}
 			
-			if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 			_DEBUG("");
 			
 			//////////////////////////////////////////////////////
@@ -2227,7 +2220,7 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 			weights(tsMCname, mass, truXid, truXmass, truXpT); ///
 			//////////////////////////////////////////////////////
 			
-			if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
+	
 			_DEBUG("");
 			
 			
@@ -2239,7 +2232,7 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				h1Map["hMass_limit_"+tsMCname+"_truth"]->Fill(mass*GeV2TeV,wgt*event_weight);
 			
 				// the templates
-				if(tsMCname=="DYmumu"  &&  doTemplates)
+				if(tsMCname=="DYmumu")
 				{
 					// simple templates (at the official Z' points)
 					for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
@@ -2266,7 +2259,7 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 					}
 					
 					// limit templates
-					if(doFullKKtemplates || doFullZPtemplates)
+					if((doFullKKtemplates || doFullZPtemplates) && doTemplates)
 					{
 						for(double M=mKKmmMin ; M<=mKKmmMax ; M+=dMKKmm)
 						{
@@ -2295,19 +2288,14 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 					}
 				} // end of templates 
 			}
-			
-			if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
+
 			_DEBUG("");
 			
 			if(recon_all_isValid)
 			{
-				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
-				
 				imuonrec  = (recon_all_charge->at(0)<0.) ? 0 : 1;
 				iamuonrec = (imuonrec==0) ? 1 : 0;
-				
-				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
-				
+
 				/*
 				tlvtmp->SetPtEtaPhiM(recon_all_pt->at(imuonrec), recon_all_eta->at(imuonrec), recon_all_phi->at(imuonrec), muonMass);
 				dr1 = fkinematics::dR(tlvtmp,tlvmutrua);
@@ -2325,12 +2313,8 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				tlvmurecbBoosted = fkinematics::Boost(tlvmureca,tlvmurecb,tlvmurecb);
 				(*tv3murecaBoosted) = tlvmurecaBoosted->Vect();
 				(*tv3murecbBoosted) = tlvmurecbBoosted->Vect();
-				
-				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 			}
-
 			
-			if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 			_DEBUG("");
 			////////////////////////////
 			/// analysis statrs here ///
@@ -2338,22 +2322,15 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 			
 			if(recon_all_isValid  &&  imuonrec>=0. && iamuonrec>=0.  &&  imuonrec!=iamuonrec)
 			{
-				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
-			
 				ca = recon_all_charge->at(imuonrec);
 				cb = recon_all_charge->at(iamuonrec);
 				if(ca*cb>=0.) _WARNING("ca*cb>=0, skipping event");
-				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
-				
 				mass          = fkinematics::imass(tlvmureca,tlvmurecb);
 				yQ            = fkinematics::ySystem(tlvmureca,tlvmurecb);
 				QT            = fkinematics::QT(tlvmureca,tlvmurecb);
 				etaQ          = fkinematics::etaSystem(tlvmureca,tlvmurecb);
 				cosThetaCS    = fkinematics::cosThetaCollinsSoper(tlvmureca,ca,tlvmurecb,cb);
 				cosThetaHE    = fkinematics::cosThetaBoost(tlvmureca,ca,tlvmurecb,cb);
-				
-				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
-				
 				etaLeading    = recon_all_eta->at(0);
 				etaSubleading = recon_all_eta->at(1);
 				phiLeading    = recon_all_phi->at(0);
@@ -2361,32 +2338,22 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				pTLeading     = recon_all_pt->at(0);
 				pTSubleading  = recon_all_pt->at(1);
 				dEta          = fabs(etaLeading-etaSubleading);
-				
-				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
-				
 				iso30Leading    = (recon_all_pt->at(0)!=0.) ? recon_all_ptcone30->at(0)/recon_all_pt->at(0) : -999.;
 				iso30Subleading = (recon_all_pt->at(1)!=0.) ? recon_all_ptcone30->at(1)/recon_all_pt->at(1) : -999.;
-				
-				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 				
 				// for the Z peak normalization
 				if(grpx[tsMCname]->order <= 20) // sum only backgrounds
 				{
-					if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
-				
 					if(mass>=imasslogicbins[0]  &&  mass<=imasslogicbins[1]) nMCall70to110          += 1.*wgt*event_weight;
 					if(mass>=imasslogicbins[0]  &&  mass<=imasslogicbins[1]) nMCall70to110_nopileup += 1.*wgt*event_weight_nopileup;
-					
-					if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 				}
 				/////////////////////////////////
 				/// MC histo fill statrs here ///
 				/////////////////////////////////
 				
-				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 				_DEBUG("");
 				
-				if(tsMCname=="DYmumu"  &&  doTemplates) // templates
+				if(tsMCname=="DYmumu") // templates
 				{
 					// simple templates (at the official Z' points)
 					for(double M=mZprimeMin ; M<=mZprimeMax ; M+=dMZprime)
@@ -2413,7 +2380,7 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 					}
 					
 					// limit templates
-					if(doFullKKtemplates || doFullZPtemplates)
+					if((doFullKKtemplates || doFullZPtemplates)  &&  doTemplates)
 					{
 						for(double M=mKKmmMin ; M<=mKKmmMax ; M+=dMKKmm)
 						{
@@ -2438,8 +2405,6 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 					}
 				}
 				
-				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
-				
 				h1Map["hNvxp_no_puwgt"+tsMCname]->Fill(recon_all_vxp_n,wgt*event_weight_nopileup);
 				h1Map["hNvxp_with_puwgt"+tsMCname]->Fill(recon_all_vxp_n,wgt*event_weight);
 				h1Map["hMassNumbers"+tsMCname]->Fill(mass,wgt*event_weight);
@@ -2459,22 +2424,14 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				h1Map["hpTSubleading"+tsMCname]->Fill(pTSubleading,wgt*event_weight);
 				h1Map["hMass_limit_"+tsMCname]->Fill(mass*GeV2TeV,wgt*event_weight); // for the 1d limit
 				
-				
-				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 				_DEBUG("");
 				
 				///// 2d
 				h2Map["hMassCosThetaCS"+tsMCname]->Fill(mass,cosThetaCS,wgt*event_weight);
 				h2Map["hMassyQ"+tsMCname]->Fill(mass,yQ,wgt*event_weight);
-				
-				if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 				_DEBUG("");
 			}
-			
-			if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 		}
-		
-		if(tsMCname.Contains("AlpgenJimmy")) _INFO("");
 	}
 	else if(tsRunType=="Data" || tsRunType=="QCD")
 	{
@@ -2678,7 +2635,7 @@ void runMCproc(TString mcName)
 {
 	for(TMapTSP2TTREE::iterator it=treMap.begin() ; it!=treMap.end() ; ++it)
 	{
-		init(it->second);
+		init(it->second);		
 		Int_t N = tree->GetEntriesFast();
 		for(Int_t entry=0 ; entry<N ; entry++)
 		{
@@ -2691,13 +2648,13 @@ void runMCproc(TString mcName)
 			   it->first=="mcLocalControl_Zmumu"  &&
 			   truth_all_Mhat>250.) continue;
 			
-			if(!truth_all_isValid && !doIsolationStudy) continue;
+			if(!truth_all_isValid && !doIsolationStudy) continue;			
 			if(doIsolationStudy) hfill_isoStudy("MC", mcName, getFlatLumiWeight(it->first)); ////
-			else                 hfill("MC", mcName, getFlatLumiWeight(it->first)); /////////////
+			else                 hfill("MC", mcName, getFlatLumiWeight(it->first)); /////////////			
 			/////////////////////////////////////////////////////////////////////////////////////
 			
 			monitor(mcName,entry,N);
-		}
+		}		
 		_INFO((string)it->first+": done.");
 	}
 }
@@ -2828,7 +2785,7 @@ void run()
 	
 	// finalize
 	if(doData && doScale2Zpeak && !doIsolationStudy) hscale2Zpeak(); // must come before hdraw.
-	if(!doIsolationStudy && doTemplates) writeTemplates();
+	if(!doIsolationStudy && (doFullKKtemplates || doFullZPtemplates) && doTemplates) writeTemplates();
 	hdraw();
 	save("plots");
 	if(!doIsolationStudy) printNumbers();

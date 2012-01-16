@@ -21,7 +21,7 @@ using namespace kFactors;
 using namespace lhapdf;
 
 const unsigned int fstQrk = PDTDWN;
-const unsigned int lstQrk = PDTTOP;
+const unsigned int lstQrk = PDTBOT;
 
 unsigned int qstate(unsigned int qrk)
 {
@@ -70,12 +70,13 @@ void pdftests()
 		
 		for(Int_t bin=1 ; bin<=hSumq->GetNbinsX() ; bin++)
 		{
-			double m = hSumq->GetBinCenter(bin);
+			double m  = hSumq->GetBinCenter(bin);
+			double dm = hSumq->GetBinWidth(bin);
 			double s  = m*m;
-			double s2  = s*s;
+			double s2 = s*s;
 			unsigned int idOut = s2f["muon"]->id;
 			unsigned int idIn = q+1;
-			unsigned int nsegments = 1000;
+			unsigned int nsegments = 10000;
 			
 			template_hA2SM TcosThetaSM(s,idIn,idOut);
 			double IcosTheta_A2SM = integrate(TcosThetaSM,-1.,+1.,nsegments);
@@ -83,9 +84,15 @@ void pdftests()
 			template_pdfintegrand TpdfSM(s,idIn);
 			double yMax = rapidityMax(s);
 			double Ipdf_A2SM = integrate(TpdfSM,-yMax,+yMax,nsegments);
+			double fullA2SM = (2.*pi)*(alphaEM*alphaEM/(4.*s))*(s2/4.)*IcosTheta_A2SM*(2.*Ipdf_A2SM/3.); // units of GeV^-4
+			// fullA2SM *= 2.*sqrt(s); // Jacobian transformation -> units of GeV^-3
+			fullA2SM *= 2.*sqrt(s); // Jacobian transformation -> units of GeV^-3
+			fullA2SM *= sqrt(s)/dm; // units of GeV^-2  ?????????????
+			// fullA2SM *= sqrt(s); // units of GeV^-2
+			fullA2SM *= GeV2fb; // units of fb
+			fullA2SM *= luminosity; // no units (number of events)
+			fullA2SM *= 3.; // no units (number of events)
 			
-			double fullA2SM = (2.*pi)*(alphaEM*alphaEM/(4.*s))*(s2/4.)*IcosTheta_A2SM*(2.*Ipdf_A2SM/3.);
-			fullA2SM *= 2.*sqrt(s)*GeV2fb*luminosity; // Jacobian and units transformatons
 			
 			h[q]->SetBinContent(bin,fullA2SM);
 			
@@ -107,7 +114,7 @@ void pdftests()
 	TString fname = "plots/mcdata_histograms_noEWkFsig_noCoupScale.root";
 	TFile* fhistos = new TFile(fname,"READ");
 	TH1D* hDY = (TH1D*)fhistos->Get("hMassDYmumu_truth")->Clone();
-	hDY->Draw();
+	
 	/*
 	setMinMax(h,dology);
 	if(dologx) h[0]->GetXaxis()->SetMoreLogLabels();
@@ -116,8 +123,20 @@ void pdftests()
 	for(unsigned int q=(fstQrk-1) ; q<=(lstQrk-1) ; q++) h[q]->Draw("SAMES");
 	leg->Draw("SAMES");
 	*/
+	hDY->Draw();
 	if(dologx) hSumq->GetXaxis()->SetMoreLogLabels();
 	if(dologx) hSumq->GetXaxis()->SetNoExponent();
+	hSumq->SetLineColor(kRed);
 	hSumq->Draw("SAMES");
 	saveas(cnv,"plots/theory_mass_pdf");
+	
+	
+	TString titles = hDY->GetTitle();
+	titles += ";" + (TString)hDY->GetXaxis()->GetTitle();
+	titles += ";" + (TString)hDY->GetYaxis()->GetTitle();
+	THStack* montecarlo = new THStack("hs",titles);
+	montecarlo->Add(hDY);
+	TCanvas* cR = (TCanvas*)(stackratio("",hSumq,montecarlo,NULL,NULL,NULL,NULL,"Theory/MC","",dologx,dology))->Clone("");
+	saveas(cR,"plots/theory_mass_pdf_ratio");
+	
 }

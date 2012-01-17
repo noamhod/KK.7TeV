@@ -317,7 +317,7 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	if(runs=="ALLRUNS")   str_events = basedir+"/../run/interestingEvents"+str_selector+".dump";
 	if(runs=="SINGLERUN") str_events = basedir+"/../run/tmp/interestingEvents_"+run_number_str+str_selector+".dump";
 	_INFO("LOADING FILE -> "+str_events);
-	m_analysis->setEventDumpFile(str_events, 500.);
+	m_analysis->setEventDumpFile(str_events, 600.);
 	
 	
 	// string str_xml_path = utilities::checkANDsetFilepath("BASEDIR", "/../xml");

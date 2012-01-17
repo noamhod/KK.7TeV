@@ -120,7 +120,7 @@ inline float kinematics::betaiSystem( TLorentzVector* pa, TLorentzVector* pb, in
 {
 	TLorentzVector pTmp = (*pa)+(*pb);
 	float E = pTmp.E();
-	if(E>0.) return -99999999.;
+	if(E<=0.) return -99999999.;
 
 	if     (i==1) return pTmp.Px()/E;
 	else if(i==2) return pTmp.Py()/E;

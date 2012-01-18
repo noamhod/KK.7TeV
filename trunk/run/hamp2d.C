@@ -35,9 +35,9 @@ void writeTemplates()
 	
 	
 	// unsigned int mXmax = 73;
-	unsigned int mXmax = 11;
-	double mMin = 250.; // GeV
-	double dm   = 250.; // GeV
+	unsigned int mXmax = 1;//11;
+	double mMin = 1000.;//250.; // GeV
+	double dm   = 500.;//250.; // GeV
 	
 	for(unsigned int mX=0 ; mX<mXmax ; mX++)
 	{
@@ -57,10 +57,10 @@ void writeTemplates()
 		
 		for(unsigned int g2=0 ; g2<(unsigned int)ng2bins ; g2++)
 		{
-			double gRe = sqrt(g2);
-			double gIm = 0.;
-			
 			Double_t gg = g2min+g2*(double)((g2max-g2min)/ng2bins);
+			
+			double gRe = sqrt(gg);
+			double gIm = 0.;
 			
 			setFgZP(gRe,gIm);
 			setFgGKK(gRe,gIm);

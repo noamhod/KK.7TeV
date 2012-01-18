@@ -56,7 +56,7 @@ void acctimeseff()
 
 	style();
 	
-	TFile* fTemplates = new TFile("plots/ZP_templates_noEWkFsig_noCoupScale.root","READ");
+	TFile* fTemplates = new TFile("plots/ZP_templates_noEWkFsig_noCoupScale_templateZP.root","READ");
 	
 	TObjArray* toarr_recon = new TObjArray();
 	toarr_recon->Read("template");
@@ -74,7 +74,8 @@ void acctimeseff()
 	
 	
 	TCanvas* c = new TCanvas("c","c", 600, 400);
-	c->SetLogy();
+	//c->SetLogy();
+	c->SetGridy();
 	c->SetTicks(1,1);
 	c->cd();
 	c->Draw();
@@ -85,8 +86,8 @@ void acctimeseff()
 	leg->SetTextFont(42);
 	
 	TH1D* hActimesEf = new TH1D("hActimesEf","Acceptance #times Efficiency vs. the pole mass;m_{BSM} TeV;Acceptance #times Efficiency",arraysize,minPoleMass-0.02,maxPoleMass+0.02);
-	hActimesEf->SetLineWidth(1);
-	hActimesEf->SetMarkerStyle(20);
+	hActimesEf->SetLineWidth(2);
+	hActimesEf->SetMarkerStyle(2);
 	hActimesEf->SetMarkerSize(0.8);
 	leg->AddEntry(hActimesEf,"Templates","lep");
 
@@ -122,7 +123,8 @@ void acctimeseff()
 		
 		Int_t bin = hActimesEf->FindBin(bsmmass[t]);
 		hActimesEf->SetBinContent(bin,actimesef[t]);
-		hActimesEf->SetBinError(bin,actimeseferr[t]);
+		// hActimesEf->SetBinError(bin,actimeseferr[t]);
+		hActimesEf->SetBinError(bin,0.);
 		
 		TString name = "acceptancetimesefficiency_templates_TruRecChop";
 		if(t==0)                pdfmode = 0;
@@ -151,7 +153,7 @@ void acctimeseff()
 	fguess->SetLineStyle(5);
 	
 	_INFO("Fit");
-	TString fitfunctype = "pol6";
+	TString fitfunctype = "pol8";
 	TString fitfuncname = "acceptancefit";
 	TF1* func = new TF1(fitfuncname,fitfunctype,minPoleMass-0.02,maxPoleMass+0.02);
 	func->SetParameters(0.248482,0.613077,-0.960227,0.774202,-0.339321,0.0756178,-0.00670578); 
@@ -162,6 +164,7 @@ void acctimeseff()
 	// func->SetParLimits(4,-1.,+0.0);
 	// func->SetParLimits(5,0.0,+0.5);
 	// func->SetParLimits(6,-0.5,+0.5);
+	// hActimesEf->Fit(fitfuncname,"MV+"); // "F" If fitting a polN, switch to Minuit fitter (by default, polN functions are fitted by the linear fitter).
 	hActimesEf->Fit(fitfuncname,"FLLEMV+"); // "F" If fitting a polN, switch to Minuit fitter (by default, polN functions are fitted by the linear fitter).
 											// "LL" An improved Log Likelihood fit in case of very low statistics and when bin contents are not integers.
 											//      Do not use this option if bin contents are large (greater than 100).
@@ -184,10 +187,10 @@ void acctimeseff()
 
 	c->cd();
 	gStyle->SetOptFit(1011);
-	hActimesEf->SetMinimum(1.e-1);
-	hActimesEf->SetMaximum(1.0);
-	hActimesEf->GetYaxis()->SetMoreLogLabels();
-	hActimesEf->GetYaxis()->SetNoExponent();
+	hActimesEf->SetMinimum(2.e-2);
+	hActimesEf->SetMaximum(0.6);
+	// hActimesEf->GetYaxis()->SetMoreLogLabels();
+	// hActimesEf->GetYaxis()->SetNoExponent();
 	hActimesEf->Draw("epx0");
 	accMM->Draw("SAMES");
 	func->Draw("SAMES");

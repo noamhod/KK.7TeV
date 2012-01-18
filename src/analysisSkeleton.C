@@ -138,9 +138,11 @@ void analysisSkeleton::set2stSmearing()
 void analysisSkeleton::setSmeared2Stations(int nMus)
 {
 	_DEBUG("analysisSkeleton::setSmeared2Stations");
-	_INFO("----------- BEGIN");
+	_INFO("----------- BEGIN -> Run-lbn-Evt = "+_s(RunNumber)+"-"+_s(lbn)+"-"+_s(EventNumber));
 	for(int i=0 ; i<nMus ; i++)
 	{
+		if(!mu_isCombinedMuon->at(i)) continue;
+	
 		// Get the relative uncertainty on ID and MS track pT at IP
 		float eptMS = fabs(mu_me_cov_qoverp_exPV->at(i)/mu_me_qoverp_exPV->at(i));
 		float eptID = fabs(mu_id_cov_qoverp_exPV->at(i)/mu_id_qoverp_exPV->at(i));

@@ -9,7 +9,7 @@
 
   /** Smearing Parameters rel.17 2 stations (Muid) **/
   const double ID_MS[4]       = {0., 0., 0., 0.};
-  const double ID_AL[4]       = {0.0001933, 0.0002445, 0., 0. };
+  const double ID_AL[4]       = {0., 0., 0., 0.};
   const double MS_MS[4]       = {0.02, 0., 0. ,0.};
   const double MS_AL[4]       = {0.00035, 0.00039, 0., 0.};
 

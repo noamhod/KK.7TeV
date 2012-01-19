@@ -25,9 +25,35 @@ static void setSqrtBins(Int_t nbins, Double_t min, Double_t max, Double_t* xpoin
 	for(int i=1 ; i<=nbins ; i++) xpoints[i] = pow(sqrtmin+i*sqrtbinwidth,2);
 }
 
+static void setLinBins(Int_t nbins, Double_t min, Double_t max, Double_t* xpoints)
+{
+	_DEBUG("setSqrtBins");
+	Double_t binwidth = (Double_t)((max-min)/(Double_t)nbins);
+	xpoints[0] = min;
+	for(int i=1 ; i<=nbins ; i++) xpoints[i] = min+i*binwidth;
+}
+
+int bins2chop = 9; // h1 should start at ~128 GeV
+
+// double mXXmin = 130.;
+// double mXXmax = 3050.;
+// double dmXX   = 40.;
+static const double mXXmin = 200.;//500.;
+static const double mXXmax = 2900.;//2500.;
+static const double dmXX   = 300.;
+
 static const Int_t    ng2bins = 40;
 static const Double_t g2min   = 0.;
 static const Double_t g2max   = 10.;
+
+static const Int_t    ng4bins = 200;
+static const Double_t g4min   = 0.;
+static const Double_t g4max   = 100.;
+
+static const Int_t    nsqrtg4bins = 40;
+static const Double_t sqrtg4min   = 1.e-6;//0.; !!!!!!!!!!!!!!!!!!!!
+static const Double_t sqrtg4max   = 10000.;
+static Double_t sqrtg4bins[nsqrtg4bins+1];
 
 static const Int_t    npbins = 20;
 static const Double_t pmin   = 1.;

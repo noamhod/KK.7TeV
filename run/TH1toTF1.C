@@ -1,19 +1,23 @@
 #include "../include/rawStd.h"
 #include "../include/rawROOT.h"
 #include "../include/logs.h"
+#include "../include/bins.h"
 #include "../include/style.h"
 #include "../include/histos.h"
 
-
-Double_t xmin = 0.;
-Double_t xmax = 10.;
+Double_t xmin = g4min;
+Double_t xmax = g4max;
 
 TFile* f2DTemplate;
 TObjArray* tobjarr;
 
+TString model = "ZP";
+
+int bins2chop = 9; // h1 should start at ~128 GeV
+
 void init()
 {
-	f2DTemplate = new TFile("plots/KK_2dtemplates_fastDY_smallDY_noEWkFsig.root","READ");
+	f2DTemplate = new TFile("plots/"+model+"_2dtemplates_fastDY_smallDY_noEWkFsig_noHighMbins_noTruth.root","READ");
 	tobjarr = new TObjArray();
 	tobjarr->Read("template2d");
 }
@@ -21,12 +25,13 @@ void init()
 TH1D* TH2toTH1(TH2D* h2, Int_t massbin)
 {
 	TString massbinname = (TString)_s(massbin);
-	TString massname = (TString)_s(h2->GetXaxis()->GetBinCenter(massbin),2);
-	TString name = "g2_in_fixed_massbin_"+massbinname;
+	TString origname = (TString)h2->GetName();
+	origname.ReplaceAll("hg4Mass_template_","");
+	TString name = origname+"_mll_"+massbinname;
 	Double_t min = h2->GetYaxis()->GetXmin();
 	Double_t max = h2->GetYaxis()->GetXmax();
 	Int_t nbins = h2->GetNbinsY();
-	TH1D* h1 = new TH1D(name,"#frac{dN}{dg^{2}};g^{2};dN/dg^{2}",nbins,min,max);
+	TH1D* h1 = new TH1D(name,"#frac{dN}{dg^{4}};g^{4};dN/dg^{4}",nbins,min,max);
 	for(Int_t bin=1 ; bin<=nbins ; bin++)
 	{
 		h1->SetBinContent(bin, h2->GetBinContent(massbin,bin));
@@ -34,25 +39,16 @@ TH1D* TH2toTH1(TH2D* h2, Int_t massbin)
 	return h1;
 }
 
-Double_t myfunction(Double_t *x, Double_t *par)
+Double_t fTH1toTF1(Double_t *x, Double_t *par)
 {
-	Double_t     g2  = x[0];                   // -> g^2 value
-	unsigned int mX  = (unsigned int)par[0];   // -> Z' / KK mass (template running number)
-	Int_t        mll = (Int_t)par[1];          // -> dilepton invariant mass bin number
-	_INFO("mX  = "+_s(mX));
-	_INFO("mll = "+_s(mll));
-	_INFO("g2  = "+_s(g2));
-	TH2D* h2 = (TH2D*)((TH2D*)(TObjArray*)tobjarr->At(mX));
-	TH1D* hTmp = (TH1D*)TH2toTH1(h2,mll);      // get the TH1 histogram of g^2 in the dilepton mass bin number mll
-	Double_t xxval = hTmp->Interpolate(g2);    // get the interpolated value of dN/dg^2 at the given g^2
+	Double_t     g4  = x[0];                    // -> g^4 value
+	unsigned int mX  = (unsigned int)par[0];    // -> Z' / KK mass (template running number)
+	Int_t        mll = (Int_t)par[1];           // -> dilepton invariant mass bin number
+	TH2D* h2         = (TH2D*)((TH2D*)(TObjArray*)tobjarr->At(mX)); // the 2d histogram (pole mass point)
+	TH1D* hTmp       = (TH1D*)TH2toTH1(h2,mll); // get the TH1 histogram of g^4 in the dilepton mass bin number mll
+	Double_t xxval   = hTmp->Interpolate(g4);   // get the interpolated value of dN/dg^4 at the given g^4
+	delete hTmp;
 	return xxval;
-}
-
-void myfunc()
-{
-	TF1 *fTmp = new TF1("myfunc",myfunction,xmin,xmax,2);
-	fTmp->SetParameters(0,43);
-	fTmp->SetParNames("mX","mll");
 }
 
 void TH1toTF1()
@@ -137,32 +133,97 @@ void TH1toTF1()
 	p1->RedrawAxis();
 	p2->cd();
 	h2->Draw("SURF1");
-	h2->SetTitle("#frac{dN}{dg^{2}dm_{#mu#mu}}");
+	h2->SetTitle("#frac{dN}{dg^{4}dm_{#mu#mu}}");
 	p1->Update();
 	p2->Update();
 	c->Update();
-	c->SaveAs("plots/TH2toTH1_test.png");
+	c->SaveAs("plots/TH2toTH1_"+model+".png");
 	
 	_INFO("----------------------------------------------------------");
 	
 	oldDir->cd();
 	
-	TF1 *f1 = new TF1("f1",myfunction,xmin,xmax,2);
-	f1->SetParameters(0,19);
-	f1->SetParNames("mX","mll");
+	unsigned int polemass = 0;
+	unsigned int massbin = 43;
 	
-	TH1D* h1 = (TH1D*)(TH2toTH1(h2,19))->Clone("");
+	TF1 *f1 = new TF1("f1",fTH1toTF1,xmin,xmax,2);
+	f1->SetParameters(polemass,massbin);
+	f1->SetParNames("mX","mll");
+	TH1D* h1 = (TH1D*)(TH2toTH1(h2,massbin))->Clone("");
 	h1->SetLineColor(kRed);
 	
-	TFile* file = new TFile("plots/TH2toTH1toTF1.root","RECREATE");	
+	TFile* file = new TFile("plots/TH2toTH1toTF1_"+model+".root","RECREATE");	
 	f1->Write();
 	file->Write();
 	file->Close();
 	
-	TCanvas* c1 = new TCanvas("c1","c1",600,400);
-	c1->cd();
-	c1->Draw();
+	TCanvas* ctest = new TCanvas("ctest","ctest",600,400);
+	ctest->cd();
+	ctest->Draw();
 	f1->Draw();
 	h1->Draw("SAMES");
-	c1->SaveAs("plots/TH1toTF1_test.png");
+	ctest->SaveAs("plots/TH1toTF1_"+model+".png");
+	
+	_INFO("----------------------------------------------------------");
+	
+	oldDir->cd();
+	
+	TFile* funcfile = new TFile("plots/"+model+"_functions.root","RECREATE");
+	unsigned int ntemplates   = (unsigned int)tobjarr->GetSize();
+	unsigned int lasttemplate = (unsigned int)tobjarr->GetLast();
+	for(unsigned int mX=0 ; mX<ntemplates && mX<=lasttemplate ; mX++)
+	{
+		TString mXname = (TString)_s(mX);
+		TString mXval = (TString)_s(mXXmin+mX*dmXX);
+		
+		TDirectory* dirX = funcfile->mkdir(mXname);
+		dirX->cd();
+		
+		TH2D* h2X = (TH2D*)((TH2D*)(TObjArray*)tobjarr->At(mX))->Clone();
+		if(h2X==NULL) _FATAL("h2X is NULL at mX="+(string)mXname);
+		unsigned int nbins = h2X->GetNbinsX();
+		for(unsigned int mll=1 ; mll<=(nbins-bins2chop) ; mll++)
+		{
+			TString mllname = (TString)_s(mll);
+			TString mllval  = (TString)_s(h2X->GetXaxis()->GetBinCenter(mll+bins2chop));
+			
+			TF1 *f1 = new TF1("fmX"+mXname+"_mll"+mllname,fTH1toTF1,xmin,xmax,2);
+			f1->SetParameters(mX,mll);
+			f1->SetParNames("mX","mll");
+			f1->SetLineColor(kBlue);
+			f1->SetLineWidth(1);
+			TH1D* h1 = (TH1D*)(TH2toTH1(h2X,mll))->Clone("");
+			h1->SetLineColor(kRed);
+			TCanvas* c1 = new TCanvas("cmX"+mXname+"_mll"+mllname,"",600,400);
+			c1->cd();
+			c1->Draw();
+			f1->Draw();
+			h1->SetTitle("dN/dg^{4} in mX="+mXval+" GeV and m_{#mu#mu}="+mllval+" TeV");
+			h1->GetXaxis()->SetTitle("g^{4}");
+			h1->GetYaxis()->SetTitle("dN/dg^{4}");
+			h1->Draw("SAMES");
+			c1->Write();
+			f1->Write();
+			h1->Write();
+			
+			delete h1;
+			delete f1;
+			delete c1;
+		}
+		
+		TCanvas* c2 = new TCanvas("cmX"+mXname,"",600,400);
+		c2->Draw();
+		c2->cd();
+		c2->SetLogx();
+		c2->SetLogz();
+		h2X->SetTitle("#frac{dN}{dg^{4}dm_{#mu#mu}}");
+		h2X->Draw("SURF1");
+		c2->Write();
+		h2X->Write();
+		
+		delete h2X;
+		delete c2;
+	}
+	funcfile->Write();
+	funcfile->Close();
 }

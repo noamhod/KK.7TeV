@@ -234,17 +234,23 @@ inline void validateinput(double cosTheta, double s, unsigned int idIn, unsigned
 inline void validateoutput(double N, double D)
 {
 	double R = N/D;
-	if(std::isinf(R)) { _ERROR("value is infinity -> "+_s(N)+"/"+_s(D)+", exitting now.");     exit(-1); }
-	if(std::isnan(R)) { _ERROR("value is not a number -> "+_s(N)+"/"+_s(D)+", exitting now."); exit(-1); }
-	if(R<=min_weight) { _WARNING("value too small or negative -> "+_s(N)+"/"+_s(D)); }
-	if(R>max_weight)  { _WARNING("value is too large -> "+_s(N)+"/"+_s(D)); }
+	if(std::isinf(R)) _FATAL("value is infinity -> "+_s(N)+"/"+_s(D)+", exitting now.");
+	if(std::isnan(R)) _FATAL("value is not a number -> "+_s(N)+"/"+_s(D)+", exitting now.");
+	if(R<=min_weight) _WARNING("value too small or negative -> "+_s(N)+"/"+_s(D));
+	if(R>max_weight)  _WARNING("value is too large -> "+_s(N)+"/"+_s(D));
 }
 inline double weightKK(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
 {
 	validateinput(cosTheta,s,idIn,idOut);
 	double N = hA2KK(cosTheta,s,idIn,idOut);
 	double D = hA2SM(cosTheta,s,idIn,idOut);
-	validateoutput(N,D);
+	if(std::isinf(N)) {_ERROR("hA2KK is inf, returning weight=0 for this event"); return 0.;}
+	if(std::isnan(N)) {_ERROR("hA2KK is nan, returning weight=0 for this event"); return 0.;}
+	if(std::isinf(D)) {_ERROR("hA2SM is inf, returning weight=0 for this event"); return 0.;}
+	if(std::isnan(D)) {_ERROR("hA2SM is nan, returning weight=0 for this event"); return 0.;}
+	if(D<=0.)         {_ERROR("hA2SM is "+_s(D)+", returning weight=0 for this event");  return 0.;}
+	if(N<0.)          {_ERROR("hA2KK is "+_s(N)+", returning weight=0 for this event");  return 0.;}
+	// validateoutput(N,D);
 	return N/D;
 }
 inline double weightKKnoSM(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
@@ -252,7 +258,13 @@ inline double weightKKnoSM(double cosTheta, double s, unsigned int idIn, unsigne
 	validateinput(cosTheta,s,idIn,idOut);
 	double N = hA2KKnoSM(cosTheta,s,idIn,idOut);
 	double D = hA2SM(cosTheta,s,idIn,idOut);
-	validateoutput(N,D);
+	if(std::isinf(N)) {_ERROR("hA2KKnoSM is inf, returning weight=0 for this event"); return 0.;}
+	if(std::isnan(N)) {_ERROR("hA2KKnoSM is nan, returning weight=0 for this event"); return 0.;}
+	if(std::isinf(D)) {_ERROR("hA2SM is inf, returning weight=0 for this event"); return 0.;}
+	if(std::isnan(D)) {_ERROR("hA2SM is nan, returning weight=0 for this event"); return 0.;}
+	if(D<=0.)         {_ERROR("hA2SM is "+_s(D)+", returning weight=0 for this event");  return 0.;}
+	if(N<0.)          {_ERROR("hA2KKnoSM is "+_s(N)+", returning weight=0 for this event");  return 0.;}
+	// validateoutput(N,D);
 	return N/D;
 }
 inline double weightZP(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
@@ -260,7 +272,13 @@ inline double weightZP(double cosTheta, double s, unsigned int idIn, unsigned in
 	validateinput(cosTheta,s,idIn,idOut);
 	double N = hA2ZP(cosTheta,s,idIn,idOut);
 	double D = hA2SM(cosTheta,s,idIn,idOut);
-	validateoutput(N,D);
+	if(std::isinf(N)) {_ERROR("hA2ZP is inf, returning weight=0 for this event"); return 0.;}
+	if(std::isnan(N)) {_ERROR("hA2ZP is nan, returning weight=0 for this event"); return 0.;}
+	if(std::isinf(D)) {_ERROR("hA2SM is inf, returning weight=0 for this event"); return 0.;}
+	if(std::isnan(D)) {_ERROR("hA2SM is nan, returning weight=0 for this event"); return 0.;}
+	if(D<=0.)         {_ERROR("hA2SM is "+_s(D)+", returning weight=0 for this event");  return 0.;}
+	if(N<0.)          {_ERROR("hA2ZP is "+_s(N)+", returning weight=0 for this event");  return 0.;}
+	// validateoutput(N,D);
 	return N/D;
 }
 inline double weightZPnoSM(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
@@ -268,7 +286,13 @@ inline double weightZPnoSM(double cosTheta, double s, unsigned int idIn, unsigne
 	validateinput(cosTheta,s,idIn,idOut);
 	double N = hA2ZPnoSM(cosTheta,s,idIn,idOut);
 	double D = hA2SM(cosTheta,s,idIn,idOut);
-	validateoutput(N,D);
+	if(std::isinf(N)) {_ERROR("hA2ZPnoSM is inf, returning weight=0 for this event"); return 0.;}
+	if(std::isnan(N)) {_ERROR("hA2ZPnoSM is nan, returning weight=0 for this event"); return 0.;}
+	if(std::isinf(D)) {_ERROR("hA2SM is inf, returning weight=0 for this event"); return 0.;}
+	if(std::isnan(D)) {_ERROR("hA2SM is nan, returning weight=0 for this event"); return 0.;}
+	if(D<=0.)         {_ERROR("hA2SM is "+_s(D)+", returning weight=0 for this event");  return 0.;}
+	if(N<0.)          {_ERROR("hA2ZPnoSM is "+_s(N)+", returning weight=0 for this event");  return 0.;}
+	// validateoutput(N,D);
 	return N/D;
 }
 

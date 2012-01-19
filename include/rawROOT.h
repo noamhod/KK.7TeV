@@ -45,6 +45,7 @@
 #include <THStack.h>
 #include <TLatex.h>
 #include <TGraphAsymmErrors.h>
+#include <TRandom.h>
 
 #endif
 

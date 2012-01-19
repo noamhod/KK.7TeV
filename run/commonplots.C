@@ -2,6 +2,7 @@
 #include "../include/rawROOT.h"
 #include "../include/types.h"
 #include "../include/logs.h"
+#include "../include/bins.h"
 #include "../include/style.h"
 #include "../include/histos.h"
 ///////////////////////////////////
@@ -246,11 +247,14 @@ void commonplots()
 	histograms.push_back("hMassDYmumu_truth");
 	histograms.push_back("hMassDYtautau");
 	histograms.push_back("hMassData");
+	histograms.push_back("hMassDataChopped");      // chopped
 	histograms.push_back("hMassDiboson");
 	histograms.push_back("hMassQCD");
 	histograms.push_back("hMassTTbar");
 	histograms.push_back("hMassW+jets");
 	histograms.push_back("hMassMCsum");
+	histograms.push_back("hMassMCnoDYsum");        // no DY
+	histograms.push_back("hMassMCnoDYsumChopped"); // chopped, no DY
 	histograms.push_back("hMassKK500_template");
 	histograms.push_back("hMassKK500_template_truth");
 	histograms.push_back("hMassKK750_template");
@@ -419,7 +423,6 @@ void commonplots()
 	histograms.push_back("hMassyQQCD");
 	histograms.push_back("hMassyQTTbar");
 	histograms.push_back("hMassyQW+jets");
-	histograms.push_back("hMassyQMCsum");
 	histograms.push_back("hMassyQZprime_SSM500");
 	histograms.push_back("hMassyQZprime_SSM750");
 	histograms.push_back("hMassyQZprime_SSM1000");
@@ -470,12 +473,29 @@ void commonplots()
 
 	for(unsigned int i=0 ; i<histograms.size() ; i++)
 	{
+		if(histograms[i].Contains("Chopped")) continue;
+		if(histograms[i].Contains("noDY"))    continue;
 		if(!histograms[i].Contains("Isolat")) hobj = (TObject*)fileAll->Get(histograms[i]);
 		else                                  hobj = (TObject*)fileIso->Get(histograms[i]);
 		_INFO("adding -> "+(string)hobj->GetName());
 		hobj->Write();
 		(*oList) << (string)hobj->GetName() << endl;
 	}
+	olddir->cd();
+	TH1D* hMassMCnoDYsum = (TH1D*)fileAll->Get("hMassDiboson")->Clone("hMassMCnoDYsum");
+	hMassMCnoDYsum->Add((TH1D*)fileAll->Get("hMassQCD"));
+	hMassMCnoDYsum->Add((TH1D*)fileAll->Get("hMassTTbar"));
+	hMassMCnoDYsum->Add((TH1D*)fileAll->Get("hMassW+jets"));
+	TH1D* hMassData      = (TH1D*)fileAll->Get("hMassData")->Clone();
+	TH1D* hMassMCnoDYsumChopped = (TH1D*)hChopper(hMassMCnoDYsum, bins2chop)->Clone("hMassMCnoDYsumChopped");
+	TH1D* hMassDataChopped = (TH1D*)hChopper(hMassData, bins2chop)->Clone("hMassDataChopped");
+	oFile->cd();
+	hMassMCnoDYsum->Write();
+	(*oList) << (string)hMassMCnoDYsum->GetName() << endl;
+	hMassMCnoDYsumChopped->Write();
+	(*oList) << (string)hMassMCnoDYsumChopped->GetName() << endl;
+	hMassDataChopped->Write();
+	(*oList) << (string)hMassDataChopped->GetName() << endl;
 	oList->close();
 	
 	unsigned int counter = 0;

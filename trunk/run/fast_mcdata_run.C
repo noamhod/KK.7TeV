@@ -28,7 +28,7 @@ bool doData            = true;
 bool do33st            = true;
 bool do32st            = false;
 bool doSmearing        = true;     // false is simply the old selection (before 3+3 / 3+2) -> should not be used !
-bool doTemplates       = true;     // must be true if doFullKKtemplates is true or if doFullZPtemplates is true
+bool doTemplates       = false;    // must be true if doFullKKtemplates is true or if doFullZPtemplates is true
 bool doQCD             = true;     // must be "false" if doIsolationStudy is "true"
 bool doIsolationStudy  = false;    // must be "false" if doQCD is true
 bool doIsolation       = false;    // should be true for the histogram of the null-isolation-cut only !!!
@@ -37,7 +37,7 @@ bool doScale2Zpeak     = true;
 bool doDYtautau        = true;     // no need to rename the output files
 bool fastDYmumu        = false;
 bool largeDYmumu       = true;
-bool doFullKKtemplates = true;     // will not change anything if doTemplates is "false"
+bool doFullKKtemplates = false;    // will not change anything if doTemplates is "false"
 bool doFullZPtemplates = false;    // will not change anything if doTemplates is "false"
 bool dopileup          = true;
 bool doEWkfactor       = true;
@@ -921,12 +921,12 @@ void setMCtrees(TString tsMCname)
 	if(tsMCname=="W+jets"  && doWjets)
 	{
 		// setMCtree(ntupledir+"/mcLocalControl_Wmunu"+filesuffix+".root", "mcLocalControl_Wmunu", 6959806, 8.7017E+00*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp0_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp0_pt20", 3421954, 6.9324E+00*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp1_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp1_pt20", 2479594, 1.3059E+00*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp2_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp2_pt20", 3718149, 3.7807E-01*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp3_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp3_pt20", 988857,  1.0185E-01*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp4_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp4_pt20", 254950,  2.5720E-02*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp5_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp5_pt20", 70000,   6.9999E-03*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp0_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp0_pt20", 3421954, 8.284);  // AMI: 6.9324E+00*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp1_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp1_pt20", 2479594, 1.5616); // AMI: 1.3059E+00*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp2_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp2_pt20", 3718149, 0.4533); // AMI: 3.7807E-01*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp3_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp3_pt20", 988857,  0.1217); // AMI: 1.0185E-01*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp4_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp4_pt20", 254950,  0.0310); // AMI: 2.5720E-02*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp5_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp5_pt20", 70000,   0.0083); // AMI: 6.9999E-03*nb2fb);
 	}
 	
 	

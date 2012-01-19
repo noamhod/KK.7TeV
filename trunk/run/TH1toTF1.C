@@ -5,15 +5,18 @@
 #include "../include/style.h"
 #include "../include/histos.h"
 
+///////////////////
+// USAGE:
+// root -b -l -q 
+
 Double_t xmin = g4min;
 Double_t xmax = g4max;
 
 TFile* f2DTemplate;
 TObjArray* tobjarr;
 
-TString model = "ZP";
-
-int bins2chop = 9; // h1 should start at ~128 GeV
+TString model   = "KK";
+TString channel = "#mu#mu";
 
 void init()
 {

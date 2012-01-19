@@ -487,8 +487,10 @@ void commonplots()
 	hMassMCnoDYsum->Add((TH1D*)fileAll->Get("hMassTTbar"));
 	hMassMCnoDYsum->Add((TH1D*)fileAll->Get("hMassW+jets"));
 	TH1D* hMassData      = (TH1D*)fileAll->Get("hMassData")->Clone();
+	TH1D* hMassMCsum     = (TH1D*)fileAll->Get("hMassMCsum")->Clone();
 	TH1D* hMassMCnoDYsumChopped = (TH1D*)hChopper(hMassMCnoDYsum, bins2chop)->Clone("hMassMCnoDYsumChopped");
 	TH1D* hMassDataChopped = (TH1D*)hChopper(hMassData, bins2chop)->Clone("hMassDataChopped");
+	TH1D* hMassMCsumChopped = (TH1D*)hChopper(hMassMCsum, bins2chop)->Clone("hMassMCsumChopped");
 	oFile->cd();
 	hMassMCnoDYsum->Write();
 	(*oList) << (string)hMassMCnoDYsum->GetName() << endl;
@@ -496,6 +498,8 @@ void commonplots()
 	(*oList) << (string)hMassMCnoDYsumChopped->GetName() << endl;
 	hMassDataChopped->Write();
 	(*oList) << (string)hMassDataChopped->GetName() << endl;
+	hMassMCsumChopped->Write();
+	(*oList) << (string)hMassMCsumChopped->GetName() << endl;
 	oList->close();
 	
 	unsigned int counter = 0;

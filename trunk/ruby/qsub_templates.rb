@@ -14,9 +14,9 @@ workdir = "/srv01/tau/hod/z0analysis-tests/z0analysis-r170/run";
 thisdir = Dir.getwd();
 Dir.chdir(workdir);
 
-mKKmin      = 200;  #130;  # 500;  # GeV
-dm          = 300;  #40;   # 250;  # GeV
-mKKmax      = 2900; #3050; # 2000; # GeV
+mKKmin      = 130; #130;  # 500;  # GeV
+dm          = 40;   #40;   # 250;  # GeV
+mKKmax      = 5130; #3050; # 2000; # GeV
 nMassPoints = (mKKmax-mKKmin)/dm;
 
 def clean(workdir="")
@@ -31,6 +31,7 @@ def submitjob(jobname="", mass="", workdir="")
 		f.puts "echo   \"host = $HOSTNAME\""
 		f.puts "cd #{workdir}"
 		f.puts "echo $PWD"
+		f.puts "echo \"mass=\"#{mass}"
 		f.puts "export PBS_SERVER=tau-ce.hep.tau.ac.il"
 		f.puts "export ROOTSYS=$HOME/root528c/root"
 		f.puts "export LD_LIBRARY_PATH=$ROOTSYS/lib:$LD_LIBRARY_PATH"
@@ -41,11 +42,12 @@ def submitjob(jobname="", mass="", workdir="")
 		f.puts "cd -"
 	}
 	
-	%x(qsub -q S -e #{workdir}/tmp/err -o #{workdir}/tmp/out #{jobname})
-	puts "sent --> #{jobname}"
+	%x(qsub -q HEP -e #{workdir}/tmp/err -o #{workdir}/tmp/out #{jobname})
+	puts "sent -> #{jobname}"
 end
 
 clean(workdir);
+
 (0..nMassPoints).each do |j|
 	mass = j*dm+mKKmin;
 	jobname = "#{workdir}/tmp/job_massnumber_#{j}.sh";

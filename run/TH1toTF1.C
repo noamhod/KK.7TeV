@@ -20,7 +20,7 @@ TString channel = "#mu#mu";
 
 void init()
 {
-	f2DTemplate = new TFile("plots/"+model+"_2dtemplates_fastDY_smallDY_noEWkFsig_noHighMbins_noTruth.root","READ");
+	f2DTemplate = new TFile("plots/"+model+"_2dtemplates_fastDY_noEWkFsig_noHighMbins_noTruth.root","READ");
 	tobjarr = new TObjArray();
 	tobjarr->Read("template2d");
 }
@@ -37,7 +37,7 @@ TH1D* TH2toTH1(TH2D* h2, Int_t massbin)
 	TH1D* h1 = new TH1D(name,"#frac{dN}{dg^{4}};g^{4};dN/dg^{4}",nbins,min,max);
 	for(Int_t bin=1 ; bin<=nbins ; bin++)
 	{
-		h1->SetBinContent(bin, h2->GetBinContent(massbin,bin));
+		h1->SetBinContent(bin, h2->GetBinContent(massbin+bins2chop,bin));
 	}
 	return h1;
 }
@@ -68,6 +68,7 @@ void TH1toTF1()
 	
 	init();
 	
+	/*
 	TH2D* h2 = (TH2D*)((TH2D*)(TObjArray*)tobjarr->At(0))->Clone();
 	
 	TH1D* h1z0  = (TH1D*)(TH2toTH1(h2,4))->Clone("");
@@ -103,11 +104,11 @@ void TH1toTF1()
 	leg->SetFillStyle(4000); //will be transparent
 	leg->SetFillColor(0);
 	leg->SetTextFont(42);
-	leg->AddEntry(h1z0,"m_{#mu#mu} #approx 90 GeV (Z^{0})");
-	leg->AddEntry(h1lowDY,"m_{#mu#mu} #approx 250 GeV (low DY)");
-	leg->AddEntry(h1dip,"m_{#mu#mu} #approx 1000 GeV (KK dip)");
-	leg->AddEntry(h1peak,"m_{#mu#mu} #approx 2000 GeV (KK peak)");
-	leg->AddEntry(h1highDY,"m_{#mu#mu} #approx 3000 GeV (high DY)");
+	leg->AddEntry(h1z0,"m_{"+channel+"} #approx 90 GeV (Z^{0})");
+	leg->AddEntry(h1lowDY,"m_{"+channel+"} #approx 250 GeV (low DY)");
+	leg->AddEntry(h1dip,"m_{"+channel+"} #approx 1000 GeV (KK dip)");
+	leg->AddEntry(h1peak,"m_{"+channel+"} #approx 2000 GeV (KK peak)");
+	leg->AddEntry(h1highDY,"m_{"+channel+"} #approx 3000 GeV (high DY)");
 	
 	TCanvas* c = new TCanvas("c","c",900,400);
 	c->Divide(2,1);
@@ -136,7 +137,7 @@ void TH1toTF1()
 	p1->RedrawAxis();
 	p2->cd();
 	h2->Draw("SURF1");
-	h2->SetTitle("#frac{dN}{dg^{4}dm_{#mu#mu}}");
+	h2->SetTitle("#frac{dN}{dg^{4}dm_{"+channel+"}}");
 	p1->Update();
 	p2->Update();
 	c->Update();
@@ -169,6 +170,8 @@ void TH1toTF1()
 	
 	_INFO("----------------------------------------------------------");
 	
+	*/
+	
 	oldDir->cd();
 	
 	TFile* funcfile = new TFile("plots/"+model+"_functions.root","RECREATE");
@@ -177,15 +180,15 @@ void TH1toTF1()
 	for(unsigned int mX=0 ; mX<ntemplates && mX<=lasttemplate ; mX++)
 	{
 		TString mXname = (TString)_s(mX);
-		TString mXval = (TString)_s(mXXmin+mX*dmXX);
+		TString mXval  = (TString)_s(mXXmin+mX*dmXX);
 		
 		TDirectory* dirX = funcfile->mkdir(mXname);
 		dirX->cd();
 		
 		TH2D* h2X = (TH2D*)((TH2D*)(TObjArray*)tobjarr->At(mX))->Clone();
 		if(h2X==NULL) _FATAL("h2X is NULL at mX="+(string)mXname);
-		unsigned int nbins = h2X->GetNbinsX();
-		for(unsigned int mll=1 ; mll<=(nbins-bins2chop) ; mll++)
+		unsigned int nbins = h2X->GetNbinsX(); // 56
+		for(unsigned int mll=1 ; mll<=(nbins-bins2chop) ; mll++) // 1...(56-9 = 47)
 		{
 			TString mllname = (TString)_s(mll);
 			TString mllval  = (TString)_s(h2X->GetXaxis()->GetBinCenter(mll+bins2chop));
@@ -201,7 +204,7 @@ void TH1toTF1()
 			c1->cd();
 			c1->Draw();
 			f1->Draw();
-			h1->SetTitle("dN/dg^{4} in mX="+mXval+" GeV and m_{#mu#mu}="+mllval+" TeV");
+			h1->SetTitle("dN/dg^{4} in mX="+mXval+" GeV and m_{"+channel+"}="+mllval+" TeV");
 			h1->GetXaxis()->SetTitle("g^{4}");
 			h1->GetYaxis()->SetTitle("dN/dg^{4}");
 			h1->Draw("SAMES");
@@ -219,7 +222,7 @@ void TH1toTF1()
 		c2->cd();
 		c2->SetLogx();
 		c2->SetLogz();
-		h2X->SetTitle("#frac{dN}{dg^{4}dm_{#mu#mu}}");
+		h2X->SetTitle("#frac{dN}{dg^{4}dm_{"+channel+"}}");
 		h2X->Draw("SURF1");
 		c2->Write();
 		h2X->Write();

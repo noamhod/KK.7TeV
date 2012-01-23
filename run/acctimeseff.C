@@ -56,6 +56,7 @@ void acctimeseff()
 
 	style();
 	
+	// TFile* fTemplates = new TFile("plots/ZP_templates_noEWkFsig_noCoupScale_templateZP.root","READ");
 	TFile* fTemplates = new TFile("plots/ZP_templates_noEWkFsig_noCoupScale_templateZP.root","READ");
 	
 	TObjArray* toarr_recon = new TObjArray();
@@ -133,6 +134,12 @@ void acctimeseff()
 		savecnv(name, hRec, hRec_chop, hTru, pdfmode);
 	}
 	
+	TFile* fAccEff = new TFile("plots/hActimesEff.root","RECREATE");
+	fAccEff->cd();
+	hActimesEf->Write();
+	fAccEff->Write();
+	fAccEff->Close();
+	
 	_INFO("");
 
 	double sigma   = 0.;
@@ -184,18 +191,15 @@ void acctimeseff()
 	TFile fFit("plots/acceptancetimesefficiency_fit.root","recreate");
 	fFit.Write();
 	fFit.Close();
-
+	
 	c->cd();
 	gStyle->SetOptFit(1011);
 	hActimesEf->SetMinimum(2.e-2);
-	hActimesEf->SetMaximum(0.6);
-	// hActimesEf->GetYaxis()->SetMoreLogLabels();
-	// hActimesEf->GetYaxis()->SetNoExponent();
+	hActimesEf->SetMaximum(0.45);
 	hActimesEf->Draw("epx0");
 	accMM->Draw("SAMES");
 	func->Draw("SAMES");
 	leg->Draw("SAMES");
-	//fguess->Draw("SAMES");
 	saveas(c,"plots/acceptancetimesefficiency");
 	
 	

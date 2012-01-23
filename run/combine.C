@@ -6,9 +6,13 @@
 #include "../include/bins.h"
 #include "../include/histos.h"
 
-TString fpath = "2dtemplates_fastDY_smallDY_noEWkFsig_noHighMbins_noTruth";
+TString fpath = "2dtemplates_fastDY_noEWkFsig_noHighMbins_noTruth";
 TObjArray* toarKKtmp;
 TObjArray* toarZPtmp;
+
+ double Mmin = 130.;
+ double Mmax = 5130.;
+ double dM   = 40.;
 
 void combine()
 {
@@ -30,7 +34,7 @@ void combine()
 	TObjArray* templates2d_ZP = new TObjArray;
 
 	TH2D* h2tmp = NULL;
-	for(double f=200 ; f<=2900 ; f+=300)
+	for(double f=Mmin ; f<Mmax ; f+=dM)
 	{
 		TString fname = (TString)_s(f);
 		

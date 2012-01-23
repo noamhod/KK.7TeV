@@ -7,6 +7,11 @@
 namespace kFactors
 {
 
+/////////////////////////////////
+static double maxEWkF = 3.; /////
+/////////////////////////////////
+
+
 static double QCD(double mass, string type="NNLO/LO**")
 {
 	_DEBUG("kFactor::QCD");

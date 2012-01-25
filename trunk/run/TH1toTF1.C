@@ -5,22 +5,32 @@
 #include "../include/style.h"
 #include "../include/histos.h"
 
-///////////////////
-// USAGE:
-// root -b -l -q 
+///////////////////////////////////
+// USAGE: /////////////////////////
+// root -b -l -q TH1toTF1.C++ /////
+///////////////////////////////////
 
-Double_t xmin = g4min;
-Double_t xmax = g4max;
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// Global definitions ///////////////////////////////////////////////////////////////////////
+TString ftype = "2dtemplates_fastDY_smallDY_noEWkFsig_sigEWkf_noHighMbins_noTruth";
+TString dir   = "plots/";
+
+Double_t xmin = g4min; // =0
+Double_t xmax = g4max; // =100
+
+TString model   = "KK";     // ZP or KK
+TString channel = "#mu#mu"; // #mu#mu or ee
+
+Double_t scale2Zpeak = 1.14527; // muon, not final 
 
 TFile* f2DTemplate;
 TObjArray* tobjarr;
-
-TString model   = "KK";
-TString channel = "#mu#mu";
+/////////////////////////////////////////////////////////////////////////////////////////////
 
 void init()
 {
-	f2DTemplate = new TFile("plots/"+model+"_2dtemplates_fastDY_noEWkFsig_noHighMbins_noTruth.root","READ");
+	f2DTemplate = new TFile(dir+model+"_"+ftype+".root","READ");
 	tobjarr = new TObjArray();
 	tobjarr->Read("template2d");
 }
@@ -49,6 +59,7 @@ Double_t fTH1toTF1(Double_t *x, Double_t *par)
 	Int_t        mll = (Int_t)par[1];           // -> dilepton invariant mass bin number
 	TH2D* h2         = (TH2D*)((TH2D*)(TObjArray*)tobjarr->At(mX)); // the 2d histogram (pole mass point)
 	TH1D* hTmp       = (TH1D*)TH2toTH1(h2,mll); // get the TH1 histogram of g^4 in the dilepton mass bin number mll
+	hTmp->Scale(scale2Zpeak);
 	Double_t xxval   = hTmp->Interpolate(g4);   // get the interpolated value of dN/dg^4 at the given g^4
 	delete hTmp;
 	return xxval;

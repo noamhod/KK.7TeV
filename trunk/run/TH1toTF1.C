@@ -22,7 +22,14 @@ Double_t xmax = g4max; // =100
 TString model   = "KK";     // ZP or KK
 TString channel = "#mu#mu"; // #mu#mu or ee
 
-Double_t scale2Zpeak = 1.14527; // muon, not final 
+Double_t scale2Zpeak = 1.12647; // muon, not final -> the normalization is for bins 3-9 of the
+								//                    logx invariant mass plot. it is the ratio
+								//                    between the data yeild and the yield of:
+								//                    2dtemplate(at g=0) + (allBGs - DYbg).
+								//                    in that range.
+								//                    The "allBGs-DYbg" histogram is given to BAT
+								//                    but it is chopped. The 2dtemplate at g=0
+								//                    must be normalized to 
 
 TFile* f2DTemplate;
 TObjArray* tobjarr;

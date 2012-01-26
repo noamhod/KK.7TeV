@@ -33,12 +33,12 @@ bool doQCD             = true;     // must be "false" if doIsolationStudy is "tr
 bool doIsolationStudy  = false;    // must be "false" if doQCD is true
 bool doIsolation       = false;    // should be true for the histogram of the null-isolation-cut only !!!
 bool doWjets           = true;     // no need to rename the output files
-bool doScale2Zpeak     = true;
+bool doScale2Zpeak     = false;
 bool doDYtautau        = true;     // no need to rename the output files
-bool fastDYmumu        = false;
-bool largeDYmumu       = true;
+bool fastDYmumu        = true;
+bool largeDYmumu       = false;
 bool doFullKKtemplates = false;    // will not change anything if doTemplates is "false"
-bool doFullZPtemplates = true;    // will not change anything if doTemplates is "false"
+bool doFullZPtemplates = false;    // will not change anything if doTemplates is "false"
 bool dopileup          = true;
 bool doEWkfactor       = true;
 bool doEWkfactorSig    = false;
@@ -582,21 +582,14 @@ void drawratio(TH1* th1n, TH1* th1d, vector<TString>& vtsMCbgds, TString drawopt
 void drawon(TString existing_oName, TObject* tobj, TString drawopt="", Int_t padNumber=-1)
 {
 	_DEBUG("drawon");
-	_DEBUG("existing_oName = "+(string)existing_oName);
 	
-	_INFO("existing_oName = "+(string)existing_oName);
-	_INFO("tobj->GetName() = "+(string)tobj->GetName());
+	if(padNumber<1) { cnvMap[existing_oName]->cd(); }
+	else            { cnvMap[existing_oName]->cd(padNumber); }
 	
-	if(padNumber<1) { _INFO(""); cnvMap[existing_oName]->cd(); }
-	else            { _INFO(""); cnvMap[existing_oName]->cd(padNumber); }
-	
-	if(drawopt=="") { _INFO(""); tobj->Draw("SAMES"); }
-	else            { _INFO(""); tobj->Draw(drawopt+" SAMES"); }
-	_INFO(""); 
+	if(drawopt=="") { tobj->Draw("SAMES"); }
+	else            { tobj->Draw(drawopt+" SAMES"); }
 	cnvMap[existing_oName]->RedrawAxis();
-	_INFO("");
 	cnvMap[existing_oName]->Update();
-	_INFO("");
 }
 
 void drawtxton(TString existing_oName, bool is2d=false)
@@ -1816,43 +1809,25 @@ void hdraw()
 	
 	if(!doIsolationStudy)
 	{
-		_INFO("");
 		hbgdraw("hNvxp_no_puwgt");
-		_INFO("");
 		hbgdraw("hNvxp_with_puwgt");
-		_INFO("");
 		hbgdraw("hMassNumbers",dolog,dolog);
-		_INFO("");
 		hbgdraw("hMass",dolog,dolog);
-		_INFO("");
 		hbgdraw("hyQ");
-		_INFO("");
 		hbgdraw("hQT",dolog,dolog);
-		_INFO("");
 		hbgdraw("hEtaQ");
-		_INFO("");
 		hbgdraw("hEtaLeading");
-		_INFO("");
 		hbgdraw("hEtaSubleading");
-		_INFO("");
 		hbgdraw("hPhiLeading");
-		_INFO("");
 		hbgdraw("hPhiSubleading");
-		_INFO("");
 		hbgdraw("hpTLeading",dolog,dolog);
-		_INFO("");
 		hbgdraw("hpTSubleading",dolog,dolog);
-		_INFO("");
 	}
 	else
 	{
-		_INFO("");
 		hbgdraw("hMassAntiIsolated",dolog,dolog);
-		_INFO("");
 		hbgdraw("hIsolationFull",!dolog,dolog);
-		_INFO("");
 		hbgdraw("hIsolationLow",!dolog,dolog);
-		_INFO("");
 	}
 	
 	///// 2d

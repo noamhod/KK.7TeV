@@ -67,8 +67,15 @@ void analysisSkeleton::setSmearedMCPpT(int nMus)
 
 	_DEBUG("");
 	
+	_DEBUG("classify3332null.size()="+_s((int)classify3332null.size()));
+	for(int j=0 ; j<nMus ; j++) _DEBUG("classify3332null["+_s(j)+"] = "+_s(classify3332null[j]));
+	
 	for(int j=0 ; j<nMus ; j++)
 	{
+		_DEBUG("j="+_s(j));
+		if(classify3332null[j]==32 || classify3332null[j]==0) continue;
+		_DEBUG("cleared j="+_s(j));
+	
 		// Retrieve Eta, PtCB, PtMS and PtID from ntuples 
 		// Use the MC event number to set seed so that the
 		// random numbers are reproducible by different analyzers
@@ -92,20 +99,13 @@ void analysisSkeleton::setSmearedMCPpT(int nMus)
 		
 		_DEBUG("");
 		
-		// Set Smeared Pts
-		
 		// float orig_ptcb = mu_pt->at(j);
 		
-		///////////////////////////////////////////////////////
-		// First, have to modify the original CB pT ///////////
-		mu_pt->at(j) = MCPpTsmearing->pTCB(); //////////////////
-		///////////////////////////////////////////////////////
-		mu_MCP_ptcb->push_back( MCPpTsmearing->pTCB() ); ///////
-		mu_MCP_ptid->push_back( MCPpTsmearing->pTID() ); ///////
-		mu_MCP_ptms->push_back( MCPpTsmearing->pTMS() ); ///////
-		///////////////////////////////////////////////////////
+		double pTCB_smeared = MCPpTsmearing->pTCB(); 
+		double pTMS_smeared = MCPpTsmearing->pTMS(); 
+		double pTID_smeared = MCPpTsmearing->pTID();
 		
-		//_INFO("pt = "+_s(orig_ptcb)+" -> "+_s(mu_pt->at(j)));
+		_DEBUG("");
 		
 		// float cfms = MCPpTsmearing->ChargeFlipMS();
 		// float cfid = MCPpTsmearing->ChargeFlipID();
@@ -118,14 +118,23 @@ void analysisSkeleton::setSmearedMCPpT(int nMus)
 		
 		_DEBUG("");
 		
-		// double pTCB_smeared = MCPpTsmearing->pTCB(); 
-		// double pTMS_smeared = MCPpTsmearing->pTMS(); 
-		// double pTID_smeared = MCPpTsmearing->pTID();
+		if(AS_doSigmaUP)
+		{
+			// For Systematic Uncertainty studies:
+			// Change the Pts UP or DOWN (ID or MS) 
+			// Valid values for "THESTRING": {"MSLOW", "MSUP", "IDLOW", "IDUP"}
+			string THESTRING = "MSUP";
+			MCPpTsmearing->PTVar(pTMS_smeared, pTID_smeared, pTCB_smeared, THESTRING); 
+		}
 		
-		// For Systematic Uncertainty studies:
-		// Change the Pts UP or DOWN (ID or MS) 
-		// MCPpTsmearing->PTVar(pTMS_smeared, pTID_smeared, pTCB_smeared, THESTRING); 
-		// Valid values for "THESTRING": {"MSLOW", "MSUP", "IDLOW", "IDUP"}
+		///////////////////////////////////////////////
+		// First, have to modify the original CB pT ///
+		mu_pt->at(j) = pTCB_smeared; //////////////////
+		///////////////////////////////////////////////
+		
+		mu_MCP_ptcb->push_back( pTCB_smeared ); 
+		mu_MCP_ptid->push_back( pTID_smeared ); 
+		mu_MCP_ptms->push_back( pTMS_smeared );
 	}
 }
 
@@ -138,29 +147,31 @@ void analysisSkeleton::set2stSmearing()
 void analysisSkeleton::setSmeared2Stations(int nMus)
 {
 	_DEBUG("analysisSkeleton::setSmeared2Stations");
-	_INFO("----------- BEGIN -> Run-lbn-Evt = "+_s(RunNumber)+"-"+_s(lbn)+"-"+_s(EventNumber));
+	// _INFO("----------- BEGIN -> Run-lbn-Evt = "+_s(RunNumber)+"-"+_s(lbn)+"-"+_s(EventNumber));
 	for(int i=0 ; i<nMus ; i++)
 	{
+		if(classify3332null[i]==33 || classify3332null[i]==0) continue;
+	
 		if(!mu_isCombinedMuon->at(i)) continue;
 	
 		// Get the relative uncertainty on ID and MS track pT at IP
-		float eptMS = fabs(mu_me_cov_qoverp_exPV->at(i)/mu_me_qoverp_exPV->at(i));
-		float eptID = fabs(mu_id_cov_qoverp_exPV->at(i)/mu_id_qoverp_exPV->at(i));
+		float eptMS = fabs(sqrt(mu_me_cov_qoverp_exPV->at(i))/mu_me_qoverp_exPV->at(i));
+		float eptID = fabs(sqrt(mu_id_cov_qoverp_exPV->at(i))/mu_id_qoverp_exPV->at(i));
 
 		// Get the pT of the combined, ID and MS tracks at IP
 		float ptcb = 1./fabs(mu_qoverp_exPV->at(i))*sin(mu_theta_exPV->at(i));
 		float ptid = 1./fabs(mu_id_qoverp->at(i))*sin(mu_id_theta->at(i));
 		float ptms = 1./fabs(mu_me_qoverp->at(i))*sin(mu_me_theta->at(i));
 
-		_INFO("mu_me_cov_qoverp_exPV->at("+_s(i)+")="+_s(mu_me_cov_qoverp_exPV->at(i)));
-		_INFO("mu_me_qoverp_exPV->at("+_s(i)+")="+_s(mu_me_qoverp_exPV->at(i)));
-		_INFO("mu_id_cov_qoverp_exPV->at("+_s(i)+")="+_s(mu_id_cov_qoverp_exPV->at(i)));
-		_INFO("mu_id_qoverp_exPV->at("+_s(i)+")="+_s(mu_id_qoverp_exPV->at(i)));
-		_INFO("eptMS="+_s(eptMS));
-		_INFO("eptID="+_s(eptID));
-		_INFO("ptcb="+_s(ptcb));
-		_INFO("ptid="+_s(ptid));
-		_INFO("ptms="+_s(ptms));
+		// _INFO("mu_me_cov_qoverp_exPV->at("+_s(i)+")="+_s(mu_me_cov_qoverp_exPV->at(i)));
+		// _INFO("mu_me_qoverp_exPV->at("+_s(i)+")="+_s(mu_me_qoverp_exPV->at(i)));
+		// _INFO("mu_id_cov_qoverp_exPV->at("+_s(i)+")="+_s(mu_id_cov_qoverp_exPV->at(i)));
+		// _INFO("mu_id_qoverp_exPV->at("+_s(i)+")="+_s(mu_id_qoverp_exPV->at(i)));
+		// _INFO("eptMS="+_s(eptMS));
+		// _INFO("eptID="+_s(eptID));
+		// _INFO("ptcb="+_s(ptcb));
+		// _INFO("ptid="+_s(ptid));
+		// _INFO("ptms="+_s(ptms));
 		
 		// Initialize the random numbers, compute the smearing, and retrieve the smeared pT:
 		TwoStationsSmearing->SetTheSeed(EventNumber, i, RunNumber);
@@ -170,7 +181,7 @@ void analysisSkeleton::setSmeared2Stations(int nMus)
 		///////////////////////////////////////////////////////////
 		float orig_ptcb = mu_pt->at(i); ////////////////////////
 		mu_pt->at(i) = fabs(ptCBsmeared); /////////////////////////
-		_INFO("pt="+_s(orig_ptcb)+" -> "+_s(mu_pt->at(i))); ///
+		// _INFO("pt="+_s(orig_ptcb)+" -> "+_s(mu_pt->at(i))); ///
 		///////////////////////////////////////////////////////////
 		
 		if(ptCBsmeared<0.)
@@ -179,7 +190,7 @@ void analysisSkeleton::setSmeared2Stations(int nMus)
 			mu_charge->at(i)*=-1.;
 		}
 	}
-	_INFO("----------- END");
+	// _INFO("----------- END");
 }
 
 void analysisSkeleton::setPileupParameters(TString dataRootFileName, TString dataRootHistName, TString mcRootFileName, TString mcRootHistName)
@@ -193,29 +204,36 @@ void analysisSkeleton::setPileupParameters(TString dataRootFileName, TString dat
 	
 	pileuprw = new Root::TPileupReweighting( "PileupReweightingTool" );
 	
-	if(doMCPUwrite)
+	/* if(doMCPUwrite)
 	{
-		/* pileuprw->AddPeriod(180164, 177986,180481); //associates mc runnumber 180164 with data period 177986 to 180481 (period B-D)
-		pileuprw->AddPeriod(183003, 180614,184169); //period E-H
-		pileuprw->AddPeriod(185649, 185353,186934); //period I-K1. For I-K you would change the last number to 187815
-		pileuprw->AddPeriod(185761, 186935,999999); //everything after K1. If you changed the previous line to I-K, change middle number of this line to 187816 */
+		// pileuprw->AddPeriod(180164, 177986,180481); //associates mc runnumber 180164 with data period 177986 to 180481 (period B-D)
+		// pileuprw->AddPeriod(183003, 180614,184169); //period E-H
+		// pileuprw->AddPeriod(185649, 185353,186934); //period I-K1. For I-K you would change the last number to 187815
+		// pileuprw->AddPeriod(185761, 186935,999999); //everything after K1. If you changed the previous line to I-K, change middle number of this line to 187816
 		pileuprw->UsePeriodConfig("MC11a"); //for MC11b change the string to "MC11b"
 		pileuprw->Initialize();
 		_WARNING("!!! Generating own MC file !!!");
 	}
 	else
 	{
-		/* pileuprw->AddMCDistribution(mcRootFileName,"MCPileupReweighting");
-		pileuprw->AddDataDistribution(dataRootFileName,"LumiMetaData");
-		// 1: to remove this data from the weight calculations. You should also veto such data events (using isUnrepresentedData(..,..) method)
-		// 2: to leave this data in the calculation. I hope you know what you're doing!! */
-		pileuprw->MergeMCRunNumbers(185649,185761); // MC11a ??????
+		// pileuprw->AddMCDistribution(mcRootFileName,"MCPileupReweighting");
+		// pileuprw->AddDataDistribution(dataRootFileName,"LumiMetaData");
+		//// 1: to remove this data from the weight calculations. You should also veto such data events (using isUnrepresentedData(..,..) method)
+		//// 2: to leave this data in the calculation. I hope you know what you're doing!!
+		pileuprw->MergeMCRunNumbers(185649,185761); // MC11a
 		pileuprw->AddConfigFile(mcRootFileName);
 		pileuprw->AddLumiCalcFile(dataRootFileName); 
 		pileuprw->SetUnrepresentedDataAction( (doRemoveData) ? 1 : 2 );
 		pileuprw->Initialize();
 		// correctedMClumi = (doRemoveData) ? pileuprw->getTotalLumiUsed() : -999.;
-	}
+	} */
+	
+	pileuprw->AddConfigFile(mcRootFileName);
+	pileuprw->AddLumiCalcFile(dataRootFileName); 
+	pileuprw->SetDefaultChannel(0);
+	pileuprw->SetUnrepresentedDataAction( 2 );
+	pileuprw->Initialize();
+	
 }
 
 void analysisSkeleton::writePileupMCfile()
@@ -269,11 +287,35 @@ void analysisSkeleton::resetMuQAflags(int nMus)
 	
 	if(muLooseQAflags.size()>0) muLooseQAflags.clear();
 	for(int j=0 ; j<nMus ; j++) muLooseQAflags.push_back(true);
-	
+}
+
+void analysisSkeleton::classifyMuons(int nMus)
+{
 	if(mu_sig_diff_qoverp.size()>0) mu_sig_diff_qoverp.clear();
 	setMuonMomentumSignificance(mu_sig_diff_qoverp,
 								mu_me_qoverp,mu_id_qoverp,
 								mu_me_cov_qoverp_exPV,mu_id_cov_qoverp_exPV);
+
+	if(classify3332null.size()>0) classify3332null.clear();
+	for(int j=0 ; j<nMus ; j++) classify3332null.push_back(0);
+	float cutval1  = (*m_cutFlowMapSVD)["MShitsPairFormation"][0];
+	float cutval2  = (*m_cutFlowMapSVD)["MShitsPairFormation"][1];
+	float cutval3  = (*m_cutFlowMapSVD)["MShitsPairFormation"][2];
+	float cutval4  = (*m_cutFlowMapSVD)["MShitsPairFormation"][3];
+	float cutval5  = (*m_cutFlowMapSVD)["MShitsPairFormation"][4];
+	float cutval6  = (*m_cutFlowMapSVD)["MShitsPairFormation"][5];
+	float cutval7  = (*m_cutFlowMapSVD)["MShitsPairFormation"][6];
+	float cutval8  = (*m_cutFlowMapSVD)["MShitsPairFormation"][7];
+	classify3233(cutval1,cutval2,cutval3,cutval4,cutval5,cutval6,cutval7,cutval8,
+				 mu_sig_diff_qoverp,
+				 mu_eta, mu_phi, mu_charge,
+				 mu_nMDTBIHits, mu_nMDTBMHits, mu_nMDTBOHits,
+				 mu_nMDTEIHits, mu_nMDTEMHits, mu_nMDTEOHits,
+				 mu_nMDTBEEHits, mu_nMDTEEHits, mu_nMDTBIS78Hits,
+				 mu_nRPCLayer1PhiHits, mu_nRPCLayer2PhiHits, mu_nRPCLayer3PhiHits,
+				 mu_nTGCLayer1PhiHits, mu_nTGCLayer2PhiHits, mu_nTGCLayer3PhiHits, mu_nTGCLayer4PhiHits,
+				 mu_nCSCEtaHits, mu_nCSCPhiHits,
+				 classify3332null);
 }
 
 string analysisSkeleton::getPeriodName()

@@ -169,6 +169,17 @@ public:
 						   int nRPCLayer1PhiHits, int nRPCLayer2PhiHits, int nRPCLayer3PhiHits,
 						   int nTGCLayer1PhiHits, int nTGCLayer2PhiHits, int nTGCLayer3PhiHits, int nTGCLayer4PhiHits,
 						   int nCSCEtaHits, int nCSCPhiHits);
+	inline void classify3233(float MuonPhiHitsCut,    float MuonPhiLayerCut,  float MuonMDTHitsCut,  float MuonMomDiffSigCut,
+							 float MuonPhiHitsCut2,   float MuonPhiLayerCut2, float MuonMDTHitsCut2, float MuonMomDiffSigCut2,
+							 vector<float>& mu_sig_diff_qoverp,
+							 vector<float>* mu_eta, vector<float>* mu_phi, vector<float>* mu_charge,
+							 vector<int>* mu_nMDTBIHits, vector<int>* mu_nMDTBMHits, vector<int>* mu_nMDTBOHits,
+							 vector<int>* mu_nMDTEIHits, vector<int>* mu_nMDTEMHits, vector<int>* mu_nMDTEOHits,
+							 vector<int>* mu_nMDTBEEHits, vector<int>* mu_nMDTEEHits, vector<int>* mu_nMDTBIS78Hits,
+							 vector<int>* mu_nRPCLayer1PhiHits, vector<int>* mu_nRPCLayer2PhiHits, vector<int>* mu_nRPCLayer3PhiHits,
+							 vector<int>* mu_nTGCLayer1PhiHits, vector<int>* mu_nTGCLayer2PhiHits, vector<int>* mu_nTGCLayer3PhiHits, vector<int>* mu_nTGCLayer4PhiHits,
+							 vector<int>* mu_nCSCEtaHits, vector<int>* mu_nCSCPhiHits,
+							 vector<unsigned int>& classified);
 	inline bool nMShitsCut3233(float MuonPhiHitsCut,    float MuonPhiLayerCut,  float MuonMDTHitsCut,  float MuonMomDiffSigCut,
 							   float MuonPhiHitsCut2,   float MuonPhiLayerCut2, float MuonMDTHitsCut2, float MuonMomDiffSigCut2,
 							   bool allow3_3st, bool allow3_2st, vector<bool>& muQAflags, vector<float>& mu_sig_diff_qoverp,

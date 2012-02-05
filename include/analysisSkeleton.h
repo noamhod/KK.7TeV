@@ -33,6 +33,7 @@ public:
 	bool AS_isMC;
 	bool AS_isQCD;
 	bool AS_doSMR;
+	bool AS_doSigmaUP;
 	bool isLoose;
 	bool do2MUselection;
 	bool doIsolation;
@@ -95,6 +96,7 @@ public:
 	string sPeriod;
 	string sCurrentPeriod;
 	vector<float> mu_sig_diff_qoverp;
+	vector<unsigned int> classify3332null;
 	vector<string>* vTriggers;
 	vector<bool> muQAflags;
 	vector<bool> muLooseQAflags;
@@ -649,7 +651,11 @@ public:
 		else if(s=="MShits=3+2") allow3_2st = true;
 		else _FATAL("MS hits can be either 3+3 or 3+2");
 	}
-	void setSmearingFlag(bool doSmearing) { AS_doSMR = doSmearing; }
+	void setSmearingFlag(bool doSmearing, bool doSigmaUp)
+	{
+		AS_doSMR     = doSmearing;
+		AS_doSigmaUP = doSigmaUp;
+	}
 	void setQCD(bool isQCD) { AS_isQCD = isQCD; }
 	void setLoose(bool isloose) { isLoose = isloose; }
 	void set2MUselection(bool do2mu) { do2MUselection = do2mu; }
@@ -667,6 +673,7 @@ public:
 	void setEventDumpFile(string sEventDumpFilePath, float massThresholdInGeV=500.);
 	void setXmlFile(string sXmlPath);
 	
+	void classifyMuons(int nMus);
 	void resetMuQAflags(int nMus);
 	int  countQAflags();
 	void pTSort();

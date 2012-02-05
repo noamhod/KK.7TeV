@@ -7,6 +7,14 @@ require 'find'
 #require 'LoggerDecorator'
 include FileUtils
 
+#####################
+sigmaUp="yes" #######
+##########################################################################
+puts "DID YOU REMEMBER TO EDIT THE FLAGS IN: fast_templates_run.C" #######
+puts "AND TO RUN: broot fast_templates_compile.C  ???" ###################
+##########################################################################
+
+
 ### set the base dir
 dir = Dir.pwd()
 
@@ -14,9 +22,9 @@ workdir = "/srv01/tau/hod/z0analysis-tests/z0analysis-r170/run";
 thisdir = Dir.getwd();
 Dir.chdir(workdir);
 
-mKKmin      = 130; #130;  # 500;  # GeV
-dm          = 40;   #40;   # 250;  # GeV
-mKKmax      = 5130; #3050; # 2000; # GeV
+mKKmin      = 130; # GeV
+dm          = 100; # GeV
+mKKmax      = 5030;# GeV
 nMassPoints = (mKKmax-mKKmin)/dm;
 
 def clean(workdir="")
@@ -42,7 +50,7 @@ def submitjob(jobname="", mass="", workdir="")
 		f.puts "cd -"
 	}
 	
-	%x(qsub -q HEP -e #{workdir}/tmp/err -o #{workdir}/tmp/out #{jobname})
+	%x(qsub -q S -e #{workdir}/tmp/err -o #{workdir}/tmp/out #{jobname})
 	puts "sent -> #{jobname}"
 end
 
@@ -50,8 +58,17 @@ clean(workdir);
 
 (0..nMassPoints).each do |j|
 	mass = j*dm+mKKmin;
-	jobname = "#{workdir}/tmp/job_massnumber_#{j}.sh";
+	type = ""
+	if(sigmaUp=="yes") then
+		type = "sigmaup"
+	else
+		type = "nominal"
+	end
+	jobname = "#{workdir}/tmp/job#{j}_#{type}_mc11c.sh";
 	submitjob(jobname, mass.to_s(), workdir);
 end
 
-Dir.chdir(thisdir); 
+Dir.chdir(thisdir);
+
+puts "DID YOU REMEMBER TO EDIT THE FLAGS IN: fast_templates_run.C"
+puts "AND TO RUN: broot fast_templates_compile.C  ???"

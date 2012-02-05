@@ -1,4 +1,3 @@
-//#include <basicIncludes.h>
 #ifndef BINS_H
 #define BINS_H
 
@@ -39,16 +38,12 @@ static const int bins2chop = 9; // h1 should start at ~128 GeV
 // double mXXmax = 3050.;
 // double dmXX   = 40.;
 static const double mXXmin = 130.;
-static const double mXXmax = 4130.;
-static const double dmXX   = 40.;
-
-static const Int_t    ng2bins = 200;
-static const Double_t g2min   = 0.;
-static const Double_t g2max   = 50.;
+static const double mXXmax = 5130.;
+static const double dmXX   = 100.;
 
 static const Int_t    ng4bins = 200;
 static const Double_t g4min   = 0.;
-static const Double_t g4max   = 100.;
+static const Double_t g4max   = 50.;
 
 static const Int_t    nsqrtg4bins = 50;
 static const Double_t sqrtg4min   = 0.;
@@ -98,6 +93,11 @@ static const Int_t    nlogisoimassbins = 20;
 static const Double_t logisoimassmin   = 70.;
 static const Double_t logisoimassmax   = 600.;
 static Double_t logisoimassbins[nlogisoimassbins+1];
+
+
+static const Int_t    nlingevimassbins = 2930;
+static const Double_t lingevimassmin   = 70.;
+static const Double_t lingevimassmax   = 3000.;
 
 // official pT
 static const Int_t    nsqrtofficialptbins = 40;

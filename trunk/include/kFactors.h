@@ -11,6 +11,19 @@ namespace kFactors
 static double maxEWkF = 3.; /////
 /////////////////////////////////
 
+static double EWkFactorEle(double mass)
+{
+	_DEBUG("kFactor::EWkFactorEle");
+
+	// Valid up to 3 TeV
+	double kF = 1.;
+	if (93.09 < mass && mass <= 250)  kF *= 0.841 + 0.00258*mass - 1.08e-05*mass*mass + 1.54e-08*mass*mass*mass;
+	else if (250 < mass && mass <= 1750)  kF *= 1.067 - 6.34e-05*mass;
+	else if (1750 < mass)  kF *= 0.873 + 0.000183*mass - 7.97e-08*mass*mass;
+
+	return kF;
+}
+
 
 static double QCD(double mass, string type="NNLO/LO**")
 {

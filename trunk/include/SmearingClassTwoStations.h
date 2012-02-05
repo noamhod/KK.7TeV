@@ -26,9 +26,9 @@ class SmearingClassTwoStations{
   void UseGeV();
   
   /* MS or ID smearing only. DetType="MS","ID"*/
-  void Event(double Pt, double _Eta,std::string DetType);
+  void Event(double Pt, double Eta,std::string DetType);
   /* For full MS ID and CB smearing */
-  void Event(double PtMS, double PtID, double PtCB, double _Eta, double ePtMS, double ePtID);
+  void Event(double PtMS, double PtID, double PtCB, double Eta, double ePtMS, double ePtID);
   void Event();
 
   double Smearing(std::string DetType);

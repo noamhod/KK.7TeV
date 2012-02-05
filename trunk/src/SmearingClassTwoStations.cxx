@@ -7,12 +7,21 @@
 #include "SmearingClassTwoStations.h"
 
 
-  /** Smearing Parameters rel.17 2 stations (Muid) **/
+//---------------------------------------------------------------------
+  //// Smearing Parameters rel.17 2 stations (Muid)
   const double ID_MS[4]       = {0., 0., 0., 0.};
-  const double ID_AL[4]       = {0., 0., 0., 0.};
+  const double ID_AL[4]       = {0., 0., 0., 0. };
   const double MS_MS[4]       = {0.02, 0., 0. ,0.};
-  const double MS_AL[4]       = {0.00035, 0.00039, 0., 0.};
+  const double MS_AL[4]       = {0.00035, 0.00037, 0., 0.};
 
+/*   //// Over-Smearing Parameters rel.17 2 stations (Muid)
+ const double ID_MS[4]       = {0., 0., 0., 0.};
+ const double ID_AL[4]       = {0., 0., 0., 0. };
+ const double MS_MS[4]       = {0.03, 0., 0. ,0.};
+ const double MS_AL[4]       = {0.00039, 0.00055, 0., 0.}; */
+//--------------------------------------------------------------------- 
+ 
+ 
 
   /** MC Parameters rel.17 2 stations (Muid) **/
   const double MC_ID_MS[4]    = {0.01607,  0.02588,  0.03389,  0.05116};
@@ -51,7 +60,7 @@ void SmearingClassTwoStations::UseGeV() {
   
 
   /* MS or ID smearing only. DetType="MS","ID"*/
-void SmearingClassTwoStations::Event(double Pt, double _Eta,std::string DetType) {        
+void SmearingClassTwoStations::Event(double Pt, double Eta,std::string DetType) {        
     ptms=0;
     ptid=0;
     ptcb=0;
@@ -61,21 +70,21 @@ void SmearingClassTwoStations::Event(double Pt, double _Eta,std::string DetType)
     if (DetType=="MS")      ptms = Pt;
     else if (DetType=="ID") ptid = Pt;
     else std::cout<<"SmearingClass ERROR: wrong DetType in input "<<DetType<<std::endl; 
-    eta=_Eta;    
+    eta=Eta;    
     detType=DetType;
     Event();
 }
   
 
   /* For full MS ID and CB smearing */
-void SmearingClassTwoStations::Event(double PtMS, double PtID, double PtCB, double _Eta, double ePtMS, double ePtID) {
+void SmearingClassTwoStations::Event(double PtMS, double PtID, double PtCB, double Eta, double ePtMS, double ePtID) {
     detType="All";
     ptms   = PtMS;
     ptid   = PtID;
     ptcb   = PtCB;
     eptms  = ePtMS;
     eptid  = ePtID;
-    eta    = _Eta;
+    eta    = Eta;
     Event();
 }  
   

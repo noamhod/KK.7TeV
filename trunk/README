@@ -46,6 +46,8 @@ to get the Pilup reweighting lib:
 	the library is:
 		PileupReweighting-XX-YY-ZZ/Standalone/libPileupReweighting.so
 
+dilepton packages:
+	svn co svn+ssh://svn.cern.ch/reps/atlasgrp/Physics/Exotic/Analysis/Dilepton/...
 ################################
 ###### SEE run/RUNREADME #######
 ################################

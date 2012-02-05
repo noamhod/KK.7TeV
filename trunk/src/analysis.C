@@ -92,12 +92,21 @@ void analysis::execute()
 	
 	_DEBUG("");
 	
+	///////////////////////////////
+	// this was in the preselection /// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// resetMuQAflags(nMus); //////////
+	////////////////////////////////
+	
+	
 	///////////////////////////////////////////////////////
 	// SMEAR THE MUON PT FOR MC ///////////////////////////
 	if(m_isMC && AS_doSMR)  ///////////////////////////////
 	{                       ///////////////////////////////
-		if     (allow3_3st) setSmearedMCPpT(nMus); ////////
-		else if(allow3_2st) setSmeared2Stations(nMus); ////
+		// if     (allow3_3st) setSmearedMCPpT(nMus); ////////
+		// else if(allow3_2st) setSmeared2Stations(nMus); ////
+		classifyMuons(nMus);
+		setSmearedMCPpT(nMus);
+		setSmeared2Stations(nMus);
 	}                       ///////////////////////////////
 	///////////////////////////////////////////////////////
 	

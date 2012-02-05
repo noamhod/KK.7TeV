@@ -33,10 +33,10 @@ bool doQCD             = true;     // must be "false" if doIsolationStudy is "tr
 bool doIsolationStudy  = false;    // must be "false" if doQCD is true
 bool doIsolation       = false;    // should be true for the histogram of the null-isolation-cut only !!!
 bool doWjets           = true;     // no need to rename the output files
-bool doScale2Zpeak     = false;
+bool doScale2Zpeak     = true;
 bool doDYtautau        = true;     // no need to rename the output files
-bool fastDYmumu        = true;
-bool largeDYmumu       = false;
+bool fastDYmumu        = false;
+bool largeDYmumu       = true;
 bool doFullKKtemplates = false;    // will not change anything if doTemplates is "false"
 bool doFullZPtemplates = false;    // will not change anything if doTemplates is "false"
 bool dopileup          = true;
@@ -45,7 +45,7 @@ bool doEWkfactorSig    = false;
 bool doQCDkfactor      = true;
 bool doZpT             = true;
 bool doCouplingsScale  = false;
-bool doRemoveHighMass  = true;
+bool doRemoveHighMass  = false;
 void matchFlags()
 {
 	doQCD = !doIsolationStudy;
@@ -914,12 +914,12 @@ void setMCtrees(TString tsMCname)
 	if(tsMCname=="W+jets"  && doWjets)
 	{
 		// setMCtree(ntupledir+"/mcLocalControl_Wmunu"+filesuffix+".root", "mcLocalControl_Wmunu", 6959806, 8.7017E+00*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp0_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp0_pt20", 3421954, 8.284);  // AMI: 6.9324E+00*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp1_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp1_pt20", 2479594, 1.5616); // AMI: 1.3059E+00*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp2_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp2_pt20", 3718149, 0.4533); // AMI: 3.7807E-01*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp3_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp3_pt20", 988857,  0.1217); // AMI: 1.0185E-01*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp4_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp4_pt20", 254950,  0.0310); // AMI: 2.5720E-02*nb2fb);
-		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp5_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp5_pt20", 70000,   0.0083); // AMI: 6.9999E-03*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp0_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp0_pt20", 3421954, 8.2840*nb2fb); // AMI: 6.9324E+00*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp1_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp1_pt20", 2479594, 1.5616*nb2fb); // AMI: 1.3059E+00*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp2_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp2_pt20", 3718149, 0.4533*nb2fb); // AMI: 3.7807E-01*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp3_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp3_pt20", 988857,  0.1217*nb2fb); // AMI: 1.0185E-01*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp4_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp4_pt20", 254950,  0.0310*nb2fb); // AMI: 2.5720E-02*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_AlpgenJimmyWmunuNp5_pt20"+filesuffix+".root", "mcLocalControl_AlpgenJimmyWmunuNp5_pt20", 70000,   0.0083*nb2fb); // AMI: 6.9999E-03*nb2fb);
 	}
 	
 	
@@ -1435,6 +1435,12 @@ void hbook()
 				 grpx[name]->filcolor,grpx[name]->filstyle,
 				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
 				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
+		h1Map.insert( make_pair("hMass1GeV"+name, new TH1D("hMass1GeV"+name,";m_{#mu#mu} GeV;Events",nlingevimassbins,lingevimassmin,lingevimassmax)) );
+		setlogx(h1Map["hMass1GeV"+name]);
+		graphics(h1Map["hMass1GeV"+name],
+				 grpx[name]->filcolor,grpx[name]->filstyle,
+				 grpx[name]->lincolor,grpx[name]->linstyle,grpx[name]->linwidth,
+				 grpx[name]->mrkcolor,grpx[name]->mrkstyle,grpx[name]->mrksize);
 				 
 		h1Map.insert( make_pair("hMassAntiIsolated"+name, new TH1D("hMassAntiIsolated"+name,";m_{#mu#mu} GeV;Events",nlogisoimassbins,logisoimassbins)) );
 		setlogx(h1Map["hMassAntiIsolated"+name]);
@@ -1566,6 +1572,7 @@ void hscale2Zpeak()
 		
 		Scale(h1Map["hMassNumbers"+name],ratio);
 		Scale(h1Map["hMass"+name],ratio);
+		Scale(h1Map["hMass1GeV"+name],ratio);
 		Scale(h1Map["hMass_limit_"+name],ratio);
 		
 		if(name=="DYmumu" || name.Contains("Zprime") || name.Contains("ExtraDimsTEV"))
@@ -1635,7 +1642,8 @@ void hMCsumDY(TString tsMCname)
 	h1Map["hNvxp_no_puwgtDYmumu"]->Add(h1Map["hNvxp_no_puwgtDYtautau"]);
 	h1Map["hNvxp_with_puwgtDYmumu"]->Add(h1Map["hNvxp_with_puwgtDYtautau"]);
 	h1Map["hMassNumbersDYmumu"]->Add(h1Map["hMassNumbersDYtautau"]);
-	h1Map["hMassDYmumu"]->Add(h1Map["hMassDYtautau"]);	
+	h1Map["hMassDYmumu"]->Add(h1Map["hMassDYtautau"]);
+	h1Map["hMass1GeVDYmumu"]->Add(h1Map["hMass1GeVDYtautau"]);
 	h1Map["hMassAntiIsolatedDYmumu"]->Add(h1Map["hMassAntiIsolatedDYtautau"]);	
 	h1Map["hMass_limit_DYmumu"]->Add(h1Map["hMass_limit_DYtautau"]);
 	h1Map["hIsolationFullDYmumu"]->Add(h1Map["hIsolationFullDYtautau"]);
@@ -1663,6 +1671,7 @@ void hMCsumall(TString tsMCname)
 	h1Map["hNvxp_with_puwgtMCsum"]->Add(h1Map["hNvxp_with_puwgt"+tsMCname]);
 	h1Map["hMassNumbersMCsum"]->Add(h1Map["hMassNumbers"+tsMCname]);
 	h1Map["hMassMCsum"]->Add(h1Map["hMass"+tsMCname]);	
+	h1Map["hMass1GeVMCsum"]->Add(h1Map["hMass1GeV"+tsMCname]);	
 	h1Map["hMassAntiIsolatedMCsum"]->Add(h1Map["hMassAntiIsolated"+tsMCname]);	
 	h1Map["hMass_limit_MCsum"]->Add(h1Map["hMass_limit_"+tsMCname]);
 	h1Map["hIsolationFullMCsum"]->Add(h1Map["hIsolationFull"+tsMCname]);
@@ -1813,6 +1822,7 @@ void hdraw()
 		hbgdraw("hNvxp_with_puwgt");
 		hbgdraw("hMassNumbers",dolog,dolog);
 		hbgdraw("hMass",dolog,dolog);
+		hbgdraw("hMass1GeV",!dolog,dolog);
 		hbgdraw("hyQ");
 		hbgdraw("hQT",dolog,dolog);
 		hbgdraw("hEtaQ");
@@ -1885,8 +1895,8 @@ void weightsNoPU(TString tsMCname, float mass=0., unsigned int truXid=0, double 
 	if(isnaninf(event_weight_backgrounds)) _FATAL("event_weight_backgrounds is nan or inf -> "+_s(event_weight_backgrounds));
 	
 	event_weight_signals = all_mcevent_weight;
-	event_weight_signals *= (doQCDkfactor && isEWSignal) ? kFQCD_NNLOvLOss   : 1.;
-	event_weight_signals *= (doZpT)                      ? ZpTweight         : 1.;
+	event_weight_signals *= (doQCDkfactor && isEWSignal) ? kFQCD_NNLOvLOss : 1.;
+	event_weight_signals *= (doZpT)                      ? ZpTweight       : 1.;
 	if(isnaninf(event_weight_signals)) _FATAL("event_weight_signals is nan or inf -> "+_s(event_weight_signals));
 
 	event_weight = (isEWSignal || isGSignal) ? event_weight_signals : event_weight_backgrounds;
@@ -2403,6 +2413,7 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 				h1Map["hNvxp_with_puwgt"+tsMCname]->Fill(recon_all_vxp_n,wgt*event_weight);
 				h1Map["hMassNumbers"+tsMCname]->Fill(mass,wgt*event_weight);
 				h1Map["hMass"+tsMCname]->Fill(mass,wgt*event_weight);
+				h1Map["hMass1GeV"+tsMCname]->Fill(mass,wgt*event_weight);
 				h1Map["hIsolationFull"+tsMCname]->Fill(iso30Leading,wgt*event_weight);
 				h1Map["hIsolationFull"+tsMCname]->Fill(iso30Subleading,wgt*event_weight); // same histogram for isolation !
 				h1Map["hIsolationLow"+tsMCname]->Fill(iso30Leading,wgt*event_weight);
@@ -2476,6 +2487,7 @@ void hfill(TString tsRunType="", TString tsMCname="", Double_t wgt=1.)
 		h1Map["hNvxp_with_puwgt"+tsRunType]->Fill(vxp_n,wgt);
 		h1Map["hMassNumbers"+tsRunType]->Fill(mass,wgt);
 		h1Map["hMass"+tsRunType]->Fill(mass,wgt);
+		h1Map["hMass1GeV"+tsRunType]->Fill(mass,wgt);
 		h1Map["hIsolationFull"+tsRunType]->Fill(iso30Leading,wgt);
 		h1Map["hIsolationFull"+tsRunType]->Fill(iso30Subleading,wgt); // same histo for isolation
 		h1Map["hIsolationLow"+tsRunType]->Fill(iso30Leading,wgt);

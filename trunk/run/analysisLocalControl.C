@@ -30,10 +30,12 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	string sRel;
 	string sMCPtag;
 	string sDoSmearing;
+	string sDoSigmaUp;
 	string sMShits;
 	string sPUwriteMC;
 	string sPUremoveData;
 	bool bDoSmearing;
+	bool bDoSigmaUp;
 	bool bPUwriteMC;
 	bool bPUremoveData;
 	string sMCorData;
@@ -52,7 +54,7 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	
 	ifstream ifsel( localRunControlFile.c_str() );
 	ifsel >> sBaseDir >> sRun
-		  >> sDataType >> sRec >> spTtype >> sRel >> sMCPtag >> sDoSmearing
+		  >> sDataType >> sRec >> spTtype >> sRel >> sMCPtag >> sDoSmearing >> sDoSigmaUp
 		  >> sPUwriteMC >> sPUremoveData
 		  >> sMCorData
 		  >> sMShits
@@ -73,6 +75,8 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	if (found==string::npos) _FATAL("YOU CHOSE MCP TAG ["+sMCPtag+"]");
 	if(sDoSmearing!="doSmearing=yes" && sDoSmearing!="doSmearing=no") _FATAL("YOU CHOSE SMEARING FLAG ["+sDoSmearing+"]");
 	bDoSmearing = (sDoSmearing=="doSmearing=yes") ? true : false;
+	if(sDoSigmaUp!="doSigmaUp=yes" && sDoSigmaUp!="doSigmaUp=no") _FATAL("YOU CHOSE SMEARING SYST' ["+sDoSigmaUp+"]");
+	bDoSigmaUp = (sDoSigmaUp=="doSigmaUp=yes") ? true : false;
 	
 	if(sPUwriteMC!="pu_writeMC=true"  &&  sPUwriteMC!="pu_writeMC=false") _FATAL("YOU CHOSE PU WRITE FLAG ["+sPUwriteMC+"]");
 	bPUwriteMC = (sPUwriteMC=="pu_writeMC=true");
@@ -117,6 +121,7 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	m_release   = sRel; // "Rel17"
 	m_MCPtag    = sMCPtag; // "MuonMomentumCorrections-XX-YY-ZZ"
 	m_doSmearing  = bDoSmearing;
+	m_doSigmaUp   = bDoSigmaUp;
 	m_doPUwriteMC = bPUwriteMC;
 	m_doPUremoveData = bPUremoveData;
 	m_MShits    = sMShits;
@@ -135,6 +140,7 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	_INFO("m_release="+m_release);
 	_INFO("m_MCPtag="+m_MCPtag);
 	_INFO("m_doSmearing="+_s(m_doSmearing));
+	_INFO("m_doSigmaUp="+_s(m_doSigmaUp));
 	_INFO("m_doPUwriteMC="+_s(m_doPUwriteMC));
 	_INFO("m_doPUremoveData="+_s(m_doPUremoveData));
 	_INFO("m_MShits="+m_MShits);
@@ -236,6 +242,7 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 		if     (m_MShits=="MShits=3+3") str_selector += "_33st";
 		else if(m_MShits=="MShits=3+2") str_selector += "_32st";
 		if(m_doSmearing && m_isMC)      str_selector += "_smeared";
+		if(m_doSigmaUp  && m_isMC)      str_selector += "_sigmaUp";
 		if(!m_do2mu)                    str_selector += "_no2muSel";
 		if(!m_doIso)                    str_selector += "_noIso";
 	}
@@ -345,11 +352,13 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 	///////////////////////////////////////////
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	if(m_isMC) m_analysis->setSmearingFlag(m_doSmearing); // will turn on/off the smearing operation ////////////
+	if(m_isMC) m_analysis->setSmearingFlag(m_doSmearing,m_doSigmaUp); // will turn on/off the smearing operation and/or +1 sigma////////////
 	if(m_isMC)
 	{
-		if     (m_analysis->allow3_3st) m_analysis->setMCPpTparameters(m_dataType, m_muRecAlgo, m_pTsmearingType, m_release, str_mcp);
-		else if(m_analysis->allow3_2st) m_analysis->set2stSmearing();
+		// if     (m_analysis->allow3_3st) m_analysis->setMCPpTparameters(m_dataType, m_muRecAlgo, m_pTsmearingType, m_release, str_mcp);
+		// else if(m_analysis->allow3_2st) m_analysis->set2stSmearing();
+		m_analysis->setMCPpTparameters(m_dataType, m_muRecAlgo, m_pTsmearingType, m_release, str_mcp);
+		m_analysis->set2stSmearing();
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
@@ -376,7 +385,8 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 		// string str_pileuphist_data = basedir+"/../conf/data11_7TeV.periodBtoD.root"; // this is just a default initializer. it is overriden in analysisSkeleton
 		string str_pileuphist_data = basedir+"/../conf/CURRENT_iLUMICALC_HISTOGRAMS.root";
 		_INFO("LOADING FILE -> "+str_pileuphist_data);
-		string str_pileuphist_mc = basedir+"/../conf/pileup_"+str_mcname+".root"; // this is just a default initializer. it is overriden in analysisSkeleton
+		// string str_pileuphist_mc = basedir+"/../conf/pileup_"+str_mcname+".root"; // this is just a default initializer. it is overriden in analysisSkeleton
+		string str_pileuphist_mc = basedir+"/../conf/mc11b_defaults.prw.root"; // this is just a default initializer. it is overriden in analysisSkeleton
 		_INFO("LOADING FILE -> "+str_pileuphist_mc);
 		m_analysis->setPileupParameters((TString)str_pileuphist_data, "LumiMetaData", (TString)str_pileuphist_mc, "MCPileupReweighting");
 	}

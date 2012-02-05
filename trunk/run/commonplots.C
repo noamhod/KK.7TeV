@@ -49,7 +49,8 @@ void commonplots()
 	
 	olddir->cd();
 	
-	TFile* fileAll = new TFile("plots/mcdata_histograms_noTmplts_noEWkFsig_noCoupScale.root","READ");
+//	TFile* fileAll = new TFile("plots/mcdata_histograms_noTmplts_noEWkFsig_noCoupScale.root","READ");
+	TFile* fileAll = new TFile("plots/mcdata_histograms_noTmplts_noEWkFsig_noCoupScale_noHighMass.root","READ");
 	TFile* fileIso = new TFile("plots/mcdata_histograms_noTmplts_noQCD_noEWkFsig_noCoupScale_isoStudy.root","READ");
 	
 	TMapiTS    scanvases;
@@ -291,6 +292,18 @@ void commonplots()
 	histograms.push_back("hMassZprime_SSM2000_truth");
 	histograms.push_back("hMassZprime_SSM2000_template");
 	histograms.push_back("hMassZprime_SSM2000_template_truth");
+
+	histograms.push_back("hMass1GeVDYmumu");
+        //histograms.push_back("hMass1GeVDYmumu_truth");
+        histograms.push_back("hMass1GeVDYtautau");
+        histograms.push_back("hMass1GeVData");
+        histograms.push_back("hMass1GeVDataChopped");      // chopped
+        histograms.push_back("hMass1GeVDiboson");
+        histograms.push_back("hMass1GeVQCD");
+        histograms.push_back("hMass1GeVTTbar");
+        histograms.push_back("hMass1GeVW+jets");
+        histograms.push_back("hMass1GeVMCsum");
+        histograms.push_back("hMass1GeVMCnoDYsum");        // no DY
 	
 	histograms.push_back("hEtaQDYmumu");
 	histograms.push_back("hEtaQDYtautau");
@@ -483,24 +496,33 @@ void commonplots()
 	}
 	olddir->cd();
 	TH1D* hMassMCnoDYsum = (TH1D*)fileAll->Get("hMassDiboson")->Clone("hMassMCnoDYsum");
+	TH1D* hMass1GeVMCnoDYsum = (TH1D*)fileAll->Get("hMass1GeVDiboson")->Clone("hMass1GeVMCnoDYsum");
 	hMassMCnoDYsum->Add((TH1D*)fileAll->Get("hMassQCD"));
+	hMass1GeVMCnoDYsum->Add((TH1D*)fileAll->Get("hMass1GeVQCD"));
 	hMassMCnoDYsum->Add((TH1D*)fileAll->Get("hMassTTbar"));
+	hMass1GeVMCnoDYsum->Add((TH1D*)fileAll->Get("hMass1GeVTTbar"));
 	hMassMCnoDYsum->Add((TH1D*)fileAll->Get("hMassW+jets"));
+	hMass1GeVMCnoDYsum->Add((TH1D*)fileAll->Get("hMass1GeVW+jets"));
 	TH1D* hMassData      = (TH1D*)fileAll->Get("hMassData")->Clone();
+	TH1D* hMass1GeVData  = (TH1D*)fileAll->Get("hMass1GeVData")->Clone();
 	TH1D* hMassMCsum     = (TH1D*)fileAll->Get("hMassMCsum")->Clone();
+	TH1D* hMass1GeVMCsum = (TH1D*)fileAll->Get("hMass1GeVMCsum")->Clone();
 	TH1D* hMassMCnoDYsumChopped = (TH1D*)hChopper(hMassMCnoDYsum, bins2chop)->Clone("hMassMCnoDYsumChopped");
+	TH1D* hMass1GeVMCnoDYsumChopped = (TH1D*)hChopper(hMass1GeVMCnoDYsum, bins2chop)->Clone("hMass1GeVMCnoDYsumChopped");
 	TH1D* hMassDataChopped = (TH1D*)hChopper(hMassData, bins2chop)->Clone("hMassDataChopped");
+	TH1D* hMass1GeVDataChopped = (TH1D*)hChopper(hMass1GeVData, bins2chop)->Clone("hMass1GeVDataChopped");
 	TH1D* hMassMCsumChopped = (TH1D*)hChopper(hMassMCsum, bins2chop)->Clone("hMassMCsumChopped");
+	TH1D* hMass1GeVMCsumChopped = (TH1D*)hChopper(hMass1GeVMCsum, bins2chop)->Clone("hMass1GeVMCsumChopped");
 	oFile->cd();
-	hMassMCnoDYsum->Write();
-	(*oList) << (string)hMassMCnoDYsum->GetName() << endl;
-	hMassMCnoDYsumChopped->Write();
-	(*oList) << (string)hMassMCnoDYsumChopped->GetName() << endl;
-	hMassDataChopped->Write();
-	(*oList) << (string)hMassDataChopped->GetName() << endl;
-	hMassMCsumChopped->Write();
-	(*oList) << (string)hMassMCsumChopped->GetName() << endl;
+	hMassMCnoDYsum->Write(); (*oList) << (string)hMassMCnoDYsum->GetName() << endl;
+	hMass1GeVMCnoDYsum->Write(); (*oList) << (string)hMass1GeVMCnoDYsum->GetName() << endl;
+	hMassMCnoDYsumChopped->Write(); (*oList) << (string)hMassMCnoDYsumChopped->GetName() << endl;
+	hMass1GeVMCnoDYsumChopped->Write(); (*oList) << (string)hMass1GeVMCnoDYsumChopped->GetName() << endl;
+	hMass1GeVDataChopped->Write(); (*oList) << (string)hMass1GeVDataChopped->GetName() << endl;
+	hMass1GeVMCsumChopped->Write(); (*oList) << (string)hMass1GeVMCsumChopped->GetName() << endl;
 	oList->close();
+
+	
 	
 	unsigned int counter = 0;
 	unsigned int max = scanvases.size();

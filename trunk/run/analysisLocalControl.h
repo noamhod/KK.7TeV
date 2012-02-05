@@ -44,6 +44,7 @@ class analysisLocalControl : public chainMaker/*, public utilities*/
 		string m_release;
 		string m_MCPtag;
 		bool m_doSmearing;
+		bool m_doSigmaUp;
 		string m_MShits;
 		bool m_doPUwriteMC;
 		bool m_doPUremoveData;

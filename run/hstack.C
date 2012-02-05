@@ -47,7 +47,7 @@ void hstack()
 	for(int i=0 ; i<gApplication->Argc() ; i++)
 	{
 		#ifdef VERBOSEARGS
-			printf("Arg  %d:  %s\n",i,gApplication->Argv(i));
+		printf("Arg  %d:  %s\n",i,gApplication->Argv(i));
 		#endif
 	}
 	if(gApplication->Argc()>10) _FATAL("gApplication->Argc()="+_s(gApplication->Argc()));
@@ -87,77 +87,78 @@ void hstack()
 	TString titles = (TString)(((TH1D*)fhistos->Get("h"+htype+"DYmumu"+truth))->GetTitle());
 	titles += ";" + (TString)(((TH1D*)fhistos->Get("h"+htype+"DYmumu"+truth))->GetXaxis()->GetTitle());
 	titles += ";" + (TString)(((TH1D*)fhistos->Get("h"+htype+"DYmumu"+truth))->GetYaxis()->GetTitle());
-	THStack* backgounds = new THStack("hs_"+htype+"_"+ftype,titles);
+	THStack* backgrounds = new THStack("hs_"+htype+"_"+ftype,titles);
 	
 	
 	// MC sum of backgrounds
 	TH1D* hMCsum = (TH1D*)fhistos->Get("h"+htype+"DYmumu"+truth)->Clone();
 	if(htype.Contains("Subleading"))
-		if(htype=="pTSubleading")  hMCsum->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
-		if(htype=="EtaSubleading") hMCsum->GetXaxis()->SetTitle("#eta^{subleading}");
-		if(htype=="PhiSubleading") hMCsum->GetXaxis()->SetTitle("#phi^{subleading}");
+	if(htype=="pTSubleading")  hMCsum->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
+	if(htype=="EtaSubleading") hMCsum->GetXaxis()->SetTitle("#eta^{subleading}");
+	if(htype=="PhiSubleading") hMCsum->GetXaxis()->SetTitle("#phi^{subleading}");
 	hMCsum->Reset();
 	hMCsum->SetName("h"+htype+"MCsum"+truth);
 	
 	TH1D* hMCsumNODY = (TH1D*)fhistos->Get("h"+htype+"DYmumu"+truth)->Clone();
-		if(htype=="pTSubleading")  hMCsumNODY->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
-		if(htype=="EtaSubleading") hMCsumNODY->GetXaxis()->SetTitle("#eta^{subleading}");
-		if(htype=="PhiSubleading") hMCsumNODY->GetXaxis()->SetTitle("#phi^{subleading}");
+	if(htype=="pTSubleading")  hMCsumNODY->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
+	if(htype=="EtaSubleading") hMCsumNODY->GetXaxis()->SetTitle("#eta^{subleading}");
+	if(htype=="PhiSubleading") hMCsumNODY->GetXaxis()->SetTitle("#phi^{subleading}");
 	hMCsumNODY->Reset();
 	hMCsumNODY->SetName("h"+htype+"MCsumNODY"+truth);
 	
 	// BACKGROUNDS
 	TH1D* hQCD  = (TH1D*)fhistos->Get("h"+htype+QCD+truth)->Clone();
-		if(htype=="pTSubleading")  hQCD->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
-		if(htype=="EtaSubleading") hQCD->GetXaxis()->SetTitle("#eta^{subleading}");
-		if(htype=="PhiTSubleading") hQCD->GetXaxis()->SetTitle("#phi^{subleading}");
+	if(htype=="pTSubleading")  hQCD->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
+	if(htype=="EtaSubleading") hQCD->GetXaxis()->SetTitle("#eta^{subleading}");
+	if(htype=="PhiTSubleading") hQCD->GetXaxis()->SetTitle("#phi^{subleading}");
 	// if(isIsolation) hQCD->Scale(2.);
 	hQCD->SetFillColor(kYellow-9);
-	backgounds->Add(hQCD);
+	backgrounds->Add(hQCD);
 	hMCsum->Add(hQCD);
 	hMCsumNODY->Add(hQCD);
 	
-	TH1D* hWjets = (TH1D*)fhistos->Get("h"+htype+"W+jets"+truth)->Clone();
-		if(htype=="pTSubleading")  hWjets->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
-		if(htype=="EtaSubleading") hWjets->GetXaxis()->SetTitle("#eta^{subleading}");
-		if(htype=="PhiSubleading") hWjets->GetXaxis()->SetTitle("#phi^{subleading}");
+	TH1D* hWjets = (TH1D*)fhistos->Get("h"+htype+"W+jets"+truth)->Clone("Wjets");
+	hWjets->Scale(nb2fb);
+	if(htype=="pTSubleading")  hWjets->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
+	if(htype=="EtaSubleading") hWjets->GetXaxis()->SetTitle("#eta^{subleading}");
+	if(htype=="PhiSubleading") hWjets->GetXaxis()->SetTitle("#phi^{subleading}");
 	hWjets->SetFillColor(kGreen-3);
-	backgounds->Add(hWjets);
+	backgrounds->Add(hWjets);
 	hMCsum->Add(hWjets);
 	hMCsumNODY->Add(hWjets);
 	
 	TH1D* hTTbar = (TH1D*)fhistos->Get("h"+htype+"TTbar"+truth)->Clone();
-		if(htype=="pTSubleading")  hTTbar->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
-		if(htype=="EtaSubleading") hTTbar->GetXaxis()->SetTitle("#eta^{subleading}");
-		if(htype=="PhiSubleading") hTTbar->GetXaxis()->SetTitle("#phi^{subleading}");
+	if(htype=="pTSubleading")  hTTbar->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
+	if(htype=="EtaSubleading") hTTbar->GetXaxis()->SetTitle("#eta^{subleading}");
+	if(htype=="PhiSubleading") hTTbar->GetXaxis()->SetTitle("#phi^{subleading}");
 	hTTbar->SetFillColor(kRed+1);
-	backgounds->Add(hTTbar);
+	backgrounds->Add(hTTbar);
 	hMCsum->Add(hTTbar);
 	hMCsumNODY->Add(hTTbar);
 	
 	TH1D* hDiboson = (TH1D*)fhistos->Get("h"+htype+"Diboson"+truth)->Clone();
-		if(htype=="pTSubleading")  hDiboson->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
-		if(htype=="EtaSubleading") hDiboson->GetXaxis()->SetTitle("#eta^{subleading}");
-		if(htype=="PhiSubleading") hDiboson->GetXaxis()->SetTitle("#phi^{subleading}");
+	if(htype=="pTSubleading")  hDiboson->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
+	if(htype=="EtaSubleading") hDiboson->GetXaxis()->SetTitle("#eta^{subleading}");
+	if(htype=="PhiSubleading") hDiboson->GetXaxis()->SetTitle("#phi^{subleading}");
 	hDiboson->SetFillColor(kOrange);
-	backgounds->Add(hDiboson);
+	backgrounds->Add(hDiboson);
 	hMCsum->Add(hDiboson);
 	hMCsumNODY->Add(hDiboson);
 	
 	TH1D* hDY = (TH1D*)fhistos->Get("h"+htype+"DYmumu"+truth)->Clone();
-		if(htype=="pTSubleading")  hDY->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
-		if(htype=="EtaSubleading") hDY->GetXaxis()->SetTitle("#eta^{subleading}");
-		if(htype=="PhiSubleading") hDY->GetXaxis()->SetTitle("#phi^{subleading}");
+	if(htype=="pTSubleading")  hDY->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
+	if(htype=="EtaSubleading") hDY->GetXaxis()->SetTitle("#eta^{subleading}");
+	if(htype=="PhiSubleading") hDY->GetXaxis()->SetTitle("#phi^{subleading}");
 	hDY->SetFillColor(kAzure-9);
-	backgounds->Add(hDY);
+	backgrounds->Add(hDY);
 	hMCsum->Add(hDY);	
 	
 	
 	// data
 	TH1D* hData = (TH1D*)fhistos->Get("h"+htype+"Data")->Clone();
-		if(htype=="pTSubleading")  hData->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
-		if(htype=="EtaSubleading") hData->GetXaxis()->SetTitle("#eta^{subleading}");
-		if(htype=="PhiSubleading") hData->GetXaxis()->SetTitle("#phi^{subleading}");
+	if(htype=="pTSubleading")  hData->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
+	if(htype=="EtaSubleading") hData->GetXaxis()->SetTitle("#eta^{subleading}");
+	if(htype=="PhiSubleading") hData->GetXaxis()->SetTitle("#phi^{subleading}");
 	hData->SetLineWidth(2);
 	hData->SetMarkerStyle(20);
 	TGraphAsymmErrors* gaData = (TGraphAsymmErrors*)(poisson(hData))->Clone("");
@@ -168,42 +169,81 @@ void hstack()
 	TH1D* ZP1500 = NULL;
 	TH1D* ZP1750 = NULL;
 	TH1D* ZP2000 = NULL;
+	/*
 	if(!isIsolation  &&  doSignals)
 	{
 		ZP1500 = (TH1D*)fhistos->Get("h"+htype+"Zprime_SSM1500_template"+truth);
 		ZP1500->Add(hMCsumNODY);
-			if(htype=="pTSubleading")  ZP1500->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
-			if(htype=="EtaSubleading") ZP1500->GetXaxis()->SetTitle("#eta^{subleading}");
-			if(htype=="PhiSubleading") ZP1500->GetXaxis()->SetTitle("#phi^{subleading}");
+		if(htype=="pTSubleading")  ZP1500->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
+		if(htype=="EtaSubleading") ZP1500->GetXaxis()->SetTitle("#eta^{subleading}");
+		if(htype=="PhiSubleading") ZP1500->GetXaxis()->SetTitle("#phi^{subleading}");
 		ZP1500->SetLineColor(kRed+2);
 		signals->Add(ZP1500);
 		signalNames.insert(make_pair((TString)ZP1500->GetName(),"Z'_{SSM} (1500 GeV)"));
 		ZP1750 = (TH1D*)fhistos->Get("h"+htype+"Zprime_SSM1750_template"+truth);
 		ZP1750->Add(hMCsumNODY);
-			if(htype=="pTSubleading")  ZP1750->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
-			if(htype=="EtaSubleading") ZP1750->GetXaxis()->SetTitle("#eta^{subleading}");
-			if(htype=="PhiSubleading") ZP1750->GetXaxis()->SetTitle("#phi^{subleading}");
+		if(htype=="pTSubleading")  ZP1750->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
+		if(htype=="EtaSubleading") ZP1750->GetXaxis()->SetTitle("#eta^{subleading}");
+		if(htype=="PhiSubleading") ZP1750->GetXaxis()->SetTitle("#phi^{subleading}");
 		ZP1750->SetLineColor(kGreen+2);
 		signals->Add(ZP1750);
 		signalNames.insert(make_pair((TString)ZP1750->GetName(),"Z'_{SSM} (1750 GeV)"));
 		ZP2000 = (TH1D*)fhistos->Get("h"+htype+"Zprime_SSM2000_template"+truth);
 		ZP2000->Add(hMCsumNODY);
-			if(htype=="pTSubleading")  ZP2000->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
-			if(htype=="EtaSubleading") ZP2000->GetXaxis()->SetTitle("#eta^{subleading}");
-			if(htype=="PhiSubleading") ZP2000->GetXaxis()->SetTitle("#phi^{subleading}");
+		if(htype=="pTSubleading")  ZP2000->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
+		if(htype=="EtaSubleading") ZP2000->GetXaxis()->SetTitle("#eta^{subleading}");
+		if(htype=="PhiSubleading") ZP2000->GetXaxis()->SetTitle("#phi^{subleading}");
 		ZP2000->SetLineColor(kViolet+2);
 		signals->Add(ZP2000);
 		signalNames.insert(make_pair((TString)ZP2000->GetName(),"Z'_{SSM} (2000 GeV)"));
+	}
+	*/
+	if(!isIsolation  &&  doSignals)
+	{
+		ZP1500 = (TH1D*)fhistos->Get("h"+htype+"KK1500_template"+truth);
+		ZP1500->Add(hMCsumNODY);
+		if(htype=="pTSubleading")  ZP1500->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
+		if(htype=="EtaSubleading") ZP1500->GetXaxis()->SetTitle("#eta^{subleading}");
+		if(htype=="PhiSubleading") ZP1500->GetXaxis()->SetTitle("#phi^{subleading}");
+		ZP1500->SetLineColor(kRed+2);
+		signals->Add(ZP1500);
+		signalNames.insert(make_pair((TString)ZP1500->GetName(),"#gamma_{KK}/Z_{KK} (1500 GeV)"));
+		ZP1750 = (TH1D*)fhistos->Get("h"+htype+"KK1750_template"+truth);
+		ZP1750->Add(hMCsumNODY);
+		if(htype=="pTSubleading")  ZP1750->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
+		if(htype=="EtaSubleading") ZP1750->GetXaxis()->SetTitle("#eta^{subleading}");
+		if(htype=="PhiSubleading") ZP1750->GetXaxis()->SetTitle("#phi^{subleading}");
+		ZP1750->SetLineColor(kGreen+2);
+		signals->Add(ZP1750);
+		signalNames.insert(make_pair((TString)ZP1750->GetName(),"#gamma_{KK}/Z_{KK} (1750 GeV)"));
+		ZP2000 = (TH1D*)fhistos->Get("h"+htype+"KK2000_template"+truth);
+		ZP2000->Add(hMCsumNODY);
+		if(htype=="pTSubleading")  ZP2000->GetXaxis()->SetTitle("p_{T}^{subleading} GeV");
+		if(htype=="EtaSubleading") ZP2000->GetXaxis()->SetTitle("#eta^{subleading}");
+		if(htype=="PhiSubleading") ZP2000->GetXaxis()->SetTitle("#phi^{subleading}");
+		ZP2000->SetLineColor(kViolet+2);
+		signals->Add(ZP2000);
+		signalNames.insert(make_pair((TString)ZP2000->GetName(),"#gamma_{KK}/Z_{KK} (2000 GeV)"));
 	}
 	
 	_INFO("");
 
 	// legend
-	TLegend* leg = new TLegend(0.70,0.55,0.87,0.92);
+	Double_t legxmin = 0.70;
+	Double_t legxmax = 0.87;
+	Double_t legymin = 0.55;
+	Double_t legymax = 0.92;
+	if(doSignals)
+	{
+		legxmin = 0.7;
+		legxmax = 0.8;
+	}
+	TLegend* leg = new TLegend(legxmin,legymin,legxmax,legymax);
 	leg->SetFillStyle(4000); //will be transparent
 	leg->SetFillColor(0);
 	// leg->SetTextFont(42);
-	leg->SetTextSize(0.04);
+	if(doSignals) leg->SetTextSize(0.035);
+	else          leg->SetTextSize(0.04);
 	leg->AddEntry(hData,"Data 2011","P");
 	leg->AddEntry(hDY,"Z/#gamma*","f");
 	leg->AddEntry(hDiboson,"Diboson","f");
@@ -252,7 +292,7 @@ void hstack()
 		minimum = 0.02;
 		maximum = 2.e7;
 	}
-	TIter next_bg((TList*)backgounds->GetHists());
+	TIter next_bg((TList*)backgrounds->GetHists());
 	while(( htmp=(TH1D*)next_bg() )!= NULL)
 	{
 		_INFO("Adding "+(string)((TH1D*)htmp)->GetName());
@@ -263,9 +303,9 @@ void hstack()
 		// htmp->SetYTitle("Events");
 		// htmp->SetXTitle("m_{#mu#mu} GeV");
 	}
-	backgounds->SetMinimum(minimum);
-	backgounds->SetMaximum(maximum);
-	backgounds->Draw();
+	backgrounds->SetMinimum(minimum);
+	backgrounds->SetMaximum(maximum);
+	backgrounds->Draw();
 	if(!isIsolation  &&  doSignals)
 	{
 		TIter next_sig(signals);
@@ -283,22 +323,22 @@ void hstack()
 	}
 	gaData->Draw("psame");  // "esame" or "psame" (p for Poisson)
 	leg->Draw("SAMES");
-	TString atlasit = "#font[72]{ATLAS}";
+	// TString atlasit = "#font[72]{ATLAS}";
 	// TString atlaspr = "#font[42]{preliminary}";
-	TString atlaspr = "#font[42]{work in progress}";
+	//TString atlaspr = "#font[42]{work in progress}";
 	TString ppcme   = "#sqrt{s} = 7 TeV";
-	TString lumi    = "#int L dt = "+(TString)_s(luminosity,2)+" fb^{-1}";
+	TString lumi    = "#int L dt = "+(TString)_s(luminosity,0)+" fb^{-1}";
 	
 	
-	TString atlas1 = atlasit+" "+atlaspr;
-	TString atlas2 = "";
+	//TString atlas1 = atlasit+" "+atlaspr;
+	//TString atlas2 = "";
 	TString atlas3 = ppcme;
 	TString atlas4 = lumi;
 	// t->DrawLatex(0.400,0.90,atlas1);
-	t->DrawLatex(0.33,0.90,atlas1);
-	t->DrawLatex(0.440,0.85,atlas2);
-	t->DrawLatex(0.40,0.80,atlas3);
-	t->DrawLatex(0.40,0.70,atlas4);
+	//t->DrawLatex(0.33,0.90,atlas1);
+	//t->DrawLatex(0.440,0.85,atlas2);
+	t->DrawLatex(0.40,0.90,atlas3);
+	t->DrawLatex(0.40,0.80,atlas4);
 	c->RedrawAxis();
 	TString name = "hstack_"+htype+"_"+ftype;
 	saveas(c,"plots/"+name);
@@ -361,12 +401,12 @@ void hstack()
 	pvtxt_atlas->SetFillStyle(4000); //will be transparent
 	pvtxt_atlas->SetFillColor(0);
 	pvtxt_atlas->SetTextFont(42);
-	txt = pvtxt_atlas->AddText(atlasit+" "+atlaspr);
+	//txt = pvtxt_atlas->AddText(atlasit+" "+atlaspr);
 	txt = pvtxt_atlas->AddText(ppcme);
 	txt = pvtxt_atlas->AddText( lumi );
 	
 	name = name + "_ratio";
-	TCanvas* cR = (TCanvas*)(stackratio(name,hData,backgounds,signals,legR,pvtxt_atlas,"Data/#SigmaMC",isLogx,isLogy,ymin,ymax))->Clone("");
+	TCanvas* cR = (TCanvas*)(stackratio(name,hData,backgrounds,signals,legR,pvtxt_atlas,"Data/#SigmaMC",isLogx,isLogy,ymin,ymax))->Clone("");
 	saveas(cR,"plots/"+name, false);
 	
 	/*
@@ -440,15 +480,15 @@ void hstack()
 	TString name = "hstack_"+htype+"_"+ftype;
 
 	c->cd();
-	if(htype.Contains("Isolation")) backgounds->SetMinimum(1.);
-	if(isIsolation) backgounds->SetMinimum(10.);
-	backgounds->Draw(); // Draw("nostack");
+	if(htype.Contains("Isolation")) backgrounds->SetMinimum(1.);
+	if(isIsolation) backgrounds->SetMinimum(10.);
+	backgrounds->Draw(); // Draw("nostack");
 	bool isLogx = (htype.Contains("Mass") || htype.Contains("pT") || htype.Contains("QT")) ? true : false;
 	if(isLogx)
 	{
 		c->SetLogx();
-		backgounds->GetXaxis()->SetMoreLogLabels();
-		backgounds->GetXaxis()->SetNoExponent();
+		backgrounds->GetXaxis()->SetMoreLogLabels();
+		backgrounds->GetXaxis()->SetNoExponent();
 	}
 		
 	bool isLogy = (htype.Contains("Mass") || htype.Contains("pT") || htype.Contains("QT") || htype.Contains("Isolation")) ? true : false;
@@ -477,7 +517,7 @@ void hstack()
 	ymin = (htype=="Mass") ? 1.e-3 : -1;
 	ymax = (htype=="Mass") ? hDY->GetMaximum()*1.5 : -1;
 
-	TCanvas* cR = (TCanvas*)(stackratio(name,hData,backgounds,signals,leg,pvtxt_lumi,pvtxt_atlas,"Data/#SigmaMC","epx0",isLogx,isLogy,ymin,ymax))->Clone("");
+	TCanvas* cR = (TCanvas*)(stackratio(name,hData,backgrounds,signals,leg,pvtxt_lumi,pvtxt_atlas,"Data/#SigmaMC","epx0",isLogx,isLogy,ymin,ymax))->Clone("");
 	saveas(cR,"plots/"+name, false);
 	*/
 }

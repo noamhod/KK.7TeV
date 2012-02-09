@@ -24,7 +24,6 @@ static double EWkFactorEle(double mass)
 	return kF;
 }
 
-
 static double QCD(double mass, string type="NNLO/LO**")
 {
 	_DEBUG("kFactor::QCD");

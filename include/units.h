@@ -33,6 +33,7 @@ static const double pb2fb = 1.e+3;
 static const double nb2mb = 1.e-6;
 
 static const float muonMass = 0.105658367; // GeV
+static const float elecMass = 0.00051099891; // GeV
 
 static const double pi   = 3.14159265;
 static const double sq2 = sqrt(2.);

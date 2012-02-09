@@ -10,23 +10,33 @@
 // TString fpath = "2dtemplates_fastDY_noTruth"; // for mc11a with the in-amplitude k-factor
 // TString fpath = "2dtemplates_fastDY_overallEWkF_noInAmpSigEWkF_noTruth"; // for mc11a with the overall k-factor
 // TString fpath = "2dtemplates_mc11c_overallEWkF_noInAmpSigEWkF_noTruth"; // for mc11c with the overall k-factor
+
+TString mutype = "33st";
+TString binning = "linearbins";
+TString fpath      = "2dtemplates_mc11c_"+mutype+"_overallEWkF_noInAmpSigEWkF_noHighMbins_noTruth"; // for mc11c with the overall k-factor
+TString fpathSigUp = "2dtemplates_mc11c_"+mutype+"_SmrSigUp_overallEWkF_noInAmpSigEWkF_noHighMbins_noTruth"; // for mc11c with the overall k-factor with +1sigma smearing
+TString sDir       = "plots/"+binning+"/"+mutype+"_nominal/";
+TString sDirSigUp  = "plots/"+binning+"/"+mutype+"_sigmaup/";
+
 TObjArray* toarKKtmp;
+TObjArray* toarKKtmpSigUp;
 TObjArray* toarZPtmp;
+TObjArray* toarZPtmpSigUp;
 
 double Mmin = 130.;
 double Mmax = 5030.;
 double dM   = 100.;
 
 TString channel = "#mu#mu"; // #mu#mu or ee
- 
+
  // remember old dir
 TDirectory* olddir = gDirectory;
  
-// TFile* fTH2toTH1 = new TFile("plots/test_TH2toTH1.root","RECREATE");
-// TFile* fsysUpDY = new TFile("plots/test_sysUpDY.root","RECREATE");
-// TFile* fsysUpSignal = new TFile("plots/test_sysUpSignal.root","RECREATE");
-// TFile* fsysUpTemplateDY = new TFile("plots/test_sysUpTemplateDY.root","RECREATE");
-// TFile* fsysUpTemplateSignal = new TFile("plots/test_sysUpTemplateSignal.root","RECREATE");
+// TFile* fTH2toTH1 = new TFile(sDir+"test_TH2toTH1.root","RECREATE");
+// TFile* fsysUpDY = new TFile(sDir+"test_sysUpDY.root","RECREATE");
+// TFile* fsysUpSignal = new TFile(sDir+"test_sysUpSignal.root","RECREATE");
+// TFile* fsysUpTemplateDY = new TFile(sDir+"test_sysUpTemplateDY.root","RECREATE");
+// TFile* fsysUpTemplateSignal = new TFile(sDir+"test_sysUpTemplateSignal.root","RECREATE");
  
  
 TH1D* TH2toTH1(TH2D* h2)
@@ -217,6 +227,41 @@ TH2D* sysUpTemplateDY(TH2D* h2, TString sysName)
 	return h2syst;
 }
 
+Double_t minratiominus1 = 1.e+10;
+
+TH2D* smearUpTemplate(TH2D* h2, TH2D* h2up)
+{
+	olddir->cd();
+	
+	TString h2name = (TString)h2->GetName();
+	
+	TH2D* h2nominal = (TH2D*)h2->Clone(h2name+"_nominal");
+	TH2D* h2smearUp = (TH2D*)h2up->Clone(h2name+"_smearUp");
+	TH2D* h2syst    = (TH2D*)h2->Clone(h2name+"_syst");
+	h2syst->Reset();
+	
+	h2smearUp->Divide(h2nominal);
+	unsigned int nbinsx = h2->GetNbinsX();
+	unsigned int nbinsy = h2->GetNbinsY();
+	for(unsigned int x=0 ; x<=nbinsx+1 ; x++)
+	{
+		for(unsigned int y=0 ; y<=nbinsy+1 ; y++)
+		{
+			Double_t ratio = h2smearUp->GetBinContent(x,y);
+			Double_t ratiominus1 = ratio-1.;
+			if(ratiominus1<0. && x!=0 && y!=0 && x!=nbinsx+1 && y!=nbinsy+1)
+			{
+				minratiominus1 = (ratiominus1<minratiominus1) ?  ratiominus1 : minratiominus1;
+			}
+			h2syst->SetBinContent(x,y,ratio-1.);
+		}
+	}
+	delete h2nominal;
+	delete h2smearUp;
+
+	return h2syst;
+}
+
 TH2D* sysUpTemplateSignal(TH2D* h2, TString sysName)
 {
 	olddir->cd();
@@ -270,7 +315,7 @@ void combine()
 	msglvl[FAT] = VISUAL;
 
 	olddir->cd();
-	TFile* fKK = new TFile("plots/KK_"+fpath+".root", "RECREATE");
+	TFile* fKK = new TFile(sDir+"KK_combined_"+fpath+".root", "RECREATE");
 	TObjArray* templates2d_KK = new TObjArray;
 	TObjArray* templates2d_KK_syst_Zxs        = new TObjArray;
 	TObjArray* templates2d_KK_syst_PDF        = new TObjArray;
@@ -278,9 +323,11 @@ void combine()
 	TObjArray* templates2d_KK_syst_QCDkF      = new TObjArray;
 	TObjArray* templates2d_KK_syst_mmSlopeEff = new TObjArray;
 	TObjArray* templates2d_KK_syst_eeIsoEff   = new TObjArray;
+	TObjArray* templates2d_KK_syst_mmRes      = new TObjArray;
+	TObjArray* templates2d_KK_syst_eeRes      = new TObjArray;
 
 	olddir->cd();
-	TFile* fZP = new TFile("plots/ZP_"+fpath+".root", "RECREATE");
+	TFile* fZP = new TFile(sDir+"ZP_combined_"+fpath+".root", "RECREATE");
 	TObjArray* templates2d_ZP = new TObjArray;
 	TObjArray* templates2d_ZP_syst_Zxs        = new TObjArray;
 	TObjArray* templates2d_ZP_syst_PDF        = new TObjArray;
@@ -288,19 +335,25 @@ void combine()
 	TObjArray* templates2d_ZP_syst_QCDkF      = new TObjArray;
 	TObjArray* templates2d_ZP_syst_mmSlopeEff = new TObjArray;
 	TObjArray* templates2d_ZP_syst_eeIsoEff   = new TObjArray;
+	TObjArray* templates2d_ZP_syst_mmRes      = new TObjArray;
+	TObjArray* templates2d_ZP_syst_eeRes      = new TObjArray;
 
 	olddir->cd();
 	
-	TH2D* h2tmp = NULL;
+	TH2D* h2tmp      = NULL;
+	TH2D* h2tmpSigUp = NULL;
 	
 	// uncertainties
 	TH2D* h2nominal        = NULL;
+	TH2D* h2smearUp        = NULL;
 	TH2D* h2sys_zXsec      = NULL;
 	TH2D* h2sys_pdfZ       = NULL;    
 	TH2D* h2sys_kEWK       = NULL;
 	TH2D* h2sys_kQCD       = NULL;
 	TH2D* h2sys_mmSlopeEff = NULL;
 	TH2D* h2sys_eeIsoEff   = NULL;
+	TH2D* h2sys_mmRes      = NULL;
+	TH2D* h2sys_eeRes      = NULL;
 	
 	for(double f=Mmin ; f<=Mmax ; f+=dM)
 	{
@@ -308,10 +361,9 @@ void combine()
 		
 		TString name = "";
 		
-		
 		// nominals
 		olddir->cd();
-		TFile* FKK = new TFile("plots/KK_"+fpath+"_Xmass"+fname+".root","READ");
+		TFile* FKK = new TFile(sDir+"KK_"+fpath+"_Xmass"+fname+".root","READ");
 		FKK->cd();
 		toarKKtmp = new TObjArray();
 		toarKKtmp->Read("template2d");
@@ -321,18 +373,32 @@ void combine()
 		templates2d_KK->Add( (TH2D*)h2tmp );
 		templates2d_KK->SetOwner(kTRUE);
 		
+		olddir->cd();
+		TFile* FKKsmearUp = new TFile(sDirSigUp+"KK_"+fpathSigUp+"_Xmass"+fname+".root","READ");
+		FKKsmearUp->cd();
+		toarKKtmpSigUp = new TObjArray();
+		toarKKtmpSigUp->Read("template2d");
+		olddir->cd();
+		h2tmpSigUp = (TH2D*)((TH2D*)(TObjArray*)toarKKtmpSigUp->At(0))->Clone();
+		delete FKKsmearUp;
+		delete toarKKtmpSigUp;
+		fKK->cd(); // important !
+		
 		/////////////////////
 		// KK systematics ///
 		/////////////////////
 		olddir->cd();
 		name = (TString)h2tmp->GetName();
 		h2nominal = (TH2D*)h2tmp->Clone(name+"_syst");
+		h2smearUp = (TH2D*)h2tmpSigUp->Clone(name+"_smearUp");
 		h2sys_zXsec      = (TH2D*)sysUpTemplateSignal(h2nominal,"Zxs")->Clone(name+"_sys_Zxs"); 
 		h2sys_pdfZ       = (TH2D*)sysUpTemplateDY(h2nominal,"PDF")->Clone(name+"_sys_pdfZ");         // PDF systematic	      
 		h2sys_kEWK       = (TH2D*)sysUpTemplateDY(h2nominal,"EWkF")->Clone(name+"_sys_kEWK");	      // EWK K-factor
 		// h2sys_kQCD    = (TH2D*)sysUpTemplateDY(h2nominal,"QCDkF")->Clone(name+"_sys_kQCD");       // QCD K-factor; Now included in pdfZ
 		h2sys_mmSlopeEff = (TH2D*)sysUpTemplateDY(h2nominal,"mmEff")->Clone(name+"_sys_mmSlopeEff"); // const slope efficiency uncertainty
 		h2sys_eeIsoEff   = (TH2D*)sysUpTemplateDY(h2nominal,"eeEff")->Clone(name+"_sys_eeIsoEff");   // isolation in ee channel
+		h2sys_mmRes      = (TH2D*)smearUpTemplate(h2nominal,h2smearUp)->Clone(name+"_sys_mmRes");    // resolution in the mm channel
+		h2sys_eeRes      = (TH2D*)smearUpTemplate(h2nominal,h2smearUp)->Clone(name+"_sys_eeRes");    // resolution in the ee channel
 		
 		fKK->cd(); // important !
 		templates2d_KK_syst_Zxs->Add( (TH2D*)h2sys_zXsec );
@@ -341,6 +407,8 @@ void combine()
 		// templates2d_KK_syst_QCDkF->Add( (TH2D*)h2sys_kQCD );
 		templates2d_KK_syst_mmSlopeEff->Add( (TH2D*)h2sys_mmSlopeEff );
 		templates2d_KK_syst_eeIsoEff->Add( (TH2D*)h2sys_eeIsoEff );
+		templates2d_KK_syst_mmRes->Add( (TH2D*)h2sys_mmRes );
+		templates2d_KK_syst_eeRes->Add( (TH2D*)h2sys_eeRes );
 		
 		templates2d_KK_syst_Zxs->SetOwner(kTRUE);
 		templates2d_KK_syst_PDF->SetOwner(kTRUE);
@@ -348,6 +416,8 @@ void combine()
 		// templates2d_KK_syst_QCDkF->SetOwner(kTRUE);
 		templates2d_KK_syst_mmSlopeEff->SetOwner(kTRUE);
 		templates2d_KK_syst_eeIsoEff->SetOwner(kTRUE);
+		templates2d_KK_syst_mmRes->SetOwner(kTRUE);
+		templates2d_KK_syst_eeRes->SetOwner(kTRUE);
 		
 		delete FKK;
 		delete toarKKtmp;
@@ -360,7 +430,7 @@ void combine()
 		
 		
 		olddir->cd();
-		TFile* FZP = new TFile("plots/ZP_"+fpath+"_Xmass"+fname+".root","READ");
+		TFile* FZP = new TFile(sDir+"ZP_"+fpath+"_Xmass"+fname+".root","READ");
 		FZP->cd();
 		toarZPtmp = new TObjArray();
 		toarZPtmp->Read("template2d");
@@ -370,6 +440,16 @@ void combine()
 		templates2d_ZP->Add( (TH2D*)h2tmp );
 		templates2d_ZP->SetOwner(kTRUE);
 		
+		olddir->cd();
+		TFile* FZPsmearUp = new TFile(sDirSigUp+"ZP_"+fpathSigUp+"_Xmass"+fname+".root","READ");
+		FZPsmearUp->cd();
+		toarZPtmpSigUp = new TObjArray();
+		toarZPtmpSigUp->Read("template2d");
+		olddir->cd();
+		h2tmpSigUp = (TH2D*)((TH2D*)(TObjArray*)toarZPtmpSigUp->At(0))->Clone();
+		delete FZPsmearUp;
+		delete toarZPtmpSigUp;
+		fZP->cd(); // important !
 		
 		/////////////////////
 		// ZP systematics ///
@@ -377,12 +457,15 @@ void combine()
 		olddir->cd();
 		name = (TString)h2tmp->GetName();
 		h2nominal = (TH2D*)h2tmp->Clone(name+"_syst");
+		h2smearUp = (TH2D*)h2tmpSigUp->Clone(name+"_smearUp");
 		h2sys_zXsec      = (TH2D*)sysUpTemplateSignal(h2nominal,"Zxs")->Clone(name+"_sys_Zxs"); 
 		h2sys_pdfZ       = (TH2D*)sysUpTemplateDY(h2nominal,"PDF")->Clone(name+"_sys_pdfZ");         // PDF systematic	      
 		h2sys_kEWK       = (TH2D*)sysUpTemplateDY(h2nominal,"EWkF")->Clone(name+"_sys_kEWK");	      // EWK K-factor
 		// h2sys_kQCD    = (TH2D*)sysUpTemplateDY(h2nominal,"QCDkF")->Clone(name+"_sys_kQCD");       // QCD K-factor; Now included in pdfZ
 		h2sys_mmSlopeEff = (TH2D*)sysUpTemplateDY(h2nominal,"mmEff")->Clone(name+"_sys_mmSlopeEff"); // const slope efficiency uncertainty
 		h2sys_eeIsoEff   = (TH2D*)sysUpTemplateDY(h2nominal,"eeEff")->Clone(name+"_sys_eeIsoEff");   // isolation in ee channel
+		h2sys_mmRes      = (TH2D*)smearUpTemplate(h2nominal,h2smearUp)->Clone(name+"_sys_mmRes");    // resolution in the mm channel
+		h2sys_eeRes      = (TH2D*)smearUpTemplate(h2nominal,h2smearUp)->Clone(name+"_sys_eeRes");    // resolution in the ee channel
 		
 		fZP->cd(); // important !
 		templates2d_ZP_syst_Zxs->Add( (TH2D*)h2sys_zXsec );
@@ -391,6 +474,8 @@ void combine()
 		// templates2d_ZP_syst_QCDkF->Add( (TH2D*)h2sys_kQCD );
 		templates2d_ZP_syst_mmSlopeEff->Add( (TH2D*)h2sys_mmSlopeEff );
 		templates2d_ZP_syst_eeIsoEff->Add( (TH2D*)h2sys_eeIsoEff );
+		templates2d_ZP_syst_mmRes->Add( (TH2D*)h2sys_mmRes );
+		templates2d_ZP_syst_eeRes->Add( (TH2D*)h2sys_eeRes );
 		
 		templates2d_ZP_syst_Zxs->SetOwner(kTRUE);
 		templates2d_ZP_syst_PDF->SetOwner(kTRUE);
@@ -398,6 +483,8 @@ void combine()
 		// templates2d_ZP_syst_QCDkF->SetOwner(kTRUE);
 		templates2d_ZP_syst_mmSlopeEff->SetOwner(kTRUE);
 		templates2d_ZP_syst_eeIsoEff->SetOwner(kTRUE);
+		templates2d_ZP_syst_mmRes->SetOwner(kTRUE);
+		templates2d_ZP_syst_eeRes->SetOwner(kTRUE);
 		
 		delete FZP;
 		delete toarZPtmp;
@@ -422,10 +509,20 @@ void combine()
 	templates2d_KK_syst_EWkF->Write("template2d_EWkF_syst", TObject::kSingleKey);
 	// templates2d_KK_syst_QCDkF->SetOwner(kTRUE);
 	// templates2d_KK_syst_QCDkF->Write("template2d_QCDkF_syst", TObject::kSingleKey);
-	templates2d_KK_syst_eeIsoEff->SetOwner(kTRUE);
-	templates2d_KK_syst_eeIsoEff->Write("template2d_eeIsoEff_syst", TObject::kSingleKey);
-	templates2d_KK_syst_mmSlopeEff->SetOwner(kTRUE);
-	templates2d_KK_syst_mmSlopeEff->Write("template2d_mmSlopeEff_syst", TObject::kSingleKey);
+	if(channel=="ee")
+	{
+		templates2d_KK_syst_eeIsoEff->SetOwner(kTRUE);
+		templates2d_KK_syst_eeIsoEff->Write("template2d_eeIsoEff_syst", TObject::kSingleKey);
+		templates2d_KK_syst_eeRes->SetOwner(kTRUE);
+		templates2d_KK_syst_eeRes->Write("template2d_eeRes_syst", TObject::kSingleKey);
+	}
+	if(channel=="#mu#mu")
+	{
+		templates2d_KK_syst_mmSlopeEff->SetOwner(kTRUE);
+		templates2d_KK_syst_mmSlopeEff->Write("template2d_mmSlopeEff_syst", TObject::kSingleKey);
+		templates2d_KK_syst_mmRes->SetOwner(kTRUE);
+		templates2d_KK_syst_mmRes->Write("template2d_mmRes_syst", TObject::kSingleKey);
+	}
 	
 	fKK->Write();
 	fKK->Close();
@@ -447,10 +544,20 @@ void combine()
 	templates2d_ZP_syst_EWkF->Write("template2d_EWkF_syst", TObject::kSingleKey);
 	// templates2d_ZP_syst_QCDkF->SetOwner(kTRUE);
 	// templates2d_ZP_syst_QCDkF->Write("template2d_QCDkF_syst", TObject::kSingleKey);
-	templates2d_ZP_syst_eeIsoEff->SetOwner(kTRUE);
-	templates2d_ZP_syst_eeIsoEff->Write("template2d_eeIsoEff_syst", TObject::kSingleKey);
-	templates2d_ZP_syst_mmSlopeEff->SetOwner(kTRUE);
-	templates2d_ZP_syst_mmSlopeEff->Write("template2d_mmSlopeEff_syst", TObject::kSingleKey);
+	if(channel=="ee")
+	{
+		templates2d_ZP_syst_eeIsoEff->SetOwner(kTRUE);
+		templates2d_ZP_syst_eeIsoEff->Write("template2d_eeIsoEff_syst", TObject::kSingleKey);
+		templates2d_ZP_syst_eeRes->SetOwner(kTRUE);
+		templates2d_ZP_syst_eeRes->Write("template2d_eeRes_syst", TObject::kSingleKey);
+	}
+	if(channel=="#mu#mu")
+	{
+		templates2d_ZP_syst_mmSlopeEff->SetOwner(kTRUE);
+		templates2d_ZP_syst_mmSlopeEff->Write("template2d_mmSlopeEff_syst", TObject::kSingleKey);
+		templates2d_ZP_syst_mmRes->SetOwner(kTRUE);
+		templates2d_ZP_syst_mmRes->Write("template2d_mmRes_syst", TObject::kSingleKey);
+	}
 	
 	fZP->Write();
 	fZP->Close();
@@ -461,14 +568,5 @@ void combine()
 	_INFO(" (1) "+(string)fKK->GetName());
 	_INFO(" (2) "+(string)fZP->GetName());
 	
-	// fTH2toTH1->Write();
-	// fsysUpDY->Write();
-	// fsysUpSignal->Write();
-	// fsysUpTemplateDY->Write();
-	// fsysUpTemplateDY->Write();
-	// fTH2toTH1->Close();
-	// fsysUpDY->Close();
-	// fsysUpSignal->Close();
-	// fsysUpTemplateDY->Close();
-	// fsysUpTemplateDY->Close();
+	_INFO("minratiominus1 = "+_s(minratiominus1));
 }

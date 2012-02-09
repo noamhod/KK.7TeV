@@ -24,6 +24,16 @@ static void setSqrtBins(Int_t nbins, Double_t min, Double_t max, Double_t* xpoin
 	for(int i=1 ; i<=nbins ; i++) xpoints[i] = pow(sqrtmin+i*sqrtbinwidth,2);
 }
 
+static void setPowerBins(Int_t nbins, Double_t step, Int_t power, Double_t* xpoints)
+{
+	_DEBUG("setPowerBins");
+	xpoints[0] = -1.0*TMath::Power(1*step,power);
+	for(int i=1 ; i<=nbins ; i++)
+	{
+		xpoints[i] = TMath::Power(i*step,power);
+	}
+}
+
 static void setLinBins(Int_t nbins, Double_t min, Double_t max, Double_t* xpoints)
 {
 	_DEBUG("setSqrtBins");
@@ -34,16 +44,22 @@ static void setLinBins(Int_t nbins, Double_t min, Double_t max, Double_t* xpoint
 
 static const int bins2chop = 9; // h1 should start at ~128 GeV
 
+
+static const Int_t npowerbins = 100;
+static const Double_t step    = 0.03;
+static const Int_t power      = 4;
+static Double_t powerbins[npowerbins+1];
+
 // double mXXmin = 130.;
 // double mXXmax = 3050.;
 // double dmXX   = 40.;
 static const double mXXmin = 130.;
-static const double mXXmax = 5130.;
+static const double mXXmax = 5030.;
 static const double dmXX   = 100.;
 
-static const Int_t    ng4bins = 200;
+static const Int_t    ng4bins = 2;//200;
 static const Double_t g4min   = 0.;
-static const Double_t g4max   = 50.;
+static const Double_t g4max   = 2.;//50.;
 
 static const Int_t    nsqrtg4bins = 50;
 static const Double_t sqrtg4min   = 0.;

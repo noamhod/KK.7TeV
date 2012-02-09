@@ -3,7 +3,59 @@
 #include "../include/logs.h"
 #include "../include/bins.h"
 
-TString model = "ZP";
+TString model  = "ZP";
+TString mutype = "33st";
+TString binning = "linearbins";
+
+inline TH1D* hGeV2TeV(TH1D* hGeV)
+{
+	const Int_t    nbins = hGeV->GetNbinsX();
+	Double_t bins[nbins+1];
+	TAxis* xaxis = (TAxis*)hGeV->GetXaxis();
+	TAxis* yaxis = (TAxis*)hGeV->GetYaxis();
+
+	for(int i=0 ; i<nbins ; i++)
+	{
+		bins[i] = xaxis->GetBinLowEdge(i+1)/1000.;
+		cout << "|" << bins[i];
+	}
+	bins[nbins] = xaxis->GetBinUpEdge(nbins)/1000.;
+	cout << "|" << bins[nbins] << "|" << endl; 
+	
+	TString name   = (TString)hGeV->GetName();
+	TString title  = (TString)hGeV->GetTitle();
+	TString xtitle = (TString)xaxis->GetTitle();
+	TString ytitle = (TString)yaxis->GetTitle();
+	
+	TH1D* hTeV = new TH1D(name+"_TeV",title+";"+xtitle+";"+ytitle, nbins,bins);
+	for(Int_t b=0 ; b<=nbins+1 ; b++) hTeV->SetBinContent(b, hGeV->GetBinContent(b));
+	return hTeV;
+}
+
+inline TH1D* hTeV2GeV(TH1D* hTeV)
+{
+	const Int_t    nbins = hTeV->GetNbinsX();
+	Double_t bins[nbins+1];
+	TAxis* xaxis = (TAxis*)hTeV->GetXaxis();
+	TAxis* yaxis = (TAxis*)hTeV->GetYaxis();
+
+	for(int i=0 ; i<nbins ; i++)
+	{
+		bins[i] = xaxis->GetBinLowEdge(i+1)*1000.;
+		cout << "|" << bins[i];
+	}
+	bins[nbins] = xaxis->GetBinUpEdge(nbins)*1000.;
+	cout << "|" << bins[nbins] << "|" << endl; 
+	
+	TString name   = (TString)hTeV->GetName();
+	TString title  = (TString)hTeV->GetTitle();
+	TString xtitle = (TString)xaxis->GetTitle();
+	TString ytitle = (TString)yaxis->GetTitle();
+	
+	TH1D* hGeV = new TH1D(name+"_TeV",title+";"+xtitle+";"+ytitle, nbins,bins);
+	for(Int_t b=0 ; b<=nbins+1 ; b++) hGeV->SetBinContent(b, hTeV->GetBinContent(b));
+	return hGeV;
+}
 
 void normtest()
 {
@@ -14,37 +66,18 @@ void normtest()
 	msglvl[FAT] = VISUAL;
 
 	Int_t g4bin   = 1; //==> g^4=0 ==> DY !
-	Int_t minMbin = 3; //~80 GeV
-	Int_t maxMbin = 9; //~128 GeV
+	Int_t minMbin = 25; //~80 GeV
+	Int_t maxMbin = 40; //~128 GeV
 	TString modelNmae = (model=="ZP") ? "Zprime_SSM" : "KK";
 	unsigned int precision = 10.;
 	
 	Int_t maxMassPointsIndex = (Int_t)((mXXmax-mXXmin)/dmXX);
 
-	//TFile* fD = new TFile("plots/mumu_common_plots_2012-1-19.root","READ");
-	TFile* fD   = new TFile("plots/mcdata_histograms_noTmplts_noZpeak_fastDY_noEWkFsig_noCoupScale_noHighMass.root","READ");
-	TH1D* h1Dmc      = (TH1D*)fD->Get("hMassMCsum")->Clone();
-	TH1D* h1Ddy      = (TH1D*)fD->Get("hMassDYmumu")->Clone();
-	TH1D* h1Dtautau  = (TH1D*)fD->Get("hMassDYtautau")->Clone();
-	TH1D* h1Dqcd     = (TH1D*)fD->Get("hMassQCD")->Clone();
-	TH1D* h1Dwjets   = (TH1D*)fD->Get("hMassW+jets")->Clone();
-	TH1D* h1Ddiboson = (TH1D*)fD->Get("hMassDiboson")->Clone();
-	TH1D* h1Dttbar   = (TH1D*)fD->Get("hMassTTbar")->Clone();
-	TH1D* h1Dmcnody  = (TH1D*)fD->Get("hMassMCsum")->Clone();
-	
-	TH1D* h1Ddummy   = (TH1D*)fD->Get("hMassMCsum")->Clone("dummy");
-	h1Ddummy->Reset();
-
-	h1Dmcnody->Reset();
-	h1Dmcnody->Add(h1Dtautau);
-	h1Dmcnody->Add(h1Dqcd);
-	h1Dmcnody->Add(h1Dwjets);
-	h1Dmcnody->Add(h1Ddiboson);
-	h1Dmcnody->Add(h1Dttbar);
-
-	TH1D* h1D   = (TH1D*)fD->Get("hMassData")->Clone("data");
-	Double_t sumDATA = 0.;
-	for(Int_t bin=minMbin ; bin<=maxMbin ; bin++) sumDATA += h1D->GetBinContent(bin);
+	TString fBGname = (mutype=="33st") ? "plots/DimuonHists_Feb05_3stC.root" : "plots/DimuonHists_Feb05_2stC.root";
+	TFile* fD = new TFile(fBGname,"READ");
+	TH1D* h1dy      = (TH1D*)fD->Get("ZLogmass_DYmm")->Clone();
+	TH1D* h1dummy   = (TH1D*)fD->Get("ZLogmass_DYmm")->Clone("dummy");
+	h1dummy->Reset();
 
 	TCanvas* c = new TCanvas("c","c",600,400);
 	c->cd();
@@ -53,53 +86,72 @@ void normtest()
 	c->SetLogx();
 	c->SetGridy();
 
-	h1Ddy->GetXaxis()->SetRange(70.,130.);
-	h1Ddy->SetLineColor(kBlue);
-	h1Ddy->SetMinimum(1.e3);
-	h1Ddy->SetMaximum(5.e5);
-	h1Ddy->Draw();
+	h1dy->SetLineColor(kBlue);
+	h1dy->Draw();
 	
 	Double_t lowerLimit = -1;
 	Double_t upperLimit = -1;
-
-	Double_t sumTEMPLATE = 0.;
-	for(int mass=0 ; mass<=maxMassPointsIndex ; mass++)
+	
+	
+	Double_t sumDYmm = 0.;
+	for(Int_t bin=minMbin ; bin<=maxMbin ; bin++) sumDYmm += (h1dy->GetBinContent(bin));
+	
+	TFile* fT = new TFile("plots/"+binning+"/"+mutype+"_nominal/"+model+"_combined_2dtemplates_mc11c_"+mutype+"_overallEWkF_noInAmpSigEWkF_noHighMbins_noTruth.root","READ");
+	TObjArray* toartmp = new TObjArray();
+	toartmp->Read("template2d");
+	TH2D* h2T = (TH2D*)((TH2D*)(TObjArray*)toartmp->At(0))->Clone();
+	for(Int_t bin=1 ; bin<=h1dummy->GetNbinsX() ; bin++)
 	{
-		TString massName   = (TString)_s(mXXmin+mass*dmXX);
-		TString massNumber = (TString)_s(mass);
-
-		//TFile* fT = new TFile("plots/"+model+"_functions.root","READ");
-		TFile* fT = new TFile("/srv01/tau/hod/newBAT/ZPrimeTemplate/interference/exe/"+model+"mm_functions.root","READ");
-		TH2D* h2T = (TH2D*)fT->Get(massNumber+"_nominal/hg4Mass_template_"+modelNmae+massName)->Clone();
-
-		if(mass==0) 
-		{
-			for(Int_t bin=1 ; bin<=h1Ddummy->GetNbinsX() ; bin++)
-			{
-				if(bin==minMbin)   lowerLimit = h1Ddummy->GetBinLowEdge(bin);
-				if(bin==maxMbin+1) upperLimit = h1Ddummy->GetBinLowEdge(bin);
-				h1Ddummy->SetBinContent(bin,h2T->GetBinContent(bin,g4bin));
-			}
-		}
-
-		sumTEMPLATE = 0.;
-		for(Int_t bin=minMbin ; bin<=maxMbin ; bin++) sumTEMPLATE += (h2T->GetBinContent(bin,g4bin) + h1Dmcnody->GetBinContent(bin)); // g^4 = 0
-
-		_INFO((string)model+"("+_s(mass)+") mass="+(string)massName+" -> sum(data)/sum(bgNoDY+DYfromTemplate(g^4=0)) = "+_s(sumDATA/sumTEMPLATE,precision));
+		if(bin==minMbin)   lowerLimit = h1dummy->GetBinLowEdge(bin);
+		if(bin==maxMbin+1) upperLimit = h1dummy->GetBinLowEdge(bin);
+		h1dummy->SetBinContent(bin,h2T->GetBinContent(bin,g4bin)); // g^4 = 0 -> DY !
 	}
-
-	double data=0;
-	double mcsum=0;
-	for(Int_t bin=minMbin ; bin<=maxMbin ; bin++) data  += h1D->GetBinContent(bin);
-	for(Int_t bin=minMbin ; bin<=maxMbin ; bin++) mcsum += h1Dmc->GetBinContent(bin);
+	
+	Double_t sumTEMPLATE = 0.;
+	for(Int_t bin=minMbin ; bin<=maxMbin ; bin++) sumTEMPLATE += (h1dummy->GetBinContent(bin));
 	_INFO("----- summary -----");
-	_INFO("sum(data)/sum(bgNoDY+DYreal) = "+_s(data/mcsum,precision)+" (THIS IS A SANITY TEST, THE VALUE IS BELOW)");
-	_INFO((string)model+" -> sum(data)/sum(bgNoDY+DYfromTemplate(g^4=0)) = "+_s(sumDATA/sumTEMPLATE,precision));
 	_INFO("Range: "+_s(lowerLimit)+"["+_s(minMbin)+"] TeV -> "+_s(upperLimit)+"["+_s(maxMbin)+"] TeV");
+	_INFO((string)model+" -> sum(data)/sum(bgNoDY+DYfromTemplate(g^4=0)) = "+_s(sumDYmm/sumTEMPLATE,precision));
 	
-	
-	h1Ddummy->SetLineColor(kRed);	
-	h1Ddummy->SetLineWidth(2);	
-	h1Ddummy->Draw("SAMES");
+	TLine* l1 = new TLine(h1dummy->GetXaxis()->GetBinLowEdge(minMbin),0,h1dummy->GetXaxis()->GetBinLowEdge(minMbin),1.e7);
+    TLine* l2 = new TLine(h1dummy->GetXaxis()->GetBinUpEdge(maxMbin),0,h1dummy->GetXaxis()->GetBinUpEdge(maxMbin),1.e7);
+    TLine* l3 = new TLine(250,0,250,1.e7);
+    l1->SetLineColor(kGreen+2);
+    l2->SetLineColor(kGreen+2);
+    l3->SetLineColor(kViolet);
+	h1dummy->SetLineColor(kRed);	
+	h1dummy->SetLineWidth(2);	
+	h1dummy->Draw("SAMES");
+	l1->Draw("SAMES");
+    l2->Draw("SAMES");
+    l3->Draw("SAMES");
 	c->SaveAs("dy_comparison.png");
+	
+	TCanvas* c1 = new TCanvas("c1","c1",600,400);
+	c1->cd();
+	c1->Draw();
+	c1->SetLogx();
+	c1->SetGridy();
+	TH1D* hratio = (TH1D*)h1dy->Clone("hratio");
+	TH1D* h1dummyGeV = (TH1D*)hTeV2GeV(h1dummy)->Clone("dummyGeV");
+	hratio->SetMinimum(0.5);
+	hratio->SetMaximum(1.5);
+	hratio->SetName("hratio");
+	hratio->Divide(h1dummyGeV);
+	TLine* line = new TLine(h1dummyGeV->GetXaxis()->GetBinLowEdge(1),1,h1dummyGeV->GetXaxis()->GetBinUpEdge(h1dummyGeV->GetNbinsX()),1);
+	hratio->SetMarkerStyle(20);
+	hratio->SetMarkerSize(0.8);
+	hratio->Draw("ep1");
+	line->Draw("SAMES");
+	l1->Draw("SAMES");
+	l2->Draw("SAMES");
+	l3->Draw("SAMES");
+	c1->RedrawAxis();
+	c1->SaveAs("dy_ratio.png");
+	
+	
+	TFile* fratio = new TFile("dyratio_Feb2.root", "RECREATE");
+	hratio->Write();
+	fratio->Write();
+	fratio->Close();
 }

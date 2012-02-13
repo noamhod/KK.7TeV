@@ -1,16 +1,16 @@
-#include "include/include/rawStd.h"
-#include "include/include/rawROOT.h"
-#include "include/include/enums.h"
-#include "include/include/style.h"
-#include "include/include/logs.h"
-#include "include/include/bins.h"
-#include "include/include/histos.h"
-#include "include/include/fkinematics.h"
-#include "include/include/units.h"
-#include "include/include/couplings.h"
-#include "include/include/width.h"
-#include "include/include/helicity.h"
-#include "include/include/kFactors.h"
+#include "../include/rawStd.h"
+#include "../include/rawROOT.h"
+#include "../include/enums.h"
+#include "../include/style.h"
+#include "../include/logs.h"
+#include "../include/bins.h"
+#include "../include/histos.h"
+#include "../include/fkinematics.h"
+#include "../include/units.h"
+#include "../include/couplings.h"
+#include "../include/width.h"
+#include "../include/helicity.h"
+#include "../include/kFactors.h"
 
 using namespace couplings;
 using namespace width;
@@ -20,31 +20,46 @@ using namespace kFactors;
 
 double EWkFactorEle(Double_t *x, Double_t *par)
 {
-  double mass = x[0];
+	double mass = x[0];
+	double threshold = par[0];
 
-  // Valid up to 3 TeV
-  double kF = 1.;
-  if (93.09 < mass && mass <= 250)  kF *= 0.841 + 0.00258*mass - 1.08e-05*mass*mass + 1.54e-08*mass*mass*mass;
-  else if (250 < mass && mass <= 1750)  kF *= 1.067 - 6.34e-05*mass;
-  else if (1750 < mass)  kF *= 0.873 + 0.000183*mass - 7.97e-08*mass*mass;
+	// Valid up to 3 TeV
+	double kF = 1.;
+	if (93.09 < mass && mass <= 250)  kF *= 0.841 + 0.00258*mass - 1.08e-05*mass*mass + 1.54e-08*mass*mass*mass;
+	else if (250 < mass && mass <= 1750)  kF *= 1.067 - 6.34e-05*mass;
+	else if (1750 < mass)  kF *= 0.873 + 0.000183*mass - 7.97e-08*mass*mass;
 
-  return kF;
+	if(kF<threshold) kF = 0.510;
+
+	return kF;
 }
 
 double EWkFactorMu(Double_t *x, Double_t *par)
 {
-  double mass = x[0];
+	double mass = x[0];
+	double threshold = par[0];
+	
+	// Valid up to 3 TeV
+	double kF = 1.;
+	if (96.65 < mass && mass <= 250)  kF *= 0.852 + 0.00233*mass - 0.953e-05*mass*mass + 1.31e-08*mass*mass*mass;
+	else if (250 < mass && mass <= 1750)  kF *= 1.060 - 6.09e-05*mass;
+	else if (1750 < mass)  kF *= 0.931 + 0.000114*mass - 5.71e-08*mass*mass;
 
-  // Valid up to 3 TeV
-  double kF = 1.;
-  if (96.65 < mass && mass <= 250)  kF *= 0.852 + 0.00233*mass - 0.953e-05*mass*mass + 1.31e-08*mass*mass*mass;
-  else if (250 < mass && mass <= 1750)  kF *= 1.060 - 6.09e-05*mass;
-  else if (1750 < mass)  kF *= 0.931 + 0.000114*mass - 5.71e-08*mass*mass;
+	if(kF<threshold) kF = 0.520;
 
-  return kF;
+	return kF;
 }
 
-
+double QCD(Double_t *x, Double_t *par) //NNLO/LO**
+{
+	double mass = x[0];
+	double threshold = par[0];	
+	double kF = 1.15171 + 1.90741e-05*mass - 8.05291e-08*mass*mass + 6.42263e-12*mass*mass*mass;
+	
+	if(kF<threshold) kF = 0.500;
+	
+	return kF;
+}
 
 void kf()
 {
@@ -53,17 +68,38 @@ void kf()
 
 	setLogBins(nlogofficialimassbins,logofficialimassmin,logofficialimassmax,logofficialimassbins);
 
-	TF1 *f1 = new TF1("muon",EWkFactorMu,0,3000,0);
-	TF1 *f2 = new TF1("electron",EWkFactorEle,0,3000,0);
+	
+	TF1 *f1 = new TF1("muon",EWkFactorMu,0,6000,1);
+	f1->SetParameter(0,0.5);
+	TF1 *f2 = new TF1("electron",EWkFactorEle,0,6000,1);
+	f2->SetParameter(0,0.5);
+	TF1 *f3 = new TF1("qcd",QCD,0,6000,1);
+	f3->SetParameter(0,0.5);
+	
+	TF1 *f11 = new TF1("muon_full",EWkFactorMu,0,6000,1);
+	f11->SetParameter(0,-999.);
+	TF1 *f22 = new TF1("electron_full",EWkFactorEle,0,6000,1);
+	f22->SetParameter(0,-999.);
+	TF1 *f33 = new TF1("qcd_full",QCD,0,6000,1);
+	f33->SetParameter(0,-999.);
+	
+	TLegend* leg = new TLegend(0.6,0.5,0.85,0.85,NULL,"brNDC");
+	leg->SetFillStyle(4000); //will be transparent
+	leg->SetFillColor(0);
+	leg->SetTextFont(42);
+	leg->AddEntry(f1,"EW muons","F");
+	leg->AddEntry(f2,"EW electrons","F");
+	leg->AddEntry(f3,"QCD","F");
+	
 
-	TLine* l = new TLine(0,0,3000,0);
+	TLine* l = new TLine(0,0,6000,0);
 
 
 	setFermions(); ////////
 	setkFactors(false); ///
 
 	double xMin = 5.;
-	double xMax = 3005.;
+	double xMax = 6005.;
 	double dx   = 5.;
 	Int_t  Nx   = (Int_t)((xMax-xMin)/dx);
 
@@ -98,9 +134,9 @@ void kf()
 		{
 
 			double dKK = 0.;
-        		double uKK = 0.;
-        		double dZP = 0.;
-		        double uZP = 0.;
+			double uKK = 0.;
+			double dZP = 0.;
+			double uZP = 0.;
 
 			dKK = weightKK(cost,s,1,idl);
 			uKK = weightKK(cost,s,2,idl);
@@ -132,7 +168,7 @@ void kf()
 	p3->SetLogx();
 	p4->SetLogx();
 	c1->cd();
-        c1->Draw();
+	c1->Draw();
 
 	p1->cd();
 	h2dKK->GetXaxis()->SetMoreLogLabels();
@@ -140,22 +176,18 @@ void kf()
 	h2dKK->Draw("SURF1");
 	p2->cd();
 	h2uKK->GetXaxis()->SetMoreLogLabels();
-        h2uKK->GetXaxis()->SetNoExponent();
-        h2uKK->Draw("SURF1");
+	h2uKK->GetXaxis()->SetNoExponent();
+	h2uKK->Draw("SURF1");
 	p3->cd();
 	h2dZP->GetXaxis()->SetMoreLogLabels();
-        h2dZP->GetXaxis()->SetNoExponent();
-        h2dZP->Draw("SURF1");
+	h2dZP->GetXaxis()->SetNoExponent();
+	h2dZP->Draw("SURF1");
 	p4->cd();
 	h2uZP->GetXaxis()->SetMoreLogLabels();
-        h2uZP->GetXaxis()->SetNoExponent();
-        h2uZP->Draw("SURF1");
+	h2uZP->GetXaxis()->SetNoExponent();
+	h2uZP->Draw("SURF1");
 
-	c1->SaveAs("weights.png");
-	c1->SaveAs("weights.root");
-
-
-
+	saveas(c1, "plots/weights");
 
 	TCanvas* c = new TCanvas("c","c",600,400);
 	c->SetGridy();
@@ -163,11 +195,39 @@ void kf()
 	c->Draw();
 
 	f1->SetLineColor(kRed);
+	f1->SetLineWidth(1);
+	f1->GetXaxis()->SetTitle("m_{ll} GeV");
 	f2->SetLineColor(kBlue);
-
-	f1->Draw();
-	f2->Draw("SAMES");
-	l->Draw("SAMES");
+	f2->SetLineWidth(1);
+	f2->GetXaxis()->SetTitle("m_{ll} GeV");
+	f3->SetLineColor(kBlack);
+	f3->SetLineWidth(1);
+	f3->GetXaxis()->SetTitle("m_{ll} GeV");
 	
-	c->SaveAs("kfactors.png");
+	f11->SetLineColor(kRed);
+	f11->SetLineWidth(1);
+	f11->SetLineStyle(3);
+	f11->GetXaxis()->SetTitle("m_{ll} GeV");
+	f22->SetLineColor(kBlue);
+	f22->SetLineWidth(1);
+	f22->SetLineStyle(3);
+	f22->GetXaxis()->SetTitle("m_{ll} GeV");
+	f33->SetLineColor(kBlack);
+	f33->SetLineWidth(1);
+	f33->SetLineStyle(3);
+	f33->GetXaxis()->SetTitle("m_{ll} GeV");
+	
+
+	f11->SetMinimum(0.);
+	f11->SetMaximum(1.2);
+	f11->Draw();
+	f22->Draw("SAMES");
+	f33->Draw("SAMES");
+	f1->Draw("SAMES");
+	f2->Draw("SAMES");
+	f3->Draw("SAMES");
+	leg->Draw("SAMES");
+	//l->Draw("SAMES");
+	
+	saveas(c,"plots/kfactors");
 }

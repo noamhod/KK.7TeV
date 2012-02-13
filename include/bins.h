@@ -50,16 +50,13 @@ static const Double_t step    = 0.03;
 static const Int_t power      = 4;
 static Double_t powerbins[npowerbins+1];
 
-// double mXXmin = 130.;
-// double mXXmax = 3050.;
-// double dmXX   = 40.;
 static const double mXXmin = 130.;
 static const double mXXmax = 5030.;
 static const double dmXX   = 100.;
 
-static const Int_t    ng4bins = 2;//200;
+static const Int_t    ng4bins = 400;//200;
 static const Double_t g4min   = 0.;
-static const Double_t g4max   = 2.;//50.;
+static const Double_t g4max   = 50.;
 
 static const Int_t    nsqrtg4bins = 50;
 static const Double_t sqrtg4min   = 0.;

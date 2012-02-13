@@ -51,11 +51,12 @@ inline dcomplex hASM(double s, double cosTheta, unsigned int idIn, unsigned int 
 	dcomplex A(0,0);
 	if(fabs(cosTheta)>1.) return A;
 	double mass = sqrt(s);
-	double sqrtkF = 1.;
-	if     (idOut==13 && dokFactors) sqrtkF = sqrt(ElectroWeak(mass));  // muons
-	else if(idOut==11 && dokFactors) sqrtkF = sqrt(EWkFactorEle(mass)); // elsectrons
-	if(isnaninf(sqrtkF)) _FATAL("k-factor is nan/inf");
-	A = sqrtkF*(hAG0(s,idIn,idOut) + hAZ0(s,idIn,idOut,hIn,hOut))*sqrt(1.+4.*hIn*hOut*cosTheta);
+	// double sqrtkF = 1.;
+	// if     (idOut==13 && dokFactors) sqrtkF = sqrt(ElectroWeak(mass));  // muons
+	// else if(idOut==11 && dokFactors) sqrtkF = sqrt(EWkFactorEle(mass)); // elsectrons
+	// if(isnaninf(sqrtkF)) _FATAL("k-factor is nan/inf");
+	// A = sqrtkF*(hAG0(s,idIn,idOut) + hAZ0(s,idIn,idOut,hIn,hOut))*sqrt(1.+4.*hIn*hOut*cosTheta);
+	A = (hAG0(s,idIn,idOut) + hAZ0(s,idIn,idOut,hIn,hOut))*sqrt(1.+4.*hIn*hOut*cosTheta);
 	if(isnaninf(real(A*conj(A)))) _FATAL("|hASM|^2 is nan/inf");
 	return A;
 }

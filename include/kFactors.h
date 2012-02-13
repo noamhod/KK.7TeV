@@ -21,6 +21,15 @@ static double EWkFactorEle(double mass)
 	else if (250 < mass && mass <= 1750)  kF *= 1.067 - 6.34e-05*mass;
 	else if (1750 < mass)  kF *= 0.873 + 0.000183*mass - 7.97e-08*mass*mass;
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Thomas Nunnemann suggested to keep the parabolic fit even above 3 TeV, /////////////////////////////////////
+	// because that is our best knowledge of the EW k-factor.                 /////////////////////////////////////
+	// The additional problem above ~4.5 TeV is then that our fit crosses zero. ///////////////////////////////////
+	// So he suggests to demand that at all times the k-factor be kept above a certain value, /////////////////////
+	// which he estimates as 0.5 ("certainly ad-hoc, but the PDF uncertainty is exploding at large masses") ///////
+	if(kF<0.5) kF = 0.5; //////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	return kF;
 }
 
@@ -29,27 +38,35 @@ static double QCD(double mass, string type="NNLO/LO**")
 	_DEBUG("kFactor::QCD");
 	double kF = 1.;
 	
-	if(type=="NNLO/LO**") // NNLO/MRST_LO** (MC11) -> Valid up to 4 TeV
+	if(type=="NNLO/LO**") // NNLO/MRST_LO** (MC11) -> Valid up to 5(4) TeV
 	{
-		double maxMass = 4000.;
-		mass = (mass>maxMass) ? maxMass : mass;
+		// double maxMass = 5000.;//(4000.);
+		// mass = (mass>maxMass) ? maxMass : mass;
 		kF *= 1.15171 + 1.90741e-05*mass - 8.05291e-08*mass*mass + 6.42263e-12*mass*mass*mass;
 	}
 	else if(type=="NNLO/LO*") // NNLO/MRST2007LOmod (MC10 ?) -> Valid up to 3 TeV
 	{
-		double maxMass = 3000.;
-		mass = (mass>maxMass) ? maxMass : mass;
+		// double maxMass = 3000.;
+		// mass = (mass>maxMass) ? maxMass : mass;
 		if (172 < mass) kF *= 1.16260 - 3.11495e-05*mass - 5.75063e-08*mass*mass;
 		else  kF *= 1.1555;
 	}
 	else if(type=="NNLO/MSTW2008LO") // NNLO/MSTW2008LO (MC10 ?) -> Valid up to 3 TeV
 	{
-		double maxMass = 3000.;
-		mass = (mass>maxMass) ? maxMass : mass;
+		// double maxMass = 3000.;
+		// mass = (mass>maxMass) ? maxMass : mass;
 		if(400 < mass) kF *= 1.34815 + 8.58823e-05*mass - 2.11201e-07*mass*mass + 1.11821e-10*mass*mass*mass - 1.76464e-14*mass*mass*mass*mass;
 		else kF *= 1.21330e+00 + 8.17233e-04*mass - 1.17503e-06*mass*mass;
 	}
 	else _FATAL("type="+type+" is unknown.");
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Thomas Nunnemann suggested to keep the parabolic fit even above 4 TeV, /////////////////////////////////////
+	// The additional problem above ~5 TeV is then that our fit crosses zero. /////////////////////////////////////
+	// So he suggests to demand that at all times the k-factor be kept above a certain value, /////////////////////
+	// which he estimates as 0.5 ("certainly ad-hoc, but the PDF uncertainty is exploding at large masses") ///////
+	if(kF<0.5) kF = 0.5; //////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	if(isnaninf(kF)) _FATAL("QCD "+type+" is nan or inf -> "+_s(kF)+" in mass="+_s(mass));
 	if(kF<0.)        _FATAL("QCD "+type+" is negative -> "+_s(kF)+" in mass="+_s(mass));
@@ -62,13 +79,22 @@ static double ElectroWeak(double mass)
 	_DEBUG("kFactor::ElectroWeak");
 	double kF = 1.;
 	
-	// Valid up to 3 TeV
-	double maxMass = 3000.;
-	mass = (mass>maxMass) ? maxMass : mass;
+	// Valid up to ~5(3) TeV
+	// double maxMass = 3000.;
+	// mass = (mass>maxMass) ? maxMass : mass;
 	
 	if (96.65 < mass && mass <= 250)  kF *= 0.852 + 0.00233*mass - 0.953e-05*mass*mass + 1.31e-08*mass*mass*mass;
 	else if (250 < mass && mass <= 1750)  kF *= 1.060 - 6.09e-05*mass;
 	else if (1750 < mass)  kF *= 0.931 + 0.000114*mass - 5.71e-08*mass*mass;
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Thomas Nunnemann suggested to keep the parabolic fit even above 3 TeV, /////////////////////////////////////
+	// because that is our best knowledge of the EW k-factor.                 /////////////////////////////////////
+	// The additional problem above ~4.5 TeV is then that our fit crosses zero. ///////////////////////////////////
+	// So he suggests to demand that at all times the k-factor be kept above a certain value, /////////////////////
+	// which he estimates as 0.5 ("certainly ad-hoc, but the PDF uncertainty is exploding at large masses") ///////
+	if(kF<0.5) kF = 0.5; //////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	if(isnaninf(kF)) _FATAL("EW k-factor is nan or inf -> "+_s(kF)+" in mass="+_s(mass));
 	if(kF<0.)        _FATAL("EW k-factor is negative -> "+_s(kF)+" in mass="+_s(mass));

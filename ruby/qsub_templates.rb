@@ -8,8 +8,8 @@ require 'find'
 include FileUtils
 
 #####################
-sigmaUp="yes" #######
-queue="S" #########
+sigmaUp="no" #######
+queue="HEP" #########
 ##########################################################################
 puts "DID YOU REMEMBER TO EDIT THE FLAGS IN: fast_templates_run.C" #######
 puts "AND TO RUN: broot fast_templates_compile.C  ???" ###################

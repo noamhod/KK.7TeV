@@ -216,6 +216,23 @@ void divide(TH1* hNom, TH1* hDen)
 	}
 }
 
+void residuals(TH1* h1, TH1* h2, TH1* hRes)
+{
+	Int_t n1 = h1->GetNbinsX();
+	Int_t n2 = h2->GetNbinsX();
+	Double_t y1 = 0.;
+	Double_t y2 = 0.;
+	Double_t res = 0.;
+	if(n1!=n2) _FATAL("histogrma bins are not equal");
+	for(Int_t b=1 ; b<=n1 ; b++)
+	{
+		y1 = h1->GetBinContent(b);
+		y2 = h2->GetBinContent(b);
+		res = ((y1+y2)!=0.) ? (y1-y2)/sqrt(y1+y2): -999.;
+		hRes->SetBinContent(b,res);
+	}
+}
+
 double getYaverage(TH1* h)
 {
 	double av    = 0.;

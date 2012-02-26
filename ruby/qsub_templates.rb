@@ -9,7 +9,7 @@ include FileUtils
 
 #####################
 sigmaUp="no" #######
-queue="HEP" #########
+queue="S" #########
 ##########################################################################
 puts "DID YOU REMEMBER TO EDIT THE FLAGS IN: fast_templates_run.C" #######
 puts "AND TO RUN: broot fast_templates_compile.C  ???" ###################
@@ -24,8 +24,8 @@ thisdir = Dir.getwd();
 Dir.chdir(workdir);
 
 mKKmin      = 130; # GeV
-dm          = 100; # GeV
-mKKmax      = 5030;# GeV
+dm          = 40; # 100; # GeV
+mKKmax      = 3050;# 5030; # GeV
 nMassPoints = (mKKmax-mKKmin)/dm;
 
 def clean(workdir="")
@@ -52,6 +52,7 @@ def submitjob(jobname="", mass="", workdir="", sigmaUp="no", queue="HEP")
 		else
 			f.puts "$ROOTSYS/bin/root.exe -b -l -q #{workdir}/fast_templates_compile.C --mass=#{mass}"
 		end
+		#f.puts "$ROOTSYS/bin/root.exe -b -l -q #{workdir}/fast_templates_compile.C --mass=#{mass}"
 		f.puts "cd -"
 	}
 	

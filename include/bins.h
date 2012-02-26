@@ -54,9 +54,10 @@ static const double mXXmin = 130.;
 static const double mXXmax = 5030.;
 static const double dmXX   = 100.;
 
-static const Int_t    ng4bins = 400;//200;
-static const Double_t g4min   = 0.;
-static const Double_t g4max   = 50.;
+static const Double_t g4shift = 1./16.;
+static const Int_t    ng4bins = 400;
+static const Double_t g4min   = 0.-g4shift;
+static const Double_t g4max   = 50.-g4shift;
 
 static const Int_t    nsqrtg4bins = 50;
 static const Double_t sqrtg4min   = 0.;

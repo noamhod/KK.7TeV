@@ -41,13 +41,20 @@ static const double f12 = 1./2.;
 static const double f13 = 1./3.;
 static const double f23 = 2./3.;
 
-static const double mZ0 = 91.1876; // GeV
-static const double wZ0 = 2.4952;  // GeV
-static const double mZ2 = mZ0*mZ0; // GeV
+// static const double mZ0 = 91.187; // GeV ->PYTHIA6
+static const double mZ0    = 91.1876;   // GeV ->PDG
+// static const double wZ0 = 2.489;  // GeV ->PYTHIA6
+static const double wZ0    = 2.4952;    // GeV ->PDG
 
-static const double sw2     = 0.2312015;; 
-static const double cw2     = 0.7687985;
-static const double alphaEM = 0.00729735256824;
+static const double mZ2 = mZ0*mZ0;   // GeV^2
+
+// static const double sw2  = 0.23;      // ->PYTHIA6
+static const double sw2     = 0.2312015; // ->PDG
+// static const double cw2  = 0.74;      // ->PYTHIA6
+static const double cw2     = 0.7687985; // ->PDG
+// static const double alphaEM = 0.00729735; // ->PYTHIA6
+static const double alphaEM    = 0.00729735; // ->PDG
+
 static const double Gmu     = 0.0000116633980690699; // GeV^-2
 
 static const double GeV2mb  = 0.38937930419;      // 1/GeV^2 to mb (mili-barn) conversion constant

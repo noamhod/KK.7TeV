@@ -21,14 +21,20 @@ using namespace integrals;
 namespace helicity
 {
 
-static const unsigned int nModes     = 10; // 100;
-static const double       min_weight = 1.e-30;
-static const double       max_weight = 1.e+10;
-static bool               dokFactors = false;
+static const unsigned int nModes       = 10; // 100;
+static const double       min_weight   = 1.e-30;
+static const double       max_weight   = 1.e+10;
+static bool               dokFactors   = false;
+static bool               doFixedWidth = false;
 
 void setkFactors(bool dokF)
 {
 	dokFactors = dokF;
+}
+
+void setFixedWidth(bool doFixed)
+{
+	doFixedWidth = doFixed;
 }
 
 //////////////////////////////////////////////////////////
@@ -43,54 +49,54 @@ inline dcomplex hAZ0(double s, unsigned int idIn, unsigned int idOut, double hIn
 {
 	dcomplex A(0,0);
 	if(s<0.) return A;
-	A = gZH(idIn,hIn)*gZH(idOut,hOut)/(s-mZ2 + Im*s*(wZ0/mZ0));
+	double widthterm = (doFixedWidth) ? wZ0*mZ0 : s*(wZ0/mZ0);
+	A = gZH(idIn,hIn)*gZH(idOut,hOut)/(s-mZ2 + Im*widthterm);
 	return A;
 }
-inline dcomplex hASM(double s, double cosTheta, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
+inline dcomplex hASM(double s, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
 {
 	dcomplex A(0,0);
-	if(fabs(cosTheta)>1.) return A;
-	double mass = sqrt(s);
+	// double mass = sqrt(s);
 	// double sqrtkF = 1.;
 	// if     (idOut==13 && dokFactors) sqrtkF = sqrt(ElectroWeak(mass));  // muons
 	// else if(idOut==11 && dokFactors) sqrtkF = sqrt(EWkFactorEle(mass)); // elsectrons
 	// if(isnaninf(sqrtkF)) _FATAL("k-factor is nan/inf");
-	// A = sqrtkF*(hAG0(s,idIn,idOut) + hAZ0(s,idIn,idOut,hIn,hOut))*sqrt(1.+4.*hIn*hOut*cosTheta);
-	A = (hAG0(s,idIn,idOut) + hAZ0(s,idIn,idOut,hIn,hOut))*sqrt(1.+4.*hIn*hOut*cosTheta);
+	// A = sqrtkF*(hAG0(s,idIn,idOut) + hAZ0(s,idIn,idOut,hIn,hOut);
+	A = hAG0(s,idIn,idOut) + hAZ0(s,idIn,idOut,hIn,hOut);
 	if(isnaninf(real(A*conj(A)))) _FATAL("|hASM|^2 is nan/inf");
 	return A;
 }
 
 
 //////////////////////////////////////////////////////////
-inline dcomplex hAZP0(double s, double cosTheta, double w, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
+inline dcomplex hAZP0(double s, double w, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
 {
 	dcomplex A(0,0);
 	if(s<0.) return A;
-	if(fabs(cosTheta)>1.) return A;
 	double mass = mZP;
 	double m2 = mass*mass;
 	dcomplex gIn  = (doScale) ? fgZPH(idIn,hIn)   : gZH(idIn,hIn);
 	dcomplex gOut = (doScale) ? fgZPH(idOut,hOut) : gZH(idOut,hOut);
-	// A = (gZH(idIn,hIn)*gZH(idOut,hOut)/(s-m2 + Im*s*(w/mass)) )*sqrt(1.+4.*hIn*hOut*cosTheta);
-	A = (gIn*gOut/(s-m2 + Im*s*(w/mass)) )*sqrt(1.+4.*hIn*hOut*cosTheta);
+	// A = gZH(idIn,hIn)*gZH(idOut,hOut)/(s-m2 + Im*s*(w/mass));
+	double widthterm = (doFixedWidth) ? w*mass : s*(w/mass);
+	A = gIn*gOut/(s-m2 + Im*widthterm);
 	return A;
 }
-inline dcomplex hAZP(double s, double cosTheta, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
+inline dcomplex hAZP(double s, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
 {
 	dcomplex A(0,0);
-	A = hASM(s,cosTheta,idIn,idOut,hIn,hOut); // the SM term
+	A = hASM(s,idIn,idOut,hIn,hOut); // the SM term
 	double w = wTotZP();
 	// double w = wTotZPsimple();
-	A += hAZP0(s,cosTheta,w,idIn,idOut,hIn,hOut);
+	A += hAZP0(s,w,idIn,idOut,hIn,hOut);
 	return A;
 }
-inline dcomplex hAZPnoSM(double s, double cosTheta, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
+inline dcomplex hAZPnoSM(double s, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
 {
 	dcomplex A(0,0);
 	double w = wTotZP();
 	// double w = wTotZPsimple();
-	A += hAZP0(s,cosTheta,w,idIn,idOut,hIn,hOut);
+	A += hAZP0(s,w,idIn,idOut,hIn,hOut);
 	return A;
 }
 
@@ -106,7 +112,8 @@ inline dcomplex hAGKKn(double s, double w, unsigned int idIn, unsigned int idOut
 	dcomplex gIn  = (doScale) ? fqGKK(idIn)  : qGKK(idIn);
 	dcomplex gOut = (doScale) ? fqGKK(idOut) : qGKK(idOut);
 	// A = qGKK(idIn)*qGKK(idOut)/(s-m2 + Im*s*(w/mass));
-	A = gIn*gOut/(s-m2 + Im*s*(w/mass));
+	double widthterm = (doFixedWidth) ? w*mass : s*(w/mass);
+	A = gIn*gOut/(s-m2 + Im*widthterm);
 	return A;
 }
 inline dcomplex hAZKKn(double s, double w, unsigned int idIn, unsigned int idOut, double hIn, double hOut, unsigned int mode)
@@ -119,35 +126,35 @@ inline dcomplex hAZKKn(double s, double w, unsigned int idIn, unsigned int idOut
 	dcomplex gIn  = (doScale) ? fgZKKH(idIn,hIn)   : gZKKH(idIn,hIn);
 	dcomplex gOut = (doScale) ? fgZKKH(idOut,hOut) : gZKKH(idOut,hOut);
 	// A = gZKKH(idIn,hIn)*gZKKH(idOut,hOut)/(s-m2 + Im*s*(w/mass));
-	A = gIn*gOut/(s-m2 + Im*s*(w/mass));
+	double widthterm = (doFixedWidth) ? w*mass : s*(w/mass);
+	A = gIn*gOut/(s-m2 + Im*widthterm);
 	return A;
 }
-inline dcomplex hAKKn(double s, double cosTheta, double wg, double wz, unsigned int idIn, unsigned int idOut, double hIn, double hOut, unsigned int mode)
+inline dcomplex hAKKn(double s, double wg, double wz, unsigned int idIn, unsigned int idOut, double hIn, double hOut, unsigned int mode)
 {
 	dcomplex A(0,0);
-	if(fabs(cosTheta)>1.) return A;
-	return ( (hAGKKn(s,wg,idIn,idOut,mode) + hAZKKn(s,wz,idIn,idOut,hIn,hOut,mode))*sqrt(1.+4.*hIn*hOut*cosTheta) );
+	return (hAGKKn(s,wg,idIn,idOut,mode) + hAZKKn(s,wz,idIn,idOut,hIn,hOut,mode));
 }
-inline dcomplex hAKK(double s, double cosTheta, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
+inline dcomplex hAKK(double s, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
 {
 	dcomplex A(0,0);
-	A = hASM(s,cosTheta,idIn,idOut,hIn,hOut); // the SM term
+	A = hASM(s,idIn,idOut,hIn,hOut); // the SM term
 	for(unsigned int n=1 ; n<=nModes ; n++) // the KK tower
 	{
 		double wg = wTotGKK(n);
 		double wz = wTotZKK(n);
-		A += hAKKn(s,cosTheta,wg,wz,idIn,idOut,hIn,hOut,n);
+		A += hAKKn(s,wg,wz,idIn,idOut,hIn,hOut,n);
 	}
 	return A;
 }
-inline dcomplex hAKKnoSM(double s, double cosTheta, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
+inline dcomplex hAKKnoSM(double s, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
 {
 	dcomplex A(0,0);
 	for(unsigned int n=1 ; n<=nModes ; n++) // the KK tower
 	{
 		double wg = wTotGKK(n);
 		double wz = wTotZKK(n);
-		A += hAKKn(s,cosTheta,wg,wz,idIn,idOut,hIn,hOut,n);
+		A += hAKKn(s,wg,wz,idIn,idOut,hIn,hOut,n);
 	}
 	return A;
 }
@@ -158,12 +165,16 @@ inline double hA2SM(double cosTheta, double s, unsigned int idIn, unsigned int i
 {
 	dcomplex A(0,0);
 	double A2 = 0.;
+	double angular = 0.;
+	double angular2 = 0.;
 	for(double hIn=-f12 ; hIn<=+f12 ; hIn++)
 	{
 		for(double hOut=-f12 ; hOut<=+f12 ; hOut++)
 		{
-			A = hASM(s,cosTheta,idIn,idOut,hIn,hOut);
-			A2 += real(A*conj(A));
+			A = hASM(s,idIn,idOut,hIn,hOut);
+			angular = (1.+4.*hIn*hOut*cosTheta);
+			angular2 = angular*angular;
+			A2 += real(A*conj(A))*angular2;
 		}
 	}
 	return A2;
@@ -172,12 +183,17 @@ inline double hA2ZP(double cosTheta, double s, unsigned int idIn, unsigned int i
 {
 	dcomplex A(0,0);
 	double A2 = 0.;
+	double angular = 0.;
+	double angular2 = 0.;
 	for(double hIn=-f12 ; hIn<=+f12 ; hIn++)
 	{
 		for(double hOut=-f12 ; hOut<=+f12 ; hOut++)
 		{
-			A = hAZP(s,cosTheta,idIn,idOut,hIn,hOut);
-			A2 += real(A*conj(A));
+			A = hAZP(s,idIn,idOut,hIn,hOut);
+			angular = (1.+4.*hIn*hOut*cosTheta);
+			angular2 = angular*angular;
+			A2 += real(A*conj(A))*angular2;
+			// A2 += norm(A); // Re[AxA*]=norm(A)=|A|^2, abs(A)=|A|
 		}
 	}
 	return A2;
@@ -186,12 +202,16 @@ inline double hA2ZPnoSM(double cosTheta, double s, unsigned int idIn, unsigned i
 {
 	dcomplex A(0,0);
 	double A2 = 0.;
+	double angular = 0.;
+	double angular2 = 0.;
 	for(double hIn=-f12 ; hIn<=+f12 ; hIn++)
 	{
 		for(double hOut=-f12 ; hOut<=+f12 ; hOut++)
 		{
-			A = hAZPnoSM(s,cosTheta,idIn,idOut,hIn,hOut);
-			A2 += real(A*conj(A));
+			A = hAZPnoSM(s,idIn,idOut,hIn,hOut);
+			angular = (1.+4.*hIn*hOut*cosTheta);
+			angular2 = angular*angular;
+			A2 += real(A*conj(A))*angular2;
 		}
 	}
 	return A2;
@@ -200,12 +220,16 @@ inline double hA2KK(double cosTheta, double s, unsigned int idIn, unsigned int i
 {
 	dcomplex A(0,0);
 	double A2 = 0.;
+	double angular = 0.;
+	double angular2 = 0.;
 	for(double hIn=-f12 ; hIn<=+f12 ; hIn++)
 	{
 		for(double hOut=-f12 ; hOut<=+f12 ; hOut++)
 		{
-			A = hAKK(s,cosTheta,idIn,idOut,hIn,hOut);
-			A2 += real(A*conj(A));
+			A = hAKK(s,idIn,idOut,hIn,hOut);
+			angular = (1.+4.*hIn*hOut*cosTheta);
+			angular2 = angular*angular;
+			A2 += real(A*conj(A))*angular2;
 		}
 	}
 	return A2;
@@ -214,12 +238,16 @@ inline double hA2KKnoSM(double cosTheta, double s, unsigned int idIn, unsigned i
 {
 	dcomplex A(0,0);
 	double A2 = 0.;
+	double angular = 0.;
+	double angular2 = 0.;
 	for(double hIn=-f12 ; hIn<=+f12 ; hIn++)
 	{
 		for(double hOut=-f12 ; hOut<=+f12 ; hOut++)
 		{
-			A = hAKKnoSM(s,cosTheta,idIn,idOut,hIn,hOut);
-			A2 += real(A*conj(A));
+			A = hAKKnoSM(s,idIn,idOut,hIn,hOut);
+			angular = (1.+4.*hIn*hOut*cosTheta);
+			angular2 = angular*angular;
+			A2 += real(A*conj(A))*angular2;
 		}
 	}
 	return A2;
@@ -231,8 +259,8 @@ inline void validateinput(double cosTheta, double s, unsigned int idIn, unsigned
 {
 	if(s<0.)              { _ERROR("s<0., exitting now.");              exit(-1); }
 	if(fabs(cosTheta)>1.) { _ERROR("fabs(cosTheta)>1., exitting now."); exit(-1); }
-	if(idIn==0)           { _ERROR("idIn<0, exitting now.");            exit(-1); }
-	if(idOut==0)          { _ERROR("idOut<0, exitting now.");           exit(-1); }
+	if(idIn<=0)           { _ERROR("idIn<0, exitting now.");            exit(-1); }
+	if(idOut<=0)          { _ERROR("idOut<0, exitting now.");           exit(-1); }
 }
 inline void validateoutput(double N, double D)
 {

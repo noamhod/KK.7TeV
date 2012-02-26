@@ -3,6 +3,67 @@
 
 #include "rawROOT.h"
 
+inline TH1D* resetErrors(TH1D* h)
+{
+	//------------------------------------------------------------
+	const Int_t nbins = h->GetNbinsX();
+	Double_t bins[nbins+1];
+	TAxis* xaxis = (TAxis*)h->GetXaxis();
+	for(int i=0 ; i<nbins ; i++) bins[i] = xaxis->GetBinLowEdge(i+1);
+	bins[nbins] = xaxis->GetBinUpEdge(nbins);
+	//------------------------------------------------------------
+	TString name  = (TString)h->GetName();
+	TString title = (TString)h->GetTitle();
+	TString xtitle = (TString)h->GetXaxis()->GetTitle();
+	TString ytitle = (TString)h->GetYaxis()->GetTitle();
+	TH1D* h0 = new TH1D(name+"_noerrors",title+";"+xtitle+";"+ytitle,nbins,bins);
+	for(Int_t bin=1 ; bin<=nbins ; bin++)
+	{
+		h0->SetBinContent(bin, h->GetBinContent(bin));
+		h0->SetBinError(bin,0.);
+	}
+	return h0;
+}
+
+inline TH1D* Shift(TH1D* h, double x=0.1)
+{
+	/// create a new histigram shifted by some amount
+	int     N = h->GetNbinsX();
+	double ul = h->GetBinLowEdge(N+1);
+	double ll = h->GetBinLowEdge(1);
+	double delta = x*(ul-ll)/N;
+	TH1D* h0 = new TH1D("h","h", N, ll-delta, ul-delta);
+	h0->SetDirectory(0);
+	for(int i=1 ; i<=N ; i++)
+	{
+		h0->SetBinContent(i,h->GetBinContent(i));
+		h0->SetBinError(i,h->GetBinError(i));
+	}
+	return h0;
+}
+
+inline TH1D* ShiftLog(TH1D* h, double x=0.1)
+{	
+	//------------------------------------------------------------
+	const Int_t nbins = h->GetNbinsX();
+	Double_t bins[nbins+1];
+	TAxis* xaxis = (TAxis*)h->GetXaxis();
+	for(int i=0 ; i<nbins ; i++) bins[i] = xaxis->GetBinLowEdge(i+1) + x*xaxis->GetBinWidth(i+1);
+	bins[nbins] = xaxis->GetBinUpEdge(nbins) + x*xaxis->GetBinWidth(nbins);
+	//------------------------------------------------------------
+	TString name  = (TString)h->GetName();
+	TString title = (TString)h->GetTitle();
+	TString xtitle = (TString)h->GetXaxis()->GetTitle();
+	TString ytitle = (TString)h->GetYaxis()->GetTitle();
+	TH1D* h0 = new TH1D(name+"_shifted",title+";"+xtitle+";"+ytitle,nbins,bins);
+	for(Int_t bin=1 ; bin<=nbins ; bin++)
+	{
+		h0->SetBinContent(bin, h->GetBinContent(bin));
+		h0->SetBinError(bin, h->GetBinError(bin));
+	}
+	return h0;
+}
+
 double Sum(TH1* h, bool addUunderFlow=false, bool addOverFlow=false)
 {
 	double I=0.;
@@ -68,21 +129,21 @@ void ScaleWerrors(TH1* h, double d)
 	}
 }
 
-TH1D* hChopper(TH1D* h, int bins2chop)
+TH1D* hChopper(TH1D* h, int binstochop)
 {
 	
 	const Int_t    nbinsorig = h->GetNbinsX();
-	const Int_t    nbins = nbinsorig-bins2chop;
+	const Int_t    nbins = nbinsorig-binstochop;
 	Double_t bins[nbins+1];
 	TAxis* xaxis = (TAxis*)h->GetXaxis();
 	TAxis* yaxis = (TAxis*)h->GetYaxis();
-	// const Double_t xmin  = xaxis->GetBinLowEdge(bins2chop+1);
+	// const Double_t xmin  = xaxis->GetBinLowEdge(binstochop+1);
 	// const Double_t xmax  = xaxis->GetBinUpEdge(nbinsorig);
 	// setLogBins(nbins, xmin, xmax, bins);
 	// _INFO("xmin="+_s(xmin));
 	// _INFO("xmax="+_s(xmax));
 	
-	for(int i=0 ; i<nbins ; i++) bins[i] = xaxis->GetBinLowEdge(bins2chop+i+1);
+	for(int i=0 ; i<nbins ; i++) bins[i] = xaxis->GetBinLowEdge(binstochop+i+1);
 	bins[nbins] = xaxis->GetBinUpEdge(nbinsorig);
 	// for(int i=0 ; i<=nbins ; i++) cout << bins[i] << ", ";
 	// cout << endl;
@@ -94,7 +155,37 @@ TH1D* hChopper(TH1D* h, int bins2chop)
 	
 	TH1D* hChopped = new TH1D(name+"_chopped",title+";"+xtitle+";"+ytitle, nbins,bins);
 	hChopped->SetBinContent(0,0.); // underflow bin
-	for(Int_t b=1 ; b<=nbins+1 ; b++) hChopped->SetBinContent(b, h->GetBinContent(b+bins2chop));
+	for(Int_t b=1 ; b<=nbins+1 ; b++)
+	{
+		hChopped->SetBinContent(b, h->GetBinContent(b+binstochop));
+		hChopped->SetBinError(b, h->GetBinError(b+binstochop));
+	}
+	return (TH1D*)hChopped->Clone();
+}
+
+TH1D* hChopperUp(TH1D* h, int binstochop)
+{
+	const Int_t    nbinsorig = h->GetNbinsX();
+	const Int_t    nbins = nbinsorig-binstochop;
+	Double_t bins[nbins+1];
+	TAxis* xaxis = (TAxis*)h->GetXaxis();
+	TAxis* yaxis = (TAxis*)h->GetYaxis();
+	
+	for(int i=0 ; i<nbins ; i++) bins[i] = xaxis->GetBinLowEdge(i+1);
+	bins[nbins] = xaxis->GetBinUpEdge(nbins);
+	
+	TString name   = (TString)h->GetName();
+	TString title  = (TString)h->GetTitle();
+	TString xtitle = (TString)xaxis->GetTitle();
+	TString ytitle = (TString)yaxis->GetTitle();
+	
+	TH1D* hChopped = new TH1D(name+"_chopped",title+";"+xtitle+";"+ytitle, nbins,bins);
+	hChopped->SetBinContent(nbins+1,0.); // overflow bin
+	for(Int_t b=1 ; b<=nbins ; b++)
+	{
+		hChopped->SetBinContent(b, h->GetBinContent(b));
+		hChopped->SetBinError(b, h->GetBinError(b));
+	}
 	return (TH1D*)hChopped->Clone();
 }
 
@@ -222,13 +313,17 @@ void residuals(TH1* h1, TH1* h2, TH1* hRes)
 	Int_t n2 = h2->GetNbinsX();
 	Double_t y1 = 0.;
 	Double_t y2 = 0.;
+	Double_t dy1 = 0.;
+	Double_t dy2 = 0.;
 	Double_t res = 0.;
 	if(n1!=n2) _FATAL("histogrma bins are not equal");
 	for(Int_t b=1 ; b<=n1 ; b++)
 	{
 		y1 = h1->GetBinContent(b);
 		y2 = h2->GetBinContent(b);
-		res = ((y1+y2)!=0.) ? (y1-y2)/sqrt(y1+y2): -999.;
+		dy1 = h1->GetBinError(b);
+		dy2 = h2->GetBinError(b);
+		res = ((dy1+dy2)!=0.) ? (y1-y2)/sqrt(dy1*dy1+y2*dy2): -999.;
 		hRes->SetBinContent(b,res);
 	}
 }

@@ -34,23 +34,22 @@ bool doSmearing         = true;     // false is simply the old selection (before
 bool doFullKKtemplates  = false;     // will not change anything if doTemplates is "false"
 bool doFullZPtemplates  = true;     // will not change anything if doTemplates is "false"
 bool dopileup           = true;
-bool doOverallEWkfactor = true;     // must be false if doInAmpSigEWkf=true
-bool doInAmpSigEWkf     = false;    // must be false if doOverallEWkfactor=true
+bool doOverallEWkfactor = false;
 bool doQCDkfactor       = true;
 bool doZpT              = true;
 bool doRemoveHighMass   = false;
 bool doTruth            = false;
-bool doOfficialZP       = true;
+bool doOfficialZP       = false;
 bool doSingleMass       = false;
 bool doInterference     = false;
+bool doFixedwidth       = false;
+bool doTreeLevelMass    = true;      // this is relevant only for the truth histograms !
 void matchFlags()
 {
-	do32st  = !do33st;
+	do32st = !do33st;
 }
 TString fileNmaeSuffix()
 {
-	doInAmpSigEWkf = !doOverallEWkfactor;
-
 	TString name = "";
 	if(isMC11c)            name += "_mc11c";
 	if(!isMC11c)           name += "_mc11a";
@@ -61,13 +60,14 @@ TString fileNmaeSuffix()
 	if(!doFullZPtemplates) name += "_noZPtmplates";
 	if(doSigmaUp)          name += "_SmrSigUp";
 	if(!dopileup)          name += "_noPUrw";
-	if(doOverallEWkfactor) name += "_overallEWkF";
-	if(!doInAmpSigEWkf)    name += "_noInAmpSigEWkF";
+	if(!doOverallEWkfactor)name += "_noOverallEWkF";
 	if(!doQCDkfactor)      name += "_noQCDkF";
 	if(!doZpT)             name += "_noZpTrw";
 	if(doRemoveHighMass)   name += "_noHighMbins";
 	if(!doTruth)           name += "_noTruth";
 	if(doOfficialZP)       name += "_wthOfficialZP";
+	if(doFixedwidth)       name += "_fixedBWwidth";
+	if(doTreeLevelMass)    name += "_treeLevelMass";
 	if(doSingleMass)       name += "_Xmass"+_s(singleMass);
 	// name += "_test";
 	return name;
@@ -76,13 +76,16 @@ TString fileNmaeSuffix()
 
 // other parameters
 TString ntupledir = "";
-TString ntupledir_regular = (isMC11c) ? "/storage/t3_data/hod/2011/NTUPLEMC11C" : "/storage/t3_data/hod/2011/NTUPLE";
+TString ntupledir_regular = (isMC11c) ? "/storage/t3_data/hod/2011/NTUPLEMC11C/AFTERMCPBUGFIX/" : "/storage/t3_data/hod/2011/NTUPLE";
 
 Int_t printmod    = 1000;
 Bool_t dolog      = true;
 
-double g4XXmin = (double)g4min;
-double g4XXmax = (double)g4max;
+double nZpeak     = 0.;
+double nZpeakNoPU = 0.;
+
+double g4XXmin = (double)(g4min+g4shift);
+double g4XXmax = (double)(g4max+g4shift);
 double dg4XX   = (g4XXmax-g4XXmin)/(double)ng4bins;
 
 double maxKKwgt = 0.;
@@ -130,6 +133,7 @@ TVector3*       tv3a   = new TVector3;
 TVector3*       tv3b   = new TVector3;
 TVector3*       tv3mu  = new TVector3;
 
+TLorentzVector* tlvmutreelevel = new TLorentzVector;
 TLorentzVector* tlvmutrua = new TLorentzVector;
 TLorentzVector* tlvmutrub = new TLorentzVector;
 TLorentzVector* tlvmureca = new TLorentzVector;
@@ -137,6 +141,7 @@ TLorentzVector* tlvmurecb = new TLorentzVector;
 TLorentzVector* tlvqa  = new TLorentzVector;
 TLorentzVector* tlvqb  = new TLorentzVector;
 
+TLorentzVector* tlvmutreelevelBoosted = new TLorentzVector;
 TLorentzVector* tlvmutruaBoosted = new TLorentzVector;
 TLorentzVector* tlvmutrubBoosted = new TLorentzVector;
 TLorentzVector* tlvmurecaBoosted = new TLorentzVector;
@@ -144,6 +149,7 @@ TLorentzVector* tlvmurecbBoosted = new TLorentzVector;
 TLorentzVector* tlvqaBoosted  = new TLorentzVector;
 TLorentzVector* tlvqbBoosted  = new TLorentzVector;
 
+TVector3*       tv3mutreelevel = new TVector3;
 TVector3*       tv3mutrua = new TVector3;
 TVector3*       tv3mutrub = new TVector3;
 TVector3*       tv3mureca = new TVector3;
@@ -152,6 +158,7 @@ TVector3*       tv3qa  = new TVector3;
 TVector3*       tv3qb  = new TVector3;
 TVector3*       tv3q   = new TVector3;
 
+TVector3*       tv3mutreelevelBoosted = new TVector3;
 TVector3*       tv3mutruaBoosted = new TVector3;
 TVector3*       tv3mutrubBoosted = new TVector3;
 TVector3*       tv3murecaBoosted = new TVector3;
@@ -592,6 +599,20 @@ void hbook()
 	}
 }
 
+void setSumW2()
+{
+	// Associated errors:
+	// By default, for each bin, the sum of weights is computed at fill time.
+	// One can also call TH1::Sumw2 to force the storage and computation of
+	// the sum of the square of weights per bin. If Sumw2 has been called,
+	// the error per bin is computed as the sqrt(sum of squares of weights),
+	// otherwise the error is set equal to the sqrt(bin content).
+	// To return the error for a given bin number, do:
+	// Double_t error = h->GetBinError(bin);
+	for(TMapTSP2TH1::iterator it=h1Map.begin() ; it!=h1Map.end() ; ++it) it->second->Sumw2();
+	for(TMapTSP2TH2::iterator it=h2Map.begin() ; it!=h2Map.end() ; ++it) it->second->Sumw2();
+}
+
 void weightsNoPU(TString tsMCname, float mass=0., unsigned int truXid=0, double truXmass=0., double truXpT=0.)
 {
 	//// ZpT reweighting
@@ -643,10 +664,11 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 	// double KKnoSMoverSM_weight = 0.;
 	// double ZPnoSMoverSM_weight = 0.;
 	
-	int imuontru  = -999;
-	int iamuontru = -999;
-	int imuonrec  = -999;
-	int iamuonrec = -999;
+	int imutreelvl = -999;
+	int imuontru   = -999;
+	int iamuontru  = -999;
+	int imuonrec   = -999;
+	int iamuonrec  = -999;
 	
 	int iquark  = -999;
 	int iaquark = -999;
@@ -672,30 +694,35 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 		_DEBUG("");
 		
 		// (1) take the true quark and the true muon and boost it to the cmf.
-		// (2) calculate cos(theta*) between the muon and the quark
+		// (2) calculate cos(theta*) between the tree-level muon and the quark
 		// (3) get the quark id
 		// (4) get the mass of the intermediate state (Z)
 		// iquark = (truth_all_partons_mc_pdgId->at(0)>0) ? 0 : 1;
 		// iaquark = (iquark==0) ? 1 : 0;
-		iquark = (truth_all_partons_mc_pdgId->at(2)>0) ? 2 : 3; // incoming partons are written in enties 2 and 3 of the vectors "truth_all_partons_mc_*"
+		imutreelvl = (truth_all_partons_mc_pdgId->at(5)>0) ? 5 : 6; // outgoing leptons are written in enties 2 and 3 of the vectors "truth_all_partons_mc_*"
+		iquark  = (truth_all_partons_mc_pdgId->at(2)>0) ? 2 : 3;        // incoming partons are written in enties 2 and 3 of the vectors "truth_all_partons_mc_*"
 		iaquark = (iquark==2) ? 3 : 2;
+		tlvmutreelevel->SetPtEtaPhiM(truth_all_partons_mc_pt->at(imutreelvl), truth_all_partons_mc_eta->at(imutreelvl), truth_all_partons_mc_phi->at(imutreelvl),truth_all_partons_mc_m->at(imutreelvl));
 		tlvqa->SetPtEtaPhiM(truth_all_partons_mc_pt->at(iquark), truth_all_partons_mc_eta->at(iquark), truth_all_partons_mc_phi->at(iquark),truth_all_partons_mc_m->at(iquark));
 		tlvqb->SetPtEtaPhiM(truth_all_partons_mc_pt->at(iaquark), truth_all_partons_mc_eta->at(iaquark), truth_all_partons_mc_phi->at(iaquark),truth_all_partons_mc_m->at(iaquark));
+		(*tv3mutreelevel) = tlvmutreelevel->Vect();
 		(*tv3qa) = tlvqa->Vect();
 		(*tv3qb) = tlvqb->Vect();
+		tlvmutreelevelBoosted = fkinematics::Boost(tlvqa,tlvqb,tlvmutreelevel);
 		tlvqaBoosted = fkinematics::Boost(tlvqa,tlvqb,tlvqa);
 		tlvqbBoosted = fkinematics::Boost(tlvqa,tlvqb,tlvqb);
+		(*tv3mutreelevelBoosted) = tlvmutreelevelBoosted->Vect();
 		(*tv3qaBoosted) = tlvqaBoosted->Vect();
 		(*tv3qbBoosted) = tlvqbBoosted->Vect();
 	
 		// bits for the KK weights
 		tv3q->SetPtEtaPhi(tlvqaBoosted->Pt(),tlvqaBoosted->Eta(),tlvqaBoosted->Phi());
-		tv3mu->SetPtEtaPhi(tlvmutruaBoosted->Pt(),tlvmutruaBoosted->Eta(),tlvmutruaBoosted->Phi());
+		tv3mu->SetPtEtaPhi(tlvmutreelevelBoosted->Pt(),tlvmutreelevelBoosted->Eta(),tlvmutreelevelBoosted->Phi());
 		truth_cost = tv3q->Dot((*tv3mu))/(tv3q->Mag()*tv3mu->Mag()); // truth cos(theta*)
 		truth_idIn = truth_all_partons_mc_pdgId->at(iquark);         // truth incoming flavor
 		truth_mass = fkinematics::imass(tlvqa,tlvqb);                // truth gamma/Z mass
 		//truth_mass = truth_all_partons_mc_m->at(4);                // truth gamma/Z mass
-		if(fabs(truth_mass-truth_all_partons_mc_m->at(4))/sqrt(truth_all_partons_mc_m->at(4))>3.)
+		if(fabs(truth_mass-truth_all_partons_mc_m->at(4))/sqrt(truth_all_partons_mc_m->at(4))>1.)
 		{
 			_WARNING("truth mass mismatch: M(qqbar)="+_s(truth_all_partons_mc_m->at(4))+", M(4->"+_s(truth_all_partons_mc_pdgId->at(4))+")="+_s(truth_mass));
 		}
@@ -710,15 +737,21 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 		
 		//////////////////////////////////////////////////////
 		//// weights handeling ///////////////////////////////
+		//// 2nd argument is the truth mass of the mm pair ///
+		//// after FSR and it is not the mc_m->at(4) /////////
 		weights(tsMCname, mass, truXid, truXmass, truXpT); ///
+		double weight_dy = (doOverallEWkfactor) ? event_weight : event_weight*kFEW_NNLOvLOs; // for the truth
 		//////////////////////////////////////////////////////
 
 		_DEBUG("");
-
+		
+		///////////////////////////////////////////////////////////////////////////////////////////////////
+		mass = (doTreeLevelMass) ? truth_all_partons_mc_m->at(4) : mass; // mass was M(mumu) AFTER FSR ////
+		///////////////////////////////////////////////////////////////////////////////////////////////////
+		
 		/////////// DY and official Z'
 		// if kF for signals is done in the amplitude then the event_weight does not contain it 
-		double weight_dy = (doOverallEWkfactor) ? event_weight : event_weight*kFEW_NNLOvLOs;
-		if(doTruth) h1Map["hMass_"+tsMCname+"_truth"]->Fill(mass*GeV2TeV,wgt/**weight_dy*/);
+		if(doTruth) h1Map["hMass_"+tsMCname+"_truth"]->Fill(mass*GeV2TeV,wgt);
 		if(doOfficialZP && doTruth && tsMCname=="DYmumu")
 		{		
 			/////////////////////////////
@@ -738,7 +771,7 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 				
 				TString tsMZP = (TString)_s(M);
 				ZPoverSM_weight = weightZP(truth_cost,truth_s,truth_idIn,idOut);
-				h1Map["hMass_Zprime_SSM"+tsMZP+"_template_truth"]->Fill(mass*GeV2TeV,wgt/**weight_dy*/*ZPoverSM_weight);
+				h1Map["hMass_Zprime_SSM"+tsMZP+"_template_truth"]->Fill(mass*GeV2TeV,wgt*ZPoverSM_weight);
 			}
 		}
 		
@@ -772,7 +805,7 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 				
 					if(doInterference) KKoverSM_weight = weightKK(truth_cost,truth_s,truth_idIn,idOut);
 					else               KKoverSM_weight = weightKKnoSM(truth_cost,truth_s,truth_idIn,idOut);
-					h1Map["hMass_truth_template_KK"+massName]->Fill(mass*GeV2TeV,wgt/**event_weight*/*KKoverSM_weight); // need to fluctuate this later
+					h1Map["hMass_truth_template_KK"+massName]->Fill(mass*GeV2TeV,wgt*KKoverSM_weight); // need to fluctuate this later
 				}
 				
 				if(doFullZPtemplates)
@@ -784,7 +817,7 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 				
 					if(doInterference) ZPoverSM_weight = weightZP(truth_cost,truth_s,truth_idIn,idOut);
 					else               ZPoverSM_weight = weightZPnoSM(truth_cost,truth_s,truth_idIn,idOut);
-					h1Map["hMass_truth_template_Zprime_SSM"+massName]->Fill(mass*GeV2TeV,wgt/**event_weight*/*ZPoverSM_weight); // need to fluctuate this later
+					h1Map["hMass_truth_template_Zprime_SSM"+massName]->Fill(mass*GeV2TeV,wgt*ZPoverSM_weight); // need to fluctuate this later
 				}
 				
 				for(double g4=g4XXmin ; g4<=g4XXmax ; g4+=dg4XX)
@@ -806,7 +839,7 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 						else               KKoverSM_weight = weightKKnoSM(truth_cost,truth_s,truth_idIn,idOut);
 						if(KKoverSM_weight>0.)
 						{
-							h2Map["hg4Mass_truth_template_KK"+massName]->Fill(mass*GeV2TeV, g4, wgt/**event_weight*/*KKoverSM_weight);
+							h2Map["hg4Mass_truth_template_KK"+massName]->Fill(mass*GeV2TeV, g4, wgt*KKoverSM_weight);
 						}
 					}
 					if(doFullZPtemplates)
@@ -822,7 +855,7 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 						else               ZPoverSM_weight = weightZPnoSM(truth_cost,truth_s,truth_idIn,idOut);
 						if(ZPoverSM_weight>0.)
 						{
-							h2Map["hg4Mass_truth_template_Zprime_SSM"+massName]->Fill(mass*GeV2TeV, g4, wgt/**event_weight*/*ZPoverSM_weight);
+							h2Map["hg4Mass_truth_template_Zprime_SSM"+massName]->Fill(mass*GeV2TeV, g4, wgt*ZPoverSM_weight);
 						}
 					}
 				}
@@ -865,7 +898,12 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 			cb = recon_all_charge->at(iamuonrec);
 			if(ca*cb>=0.) _WARNING("ca*cb>=0, skipping event");
 			mass          = fkinematics::imass(tlvmureca,tlvmurecb);
-			
+		
+			//////////////////////////////////////////////////////////////////////////////////////////////
+			if(mass>=70. && mass<=110. && tsMCname=="DYmumu") nZpeak += event_weight*wgt; ////////////////
+			if(mass>=70. && mass<=110. && tsMCname=="DYmumu") nZpeakNoPU += event_weight_nopileup*wgt; ///
+			//////////////////////////////////////////////////////////////////////////////////////////////
+		
 			_DEBUG("");
 			
 			for(double M=mXXmin ; M<=mXXmax && tsMCname=="DYmumu" ; M+=dmXX)
@@ -1253,7 +1291,7 @@ void run(Double_t Xmass=-1.)
 	///////////////////////////////////////////////
 	// theoretical stuff... ///////////////////////
 	setFermions(); ////////////////////////////////
-	setkFactors(doInAmpSigEWkf); //////////////////
+	setFixedWidth(doFixedwidth); //////////////////
 	resetKKmass();/////////////////////////////////
 	resetZPmass(); ////////////////////////////////
 	resetfgZP(); //////////////////////////////////
@@ -1265,7 +1303,7 @@ void run(Double_t Xmass=-1.)
 	style();
 	samples();
 	hbook();
-
+	setSumW2();
 	
 	for(TMapiTS::iterator it=grpx_ordered.begin() ; it!=grpx_ordered.end() ; ++it)
 	{
@@ -1285,4 +1323,6 @@ void run(Double_t Xmass=-1.)
 	writeTemplates();
 	
 	_INFO("Done mass -> "+_s(singleMass));
+	_INFO("nZpeakNoPU = "+_s(nZpeakNoPU));
+	_INFO("nZpeak = "+_s(nZpeak));
 }

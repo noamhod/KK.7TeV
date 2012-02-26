@@ -6,6 +6,8 @@
 TString model  = "ZP";
 TString mutype = "33st";
 TString binning = "linearbins";
+bool doGrid = true;
+TString version = (doGrid) ? "v19" : "";
 
 inline TH1D* hGeV2TeV(TH1D* hGeV)
 {
@@ -96,7 +98,9 @@ void normtest()
 	Double_t sumDYmm = 0.;
 	for(Int_t bin=minMbin ; bin<=maxMbin ; bin++) sumDYmm += (h1dy->GetBinContent(bin));
 	
-	TFile* fT = new TFile("plots/"+binning+"/"+mutype+"_nominal/"+model+"_combined_2dtemplates_mc11c_"+mutype+"_overallEWkF_noInAmpSigEWkF_noHighMbins_noTruth.root","READ");
+	TString gridFile = "plots/"+binning+"/"+mutype+"_nominal/"+version+"/"+model+"_combined_"+version+".root";
+	TString infName = (doGrid) ? gridFile : "plots/"+binning+"/"+mutype+"_nominal/"+model+"_combined_2dtemplates_mc11c_"+mutype+"_overallEWkF_noInAmpSigEWkF_noHighMbins_noTruth.root";	
+	TFile* fT = new TFile(infName,"READ");
 	TObjArray* toartmp = new TObjArray();
 	toartmp->Read("template2d");
 	TH2D* h2T = (TH2D*)((TH2D*)(TObjArray*)toartmp->At(0))->Clone();

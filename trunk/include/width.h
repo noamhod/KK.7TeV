@@ -21,6 +21,12 @@ static const double mKKinit = 2000.; // GeV
 static const double mZPinit = 2000.; // GeV
 static double mKK = 2000.; // GeV
 static double mZP = 2000.; // GeV
+static bool doTTbarWidth = true; // turn on/off the partial decay width to ttbar
+
+void setTTbarWidth(bool doTTbarWdt)
+{
+	doTTbarWidth = doTTbarWdt;
+}
 
 void setKKmass(double m) { mKK = m; }
 void setZPmass(double m) { mZP = m; }
@@ -39,6 +45,8 @@ inline double wGKK2ttbar(unsigned int id, unsigned int mode)
 	double m2 = mass*mass;
 	double mf2 = mf(id)*mf(id);
 	double qf2 = qf(id)*qf(id);
+	
+	if((1.-4.*mf2/m2)<0.) return 0.;
 
 	// GKK->ttbar
 	double w = 2. * Ncf(id)*(alphaEM/6.) * mass * 2.*qf2 * sqrt( 1. - 4.*mf2/m2) * (1. + 2.*mf2/m2); // top is not massless !!!
@@ -52,7 +60,7 @@ inline double wZKK2ttbar(unsigned int id, unsigned int mode)
 	double mKKn2 = (mode*mKK)*(mode*mKK);
 	double mass = sqrt(mZ2 + mKKn2);
 	
-	if(mass<2.*mf(id)) return 0.; // 2tops mass threshold
+	if(mass<2.*mf(id))    return 0.; // 2tops mass threshold
 	
 	double m2 = mass*mass;
 	double mf2 = mf(id)*mf(id);
@@ -60,18 +68,20 @@ inline double wZKK2ttbar(unsigned int id, unsigned int mode)
 	double gL2 = gL*gL; _DEBUG("gL2="+_s(gL2));
 	double gR = gZR(id);
 	double gR2 = gR*gR; _DEBUG("gR2="+_s(gR2));
+
+	if((1.-4.*mf2/m2)<0.) return 0.;
 	
 	// ZKK->ttbar
-	double w =  2.*
+	/* double w =  2.*
 				(1./(24.*pi*sq2))*
 				Gmu*Ncf(id)*
 				(mZ2*mass)*
 				sqrt(1.-4.*mf2/m2)*
-				(1.-4.*mf2/m2+(2.*I3f(id)-4.*qf(id)*sw2)*(2.*I3f(id)-4.*qf(id)*sw2)*(1.+2.*mf2/m2)); // top is not massless !!!
-	/* double w = 2.*
-				Ncf(id)*(alphaEM*3./6.)*
+				(1.-4.*mf2/m2+(2.*I3f(id)-4.*qf(id)*sw2)*(2.*I3f(id)-4.*qf(id)*sw2)*(1.+2.*mf2/m2)); // top is not massless !!! */
+	double w = 2.*
+				Ncf(id)*(alphaEM/6.)*
 				mass*sqrt(1.-4.*mf2/m2)*
-				((gL2+gR2)+(mf2/m2)*(6.*gL*gR-gL2-gR2)); */
+				((gL2+gR2)+(mf2/m2)*(6.*gL*gR-gL2-gR2));
 	return w; // no scale factor included here
 }
 
@@ -81,24 +91,26 @@ inline double wZP2ttbar(unsigned int id)
 
 	double mass = mZP;
 	
-	if(mass<2.*mf(id)) return 0.; // 2tops mass threshold
+	if(mass<2.*mf(id))    return 0.; // 2tops mass threshold
 	
 	double m2 = mass*mass;
 	double mf2 = mf(id)*mf(id);
 	double gL = gZL(id);
-	double gL2 = gL*gL; _DEBUG("gL2="+_s(gL2));
+	double gL2 = gL*gL;
 	double gR = gZR(id);
-	double gR2 = gR*gR; _DEBUG("gR2="+_s(gR2));
+	double gR2 = gR*gR;
+	
+	if((1.-4.*mf2/m2)<0.) return 0.;
 	
 	// Z'->ttbar
-	double w = (1./(24.*pi*sq2))*
+	/* double w = (1./(24.*pi*sq2))*
 				Gmu*Ncf(id)*
 				(mZ2*mass)*
 				sqrt(1.-4.*mf2/m2)*
-				(1.-4.*mf2/m2+(2.*I3f(id)-4.*qf(id)*sw2)*(2.*I3f(id)-4.*qf(id)*sw2)*(1.+2.*mf2/m2)); // top is not massless !!!
-	/* double w = Ncf(id)*(alphaEM*3./6.)*
+				(1.-4.*mf2/m2+(2.*I3f(id)-4.*qf(id)*sw2)*(2.*I3f(id)-4.*qf(id)*sw2)*(1.+2.*mf2/m2)); // top is not massless !!! */
+	double w = Ncf(id)*(alphaEM/6.)*
 				mass*sqrt(1.-4.*mf2/m2)*
-				((gL2+gR2)+(mf2/m2)*(6.*gL*gR-gL2-gR2)); */
+				((gL2+gR2)+(mf2/m2)*(6.*gL*gR-gL2-gR2));
 	return w; // no scale factor included here
 }
 
@@ -116,7 +128,6 @@ inline double wGKK2ffbar(unsigned int id, unsigned int mode)
 	{
 		w = Ncf(id)*(alphaEM/6.) * mass * 4.*(qf(id)*qf(id)); // all the rest
 	}
-	if(doScale) w *= fgGKK2();
 	return w;
 }
 
@@ -172,8 +183,9 @@ inline double wTotZKK(unsigned int mode)
 	// loop on all the flavors
 	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) w += wZKK2ffbar(it->first,mode);
 	*/
-	w = 2.*wZ0*mass/mZ0 + wZKK2ttbar(PDTTOP,mode);
-	if(doScale) w *= fgZKK2();
+	w = 2.*wZ0*mass/mZ0;
+	if(doTTbarWidth) w += wZKK2ttbar(PDTTOP,mode);
+	if(doScale)      w *= fgZKK2();
 	return w;
 }
 inline double wTotZP()
@@ -184,8 +196,9 @@ inline double wTotZP()
 	// loop on all the flavors
 	for(ui2fermion::iterator it=ui2f.begin() ; it!=ui2f.end() ; ++it) w += wZP2ffbar(it->first);
 	*/
-	w = wZ0*mass/mZ0 + wZP2ttbar(PDTTOP);
-	if(doScale) w *= fgZP2();
+	w = wZ0*mass/mZ0;
+	if(doTTbarWidth) w += wZP2ttbar(PDTTOP);
+	if(doScale)      w *= fgZP2();
 	return w;
 }
 

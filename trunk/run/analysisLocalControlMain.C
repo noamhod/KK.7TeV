@@ -11,7 +11,7 @@ void prepare(TString sGRLtag, TString sRunDir="", TString sGdb="") // do not use
 {
 	gROOT->Reset();
 
-	TString sMCPtag = "00-05-00";
+	TString sMCPtag = "00-05-02";
 	TString sPRWtag = "00-02-01";
 	
 	gROOT->ProcessLine(".include "+sRunDir+"../include/");

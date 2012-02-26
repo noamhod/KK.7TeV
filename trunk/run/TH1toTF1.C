@@ -15,23 +15,36 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // Global definitions ///////////////////////////////////////////////////////////////////////
+bool doGrid         = false;
+bool doInterference = false;
+bool doHighMass     = true;
+bool doKKtemplates  = false;
+bool doArbitraryScale  = false;
 TString mutype  = "33st";
 TString binning = "linearbins";
-TString fpath   = "_combined_2dtemplates_mc11c_"+mutype+"_overallEWkF_noInAmpSigEWkF_noHighMbins_noTruth"; // for mc11c with the overall k-factor
-TString sDir    = "plots/"+binning+"/"+mutype+"_nominal/";
+TString version = (doGrid) ? "v30/" : "";
+TString interference = (doInterference) ? "" : "_noInterference";
+TString KKtemplates  = (doKKtemplates)  ? "" : "_noKKtmplates";
+TString highmass     = (doHighMass)     ? "" : "_noHighMbins";
+Double_t arbitraryScale = 1.15;    // arbitrary scale by 15%
+TString sArbitraryScale = (doArbitraryScale) ? "_scaledBy"+(TString)_s((arbitraryScale-1)*100)+"percent" : "";
+//TString fpath = (doGrid) ? "_combined_"+version+sArbitraryScale : "_combined_2dtemplates_mc11c_"+mutype+interference+KKtemplates+"_overallEWkF_noInAmpSigEWkF"+highmass+"_noTruth"; // for mc11c with the overall k-factor
+// TString fpath = "_combined_2dtemplates_mc11c_33st_noInterference_noKKtmplates_noInAmpSigEWkF_treeLevelMass";
+TString fpath = "_combined_2dtemplates_mc11c_33st_noInterference_noKKtmplates_noOverallEWkF_noTruth_treeLevelMass";
+TString sDirNoint = (doInterference) ? "" : "nointerference/";
+TString sDir  = "plots/"+sDirNoint+binning+"/"+mutype+"_nominal/"+version;
 
-Double_t xmin = g4min; // 0.; // g4min;
+Double_t xmin = 0.; // g4min;
 Double_t xmax = g4max; // TMath::Power(npowerbins*step,power); // g4max;
 
 TString model   = "KK";     // ZP or KK
 TString channel = "#mu#mu"; // #mu#mu or ee
 
-bool     doScale2Zpeak = true;
-// Double_t scale2Zpeak   = (mutype=="33st") ? 0.9920241910 : 0.8852545818; // For powerbins,   see normtest.C
-Double_t scale2Zpeak   = (mutype=="33st") ? 0.9920241847 : 0.8852545729;    // For linear bins, see normtest.C
-bool doInterpolation   = true;
+bool doScale2Zpeak = false;
+Double_t scale2Zpeak = (mutype=="33st") ? 1. : 1.;    // For linear bins, see normtest.C
+bool doInterpolation = false;
 
-Int_t npx = 10000;
+Int_t npx = 2000;
 
 
 
@@ -80,9 +93,12 @@ void init()
 		tobjarr_syst_mmSlopeEff = new TObjArray();
 		tobjarr_syst_mmSlopeEff->Read("template2d_mmSlopeEff_syst");
 		_INFO("mmSlopeEff: "+_s(tobjarr_syst_mmSlopeEff->GetLast()));
-		tobjarr_syst_mmRes = new TObjArray();
-		tobjarr_syst_mmRes->Read("template2d_mmRes_syst");
-		_INFO("mmRes:      "+_s(tobjarr_syst_mmRes->GetLast()));
+		if(doInterference)
+		{
+			tobjarr_syst_mmRes = new TObjArray();
+			tobjarr_syst_mmRes->Read("template2d_mmRes_syst");
+			_INFO("mmRes:      "+_s(tobjarr_syst_mmRes->GetLast()));
+		}
 	}
 	if(channel=="ee")
 	{
@@ -194,6 +210,8 @@ void TH1toTF1(TString mod, int mXX)
 	{
 		_INFO("looping.");
 	}
+	
+	_INFO("working in -> "+(string)sDir);
 	
 	style();
 
@@ -416,32 +434,35 @@ void TH1toTF1(TString mod, int mXX)
 				delete f;
 				delete c;
 
-				oldDir->cd();
-				h2X = (TH2D*)((TH2D*)(TObjArray*)tobjarr_syst_mmRes->At(mX))->Clone();
-				f = new TF1("fmmRes_mX"+mXname+"_mll"+mllname,fTH1toTF1,xmin,xmax,3);
-				f->SetParameters(mX,mll,MMRES);
-				f->SetParNames("mX","mll","typ");
-				f->SetLineColor(kBlue);
-				f->SetLineWidth(1);
-				f->SetNpx(npx);
-				h = (TH1D*)(TH2toTH1(h2X,mll))->Clone("");
-				h->SetLineColor(kRed);
-				c = new TCanvas("cmmRes_mX"+mXname+"_mll"+mllname,"",600,400);
-				c->cd();
-				c->Draw();
-				f->Draw();
-				h->SetTitle("dN/dg^{4} in mX="+mXval+" GeV and m_{"+channel+"}="+mllval+" TeV");
-				h->GetXaxis()->SetTitle("g^{4}");
-				h->GetYaxis()->SetTitle("dN/dg^{4}");
-				h->Draw("SAMES");
-				dirXmmRes->cd();
-				c->Write();
-				f->Write();
-				h->Write();
-				delete h2X;
-				delete h;
-				delete f;
-				delete c;
+				if(doInterference)
+				{
+					oldDir->cd();
+					h2X = (TH2D*)((TH2D*)(TObjArray*)tobjarr_syst_mmRes->At(mX))->Clone();
+					f = new TF1("fmmRes_mX"+mXname+"_mll"+mllname,fTH1toTF1,xmin,xmax,3);
+					f->SetParameters(mX,mll,MMRES);
+					f->SetParNames("mX","mll","typ");
+					f->SetLineColor(kBlue);
+					f->SetLineWidth(1);
+					f->SetNpx(npx);
+					h = (TH1D*)(TH2toTH1(h2X,mll))->Clone("");
+					h->SetLineColor(kRed);
+					c = new TCanvas("cmmRes_mX"+mXname+"_mll"+mllname,"",600,400);
+					c->cd();
+					c->Draw();
+					f->Draw();
+					h->SetTitle("dN/dg^{4} in mX="+mXval+" GeV and m_{"+channel+"}="+mllval+" TeV");
+					h->GetXaxis()->SetTitle("g^{4}");
+					h->GetYaxis()->SetTitle("dN/dg^{4}");
+					h->Draw("SAMES");
+					dirXmmRes->cd();
+					c->Write();
+					f->Write();
+					h->Write();
+					delete h2X;
+					delete h;
+					delete f;
+					delete c;
+				}
 			}
 			
 			if(channel=="ee")
@@ -473,7 +494,7 @@ void TH1toTF1(TString mod, int mXX)
 				delete f;
 				delete c;
 				
-				oldDir->cd();
+				/* oldDir->cd();
 				h2X = (TH2D*)((TH2D*)(TObjArray*)tobjarr_syst_eeRes->At(mX))->Clone();
 				f = new TF1("feeRes_mX"+mXname+"_mll"+mllname,fTH1toTF1,xmin,xmax,3);
 				f->SetParameters(mX,mll,EERES);
@@ -498,7 +519,7 @@ void TH1toTF1(TString mod, int mXX)
 				delete h2X;
 				delete h;
 				delete f;
-				delete c;
+				delete c; */
 			}
 		}
 		
@@ -589,19 +610,22 @@ void TH1toTF1(TString mod, int mXX)
 			delete h2X;
 			delete c2;
 			
-			oldDir->cd();
-			c2 = new TCanvas("cmmRes_mX"+mXname,"",600,400);
-			c2->Draw();
-			c2->cd();
-			c2->SetLogx();
-			h2X = (TH2D*)((TH2D*)(TObjArray*)tobjarr_syst_mmRes->At(mX))->Clone();
-			h2X->SetTitle("#frac{smeared +1#sigma}{nominal}-1 vs. g^{4} vs. m_{"+channel+"}");
-			h2X->Draw("SURF1");
-			dirXmmRes->cd();
-			c2->Write();
-			h2X->Write();
-			delete h2X;
-			delete c2;
+			if(doInterference)
+			{
+				oldDir->cd();
+				c2 = new TCanvas("cmmRes_mX"+mXname,"",600,400);
+				c2->Draw();
+				c2->cd();
+				c2->SetLogx();
+				h2X = (TH2D*)((TH2D*)(TObjArray*)tobjarr_syst_mmRes->At(mX))->Clone();
+				h2X->SetTitle("#frac{smeared +1#sigma}{nominal}-1 vs. g^{4} vs. m_{"+channel+"}");
+				h2X->Draw("SURF1");
+				dirXmmRes->cd();
+				c2->Write();
+				h2X->Write();
+				delete h2X;
+				delete c2;
+			}
 		}
 		
 		if(channel=="ee")
@@ -620,7 +644,7 @@ void TH1toTF1(TString mod, int mXX)
 			delete h2X;
 			delete c2;
 			
-			oldDir->cd();
+			/* oldDir->cd();
 			c2 = new TCanvas("ceeRes_mX"+mXname,"",600,400);
 			c2->Draw();
 			c2->cd();
@@ -632,7 +656,7 @@ void TH1toTF1(TString mod, int mXX)
 			c2->Write();
 			h2X->Write();
 			delete h2X;
-			delete c2;
+			delete c2; */
 		}
 		
 		_INFO("done mX="+_s(mX));

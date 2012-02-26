@@ -53,6 +53,7 @@ void analysisSkeleton::setMCPpTparameters(string sDataType, string sAlgo, string
 	MCPpTsmearing->UseScale(1);
 	
 	// Optional: enable advanced (charge-dependent) muon scale corrections that result in better data/MC agreement 
+	MCPpTsmearing->UseImprovedCombine();
 	MCPpTsmearing->RestrictCurvatureCorrections(2.5);
 	MCPpTsmearing->FillScales("KC");
 }

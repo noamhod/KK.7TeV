@@ -31,4 +31,13 @@ void bintest()
 	int nbinslessthanone = 0;
 	for(int i=0 ; i<=N ; i++) {if(xpoints[i]<1.) nbinslessthanone++;}
 	cout << "nbins less than one: " << nbinslessthanone << endl;
+
+
+	const unsigned int n = 400;
+	const double shift = 1./16.;
+	const double xmin = 0.-shift;
+	const double xmax = 50-shift;
+	TH1D* h = new TH1D("","",n,xmin,xmax);
+	for(int i=1 ; i<=n ; i++) cout << "|" << h->GetBinCenter(i);
+	cout << "|" << endl;
 }

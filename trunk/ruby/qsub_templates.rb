@@ -24,8 +24,8 @@ thisdir = Dir.getwd();
 Dir.chdir(workdir);
 
 mKKmin      = 130; # GeV
-dm          = 40; # 100; # GeV
-mKKmax      = 3050;# 5030; # GeV
+dm          = 100; # GeV
+mKKmax      = 5030; # GeV
 nMassPoints = (mKKmax-mKKmin)/dm;
 
 def clean(workdir="")

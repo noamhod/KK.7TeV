@@ -15,10 +15,10 @@ bool doKKtemplates  = false;
 bool doHighmassBin  = true;
 bool doOfficialZP   = false;
 bool doScale2Zpeak  = true;
-bool doArbitraryScale  = false;
+bool doArbitraryScale = false;
 TString channel = "#mu#mu"; // #mu#mu or ee
 TString model = "ZP";
-TString version = (doGrid) ? "v30/" : "";
+TString version = (doGrid) ? "v33/" : "";
 TString mutype = "33st"; // or "32st"
 TString binning = "linearbins"; // or "powercins"
 TString basedir = (doInterference) ? "" : "nointerference/"; // or ""
@@ -27,15 +27,16 @@ Double_t arbitraryScale = 1.15;    // arbitrary scale by 15%
 TString sArbitraryScale = (doArbitraryScale) ? "_scaledBy"+(TString)_s((arbitraryScale-1)*100)+"percent" : "";
 
 double Mmin = 130.;
-double Mmax = 3050.;//5030.;
-double dM   = 40.;//100.;
+double Mmax = 5030.;//5030.;
+double dM   = 100.;//100.;
 
 TString interference = (doInterference) ? "" : "_noInterference";
 TString KKtemplates  = (doKKtemplates)  ? "" : "_noKKtmplates";
 TString highmassBin  = (doHighmassBin)  ? "" : "_noHighMbins";
 TString officialZP   = (!doOfficialZP)  ? "" : "_wthOfficialZP";
 
-TString fpath      = (doGrid) ? "template_nominal_" : "2dtemplates_mc11c_"+mutype+interference+KKtemplates+"_noOverallEWkF_noTruth_treeLevelMass"; // for mc11c with the overall k-factor
+// TString fpath      = (doGrid) ? "template_nominal_" : "2dtemplates_mc11c_"+mutype+interference+KKtemplates+"_noOverallEWkF_noTruth_treeLevelMass"; // for mc11c with the overall k-factor
+TString fpath      = "2dtemplates_mc11c_33st_noInterference_noKKtmplates_noOverallEWkF_wthOfficialZP_treeLevelMass";
 TString fpathSigUp = (doGrid) ? "template_oversmeared_" : "2dtemplates_mc11c_"+mutype+interference+KKtemplates+"_SmrSigUp_overallEWkF_noInAmpSigEWkF"+highmassBin+"_noTruth"; // for mc11c with the overall k-factor with +1sigma smearing
 
 TString sDir       = "plots/"+basedir+binning+"/"+mutype+"_nominal/"+version;
@@ -72,9 +73,6 @@ TH2D* addDYtoPureSigTemplate(TH2D* h2, TH1D* hDY)
 	
 	return h2sig;
 }
-
- 
- 
 
 void combine()
 {

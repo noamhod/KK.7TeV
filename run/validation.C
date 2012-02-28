@@ -5,6 +5,7 @@
 #include "../include/bins.h"
 #include "../include/histos.h"
 #include "../include/style.h"
+#include "../include/units.h"
 
 TString model    = "ZP";
 TString mutype   = "33st";
@@ -12,7 +13,7 @@ TString binning  = "linearbins";
 bool doTruth     = false;
 bool doResiduals = false;
 bool isMC11c     = true;
-bool doInterpolation = true;
+bool doInterpolation = false;
 
 TH2D* h2Template;
 
@@ -137,34 +138,45 @@ void validation()
 	TH1D* hDYrozmin = (TH1D*)fDYrozmin->Get("mass_log_dy")->Clone();
 	hDYrozmin = (TH1D*)hGeV2TeV(hDYrozmin)->Clone();
 	hDYrozmin = (TH1D*)hChopper(hDYrozmin,bins2chop)->Clone();
-
 	oldDir->cd();
-
-	TFile* f1dTemplates = new TFile("plots/ZprimeSignal_mc11c_BrandeisPreliminary.root","READ");
+	TFile* f1dTemplates = new TFile("plots/ZpSignal_MM_MC11c_5points.root","READ");
 	TObjArray* toarr1d = new TObjArray();
 	toarr1d->Read("template");
-	TMapTSP2TH1D h1dtemplateMap;
-	
+	TMapTSP2TH1D h1dBrandeisTmpltMap;
+	double Nflat = 399948;
+	double sigmaflat = 4.3988E+07*nb2fb;
+	double Lmcflat = Nflat/sigmaflat;
+	double scale = luminosity/Lmcflat;
 	TH1D* h1dTmp = NULL;
-	h1dTmp = (TH1D*)((TObjArray*)toarr1d->At(22))->Clone();
+	h1dTmp = (TH1D*)((TObjArray*)toarr1d->At(0/*22*/))->Clone();
+	h1dTmp->Scale(scale);
+	h1dTmp = (TH1D*)hChopper(h1dTmp,bins2chop)->Clone();
 	h1dTmp->Add(hDYrozmin);
-	h1dtemplateMap.insert( make_pair("1000",(TH1D*)resetErrors(h1dTmp)->Clone("1010")) );
+	h1dBrandeisTmpltMap.insert( make_pair("1000",(TH1D*)resetErrors(h1dTmp)->Clone("1000")) );
 	h1dTmp = NULL;
-	h1dTmp = (TH1D*)((TObjArray*)toarr1d->At(28))->Clone();
+	h1dTmp = (TH1D*)((TObjArray*)toarr1d->At(1/*28*/))->Clone();
+	h1dTmp->Scale(scale);
+	h1dTmp = (TH1D*)hChopper(h1dTmp,bins2chop)->Clone();
 	h1dTmp->Add(hDYrozmin);
-	h1dtemplateMap.insert( make_pair("1250",(TH1D*)resetErrors(h1dTmp)->Clone("1250")) );
+	h1dBrandeisTmpltMap.insert( make_pair("1250",(TH1D*)resetErrors(h1dTmp)->Clone("1250")) );
 	h1dTmp = NULL;
-	h1dTmp = (TH1D*)((TObjArray*)toarr1d->At(34))->Clone();
+	h1dTmp = (TH1D*)((TObjArray*)toarr1d->At(2/*34*/))->Clone();
+	h1dTmp->Scale(scale);
+	h1dTmp = (TH1D*)hChopper(h1dTmp,bins2chop)->Clone();
 	h1dTmp->Add(hDYrozmin);
-	h1dtemplateMap.insert( make_pair("1500",(TH1D*)resetErrors(h1dTmp)->Clone("1490")) );
+	h1dBrandeisTmpltMap.insert( make_pair("1500",(TH1D*)resetErrors(h1dTmp)->Clone("1500")) );
 	h1dTmp = NULL;
-	h1dTmp = (TH1D*)((TObjArray*)toarr1d->At(40))->Clone();
+	h1dTmp = (TH1D*)((TObjArray*)toarr1d->At(3/*40*/))->Clone();
+	h1dTmp->Scale(scale);
+	h1dTmp = (TH1D*)hChopper(h1dTmp,bins2chop)->Clone();
 	h1dTmp->Add(hDYrozmin);
-	h1dtemplateMap.insert( make_pair("1750",(TH1D*)resetErrors(h1dTmp)->Clone("1730")) );
+	h1dBrandeisTmpltMap.insert( make_pair("1750",(TH1D*)resetErrors(h1dTmp)->Clone("1750")) );
 	h1dTmp = NULL;
-	h1dTmp = (TH1D*)((TObjArray*)toarr1d->At(47))->Clone();
+	h1dTmp = (TH1D*)((TObjArray*)toarr1d->At(4/*47*/))->Clone();
+	h1dTmp->Scale(scale);
+	h1dTmp = (TH1D*)hChopper(h1dTmp,bins2chop)->Clone();
 	h1dTmp->Add(hDYrozmin);
-	h1dtemplateMap.insert( make_pair("2000",(TH1D*)resetErrors(h1dTmp)->Clone("2010")) );
+	h1dBrandeisTmpltMap.insert( make_pair("2000",(TH1D*)resetErrors(h1dTmp)->Clone("2000")) );
 
 	oldDir->cd();
 
@@ -244,9 +256,6 @@ void validation()
 	h1Template->SetMarkerStyle(20);
 	h1Template->SetMarkerSize(0.3);
 	h1Template->SetMarkerColor(kViolet);
-
-	_INFO("");
-	
 	// the functions
 	h2Template = (TH2D*)h2SSM2000->Clone();
 	vector<TF1*> vfunc;
@@ -279,7 +288,43 @@ void validation()
 		graphDY->SetPoint(i,h2Template->GetXaxis()->GetBinCenter(bins2chop+i+1),DY);
 		graphSSM->SetPoint(i,h2Template->GetXaxis()->GetBinCenter(bins2chop+i+1),SSM);
 	}
+	
+	
+	oldDir->cd();
 
+	TObjArray* toarr1dTLV = new TObjArray();
+	TMapTSP2TH1D h1dTlvTmpltMap;
+	TFile* fT = NULL;
+	TString fTname = "plots/ZP_2dtemplates_mc11c_33st_noInterference_noKKtmplates_noOverallEWkF_wthOfficialZP_treeLevelMass_Xmass";
+	
+	fT = new TFile(fTname+"1000.root","READ");
+	toarr1dTLV->Read("template");
+	h1dTmp = (TH1D*)((TObjArray*)toarr1dTLV->At(0))->Clone();
+	h1dTmp->Add(hDY);
+	h1dTlvTmpltMap.insert( make_pair("1000",(TH1D*)resetErrors(h1dTmp)->Clone("1000")) );
+	fT = new TFile(fTname+"1250.root","READ");
+	toarr1dTLV->Read("template");
+	h1dTmp = (TH1D*)((TObjArray*)toarr1dTLV->At(0))->Clone();
+	h1dTmp->Add(hDY);
+	h1dTlvTmpltMap.insert( make_pair("1250",(TH1D*)resetErrors(h1dTmp)->Clone("1250")) );
+	fT = new TFile(fTname+"1500.root","READ");
+	toarr1dTLV->Read("template");
+	h1dTmp = (TH1D*)((TObjArray*)toarr1dTLV->At(0))->Clone();
+	h1dTmp->Add(hDY);
+	h1dTlvTmpltMap.insert( make_pair("1500",(TH1D*)resetErrors(h1dTmp)->Clone("1500")) );
+	fT = new TFile(fTname+"1750.root","READ");
+	toarr1dTLV->Read("template");
+	h1dTmp = (TH1D*)((TObjArray*)toarr1dTLV->At(0))->Clone();
+	h1dTmp->Add(hDY);
+	h1dTlvTmpltMap.insert( make_pair("1750",(TH1D*)resetErrors(h1dTmp)->Clone("1750")) );
+	fT = new TFile(fTname+"2000.root","READ");
+	toarr1dTLV->Read("template");
+	h1dTmp = (TH1D*)((TObjArray*)toarr1dTLV->At(0))->Clone();
+	h1dTmp->Add(hDY);
+	h1dTlvTmpltMap.insert( make_pair("2000",(TH1D*)resetErrors(h1dTmp)->Clone("2000")) );
+
+	oldDir->cd();
+	
 	
 	for(TMapTSP2TH1D::iterator it=h1Map.begin() ; it!=h1Map.end() ; ++it)
 	{
@@ -326,8 +371,8 @@ void validation()
 	for(TMapTSP2TCNV::iterator it=cnvMap.begin() ; it!=cnvMap.end() ; ++it)
 	{
 		_INFO("starting "+(string)it->first);
-		if(it->first=="2000") legMap.insert( make_pair(it->first, new TLegend(0.35,0.6,0.83,0.84,NULL,"brNDC")) );
-		else                  legMap.insert( make_pair(it->first, new TLegend(0.4,0.7,0.85,0.8,NULL,"brNDC")) );
+		if(it->first=="2000") legMap.insert( make_pair(it->first, new TLegend(0.35,0.55,0.83,0.84,NULL,"brNDC")) );
+		else                  legMap.insert( make_pair(it->first, new TLegend(0.35,0.60,0.83,0.84,NULL,"brNDC")) );
 		legMap[it->first]->SetFillStyle(4000); //will be transparent
 		legMap[it->first]->SetFillColor(0);
 		legMap[it->first]->SetTextFont(42);
@@ -342,11 +387,17 @@ void validation()
 		}
 		if(!doTruth)
 		{
-			h1dtemplateMap[it->first]->SetLineColor(kRed);
-			h1dtemplateMap[it->first]->SetMarkerColor(kRed);
-			h1dtemplateMap[it->first]->SetMarkerStyle(28);
-			h1dtemplateMap[it->first]->SetMarkerSize(0.5);
-			legMap[it->first]->AddEntry(h1dtemplateMap[it->first],"Brandeis DY+Template (#slash{interference})","p");
+			h1dTlvTmpltMap[it->first]->SetLineColor(kCyan+2);
+			h1dTlvTmpltMap[it->first]->SetMarkerColor(kCyan+2);
+			h1dTlvTmpltMap[it->first]->SetMarkerStyle(5);
+			h1dTlvTmpltMap[it->first]->SetMarkerSize(0.5);
+			legMap[it->first]->AddEntry(h1dTlvTmpltMap[it->first],"TLV DY+Template (#slash{interference})","p");
+		
+			h1dBrandeisTmpltMap[it->first]->SetLineColor(kRed);
+			h1dBrandeisTmpltMap[it->first]->SetMarkerColor(kRed);
+			h1dBrandeisTmpltMap[it->first]->SetMarkerStyle(27);
+			h1dBrandeisTmpltMap[it->first]->SetMarkerSize(0.5);
+			legMap[it->first]->AddEntry(h1dBrandeisTmpltMap[it->first],"Brandeis DY+Template (#slash{interference})","p");
 		}
 
 		it->second->Divide(1,2);
@@ -385,7 +436,8 @@ void validation()
 			h1Template->Draw("epSAMES");
 		}
 		_INFO("");
-		h1dtemplateMap[it->first]->Draw("SAMESp");
+		h1dTlvTmpltMap[it->first]->Draw("SAMESp");
+		h1dBrandeisTmpltMap[it->first]->Draw("SAMESp");
 		legMap[it->first]->Draw("SAMES");
 		ph->RedrawAxis();
 		ph->Update();
@@ -429,7 +481,8 @@ void validation()
 			graphSSM->Draw("SAMESp");
 			h1Template->Draw("epSAMES");
 		}
-		h1dtemplateMap[it->first]->Draw("SAMESp");
+		h1dTlvTmpltMap[it->first]->Draw("SAMESp");
+		h1dBrandeisTmpltMap[it->first]->Draw("SAMESp");
 		legMap[it->first]->Draw("SAMES");
 		c->RedrawAxis();
 		c->Update();

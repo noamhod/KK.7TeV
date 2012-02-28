@@ -22,17 +22,17 @@ bool doKKtemplates  = false;
 bool doArbitraryScale  = false;
 TString mutype  = "33st";
 TString binning = "linearbins";
-TString version = (doGrid) ? "v30/" : "";
+TString version = (doGrid) ? "v33" : "";
 TString interference = (doInterference) ? "" : "_noInterference";
 TString KKtemplates  = (doKKtemplates)  ? "" : "_noKKtmplates";
 TString highmass     = (doHighMass)     ? "" : "_noHighMbins";
 Double_t arbitraryScale = 1.15;    // arbitrary scale by 15%
 TString sArbitraryScale = (doArbitraryScale) ? "_scaledBy"+(TString)_s((arbitraryScale-1)*100)+"percent" : "";
-//TString fpath = (doGrid) ? "_combined_"+version+sArbitraryScale : "_combined_2dtemplates_mc11c_"+mutype+interference+KKtemplates+"_overallEWkF_noInAmpSigEWkF"+highmass+"_noTruth"; // for mc11c with the overall k-factor
+// TString fpath = (doGrid) ? "_combined_"+version+sArbitraryScale : "_combined_2dtemplates_mc11c_"+mutype+interference+KKtemplates+"_overallEWkF_noInAmpSigEWkF"+highmass+"_noTruth"; // for mc11c with the overall k-factor
 // TString fpath = "_combined_2dtemplates_mc11c_33st_noInterference_noKKtmplates_noInAmpSigEWkF_treeLevelMass";
-TString fpath = "_combined_2dtemplates_mc11c_33st_noInterference_noKKtmplates_noOverallEWkF_noTruth_treeLevelMass";
+TString fpath = "_combined_2dtemplates_mc11c_33st_noInterference_noKKtmplates_noOverallEWkF_wthOfficialZP_treeLevelMass";
 TString sDirNoint = (doInterference) ? "" : "nointerference/";
-TString sDir  = "plots/"+sDirNoint+binning+"/"+mutype+"_nominal/"+version;
+TString sDir  = "plots/"+sDirNoint+binning+"/"+mutype+"_nominal/"+version+"/";
 
 Double_t xmin = 0.; // g4min;
 Double_t xmax = g4max; // TMath::Power(npowerbins*step,power); // g4max;
@@ -44,7 +44,7 @@ bool doScale2Zpeak = false;
 Double_t scale2Zpeak = (mutype=="33st") ? 1. : 1.;    // For linear bins, see normtest.C
 bool doInterpolation = false;
 
-Int_t npx = 2000;
+Int_t npx = 400;
 
 
 

@@ -9,38 +9,41 @@
 
 using namespace systematics;
 
-bool doGrid         = false;
-bool doInterference = false;
-bool doKKtemplates  = false;
-bool doHighmassBin  = true;
-bool doOfficialZP   = false;
-bool doScale2Zpeak  = true;
-bool doArbitraryScale = false;
-TString channel = "#mu#mu"; // #mu#mu or ee
-TString model = "ZP";
-TString version = (doGrid) ? "v33/" : "";
-TString mutype = "33st"; // or "32st"
-TString binning = "linearbins"; // or "powercins"
-TString basedir = (doInterference) ? "" : "nointerference/"; // or ""
-Double_t scale2Zpeak = (mutype=="33st") ? 0.9920123197 : 0.8852545729;    // For linear bins, see normtest.C
-Double_t arbitraryScale = 1.15;    // arbitrary scale by 15%
-TString sArbitraryScale = (doArbitraryScale) ? "_scaledBy"+(TString)_s((arbitraryScale-1)*100)+"percent" : "";
+bool doGrid          = false;
+bool doTruth         = false;
+bool doEWkf          = false;
+bool doInterference  = false;
+bool doKKtemplates   = false;
+bool doOfficialZP    = false;
+bool doScale2Zpeak   = true;
+bool dog4bins        = false;
+TString channel      = "#mu#mu"; // #mu#mu or ee
+TString model        = "ZP";
+TString mutype       = "3332st"; // or "33st" or "32st"
+TString binning      = "linearbins"; // or "powercins"
+
+TString version      = (doGrid)         ? "v33/"    : "";
+TString basedir      = (doInterference) ? ""        : "nointerference/";
+TString interference = (doInterference) ? ""        : "_noInterference";
+TString overallEWkF  = (doInterference) ? ""        : "_noOverallEWkF";
+TString doEWkfactor  = (doEWkf)         ? ""        : "_noEWkF";
+TString dotruth      = (doTruth)        ? ""        : "_noTruth";
+TString gNbinning    = (dog4bins)       ? "_g4bins" : "_g2bins";
+TString KKtemplates  = (doKKtemplates)  ? ""        : "_noKKtmplates";
+TString officialZP   = (!doOfficialZP)  ? ""        : "_wthOfficialZP";
+TString gNbins       = (dog4bins)       ? "g4bins"  : "g2bins";
+
+Double_t scale2Zpeak = 1.;
 
 double Mmin = 130.;
 double Mmax = 5030.;//5030.;
 double dM   = 100.;//100.;
 
-TString interference = (doInterference) ? "" : "_noInterference";
-TString KKtemplates  = (doKKtemplates)  ? "" : "_noKKtmplates";
-TString highmassBin  = (doHighmassBin)  ? "" : "_noHighMbins";
-TString officialZP   = (!doOfficialZP)  ? "" : "_wthOfficialZP";
+TString fpath      = "";
+TString fpathSigUp = "";
 
-// TString fpath      = (doGrid) ? "template_nominal_" : "2dtemplates_mc11c_"+mutype+interference+KKtemplates+"_noOverallEWkF_noTruth_treeLevelMass"; // for mc11c with the overall k-factor
-TString fpath      = "2dtemplates_mc11c_33st_noInterference_noKKtmplates_noOverallEWkF_wthOfficialZP_treeLevelMass";
-TString fpathSigUp = (doGrid) ? "template_oversmeared_" : "2dtemplates_mc11c_"+mutype+interference+KKtemplates+"_SmrSigUp_overallEWkF_noInAmpSigEWkF"+highmassBin+"_noTruth"; // for mc11c with the overall k-factor with +1sigma smearing
-
-TString sDir       = "plots/"+basedir+binning+"/"+mutype+"_nominal/"+version;
-TString sDirSigUp  = "plots/"+basedir+binning+"/"+mutype+"_sigmaup/"+version;
+TString sDir       = "";
+TString sDirSigUp  = "";
 
 TObjArray* toarKKtmp;
 TObjArray* toarKKtmpSigUp;
@@ -49,7 +52,45 @@ TObjArray* toarZPtmpSigUp;
 
  // remember old dir
 TDirectory* olddir = gDirectory;
- 
+
+
+void setFpath()
+{
+	if(channel=="#mu#mu")
+	{
+		sDir       = "plots/"+basedir+binning+"/"+gNbins+"/"+mutype+"_nominal/"+version;
+		sDirSigUp  = "plots/"+basedir+binning+"/"+gNbins+"/"+mutype+"_sigmaup/"+version;
+		if(doGrid)
+		{
+			fpath      = "template_nominal_";
+			fpathSigUp = "template_oversmeared_";
+		}
+		else
+		{
+			fpath      = "2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+overallEWkF+doEWkfactor+dotruth;
+			fpathSigUp = "2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+"_SmrSigUp"+overallEWkF+doEWkfactor+dotruth; // +1sigma smearing
+		}
+	}
+	else if(channel=="ee")
+	{
+		////
+	}
+}
+
+
+void setScale2Zpeak()
+{
+	if(channel=="#mu#mu")
+	{
+		scale2Zpeak = (mutype=="33st")   ? 0.9920123197 : 1.;    // For linear bins, see normtest.C
+		scale2Zpeak = (mutype=="32st")   ? 0.8852545729 : 1.;    // For linear bins, see normtest.C
+		scale2Zpeak = (mutype=="3332st") ? 0.9841360523 : 1.;    // For linear bins, see normtest.C
+	}
+	else if(channel=="ee")
+	{
+		////
+	}
+} 
 
 TH2D* addDYtoPureSigTemplate(TH2D* h2, TH1D* hDY)
 {
@@ -88,6 +129,12 @@ void combine()
 	setSystInrerference(doInterference); //////
 	///////////////////////////////////////////
 	
+	///////////////////////////////////////////
+	//// set globals //////////////////////////
+	setFpath(); ///////////////////////////////
+	setScale2Zpeak(); /////////////////////////
+	///////////////////////////////////////////
+	
 	_INFO("working in -> "+(string)sDir);
 	
 	TFile* fOfficial = new TFile("DimuonHists_Feb05_3stC.root","READ");
@@ -99,8 +146,8 @@ void combine()
 	
 	olddir->cd();
 	TFile* fKK = NULL;
-	TString outfNameKK = sDir+"KK_combined_"+fpath+sArbitraryScale+".root";
-	outfNameKK = (doGrid) ? sDir+"KK_combined_"+version+sArbitraryScale+".root" : outfNameKK;
+	TString outfNameKK = sDir+"KK_combined_"+fpath+".root";
+	outfNameKK = (doGrid) ? sDir+"KK_combined_"+version+".root" : outfNameKK;
 	if(model=="KK" || model=="ALL") fKK = new TFile(outfNameKK, "RECREATE");
 	TObjArray* templates2d_KK                 = new TObjArray;
 	TObjArray* templates2d_KK_syst_Zxs        = new TObjArray;
@@ -113,8 +160,8 @@ void combine()
 	// TObjArray* templates2d_KK_syst_eeRes      = new TObjArray;
 
 	olddir->cd();
-	TString outfNameZP = sDir+"ZP_combined_"+fpath+sArbitraryScale+".root";
-	outfNameZP = (doGrid) ? sDir+"ZP_combined_"+version+sArbitraryScale+".root" : outfNameZP;
+	TString outfNameZP = sDir+"ZP_combined_"+fpath+".root";
+	outfNameZP = (doGrid) ? sDir+"ZP_combined_"+version+".root" : outfNameZP;
 	TFile* fZP = new TFile(outfNameZP,"RECREATE");
 	TObjArray* templates2d_ZP                 = new TObjArray;
 	TObjArray* templates2d_ZP_syst_Zxs        = new TObjArray;
@@ -162,7 +209,6 @@ void combine()
 			olddir->cd();
 			h2tmp = (TH2D*)((TH2D*)(TObjArray*)toarKKtmp->At(0))->Clone();
 			if(doScale2Zpeak) h2tmp->Scale(scale2Zpeak);
-			if(doArbitraryScale) h2tmp->Scale(arbitraryScale);
 			if(!doInterference) h2tmp = (TH2D*)addDYtoPureSigTemplate(h2tmp, hDYofficial)->Clone();
 			fKK->cd(); // important !
 			templates2d_KK->Add( (TH2D*)h2tmp );
@@ -180,7 +226,6 @@ void combine()
 				olddir->cd();
 				h2tmpSigUp = (TH2D*)((TH2D*)(TObjArray*)toarKKtmpSigUp->At(0))->Clone();
 				if(doScale2Zpeak) h2tmpSigUp->Scale(scale2Zpeak);
-				if(doArbitraryScale) h2tmpSigUp->Scale(arbitraryScale);
 				if(!doInterference) h2tmpSigUp = (TH2D*)addDYtoPureSigTemplate(h2tmpSigUp, hDYofficial)->Clone();
 				delete FKKsmearUp;
 				delete toarKKtmpSigUp;
@@ -243,7 +288,6 @@ void combine()
 		olddir->cd();
 		h2tmp = (TH2D*)((TH2D*)(TObjArray*)toarZPtmp->At(0))->Clone();
 		if(doScale2Zpeak) h2tmp->Scale(scale2Zpeak);
-		if(doArbitraryScale) h2tmp->Scale(arbitraryScale);
 		if(!doInterference) h2tmp = (TH2D*)addDYtoPureSigTemplate(h2tmp, hDYofficial)->Clone();
 		fZP->cd(); // important !
 		templates2d_ZP->Add( (TH2D*)h2tmp );
@@ -261,7 +305,6 @@ void combine()
 			olddir->cd();
 			h2tmpSigUp = (TH2D*)((TH2D*)(TObjArray*)toarZPtmpSigUp->At(0))->Clone();
 			if(doScale2Zpeak) h2tmpSigUp->Scale(scale2Zpeak);
-			if(doArbitraryScale) h2tmpSigUp->Scale(arbitraryScale);
 			delete FZPsmearUp;
 			delete toarZPtmpSigUp;
 			fZP->cd(); // important !

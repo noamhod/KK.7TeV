@@ -649,7 +649,12 @@ public:
 		allow3_2st = false;
 		if     (s=="MShits=3+3") allow3_3st = true;
 		else if(s=="MShits=3+2") allow3_2st = true;
-		else _FATAL("MS hits can be either 3+3 or 3+2");
+		else if(s=="MShits=3+3,3+2")
+		{
+			allow3_3st = true;
+			allow3_2st = true;
+		}
+		else _FATAL("MS hits can be 3+3 or 3+2 or 3+3,3+2");
 	}
 	void setSmearingFlag(bool doSmearing, bool doSigmaUp)
 	{

@@ -122,9 +122,34 @@ void validation()
 	// TString fBGname = "plots/ZP_2dtemplates_"+mctype+"_33st_noKKtmplates_overallEWkF_noInAmpSigEWkF_noTruth_wthOfficialZP_treeLevelMass_Xmass2000.root";
 	// TString fBGname = "plots/ZP_2dtemplates_"+mctype+"_33st_noKKtmplates_overallEWkF_noInAmpSigEWkF_noTruth_wthOfficialZP_fixedBWwidth_treeLevelMass_Xmass2000.root";
 
+	TLegend* legR = new TLegend(0.15,0.75,0.35,0.85,NULL,"brNDC");
+	legR->SetFillStyle(4000); //will be transparent
+	legR->SetFillColor(0);
+	legR->SetTextFont(42);
+	TH1D* hDummy = new TH1D("","",1,0.,1.);
+	hDummy->SetMarkerStyle(20);
+	hDummy->SetMarkerSize(0.8);
+	hDummy->SetMarkerColor(kBlack);
+	if(!doResiduals) legR->AddEntry(hDummy,"#frac{template}{official}","lep");
+	else             legR->AddEntry(hDummy,"#frac{template - official}{#sqrt{#delta^{2}template + #delta^{2}official}}","lep");
+	
+	TPaveText* ptxt = new TPaveText(0.145,0.35,0.245,0.55,"NDC");
+	TText* txt;
+	ptxt->SetTextSize(0.03);
+	ptxt->SetBorderSize(0);
+	ptxt->SetFillStyle(4000); //will be transparent
+	ptxt->SetFillColor(0);
+	ptxt->SetTextAlign(12);
+	txt = ptxt->AddText("This range");
+	txt = ptxt->AddText("is chopped");
+	txt = ptxt->AddText("before the");
+	txt = ptxt->AddText("template is");
+	txt = ptxt->AddText("handed to");
+	txt = ptxt->AddText("BAT (limit).");
+	
 	oldDir->cd();
 
-	TString fBGname = "plots/ZP_2dtemplates_mc11c_33st_noKKtmplates_wthOfficialZP_treeLevelMass_Xmass2000.root";
+	TString fBGname = "plots/validation/ZP_2dtemplates_mc11c_33st_noKKtmplates_wthOfficialZP_treeLevelMass_Xmass2000.root";
 	TFile* fD = new TFile(fBGname,"READ");
 	TH1D* hDY = NULL;
 	if(doTruth) hDY = (TH1D*)fD->Get("hMass_DYmumu_truth")->Clone();
@@ -295,7 +320,7 @@ void validation()
 	TObjArray* toarr1dTLV = new TObjArray();
 	TMapTSP2TH1D h1dTlvTmpltMap;
 	TFile* fT = NULL;
-	TString fTname = "plots/ZP_2dtemplates_mc11c_33st_noInterference_noKKtmplates_noOverallEWkF_wthOfficialZP_treeLevelMass_Xmass";
+	TString fTname = "plots/validation/ZP_2dtemplates_mc11c_33st_noInterference_noKKtmplates_noOverallEWkF_wthOfficialZP_treeLevelMass_Xmass";
 	
 	fT = new TFile(fTname+"1000.root","READ");
 	toarr1dTLV->Read("template");
@@ -377,13 +402,13 @@ void validation()
 		legMap[it->first]->SetFillColor(0);
 		legMap[it->first]->SetTextFont(42);
 		legMap[it->first]->AddEntry(h1Map[it->first+"o"],"Official Z'_{SSM}","F");
-		legMap[it->first]->AddEntry(hDY,"Official DY","lep");
-		legMap[it->first]->AddEntry(h1Map[it->first+"t"],"Template w/o couplings scale","lep");
+		legMap[it->first]->AddEntry(hDY,"Official DY#mu#mu","lep");
+		legMap[it->first]->AddEntry(h1Map[it->first+"t"],"ME^{2} method: Template w/o couplings scale","lep");
 		if(it->first=="2000")
 		{
-			legMap[it->first]->AddEntry(h1Template,"Template histogram at  #it{g=1} (SSM)","lep");
-			legMap[it->first]->AddEntry(graphSSM,  "Template function  at  #it{g=1} (SSM)","p");
-			legMap[it->first]->AddEntry(graphDY,   "Template function  at  #it{g=0} (DY)","p");
+			legMap[it->first]->AddEntry(h1Template,"ME^{2} method: Template histogram at  #it{g=1} (SSM)","lep");
+			legMap[it->first]->AddEntry(graphSSM,  "ME^{2} method: Template function  at  #it{g=1} (SSM)","p");
+			legMap[it->first]->AddEntry(graphDY,   "ME^{2} method: Template function  at  #it{g=0} (DY)","p");
 		}
 		if(!doTruth)
 		{
@@ -391,13 +416,13 @@ void validation()
 			h1dTlvTmpltMap[it->first]->SetMarkerColor(kCyan+2);
 			h1dTlvTmpltMap[it->first]->SetMarkerStyle(5);
 			h1dTlvTmpltMap[it->first]->SetMarkerSize(0.5);
-			legMap[it->first]->AddEntry(h1dTlvTmpltMap[it->first],"TLV DY+Template (#slash{interference})","p");
+			legMap[it->first]->AddEntry(h1dTlvTmpltMap[it->first],"ME^{2} method: DY+Template (no interference)","p");
 		
 			h1dBrandeisTmpltMap[it->first]->SetLineColor(kRed);
 			h1dBrandeisTmpltMap[it->first]->SetMarkerColor(kRed);
 			h1dBrandeisTmpltMap[it->first]->SetMarkerStyle(27);
 			h1dBrandeisTmpltMap[it->first]->SetMarkerSize(0.5);
-			legMap[it->first]->AddEntry(h1dBrandeisTmpltMap[it->first],"Brandeis DY+Template (#slash{interference})","p");
+			legMap[it->first]->AddEntry(h1dBrandeisTmpltMap[it->first],"Flat Z' method: DY+Template (no interference)","p");
 		}
 
 		it->second->Divide(1,2);
@@ -438,6 +463,13 @@ void validation()
 		_INFO("");
 		h1dTlvTmpltMap[it->first]->Draw("SAMESp");
 		h1dBrandeisTmpltMap[it->first]->Draw("SAMESp");
+		
+		TLine* chopline = new TLine(0.12805,getYmin(h1Map[it->first+"o"]),0.12805,7.e5);
+		chopline->SetLineStyle(2);
+		chopline->SetLineColor(kBlack);
+		chopline->Draw("SAMES");
+		ptxt->Draw("SAMES");
+		
 		legMap[it->first]->Draw("SAMES");
 		ph->RedrawAxis();
 		ph->Update();
@@ -452,6 +484,7 @@ void validation()
 		h1rMap[it->first]->Draw("ep");
 		line->Draw("SAMES");
 		h1rMap[it->first]->Draw("epSAMES");
+		legR->Draw("SAMES");
 		pr->RedrawAxis();
 		pr->Update();
 
@@ -461,8 +494,8 @@ void validation()
 		else                       savestate = 1;
 		TString testType = (doResiduals) ? "_residuals" : "_ratio";
 		mutype   = (doTruth)     ? "_truth"     : "_recon";
-		savemultipdf(it->second, "plots/validation"+mutype+testType+"_"+mctype+".pdf", savestate);
-		
+		savemultipdf(it->second, "plots/validation/validation"+mutype+testType+"_"+mctype+"_all.pdf", savestate);
+		saveas(it->second, "plots/validation/validation"+mutype+testType+"_"+mctype+"_"+it->first);
 		
 		TCanvas* c = new TCanvas(it->first,"",600,400);
 		c->cd();
@@ -484,9 +517,11 @@ void validation()
 		h1dTlvTmpltMap[it->first]->Draw("SAMESp");
 		h1dBrandeisTmpltMap[it->first]->Draw("SAMESp");
 		legMap[it->first]->Draw("SAMES");
+		chopline->Draw("SAMES");
+		ptxt->Draw("SAMES");
 		c->RedrawAxis();
 		c->Update();
-		saveas(c,"plots/validation_"+it->first+"_"+mutype+testType);
+		saveas(c,"plots/validation/validation_"+it->first+"_"+mutype+testType);
 		
 		_INFO("done "+(string)it->first);
 	}

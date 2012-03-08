@@ -283,6 +283,8 @@ class graphicObjects// : public utilities
 		vector<int>*   vxp_type;
 		vector<float>* vxp_z;
 		
+		vector<unsigned int>* mutype;
+		
 		Int_t          n;
 		vector<float>* E;
 		vector<float>* pt;
@@ -731,6 +733,7 @@ class graphicObjects// : public utilities
 		vector<double>* truth_all_vBSMmass;
 		
 		bool recon_all_isValid;
+		vector<unsigned int>* recon_all_mutype;
 		int recon_all_vxp_n;
 		vector<float>* recon_all_E;
 		vector<float>* recon_all_pt;

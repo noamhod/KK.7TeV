@@ -83,7 +83,7 @@ void analysisLocalControl::setRunControl(string localRunControlFile)
 	if(sPUremoveData!="pu_removeData=true"  &&  sPUremoveData!="pu_removeData=false") _FATAL("YOU CHOSE PU REMOVE DATA FLAT ["+sPUremoveData+"]");
 	bPUremoveData = (sPUremoveData=="pu_removeData=true");
 	
-	if(sMShits!="MShits=3+3"  &&  sMShits!="MShits=3+2") _FATAL("YOU CHOSE MS HITS ["+sMShits+"]");
+	if(sMShits!="MShits=3+3"  &&  sMShits!="MShits=3+2"  &&  sMShits!="MShits=3+3,3+2") _FATAL("YOU CHOSE MS HITS ["+sMShits+"]");
 	
 	if(sMCorData!="mc"  &&  sMCorData!="data"  &&  sMCorData!="mcqsub") _FATAL("ERROR: YOU CHOSE MC/DATA ["+sMCorData+"]");
 	
@@ -238,13 +238,14 @@ void analysisLocalControl::initialize(string run_number_str, string runs, string
 		||
 		(runs=="ALLRUNS")/*-> this is a linear data run (no qsub)*/)
 	{
-		if(m_isQCD)                     str_selector += "_QCD";
-		if     (m_MShits=="MShits=3+3") str_selector += "_33st";
-		else if(m_MShits=="MShits=3+2") str_selector += "_32st";
-		if(m_doSmearing && m_isMC)      str_selector += "_smeared";
-		if(m_doSigmaUp  && m_isMC)      str_selector += "_sigmaUp";
-		if(!m_do2mu)                    str_selector += "_no2muSel";
-		if(!m_doIso)                    str_selector += "_noIso";
+		if(m_isQCD)                         str_selector += "_QCD";
+		if     (m_MShits=="MShits=3+3")     str_selector += "_33st";
+		else if(m_MShits=="MShits=3+2")     str_selector += "_32st";
+		else if(m_MShits=="MShits=3+3,3+2") str_selector += "_3332st";
+		if(m_doSmearing && m_isMC)          str_selector += "_smeared";
+		if(m_doSigmaUp  && m_isMC)          str_selector += "_sigmaUp";
+		if(!m_do2mu)                        str_selector += "_no2muSel";
+		if(!m_doIso)                        str_selector += "_noIso";
 	}
 	m_selector = str_selector;
 	

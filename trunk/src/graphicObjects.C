@@ -66,6 +66,8 @@ void graphicObjects::clearTreeVars()
 	vxp_type->clear();
 	vxp_z->clear();
 	
+	mutype->clear();
+	
 	n = -9999;
 	E->clear();
 	pt->clear();
@@ -497,6 +499,8 @@ void graphicObjects::clearTreeVars()
 	truth_all_vZPwgt->clear();
 	truth_all_vBSMmass->clear();
 	
+	recon_all_mutype->clear();
+	
 	recon_all_E->clear();
 	recon_all_pt->clear();
 	recon_all_m->clear();
@@ -592,6 +596,8 @@ TDirectory* tDir_efficiency)
 	vxp_nTracks = new vector<int>;
 	vxp_type = new vector<int>;
 	vxp_z = new vector<float>;
+	
+	mutype = new vector<unsigned int>;
 	
 	E = new vector<float>;
 	pt = new vector<float>;
@@ -984,6 +990,7 @@ TDirectory* tDir_efficiency)
 	tree_allCuts->Branch( "vxp_z",       &vxp_z );
 	
 	// 1 muon (vectors)
+	tree_allCuts->Branch( "mutype", &mutype);
 	tree_allCuts->Branch( "n", &n);
 	tree_allCuts->Branch( "E", &E);
 	tree_allCuts->Branch( "pt", &pt);
@@ -1354,6 +1361,7 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	truth_all_motherbarcode = new vector<int>;
 	truth_all_matched = new vector<int>;
 	
+	recon_all_mutype = new vector<unsigned int>;
 	recon_all_E = new vector<float>;
 	recon_all_pt = new vector<float>;
 	recon_all_m = new vector<float>;
@@ -1526,6 +1534,7 @@ void graphicObjects::setTrees(TDirectory* tDir_allCuts,
 	tree_truth->Branch( "truth_all_vBSMmass", &truth_all_vBSMmass);
 	
 	tree_truth->Branch( "recon_all_isValid",  &recon_all_isValid );
+	tree_truth->Branch( "recon_all_mutype",  &recon_all_mutype );
 	tree_truth->Branch( "recon_all_vxp_n",  &recon_all_vxp_n );
 	tree_truth->Branch( "recon_all_E", &recon_all_E );
 	tree_truth->Branch( "recon_all_pt", &recon_all_pt );

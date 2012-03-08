@@ -26,57 +26,67 @@ Double_t singleMass = -1.;
 ///////////////////////////////////////
 // selectors //////////////////////////
 ///////////////////////////////////////
+bool doGrid             = false;
 bool isMC11c            = true;
 bool doSigmaUp          = false;
+bool dog2               = true;
+bool dog4               = false;
 bool do33st             = true;
-bool do32st             = false;
+bool do32st             = true;
 bool doSmearing         = true;     // false is simply the old selection (before 3+3 / 3+2) -> should not be changed  !
-bool doFullKKtemplates  = false;     // will not change anything if doTemplates is "false"
+bool doFullKKtemplates  = false;    // will not change anything if doTemplates is "false"
 bool doFullZPtemplates  = true;     // will not change anything if doTemplates is "false"
 bool dopileup           = true;
-bool doOverallEWkfactor = false;
+bool doOverallEWkfactor = true;
 bool doQCDkfactor       = true;
 bool doZpT              = true;
 bool doRemoveHighMass   = false;
-bool doTruth            = true;
-bool doOfficialZP       = true;
+bool doTruth            = false;
+bool doOfficialZP       = false;
 bool doSingleMass       = false;
 bool doInterference     = false;
 bool doFixedwidth       = false;
-bool doTreeLevelMass    = true;      // this is relevant only for the truth histograms !
+bool doTreeLevel        = true; // relevant for truth only
+TString tsgN      = (dog4) ? "g4" : "g2";
+TString tsgNlabel = (dog4) ? "g^{4}" : "g^{2}";
 void matchFlags()
 {
-	do32st = !do33st;
+	doOverallEWkfactor = doInterference;
 }
 TString fileNmaeSuffix()
 {
 	TString name = "";
-	if(isMC11c)            name += "_mc11c";
-	if(!isMC11c)           name += "_mc11a";
-	if(do33st)             name += "_33st";
-	if(do32st)             name += "_32st";
-	if(!doInterference)    name += "_noInterference";
-	if(!doFullKKtemplates) name += "_noKKtmplates";
-	if(!doFullZPtemplates) name += "_noZPtmplates";
-	if(doSigmaUp)          name += "_SmrSigUp";
-	if(!dopileup)          name += "_noPUrw";
-	if(!doOverallEWkfactor)name += "_noOverallEWkF";
-	if(!doQCDkfactor)      name += "_noQCDkF";
-	if(!doZpT)             name += "_noZpTrw";
-	if(doRemoveHighMass)   name += "_noHighMbins";
-	if(!doTruth)           name += "_noTruth";
-	if(doOfficialZP)       name += "_wthOfficialZP";
-	if(doFixedwidth)       name += "_fixedBWwidth";
-	if(doTreeLevelMass)    name += "_treeLevelMass";
-	if(doSingleMass)       name += "_Xmass"+_s(singleMass);
-	// name += "_test";
+	if(isMC11c)              name += "_mc11c";
+	if(!isMC11c)             name += "_mc11a";
+	if     (do32st && !do33st)name += "_32st";
+	else if(do33st && !do32st)name += "_33st";
+	else if(do33st && do32st)name += "_3332st";
+	else                     _FATAL("must choose 3+3 / 3+2 or both");
+	if(dog2)                 name += "_g2bins";
+	else if(dog4)            name += "_g4bins";
+	else                     _FATAL("either g4 or g2 bins");
+	if(!doInterference)      name += "_noInterference";
+	if(!doFullKKtemplates)   name += "_noKKtmplates";
+	if(!doFullZPtemplates)   name += "_noZPtmplates";
+	if(doSigmaUp)            name += "_SmrSigUp";
+	if(!dopileup)            name += "_noPUrw";
+	if(!doOverallEWkfactor)  name += "_noOverallEWkF";
+	if(!doOverallEWkfactor)  name += "_noEWkF";
+	if(!doQCDkfactor)        name += "_noQCDkF";
+	if(!doZpT)               name += "_noZpTrw";
+	if(doRemoveHighMass)     name += "_noHighMbins";
+	if(!doTruth)             name += "_noTruth";
+	if(doOfficialZP)         name += "_wthOfficialZP";
+	if(doFixedwidth)         name += "_fixedBWwidth";
+	if(doTreeLevel&&doTruth) name += "_treeLevel";
+	if(doSingleMass)         name += "_Xmass"+_s(singleMass);
 	return name;
 }
 ///////////////////////////////////////
 
 // other parameters
 TString ntupledir = "";
-TString ntupledir_regular = (isMC11c) ? "/storage/t3_data/hod/2011/NTUPLEMC11C/AFTERMCPBUGFIX/" : "/storage/t3_data/hod/2011/NTUPLE";
+TString ntupledir_regular = (isMC11c) ? "/storage/t3_data/hod/2011/NTUPLEMC11C/AFTERMCP000503" : "/storage/t3_data/hod/2011/NTUPLEMC11C/AFTERMCP000503";
 
 Int_t printmod    = 1000;
 Bool_t dolog      = true;
@@ -84,9 +94,14 @@ Bool_t dolog      = true;
 double nZpeak     = 0.;
 double nZpeakNoPU = 0.;
 
-double g4XXmin = (double)(g4min+g4shift);
-double g4XXmax = (double)(g4max+g4shift);
-double dg4XX   = (g4XXmax-g4XXmin)/(double)ng4bins;
+double       gNshift = (dog4) ? g4shift : g2shift;
+unsigned int ngNbins = (dog4) ? ng4bins : ng2bins;
+double       gNmin = (dog4) ? g4min : g2min;
+double       gNmax = (dog4) ? g4max : g2max;
+
+double gNXXmin = (dog4) ? (double)(g4min+g4shift) : (double)(g2min+g2shift);
+double gNXXmax = (dog4) ? (double)(g4max+g4shift) : (double)(g2max+g2shift);
+double dgNXX   = (dog4) ? (gNXXmax-gNXXmin)/(double)ng4bins : (gNXXmax-gNXXmin)/(double)ng2bins;
 
 double maxKKwgt = 0.;
 double maxZPwgt = 0.;
@@ -326,6 +341,74 @@ void samples()
 	}
 }
 
+void readInput(vector<TString>& vnames)
+{
+	if(vnames.size()!=0) vnames.clear();
+
+	/*
+	string line;
+	ifstream myfile("input.txt");
+	if(myfile.is_open())
+	{
+		while( myfile.good() )
+		{
+			getline(myfile,line);
+			TString name = (TString)line;
+			name.ReplaceAll("\n","");
+			name.ReplaceAll(" ","");
+			if(!name.Contains(".root")) continue;
+			_INFO("reading -> "+line);
+			vnames.push_back(name);
+		}
+		myfile.close();
+	}
+	else _FATAL("Unable to open file"); 
+	*/
+
+	string argStr;
+	unsigned int delpos;
+	string sFileName = "input.txt";
+	ifstream ifs(sFileName.c_str());
+	string sLine = "";
+	while(!ifs.eof())
+	{
+		getline(ifs,sLine);
+		argStr += sLine;
+	}
+	
+	// split by ','
+	vector<string> fileList;
+	string tmp;
+	for (size_t i=0 ; i<argStr.length(); ++i)
+	{
+		if(argStr.substr(i,1)!=",") tmp += argStr.substr(i,1);
+		else
+		{
+			fileList.push_back(tmp);
+			_INFO("tmp="+tmp);
+			tmp.clear();
+		}
+
+		if(i==argStr.length()-1)
+		{
+			fileList.push_back(tmp);
+			_INFO("tmp="+tmp);
+			tmp.clear();
+		}
+	}
+
+	// get the neames in TString
+	for (unsigned int iFile=0; iFile<fileList.size(); ++iFile)
+	{
+		TString name = (TString)fileList[iFile];
+		name.ReplaceAll("\n","");
+		name.ReplaceAll(" ","");
+		if(!name.Contains(".root")) continue;
+		_INFO("reading -> "+(string)name);
+		vnames.push_back(name);
+	}
+}
+
 void setMCtrees(TString tsMCname)
 {
 	_DEBUG("setMCtrees");
@@ -334,22 +417,68 @@ void setMCtrees(TString tsMCname)
 	clearMaps(); ///
 	////////////////
 
+	if(doGrid)
+	{
+		vector<TString> vnames;
+		readInput(vnames);
+
+		TString name;
+		Double_t N;
+		Double_t sigma;
+
+		for(unsigned int n=0 ; n<vnames.size() ; n++)
+		{
+			_INFO("setting file -> "+(string)vnames[n]);
+
+			if(vnames[n].Contains("75M120"))    { name="mcLocalControl_Pythia6_DYmumu_75M120";    N=99999;  sigma=7.9836E-01*nb2fb; }
+			if(vnames[n].Contains("120M250"))   { name="mcLocalControl_Pythia6_DYmumu_120M250";   N=99949;  sigma=8.5304E-03*nb2fb; }
+			if(vnames[n].Contains("250M400"))   { name="mcLocalControl_Pythia6_DYmumu_250M400";   N=100000; sigma=4.1004E-04*nb2fb; }
+			if(vnames[n].Contains("400M600"))   { name="mcLocalControl_Pythia6_DYmumu_400M600";   N=100000; sigma=6.6393E-05*nb2fb; }
+			if(vnames[n].Contains("600M800"))   { name="mcLocalControl_Pythia6_DYmumu_600M800";   N=99900;  sigma=1.0955E-05*nb2fb; }
+			if(vnames[n].Contains("800M1000"))  { name="mcLocalControl_Pythia6_DYmumu_800M1000";  N=99999;  sigma=2.6470E-06*nb2fb; }
+			if(vnames[n].Contains("1000M1250")) { name="mcLocalControl_Pythia6_DYmumu_1000M1250"; N=100000; sigma=8.9015E-07*nb2fb; }
+			if(vnames[n].Contains("1250M1500")) { name="mcLocalControl_Pythia6_DYmumu_1250M1500"; N=99999;  sigma=2.3922E-07*nb2fb; }
+			if(vnames[n].Contains("1500M1750")) { name="mcLocalControl_Pythia6_DYmumu_1500M1750"; N=99999;  sigma=7.3439E-08*nb2fb; }
+			if(vnames[n].Contains("1750M2000")) { name="mcLocalControl_Pythia6_DYmumu_1750M2000"; N=100000; sigma=2.4643E-08*nb2fb; }
+			if(vnames[n].Contains("2000M2250")) { name="mcLocalControl_Pythia6_DYmumu_2000M2250"; N=100000; sigma=8.7619E-09*nb2fb; }
+			if(vnames[n].Contains("2250M2500")) { name="mcLocalControl_Pythia6_DYmumu_2250M2500"; N=99950;  sigma=3.2232E-09*nb2fb; }
+			if(vnames[n].Contains("2500M2750")) { name="mcLocalControl_Pythia6_DYmumu_2500M2750"; N=99000;  sigma=1.2073E-09*nb2fb; }
+			if(vnames[n].Contains("2750M3000")) { name="mcLocalControl_Pythia6_DYmumu_2750M3000"; N=99999;  sigma=4.4763E-10*nb2fb; }
+			if(vnames[n].Contains("M3000"))     { name="mcLocalControl_Pythia6_DYmumu_M3000";     N=100000; sigma=2.5586E-10*nb2fb; }
+
+			TString filename = vnames[n];
+
+			///////////////////////////////////////
+			setMCtree(filename,name,N,sigma); /////
+			///////////////////////////////////////
+
+		}
+
+		///////////
+		return; ///
+		///////////
+	}
+	
+
+
+	////////////////////////////////////////////////////////////////// 
 	ntupledir = ntupledir_regular;
-	
-	TString sNMst = "";
-	sNMst += (do33st && !do32st) ? "_33st" : "";
-	sNMst += (do32st && !do33st) ? "_32st" : "";
-	
-	TString sSMR = "";
-	sSMR += (doSmearing) ? "_smeared" : "";
-	
-	TString sSIGUP = "";
-	sSIGUP += (doSigmaUp) ? "_sigmaUp" : "";
-	
-	//////////////////////////////////////////////
-	TString filesuffix = sNMst+sSMR+sSIGUP; //////
-	//////////////////////////////////////////////
-	
+
+        TString sNMst = "";
+        sNMst += (do33st && !do32st) ? "_33st" : "";
+        sNMst += (do32st && !do33st) ? "_32st" : "";
+        sNMst += (do32st && do33st)  ? "_3332st" : "";
+
+        TString sSMR = "";
+        sSMR += (doSmearing) ? "_smeared" : "";
+
+        TString sSIGUP = "";
+        sSIGUP += (doSigmaUp) ? "_sigmaUp" : "";
+
+        //////////////////////////////////////////////
+        TString filesuffix = sNMst+sSMR+sSIGUP; //////
+        //////////////////////////////////////////////
+
 	if(tsMCname=="DYmumu")
 	{
 		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_75M120"+filesuffix+".root",    "mcLocalControl_Pythia6_DYmumu_75M120",    99999,  7.9836E-01*nb2fb);
@@ -569,16 +698,22 @@ void hbook()
 			h1Map.insert( make_pair("hMass_template_KK"+massName, new TH1D("hMass_template_KK"+massName, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 			if(doTruth) h1Map.insert( make_pair("hMass_truth_template_KK"+massName, new TH1D("hMass_truth_template_KK"+massName, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 			
-			h2Map.insert( make_pair("hg4Mass_template_KK"+massName, new TH2D("hg4Mass_template_KK"+massName, "#mu#mu mass vs. g^{4};m_{#mu#mu} TeV;g^{4};Events", nloglimitimassbins,loglimitimassbins, ng4bins,g4min,g4max /*npowerbins,powerbins*/) ) );
-			if(doTruth) h2Map.insert( make_pair("hg4Mass_truth_template_KK"+massName, new TH2D("hg4Mass_truth_template_KK"+massName, "#mu#mu mass vs. g^{4};m_{#mu#mu} TeV;g^{4};Events", nloglimitimassbins,loglimitimassbins, ng4bins,g4min,g4max /*npowerbins,powerbins*/) ) );
+			h2Map.insert( make_pair("h"+tsgN+"Mass_template_KK"+massName, new TH2D("h"+tsgN+"Mass_template_KK"+massName, "#mu#mu mass vs. "+tsgNlabel+";m_{#mu#mu} TeV;"+tsgNlabel+";Events", nloglimitimassbins,loglimitimassbins, ngNbins,gNmin,gNmax /*npowerbins,powerbins*/) ) );
+			if(doTruth)
+			{
+				h2Map.insert( make_pair("h"+tsgN+"Mass_truth_template_KK"+massName, new TH2D("h"+tsgN+"Mass_truth_template_KK"+massName, "#mu#mu mass vs. "+tsgNlabel+";m_{#mu#mu} TeV;g^{4};Events", nloglimitimassbins,loglimitimassbins, ngNbins,gNmin,gNmax /*npowerbins,powerbins*/) ) );
+			}
 		}
 		if(doFullZPtemplates)
 		{
 			h1Map.insert( make_pair("hMass_template_Zprime_SSM"+massName, new TH1D("hMass_template_Zprime_SSM"+massName, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 			if(doTruth) h1Map.insert( make_pair("hMass_truth_template_Zprime_SSM"+massName, new TH1D("hMass_truth_template_Zprime_SSM"+massName, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 			
-			h2Map.insert( make_pair("hg4Mass_template_Zprime_SSM"+massName, new TH2D("hg4Mass_template_Zprime_SSM"+massName, "#mu#mu mass vs. g^{4};m_{#mu#mu} TeV;g^{4};Events", nloglimitimassbins,loglimitimassbins, ng4bins,g4min,g4max /*npowerbins,powerbins*/) ) );
-			if(doTruth) h2Map.insert( make_pair("hg4Mass_truth_template_Zprime_SSM"+massName, new TH2D("hg4Mass_truth_template_Zprime_SSM"+massName, "#mu#mu mass vs. g^{4};m_{#mu#mu} TeV;g^{4};Events", nloglimitimassbins,loglimitimassbins, ng4bins,g4min,g4max /*npowerbins,powerbins*/) ) );
+			h2Map.insert( make_pair("h"+tsgN+"Mass_template_Zprime_SSM"+massName, new TH2D("h"+tsgN+"Mass_template_Zprime_SSM"+massName, "#mu#mu mass vs. "+tsgNlabel+";m_{#mu#mu} TeV;"+tsgNlabel+";Events", nloglimitimassbins,loglimitimassbins, ngNbins,gNmin,gNmax /*npowerbins,powerbins*/) ) );
+			if(doTruth)
+			{
+				h2Map.insert( make_pair("h"+tsgN+"Mass_truth_template_Zprime_SSM"+massName, new TH2D("h"+tsgN+"Mass_truth_template_Zprime_SSM"+massName, "#mu#mu mass vs. "+tsgNlabel+";m_{#mu#mu} TeV;"+tsgNlabel+";Events", nloglimitimassbins,loglimitimassbins, ngNbins,gNmin,gNmax /*npowerbins,powerbins*/) ) );
+			}
 		}
 		
 		/////////////////////////////
@@ -677,6 +812,7 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 	double truXmass  = 0.;
 	double truXpT    = 0.;
 
+	
 	if(truth_all_isValid)
 	{
 		imuontru  = (truth_all_mc_pdgId->at(0)>0) ? 0 : 1;
@@ -692,6 +828,7 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 		mass = fkinematics::imass(tlvmutrua,tlvmutrub);
 		
 		_DEBUG("");
+		
 		
 		// (1) take the true quark and the true muon and boost it to the cmf.
 		// (2) calculate cos(theta*) between the tree-level muon and the quark
@@ -728,6 +865,7 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 		}
 		truth_s = truth_mass*truth_mass;
 		
+
 		// X = Z/Z'/ZKK are always at index 4.
 		truXid   = truth_all_partons_mc_pdgId->at(4);
 		truXmass = truth_all_partons_mc_m->at(4)*GeV2MeV;
@@ -740,17 +878,18 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 		//// 2nd argument is the truth mass of the mm pair ///
 		//// after FSR and it is not the mc_m->at(4) /////////
 		weights(tsMCname, mass, truXid, truXmass, truXpT); ///
-		double weight_dy = (doOverallEWkfactor) ? event_weight : event_weight*kFEW_NNLOvLOs; // for the truth
+		// if kF for signals is done in the amplitude then the event_weight does not contain it 
+                double weight_dy = (doOverallEWkfactor) ? event_weight : event_weight*kFEW_NNLOvLOs; // relevant only for truth, DY and the official Z'
 		//////////////////////////////////////////////////////
 
+		
 		_DEBUG("");
 		
-		///////////////////////////////////////////////////////////////////////////////////////////////////
-		mass = (doTreeLevelMass) ? truth_all_partons_mc_m->at(4) : mass; // mass was M(mumu) AFTER FSR ////
-		///////////////////////////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////////////////////
+		mass = (doTreeLevel) ? truth_all_partons_mc_m->at(4) : mass; // mass is M(mumu after FSR) /////
+		///////////////////////////////////////////////////////////////////////////////////////////////
 		
 		/////////// DY and official Z'
-		// if kF for signals is done in the amplitude then the event_weight does not contain it 
 		if(doTruth) h1Map["hMass_"+tsMCname+"_truth"]->Fill(mass*GeV2TeV,wgt);
 		if(doOfficialZP && doTruth && tsMCname=="DYmumu")
 		{		
@@ -775,6 +914,7 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 			}
 		}
 		
+		
 		_DEBUG("");
 		
 		for(double M=mXXmin ; M<=mXXmax && doTruth && tsMCname=="DYmumu" ; M+=dmXX)
@@ -789,7 +929,8 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 			setZPmass(M); ////////////////
 			//////////////////////////////
 			TString massName   = (TString)_s(M);
-			TAxis* g4axis = (TAxis*)h2Map["hg4Mass_truth_template_KK"+massName]->GetYaxis();
+			TAxis*  gaxis = (TAxis*)h2Map["h"+tsgN+"Mass_truth_template_KK"+massName]->GetYaxis();
+			
 			
 			_DEBUG("massName="+(string)massName);
 			
@@ -819,17 +960,17 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 					else               ZPoverSM_weight = weightZPnoSM(truth_cost,truth_s,truth_idIn,idOut);
 					h1Map["hMass_truth_template_Zprime_SSM"+massName]->Fill(mass*GeV2TeV,wgt*ZPoverSM_weight); // need to fluctuate this later
 				}
-				
-				for(double g4=g4XXmin ; g4<=g4XXmax ; g4+=dg4XX)
-				// for(unsigned int g4bin=1 ; g4bin<=npowerbins ; g4bin++)
+
+				for(double gN=gNXXmin ; gN<=gNXXmax ; gN+=dgNXX)
+				// for(unsigned int gNbin=1 ; gNbin<=npowerbins ; gNbin++)
 				{
-					// double g4 = g4axis->GetBinCenter(g4bin);
+					// double gN = gaxis->GetBinCenter(gNbin);
 				
 					if(doFullKKtemplates)
 					{
 						/////////////////////////////
 						setCouplingsScale(true); ////
-						double gRe = sqrt(sqrt(g4));
+						double gRe = (dog4) ? sqrt(sqrt(gN)) : sqrt(gN);
 						double gIm = 0.; ////////////
 						setFgGKK(gRe,gIm); //////////
 						setFgZKK(gRe,gIm); //////////
@@ -839,14 +980,14 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 						else               KKoverSM_weight = weightKKnoSM(truth_cost,truth_s,truth_idIn,idOut);
 						if(KKoverSM_weight>0.)
 						{
-							h2Map["hg4Mass_truth_template_KK"+massName]->Fill(mass*GeV2TeV, g4, wgt*KKoverSM_weight);
+							h2Map["h"+tsgN+"Mass_truth_template_KK"+massName]->Fill(mass*GeV2TeV, gN, wgt*KKoverSM_weight);
 						}
 					}
 					if(doFullZPtemplates)
 					{
 						/////////////////////////////
 						setCouplingsScale(true); ////
-						double gRe = sqrt(sqrt(g4));
+						double gRe = (dog4) ? sqrt(sqrt(gN)) : sqrt(gN);
 						double gIm = 0.; ////////////
 						setFgZP(gRe,gIm); ///////////
 						/////////////////////////////
@@ -855,11 +996,12 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 						else               ZPoverSM_weight = weightZPnoSM(truth_cost,truth_s,truth_idIn,idOut);
 						if(ZPoverSM_weight>0.)
 						{
-							h2Map["hg4Mass_truth_template_Zprime_SSM"+massName]->Fill(mass*GeV2TeV, g4, wgt*ZPoverSM_weight);
+							h2Map["h"+tsgN+"Mass_truth_template_Zprime_SSM"+massName]->Fill(mass*GeV2TeV, gN, wgt*ZPoverSM_weight);
 						}
 					}
 				}
 			}
+			
 			
 			/////////////////////////////
 			if(doSingleMass) break; /////
@@ -868,6 +1010,7 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 		
 		if(recon_all_isValid)
 		{
+			
 			imuonrec  = (recon_all_charge->at(0)<0.) ? 0 : 1;
 			iamuonrec = (imuonrec==0) ? 1 : 0;
 
@@ -890,6 +1033,7 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 			(*tv3murecbBoosted) = tlvmurecbBoosted->Vect();
 		}
 		
+		
 		_DEBUG("");
 		
 		if(recon_all_isValid  &&  imuonrec>=0. && iamuonrec>=0.  &&  imuonrec!=iamuonrec)
@@ -904,6 +1048,7 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 			if(mass>=70. && mass<=110. && tsMCname=="DYmumu") nZpeakNoPU += event_weight_nopileup*wgt; ///
 			//////////////////////////////////////////////////////////////////////////////////////////////
 		
+			
 			_DEBUG("");
 			
 			for(double M=mXXmin ; M<=mXXmax && tsMCname=="DYmumu" ; M+=dmXX)
@@ -918,7 +1063,8 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 				setZPmass(M); ////////////////
 				//////////////////////////////
 				TString massName = (TString)_s(M);
-				TAxis* g4axis = (TAxis*)h2Map["hg4Mass_template_KK"+massName]->GetYaxis();
+				TAxis* gaxis = (TAxis*)h2Map["h"+tsgN+"Mass_template_KK"+massName]->GetYaxis();
+				
 				
 				_DEBUG("");
 				
@@ -946,18 +1092,18 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 					if(ZPoverSM_weight>0.) h1Map["hMass_template_Zprime_SSM"+massName]->Fill(mass*GeV2TeV,wgt*event_weight*ZPoverSM_weight); // need to fluctuate this later
 				}
 				
+				
 				_DEBUG("");
 				
-				for(double g4=g4XXmin ; g4<=g4XXmax ; g4+=dg4XX)
-				// for(unsigned int g4bin=1 ; g4bin<=npowerbins ; g4bin++)
+				for(double gN=gNXXmin ; gN<=gNXXmax ; gN+=dgNXX)
+				// for(unsigned int gNbin=1 ; gNbin<=npowerbins ; gNbin++)
 				{
-					// double g4 = g4axis->GetBinCenter(g4bin);
-				
+					// double gN = gaxis->GetBinCenter(gNbin);
 					if(doFullKKtemplates)
 					{
 						////////////////////////////////
 						setCouplingsScale(true); ///////
-						double gRe = sqrt(sqrt(g4)); ///
+						double gRe = (dog4) ? sqrt(sqrt(gN)) : sqrt(gN);
 						double gIm = 0.; ///////////////
 						setFgGKK(gRe,gIm); /////////////
 						setFgZKK(gRe,gIm); /////////////
@@ -967,15 +1113,14 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 						else               KKoverSM_weight = weightKKnoSM(truth_cost,truth_s,truth_idIn,idOut);
 						if(KKoverSM_weight>0.)
 						{
-							h2Map["hg4Mass_template_KK"+massName]->Fill(mass*GeV2TeV, g4, wgt*event_weight*KKoverSM_weight);
+							h2Map["h"+tsgN+"Mass_template_KK"+massName]->Fill(mass*GeV2TeV, gN, wgt*event_weight*KKoverSM_weight);
 						}
 					}
-					
 					if(doFullZPtemplates)
 					{
 						////////////////////////////////
 						setCouplingsScale(true); ///////
-						double gRe = sqrt(sqrt(g4)); ///
+						double gRe = (dog4) ? sqrt(sqrt(gN)) : sqrt(gN);
 						double gIm = 0.; ///////////////
 						setFgZP(gRe,gIm); //////////////
 						////////////////////////////////
@@ -984,15 +1129,18 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 						else               ZPoverSM_weight = weightZPnoSM(truth_cost,truth_s,truth_idIn,idOut);
 						if(ZPoverSM_weight>0.)
 						{
-							h2Map["hg4Mass_template_Zprime_SSM"+massName]->Fill(mass*GeV2TeV, g4, wgt*event_weight*ZPoverSM_weight);
+							h2Map["h"+tsgN+"Mass_template_Zprime_SSM"+massName]->Fill(mass*GeV2TeV, gN, wgt*event_weight*ZPoverSM_weight);
 						}
 					}
+
+					//cout << tsgN << "=" << gN << "\r" << flush;
 				}
 				
 				////////////////////////////
 				if(doSingleMass) break; ////
 				////////////////////////////
 			}
+			
 			
 			_DEBUG("");
 			
@@ -1022,6 +1170,7 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 				_DEBUG("");
 			}
 			
+			
 			_DEBUG("");
 		}
 	}
@@ -1041,10 +1190,99 @@ void writeTemplates()
 	
 	// remember old dir
 	TDirectory* olddir = gDirectory;
+
+	if(doGrid)
+	{
+		TString fTemplatesName = "template"+(TString)_s(singleMass)+"GeV.root";
+		TFile* fTemplates = new TFile(fTemplatesName, "RECREATE");
+
+		olddir->cd();
+
+		TObjArray* templates_KK         = new TObjArray;
+		TObjArray* templates_KK_truth   = new TObjArray;
+		TObjArray* templates2d_KK       = new TObjArray;
+		TObjArray* templates2d_KK_truth = new TObjArray;
+
+		TObjArray* templates_ZP         = new TObjArray;
+		TObjArray* templates_ZP_truth   = new TObjArray;
+		TObjArray* templates2d_ZP       = new TObjArray;
+		TObjArray* templates2d_ZP_truth = new TObjArray;
+
+		///////////////////////////////////////
+		double M = singleMass; ////////////////
+		TString massName = (TString)_s(M); ////
+		///////////////////////////////////////
+		
+		if(doFullKKtemplates)
+		{
+			templates_KK->Add( (TH1D*)h1Map["hMass_template_KK"+massName]->Clone("") );
+			if(doTruth) templates_KK_truth->Add( (TH1D*)h1Map["hMass_truth_template_KK"+massName]->Clone("") );
+			templates2d_KK->Add( (TH2D*)h2Map["h"+tsgN+"Mass_template_KK"+massName]->Clone("") );
+			if(doTruth)
+			{
+				templates2d_KK_truth->Add( (TH2D*)h2Map["h"+tsgN+"Mass_truth_template_KK"+massName]->Clone("") );
+			}
 	
+			fTemplates->cd();
+
+			templates_KK->SetOwner(kTRUE);
+			templates_KK->Write("templateKK", TObject::kSingleKey);
+			if(doTruth) templates_KK_truth->SetOwner(kTRUE);
+			if(doTruth) templates_KK_truth->Write("truth_templateKK", TObject::kSingleKey);
+			templates2d_KK->SetOwner(kTRUE);
+			templates2d_KK->Write("template2dKK", TObject::kSingleKey);
+			if(doTruth) templates2d_KK_truth->SetOwner(kTRUE);
+			if(doTruth) templates2d_KK_truth->Write("truth_template2dKK", TObject::kSingleKey);
+		}
+		if(doFullZPtemplates)
+		{
+			templates_ZP->Add( (TH1D*)h1Map["hMass_template_Zprime_SSM"+massName]->Clone("") );
+			if(doTruth) templates_ZP_truth->Add( (TH1D*)h1Map["hMass_truth_template_Zprime_SSM"+massName]->Clone("") );
+			templates2d_ZP->Add( (TH2D*)h2Map["h"+tsgN+"Mass_template_Zprime_SSM"+massName]->Clone("") );
+			if(doTruth)
+			{
+				templates2d_ZP_truth->Add( (TH2D*)h2Map["h"+tsgN+"Mass_truth_template_Zprime_SSM"+massName]->Clone("") );
+			}
+
+			fTemplates->cd();
+
+			templates_ZP->SetOwner(kTRUE);
+			templates_ZP->Write("templateZP", TObject::kSingleKey);
+			if(doTruth) templates_ZP_truth->SetOwner(kTRUE);
+			if(doTruth) templates_ZP_truth->Write("truth_templateZP", TObject::kSingleKey);
+			templates2d_ZP->SetOwner(kTRUE);
+			templates2d_ZP->Write("template2dZP", TObject::kSingleKey);
+			if(doTruth) templates2d_ZP_truth->SetOwner(kTRUE);
+			if(doTruth) templates2d_ZP_truth->Write("truth_template2dZP", TObject::kSingleKey);
+		}
+
+		olddir->cd();
+
+		TH1D* hDYrec = (TH1D*)h1Map["hMass_DYmumu"]->Clone("");
+		fTemplates->cd();
+		hDYrec->Write();
+		TH1D* hDYtru = NULL;
+		if(doTruth) { olddir->cd(); hDYtru = (TH1D*)h1Map["hMass_DYmumu_truth"]->Clone("");}
+		if(doTruth) { fTemplates->cd(); hDYtru->Write();}
+
+		TString templateFname = (TString)fTemplates->GetName();
+		_INFO("write -> "+(string)templateFname);
+		fTemplates->Write();
+		fTemplates->Close();
+		_INFO("wrote -> "+(string)templateFname);
+
+		/////////////
+		return; /////
+		/////////////
+	}
+
+
+
+
 	if(doFullKKtemplates)
 	{
 		TString fKKTemplatesName = "plots/KK_2dtemplates"+fileNmaeSuffix()+".root";
+		if(doGrid) fKKTemplatesName = "KK_2dtemplates.root";
 		TFile* fKKTemplates = new TFile(fKKTemplatesName, "RECREATE");
 		
 		olddir->cd();
@@ -1063,8 +1301,11 @@ void writeTemplates()
 			TString massName = (TString)_s(M);
 			templates_KK->Add( (TH1D*)h1Map["hMass_template_KK"+massName]->Clone("") );
 			if(doTruth) templates_KK_truth->Add( (TH1D*)h1Map["hMass_truth_template_KK"+massName]->Clone("") );
-			templates2d_KK->Add( (TH2D*)h2Map["hg4Mass_template_KK"+massName]->Clone("") );
-			if(doTruth) templates2d_KK_truth->Add( (TH2D*)h2Map["hg4Mass_truth_template_KK"+massName]->Clone("") );
+			templates2d_KK->Add( (TH2D*)h2Map["h"+tsgN+"Mass_template_KK"+massName]->Clone("") );
+			if(doTruth)
+			{
+				templates2d_KK_truth->Add( (TH2D*)h2Map["h"+tsgN+"Mass_truth_template_KK"+massName]->Clone("") );
+			}
 			
 			/////////////////////////////
 			if(doSingleMass) break; /////
@@ -1136,6 +1377,7 @@ void writeTemplates()
 	if(doFullZPtemplates)
 	{
 		TString fZPTemplatesName = "plots/ZP_2dtemplates"+fileNmaeSuffix()+".root";
+		if(doGrid) fZPTemplatesName = "ZP_2dtemplates.root";
 		TFile* fZPTemplates = new TFile(fZPTemplatesName, "RECREATE");
 		
 		olddir->cd();
@@ -1154,8 +1396,11 @@ void writeTemplates()
 			TString massName = (TString)_s(M);
 			templates_ZP->Add( (TH1D*)h1Map["hMass_template_Zprime_SSM"+massName]->Clone("") );
 			if(doTruth) templates_ZP_truth->Add( (TH1D*)h1Map["hMass_truth_template_Zprime_SSM"+massName]->Clone("") );
-			templates2d_ZP->Add( (TH2D*)h2Map["hg4Mass_template_Zprime_SSM"+massName]->Clone("") );
-			if(doTruth) templates2d_ZP_truth->Add( (TH2D*)h2Map["hg4Mass_truth_template_Zprime_SSM"+massName]->Clone("") );
+			templates2d_ZP->Add( (TH2D*)h2Map["h"+tsgN+"Mass_template_Zprime_SSM"+massName]->Clone("") );
+			if(doTruth)
+			{
+				templates2d_ZP_truth->Add( (TH2D*)h2Map["h"+tsgN+"Mass_truth_template_Zprime_SSM"+massName]->Clone("") );
+			}
 			
 			/////////////////////////////
 			if(doSingleMass) break; /////
@@ -1265,7 +1510,6 @@ void runMCproc(TString mcName)
 			//////////////////////////////////////////////////////////////////////////
 			
 			monitor(mcName,entry,N);
-			
 		}		
 		_INFO((string)it->first+": done ("+_s(Npractice)+").");
 	}
@@ -1291,7 +1535,7 @@ void run(Double_t Xmass=-1.)
 	///////////////////////////////////////////////
 	// theoretical stuff... ///////////////////////
 	setFermions(); ////////////////////////////////
-	setFixedWidth(doFixedwidth); //////////////////
+	setFixedWidth(false); /////////////////////////
 	resetKKmass();/////////////////////////////////
 	resetZPmass(); ////////////////////////////////
 	resetfgZP(); //////////////////////////////////

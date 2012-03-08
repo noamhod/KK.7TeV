@@ -516,8 +516,8 @@ inline void selection::classify3233(float MuonPhiHitsCut,    float MuonPhiLayerC
 		// mu_is2St[j] = mu_is2StBarrel[j] || mu_is2StEndcap[j];
 		mu_is2St[j] = mu_is2StBarrel[j];
 		
-		if     (mu_is3St[j]  &&  !mu_is2St[j]) classified[j] = 33;
-		else if(mu_is2St[j]  &&  !mu_is3St[j]) classified[j] = 32;
+		if     (mu_is3St[j]  &&  !mu_is2St[j]) classified[j] = 3;
+		else if(mu_is2St[j]  &&  !mu_is3St[j]) classified[j] = 2;
 		else                                   classified[j] = 0;
 	}
 }
@@ -537,7 +537,7 @@ inline bool selection::nMShitsCut3233(float MuonPhiHitsCut,    float MuonPhiLaye
 									  int& ai, int& bi
 									  )
 {
-	if(allow3_3st && allow3_2st) _FATAL("cannot call 3+3 and 3+2");
+	//if(allow3_3st && allow3_2st) _FATAL("cannot call 3+3 and 3+2");
 
 	unsigned int muSize = mu_eta->size();
 

@@ -74,7 +74,7 @@ void analysisSkeleton::setSmearedMCPpT(int nMus)
 	for(int j=0 ; j<nMus ; j++)
 	{
 		_DEBUG("j="+_s(j));
-		if(classify3332null[j]==32 || classify3332null[j]==0) continue;
+		if(classify3332null[j]==2 || classify3332null[j]==0) continue; // if 2st or null muon, go on
 		_DEBUG("cleared j="+_s(j));
 	
 		// Retrieve Eta, PtCB, PtMS and PtID from ntuples 
@@ -148,10 +148,9 @@ void analysisSkeleton::set2stSmearing()
 void analysisSkeleton::setSmeared2Stations(int nMus)
 {
 	_DEBUG("analysisSkeleton::setSmeared2Stations");
-	// _INFO("----------- BEGIN -> Run-lbn-Evt = "+_s(RunNumber)+"-"+_s(lbn)+"-"+_s(EventNumber));
 	for(int i=0 ; i<nMus ; i++)
 	{
-		if(classify3332null[i]==33 || classify3332null[i]==0) continue;
+		if(classify3332null[i]==3 || classify3332null[i]==0) continue; // if 3st or null muon, go on
 	
 		if(!mu_isCombinedMuon->at(i)) continue;
 	
@@ -163,16 +162,6 @@ void analysisSkeleton::setSmeared2Stations(int nMus)
 		float ptcb = 1./fabs(mu_qoverp_exPV->at(i))*sin(mu_theta_exPV->at(i));
 		float ptid = 1./fabs(mu_id_qoverp->at(i))*sin(mu_id_theta->at(i));
 		float ptms = 1./fabs(mu_me_qoverp->at(i))*sin(mu_me_theta->at(i));
-
-		// _INFO("mu_me_cov_qoverp_exPV->at("+_s(i)+")="+_s(mu_me_cov_qoverp_exPV->at(i)));
-		// _INFO("mu_me_qoverp_exPV->at("+_s(i)+")="+_s(mu_me_qoverp_exPV->at(i)));
-		// _INFO("mu_id_cov_qoverp_exPV->at("+_s(i)+")="+_s(mu_id_cov_qoverp_exPV->at(i)));
-		// _INFO("mu_id_qoverp_exPV->at("+_s(i)+")="+_s(mu_id_qoverp_exPV->at(i)));
-		// _INFO("eptMS="+_s(eptMS));
-		// _INFO("eptID="+_s(eptID));
-		// _INFO("ptcb="+_s(ptcb));
-		// _INFO("ptid="+_s(ptid));
-		// _INFO("ptms="+_s(ptms));
 		
 		// Initialize the random numbers, compute the smearing, and retrieve the smeared pT:
 		TwoStationsSmearing->SetTheSeed(EventNumber, i, RunNumber);
@@ -191,7 +180,6 @@ void analysisSkeleton::setSmeared2Stations(int nMus)
 			mu_charge->at(i)*=-1.;
 		}
 	}
-	// _INFO("----------- END");
 }
 
 void analysisSkeleton::setPileupParameters(TString dataRootFileName, TString dataRootHistName, TString mcRootFileName, TString mcRootHistName)
@@ -1242,6 +1230,7 @@ void analysisSkeleton::fillAfterCuts()
 	_DEBUG("");
 
 	graphicObjects::n = mu_n;
+	graphicObjects::mutype->push_back(classify3332null[lead_mu]);
 	graphicObjects::E->push_back(mu_E->at(lead_mu));
 	graphicObjects::pt->push_back(mu_pt->at(lead_mu));
 	graphicObjects::m->push_back(mu_m->at(lead_mu));
@@ -1533,6 +1522,7 @@ void analysisSkeleton::fillAfterCuts()
 	graphicObjects::L1_dr->push_back(mu_L1_dr->at(lead_mu));
 	graphicObjects::L1_index->push_back(mu_L1_index->at(lead_mu));
 	
+	graphicObjects::mutype->push_back(classify3332null[sublead_mu]);
 	graphicObjects::E->push_back(mu_E->at(sublead_mu));
 	graphicObjects::pt->push_back(mu_pt->at(sublead_mu));
 	graphicObjects::m->push_back(mu_m->at(sublead_mu));
@@ -2842,7 +2832,8 @@ void analysisSkeleton::fillTruth()
 void analysisSkeleton::fillRecon()
 {
 	_DEBUG("analysisSkeleton::fillRecon");
-	
+	recon_all_mutype->push_back(classify3332null[ai]);
+	recon_all_mutype->push_back(classify3332null[bi]);
 	recon_all_E->push_back(mu_E->at(ai)*MeV2GeV);
 	recon_all_E->push_back(mu_E->at(bi)*MeV2GeV);
 	recon_all_pt->push_back(mu_pt->at(ai)*MeV2GeV);

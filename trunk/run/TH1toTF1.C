@@ -5,30 +5,29 @@
 #include "../include/style.h"
 #include "../include/histos.h"
 
-///////////////////////////////////
-// USAGE: /////////////////////////
+/////////////////////////////////////////////////////////
+// USAGE: ///////////////////////////////////////////////
 // Compile: root -b -l -q TH1toTF1.C++\(\"ZP\",-1\) /////
-// Loop:    root -b -l -q TH1toTF1.C++\(\"ZP\",-2\)
-// SINGLE:  root -b -l -q TH1toTF1.C++\(\"ZP\"\,19)
-///////////////////////////////////
+// Loop:    root -b -l -q TH1toTF1.C++\(\"ZP\",-2\) /////
+// SINGLE:  root -b -l -q TH1toTF1.C++\(\"ZP\"\,19) /////
+/////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // Global definitions ///////////////////////////////////////////////////////////////////////
-bool doGrid          = false;
+bool doGrid          = true;
 bool doTruth         = false;
-bool doEWkf          = false;
-bool doInterference  = false;
-bool doKKtemplates   = false;
+bool doEWkf          = true;
+bool doInterference  = true;
+bool doKKtemplates   = true;
 bool doOfficialZP    = false;
-bool dog4bins        = false;
+bool dog4bins        = true;
 bool doInterpolation = false;
 TString channel      = "#mu#mu";     // #mu#mu or ee
-TString model        = "ZP";         // ZP or KK
+TString model        = "KK";         // ZP or KK
 TString mutype       = "3332st";     // or "33st" or "32st"
 TString binning      = "linearbins"; // or "powerbins"
 
-TString version      = (doGrid)         ? "v33/"    : "";
 TString basedir      = (doInterference) ? ""        : "nointerference/";
 TString interference = (doInterference) ? ""        : "_noInterference";
 TString overallEWkF  = (doInterference) ? ""        : "_noOverallEWkF";
@@ -37,16 +36,17 @@ TString dotruth      = (doTruth)        ? ""        : "_noTruth";
 TString gNbinning    = (dog4bins)       ? "_g4bins" : "_g2bins";
 TString KKtemplates  = (doKKtemplates)  ? ""        : "_noKKtmplates";
 TString officialZP   = (!doOfficialZP)  ? ""        : "_wthOfficialZP";
-TString gNbins       = (dog4bins)       ? "g4bins"  : "g2bins";
+TString gNNbins      = (dog4bins)       ? "g4bins"  : "g2bins";
 TString tsgN         = (dog4bins)       ? "g4"      : "g2";
 TString tsgNlabel    = (dog4bins)       ? "g^{4}"   : "g^{2}";
 
+TString version   = "";
 TString fpath     = "";
 TString sDir      = "";
 
-Double_t xmin = (dog4bins) ? g4min : g2min;
-Double_t xmax = (dog4bins) ? g4max : g2max; // TMath::Power(npowerbins*step,power);
-Int_t npx     = (dog4bins) ? 400 : 160;
+Double_t xmin = (dog4bins) ? gNmin : gNmin; // g4min : g2min;
+Double_t xmax = (dog4bins) ? gNmax : gNmax; // g4max : g2max; // TMath::Power(npowerbins*step,power);
+Int_t npx     = (dog4bins) ? 3200  : 3200;  // 162   : 162;     // 400   : 160;
 
 TFile* f2DTemplate;
 TObjArray* tobjarr;
@@ -66,14 +66,25 @@ enum template_types
 	PDF, EWKF, QCDKF, MMSLOPEFF, EEISOEFF, MMRES, EERES
 };
 
+void setGridVersion()
+{               
+	if(!doGrid) version = "";
+	else    
+	{       
+		if(dog4bins) version = "v59/";//"v52/";
+		else         version = "v57/";//"v55/";
+	}
+}
+
 void setFpath()
 {
 	if(channel=="#mu#mu")
 	{
-		sDir = "plots/"+basedir+binning+"/"+gNbins+"/"+mutype+"_nominal/"+version;
+		sDir = "plots/"+basedir+binning+"/"+gNNbins+"/"+mutype+"_nominal/"+version;
 		if(doGrid)
 		{
-			fpath = "_combined_"+version;
+			TString versionlabel = version.ReplaceAll("/","");
+			fpath = "_combined_"+versionlabel;
 		}
 		else
 		{
@@ -228,16 +239,18 @@ void TH1toTF1(TString mod, int mXX)
 	TDirectory* oldDir = gDirectory; // remember old directory
 	
 	
-	/////////////////
-	setFpath(); /////
-	style(); ////////
-	model = mod; ////
-	init(); /////////
-	/////////////////
+	/////////////////////
+	setGridVersion(); ///
+	setFpath(); /////////
+	style(); ////////////
+	model = mod; ////////
+	init(); /////////////
+	/////////////////////
 	
 	oldDir->cd();
 	
 	TString fname = sDir+model+"_"+mutype+"_functions";
+	fname += gNbinning;
 	fname += (!doInterpolation) ? "" : "_interpolated";
 	fname += (!doSinglePoint)   ? "" : "_mX_"+(TString)_s(mXX);
 	fname += "_npx"+(TString)_s(npx);
@@ -364,7 +377,7 @@ void TH1toTF1(TString mod, int mXX)
 			
 			oldDir->cd();
 			h2X = (TH2D*)((TH2D*)(TObjArray*)tobjarr_syst_EWkF->At(mX))->Clone();
-			TF1 *f = new TF1("fEWkF_mX"+mXname+"_mll"+mllname,fTH1toTF1,xmin,xmax,3);
+			TF1* f = new TF1("fEWkF_mX"+mXname+"_mll"+mllname,fTH1toTF1,xmin,xmax,3);
 			f->SetParameters(mX,mll,EWKF);
 			f->SetParNames("mX","mll","typ");
 			f->SetLineColor(kBlue);

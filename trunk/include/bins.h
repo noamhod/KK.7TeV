@@ -42,8 +42,25 @@ static void setLinBins(Int_t nbins, Double_t min, Double_t max, Double_t* xpoint
 	for(int i=1 ; i<=nbins ; i++) xpoints[i] = min+i*binwidth;
 }
 
+static void setgNbins(Int_t nbinslow, Int_t nbinshigh, Double_t min, Double_t mid, Double_t max, Double_t* xpoints)
+{
+	_DEBUG("setgNbins");
+	Double_t binwidthlow = (Double_t)((mid-min)/(Double_t)nbinslow);
+	Double_t binwidthhigh = (Double_t)((max-mid)/(Double_t)nbinshigh);
+	xpoints[0] = min;
+	for(int i=1 ; i<=nbinslow ; i++) xpoints[i] = min+i*binwidthlow;
+	for(int i=1 ; i<=nbinshigh ; i++) xpoints[i+nbinslow] = mid+i*binwidthhigh;
+}
+
 static const int bins2chop = 9; // h1 should start at ~128 GeV
 
+static const Int_t ngNbinslow   = 64;
+static const Int_t ngNbinshigh  = 98;
+static const Int_t ngNbinstotal = ngNbinslow+ngNbinshigh;
+static const Double_t gNmin = 0.;
+static const Double_t gNmid = 2.;
+static const Double_t gNmax = 100.;
+static Double_t gNbins[ngNbinstotal+1];
 
 static const Int_t npowerbins = 100;
 static const Double_t step    = 0.03;
@@ -55,12 +72,12 @@ static const double mXXmax = 5030.;
 static const double dmXX   = 100.;
 
 /*
-static const Int_t    ng4bins = 400;//200;
+static const Int_t    ng4bins = 400; //200;
 static const Double_t g4min   = 0.;
 static const Double_t g4max   = 50.;
 */
 
-static const Double_t g4shift = 0.;//1./16.;
+static const Double_t g4shift = 0.; // 1./16.;
 static const Int_t    ng4bins = 400;
 static const Double_t g4min   = 0.-g4shift;
 static const Double_t g4max   = 50.-g4shift;
@@ -263,7 +280,6 @@ const Double_t dymassbins[ndymassbins+1] =
 	75,120,250,400,600,800,1000,1250,1500,1750,2000,2200
 };
 TH1* hDYbins = new TH1("hDYbins","hDYbins",ndymassbins,dymassbins);				
-
 
 static const Double_t etax    = 1.05;
 static const Double_t ystarlow  = 0.6;

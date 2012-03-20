@@ -6,7 +6,7 @@
 TString model  = "ZP";
 TString mutype = "3332st";
 TString binning = "linearbins";
-TString gNbinning = "g2bins";
+TString gNbinning = "g4bins";
 bool doGrid = false;
 TString version = (doGrid) ? "v19" : "";
 
@@ -103,11 +103,16 @@ void normtest()
 	
 	Double_t sumDYmm = 0.;
 	for(Int_t bin=minMbin ; bin<=maxMbin ; bin++) sumDYmm += (h1dy->GetBinContent(bin));
-	 
-	TString infName = "plots/linearbins/g2bins/3332st_nominal/ZP_2dtemplates_mc11c_3332st_g2bins_noKKtmplates_noTruth_Xmass1030.root";
+	
+	// TString infName = "plots/linearbins/"+gNbinning+"/3332st_nominal/ZP_2dtemplates_mc11c_3332st_"+gNbinning+"_noKKtmplates_noTruth_Xmass1030.root";
+	// TFile* fT = new TFile(infName,"READ");
+	// TObjArray* toartmp = new TObjArray();
+	// toartmp->Read("template2d");
+	
+	TString infName = "/data/hod/2011/grid/3332st/162bins/g2.nominal.v57/template_nominal_3030GeV_v57.root";
 	TFile* fT = new TFile(infName,"READ");
 	TObjArray* toartmp = new TObjArray();
-	toartmp->Read("template2d");
+	toartmp->Read("template2dKK");
 	TH2D* h2T = (TH2D*)((TH2D*)(TObjArray*)toartmp->At(0))->Clone();
 	for(Int_t bin=1 ; bin<=h1template->GetNbinsX() ; bin++)
 	{

@@ -28,9 +28,10 @@ Double_t singleMass = -1.;
 ///////////////////////////////////////
 bool doGrid             = false;
 bool isMC11c            = true;
+bool isMuons            = true;    // false for electrons
 bool doSigmaUp          = false;
-bool dog2               = true;
-bool dog4               = false;
+bool dog2               = false;
+bool dog4               = true;
 bool do33st             = true;
 bool do32st             = true;
 bool doSmearing         = true;     // false is simply the old selection (before 3+3 / 3+2) -> should not be changed  !
@@ -40,41 +41,67 @@ bool dopileup           = true;
 bool doOverallEWkfactor = true;
 bool doQCDkfactor       = true;
 bool doZpT              = true;
-bool doRemoveHighMass   = false;
+bool doEEtrigSF         = true;
 bool doTruth            = false;
 bool doOfficialZP       = false;
 bool doSingleMass       = false;
 bool doInterference     = false;
 bool doFixedwidth       = false;
 bool doTreeLevel        = true; // relevant for truth only
-TString tsgN      = (dog4) ? "g4" : "g2";
-TString tsgNlabel = (dog4) ? "g^{4}" : "g^{2}";
-void matchFlags()
+
+// TString channel   = (isMuons) ? "mm"     : "ee";
+// TString chlabel   = (isMuons) ? "#mu#mu" : "ee";
+// TString tsgN      = (dog4)    ? "g4"     : "g2";
+// TString tsgNlabel = (dog4)    ? "g^{4}"  : "g^{2}";
+TString channel   = "";
+TString chlabel   = "";
+TString tsgN      = "";
+TString tsgNlabel = "";
+
+void matchFlags(TString channelName="mm", TString gPower="g2", Bool_t doSigUp=0)
 {
 	doOverallEWkfactor = doInterference;
+	
+	if(channelName=="mm")      isMuons = true;
+	else if(channelName=="ee") isMuons = false;
+	
+	if(gPower=="g2")      { dog2 = true;  dog4 = false; }
+	else if(gPower=="g4") { dog2 = false; dog4 = true;  }
+	
+	if(doSigUp && isMuons)       doSigmaUp = true;
+	else if(!doSigUp && isMuons) doSigmaUp = false;
+	
+	channel   = (isMuons) ? "mumu"   : "ee";
+	chlabel   = (isMuons) ? "#mu#mu" : "ee";
+	tsgN      = (dog4)    ? "g4"     : "g2";
+	tsgNlabel = (dog4)    ? "g^{4}"  : "g^{2}";
 }
+
 TString fileNmaeSuffix()
 {
 	TString name = "";
 	if(isMC11c)              name += "_mc11c";
 	if(!isMC11c)             name += "_mc11a";
-	if     (do32st && !do33st)name += "_32st";
-	else if(do33st && !do32st)name += "_33st";
-	else if(do33st && do32st)name += "_3332st";
-	else                     _FATAL("must choose 3+3 / 3+2 or both");
+	if(isMuons)
+	{
+		if     (do32st && !do33st) name += "_32st";
+		else if(do33st && !do32st) name += "_33st";
+		else if(do33st && do32st)  name += "_3332st";
+		else                       _FATAL("must choose 3+3 / 3+2 or both");
+	}
+	else                     name += "_ee";
 	if(dog2)                 name += "_g2bins";
 	else if(dog4)            name += "_g4bins";
 	else                     _FATAL("either g4 or g2 bins");
 	if(!doInterference)      name += "_noInterference";
 	if(!doFullKKtemplates)   name += "_noKKtmplates";
 	if(!doFullZPtemplates)   name += "_noZPtmplates";
-	if(doSigmaUp)            name += "_SmrSigUp";
+	if(doSigmaUp && isMuons) name += "_SmrSigUp";
 	if(!dopileup)            name += "_noPUrw";
-	if(!doOverallEWkfactor)  name += "_noOverallEWkF";
 	if(!doOverallEWkfactor)  name += "_noEWkF";
 	if(!doQCDkfactor)        name += "_noQCDkF";
 	if(!doZpT)               name += "_noZpTrw";
-	if(doRemoveHighMass)     name += "_noHighMbins";
+	if(!isMuons && !doEEtrigSF) name += "_noEEtrigSF";
 	if(!doTruth)             name += "_noTruth";
 	if(doOfficialZP)         name += "_wthOfficialZP";
 	if(doFixedwidth)         name += "_fixedBWwidth";
@@ -96,8 +123,8 @@ double nZpeakNoPU = 0.;
 
 double       gNshift = (dog4) ? g4shift : g2shift;
 unsigned int ngNbins = (dog4) ? ng4bins : ng2bins;
-double       gNmin = (dog4) ? g4min : g2min;
-double       gNmax = (dog4) ? g4max : g2max;
+double       gNNmin  = (dog4) ? g4min   : g2min;
+double       gNNmax  = (dog4) ? g4max   : g2max;
 
 double gNXXmin = (dog4) ? (double)(g4min+g4shift) : (double)(g2min+g2shift);
 double gNXXmax = (dog4) ? (double)(g4max+g4shift) : (double)(g2max+g2shift);
@@ -148,19 +175,19 @@ TVector3*       tv3a   = new TVector3;
 TVector3*       tv3b   = new TVector3;
 TVector3*       tv3mu  = new TVector3;
 
-TLorentzVector* tlvmutreelevel = new TLorentzVector;
-TLorentzVector* tlvmutrua = new TLorentzVector;
-TLorentzVector* tlvmutrub = new TLorentzVector;
-TLorentzVector* tlvmureca = new TLorentzVector;
-TLorentzVector* tlvmurecb = new TLorentzVector;
+TLorentzVector* tlvleptontreelevel = new TLorentzVector;
+TLorentzVector* tlvleptontrua = new TLorentzVector;
+TLorentzVector* tlvleptontrub = new TLorentzVector;
+TLorentzVector* tlvleptonreca = new TLorentzVector;
+TLorentzVector* tlvleptonrecb = new TLorentzVector;
 TLorentzVector* tlvqa  = new TLorentzVector;
 TLorentzVector* tlvqb  = new TLorentzVector;
 
-TLorentzVector* tlvmutreelevelBoosted = new TLorentzVector;
-TLorentzVector* tlvmutruaBoosted = new TLorentzVector;
-TLorentzVector* tlvmutrubBoosted = new TLorentzVector;
-TLorentzVector* tlvmurecaBoosted = new TLorentzVector;
-TLorentzVector* tlvmurecbBoosted = new TLorentzVector;
+TLorentzVector* tlvleptontreelevelBoosted = new TLorentzVector;
+TLorentzVector* tlvleptontruaBoosted = new TLorentzVector;
+TLorentzVector* tlvleptontrubBoosted = new TLorentzVector;
+TLorentzVector* tlvleptonrecaBoosted = new TLorentzVector;
+TLorentzVector* tlvleptonrecbBoosted = new TLorentzVector;
 TLorentzVector* tlvqaBoosted  = new TLorentzVector;
 TLorentzVector* tlvqbBoosted  = new TLorentzVector;
 
@@ -189,9 +216,10 @@ unsigned int all_mc_channel_number;
 unsigned int all_mc_event_number;
 double all_mc_event_weight;
 
-int   all_RunNumber;
+// int   all_RunNumber;
 float all_pileup_weight;
 float all_mcevent_weight;
+float all_eeTriggerSF; // ELECTRONS ONLY
 // float all_intime_pileup_weight;
 // float all_outoftime_pileup_weight;
 // float all_lumi_pileup_weight;
@@ -297,8 +325,10 @@ void setMCtree(TString fPath, TString name, Double_t N, Double_t sigma)
 	// treeTmp->SetEventList(0);
 	// delete treeTmp;
 	
-	treMap.insert( make_pair(name, (TTree*)file->Get("truth/truth_tree")->Clone("")) );
-	flatLumiWgtMap.insert( make_pair(name, luminosity/(N/sigma)) );
+	if(isMuons) treMap.insert( make_pair(name, (TTree*)file->Get("truth/truth_tree")->Clone("")) );
+	else        treMap.insert( make_pair(name, (TTree*)file->Get("MyTree")->Clone("")) );
+	double datalumi = (isMuons) ? mmluminosity : eeluminosity;
+	flatLumiWgtMap.insert( make_pair(name, datalumi/(N/sigma)) );
 	mcNeventsMap.insert( make_pair(name, N) );
 	mcSigmaMap.insert( make_pair(name, sigma) );
 	pathMap.insert( make_pair(name, fPath) );
@@ -319,25 +349,32 @@ void samples()
 				 Color_t mc, Int_t mst, Int_t mss,
 				 )*/
 	int counter = 0;
-	grpx.insert( make_pair("DYmumu",   new GRPX(counter,"#gamma/Z",      kAzure+8,-1,   kBlack,1,1,  -1,-1,-1)));
-	grpx_ordered.insert( make_pair(grpx["DYmumu"]->order,"DYmumu") );
+	grpx.insert( make_pair("DY"+channel,   new GRPX(counter,"#gamma/Z",      kAzure+8,-1,   kBlack,1,1,  -1,-1,-1)));
+	grpx_ordered.insert( make_pair(grpx["DY"+channel]->order,"DY"+channel) );
 	
 	if(doOfficialZP)
 	{
 		counter = 100;
-		grpx.insert( make_pair("Zprime_SSM1000",  new GRPX(counter,"1000 GeV Z'_{SSM}",  kAzure+0,-1,    kBlack,1,1,  -1,-1,-1)));
-		grpx_ordered.insert( make_pair(grpx["Zprime_SSM1000"]->order,"Zprime_SSM1000") );
-		if(isMC11c)
+		if(isMuons)
 		{
-			grpx.insert( make_pair("Zprime_SSM1250",  new GRPX(proccount(counter),"1250 GeV Z'_{SSM}",  kAzure-2,-1,  kBlack,1,1,  -1,-1,-1)));
-			grpx_ordered.insert( make_pair(grpx["Zprime_SSM1250"]->order,"Zprime_SSM1250") );
+			grpx.insert( make_pair("Zprime_SSM1000",  new GRPX(counter,"1000 GeV Z'_{SSM}",  kAzure+0,-1,    kBlack,1,1,  -1,-1,-1)));
+			grpx_ordered.insert( make_pair(grpx["Zprime_SSM1000"]->order,"Zprime_SSM1000") );
+			if(isMC11c)
+			{
+				grpx.insert( make_pair("Zprime_SSM1250",  new GRPX(proccount(counter),"1250 GeV Z'_{SSM}",  kAzure-2,-1,  kBlack,1,1,  -1,-1,-1)));
+				grpx_ordered.insert( make_pair(grpx["Zprime_SSM1250"]->order,"Zprime_SSM1250") );
+			}
+			grpx.insert( make_pair("Zprime_SSM1500",  new GRPX(proccount(counter),"1500 GeV Z'_{SSM}",  kAzure-2,-1,  kBlack,1,1,  -1,-1,-1)));
+			grpx_ordered.insert( make_pair(grpx["Zprime_SSM1500"]->order,"Zprime_SSM1500") );
+			grpx.insert( make_pair("Zprime_SSM1750",  new GRPX(proccount(counter),"1750 GeV Z'_{SSM}",  kAzure-2,-1,  kBlack,1,1,  -1,-1,-1)));
+			grpx_ordered.insert( make_pair(grpx["Zprime_SSM1750"]->order,"Zprime_SSM1750") );
+			grpx.insert( make_pair("Zprime_SSM2000",  new GRPX(proccount(counter),"2000 GeV Z'_{SSM}",  kAzure-3,-1,  kBlack,1,1,  -1,-1,-1)));
+			grpx_ordered.insert( make_pair(grpx["Zprime_SSM2000"]->order,"Zprime_SSM2000") );
 		}
-		grpx.insert( make_pair("Zprime_SSM1500",  new GRPX(proccount(counter),"1500 GeV Z'_{SSM}",  kAzure-2,-1,  kBlack,1,1,  -1,-1,-1)));
-		grpx_ordered.insert( make_pair(grpx["Zprime_SSM1500"]->order,"Zprime_SSM1500") );
-		grpx.insert( make_pair("Zprime_SSM1750",  new GRPX(proccount(counter),"1750 GeV Z'_{SSM}",  kAzure-2,-1,  kBlack,1,1,  -1,-1,-1)));
-		grpx_ordered.insert( make_pair(grpx["Zprime_SSM1750"]->order,"Zprime_SSM1750") );
-		grpx.insert( make_pair("Zprime_SSM2000",  new GRPX(proccount(counter),"2000 GeV Z'_{SSM}",  kAzure-3,-1,  kBlack,1,1,  -1,-1,-1)));
-		grpx_ordered.insert( make_pair(grpx["Zprime_SSM2000"]->order,"Zprime_SSM2000") );
+		else
+		{
+			_INFO("not yet implemented the official Z'->ee");
+		}
 	}
 }
 
@@ -430,22 +467,42 @@ void setMCtrees(TString tsMCname)
 		{
 			_INFO("setting file -> "+(string)vnames[n]);
 
-			if(vnames[n].Contains("75M120"))    { name="mcLocalControl_Pythia6_DYmumu_75M120";    N=99999;  sigma=7.9836E-01*nb2fb; }
-			if(vnames[n].Contains("120M250"))   { name="mcLocalControl_Pythia6_DYmumu_120M250";   N=99949;  sigma=8.5304E-03*nb2fb; }
-			if(vnames[n].Contains("250M400"))   { name="mcLocalControl_Pythia6_DYmumu_250M400";   N=100000; sigma=4.1004E-04*nb2fb; }
-			if(vnames[n].Contains("400M600"))   { name="mcLocalControl_Pythia6_DYmumu_400M600";   N=100000; sigma=6.6393E-05*nb2fb; }
-			if(vnames[n].Contains("600M800"))   { name="mcLocalControl_Pythia6_DYmumu_600M800";   N=99900;  sigma=1.0955E-05*nb2fb; }
-			if(vnames[n].Contains("800M1000"))  { name="mcLocalControl_Pythia6_DYmumu_800M1000";  N=99999;  sigma=2.6470E-06*nb2fb; }
-			if(vnames[n].Contains("1000M1250")) { name="mcLocalControl_Pythia6_DYmumu_1000M1250"; N=100000; sigma=8.9015E-07*nb2fb; }
-			if(vnames[n].Contains("1250M1500")) { name="mcLocalControl_Pythia6_DYmumu_1250M1500"; N=99999;  sigma=2.3922E-07*nb2fb; }
-			if(vnames[n].Contains("1500M1750")) { name="mcLocalControl_Pythia6_DYmumu_1500M1750"; N=99999;  sigma=7.3439E-08*nb2fb; }
-			if(vnames[n].Contains("1750M2000")) { name="mcLocalControl_Pythia6_DYmumu_1750M2000"; N=100000; sigma=2.4643E-08*nb2fb; }
-			if(vnames[n].Contains("2000M2250")) { name="mcLocalControl_Pythia6_DYmumu_2000M2250"; N=100000; sigma=8.7619E-09*nb2fb; }
-			if(vnames[n].Contains("2250M2500")) { name="mcLocalControl_Pythia6_DYmumu_2250M2500"; N=99950;  sigma=3.2232E-09*nb2fb; }
-			if(vnames[n].Contains("2500M2750")) { name="mcLocalControl_Pythia6_DYmumu_2500M2750"; N=99000;  sigma=1.2073E-09*nb2fb; }
-			if(vnames[n].Contains("2750M3000")) { name="mcLocalControl_Pythia6_DYmumu_2750M3000"; N=99999;  sigma=4.4763E-10*nb2fb; }
-			if(vnames[n].Contains("M3000"))     { name="mcLocalControl_Pythia6_DYmumu_M3000";     N=100000; sigma=2.5586E-10*nb2fb; }
-
+			if(isMuons)
+			{
+				if(vnames[n].Contains("75M120"))    { name="mcLocalControl_Pythia6_DYmumu_75M120";    N=99999;  sigma=7.9836E-01*nb2fb; }
+				if(vnames[n].Contains("120M250"))   { name="mcLocalControl_Pythia6_DYmumu_120M250";   N=99949;  sigma=8.5304E-03*nb2fb; }
+				if(vnames[n].Contains("250M400"))   { name="mcLocalControl_Pythia6_DYmumu_250M400";   N=100000; sigma=4.1004E-04*nb2fb; }
+				if(vnames[n].Contains("400M600"))   { name="mcLocalControl_Pythia6_DYmumu_400M600";   N=100000; sigma=6.6393E-05*nb2fb; }
+				if(vnames[n].Contains("600M800"))   { name="mcLocalControl_Pythia6_DYmumu_600M800";   N=99900;  sigma=1.0955E-05*nb2fb; }
+				if(vnames[n].Contains("800M1000"))  { name="mcLocalControl_Pythia6_DYmumu_800M1000";  N=99999;  sigma=2.6470E-06*nb2fb; }
+				if(vnames[n].Contains("1000M1250")) { name="mcLocalControl_Pythia6_DYmumu_1000M1250"; N=100000; sigma=8.9015E-07*nb2fb; }
+				if(vnames[n].Contains("1250M1500")) { name="mcLocalControl_Pythia6_DYmumu_1250M1500"; N=99999;  sigma=2.3922E-07*nb2fb; }
+				if(vnames[n].Contains("1500M1750")) { name="mcLocalControl_Pythia6_DYmumu_1500M1750"; N=99999;  sigma=7.3439E-08*nb2fb; }
+				if(vnames[n].Contains("1750M2000")) { name="mcLocalControl_Pythia6_DYmumu_1750M2000"; N=100000; sigma=2.4643E-08*nb2fb; }
+				if(vnames[n].Contains("2000M2250")) { name="mcLocalControl_Pythia6_DYmumu_2000M2250"; N=100000; sigma=8.7619E-09*nb2fb; }
+				if(vnames[n].Contains("2250M2500")) { name="mcLocalControl_Pythia6_DYmumu_2250M2500"; N=99950;  sigma=3.2232E-09*nb2fb; }
+				if(vnames[n].Contains("2500M2750")) { name="mcLocalControl_Pythia6_DYmumu_2500M2750"; N=99000;  sigma=1.2073E-09*nb2fb; }
+				if(vnames[n].Contains("2750M3000")) { name="mcLocalControl_Pythia6_DYmumu_2750M3000"; N=99999;  sigma=4.4763E-10*nb2fb; }
+				if(vnames[n].Contains("M3000"))     { name="mcLocalControl_Pythia6_DYmumu_M3000";     N=100000; sigma=2.5586E-10*nb2fb; }
+			}
+			else
+			{
+				if(vnames[n].Contains("75M120"))    { name="mcLocalControl_Pythia6_DYee_75M120";    N=100000; sigma=7.9837E-01*nb2fb; }
+				if(vnames[n].Contains("120M250"))   { name="mcLocalControl_Pythia6_DYee_120M250";   N=100000; sigma=8.5207E-03*nb2fb; }
+				if(vnames[n].Contains("250M400"))   { name="mcLocalControl_Pythia6_DYee_250M400";   N=100000; sigma=4.1004E-04*nb2fb; }
+				if(vnames[n].Contains("400M600"))   { name="mcLocalControl_Pythia6_DYee_400M600";   N=99999;  sigma=6.6397E-05*nb2fb; }
+				if(vnames[n].Contains("600M800"))   { name="mcLocalControl_Pythia6_DYee_600M800";   N=100000; sigma=1.0959E-05*nb2fb; }
+				if(vnames[n].Contains("800M1000"))  { name="mcLocalControl_Pythia6_DYee_800M1000";  N=99999;  sigma=2.6468E-06*nb2fb; }
+				if(vnames[n].Contains("1000M1250")) { name="mcLocalControl_Pythia6_DYee_1000M1250"; N=99998;  sigma=8.9030E-07*nb2fb; }
+				if(vnames[n].Contains("1250M1500")) { name="mcLocalControl_Pythia6_DYee_1250M1500"; N=99997;  sigma=2.3922E-07*nb2fb; }
+				if(vnames[n].Contains("1500M1750")) { name="mcLocalControl_Pythia6_DYee_1500M1750"; N=99998;  sigma=7.3439E-08*nb2fb; }
+				if(vnames[n].Contains("1750M2000")) { name="mcLocalControl_Pythia6_DYee_1750M2000"; N=99996;  sigma=2.4643E-08*nb2fb; }
+				if(vnames[n].Contains("2000M2250")) { name="mcLocalControl_Pythia6_DYee_2000M2250"; N=99997;  sigma=8.7619E-09*nb2fb; }
+				if(vnames[n].Contains("2250M2500")) { name="mcLocalControl_Pythia6_DYee_2250M2500"; N=99993;  sigma=3.2232E-09*nb2fb; }
+				if(vnames[n].Contains("2500M2750")) { name="mcLocalControl_Pythia6_DYee_2500M2750"; N=99994;  sigma=1.2073E-09*nb2fb; }
+				if(vnames[n].Contains("2750M3000")) { name="mcLocalControl_Pythia6_DYee_2750M3000"; N=99995;  sigma=4.4770E-10*nb2fb; }
+				if(vnames[n].Contains("M3000"))     { name="mcLocalControl_Pythia6_DYee_M3000";     N=99994;  sigma=2.5586E-10*nb2fb; }
+			}
 			TString filename = vnames[n];
 
 			///////////////////////////////////////
@@ -464,21 +521,28 @@ void setMCtrees(TString tsMCname)
 	////////////////////////////////////////////////////////////////// 
 	ntupledir = ntupledir_regular;
 
-        TString sNMst = "";
-        sNMst += (do33st && !do32st) ? "_33st" : "";
-        sNMst += (do32st && !do33st) ? "_32st" : "";
-        sNMst += (do32st && do33st)  ? "_3332st" : "";
-
-        TString sSMR = "";
-        sSMR += (doSmearing) ? "_smeared" : "";
-
-        TString sSIGUP = "";
-        sSIGUP += (doSigmaUp) ? "_sigmaUp" : "";
-
-        //////////////////////////////////////////////
-        TString filesuffix = sNMst+sSMR+sSIGUP; //////
-        //////////////////////////////////////////////
-
+	TString sNMst = "";
+	if(isMuons)
+	{
+		sNMst += (do33st && !do32st) ? "_33st" : "";
+		sNMst += (do32st && !do33st) ? "_32st" : "";
+		sNMst += (do32st && do33st)  ? "_3332st" : "";
+	}
+	else
+	{
+		sNMst += "";
+	}
+	
+	TString sSMR = "";
+	sSMR += (doSmearing && isMuons) ? "_smeared" : "";
+	
+	TString sSIGUP = "";
+	sSIGUP += (doSigmaUp && isMuons) ? "_sigmaUp" : "";
+	
+	//////////////////////////////////////////////
+	TString filesuffix = sNMst+sSMR+sSIGUP; //////
+	//////////////////////////////////////////////
+	
 	if(tsMCname=="DYmumu")
 	{
 		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_75M120"+filesuffix+".root",    "mcLocalControl_Pythia6_DYmumu_75M120",    99999,  7.9836E-01*nb2fb);
@@ -495,30 +559,55 @@ void setMCtrees(TString tsMCname)
 		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2250M2500"+filesuffix+".root", "mcLocalControl_Pythia6_DYmumu_2250M2500", 99950,  3.2232E-09*nb2fb);
 		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2500M2750"+filesuffix+".root", "mcLocalControl_Pythia6_DYmumu_2500M2750", 99000,  1.2073E-09*nb2fb);
 		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_2750M3000"+filesuffix+".root", "mcLocalControl_Pythia6_DYmumu_2750M3000", 99999,  4.4763E-10*nb2fb);
-		if(!doRemoveHighMass) setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_M3000"+filesuffix+".root", "mcLocalControl_Pythia6_DYmumu_M3000", 100000, 2.5586E-10*nb2fb); // this is taken out because the EW k-factors are valid only below 3 TeV
+		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYmumu_M3000"+filesuffix+".root",     "mcLocalControl_Pythia6_DYmumu_M3000",     100000, 2.5586E-10*nb2fb);
+	}
+	else if(tsMCname=="DYee")
+	{
+		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYee_75M120"+filesuffix+".root",    "mcLocalControl_Pythia6_DYee_75M120",    100000, 7.9837E-01*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYee_120M250"+filesuffix+".root",   "mcLocalControl_Pythia6_DYee_120M250",   100000, 8.5207E-03*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYee_250M400"+filesuffix+".root",   "mcLocalControl_Pythia6_DYee_250M400",   100000, 4.1004E-04*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYee_400M600"+filesuffix+".root",   "mcLocalControl_Pythia6_DYee_400M600",   99999 , 6.6397E-05*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYee_600M800"+filesuffix+".root",   "mcLocalControl_Pythia6_DYee_600M800",   100000, 1.0959E-05*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYee_800M1000"+filesuffix+".root",  "mcLocalControl_Pythia6_DYee_800M1000",  99999,  2.6468E-06*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYee_1000M1250"+filesuffix+".root", "mcLocalControl_Pythia6_DYee_1000M1250", 99998,  8.9030E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYee_1250M1500"+filesuffix+".root", "mcLocalControl_Pythia6_DYee_1250M1500", 99997,  2.3922E-07*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYee_1500M1750"+filesuffix+".root", "mcLocalControl_Pythia6_DYee_1500M1750", 99998,  7.3439E-08*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYee_1750M2000"+filesuffix+".root", "mcLocalControl_Pythia6_DYee_1750M2000", 99996,  2.4643E-08*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYee_2000M2250"+filesuffix+".root", "mcLocalControl_Pythia6_DYee_2000M2250", 99997,  8.7619E-09*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYee_2250M2500"+filesuffix+".root", "mcLocalControl_Pythia6_DYee_2250M2500", 99993,  3.2232E-09*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYee_2500M2750"+filesuffix+".root", "mcLocalControl_Pythia6_DYee_2500M2750", 99994,  1.2073E-09*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYee_2750M3000"+filesuffix+".root", "mcLocalControl_Pythia6_DYee_2750M3000", 99995,  4.4770E-10*nb2fb);
+		setMCtree(ntupledir+"/mcLocalControl_Pythia6_DYee_M3000"+filesuffix+".root",     "mcLocalControl_Pythia6_DYee_M3000",     99994,  2.5586E-10*nb2fb);
 	}
 	
 	if(doOfficialZP)
 	{
-		if(tsMCname=="Zprime_SSM1000")
+		if(isMuons)
 		{
-			setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1000"+filesuffix+".root", "mcLocalControl_Zprime_SSM1000", 20000, 1.2466E-04*nb2fb);
+			if(tsMCname=="Zprime_SSM1000")
+			{
+				setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1000"+filesuffix+".root", "mcLocalControl_Zprime_SSM1000", 20000, 1.2466E-04*nb2fb);
+			}
+			if(tsMCname=="Zprime_SSM1250" && isMC11c)
+			{
+				setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1250"+filesuffix+".root", "mcLocalControl_Zprime_SSM1250", 20000, 3.9887E-05*nb2fb);
+			}
+			if(tsMCname=="Zprime_SSM1500")
+			{
+				setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1500"+filesuffix+".root", "mcLocalControl_Zprime_SSM1500", 20000, 1.4380E-05*nb2fb);
+			}
+			if(tsMCname=="Zprime_SSM1750")
+			{
+				setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1750"+filesuffix+".root", "mcLocalControl_Zprime_SSM1750", 20000, 5.6743E-06*nb2fb);
+			}
+			if(tsMCname=="Zprime_SSM2000")
+			{
+				setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM2000"+filesuffix+".root", "mcLocalControl_Zprime_SSM2000", 20000, 2.4357E-06*nb2fb);
+			}
 		}
-		if(tsMCname=="Zprime_SSM1250" && isMC11c)
+		else
 		{
-			setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1250"+filesuffix+".root", "mcLocalControl_Zprime_SSM1250", 20000, 3.9887E-05*nb2fb);
-		}
-		if(tsMCname=="Zprime_SSM1500")
-		{
-			setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1500"+filesuffix+".root", "mcLocalControl_Zprime_SSM1500", 20000, 1.4380E-05*nb2fb);
-		}
-		if(tsMCname=="Zprime_SSM1750")
-		{
-			setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM1750"+filesuffix+".root", "mcLocalControl_Zprime_SSM1750", 20000, 5.6743E-06*nb2fb);
-		}
-		if(tsMCname=="Zprime_SSM2000")
-		{
-			setMCtree(ntupledir+"/mcLocalControl_Zprime_mumu_SSM2000"+filesuffix+".root", "mcLocalControl_Zprime_SSM2000", 20000, 2.4357E-06*nb2fb);
+			_INFO("not yet implemented the official Z'->ee");
 		}
 	}
 }
@@ -580,9 +669,10 @@ void setMCbranches()
 	// tree->SetBranchAddress( "all_mc_event_number",   &all_mc_event_number );
 	// tree->SetBranchAddress( "all_mc_event_weight",   &all_mc_event_weight );
 	
-	tree->SetBranchAddress( "all_RunNumber",         &all_RunNumber );
+	// tree->SetBranchAddress( "all_RunNumber",         &all_RunNumber );
 	tree->SetBranchAddress( "all_mcevent_weight",     &all_mcevent_weight );
 	tree->SetBranchAddress( "all_pileup_weight",      &all_pileup_weight );
+	if(!isMuons) tree->SetBranchAddress( "all_eeTriggerSF", &all_eeTriggerSF );
 	// tree->SetBranchAddress( "all_intime_pileup_weight",    &all_intime_pileup_weight );
 	// tree->SetBranchAddress( "all_outoftime_pileup_weight", &all_outoftime_pileup_weight );
 	// tree->SetBranchAddress( "all_lumi_pileup_weight", &all_lumi_pileup_weight );
@@ -663,7 +753,8 @@ float getFlatLumiWeight(TString mcName)
 	float N     = mcNeventsMap[mcName];
 	float sigma = mcSigmaMap[mcName];
 	float Lmc   = N/sigma;
-	return luminosity/Lmc;
+	double datalumi = (isMuons) ? mmluminosity : eeluminosity;
+	return datalumi/Lmc;
 }
 
 void hbook()
@@ -683,6 +774,7 @@ void hbook()
 	setSqrtBins(nsqrtofficialqtbins, sqrtofficialqtmin, sqrtofficialqtmax, sqrtofficialqtbins);
 	setSqrtBins(nsqrtg4bins, sqrtg4min, sqrtg4max, sqrtg4bins);
 	setPowerBins(npowerbins,step,power,powerbins);
+	setgNbins(ngNbinslow,ngNbinshigh,gNNmin,gNmid,gNNmax,gNbins);
 	
 	//// KK/ZP templates for the limit
 	for(double M=mXXmin ; M<=mXXmax ; M+=dmXX)
@@ -695,24 +787,24 @@ void hbook()
 		
 		if(doFullKKtemplates)
 		{
-			h1Map.insert( make_pair("hMass_template_KK"+massName, new TH1D("hMass_template_KK"+massName, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-			if(doTruth) h1Map.insert( make_pair("hMass_truth_template_KK"+massName, new TH1D("hMass_truth_template_KK"+massName, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+			h1Map.insert( make_pair("hMass_template_KK"+massName, new TH1D("hMass_template_KK"+massName, chlabel+" mass;m_{"+chlabel+"} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+			if(doTruth) h1Map.insert( make_pair("hMass_truth_template_KK"+massName, new TH1D("hMass_truth_template_KK"+massName, chlabel+" mass;m_{"+chlabel+"} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 			
-			h2Map.insert( make_pair("h"+tsgN+"Mass_template_KK"+massName, new TH2D("h"+tsgN+"Mass_template_KK"+massName, "#mu#mu mass vs. "+tsgNlabel+";m_{#mu#mu} TeV;"+tsgNlabel+";Events", nloglimitimassbins,loglimitimassbins, ngNbins,gNmin,gNmax /*npowerbins,powerbins*/) ) );
+			h2Map.insert( make_pair("h"+tsgN+"Mass_template_KK"+massName, new TH2D("h"+tsgN+"Mass_template_KK"+massName, chlabel+" mass vs. "+tsgNlabel+";m_{"+chlabel+"} TeV;"+tsgNlabel+";Events", nloglimitimassbins,loglimitimassbins, ngNbinstotal,gNbins /*ngNbins,gNNmin,gNNmax*/ /*npowerbins,powerbins*/) ) );
 			if(doTruth)
 			{
-				h2Map.insert( make_pair("h"+tsgN+"Mass_truth_template_KK"+massName, new TH2D("h"+tsgN+"Mass_truth_template_KK"+massName, "#mu#mu mass vs. "+tsgNlabel+";m_{#mu#mu} TeV;g^{4};Events", nloglimitimassbins,loglimitimassbins, ngNbins,gNmin,gNmax /*npowerbins,powerbins*/) ) );
+				h2Map.insert( make_pair("h"+tsgN+"Mass_truth_template_KK"+massName, new TH2D("h"+tsgN+"Mass_truth_template_KK"+massName, chlabel+" mass vs. "+tsgNlabel+";m_{"+chlabel+"} TeV;g^{4};Events", nloglimitimassbins,loglimitimassbins, ngNbinstotal,gNbins /*ngNbins,gNNmin,gNNmax*/ /*npowerbins,powerbins*/) ) );
 			}
 		}
 		if(doFullZPtemplates)
 		{
-			h1Map.insert( make_pair("hMass_template_Zprime_SSM"+massName, new TH1D("hMass_template_Zprime_SSM"+massName, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-			if(doTruth) h1Map.insert( make_pair("hMass_truth_template_Zprime_SSM"+massName, new TH1D("hMass_truth_template_Zprime_SSM"+massName, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+			h1Map.insert( make_pair("hMass_template_Zprime_SSM"+massName, new TH1D("hMass_template_Zprime_SSM"+massName, chlabel+" mass;m_{"+chlabel+"} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+			if(doTruth) h1Map.insert( make_pair("hMass_truth_template_Zprime_SSM"+massName, new TH1D("hMass_truth_template_Zprime_SSM"+massName, chlabel+" mass;m_{"+chlabel+"} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 			
-			h2Map.insert( make_pair("h"+tsgN+"Mass_template_Zprime_SSM"+massName, new TH2D("h"+tsgN+"Mass_template_Zprime_SSM"+massName, "#mu#mu mass vs. "+tsgNlabel+";m_{#mu#mu} TeV;"+tsgNlabel+";Events", nloglimitimassbins,loglimitimassbins, ngNbins,gNmin,gNmax /*npowerbins,powerbins*/) ) );
+			h2Map.insert( make_pair("h"+tsgN+"Mass_template_Zprime_SSM"+massName, new TH2D("h"+tsgN+"Mass_template_Zprime_SSM"+massName, chlabel+" mass vs. "+tsgNlabel+";m_{"+chlabel+"} TeV;"+tsgNlabel+";Events", nloglimitimassbins,loglimitimassbins, ngNbinstotal,gNbins /*ngNbins,gNNmin,gNNmax*/ /*npowerbins,powerbins*/) ) );
 			if(doTruth)
 			{
-				h2Map.insert( make_pair("h"+tsgN+"Mass_truth_template_Zprime_SSM"+massName, new TH2D("h"+tsgN+"Mass_truth_template_Zprime_SSM"+massName, "#mu#mu mass vs. "+tsgNlabel+";m_{#mu#mu} TeV;"+tsgNlabel+";Events", nloglimitimassbins,loglimitimassbins, ngNbins,gNmin,gNmax /*npowerbins,powerbins*/) ) );
+				h2Map.insert( make_pair("h"+tsgN+"Mass_truth_template_Zprime_SSM"+massName, new TH2D("h"+tsgN+"Mass_truth_template_Zprime_SSM"+massName, chlabel+" mass vs. "+tsgNlabel+";m_{"+chlabel+"} TeV;"+tsgNlabel+";Events", nloglimitimassbins,loglimitimassbins, ngNbinstotal,gNbins /*ngNbins,gNNmin,gNNmax*/ /*npowerbins,powerbins*/) ) );
 			}
 		}
 		
@@ -726,11 +818,11 @@ void hbook()
 	{
 		TString name = it->first;
 
-		h1Map.insert( make_pair("hMass_"+name, new TH1D("hMass_"+name, "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		if(doTruth) h1Map.insert( make_pair("hMass_"+name+"_truth", new TH1D("hMass_"+name+"_truth", "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+		h1Map.insert( make_pair("hMass_"+name, new TH1D("hMass_"+name, chlabel+" mass;m_{"+chlabel+"} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+		if(doTruth) h1Map.insert( make_pair("hMass_"+name+"_truth", new TH1D("hMass_"+name+"_truth", chlabel+" mass;m_{"+chlabel+"} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 		
-		if(doOfficialZP) h1Map.insert( make_pair("hMass_"+name+"_template", new TH1D("hMass_"+name+"_template", "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
-		if(doOfficialZP && doTruth) h1Map.insert( make_pair("hMass_"+name+"_template_truth", new TH1D("hMass_"+name+"_template_truth", "#mu#mu mass;m_{#mu#mu} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+		if(doOfficialZP) h1Map.insert( make_pair("hMass_"+name+"_template", new TH1D("hMass_"+name+"_template", chlabel+" mass;m_{"+chlabel+"} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
+		if(doOfficialZP && doTruth) h1Map.insert( make_pair("hMass_"+name+"_template_truth", new TH1D("hMass_"+name+"_template_truth", chlabel+" mass;m_{"+chlabel+"} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 	}
 }
 
@@ -756,14 +848,15 @@ void weightsNoPU(TString tsMCname, float mass=0., unsigned int truXid=0, double 
 	
 	//// kFactors:			
 	kFQCD_NNLOvLOss = QCD(mass,"NNLO/LO**");
-	kFEW_NNLOvLOs   = ElectroWeak(mass);
+	kFEW_NNLOvLOs   = (isMuons) ? ElectroWeak(mass) : EWkFactorEle(mass);
 	if(isnaninf(kFQCD_NNLOvLOss)) _FATAL("kFQCD_NNLOvLOss is nan or inf -> "+_s(kFQCD_NNLOvLOss)+": in "+_s(mass)+" GeV");
 	if(isnaninf(kFEW_NNLOvLOs))   _FATAL("kFEW_NNLOvLOs is nan or inf -> "+_s(kFEW_NNLOvLOs)+": in "+_s(mass)+" GeV");
 	
-	event_weight = all_mcevent_weight; // the generator intrinsic event weight
-	event_weight *= (doQCDkfactor)       ? kFQCD_NNLOvLOss : 1.;
-	event_weight *= (doOverallEWkfactor) ? kFEW_NNLOvLOs   : 1.;
-	event_weight *= (doZpT)              ? ZpTweight       : 1.;
+	event_weight =  (isMuons)                ? all_mcevent_weight : 1.; // the generator intrinsic event weight  //// should be the same for mm and ee
+	event_weight *= (doQCDkfactor)           ? kFQCD_NNLOvLOss    : 1.;
+	event_weight *= (doOverallEWkfactor)     ? kFEW_NNLOvLOs      : 1.;
+	event_weight *= (doZpT)                  ? ZpTweight          : 1.;
+	event_weight *= (!isMuons && doEEtrigSF) ? all_eeTriggerSF    : 1.;
 	if(isnaninf(event_weight)) _FATAL("event_weight is nan or inf -> "+_s(event_weight));
 }
 
@@ -793,17 +886,17 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 	float truth_s    = 0.;
 	float truth_cost = 0.;
 	unsigned int truth_idIn = 0;
-	unsigned int idOut      = 13; // muon
+	unsigned int idOut      = (isMuons) ? 13 : 11; // muon or electron
 	double KKoverSM_weight     = 0.;
 	double ZPoverSM_weight     = 0.;
 	// double KKnoSMoverSM_weight = 0.;
 	// double ZPnoSMoverSM_weight = 0.;
 	
-	int imutreelvl = -999;
-	int imuontru   = -999;
-	int iamuontru  = -999;
-	int imuonrec   = -999;
-	int iamuonrec  = -999;
+	int ileptontreelvl = -999;
+	int ileptontru     = -999;
+	int ialeptontru    = -999;
+	int ileptonrec     = -999;
+	int ialeptonrec    = -999;
 	
 	int iquark  = -999;
 	int iaquark = -999;
@@ -811,50 +904,61 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 	unsigned int truXid = 0;
 	double truXmass  = 0.;
 	double truXpT    = 0.;
+	
+	double leptonMass = (isMuons) ?  muonMass : elecMass;
 
+	_DEBUG("");
 	
 	if(truth_all_isValid)
 	{
-		imuontru  = (truth_all_mc_pdgId->at(0)>0) ? 0 : 1;
-		iamuontru = (imuontru==0) ? 1 : 0;
-		tlvmutrua->SetPtEtaPhiM(truth_all_mc_pt->at(imuontru),  truth_all_mc_eta->at(imuontru),  truth_all_mc_phi->at(imuontru),  muonMass);
-		tlvmutrub->SetPtEtaPhiM(truth_all_mc_pt->at(iamuontru), truth_all_mc_eta->at(iamuontru), truth_all_mc_phi->at(iamuontru), muonMass);
-		(*tv3mutrua) = tlvmutrua->Vect();
-		(*tv3mutrub) = tlvmutrub->Vect();
-		tlvmutruaBoosted = fkinematics::Boost(tlvmutrua,tlvmutrub,tlvmutrua);
-		tlvmutrubBoosted = fkinematics::Boost(tlvmutrua,tlvmutrub,tlvmutrub);
-		(*tv3mutruaBoosted) = tlvmutruaBoosted->Vect();
-		(*tv3mutrubBoosted) = tlvmutrubBoosted->Vect();
-		mass = fkinematics::imass(tlvmutrua,tlvmutrub);
+		ileptontru  = (truth_all_mc_pdgId->at(0)>0) ? 0 : 1;
+		ialeptontru = (ileptontru==0) ? 1 : 0;
+		float leptonpt  = truth_all_mc_pt->at(ileptontru);
+		float aleptonpt = truth_all_mc_pt->at(ialeptontru);
+		if(!isMuons) //// ???????????????????????????????????????????????????????????????????????????????????????????????????????????
+		{
+			leptonpt  /= 1000.;
+			aleptonpt /= 1000.;
+		}
+		tlvleptontrua->SetPtEtaPhiM(leptonpt,  truth_all_mc_eta->at(ileptontru),  truth_all_mc_phi->at(ileptontru),  leptonMass);
+		tlvleptontrub->SetPtEtaPhiM(aleptonpt, truth_all_mc_eta->at(ialeptontru), truth_all_mc_phi->at(ialeptontru), leptonMass);
+		(*tv3mutrua) = tlvleptontrua->Vect();
+		(*tv3mutrub) = tlvleptontrub->Vect();
+		tlvleptontruaBoosted = fkinematics::Boost(tlvleptontrua,tlvleptontrub,tlvleptontrua);
+		tlvleptontrubBoosted = fkinematics::Boost(tlvleptontrua,tlvleptontrub,tlvleptontrub);
+		(*tv3mutruaBoosted) = tlvleptontruaBoosted->Vect();
+		(*tv3mutrubBoosted) = tlvleptontrubBoosted->Vect();
+		mass = fkinematics::imass(tlvleptontrua,tlvleptontrub);
 		
 		_DEBUG("");
 		
-		
-		// (1) take the true quark and the true muon and boost it to the cmf.
-		// (2) calculate cos(theta*) between the tree-level muon and the quark
+		// (1) take the true quark and the true lepton and boost it to the cmf.
+		// (2) calculate cos(theta*) between the tree-level lepton and the quark
 		// (3) get the quark id
 		// (4) get the mass of the intermediate state (Z)
 		// iquark = (truth_all_partons_mc_pdgId->at(0)>0) ? 0 : 1;
 		// iaquark = (iquark==0) ? 1 : 0;
-		imutreelvl = (truth_all_partons_mc_pdgId->at(5)>0) ? 5 : 6; // outgoing leptons are written in enties 2 and 3 of the vectors "truth_all_partons_mc_*"
+		ileptontreelvl = (truth_all_partons_mc_pdgId->at(5)>0) ? 5 : 6; // outgoing leptons are written in enties 2 and 3 of the vectors "truth_all_partons_mc_*"
 		iquark  = (truth_all_partons_mc_pdgId->at(2)>0) ? 2 : 3;        // incoming partons are written in enties 2 and 3 of the vectors "truth_all_partons_mc_*"
 		iaquark = (iquark==2) ? 3 : 2;
-		tlvmutreelevel->SetPtEtaPhiM(truth_all_partons_mc_pt->at(imutreelvl), truth_all_partons_mc_eta->at(imutreelvl), truth_all_partons_mc_phi->at(imutreelvl),truth_all_partons_mc_m->at(imutreelvl));
+		tlvleptontreelevel->SetPtEtaPhiM(truth_all_partons_mc_pt->at(ileptontreelvl), truth_all_partons_mc_eta->at(ileptontreelvl), truth_all_partons_mc_phi->at(ileptontreelvl),truth_all_partons_mc_m->at(ileptontreelvl));
 		tlvqa->SetPtEtaPhiM(truth_all_partons_mc_pt->at(iquark), truth_all_partons_mc_eta->at(iquark), truth_all_partons_mc_phi->at(iquark),truth_all_partons_mc_m->at(iquark));
 		tlvqb->SetPtEtaPhiM(truth_all_partons_mc_pt->at(iaquark), truth_all_partons_mc_eta->at(iaquark), truth_all_partons_mc_phi->at(iaquark),truth_all_partons_mc_m->at(iaquark));
-		(*tv3mutreelevel) = tlvmutreelevel->Vect();
+		(*tv3mutreelevel) = tlvleptontreelevel->Vect();
 		(*tv3qa) = tlvqa->Vect();
 		(*tv3qb) = tlvqb->Vect();
-		tlvmutreelevelBoosted = fkinematics::Boost(tlvqa,tlvqb,tlvmutreelevel);
+		tlvleptontreelevelBoosted = fkinematics::Boost(tlvqa,tlvqb,tlvleptontreelevel);
 		tlvqaBoosted = fkinematics::Boost(tlvqa,tlvqb,tlvqa);
 		tlvqbBoosted = fkinematics::Boost(tlvqa,tlvqb,tlvqb);
-		(*tv3mutreelevelBoosted) = tlvmutreelevelBoosted->Vect();
+		(*tv3mutreelevelBoosted) = tlvleptontreelevelBoosted->Vect();
 		(*tv3qaBoosted) = tlvqaBoosted->Vect();
 		(*tv3qbBoosted) = tlvqbBoosted->Vect();
 	
+		_DEBUG("");
+	
 		// bits for the KK weights
 		tv3q->SetPtEtaPhi(tlvqaBoosted->Pt(),tlvqaBoosted->Eta(),tlvqaBoosted->Phi());
-		tv3mu->SetPtEtaPhi(tlvmutreelevelBoosted->Pt(),tlvmutreelevelBoosted->Eta(),tlvmutreelevelBoosted->Phi());
+		tv3mu->SetPtEtaPhi(tlvleptontreelevelBoosted->Pt(),tlvleptontreelevelBoosted->Eta(),tlvleptontreelevelBoosted->Phi());
 		truth_cost = tv3q->Dot((*tv3mu))/(tv3q->Mag()*tv3mu->Mag()); // truth cos(theta*)
 		truth_idIn = truth_all_partons_mc_pdgId->at(iquark);         // truth incoming flavor
 		truth_mass = fkinematics::imass(tlvqa,tlvqb);                // truth gamma/Z mass
@@ -866,6 +970,8 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 		truth_s = truth_mass*truth_mass;
 		
 
+		_DEBUG("");
+		
 		// X = Z/Z'/ZKK are always at index 4.
 		truXid   = truth_all_partons_mc_pdgId->at(4);
 		truXmass = truth_all_partons_mc_m->at(4)*GeV2MeV;
@@ -879,20 +985,23 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 		//// after FSR and it is not the mc_m->at(4) /////////
 		weights(tsMCname, mass, truXid, truXmass, truXpT); ///
 		// if kF for signals is done in the amplitude then the event_weight does not contain it 
-                double weight_dy = (doOverallEWkfactor) ? event_weight : event_weight*kFEW_NNLOvLOs; // relevant only for truth, DY and the official Z'
+		double weight_dy = (doOverallEWkfactor) ? event_weight : event_weight*kFEW_NNLOvLOs; // relevant only for truth, DY and the official Z'
 		//////////////////////////////////////////////////////
 
-		
 		_DEBUG("");
 		
 		///////////////////////////////////////////////////////////////////////////////////////////////
 		mass = (doTreeLevel) ? truth_all_partons_mc_m->at(4) : mass; // mass is M(mumu after FSR) /////
 		///////////////////////////////////////////////////////////////////////////////////////////////
 		
+		_DEBUG("");
+		
 		/////////// DY and official Z'
 		if(doTruth) h1Map["hMass_"+tsMCname+"_truth"]->Fill(mass*GeV2TeV,wgt);
-		if(doOfficialZP && doTruth && tsMCname=="DYmumu")
-		{		
+		if(doOfficialZP && doTruth && (tsMCname=="DYmumu" || tsMCname=="DYee"))
+		{
+			_DEBUG("");
+		
 			/////////////////////////////
 			setCouplingsScale(false); ///
 			resetfgZP(); ////////////////
@@ -914,10 +1023,12 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 			}
 		}
 		
+		_DEBUG("");
+		
 		
 		_DEBUG("");
 		
-		for(double M=mXXmin ; M<=mXXmax && doTruth && tsMCname=="DYmumu" ; M+=dmXX)
+		for(double M=mXXmin ; M<=mXXmax && doTruth && (tsMCname=="DYmumu" || tsMCname=="DYee") ; M+=dmXX)
 		{
 			//////////////////////////////////////
 			if(doSingleMass) M = singleMass; /////
@@ -928,9 +1039,10 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 			setKKmass(M); ////////////////
 			setZPmass(M); ////////////////
 			//////////////////////////////
-			TString massName   = (TString)_s(M);
-			TAxis*  gaxis = (TAxis*)h2Map["h"+tsgN+"Mass_truth_template_KK"+massName]->GetYaxis();
-			
+			TString massName = (TString)_s(M);
+			TMapTSP2TH2::iterator ii=h2Map.begin();
+			TAxis*  gNaxis = (TAxis*)ii->second->GetYaxis();
+			// TAxis*  gNaxis = (TAxis*)h2Map["h"+tsgN+"Mass_truth_template_ZP"+massName]->GetYaxis();
 			
 			_DEBUG("massName="+(string)massName);
 			
@@ -961,10 +1073,12 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 					h1Map["hMass_truth_template_Zprime_SSM"+massName]->Fill(mass*GeV2TeV,wgt*ZPoverSM_weight); // need to fluctuate this later
 				}
 
-				for(double gN=gNXXmin ; gN<=gNXXmax ; gN+=dgNXX)
+				// for(double gN=gNXXmin ; gN<=gNXXmax ; gN+=dgNXX)
 				// for(unsigned int gNbin=1 ; gNbin<=npowerbins ; gNbin++)
+				for(unsigned int gNbin=1 ; gNbin<=ngNbinstotal+1 ; gNbin++) // go up to the uoverflow bin and take its lower edge
 				{
-					// double gN = gaxis->GetBinCenter(gNbin);
+					double gN = gNaxis->GetBinLowEdge(gNbin);
+					_INFO("");
 				
 					if(doFullKKtemplates)
 					{
@@ -1010,48 +1124,53 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 		
 		if(recon_all_isValid)
 		{
-			
-			imuonrec  = (recon_all_charge->at(0)<0.) ? 0 : 1;
-			iamuonrec = (imuonrec==0) ? 1 : 0;
+			if(isMuons)
+			{
+				ileptonrec  = (recon_all_charge->at(0)<0.) ? 0 : 1;
+				ialeptonrec = (ileptonrec==0) ? 1 : 0;
+			}
+			else
+			{
+				ileptonrec  = 0;
+				ialeptonrec = 1;
+			}
 
 			/*
-			tlvtmp->SetPtEtaPhiM(recon_all_pt->at(imuonrec), recon_all_eta->at(imuonrec), recon_all_phi->at(imuonrec), muonMass);
-			dr1 = fkinematics::dR(tlvtmp,tlvmutrua);
-			dr2 = fkinematics::dR(tlvtmp,tlvmutrub);
-			imuonrec  = (dr1<=dr2) ? imuonrec : iamuonrec;
-			iamuonrec = (imuonrec==0) ? 1 : 0;
+			tlvtmp->SetPtEtaPhiM(recon_all_pt->at(ileptonrec), recon_all_eta->at(ileptonrec), recon_all_phi->at(ileptonrec), leptonMass);
+			dr1 = fkinematics::dR(tlvtmp,tlvleptontrua);
+			dr2 = fkinematics::dR(tlvtmp,tlvleptontrub);
+			ileptonrec  = (dr1<=dr2) ? ileptonrec : ialeptonrec;
+			ialeptonrec = (ileptonrec==0) ? 1 : 0;
 			// if(dr1>dr2) _WARNING("dr1(recA,truA) > dr2(recA,truB)");
 			*/
 			
-			tlvmureca->SetPtEtaPhiM(recon_all_pt->at(imuonrec),  recon_all_eta->at(imuonrec),  recon_all_phi->at(imuonrec),  muonMass);
-			tlvmurecb->SetPtEtaPhiM(recon_all_pt->at(iamuonrec), recon_all_eta->at(iamuonrec), recon_all_phi->at(iamuonrec), muonMass);
-			(*tv3mureca) = tlvmureca->Vect();
-			(*tv3murecb) = tlvmurecb->Vect();
-			tlvmurecaBoosted = fkinematics::Boost(tlvmureca,tlvmurecb,tlvmureca);
-			tlvmurecbBoosted = fkinematics::Boost(tlvmureca,tlvmurecb,tlvmurecb);
-			(*tv3murecaBoosted) = tlvmurecaBoosted->Vect();
-			(*tv3murecbBoosted) = tlvmurecbBoosted->Vect();
+			tlvleptonreca->SetPtEtaPhiM(recon_all_pt->at(ileptonrec),  recon_all_eta->at(ileptonrec),  recon_all_phi->at(ileptonrec),  leptonMass);
+			tlvleptonrecb->SetPtEtaPhiM(recon_all_pt->at(ialeptonrec), recon_all_eta->at(ialeptonrec), recon_all_phi->at(ialeptonrec), leptonMass);
+			(*tv3mureca) = tlvleptonreca->Vect();
+			(*tv3murecb) = tlvleptonrecb->Vect();
+			tlvleptonrecaBoosted = fkinematics::Boost(tlvleptonreca,tlvleptonrecb,tlvleptonreca);
+			tlvleptonrecbBoosted = fkinematics::Boost(tlvleptonreca,tlvleptonrecb,tlvleptonrecb);
+			(*tv3murecaBoosted) = tlvleptonrecaBoosted->Vect();
+			(*tv3murecbBoosted) = tlvleptonrecbBoosted->Vect();
 		}
-		
 		
 		_DEBUG("");
 		
-		if(recon_all_isValid  &&  imuonrec>=0. && iamuonrec>=0.  &&  imuonrec!=iamuonrec)
+		if(recon_all_isValid  &&  ileptonrec>=0. && ialeptonrec>=0.  &&  ileptonrec!=ialeptonrec)
 		{
-			ca = recon_all_charge->at(imuonrec);
-			cb = recon_all_charge->at(iamuonrec);
-			if(ca*cb>=0.) _WARNING("ca*cb>=0, skipping event");
-			mass          = fkinematics::imass(tlvmureca,tlvmurecb);
+			ca = recon_all_charge->at(ileptonrec);
+			cb = recon_all_charge->at(ialeptonrec);
+			// if(ca*cb>=0.) _WARNING("ca*cb>=0");
+			mass          = fkinematics::imass(tlvleptonreca,tlvleptonrecb);
 		
-			//////////////////////////////////////////////////////////////////////////////////////////////
-			if(mass>=70. && mass<=110. && tsMCname=="DYmumu") nZpeak += event_weight*wgt; ////////////////
-			if(mass>=70. && mass<=110. && tsMCname=="DYmumu") nZpeakNoPU += event_weight_nopileup*wgt; ///
-			//////////////////////////////////////////////////////////////////////////////////////////////
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			if(mass>=70. && mass<=110. && (tsMCname=="DYmumu" || tsMCname=="DYee")) nZpeak += event_weight*wgt; ////////////////
+			if(mass>=70. && mass<=110. && (tsMCname=="DYmumu" || tsMCname=="DYee")) nZpeakNoPU += event_weight_nopileup*wgt; ///
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-			
 			_DEBUG("");
 			
-			for(double M=mXXmin ; M<=mXXmax && tsMCname=="DYmumu" ; M+=dmXX)
+			for(double M=mXXmin ; M<=mXXmax && (tsMCname=="DYmumu" || tsMCname=="DYee") ; M+=dmXX)
 			{
 				//////////////////////////////////////
 				if(doSingleMass) M = singleMass; /////
@@ -1063,8 +1182,9 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 				setZPmass(M); ////////////////
 				//////////////////////////////
 				TString massName = (TString)_s(M);
-				TAxis* gaxis = (TAxis*)h2Map["h"+tsgN+"Mass_template_KK"+massName]->GetYaxis();
-				
+				TMapTSP2TH2::iterator ii=h2Map.begin();
+				TAxis*  gNaxis = (TAxis*)ii->second->GetYaxis();
+				// TAxis* gNaxis = (TAxis*)h2Map["h"+tsgN+"Mass_template_ZP"+massName]->GetYaxis();
 				
 				_DEBUG("");
 				
@@ -1095,10 +1215,16 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 				
 				_DEBUG("");
 				
-				for(double gN=gNXXmin ; gN<=gNXXmax ; gN+=dgNXX)
+				// for(double gN=gNXXmin ; gN<=gNXXmax ; gN+=dgNXX)
 				// for(unsigned int gNbin=1 ; gNbin<=npowerbins ; gNbin++)
+				for(unsigned int gNbin=1 ; gNbin<=ngNbinstotal+1 ; gNbin++) // go up to the uoverflow bin and take its lower edge
 				{
-					// double gN = gaxis->GetBinCenter(gNbin);
+					_DEBUG("");
+				
+					double gN = gNaxis->GetBinLowEdge(gNbin);
+					
+					_DEBUG("");
+					
 					if(doFullKKtemplates)
 					{
 						////////////////////////////////
@@ -1141,12 +1267,13 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 				////////////////////////////
 			}
 			
-			
 			_DEBUG("");
 			
 			h1Map["hMass_"+tsMCname]->Fill(mass*GeV2TeV,wgt*weight_dy);
 			
-			if(doOfficialZP && tsMCname=="DYmumu")
+			_DEBUG("");
+			
+			if(doOfficialZP && (tsMCname=="DYmumu" || tsMCname=="DYee"))
 			{
 				_DEBUG("");
 			
@@ -1169,8 +1296,6 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 				}
 				_DEBUG("");
 			}
-			
-			
 			_DEBUG("");
 		}
 	}
@@ -1258,11 +1383,11 @@ void writeTemplates()
 
 		olddir->cd();
 
-		TH1D* hDYrec = (TH1D*)h1Map["hMass_DYmumu"]->Clone("");
+		TH1D* hDYrec = (TH1D*)h1Map["hMass_DY"+channel]->Clone("");
 		fTemplates->cd();
 		hDYrec->Write();
 		TH1D* hDYtru = NULL;
-		if(doTruth) { olddir->cd(); hDYtru = (TH1D*)h1Map["hMass_DYmumu_truth"]->Clone("");}
+		if(doTruth) { olddir->cd(); hDYtru = (TH1D*)h1Map["hMass_DY"+channel+"_truth"]->Clone("");}
 		if(doTruth) { fTemplates->cd(); hDYtru->Write();}
 
 		TString templateFname = (TString)fTemplates->GetName();
@@ -1325,10 +1450,10 @@ void writeTemplates()
 		
 		
 		olddir->cd();
-		TH1D* hDYrec = (TH1D*)h1Map["hMass_DYmumu"]->Clone("");
+		TH1D* hDYrec = (TH1D*)h1Map["hMass_DY"+channel]->Clone("");
 		fKKTemplates->cd(); hDYrec->Write();
 		TH1D* hDYtru = NULL;
-		if(doTruth) {olddir->cd(); hDYtru = (TH1D*)h1Map["hMass_DYmumu_truth"]->Clone("");}
+		if(doTruth) {olddir->cd(); hDYtru = (TH1D*)h1Map["hMass_DY"+channel+"_truth"]->Clone("");}
 		if(doTruth) {fKKTemplates->cd(); hDYtru->Write();}
 		
 		
@@ -1419,10 +1544,10 @@ void writeTemplates()
 		if(doTruth) templates2d_ZP_truth->Write("truth_template2d", TObject::kSingleKey);
 		
 		olddir->cd();
-		TH1D* hDYrec = (TH1D*)h1Map["hMass_DYmumu"]->Clone("");
+		TH1D* hDYrec = (TH1D*)h1Map["hMass_DY"+channel]->Clone("");
 		fZPTemplates->cd(); hDYrec->Write();
 		TH1D* hDYtru = NULL;
-		if(doTruth) {olddir->cd(); hDYtru = (TH1D*)h1Map["hMass_DYmumu_truth"]->Clone("");}
+		if(doTruth) {olddir->cd(); hDYtru = (TH1D*)h1Map["hMass_DY"+channel+"_truth"]->Clone("");}
 		if(doTruth) {fZPTemplates->cd(); hDYtru->Write();}
 		
 		if(doOfficialZP)
@@ -1515,7 +1640,7 @@ void runMCproc(TString mcName)
 	}
 }
 
-void run(Double_t Xmass=-1.)
+void run(TString channelName="mm", TString gPower="g2", Bool_t doSigUp=0, Double_t Xmass=-1.)
 {
 	msglvl[DBG] = SILENT; // SILENT;
 	msglvl[INF] = VISUAL;
@@ -1532,6 +1657,14 @@ void run(Double_t Xmass=-1.)
 		_INFO("Running with mass -> "+_s(singleMass));
 	}
 	
+	///////////////////////////////////////////
+	matchFlags(channelName,gPower,doSigUp); ///
+	style(); //////////////////////////////////
+	samples(); //////
+	hbook(); ////////
+	setSumW2(); /////
+	/////////////////
+	
 	///////////////////////////////////////////////
 	// theoretical stuff... ///////////////////////
 	setFermions(); ////////////////////////////////
@@ -1542,12 +1675,6 @@ void run(Double_t Xmass=-1.)
 	resetfgGKK(); /////////////////////////////////
 	resetfgZKK(); /////////////////////////////////
 	///////////////////////////////////////////////
-	
-	matchFlags();
-	style();
-	samples();
-	hbook();
-	setSumW2();
 	
 	for(TMapiTS::iterator it=grpx_ordered.begin() ; it!=grpx_ordered.end() ; ++it)
 	{
@@ -1560,8 +1687,8 @@ void run(Double_t Xmass=-1.)
 		_INFO((string)name+" -> finished");
 	}
 	
-	// setMCtrees("DYmumu");
-	// runMCproc("DYmumu");
+	// setMCtrees("DY"+channel);
+	// runMCproc("DY"+channel);
 	
 	// finalize
 	writeTemplates();

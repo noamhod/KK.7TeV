@@ -9,20 +9,19 @@
 
 using namespace systematics;
 
-bool doGrid          = false;
+bool doGrid          = true;
 bool doTruth         = false;
-bool doEWkf          = false;
-bool doInterference  = false;
-bool doKKtemplates   = false;
+bool doEWkf          = true;
+bool doInterference  = true;
+bool doKKtemplates   = true;
 bool doOfficialZP    = false;
 bool doScale2Zpeak   = true;
-bool dog4bins        = false;
+bool dog4bins        = true;
 TString channel      = "#mu#mu"; // #mu#mu or ee
-TString model        = "ZP";
+TString model        = "KK";
 TString mutype       = "3332st"; // or "33st" or "32st"
 TString binning      = "linearbins"; // or "powercins"
 
-TString version      = (doGrid)         ? "v33/"    : "";
 TString basedir      = (doInterference) ? ""        : "nointerference/";
 TString interference = (doInterference) ? ""        : "_noInterference";
 TString overallEWkF  = (doInterference) ? ""        : "_noOverallEWkF";
@@ -31,7 +30,7 @@ TString dotruth      = (doTruth)        ? ""        : "_noTruth";
 TString gNbinning    = (dog4bins)       ? "_g4bins" : "_g2bins";
 TString KKtemplates  = (doKKtemplates)  ? ""        : "_noKKtmplates";
 TString officialZP   = (!doOfficialZP)  ? ""        : "_wthOfficialZP";
-TString gNbins       = (dog4bins)       ? "g4bins"  : "g2bins";
+TString gNNbins      = (dog4bins)       ? "g4bins"  : "g2bins";
 
 Double_t scale2Zpeak = 1.;
 
@@ -39,6 +38,7 @@ double Mmin = 130.;
 double Mmax = 5030.;//5030.;
 double dM   = 100.;//100.;
 
+TString version    = "";
 TString fpath      = "";
 TString fpathSigUp = "";
 
@@ -54,12 +54,22 @@ TObjArray* toarZPtmpSigUp;
 TDirectory* olddir = gDirectory;
 
 
+void setGridVersion()
+{
+	if(!doGrid) version = "";
+	else
+	{
+		if(dog4bins) version = "v59/";//"v52/";
+		else         version = "v57/";//"v55/";
+	}
+}
+
 void setFpath()
 {
 	if(channel=="#mu#mu")
 	{
-		sDir       = "plots/"+basedir+binning+"/"+gNbins+"/"+mutype+"_nominal/"+version;
-		sDirSigUp  = "plots/"+basedir+binning+"/"+gNbins+"/"+mutype+"_sigmaup/"+version;
+		sDir       = "plots/"+basedir+binning+"/"+gNNbins+"/"+mutype+"_nominal/"+version;
+		sDirSigUp  = "plots/"+basedir+binning+"/"+gNNbins+"/"+mutype+"_sigmaup/"+version;
 		if(doGrid)
 		{
 			fpath      = "template_nominal_";
@@ -84,7 +94,7 @@ void setScale2Zpeak()
 	{
 		scale2Zpeak = (mutype=="33st")   ? 0.9920123197 : 1.;    // For linear bins, see normtest.C
 		scale2Zpeak = (mutype=="32st")   ? 0.8852545729 : 1.;    // For linear bins, see normtest.C
-		scale2Zpeak = (mutype=="3332st") ? 0.9841360523 : 1.;    // For linear bins, see normtest.C
+		scale2Zpeak = (mutype=="3332st") ? 0.9841360216 : 1.;    // For linear bins, see normtest.C
 	}
 	else if(channel=="ee")
 	{
@@ -131,14 +141,22 @@ void combine()
 	
 	///////////////////////////////////////////
 	//// set globals //////////////////////////
+	setGridVersion(); /////////////////////////
 	setFpath(); ///////////////////////////////
 	setScale2Zpeak(); /////////////////////////
 	///////////////////////////////////////////
 	
 	_INFO("working in -> "+(string)sDir);
 	
-	TFile* fOfficial = new TFile("DimuonHists_Feb05_3stC.root","READ");
-	TH1D* hDYofficial = (TH1D*)fOfficial->Get("ZLogmass_DYmm")->Clone();
+	TFile* fOfficial1 = new TFile("DimuonHists_Feb05_3stC.root","READ");
+	TFile* fOfficial2 = new TFile("DimuonHists_Feb05_2stC.root","READ");
+	TH1D* hDYofficial1 = (TH1D*)fOfficial1->Get("ZLogmass_DYmm")->Clone();
+	TH1D* hDYofficial2 = (TH1D*)fOfficial2->Get("ZLogmass_DYmm")->Clone();
+	TH1D* hDYofficial = (TH1D*)hDYofficial1->Clone();
+	hDYofficial->Reset();
+	hDYofficial->Add(hDYofficial1);
+	hDYofficial->Add(hDYofficial2);
+
 	
 	_INFO("");
 

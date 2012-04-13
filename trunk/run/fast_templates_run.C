@@ -39,7 +39,7 @@ bool doFullKKtemplates  = false;    // will not change anything if doTemplates i
 bool doFullZPtemplates  = true;     // will not change anything if doTemplates is "false"
 bool dopileup           = true;
 bool doOverallEWkfactor = true;
-bool doQCDkfactor       = true;
+bool doQCDkfactor       = false;
 bool doZpT              = true;
 bool doEEtrigSF         = true;
 bool doTruth            = false;
@@ -49,10 +49,6 @@ bool doInterference     = false;
 bool doFixedwidth       = false;
 bool doTreeLevel        = true; // relevant for truth only
 
-// TString channel   = (isMuons) ? "mm"     : "ee";
-// TString chlabel   = (isMuons) ? "#mu#mu" : "ee";
-// TString tsgN      = (dog4)    ? "g4"     : "g2";
-// TString tsgNlabel = (dog4)    ? "g^{4}"  : "g^{2}";
 TString channel   = "";
 TString chlabel   = "";
 TString tsgN      = "";
@@ -121,6 +117,7 @@ Bool_t dolog      = true;
 double nZpeak     = 0.;
 double nZpeakNoPU = 0.;
 
+/*
 double       gNshift = (dog4) ? g4shift : g2shift;
 unsigned int ngNbins = (dog4) ? ng4bins : ng2bins;
 double       gNNmin  = (dog4) ? g4min   : g2min;
@@ -129,6 +126,12 @@ double       gNNmax  = (dog4) ? g4max   : g2max;
 double gNXXmin = (dog4) ? (double)(g4min+g4shift) : (double)(g2min+g2shift);
 double gNXXmax = (dog4) ? (double)(g4max+g4shift) : (double)(g2max+g2shift);
 double dgNXX   = (dog4) ? (gNXXmax-gNXXmin)/(double)ng4bins : (gNXXmax-gNXXmin)/(double)ng2bins;
+*/
+
+double gNXXbins = (double)ngNZPbins;
+double gNXXmin  = 0.;
+double gNXXmax  = gNZPmax;
+double dgNXX    = (gNXXmax-gNXXmin)/(double)gNXXbins;
 
 double maxKKwgt = 0.;
 double maxZPwgt = 0.;
@@ -774,7 +777,7 @@ void hbook()
 	setSqrtBins(nsqrtofficialqtbins, sqrtofficialqtmin, sqrtofficialqtmax, sqrtofficialqtbins);
 	setSqrtBins(nsqrtg4bins, sqrtg4min, sqrtg4max, sqrtg4bins);
 	setPowerBins(npowerbins,step,power,powerbins);
-	setgNbins(ngNbinslow,ngNbinshigh,gNNmin,gNmid,gNNmax,gNbins);
+	setgNbins(ngNbinslow,ngNbinshigh,gNmin,gNmid,gNmax,gNbins);
 	
 	//// KK/ZP templates for the limit
 	for(double M=mXXmin ; M<=mXXmax ; M+=dmXX)
@@ -790,10 +793,10 @@ void hbook()
 			h1Map.insert( make_pair("hMass_template_KK"+massName, new TH1D("hMass_template_KK"+massName, chlabel+" mass;m_{"+chlabel+"} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 			if(doTruth) h1Map.insert( make_pair("hMass_truth_template_KK"+massName, new TH1D("hMass_truth_template_KK"+massName, chlabel+" mass;m_{"+chlabel+"} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 			
-			h2Map.insert( make_pair("h"+tsgN+"Mass_template_KK"+massName, new TH2D("h"+tsgN+"Mass_template_KK"+massName, chlabel+" mass vs. "+tsgNlabel+";m_{"+chlabel+"} TeV;"+tsgNlabel+";Events", nloglimitimassbins,loglimitimassbins, ngNbinstotal,gNbins /*ngNbins,gNNmin,gNNmax*/ /*npowerbins,powerbins*/) ) );
+			h2Map.insert( make_pair("h"+tsgN+"Mass_template_KK"+massName, new TH2D("h"+tsgN+"Mass_template_KK"+massName, chlabel+" mass vs. "+tsgNlabel+";m_{"+chlabel+"} TeV;"+tsgNlabel+";Events", nloglimitimassbins,loglimitimassbins, ngNKKbins,gNKKmin,gNKKmax /*ngNbinstotal,gNbins*/ /*ngNbins,gNNmin,gNNmax*/ /*npowerbins,powerbins*/) ) );
 			if(doTruth)
 			{
-				h2Map.insert( make_pair("h"+tsgN+"Mass_truth_template_KK"+massName, new TH2D("h"+tsgN+"Mass_truth_template_KK"+massName, chlabel+" mass vs. "+tsgNlabel+";m_{"+chlabel+"} TeV;g^{4};Events", nloglimitimassbins,loglimitimassbins, ngNbinstotal,gNbins /*ngNbins,gNNmin,gNNmax*/ /*npowerbins,powerbins*/) ) );
+				h2Map.insert( make_pair("h"+tsgN+"Mass_truth_template_KK"+massName, new TH2D("h"+tsgN+"Mass_truth_template_KK"+massName, chlabel+" mass vs. "+tsgNlabel+";m_{"+chlabel+"} TeV;g^{4};Events", nloglimitimassbins,loglimitimassbins, ngNKKbins,gNKKmin,gNKKmax /*ngNbinstotal,gNbins*/ /*ngNbins,gNNmin,gNNmax*/ /*npowerbins,powerbins*/) ) );
 			}
 		}
 		if(doFullZPtemplates)
@@ -801,10 +804,10 @@ void hbook()
 			h1Map.insert( make_pair("hMass_template_Zprime_SSM"+massName, new TH1D("hMass_template_Zprime_SSM"+massName, chlabel+" mass;m_{"+chlabel+"} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 			if(doTruth) h1Map.insert( make_pair("hMass_truth_template_Zprime_SSM"+massName, new TH1D("hMass_truth_template_Zprime_SSM"+massName, chlabel+" mass;m_{"+chlabel+"} TeV;Events", nloglimitimassbins,loglimitimassbins) ) );
 			
-			h2Map.insert( make_pair("h"+tsgN+"Mass_template_Zprime_SSM"+massName, new TH2D("h"+tsgN+"Mass_template_Zprime_SSM"+massName, chlabel+" mass vs. "+tsgNlabel+";m_{"+chlabel+"} TeV;"+tsgNlabel+";Events", nloglimitimassbins,loglimitimassbins, ngNbinstotal,gNbins /*ngNbins,gNNmin,gNNmax*/ /*npowerbins,powerbins*/) ) );
+			h2Map.insert( make_pair("h"+tsgN+"Mass_template_Zprime_SSM"+massName, new TH2D("h"+tsgN+"Mass_template_Zprime_SSM"+massName, chlabel+" mass vs. "+tsgNlabel+";m_{"+chlabel+"} TeV;"+tsgNlabel+";Events", nloglimitimassbins,loglimitimassbins, ngNZPbins,gNZPmin,gNZPmax /*ngNbinstotal,gNbins*/ /*ngNbins,gNNmin,gNNmax*/ /*npowerbins,powerbins*/) ) );
 			if(doTruth)
 			{
-				h2Map.insert( make_pair("h"+tsgN+"Mass_truth_template_Zprime_SSM"+massName, new TH2D("h"+tsgN+"Mass_truth_template_Zprime_SSM"+massName, chlabel+" mass vs. "+tsgNlabel+";m_{"+chlabel+"} TeV;"+tsgNlabel+";Events", nloglimitimassbins,loglimitimassbins, ngNbinstotal,gNbins /*ngNbins,gNNmin,gNNmax*/ /*npowerbins,powerbins*/) ) );
+				h2Map.insert( make_pair("h"+tsgN+"Mass_truth_template_Zprime_SSM"+massName, new TH2D("h"+tsgN+"Mass_truth_template_Zprime_SSM"+massName, chlabel+" mass vs. "+tsgNlabel+";m_{"+chlabel+"} TeV;"+tsgNlabel+";Events", nloglimitimassbins,loglimitimassbins, ngNZPbins,gNZPmin,gNZPmax /*ngNbinstotal,gNbins*/ /*ngNbins,gNNmin,gNNmax*/ /*npowerbins,powerbins*/) ) );
 			}
 		}
 		
@@ -1075,26 +1078,30 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 
 				// for(double gN=gNXXmin ; gN<=gNXXmax ; gN+=dgNXX)
 				// for(unsigned int gNbin=1 ; gNbin<=npowerbins ; gNbin++)
-				for(unsigned int gNbin=1 ; gNbin<=ngNbinstotal+1 ; gNbin++) // go up to the uoverflow bin and take its lower edge
+				// for(unsigned int gNbin=1 ; gNbin<=ngNbinstotal+1 ; gNbin++) // go up to the uoverflow bin and take its lower edge
+				for(double gN=gNXXmin ; gN<=gNXXmax ; gN+=dgNXX)
 				{
-					double gN = gNaxis->GetBinLowEdge(gNbin);
-					_INFO("");
+					// double gN = gNaxis->GetBinLowEdge(gNbin);
 				
 					if(doFullKKtemplates)
 					{
-						/////////////////////////////
-						setCouplingsScale(true); ////
-						double gRe = (dog4) ? sqrt(sqrt(gN)) : sqrt(gN);
-						double gIm = 0.; ////////////
-						setFgGKK(gRe,gIm); //////////
-						setFgZKK(gRe,gIm); //////////
-						/////////////////////////////
-					
-						if(doInterference) KKoverSM_weight = weightKK(truth_cost,truth_s,truth_idIn,idOut);
-						else               KKoverSM_weight = weightKKnoSM(truth_cost,truth_s,truth_idIn,idOut);
-						if(KKoverSM_weight>0.)
+						TH2* hTmp = h2Map["h"+tsgN+"Mass_truth_template_KK"+massName];
+						if(gN<=hTmp->GetYaxis()->GetBinUpEdge(hTmp->GetNbinsY()))
 						{
-							h2Map["h"+tsgN+"Mass_truth_template_KK"+massName]->Fill(mass*GeV2TeV, gN, wgt*KKoverSM_weight);
+							/////////////////////////////
+							setCouplingsScale(true); ////
+							double gRe = (dog4) ? sqrt(sqrt(gN)) : sqrt(gN);
+							double gIm = 0.; ////////////
+							setFgGKK(gRe,gIm); //////////
+							setFgZKK(gRe,gIm); //////////
+							/////////////////////////////
+						
+							if(doInterference) KKoverSM_weight = weightKK(truth_cost,truth_s,truth_idIn,idOut);
+							else               KKoverSM_weight = weightKKnoSM(truth_cost,truth_s,truth_idIn,idOut);
+							if(KKoverSM_weight>0.)
+							{
+								h2Map["h"+tsgN+"Mass_truth_template_KK"+massName]->Fill(mass*GeV2TeV, gN, wgt*KKoverSM_weight);
+							}
 						}
 					}
 					if(doFullZPtemplates)
@@ -1217,29 +1224,30 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 				
 				// for(double gN=gNXXmin ; gN<=gNXXmax ; gN+=dgNXX)
 				// for(unsigned int gNbin=1 ; gNbin<=npowerbins ; gNbin++)
-				for(unsigned int gNbin=1 ; gNbin<=ngNbinstotal+1 ; gNbin++) // go up to the uoverflow bin and take its lower edge
+				// for(unsigned int gNbin=1 ; gNbin<=ngNbinstotal+1 ; gNbin++) // go up to the uoverflow bin and take its lower edge
+				for(double gN=gNXXmin ; gN<=gNXXmax ; gN+=dgNXX)
 				{
-					_DEBUG("");
-				
-					double gN = gNaxis->GetBinLowEdge(gNbin);
-					
-					_DEBUG("");
+					// double gN = gNaxis->GetBinLowEdge(gNbin);
 					
 					if(doFullKKtemplates)
 					{
-						////////////////////////////////
-						setCouplingsScale(true); ///////
-						double gRe = (dog4) ? sqrt(sqrt(gN)) : sqrt(gN);
-						double gIm = 0.; ///////////////
-						setFgGKK(gRe,gIm); /////////////
-						setFgZKK(gRe,gIm); /////////////
-						////////////////////////////////
-						
-						if(doInterference) KKoverSM_weight = weightKK(truth_cost,truth_s,truth_idIn,idOut);
-						else               KKoverSM_weight = weightKKnoSM(truth_cost,truth_s,truth_idIn,idOut);
-						if(KKoverSM_weight>0.)
+						TH2* hTmp = h2Map["h"+tsgN+"Mass_template_KK"+massName];
+						if(gN<=hTmp->GetYaxis()->GetBinUpEdge(hTmp->GetNbinsY()))
 						{
-							h2Map["h"+tsgN+"Mass_template_KK"+massName]->Fill(mass*GeV2TeV, gN, wgt*event_weight*KKoverSM_weight);
+							////////////////////////////////
+							setCouplingsScale(true); ///////
+							double gRe = (dog4) ? sqrt(sqrt(gN)) : sqrt(gN);
+							double gIm = 0.; ///////////////
+							setFgGKK(gRe,gIm); /////////////
+							setFgZKK(gRe,gIm); /////////////
+							////////////////////////////////
+							
+							if(doInterference) KKoverSM_weight = weightKK(truth_cost,truth_s,truth_idIn,idOut);
+							else               KKoverSM_weight = weightKKnoSM(truth_cost,truth_s,truth_idIn,idOut);
+							if(KKoverSM_weight>0.)
+							{
+								h2Map["h"+tsgN+"Mass_template_KK"+massName]->Fill(mass*GeV2TeV, gN, wgt*event_weight*KKoverSM_weight);
+							}
 						}
 					}
 					if(doFullZPtemplates)
@@ -1258,8 +1266,6 @@ void hfill(TString tsMCname="", Double_t wgt=1.)
 							h2Map["h"+tsgN+"Mass_template_Zprime_SSM"+massName]->Fill(mass*GeV2TeV, gN, wgt*event_weight*ZPoverSM_weight);
 						}
 					}
-
-					//cout << tsgN << "=" << gN << "\r" << flush;
 				}
 				
 				////////////////////////////

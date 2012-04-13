@@ -15,22 +15,22 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // Global definitions ///////////////////////////////////////////////////////////////////////
-bool doGrid          = true;
+bool doGrid          = false;
 bool doTruth         = false;
-bool doEWkf          = true;
-bool doInterference  = true;
-bool doKKtemplates   = true;
+bool doEWkf          = false;
+bool doInterference  = false;
+bool doKKtemplates   = false;
 bool doOfficialZP    = false;
 bool dog4bins        = true;
 bool doInterpolation = false;
+TString model        = "";           // ZP or KK
 TString channel      = "#mu#mu";     // #mu#mu or ee
-TString model        = "KK";         // ZP or KK
 TString mutype       = "3332st";     // or "33st" or "32st"
 TString binning      = "linearbins"; // or "powerbins"
 
 TString basedir      = (doInterference) ? ""        : "nointerference/";
 TString interference = (doInterference) ? ""        : "_noInterference";
-TString overallEWkF  = (doInterference) ? ""        : "_noOverallEWkF";
+//TString overallEWkF  = (doInterference) ? ""        : "_noOverallEWkF";
 TString doEWkfactor  = (doEWkf)         ? ""        : "_noEWkF";
 TString dotruth      = (doTruth)        ? ""        : "_noTruth";
 TString gNbinning    = (dog4bins)       ? "_g4bins" : "_g2bins";
@@ -44,9 +44,9 @@ TString version   = "";
 TString fpath     = "";
 TString sDir      = "";
 
-Double_t xmin = (dog4bins) ? gNmin : gNmin; // g4min : g2min;
-Double_t xmax = (dog4bins) ? gNmax : gNmax; // g4max : g2max; // TMath::Power(npowerbins*step,power);
-Int_t npx     = (dog4bins) ? 3200  : 3200;  // 162   : 162;     // 400   : 160;
+Double_t xmin = 0;
+Double_t xmax = 0;
+Int_t npx     = 0;
 
 TFile* f2DTemplate;
 TObjArray* tobjarr;
@@ -71,8 +71,8 @@ void setGridVersion()
 	if(!doGrid) version = "";
 	else    
 	{       
-		if(dog4bins) version = "v59/";//"v52/";
-		else         version = "v57/";//"v55/";
+		if(dog4bins) version = "v63/";//"v59/";//"v52/";
+		else         version = "v63/";//"v57/";//"v55/";
 	}
 }
 
@@ -88,13 +88,25 @@ void setFpath()
 		}
 		else
 		{
-			fpath = "_combined_2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+overallEWkF+doEWkfactor+dotruth;
+			//fpath = "_combined_2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+overallEWkF+doEWkfactor+dotruth;
+			fpath = "_combined_2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+doEWkfactor+dotruth;
 		}
 	}
 	else if(channel=="ee")
 	{
 		////
 	}
+}
+
+void setgNbinning()
+{
+	// xmin = (dog4bins) ? gNmin : gNmin; // g4min : g2min;
+	// xmax = (dog4bins) ? gNmax : gNmax; // g4max : g2max; // TMath::Power(npowerbins*step,power);
+	// npx     = (dog4bins) ? 3200  : 3200;  // 162   : 162;     // 400   : 160;
+	
+	npx  = (model=="KK") ? 400     : 800;
+	xmin = (model=="KK") ? gNKKmin : gNZPmin;
+	xmax = (model=="KK") ? gNKKmax : gNZPmax;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -240,10 +252,14 @@ void TH1toTF1(TString mod, int mXX)
 	
 	
 	/////////////////////
+	model = mod; ////////
+	/////////////////////
+	
+	/////////////////////
 	setGridVersion(); ///
+	setgNbinning(); /////
 	setFpath(); /////////
 	style(); ////////////
-	model = mod; ////////
 	init(); /////////////
 	/////////////////////
 	

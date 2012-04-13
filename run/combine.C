@@ -9,22 +9,25 @@
 
 using namespace systematics;
 
-bool doGrid          = true;
+//// remember old dir
+TDirectory* olddir = gDirectory;
+
+bool doGrid          = false;
 bool doTruth         = false;
-bool doEWkf          = true;
-bool doInterference  = true;
-bool doKKtemplates   = true;
+bool doEWkf          = false;
+bool doInterference  = false;
+bool doKKtemplates   = false;
 bool doOfficialZP    = false;
 bool doScale2Zpeak   = true;
 bool dog4bins        = true;
 TString channel      = "#mu#mu"; // #mu#mu or ee
-TString model        = "KK";
+TString model        = "ZP";
 TString mutype       = "3332st"; // or "33st" or "32st"
 TString binning      = "linearbins"; // or "powercins"
 
 TString basedir      = (doInterference) ? ""        : "nointerference/";
 TString interference = (doInterference) ? ""        : "_noInterference";
-TString overallEWkF  = (doInterference) ? ""        : "_noOverallEWkF";
+//TString overallEWkF  = (doInterference) ? ""        : "_noOverallEWkF";
 TString doEWkfactor  = (doEWkf)         ? ""        : "_noEWkF";
 TString dotruth      = (doTruth)        ? ""        : "_noTruth";
 TString gNbinning    = (dog4bins)       ? "_g4bins" : "_g2bins";
@@ -50,17 +53,38 @@ TObjArray* toarKKtmpSigUp;
 TObjArray* toarZPtmp;
 TObjArray* toarZPtmpSigUp;
 
- // remember old dir
-TDirectory* olddir = gDirectory;
+inline TH1D* hGeV2TeV(TH1D* hGeV)
+{
+        const Int_t    nbins = hGeV->GetNbinsX();
+        Double_t bins[nbins+1];
+        TAxis* xaxis = (TAxis*)hGeV->GetXaxis();
+        TAxis* yaxis = (TAxis*)hGeV->GetYaxis();
 
+        for(int i=0 ; i<nbins ; i++)
+        {
+                bins[i] = xaxis->GetBinLowEdge(i+1)/1000.;
+                //cout << "|" << bins[i];
+        }
+        bins[nbins] = xaxis->GetBinUpEdge(nbins)/1000.;
+        //cout << "|" << bins[nbins] << "|" << endl; 
+
+        TString name   = (TString)hGeV->GetName();
+        TString title  = (TString)hGeV->GetTitle();
+        TString xtitle = (TString)xaxis->GetTitle();
+        TString ytitle = (TString)yaxis->GetTitle();
+
+        TH1D* hTeV = new TH1D(name+"_TeV",title+";"+xtitle+";"+ytitle, nbins,bins);
+        for(Int_t b=0 ; b<=nbins+1 ; b++) hTeV->SetBinContent(b, hGeV->GetBinContent(b));
+        return hTeV;
+}
 
 void setGridVersion()
 {
 	if(!doGrid) version = "";
 	else
 	{
-		if(dog4bins) version = "v59/";//"v52/";
-		else         version = "v57/";//"v55/";
+		if(dog4bins) version = (channel=="ee") ? "v4/" : "v63/";//"v59/";//"v52/";
+		else         version = (channel=="ee") ? "v5/" : "v63/";//"v57/";//"v55/";
 	}
 }
 
@@ -77,16 +101,26 @@ void setFpath()
 		}
 		else
 		{
-			fpath      = "2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+overallEWkF+doEWkfactor+dotruth;
-			fpathSigUp = "2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+"_SmrSigUp"+overallEWkF+doEWkfactor+dotruth; // +1sigma smearing
+			//fpath      = "2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+overallEWkF+doEWkfactor+dotruth;
+			fpath      = "2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+doEWkfactor+dotruth;
+			//fpathSigUp = "2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+"_SmrSigUp"+overallEWkF+doEWkfactor+dotruth; // +1sigma smearing
+			fpathSigUp = "2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+"_SmrSigUp"+doEWkfactor+dotruth; // +1sigma smearing
 		}
 	}
 	else if(channel=="ee")
 	{
-		////
+		sDir = "plots/"+basedir+binning+"/"+gNNbins+"/ee_nominal/"+version;
+                if(doGrid)
+                {
+                        fpath      = "template_nominal_";
+                }
+                else
+                {
+                        //fpath      = "2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+overallEWkF+doEWkfactor+dotruth;
+                        fpath      = "2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+doEWkfactor+dotruth;
+                }
 	}
 }
-
 
 void setScale2Zpeak()
 {
@@ -100,7 +134,7 @@ void setScale2Zpeak()
 	{
 		////
 	}
-} 
+}
 
 TH2D* addDYtoPureSigTemplate(TH2D* h2, TH1D* hDY)
 {
@@ -147,16 +181,31 @@ void combine()
 	///////////////////////////////////////////
 	
 	_INFO("working in -> "+(string)sDir);
-	
-	TFile* fOfficial1 = new TFile("DimuonHists_Feb05_3stC.root","READ");
-	TFile* fOfficial2 = new TFile("DimuonHists_Feb05_2stC.root","READ");
-	TH1D* hDYofficial1 = (TH1D*)fOfficial1->Get("ZLogmass_DYmm")->Clone();
-	TH1D* hDYofficial2 = (TH1D*)fOfficial2->Get("ZLogmass_DYmm")->Clone();
-	TH1D* hDYofficial = (TH1D*)hDYofficial1->Clone();
-	hDYofficial->Reset();
-	hDYofficial->Add(hDYofficial1);
-	hDYofficial->Add(hDYofficial2);
 
+
+	TH1D* hDYofficial;
+	if(channel=="#mu#mu")
+	{	
+		/*
+		TFile* fOfficial1 = new TFile("DimuonHists_Feb05_3stC.root","READ");
+		TFile* fOfficial2 = new TFile("DimuonHists_Feb05_2stC.root","READ");
+		TH1D* hDYofficial1 = (TH1D*)fOfficial1->Get("ZLogmass_DYmm")->Clone();
+		TH1D* hDYofficial2 = (TH1D*)fOfficial2->Get("ZLogmass_DYmm")->Clone();
+		hDYofficial = (TH1D*)hDYofficial1->Clone();
+		hDYofficial->Reset();
+		hDYofficial->Add(hDYofficial1);
+		hDYofficial->Add(hDYofficial2);
+		*/
+                TFile* fOfficial = new TFile("plots/CombinedMu_Templates_and_Data.root","READ");
+                hDYofficial = (TH1D*)fOfficial->Get("mass_plot_dy")->Clone(); // GeV
+                hDYofficial = (TH1D*)hGeV2TeV(hDYofficial); // TeV
+	}
+	else if(channel=="ee")
+	{
+		// CommonPlots_Limits.root
+		TFile* fOfficial = new TFile("CommonPlots_Limits.root","READ");
+		hDYofficial = (TH1D*)fOfficial->Get("")->Clone("DYee/hisMee");
+	}
 	
 	_INFO("");
 

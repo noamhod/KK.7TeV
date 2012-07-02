@@ -21,11 +21,19 @@ using namespace integrals;
 namespace helicity
 {
 
+enum GZKKmode
+{
+	BOTHGZ,ONLYG,ONLYZ
+};
+
 static const unsigned int nModes       = 10; // 100;
 static const double       min_weight   = 1.e-30;
 static const double       max_weight   = 1.e+10;
-static bool               dokFactors   = false;
-static bool               doFixedWidth = false;
+
+static bool         dokFactors   = false;
+static bool         doFixedWidth = false;
+static unsigned int gmZKKmode  = BOTHGZ;
+
 
 void setkFactors(bool dokF)
 {
@@ -35,6 +43,15 @@ void setkFactors(bool dokF)
 void setFixedWidth(bool doFixed)
 {
 	doFixedWidth = doFixed;
+}
+
+void setGZKKmode(unsigned int gzkkmode=BOTHGZ)
+{
+	if(gzkkmode!=BOTHGZ && gzkkmode!=ONLYG && gzkkmode!=ONLYZ)
+	{
+		_FATAL("gzkkmode: "+_s(gzkkmode)+" is not suported. can be 0,1,2 - see `enum GZKKmode`");
+	}
+	gmZKKmode = gzkkmode;
 }
 
 //////////////////////////////////////////////////////////
@@ -102,6 +119,37 @@ inline dcomplex hAZPnoSM(double s, unsigned int idIn, unsigned int idOut, double
 
 
 //////////////////////////////////////////////////////////
+inline dcomplex hAE60(double s, double w, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
+{
+	dcomplex A(0,0);
+	if(s<0.) return A;
+	double mass = mZP;
+	double m2 = mass*mass;
+	dcomplex gIn  = (doScale) ? fgE6H(idIn,hIn)   : gHE6(idIn,hIn);
+	dcomplex gOut = (doScale) ? fgE6H(idOut,hOut) : gHE6(idOut,hOut);
+	// A = gHE6(idIn,hIn)*gHE6(idOut,hOut)/(s-m2 + Im*s*(w/mass));
+	double widthterm = (doFixedWidth) ? w*mass : s*(w/mass);
+	A = gIn*gOut/(s-m2 + Im*widthterm);
+	return A;
+}
+inline dcomplex hAE6(double s, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
+{
+	dcomplex A(0,0);
+	A = hASM(s,idIn,idOut,hIn,hOut); // the SM term
+	double w = wTotE6();
+	A += hAE60(s,w,idIn,idOut,hIn,hOut);
+	return A;
+}
+inline dcomplex hAE6noSM(double s, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
+{
+	dcomplex A(0,0);
+	double w = wTotE6();
+	A += hAE60(s,w,idIn,idOut,hIn,hOut);
+	return A;
+}
+
+
+//////////////////////////////////////////////////////////
 inline dcomplex hAGKKn(double s, double w, unsigned int idIn, unsigned int idOut, unsigned int mode)
 {
 	dcomplex A(0,0);
@@ -133,7 +181,12 @@ inline dcomplex hAZKKn(double s, double w, unsigned int idIn, unsigned int idOut
 inline dcomplex hAKKn(double s, double wg, double wz, unsigned int idIn, unsigned int idOut, double hIn, double hOut, unsigned int mode)
 {
 	dcomplex A(0,0);
-	return (hAGKKn(s,wg,idIn,idOut,mode) + hAZKKn(s,wz,idIn,idOut,hIn,hOut,mode));
+	// return (hAGKKn(s,wg,idIn,idOut,mode) + hAZKKn(s,wz,idIn,idOut,hIn,hOut,mode));
+	if     (gmZKKmode==BOTHGZ) A = hAGKKn(s,wg,idIn,idOut,mode) + hAZKKn(s,wz,idIn,idOut,hIn,hOut,mode);
+	else if(gmZKKmode==ONLYG)  A = hAGKKn(s,wg,idIn,idOut,mode);
+	else if(gmZKKmode==ONLYZ)  A = hAZKKn(s,wz,idIn,idOut,hIn,hOut,mode);
+	else _FATAL("gmZKKmode: "+_s(gmZKKmode)+" is not suported. can be 0,1,2 - see `enum GZKKmode`");
+	return A;
 }
 inline dcomplex hAKK(double s, unsigned int idIn, unsigned int idOut, double hIn, double hOut)
 {
@@ -161,6 +214,7 @@ inline dcomplex hAKKnoSM(double s, unsigned int idIn, unsigned int idOut, double
 
 
 //////////////////////////////////////////////////////
+// adding the angular information ////////////////////
 inline double hA2SM(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
 {
 	dcomplex A(0,0);
@@ -175,6 +229,20 @@ inline double hA2SM(double cosTheta, double s, unsigned int idIn, unsigned int i
 			angular = (1.+4.*hIn*hOut*cosTheta);
 			angular2 = angular*angular;
 			A2 += real(A*conj(A))*angular2;
+		}
+	}
+	return A2;
+}
+inline double hA2SM(double s, unsigned int idIn, unsigned int idOut)
+{
+	dcomplex A(0,0);
+	double A2 = 0.;
+	for(double hIn=-f12 ; hIn<=+f12 ; hIn++)
+	{
+		for(double hOut=-f12 ; hOut<=+f12 ; hOut++)
+		{
+			A = hASM(s,idIn,idOut,hIn,hOut);
+			A2 += real(A*conj(A));
 		}
 	}
 	return A2;
@@ -198,6 +266,21 @@ inline double hA2ZP(double cosTheta, double s, unsigned int idIn, unsigned int i
 	}
 	return A2;
 }
+inline double hA2ZP(double s, unsigned int idIn, unsigned int idOut)
+{
+	dcomplex A(0,0);
+	double A2 = 0.;
+	for(double hIn=-f12 ; hIn<=+f12 ; hIn++)
+	{
+		for(double hOut=-f12 ; hOut<=+f12 ; hOut++)
+		{
+			A = hAZP(s,idIn,idOut,hIn,hOut);
+			A2 += real(A*conj(A));
+			// A2 += norm(A); // Re[AxA*]=norm(A)=|A|^2, abs(A)=|A|
+		}
+	}
+	return A2;
+}
 inline double hA2ZPnoSM(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
 {
 	dcomplex A(0,0);
@@ -212,6 +295,87 @@ inline double hA2ZPnoSM(double cosTheta, double s, unsigned int idIn, unsigned i
 			angular = (1.+4.*hIn*hOut*cosTheta);
 			angular2 = angular*angular;
 			A2 += real(A*conj(A))*angular2;
+		}
+	}
+	return A2;
+}
+inline double hA2ZPnoSM(double s, unsigned int idIn, unsigned int idOut)
+{
+	dcomplex A(0,0);
+	double A2 = 0.;
+	for(double hIn=-f12 ; hIn<=+f12 ; hIn++)
+	{
+		for(double hOut=-f12 ; hOut<=+f12 ; hOut++)
+		{
+			A = hAZPnoSM(s,idIn,idOut,hIn,hOut);
+			A2 += real(A*conj(A));
+		}
+	}
+	return A2;
+}
+
+inline double hA2E6(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
+{
+	dcomplex A(0,0);
+	double A2 = 0.;
+	double angular = 0.;
+	double angular2 = 0.;
+	for(double hIn=-f12 ; hIn<=+f12 ; hIn++)
+	{
+		for(double hOut=-f12 ; hOut<=+f12 ; hOut++)
+		{
+			A = hAE6(s,idIn,idOut,hIn,hOut);
+			angular = (1.+4.*hIn*hOut*cosTheta);
+			angular2 = angular*angular;
+			A2 += real(A*conj(A))*angular2;
+			// A2 += norm(A); // Re[AxA*]=norm(A)=|A|^2, abs(A)=|A|
+		}
+	}
+	return A2;
+}
+inline double hA2E6(double s, unsigned int idIn, unsigned int idOut)
+{
+	dcomplex A(0,0);
+	double A2 = 0.;
+	for(double hIn=-f12 ; hIn<=+f12 ; hIn++)
+	{
+		for(double hOut=-f12 ; hOut<=+f12 ; hOut++)
+		{
+			A = hAE6(s,idIn,idOut,hIn,hOut);
+			A2 += real(A*conj(A));
+			// A2 += norm(A); // Re[AxA*]=norm(A)=|A|^2, abs(A)=|A|
+		}
+	}
+	return A2;
+}
+inline double hA2E6noSM(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
+{
+	dcomplex A(0,0);
+	double A2 = 0.;
+	double angular = 0.;
+	double angular2 = 0.;
+	for(double hIn=-f12 ; hIn<=+f12 ; hIn++)
+	{
+		for(double hOut=-f12 ; hOut<=+f12 ; hOut++)
+		{
+			A = hAE6noSM(s,idIn,idOut,hIn,hOut);
+			angular = (1.+4.*hIn*hOut*cosTheta);
+			angular2 = angular*angular;
+			A2 += real(A*conj(A))*angular2;
+		}
+	}
+	return A2;
+}
+inline double hA2E6noSM(double s, unsigned int idIn, unsigned int idOut)
+{
+	dcomplex A(0,0);
+	double A2 = 0.;
+	for(double hIn=-f12 ; hIn<=+f12 ; hIn++)
+	{
+		for(double hOut=-f12 ; hOut<=+f12 ; hOut++)
+		{
+			A = hAE6noSM(s,idIn,idOut,hIn,hOut);
+			A2 += real(A*conj(A));
 		}
 	}
 	return A2;
@@ -234,6 +398,20 @@ inline double hA2KK(double cosTheta, double s, unsigned int idIn, unsigned int i
 	}
 	return A2;
 }
+inline double hA2KK(double s, unsigned int idIn, unsigned int idOut)
+{
+	dcomplex A(0,0);
+	double A2 = 0.;
+	for(double hIn=-f12 ; hIn<=+f12 ; hIn++)
+	{
+		for(double hOut=-f12 ; hOut<=+f12 ; hOut++)
+		{
+			A = hAKK(s,idIn,idOut,hIn,hOut);
+			A2 += real(A*conj(A));
+		}
+	}
+	return A2;
+}
 inline double hA2KKnoSM(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
 {
 	dcomplex A(0,0);
@@ -252,13 +430,43 @@ inline double hA2KKnoSM(double cosTheta, double s, unsigned int idIn, unsigned i
 	}
 	return A2;
 }
+inline double hA2KKnoSM(double s, unsigned int idIn, unsigned int idOut)
+{
+	dcomplex A(0,0);
+	double A2 = 0.;
+	for(double hIn=-f12 ; hIn<=+f12 ; hIn++)
+	{
+		for(double hOut=-f12 ; hOut<=+f12 ; hOut++)
+		{
+			A = hAKKnoSM(s,idIn,idOut,hIn,hOut);
+			A2 += real(A*conj(A));
+		}
+	}
+	return A2;
+}
+
 
 
 //////////////////////////////////////////////////////////
+// validations and weights calculation ///////////////////
+inline void writeparameters(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
+{
+	_ERROR("Event parameters: cosTheta="+_s(cosTheta)+", s="+_s(s)+", idIn="+_s(idIn)+", idOut="+_s(idOut));
+}
+inline void writeparameters(double s, unsigned int idIn, unsigned int idOut)
+{
+	_ERROR("Event parameters: s="+_s(s)+", idIn="+_s(idIn)+", idOut="+_s(idOut));
+}
 inline void validateinput(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
 {
 	if(s<0.)              { _ERROR("s<0., exitting now.");              exit(-1); }
 	if(fabs(cosTheta)>1.) { _ERROR("fabs(cosTheta)>1., exitting now."); exit(-1); }
+	if(idIn<=0)           { _ERROR("idIn<0, exitting now.");            exit(-1); }
+	if(idOut<=0)          { _ERROR("idOut<0, exitting now.");           exit(-1); }
+}
+inline void validateinput(double s, unsigned int idIn, unsigned int idOut)
+{
+	if(s<0.)              { _ERROR("s<0., exitting now.");              exit(-1); }
 	if(idIn<=0)           { _ERROR("idIn<0, exitting now.");            exit(-1); }
 	if(idOut<=0)          { _ERROR("idOut<0, exitting now.");           exit(-1); }
 }
@@ -275,12 +483,26 @@ inline double weightKK(double cosTheta, double s, unsigned int idIn, unsigned in
 	validateinput(cosTheta,s,idIn,idOut);
 	double N = hA2KK(cosTheta,s,idIn,idOut);
 	double D = hA2SM(cosTheta,s,idIn,idOut);
-	if(std::isinf(N)) {_ERROR("hA2KK is inf, returning weight=0 for this event"); return 0.;}
-	if(std::isnan(N)) {_ERROR("hA2KK is nan, returning weight=0 for this event"); return 0.;}
-	if(std::isinf(D)) {_ERROR("hA2SM is inf, returning weight=0 for this event"); return 0.;}
-	if(std::isnan(D)) {_ERROR("hA2SM is nan, returning weight=0 for this event"); return 0.;}
-	if(D<=0.)         {_ERROR("hA2SM is "+_s(D)+", returning weight=0 for this event");  return 0.;}
-	if(N<0.)          {_ERROR("hA2KK is "+_s(N)+", returning weight=0 for this event");  return 0.;}
+	if(std::isinf(N)) {_ERROR("hA2KK is inf, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(std::isnan(N)) {_ERROR("hA2KK is nan, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(std::isinf(D)) {_ERROR("hA2SM is inf, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(std::isnan(D)) {_ERROR("hA2SM is nan, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(D<=0.)         {_ERROR("hA2SM is "+_s(D)+", returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(N<0.)          {_ERROR("hA2KK is "+_s(N)+", returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	// validateoutput(N,D);
+	return N/D;
+}
+inline double weightKK(double s, unsigned int idIn, unsigned int idOut)
+{
+	validateinput(s,idIn,idOut);
+	double N = hA2KK(s,idIn,idOut);
+	double D = hA2SM(s,idIn,idOut);
+	if(std::isinf(N)) {_ERROR("hA2KK is inf, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(std::isnan(N)) {_ERROR("hA2KK is nan, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(std::isinf(D)) {_ERROR("hA2SM is inf, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(std::isnan(D)) {_ERROR("hA2SM is nan, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(D<=0.)         {_ERROR("hA2SM is "+_s(D)+", returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(N<0.)          {_ERROR("hA2KK is "+_s(N)+", returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
 	// validateoutput(N,D);
 	return N/D;
 }
@@ -289,12 +511,26 @@ inline double weightKKnoSM(double cosTheta, double s, unsigned int idIn, unsigne
 	validateinput(cosTheta,s,idIn,idOut);
 	double N = hA2KKnoSM(cosTheta,s,idIn,idOut);
 	double D = hA2SM(cosTheta,s,idIn,idOut);
-	if(std::isinf(N)) {_ERROR("hA2KKnoSM is inf, returning weight=0 for this event"); return 0.;}
-	if(std::isnan(N)) {_ERROR("hA2KKnoSM is nan, returning weight=0 for this event"); return 0.;}
-	if(std::isinf(D)) {_ERROR("hA2SM is inf, returning weight=0 for this event"); return 0.;}
-	if(std::isnan(D)) {_ERROR("hA2SM is nan, returning weight=0 for this event"); return 0.;}
-	if(D<=0.)         {_ERROR("hA2SM is "+_s(D)+", returning weight=0 for this event");  return 0.;}
-	if(N<0.)          {_ERROR("hA2KKnoSM is "+_s(N)+", returning weight=0 for this event");  return 0.;}
+	if(std::isinf(N)) {_ERROR("hA2KKnoSM is inf, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(std::isnan(N)) {_ERROR("hA2KKnoSM is nan, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(std::isinf(D)) {_ERROR("hA2SM is inf, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(std::isnan(D)) {_ERROR("hA2SM is nan, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(D<=0.)         {_ERROR("hA2SM is "+_s(D)+", returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut);  return 0.;}
+	if(N<0.)          {_ERROR("hA2KKnoSM is "+_s(N)+", returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut);  return 0.;}
+	// validateoutput(N,D);
+	return N/D;
+}
+inline double weightKKnoSM(double s, unsigned int idIn, unsigned int idOut)
+{
+	validateinput(s,idIn,idOut);
+	double N = hA2KKnoSM(s,idIn,idOut);
+	double D = hA2SM(s,idIn,idOut);
+	if(std::isinf(N)) {_ERROR("hA2KKnoSM is inf, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(std::isnan(N)) {_ERROR("hA2KKnoSM is nan, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(std::isinf(D)) {_ERROR("hA2SM is inf, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(std::isnan(D)) {_ERROR("hA2SM is nan, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(D<=0.)         {_ERROR("hA2SM is "+_s(D)+", returning weight=0 for this event"); writeparameters(s,idIn,idOut);  return 0.;}
+	if(N<0.)          {_ERROR("hA2KKnoSM is "+_s(N)+", returning weight=0 for this event"); writeparameters(s,idIn,idOut);  return 0.;}
 	// validateoutput(N,D);
 	return N/D;
 }
@@ -303,12 +539,26 @@ inline double weightZP(double cosTheta, double s, unsigned int idIn, unsigned in
 	validateinput(cosTheta,s,idIn,idOut);
 	double N = hA2ZP(cosTheta,s,idIn,idOut);
 	double D = hA2SM(cosTheta,s,idIn,idOut);
-	if(std::isinf(N)) {_ERROR("hA2ZP is inf, returning weight=0 for this event"); return 0.;}
-	if(std::isnan(N)) {_ERROR("hA2ZP is nan, returning weight=0 for this event"); return 0.;}
-	if(std::isinf(D)) {_ERROR("hA2SM is inf, returning weight=0 for this event"); return 0.;}
-	if(std::isnan(D)) {_ERROR("hA2SM is nan, returning weight=0 for this event"); return 0.;}
-	if(D<=0.)         {_ERROR("hA2SM is "+_s(D)+", returning weight=0 for this event");  return 0.;}
-	if(N<0.)          {_ERROR("hA2ZP is "+_s(N)+", returning weight=0 for this event");  return 0.;}
+	if(std::isinf(N)) {_ERROR("hA2ZP is inf, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(std::isnan(N)) {_ERROR("hA2ZP is nan, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(std::isinf(D)) {_ERROR("hA2SM is inf, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(std::isnan(D)) {_ERROR("hA2SM is nan, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(D<=0.)         {_ERROR("hA2SM is "+_s(D)+", returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(N<0.)          {_ERROR("hA2ZP is "+_s(N)+", returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	// validateoutput(N,D);
+	return N/D;
+}
+inline double weightZP(double s, unsigned int idIn, unsigned int idOut)
+{
+	validateinput(s,idIn,idOut);
+	double N = hA2ZP(s,idIn,idOut);
+	double D = hA2SM(s,idIn,idOut);
+	if(std::isinf(N)) {_ERROR("hA2ZP is inf, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(std::isnan(N)) {_ERROR("hA2ZP is nan, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(std::isinf(D)) {_ERROR("hA2SM is inf, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(std::isnan(D)) {_ERROR("hA2SM is nan, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(D<=0.)         {_ERROR("hA2SM is "+_s(D)+", returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(N<0.)          {_ERROR("hA2ZP is "+_s(N)+", returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
 	// validateoutput(N,D);
 	return N/D;
 }
@@ -317,17 +567,92 @@ inline double weightZPnoSM(double cosTheta, double s, unsigned int idIn, unsigne
 	validateinput(cosTheta,s,idIn,idOut);
 	double N = hA2ZPnoSM(cosTheta,s,idIn,idOut);
 	double D = hA2SM(cosTheta,s,idIn,idOut);
-	if(std::isinf(N)) {_ERROR("hA2ZPnoSM is inf, returning weight=0 for this event"); return 0.;}
-	if(std::isnan(N)) {_ERROR("hA2ZPnoSM is nan, returning weight=0 for this event"); return 0.;}
-	if(std::isinf(D)) {_ERROR("hA2SM is inf, returning weight=0 for this event"); return 0.;}
-	if(std::isnan(D)) {_ERROR("hA2SM is nan, returning weight=0 for this event"); return 0.;}
-	if(D<=0.)         {_ERROR("hA2SM is "+_s(D)+", returning weight=0 for this event");  return 0.;}
-	if(N<0.)          {_ERROR("hA2ZPnoSM is "+_s(N)+", returning weight=0 for this event");  return 0.;}
+	if(std::isinf(N)) {_ERROR("hA2ZPnoSM is inf, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(std::isnan(N)) {_ERROR("hA2ZPnoSM is nan, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(std::isinf(D)) {_ERROR("hA2SM is inf, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(std::isnan(D)) {_ERROR("hA2SM is nan, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(D<=0.)         {_ERROR("hA2SM is "+_s(D)+", returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(N<0.)          {_ERROR("hA2ZPnoSM is "+_s(N)+", returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	// validateoutput(N,D);
+	return N/D;
+}
+inline double weightZPnoSM(double s, unsigned int idIn, unsigned int idOut)
+{
+	validateinput(s,idIn,idOut);
+	double N = hA2ZPnoSM(s,idIn,idOut);
+	double D = hA2SM(s,idIn,idOut);
+	if(std::isinf(N)) {_ERROR("hA2ZPnoSM is inf, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(std::isnan(N)) {_ERROR("hA2ZPnoSM is nan, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(std::isinf(D)) {_ERROR("hA2SM is inf, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(std::isnan(D)) {_ERROR("hA2SM is nan, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(D<=0.)         {_ERROR("hA2SM is "+_s(D)+", returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(N<0.)          {_ERROR("hA2ZPnoSM is "+_s(N)+", returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
 	// validateoutput(N,D);
 	return N/D;
 }
 
 
+
+
+inline double weightE6(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
+{
+	validateinput(cosTheta,s,idIn,idOut);
+	double N = hA2E6(cosTheta,s,idIn,idOut);
+	double D = hA2SM(cosTheta,s,idIn,idOut);
+	if(std::isinf(N)) {_ERROR("hA2E6 is inf, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(std::isnan(N)) {_ERROR("hA2E6 is nan, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(std::isinf(D)) {_ERROR("hA2SM is inf, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(std::isnan(D)) {_ERROR("hA2SM is nan, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(D<=0.)         {_ERROR("hA2SM is "+_s(D)+", returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(N<0.)          {_ERROR("hA2E6 is "+_s(N)+", returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	// validateoutput(N,D);
+	return N/D;
+}
+inline double weightE6(double s, unsigned int idIn, unsigned int idOut)
+{
+	validateinput(s,idIn,idOut);
+	double N = hA2E6(s,idIn,idOut);
+	double D = hA2SM(s,idIn,idOut);
+	if(std::isinf(N)) {_ERROR("hA2E6 is inf, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(std::isnan(N)) {_ERROR("hA2E6 is nan, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(std::isinf(D)) {_ERROR("hA2SM is inf, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(std::isnan(D)) {_ERROR("hA2SM is nan, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(D<=0.)         {_ERROR("hA2SM is "+_s(D)+", returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(N<0.)          {_ERROR("hA2E6 is "+_s(N)+", returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	// validateoutput(N,D);
+	return N/D;
+}
+inline double weightE6noSM(double cosTheta, double s, unsigned int idIn, unsigned int idOut)
+{
+	validateinput(cosTheta,s,idIn,idOut);
+	double N = hA2E6noSM(cosTheta,s,idIn,idOut);
+	double D = hA2SM(cosTheta,s,idIn,idOut);
+	if(std::isinf(N)) {_ERROR("hA2E6noSM is inf, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(std::isnan(N)) {_ERROR("hA2E6noSM is nan, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(std::isinf(D)) {_ERROR("hA2SM is inf, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(std::isnan(D)) {_ERROR("hA2SM is nan, returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(D<=0.)         {_ERROR("hA2SM is "+_s(D)+", returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	if(N<0.)          {_ERROR("hA2E6noSM is "+_s(N)+", returning weight=0 for this event"); writeparameters(cosTheta,s,idIn,idOut); return 0.;}
+	// validateoutput(N,D);
+	return N/D;
+}
+inline double weightE6noSM(double s, unsigned int idIn, unsigned int idOut)
+{
+	validateinput(s,idIn,idOut);
+	double N = hA2E6noSM(s,idIn,idOut);
+	double D = hA2SM(s,idIn,idOut);
+	if(std::isinf(N)) {_ERROR("hA2E6noSM is inf, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(std::isnan(N)) {_ERROR("hA2E6noSM is nan, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(std::isinf(D)) {_ERROR("hA2SM is inf, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(std::isnan(D)) {_ERROR("hA2SM is nan, returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(D<=0.)         {_ERROR("hA2SM is "+_s(D)+", returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	if(N<0.)          {_ERROR("hA2E6noSM is "+_s(N)+", returning weight=0 for this event"); writeparameters(s,idIn,idOut); return 0.;}
+	// validateoutput(N,D);
+	return N/D;
+}
+
+
+/*
 //////////////////////////////////////////////////////////
 inline double hA2SMsumQ(double cosTheta, double s, unsigned int idOut)
 {
@@ -379,37 +704,12 @@ inline double hA2KKnoSMsumQ(double cosTheta, double s, unsigned int idOut)
 	}
 	return A2;
 }
+*/
 
-/* 
-//////////////////////////////////////////////////////////////////
-// http://homepage.mac.com/sigfpe/Computing/fobjects.html
-template<class F>
-double integrate(const F &f, double xMin, double xMax, unsigned int nsegments=100)
-{
-	double dx        = (xMax-xMin)/((double)nsegments);
-	double h         = dx/3.;
-	double integrand = 0.;
-	double I         = 0.;
-	double x         = xMin;
-	unsigned int i   = 0;
-	
-	while(i<=nsegments) // i=0(1st point),...,i=nsegments(point nth+1)
-	{
-		// calculate the integrand 
-		integrand = f(x);
 
-		// simpson
-		if      (i==0 || i==nsegments)           I+=integrand;
-		else if (i%2==0 && i!=0 && i!=nsegments) I+=2.*integrand;
-		else                                     I+=4.*integrand;
 
-		// propagate x and i
-		x += dx;
-		i++;
-	}
-	return(h*I);
-} */
-
+///////////////////////////////////////////////////////////////////////////////
+// for doing the integration over cos(theta*), need to define template classes 
 class template_hA2SM
 {
 	double s;
@@ -449,6 +749,32 @@ class template_hA2ZPnoSM
 			return hA2ZPnoSM(cosTheta,s,idIn,idOut);
 		}
 };
+class template_hA2E6
+{
+	double s;
+	unsigned int idIn;
+	unsigned int idOut;
+	public:
+		template_hA2E6(double s0, unsigned int idIn0, unsigned int idOut0) : s(s0), idIn(idIn0), idOut(idOut0) { }
+		template<class X>
+		X operator()(X cosTheta) const
+		{
+			return hA2E6(cosTheta,s,idIn,idOut);
+		}
+};
+class template_hA2E6noSM
+{
+	double s;
+	unsigned int idIn;
+	unsigned int idOut;
+	public:
+		template_hA2E6noSM(double s0, unsigned int idIn0, unsigned int idOut0) : s(s0), idIn(idIn0), idOut(idOut0) { }
+		template<class X>
+		X operator()(X cosTheta) const
+		{
+			return hA2E6noSM(cosTheta,s,idIn,idOut);
+		}
+};
 class template_hA2KK
 {
 	double s;
@@ -475,64 +801,6 @@ class template_hA2KKnoSM
 			return hA2KKnoSM(cosTheta,s,idIn,idOut);
 		}
 };
-
-
-
-/////////////////////////////////////////////////////////////////
-// class IrZP
-// {
-	// double s;
-	// unsigned int idIn;
-	// unsigned int idOut;
-	// public:
-		// IrZP(double s0, unsigned int idIn0, unsigned int idOut0) : s(s0), idIn(idIn0), idOut(idOut0) { }
-		// template<class X>
-		// X operator()(X cosTheta) const
-		// {
-			// return weightZP(cosTheta,s,idIn,idOut);
-		// }
-// };
-// class IrKK
-// {
-	// double s;
-	// unsigned int idIn;
-	// unsigned int idOut;
-	// public:
-		// IrKK(double s0, unsigned int idIn0, unsigned int idOut0) : s(s0), idIn(idIn0), idOut(idOut0) { }
-		// template<class X>
-		// X operator()(X cosTheta) const
-		// {
-			// return weightKK(cosTheta,s,idIn,idOut);
-		// }
-// };
-
-
-
-
-
-
-/* class F
-{
-	double y;
-	double z;
-	public:
-		F(double y0, double z0) : y(y0), z(z0) { }
-		template<class X>
-		X operator()(X x) const
-		{
-			return x*y*z;
-		}
-}; */
-
-/*
-int main() {
-	. . .
-	. . .
-	F f(2,3);
-	integrate(f,0,1);
-	. . .
-}
-*/
 
 
 }

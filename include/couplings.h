@@ -22,10 +22,39 @@
 namespace couplings
 {
 
-static bool doScale = false;
+static bool doScale      = false;
+static bool doScaleWidth = true; // turn on/off the g^2 scale in the BW width (default = true)
+
+static const double thetaE6_psi = 0.;
+static const double thetaE6_chi = -pi/2.;
+static const double thetaE6_eta = asin(sqrt(3./8.));
+static const double thetaE6_I   = asin(sqrt(5./8.));
+
+static double thetaE6 = thetaE6_psi;
+
 void setCouplingsScale(bool doscale)
 {
 	doScale = doscale;
+}
+
+void setScaleWidth(bool doscale)
+{
+	doScaleWidth = doscale;
+}
+
+void setThetaE6(double thetae6)
+{
+	if(fabs(thetae6)>2.*pi) _FATAL("fabs(thetae6)>2.*pi for thetae6="+_s(thetae6));
+	thetaE6 = thetae6;
+}
+
+void setThetaE6(TString model)
+{
+	if     (model=="psi") setThetaE6(thetaE6_psi);
+	else if(model=="chi") setThetaE6(thetaE6_chi);
+	else if(model=="eta") setThetaE6(thetaE6_eta);
+	else if(model=="I")   setThetaE6(thetaE6_I);
+	else _FATAL("E6 model :"+(string)model+", is not supported.");
 }
 
 ui2fermion ui2f;
@@ -119,10 +148,46 @@ inline double gZH(unsigned int id, double h)
 	return 0.;
 }
 
+// E6
+inline double gVE6(unsigned int id)
+{
+	double gV = 0.;
+	if     (id==s2f["nuel"]->id || id==s2f["numu"]->id || id==s2f["nutau"]->id) gV = 1./6.*sqrt(5./2.)*cos(thetaE6)-3./2.*sqrt(1./6.)*sin(thetaE6);
+	else if(id==s2f["elec"]->id || id==s2f["muon"]->id || id==s2f["tau"]->id)   gV = -2./sqrt(6.)*sin(thetaE6);
+	else if(id==s2f["up"]->id   || id==s2f["chm"]->id  || id==s2f["top"]->id)   gV = 0.;
+	else if(id==s2f["dwn"]->id  || id==s2f["str"]->id  || id==s2f["bot"]->id)   gV = +2./sqrt(6.)*sin(thetaE6);
+	else _FATAL("id="+_s(id)+" is not supported");
+	return gV;
+}
+inline double gAE6(unsigned int id)
+{
+	double gA = 0.;
+	if     (id==s2f["nuel"]->id || id==s2f["numu"]->id || id==s2f["nutau"]->id) gA = 1./6.*sqrt(5./2.)*cos(thetaE6)-3./2.*sqrt(1./6.)*sin(thetaE6);
+	else if(id==s2f["elec"]->id || id==s2f["muon"]->id || id==s2f["tau"]->id)   gA = 1./3.*sqrt(5./2.)*cos(thetaE6)-sqrt(1./6.)*sin(thetaE6);
+	else if(id==s2f["up"]->id   || id==s2f["chm"]->id  || id==s2f["top"]->id)   gA = 1./3.*sqrt(5./2.)*cos(thetaE6)+sqrt(1./6.)*sin(thetaE6);
+	else if(id==s2f["dwn"]->id  || id==s2f["str"]->id  || id==s2f["bot"]->id)   gA = 1./3.*sqrt(5./2.)*cos(thetaE6)-sqrt(1./6.)*sin(thetaE6);
+	else _FATAL("id="+_s(id)+" is not supported");
+	return gA;
+}
+inline double gLE6(unsigned int id) { return (1./sqrt(sw2*cw2))*(gVE6(id)+gAE6(id))/2.; }
+inline double gRE6(unsigned int id) { return (1./sqrt(sw2*cw2))*(gVE6(id)-gAE6(id))/2.; }
+inline double gHE6(unsigned int id, double h)
+{
+	if     (h==-f12) return gLE6(id);
+	else if(h==+f12) return gRE6(id);
+	else _FATAL("unknown helicity: "+_s(h));
+	return 0.;
+}
+
 // ZP (real methods for ZP are like for Z0)
 inline dcomplex fgZPL(unsigned int id)           { return fgZP*gZL(id); }
 inline dcomplex fgZPR(unsigned int id)           { return fgZP*gZR(id); }
 inline dcomplex fgZPH(unsigned int id, double h) { return fgZP*gZH(id,h); }
+
+// ZP E6 
+inline dcomplex fgE6L(unsigned int id)           { return fgZP*gLE6(id); }
+inline dcomplex fgE6R(unsigned int id)           { return fgZP*gRE6(id); }
+inline dcomplex fgE6H(unsigned int id, double h) { return fgZP*gHE6(id,h); }
 
 // KK (no scale)
 inline double qGKK(unsigned int id)            { return sq2*gG(id); }

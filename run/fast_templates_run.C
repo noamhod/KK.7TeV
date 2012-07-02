@@ -26,37 +26,44 @@ Double_t singleMass = -1.;
 ///////////////////////////////////////
 // selectors //////////////////////////
 ///////////////////////////////////////
-bool doGrid             = false;
+bool doGrid             = true;
+bool doLocal            = true;    // should be combined with the doGrid=true 
 bool isMC11c            = true;
 bool isMuons            = true;    // false for electrons
 bool doSigmaUp          = false;
-bool dog2               = false;
+bool dog2               = true;
 bool dog4               = true;
 bool do33st             = true;
 bool do32st             = true;
 bool doSmearing         = true;     // false is simply the old selection (before 3+3 / 3+2) -> should not be changed  !
-bool doFullKKtemplates  = false;    // will not change anything if doTemplates is "false"
+bool doFullKKtemplates  = true;    // will not change anything if doTemplates is "false"
 bool doFullZPtemplates  = true;     // will not change anything if doTemplates is "false"
 bool dopileup           = true;
 bool doOverallEWkfactor = true;
-bool doQCDkfactor       = false;
+bool doQCDkfactor       = true;
 bool doZpT              = true;
 bool doEEtrigSF         = true;
 bool doTruth            = false;
 bool doOfficialZP       = false;
 bool doSingleMass       = false;
-bool doInterference     = false;
+bool doInterference     = true;
 bool doFixedwidth       = false;
+bool doScalewidth       = true;
 bool doTreeLevel        = true; // relevant for truth only
 
 TString channel   = "";
+TString tschannel = "";
 TString chlabel   = "";
 TString tsgN      = "";
 TString tsgNlabel = "";
 
 void matchFlags(TString channelName="mm", TString gPower="g2", Bool_t doSigUp=0)
 {
-	doOverallEWkfactor = doInterference;
+	if(doOverallEWkfactor && !doInterference)
+	{
+		_WARNING("running without interference but with EWkF, switching the EWkF flag to false");
+		doOverallEWkfactor = false;
+	}
 	
 	if(channelName=="mm")      isMuons = true;
 	else if(channelName=="ee") isMuons = false;
@@ -67,6 +74,7 @@ void matchFlags(TString channelName="mm", TString gPower="g2", Bool_t doSigUp=0)
 	if(doSigUp && isMuons)       doSigmaUp = true;
 	else if(!doSigUp && isMuons) doSigmaUp = false;
 	
+	tschannel = (isMuons) ? "mm"     : "ee";
 	channel   = (isMuons) ? "mumu"   : "ee";
 	chlabel   = (isMuons) ? "#mu#mu" : "ee";
 	tsgN      = (dog4)    ? "g4"     : "g2";
@@ -101,6 +109,7 @@ TString fileNmaeSuffix()
 	if(!doTruth)             name += "_noTruth";
 	if(doOfficialZP)         name += "_wthOfficialZP";
 	if(doFixedwidth)         name += "_fixedBWwidth";
+	if(!doScalewidth)        name += "_noWidthScale";
 	if(doTreeLevel&&doTruth) name += "_treeLevel";
 	if(doSingleMass)         name += "_Xmass"+_s(singleMass);
 	return name;
@@ -109,7 +118,7 @@ TString fileNmaeSuffix()
 
 // other parameters
 TString ntupledir = "";
-TString ntupledir_regular = (isMC11c) ? "/storage/t3_data/hod/2011/NTUPLEMC11C/AFTERMCP000503" : "/storage/t3_data/hod/2011/NTUPLEMC11C/AFTERMCP000503";
+TString ntupledir_regular = "/storage/t3_data/hod/2011/NTUPLEMC11C/AFTER2STATIONSFIX";
 
 Int_t printmod    = 1000;
 Bool_t dolog      = true;
@@ -457,7 +466,7 @@ void setMCtrees(TString tsMCname)
 	clearMaps(); ///
 	////////////////
 
-	if(doGrid)
+	if(doGrid && !doLocal)
 	{
 		vector<TString> vnames;
 		readInput(vnames);
@@ -529,7 +538,7 @@ void setMCtrees(TString tsMCname)
 	{
 		sNMst += (do33st && !do32st) ? "_33st" : "";
 		sNMst += (do32st && !do33st) ? "_32st" : "";
-		sNMst += (do32st && do33st)  ? "_3332st" : "";
+		sNMst += (do32st && do33st)  ? "_3332st_v5" : ""; // !!!!!!!!!!!!!!!!! v5 !!!!!!!!!!!!!!!!!!!
 	}
 	else
 	{
@@ -1324,7 +1333,7 @@ void writeTemplates()
 
 	if(doGrid)
 	{
-		TString fTemplatesName = "template"+(TString)_s(singleMass)+"GeV.root";
+		TString fTemplatesName = "template_"+tschannel+tsgN+(TString)_s(singleMass)+"GeV.root";
 		TFile* fTemplates = new TFile(fTemplatesName, "RECREATE");
 
 		olddir->cd();
@@ -1643,6 +1652,11 @@ void runMCproc(TString mcName)
 			monitor(mcName,entry,N);
 		}		
 		_INFO((string)it->first+": done ("+_s(Npractice)+").");
+	
+		///////////////////////
+		delete it->second; ////
+		///////////////////////
+
 	}
 }
 
@@ -1674,7 +1688,8 @@ void run(TString channelName="mm", TString gPower="g2", Bool_t doSigUp=0, Double
 	///////////////////////////////////////////////
 	// theoretical stuff... ///////////////////////
 	setFermions(); ////////////////////////////////
-	setFixedWidth(false); /////////////////////////
+	setFixedWidth(doFixedwidth); //////////////////
+	setScaleWidth(doScalewidth); //////////////////
 	resetKKmass();/////////////////////////////////
 	resetZPmass(); ////////////////////////////////
 	resetfgZP(); //////////////////////////////////

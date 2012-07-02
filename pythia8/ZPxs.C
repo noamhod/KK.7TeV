@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 
 	// Process selection.
 	pythia.readString("NewGaugeBoson:ffbar2gmZZprime = on");
-        pythia.readString("Zprime:gmZmode = 3"); // only Z'
+    pythia.readString("Zprime:gmZmode = 3"); // only Z'
 
 	cout << "Z' mass is: " << mZP << endl;
 	

@@ -15,24 +15,25 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // Global definitions ///////////////////////////////////////////////////////////////////////
-bool doGrid          = false;
+bool doGrid          = true;
 bool doTruth         = false;
-bool doEWkf          = false;
-bool doInterference  = false;
-bool doKKtemplates   = false;
+bool doEWkf          = true;
+bool doInterference  = true;
+bool doScaleWidth    = true;
+bool doKKtemplates   = true;
 bool doOfficialZP    = false;
 bool dog4bins        = true;
 bool doInterpolation = false;
-TString model        = "";           // ZP or KK
+TString model        = "ZP";         // ZP or KK
 TString channel      = "#mu#mu";     // #mu#mu or ee
 TString mutype       = "3332st";     // or "33st" or "32st"
 TString binning      = "linearbins"; // or "powerbins"
 
 TString basedir      = (doInterference) ? ""        : "nointerference/";
 TString interference = (doInterference) ? ""        : "_noInterference";
-//TString overallEWkF  = (doInterference) ? ""        : "_noOverallEWkF";
 TString doEWkfactor  = (doEWkf)         ? ""        : "_noEWkF";
 TString dotruth      = (doTruth)        ? ""        : "_noTruth";
+TString doscalewidth = (doScaleWidth)   ? ""        : "_noWidthScale";
 TString gNbinning    = (dog4bins)       ? "_g4bins" : "_g2bins";
 TString KKtemplates  = (doKKtemplates)  ? ""        : "_noKKtmplates";
 TString officialZP   = (!doOfficialZP)  ? ""        : "_wthOfficialZP";
@@ -71,13 +72,19 @@ void setGridVersion()
 	if(!doGrid) version = "";
 	else    
 	{       
-		if(dog4bins) version = "v63/";//"v59/";//"v52/";
-		else         version = "v63/";//"v57/";//"v55/";
+		if(dog4bins) version = "v81/";//"v63/";//"v59/";//"v52/";
+		else         version = "v81/";//"v63/";//"v57/";//"v55/";
 	}
 }
 
 void setFpath()
 {
+	if(!doScaleWidth)
+	{
+		basedir.ReplaceAll("/","");
+		basedir+="_nowidthscale/";
+	}
+	
 	if(channel=="#mu#mu")
 	{
 		sDir = "plots/"+basedir+binning+"/"+gNNbins+"/"+mutype+"_nominal/"+version;
@@ -89,7 +96,7 @@ void setFpath()
 		else
 		{
 			//fpath = "_combined_2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+overallEWkF+doEWkfactor+dotruth;
-			fpath = "_combined_2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+doEWkfactor+dotruth;
+			fpath = "_combined_2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+doEWkfactor+dotruth+doscalewidth;
 		}
 	}
 	else if(channel=="ee")
@@ -393,7 +400,7 @@ void TH1toTF1(TString mod, int mXX)
 			
 			oldDir->cd();
 			h2X = (TH2D*)((TH2D*)(TObjArray*)tobjarr_syst_EWkF->At(mX))->Clone();
-			TF1* f = new TF1("fEWkF_mX"+mXname+"_mll"+mllname,fTH1toTF1,xmin,xmax,3);
+			f = new TF1("fEWkF_mX"+mXname+"_mll"+mllname,fTH1toTF1,xmin,xmax,3);
 			f->SetParameters(mX,mll,EWKF);
 			f->SetParNames("mX","mll","typ");
 			f->SetLineColor(kBlue);

@@ -370,6 +370,26 @@ void saveas(TCanvas* c, TString name, Bool_t savesource=false)
 	if(savesource) c->SaveAs(name+".C");
 }
 
+void saveas(TObject* obj, TString name, Bool_t logx=false, Bool_t logy=false, Bool_t logz=false, Bool_t savesource=false)
+{
+	TCanvas* c = new TCanvas("","",600,400);
+	c->cd();
+	c->Draw();
+	if(logx) c->SetLogx();
+	if(logy) c->SetLogy();
+	if(logz) c->SetLogz();
+	c->SetTicks(1,1);
+	obj->Draw();
+	c->RedrawAxis();
+	c->Update();
+	c->SaveAs(name+".png");
+	c->SaveAs(name+".pdf");
+	c->SaveAs(name+".eps");
+	c->SaveAs(name+".root");
+	if(savesource) c->SaveAs(name+".C");
+	delete c;
+}
+
 void savemultipdf(TCanvas* c, TString fullpath, unsigned int state)
 {
 	switch(state)
@@ -380,6 +400,51 @@ void savemultipdf(TCanvas* c, TString fullpath, unsigned int state)
 	}
 	c->SaveAs(fullpath);
 }
+
+void plotsurface
+(
+	TH2D* h,
+	TString name="", Float_t phi = -25, bool dologz=true,
+	Double_t ymin=0.,
+	Double_t ymax=0.,
+	Int_t nPrimitiveBins=0
+)
+{
+	TCanvas* c = NULL;
+	h->SetTitle("");
+
+	c = new TCanvas("c","c",900,600);
+	c->cd();
+	c->Draw();
+	c->SetLogx();
+	if(dologz) c->SetLogz();
+	
+	if(nPrimitiveBins>0)
+	{
+		h->GetYaxis()->SetLimits(ymin,ymax);
+		Int_t nBins = nPrimitiveBins*(Int_t)(ymax-ymin);
+		h->GetYaxis()->Set(nBins,ymin,ymax);
+	}
+	//// h->GetYaxis()->SetNdivisions((Int_t)(10.*16),kFALSE);
+	//// h->RebinY(5);
+	
+	//// h->SetFillColor(kOrange);
+	//// h->Draw("SURF4");
+	
+	c->SetPhi(phi);
+	c->SetTheta(20);
+	
+	h->GetZaxis()->SetTitleOffset(1.3);
+	
+	h->Draw("SURF3");
+
+	c->Modified();
+	c->Update();
+	c->SaveAs(name+".png");
+	c->SaveAs(name+".eps");
+	delete c;
+}
+
 
 TCanvas* stackratio(TString name,
 					TH1D* hNumerator, THStack* hsDenominator, TList* hlSignals,

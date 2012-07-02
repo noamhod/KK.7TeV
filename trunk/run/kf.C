@@ -197,25 +197,31 @@ void kf()
 	f1->SetLineColor(kRed);
 	f1->SetLineWidth(1);
 	f1->GetXaxis()->SetTitle("m_{ll} GeV");
+	f1->GetYaxis()->SetTitle("Correction (weight)");
 	f2->SetLineColor(kBlue);
 	f2->SetLineWidth(1);
 	f2->GetXaxis()->SetTitle("m_{ll} GeV");
+	f2->GetYaxis()->SetTitle("Correction (weight)");
 	f3->SetLineColor(kBlack);
 	f3->SetLineWidth(1);
 	f3->GetXaxis()->SetTitle("m_{ll} GeV");
+	f3->GetYaxis()->SetTitle("Correction (weight)");
 	
 	f11->SetLineColor(kRed);
 	f11->SetLineWidth(1);
 	f11->SetLineStyle(3);
 	f11->GetXaxis()->SetTitle("m_{ll} GeV");
+	f11->GetYaxis()->SetTitle("Correction (weight)");
 	f22->SetLineColor(kBlue);
 	f22->SetLineWidth(1);
 	f22->SetLineStyle(3);
 	f22->GetXaxis()->SetTitle("m_{ll} GeV");
+	f22->GetYaxis()->SetTitle("Correction (weight)");
 	f33->SetLineColor(kBlack);
 	f33->SetLineWidth(1);
 	f33->SetLineStyle(3);
 	f33->GetXaxis()->SetTitle("m_{ll} GeV");
+	f33->GetYaxis()->SetTitle("Correction (weight)");
 	
 
 	f11->SetMinimum(0.);

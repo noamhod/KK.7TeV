@@ -2,7 +2,10 @@
 #include "../include/rawROOT.h"
 #include "../include/logs.h"
 #include "../include/bins.h"
-// #include "../include/histos.h"
+#include "../include/histos.h"
+#include "../include/kFactors.h"
+
+using namespace kFactors;
 
 TString model     = "ZP";
 TString channel   = "mm";
@@ -72,49 +75,41 @@ void normtest()
 
 	Int_t gNbin   = 1; //==> g^4=0 ==> DY !
 	Int_t minMbin = 25;
-	Int_t maxMbin = 37;
+	Int_t maxMbin = 45;
 	TString modelNmae = (model=="ZP") ? "Zprime_SSM" : "KK";
 	unsigned int precision = 10.;
 	
 	Int_t maxMassPointsIndex = (Int_t)((mXXmax-mXXmin)/dmXX);
 
-	/*
-	//// from Simon
-	TString fBGname1 = "";
-	TString fBGname2 = "";
-	if     (mutype=="33st") fBGname1 = "plots/DimuonHists_Feb05_3stC.root";
-	else if(mutype=="32st") fBGname1 = "plots/DimuonHists_Feb05_2stC.root";
-	else if(mutype=="3332st")
-	{
-		fBGname1 = "plots/DimuonHists_Feb05_3stC.root";
-		fBGname2 = "plots/DimuonHists_Feb05_2stC.root";
-	}
-	TFile* fD1 = new TFile(fBGname1,"READ");
-	TH1D* h1dy = (TH1D*)fD1->Get("ZLogmass_DYmm")->Clone();
-	if(mutype=="3332st")
-	{
-		_INFO("Adding the 3+2 DY histogram");
-		TFile* fD2 = new TFile(fBGname2,"READ");
-		TH1D* h1dy32st = (TH1D*)fD2->Get("ZLogmass_DYmm")->Clone();
-		h1dy->Add(h1dy32st);
-		_INFO("done");
-	}
-	TH1D* h1template = (TH1D*)fD1->Get("ZLogmass_DYmm")->Clone("template");
-	h1template->Reset();
-	*/
-	
 	//// from Rozmin
 	TH1D* h1dy;
 	TH1D* h1template;
 	if(channel=="mm")
 	{
-		TString fBGname1 = "plots/CombinedMu_Templates_and_Data.root";
+		//TString fBGname1 = "plots/invariant_mass_hists_comb_250stitch.root";
+		TString fBGname1 = "plots/invariant_mass_hists_comb_250stitch_07052012.root";
 		TFile* fD1 = new TFile(fBGname1,"READ");
-		h1dy = (TH1D*)fD1->Get("mass_plot_dy")->Clone(); // GeV
+		h1dy = (TH1D*)fD1->Get("mass_plot_dy_noTau")->Clone(); // GeV
 		h1dy = (TH1D*)hGeV2TeV(h1dy);
-		h1template = (TH1D*)fD1->Get("mass_plot_dy")->Clone("template");
+		h1template = (TH1D*)fD1->Get("mass_plot_dy_noTau")->Clone("template");
 		h1template = (TH1D*)hGeV2TeV(h1template);
 		h1template->Reset();
+
+		/*
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		TFile* fT1 = new TFile("/data/hod/2011/functions/functions_MAY14_v81mm_v4ee/KKmm_functions_g2bins_npx400.root","READ");
+		TH2D*  h2Ttmp = (TH2D*)fT1->Get("19_nominal/hg2Mass_template_KK2030")->Clone("test");
+		for(Int_t bin=1 ; bin<=h1dy->GetNbinsX() ; bin++)
+		{
+			h1dy->SetBinContent(bin,h2Ttmp->GetBinContent(bin,gNbin)); // g^4=0 or g^2=0 -> DY !
+			h1dy->SetBinError(bin,h2Ttmp->GetBinError(bin,gNbin));
+		}
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		*/
 	}
 	else
 	{
@@ -141,17 +136,47 @@ void normtest()
 	// toartmp->Read("template2d");
 	
 	TString infName = "";
-	if(channel=="mm") infName = "/srv01/tau/hod/z0analysis-tests/z0analysis-r170/run/plots/linearbins/g2bins/3332st_nominal/v63/template_nominal_3030GeV_v63.root";
+	//if(channel=="mm") infName = "/srv01/tau/hod/z0analysis-tests/z0analysis-r170/run/plots/linearbins/g2bins/3332st_nominal/v63/template_nominal_3030GeV_v63.root";
+	//if(channel=="mm") infName = "/srv01/tau/hod/z0analysis-tests/z0analysis-r170/run/plots/linearbins/g4bins/3332st_nominal/v70/template_nominal_3030GeV_v70.root";
+	//if(channel=="mm") infName = "/srv01/tau/hod/z0analysis-tests/z0analysis-r170/run/plots/linearbins/g2bins/3332st_nominal/v81/template_nominal_5730GeV_v81.root";
+	if(channel=="mm") infName = "/srv01/tau/hod/z0analysis-tests/z0analysis-r170/run/plots/linearbins/g4bins/3332st_nominal/v81/template_nominal_4730GeV_v81.root";
 	if(channel=="ee") infName = "/srv01/tau/yiftahsi/KK_analysis_t301/plots/linearbins/g4bins/ee_nominal/v4/template_nominal_3030GeV_v63.root";
 	// TString infName = "/data/hod/2011/grid/3332st/162bins/g2.nominal.v57/template_nominal_3030GeV_v57.root";
+
+	_INFO("GETTING -> "+(string)infName);
 	TFile* fT = new TFile(infName,"READ");
 	TObjArray* toartmp = new TObjArray();
 	toartmp->Read("template2dKK");
 	TH2D* h2T = (TH2D*)((TH2D*)(TObjArray*)toartmp->At(0))->Clone();
+
+	/*
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	if(channel=="mm")
+	{
+		//TFile* ftmp = new TFile("/data/hod/2011/functions/functions_MAY11_v70mm_v4ee/KKmm_3332st_functions_g2bins_npx400.root","READ");
+		//TFile* ftmp = new TFile("plots/linearbins/g2bins/3332st_nominal/v81/KKmm_3332st_functions_g2bins_npx400.root","READ");
+		//TFile* ftmp = new TFile("/data/hod/2011/functions/functions_MAY14_v81mm_v4ee/KKmm_nostitch_functions_g2bins_npx400.root","READ");
+		TFile* ftmp = new TFile("/data/hod/2011/functions/functions_MAY14_v81mm_v4ee/KKmm_nostitch_functions_g2bins_npx400.root","READ");
+		h2T = (TH2D*)ftmp->Get("19_nominal/hg2Mass_template_KK2030")->Clone("test");
+	}
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	*/
+
+
 	for(Int_t bin=1 ; bin<=h1template->GetNbinsX() ; bin++)
 	{
+		Double_t x = 1000.*h1template->GetBinCenter(bin);
+		_INFO("x -> "+_s(x));
+		
 		if(bin==minMbin)   lowerLimit = h1template->GetBinLowEdge(bin);
 		if(bin==maxMbin+1) upperLimit = h1template->GetBinLowEdge(bin);
+		//h1template->SetBinContent(bin,h2T->GetBinContent(bin,gNbin)*ElectroWeak(x)); // g^4=0 or g^2=0 -> DY !
 		h1template->SetBinContent(bin,h2T->GetBinContent(bin,gNbin)); // g^4=0 or g^2=0 -> DY !
 		h1template->SetBinError(bin,h2T->GetBinError(bin,gNbin));
 	}
@@ -176,7 +201,7 @@ void normtest()
 	TLine* l3 = new TLine(250,0,250,1.e7);
 	l1->SetLineColor(kGreen+2);
 	l2->SetLineColor(kGreen+2);
-	l3->SetLineColor(kViolet);
+	l3->SetLineColor(kRed);
 	h1dy->SetLineColor(kBlue);
 	h1dy->SetLineWidth(1);
 	h1dy->SetMarkerColor(kBlue);
@@ -199,23 +224,26 @@ void normtest()
 	c1->Draw();
 	c1->SetLogx();
 	c1->SetGridy();
-	TH1D* hratio        = (TH1D*)h1dy->Clone("hratio");
-	//TH1D* h1templateGeV = (TH1D*)hTeV2GeV(h1template)->Clone("GeV");
-	hratio->SetMinimum(0.5);
-	hratio->SetMaximum(1.5);
-	hratio->SetName("hratio");
-	// hratio->Divide(h1templateGeV);
-	// TLine* line = new TLine(h1templateGeV->GetXaxis()->GetBinLowEdge(1),1,h1templateGeV->GetXaxis()->GetBinUpEdge(h1templateGeV->GetNbinsX()),1);
 	
 	///////////////////////////////////////////////////////////////////////////////////////
 	//// hratio = official DY, norm'ed to the Z peak (with all the bg's) //////////////////
 	//// h1template = template at g=0 /////////////////////////////////////////////////////
 	//// ==> R = hratio/h1template ////////////////////////////////////////////////////////
 	//// ==> need to scale the template by R to get the template norm'ed to the Z peak ////
+	TH1D* hratio = (TH1D*)h1dy->Clone("hratio");
+	hratio->SetMinimum(0.5);
+	hratio->SetMaximum(1.5);
+	hratio->SetName("hratio");
 	hratio->Divide(h1template); ///////////////////////////////////////////////////////////
+	TLine* line = new TLine(h1template->GetXaxis()->GetBinLowEdge(1),1,h1template->GetXaxis()->GetBinUpEdge(h1template->GetNbinsX()),1);
+	// TH1D* hratio = (TH1D*)h1dy->Clone("hratio");
+	// hratio->SetMinimum(-1.5);
+	// hratio->SetMaximum(+1.5);
+	// hratio->SetName("residuals");
+	// residuals(h1template,hratio,hratio); //////////////////////////////////////////////////////////
+	// TLine* line = new TLine(h1template->GetXaxis()->GetBinLowEdge(1),0.,h1template->GetXaxis()->GetBinUpEdge(h1template->GetNbinsX()),0.);
 	///////////////////////////////////////////////////////////////////////////////////////
 	
-	TLine* line = new TLine(h1template->GetXaxis()->GetBinLowEdge(1),1,h1template->GetXaxis()->GetBinUpEdge(h1template->GetNbinsX()),1);
 	line->SetLineColor(kRed);
 	hratio->SetMarkerStyle(20);
 	hratio->SetMarkerSize(0.5);
@@ -226,6 +254,8 @@ void normtest()
 	l3->Draw("SAMES");
 	c1->RedrawAxis();
 	c1->SaveAs("dy_ratio.png");
+
+	hratio->SaveAs("plots/official_dy_ratio_tmp.root");
 
 	/*
 	TFile* fratio = new TFile("dyratio.root", "RECREATE");

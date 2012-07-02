@@ -77,6 +77,14 @@ static const Double_t g4min   = 0.;
 static const Double_t g4max   = 50.;
 */
 
+static const Int_t    ngNKKbins = 400;
+static const Double_t gNKKmin   = 0.;
+static const Double_t gNKKmax   = 50.;
+
+static const Int_t    ngNZPbins = 800;
+static const Double_t gNZPmin   = 0.;
+static const Double_t gNZPmax   = 100.;
+
 static const Double_t g4shift = 0.; // 1./16.;
 static const Int_t    ng4bins = 400;
 static const Double_t g4min   = 0.-g4shift;
@@ -102,6 +110,11 @@ static const Double_t logmassmin   = 120.;
 static const Double_t logmassmax   = 1500.;
 static Double_t logmassbins[nlogmassbins+1];
 
+static const Int_t    nlinmassbins = 1000;
+static const Double_t linmassmin   = 5.;
+static const Double_t linmassmax   = 5005.;
+static Double_t linmassbins[nlinmassbins+1];
+
 static const Int_t    nlogimassbins = 50;
 static const Double_t logimassmin   = 120.;
 static const Double_t logimassmax   = 1500.;
@@ -125,11 +138,27 @@ static const Int_t    nlinfullimassbins = 250;
 static const Double_t linfullimassmin   = 70.;
 static const Double_t linfullimassmax   = 2000.;
 
+static const Int_t    nlogtheoryimassbins = 76;
+static const Double_t logtheoryimassmin   = 75.;
+static const Double_t logtheoryimassmax   = 4000.;
+static Double_t logtheoryimassbins[nlogtheoryimassbins+1];
+
+static const Int_t    nlogtheoryAFBimassbins = 22;
+static const Double_t logtheoryAFBimassmin   = 75.;
+static const Double_t logtheoryAFBimassmax   = 4000.;
+static Double_t logtheoryAFBimassbins[nlogtheoryAFBimassbins+1];
+
+
 // official imass
 static const Int_t    nlogofficialimassbins = 56;
 static const Double_t logofficialimassmin   = 70.;
 static const Double_t logofficialimassmax   = 3000.;
 static Double_t logofficialimassbins[nlogofficialimassbins+1];
+
+static const Int_t    nlogofficiallongimassbins = 400;
+static const Double_t logofficiallongimassmin   = 55.;
+static const Double_t logofficiallongimassmax   = 5005.;
+static Double_t logofficiallongimassbins[nlogofficiallongimassbins+1];
 
 static const Int_t    nlogisoimassbins = 20;
 static const Double_t logisoimassmin   = 70.;

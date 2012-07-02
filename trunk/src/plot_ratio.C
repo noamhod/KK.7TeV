@@ -60,7 +60,7 @@
 	TVirtualPad* tvp_ratio = c->cd(2);
 
 	tvp_hists->SetPad(0.00, 0.35, 1.00, 1.00);
-	tvp_ratio->SetPad(0.00, 0.00, 1.00, 0.35);
+	tvp_ratio->SetPad(0.00, 0.00, 1.00, 0.355);
 
 	tvp_hists->SetBottomMargin(0.012);
 	tvp_ratio->SetBottomMargin(0.20);
@@ -86,7 +86,8 @@
 	TString sXtitle = "m_{#mu#mu} GeV";
 	TString sTitle = "#frac{Data}{#sum MC#times wgt};"+sXtitle+";Ratio";
 	hr->SetTitle(sTitle);
-	hr->Divide(h1,h2,1.,1.,"B");
+	//hr->Divide(h1,h2,1.,1.,"B");
+	hr->Divide(h2);
 
 	hr->GetXaxis()->SetLabelSize(0.075);
 	hr->GetYaxis()->SetLabelSize(0.075);

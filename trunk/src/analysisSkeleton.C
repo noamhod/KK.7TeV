@@ -165,6 +165,8 @@ void analysisSkeleton::setSmeared2Stations(int nMus)
 		
 		// Initialize the random numbers, compute the smearing, and retrieve the smeared pT:
 		TwoStationsSmearing->SetTheSeed(EventNumber, i, RunNumber);
+		if(AS_doSigmaUP) TwoStationsSmearing->SetVarType("UP"); // Available options: "", "UP", "LOW"
+		else             TwoStationsSmearing->SetVarType("");
 		TwoStationsSmearing->Event(ptms, ptid, ptcb, mu_eta->at(i), eptMS*ptms, eptID*ptid);
 		float ptCBsmeared = TwoStationsSmearing->pTCB();  // Returns a signed smeared pT
 		

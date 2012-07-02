@@ -12,24 +12,25 @@ using namespace systematics;
 //// remember old dir
 TDirectory* olddir = gDirectory;
 
-bool doGrid          = false;
+bool doGrid          = true;
 bool doTruth         = false;
-bool doEWkf          = false;
-bool doInterference  = false;
-bool doKKtemplates   = false;
+bool doEWkf          = true;
+bool doInterference  = true;
+bool doScaleWidth    = true;
+bool doKKtemplates   = true;
 bool doOfficialZP    = false;
 bool doScale2Zpeak   = true;
 bool dog4bins        = true;
-TString channel      = "#mu#mu"; // #mu#mu or ee
-TString model        = "ZP";
-TString mutype       = "3332st"; // or "33st" or "32st"
+TString channel      = "#mu#mu";     // #mu#mu or ee
+TString model        = "KK";         // choose KK to do both
+TString mutype       = "3332st";     // or "33st" or "32st"
 TString binning      = "linearbins"; // or "powercins"
 
 TString basedir      = (doInterference) ? ""        : "nointerference/";
 TString interference = (doInterference) ? ""        : "_noInterference";
-//TString overallEWkF  = (doInterference) ? ""        : "_noOverallEWkF";
 TString doEWkfactor  = (doEWkf)         ? ""        : "_noEWkF";
 TString dotruth      = (doTruth)        ? ""        : "_noTruth";
+TString doscalewidth = (doScaleWidth)   ? ""        : "_noWidthScale";
 TString gNbinning    = (dog4bins)       ? "_g4bins" : "_g2bins";
 TString KKtemplates  = (doKKtemplates)  ? ""        : "_noKKtmplates";
 TString officialZP   = (!doOfficialZP)  ? ""        : "_wthOfficialZP";
@@ -38,7 +39,7 @@ TString gNNbins      = (dog4bins)       ? "g4bins"  : "g2bins";
 Double_t scale2Zpeak = 1.;
 
 double Mmin = 130.;
-double Mmax = 5030.;//5030.;
+double Mmax = (dog4bins) ? 5030. : 6030.;
 double dM   = 100.;//100.;
 
 TString version    = "";
@@ -52,6 +53,9 @@ TObjArray* toarKKtmp;
 TObjArray* toarKKtmpSigUp;
 TObjArray* toarZPtmp;
 TObjArray* toarZPtmpSigUp;
+
+TFile* fDYratio = new TFile("plots/official_dy_ratio.root", "READ");
+//TH1D*  hDYratio = (TH1D*)fDYratio->Get("hratio")->Clone("hDYratio");
 
 inline TH1D* hGeV2TeV(TH1D* hGeV)
 {
@@ -83,13 +87,19 @@ void setGridVersion()
 	if(!doGrid) version = "";
 	else
 	{
-		if(dog4bins) version = (channel=="ee") ? "v4/" : "v63/";//"v59/";//"v52/";
-		else         version = (channel=="ee") ? "v5/" : "v63/";//"v57/";//"v55/";
+		if(dog4bins) version = (channel=="ee") ? "v4/" : "v81/";//"v63/";//"v59/";//"v52/";
+		else         version = (channel=="ee") ? "v5/" : "v81/";//"v63/";//"v57/";//"v55/";
 	}
 }
 
 void setFpath()
 {
+	if(!doScaleWidth)
+	{
+		basedir.ReplaceAll("/","");
+		basedir+="_nowidthscale/";
+	}
+
 	if(channel=="#mu#mu")
 	{
 		sDir       = "plots/"+basedir+binning+"/"+gNNbins+"/"+mutype+"_nominal/"+version;
@@ -102,7 +112,7 @@ void setFpath()
 		else
 		{
 			//fpath      = "2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+overallEWkF+doEWkfactor+dotruth;
-			fpath      = "2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+doEWkfactor+dotruth;
+			fpath      = "2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+doEWkfactor+dotruth+doscalewidth;
 			//fpathSigUp = "2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+"_SmrSigUp"+overallEWkF+doEWkfactor+dotruth; // +1sigma smearing
 			fpathSigUp = "2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+"_SmrSigUp"+doEWkfactor+dotruth; // +1sigma smearing
 		}
@@ -110,15 +120,15 @@ void setFpath()
 	else if(channel=="ee")
 	{
 		sDir = "plots/"+basedir+binning+"/"+gNNbins+"/ee_nominal/"+version;
-                if(doGrid)
-                {
-                        fpath      = "template_nominal_";
-                }
-                else
-                {
-                        //fpath      = "2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+overallEWkF+doEWkfactor+dotruth;
-                        fpath      = "2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+doEWkfactor+dotruth;
-                }
+		if(doGrid)
+		{
+			fpath = "template_nominal_";
+		}
+		else
+		{
+			//fpath = "2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+overallEWkF+doEWkfactor+dotruth;
+			fpath  = "2dtemplates_mc11c_"+mutype+gNbinning+interference+KKtemplates+doEWkfactor+dotruth;
+		}
 	}
 }
 
@@ -128,11 +138,30 @@ void setScale2Zpeak()
 	{
 		scale2Zpeak = (mutype=="33st")   ? 0.9920123197 : 1.;    // For linear bins, see normtest.C
 		scale2Zpeak = (mutype=="32st")   ? 0.8852545729 : 1.;    // For linear bins, see normtest.C
-		scale2Zpeak = (mutype=="3332st") ? 0.9841360216 : 1.;    // For linear bins, see normtest.C
+		// scale2Zpeak = (mutype=="3332st") ? 0.9841360216 : 1.;    // For linear bins, see normtest.C
+		scale2Zpeak = (mutype=="3332st") ? 0.9942322461 : 1.;    // For linear bins, see normtest.C
 	}
 	else if(channel=="ee")
 	{
 		////
+	}
+}
+
+void scale2officialDY(TH2D* h2Template, unsigned int maxBinNorm = 20)
+{
+	TH1D*  hDYratio = (TH1D*)fDYratio->Get("hratio")->Clone("hDYratio");
+
+	unsigned int nbinsx = h2Template->GetNbinsX();
+	unsigned int nbinsy = h2Template->GetNbinsY();
+	for(unsigned int x=0 ; x<=20/*nbinsx+1*/ ; x++)
+	{
+		Double_t ratio = hDYratio->GetBinContent(x);
+
+		for(unsigned int y=0 ; y<=nbinsy+1 ; y++)
+		{       
+			h2Template->SetBinContent(x,y,ratio*h2Template->GetBinContent(x,y));
+			h2Template->SetBinError(x,y,ratio*h2Template->GetBinError(x,y));
+		}
 	}
 }
 
@@ -181,7 +210,7 @@ void combine()
 	///////////////////////////////////////////
 	
 	_INFO("working in -> "+(string)sDir);
-
+	
 
 	TH1D* hDYofficial;
 	if(channel=="#mu#mu")
@@ -196,9 +225,16 @@ void combine()
 		hDYofficial->Add(hDYofficial1);
 		hDYofficial->Add(hDYofficial2);
 		*/
-                TFile* fOfficial = new TFile("plots/CombinedMu_Templates_and_Data.root","READ");
-                hDYofficial = (TH1D*)fOfficial->Get("mass_plot_dy")->Clone(); // GeV
-                hDYofficial = (TH1D*)hGeV2TeV(hDYofficial); // TeV
+		
+		/*
+		TFile* fOfficial = new TFile("plots/CombinedMu_Templates_and_Data.root","READ");
+		hDYofficial = (TH1D*)fOfficial->Get("mass_plot_dy")->Clone(); // GeV
+		hDYofficial = (TH1D*)hGeV2TeV(hDYofficial); // TeV
+		*/
+		
+		TFile* fOfficial = new TFile("plots/invariant_mass_hists_comb_250stitch.root","READ");
+		hDYofficial = (TH1D*)fOfficial->Get("mass_plot_dy")->Clone(); // GeV
+		hDYofficial = (TH1D*)hGeV2TeV(hDYofficial); // TeV
 	}
 	else if(channel=="ee")
 	{
@@ -276,6 +312,7 @@ void combine()
 			olddir->cd();
 			h2tmp = (TH2D*)((TH2D*)(TObjArray*)toarKKtmp->At(0))->Clone();
 			if(doScale2Zpeak) h2tmp->Scale(scale2Zpeak);
+			//if(doScale2Zpeak) scale2officialDY(h2tmp);
 			if(!doInterference) h2tmp = (TH2D*)addDYtoPureSigTemplate(h2tmp, hDYofficial)->Clone();
 			fKK->cd(); // important !
 			templates2d_KK->Add( (TH2D*)h2tmp );
@@ -293,6 +330,7 @@ void combine()
 				olddir->cd();
 				h2tmpSigUp = (TH2D*)((TH2D*)(TObjArray*)toarKKtmpSigUp->At(0))->Clone();
 				if(doScale2Zpeak) h2tmpSigUp->Scale(scale2Zpeak);
+				//if(doScale2Zpeak) scale2officialDY(h2tmpSigUp);
 				if(!doInterference) h2tmpSigUp = (TH2D*)addDYtoPureSigTemplate(h2tmpSigUp, hDYofficial)->Clone();
 				delete FKKsmearUp;
 				delete toarKKtmpSigUp;
@@ -355,6 +393,7 @@ void combine()
 		olddir->cd();
 		h2tmp = (TH2D*)((TH2D*)(TObjArray*)toarZPtmp->At(0))->Clone();
 		if(doScale2Zpeak) h2tmp->Scale(scale2Zpeak);
+		//if(doScale2Zpeak) scale2officialDY(h2tmp);
 		if(!doInterference) h2tmp = (TH2D*)addDYtoPureSigTemplate(h2tmp, hDYofficial)->Clone();
 		fZP->cd(); // important !
 		templates2d_ZP->Add( (TH2D*)h2tmp );
@@ -372,6 +411,7 @@ void combine()
 			olddir->cd();
 			h2tmpSigUp = (TH2D*)((TH2D*)(TObjArray*)toarZPtmpSigUp->At(0))->Clone();
 			if(doScale2Zpeak) h2tmpSigUp->Scale(scale2Zpeak);
+			//if(doScale2Zpeak) scale2officialDY(h2tmpSigUp);
 			delete FZPsmearUp;
 			delete toarZPtmpSigUp;
 			fZP->cd(); // important !

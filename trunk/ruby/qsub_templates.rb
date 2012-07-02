@@ -8,8 +8,10 @@ require 'find'
 include FileUtils
 
 #####################
-sigmaUp="no" #######
-queue="S" #########
+channel="ee"
+gPower="g4"
+oversmeared=0
+queue="HEP" #########
 ##########################################################################
 puts "DID YOU REMEMBER TO EDIT THE FLAGS IN: fast_templates_run.C" #######
 puts "AND TO RUN: broot fast_templates_compile.C  ???" ###################
@@ -23,9 +25,9 @@ workdir = "/srv01/tau/hod/z0analysis-tests/z0analysis-r170/run";
 thisdir = Dir.getwd();
 Dir.chdir(workdir);
 
-mKKmin      = 130; # GeV
+mKKmin      = 5130; # GeV
 dm          = 100; # GeV
-mKKmax      = 5030; # GeV
+mKKmax      = 6030; # GeV
 nMassPoints = (mKKmax-mKKmin)/dm;
 
 def clean(workdir="")
@@ -34,8 +36,17 @@ def clean(workdir="")
 	# %x(rm -f #{workdir}/tmp/out/*)
 end
 
-def submitjob(jobname="", mass="", workdir="", sigmaUp="no", queue="HEP")
-	jobfile = File.open(jobname, 'w') { |f| 
+clean(workdir);
+
+minpoint=(mKKmin-130)/dm;   # if mXmin=130 then minpoint=0, if mXmin=5130 then minpoint=50
+maxpoint=(mKKmax-130)/dm-1; # if mXmax=5130 then maxpoint=49, if mXmax=6130 then maxpoint=59
+
+#(0..nMassPoints).each do |j|
+#	mass = j*dm+mKKmin;
+(minpoint..maxpoint+1).each do |j|
+	mass = j*dm+130;
+	jobname = "#{workdir}/tmp/job#{j}_#{channel}_#{gPower}_smr#{oversmeared}.sh";
+	jobfile = File.open(jobname, 'w') { |f|
 		f.puts "#!/bin/bash"
 		f.puts "echo   \"host = $HOSTNAME\""
 		f.puts "cd #{workdir}"
@@ -47,31 +58,12 @@ def submitjob(jobname="", mass="", workdir="", sigmaUp="no", queue="HEP")
 		f.puts "export PATH=$ROOTSYS/bin:$PATH"
 		f.puts "export RUBYLIB=$ROOTSYS/lib:$RUBYLIB"
 		f.puts "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PYTHIA8/lib"
-		if(sigmaUp=="yes") then
-			f.puts "$ROOTSYS/bin/root.exe -b -l -q #{workdir}/fast_templates_compile_up.C --mass=#{mass}"
-		else
-			f.puts "$ROOTSYS/bin/root.exe -b -l -q #{workdir}/fast_templates_compile.C --mass=#{mass}"
-		end
-		#f.puts "$ROOTSYS/bin/root.exe -b -l -q #{workdir}/fast_templates_compile.C --mass=#{mass}"
+		f.puts "$ROOTSYS/bin/root.exe -b -l -q #{workdir}/fast_templates_compile.C --channel=#{channel} --gN=#{gPower} --oversmeared=#{oversmeared} --mass=#{mass}"
 		f.puts "cd -"
 	}
 	
 	%x(qsub -q #{queue} -e #{workdir}/tmp/err -o #{workdir}/tmp/out #{jobname})
 	puts "sent -> #{jobname}"
-end
-
-clean(workdir);
-
-(0..nMassPoints).each do |j|
-	mass = j*dm+mKKmin;
-	type = ""
-	if(sigmaUp=="yes") then
-		type = "sigmaup"
-	else
-		type = "nominal"
-	end
-	jobname = "#{workdir}/tmp/job#{j}_#{type}_mc11c.sh";
-	submitjob(jobname, mass.to_s(), workdir, sigmaUp, queue);
 end
 
 Dir.chdir(thisdir);

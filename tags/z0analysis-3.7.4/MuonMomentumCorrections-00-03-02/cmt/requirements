@@ -1,0 +1,17 @@
+package MuonMomentumCorrections
+	
+	author Antonio Salvucci <Antonio.Salvucci@CERN.CH>
+	
+	public
+	
+	use AtlasPolicy AtlasPolicy-*
+	use AtlasROOT   AtlasROOT-*    External
+	
+	apply_tag ROOTMathLibs
+	apply_tag ROOTGraphicsLibs
+	
+	library MuonMomentumCorrections "../Root/*.cxx"
+	
+#apply_pattern dual_use_library files=*.cxx
+        apply_pattern installed_library
+ 	apply_pattern declare_runtime files="*.dat"

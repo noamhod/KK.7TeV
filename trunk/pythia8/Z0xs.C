@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 	string channel = argv[4];
 	int nEvents    = validate_int(argv[5]);
 	
-	 // set the mass and therefore the width 
+	// set the mass and therefore the width 
 	string sNewLowBound  = _s(minPhaseSpace);
 	string sNewHighBound = _s(maxPhaseSpace);
 	string sIDout        = (channel=="mumu")?"13":"11";
@@ -45,20 +45,26 @@ int main(int argc, char *argv[])
 	// Need to change pT0Ref depending on choice of PDF.
 	// One possibility: retune to same <n_charged>.
 	//pythia.readString("MultipleInteractions:pT0Ref = 10");
-		
+	
 	// Pick new random number seed for each run, based on clock.
 	pythia.readString("Random:setSeed = on");
 	pythia.readString("Random:seed = 0");
 
 	string sprocName = "";
 
-
+	double mKK        = 2000.;
+	double mKK1st     = sqrt(mKK*mKK+mZ0*mZ0);	
+	string sNewKKMass = _s(mKK);
+	string sNewMass   = "";
+	string sNewWidth  = "";
+	
+	
 	/*
 	// Z0(internal) Process selection.
 	sprocName = "Z0";
 	pythia.readString("WeakSingleBoson:ffbar2gmZ = on");
-        pythia.readString("23:onMode = off"); // switch off all of the Z0 decay modes
-        pythia.readString("23:onIfAny = 13"); // switch on the Z0->mu-mu+ decay mode only
+	pythia.readString("23:onMode = off"); // switch off all of the Z0 decay modes
+	pythia.readString("23:onIfAny = 13"); // switch on the Z0->mu-mu+ decay mode only
 	pythia.readString("23:onMode = off"); // switch off all of the Z0 decay modes
 	pythia.readString("23:onIfAny = " + sIDout); // switch on the Z0->mu-mu+ decay mode only	
 	*/
@@ -66,36 +72,38 @@ int main(int argc, char *argv[])
 	/*
 	// KK Process selection.
 	sprocName = "KK";
-	double mKK     = 2000.;
-        double mKK1st = sqrt(mKK*mKK+mZ0*mZ0);	
+	double mKK    = 2000.;
+	double mKK1st = sqrt(mKK*mKK+mZ0*mZ0);	
 	string sNewKKMass = _s(mKK);
-        string sNewMass   = _s(mKK1st);
-        string sNewWidth  = _s(mKK1st / 4000. * 240.);
+	string sNewMass   = _s(mKK1st);
+	string sNewWidth  = _s(mKK1st / 4000. * 240.);
 	pythia.readString("ExtraDimensionsTEV:ffbar2mu+mu- = on");
-        pythia.readString("5000023:isResonance = false");
-        pythia.readString("ExtraDimensionsTEV:gmZmode = 3"); // 0=(gm+Z), 1=(gm), 2=(Z), 3=(gm+Z+gmKK+ZKK), 4=(Z+gmKK), 5=(Z+ZKK), 6=(gmKK+ZKK)
-        pythia.readString("ExtraDimensionsTEV:nMax = 100"); // min=0, max=100, default=10
+	pythia.readString("5000023:isResonance = false");
+	pythia.readString("ExtraDimensionsTEV:gmZmode = 3"); // 0=(gm+Z), 1=(gm), 2=(Z), 3=(gm+Z+gmKK+ZKK), 4=(Z+gmKK), 5=(Z+ZKK), 6=(gmKK+ZKK)
+	pythia.readString("ExtraDimensionsTEV:nMax = 10"); // min=0, max=100, default=10
 	pythia.readString("ExtraDimensionsTEV:mStar = " + sNewKKMass);
-        pythia.readString("5000023:m0 = " + sNewKKMass);
-        pythia.readString("5000023:mWidth = " + sNewWidth);
-        pythia.readString("5000023:mMin = " + sNewLowBound);
-        pythia.readString("5000023:mMax = " + sNewHighBound);
-        pythia.readString("5000023:isResonance = false");
+	pythia.readString("5000023:m0 = " + sNewKKMass);
+	pythia.readString("5000023:mWidth = " + sNewWidth);
+	pythia.readString("5000023:mMin = " + sNewLowBound);
+	pythia.readString("5000023:mMax = " + sNewHighBound);
+	pythia.readString("5000023:isResonance = false");
 	*/
 
+	/*
 	// ZP Process selection.
-        sprocName = "ZP";
+	sprocName = "ZP";
 	double mZP = 2000.;
-	string sNewZPMass    = _s(mZP);
-        string sNewWidth     = _s(mZP / 500. * 14.54029);
-        pythia.readString("NewGaugeBoson:ffbar2gmZZprime = on");
-        pythia.readString("Zprime:gmZmode = 0"); // full Z'
+	string sNewZPMass = _s(mZP);
+	string sNewWidth  = _s(mZP / 500. * 14.54029);
+	pythia.readString("NewGaugeBoson:ffbar2gmZZprime = on");
+	pythia.readString("Zprime:gmZmode = 0"); // full Z'
 	pythia.readString("32:m0 = " + sNewZPMass);
-        //pythia.readString("32:mWidth = " + sNewWidth);
-        pythia.readString("32:mMin = " + sNewLowBound);
-        pythia.readString("32:mMax = " + sNewHighBound);
-        pythia.readString("32:onMode = off"); // switch on the Z'->mu-mu+ decay mode only
-        pythia.readString("32:onIfAny = " + sIDout);
+	//pythia.readString("32:mWidth = " + sNewWidth);
+	pythia.readString("32:mMin = " + sNewLowBound);
+	pythia.readString("32:mMax = " + sNewHighBound);
+	pythia.readString("32:onMode = off"); // switch on the Z'->mu-mu+ decay mode only
+	pythia.readString("32:onIfAny = " + sIDout);
+	*/
 
 
 	// phase space

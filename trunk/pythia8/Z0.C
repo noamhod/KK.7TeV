@@ -26,8 +26,8 @@ void findpair(vector<int>* index, Event& evt, int& ia, int& ib)
 	ib = -1;
 }
 
-int main() {
-
+int main()
+{
 	// Generator.
 	Pythia pythia;
 	//ParticleData& pdt = pythia.particleData;

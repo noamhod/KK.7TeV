@@ -1,5 +1,33 @@
-#include "pythiaROOT.h"
-#include "all.h"
+// #include "pythiaROOT.h"
+// #include "all.h"
+#include "../include/rawStd.h"
+#include "../include/rawROOT.h"
+#include "../include/enums.h"
+#include "../include/logs.h"
+#include "../include/style.h"
+#include "../include/bins.h"
+#include "../include/histos.h"
+#include "../include/fkinematics.h"
+#include "../include/units.h"
+// #include "../include/couplings.h"
+// #include "../include/width.h"
+// #include "../include/helicity.h"
+// #include "../include/kFactors.h"
+// #include "../include/integrals.h"
+// #include "../include/lhapdf.h"
+
+// using namespace couplings;
+// using namespace width;
+// using namespace helicity;
+// using namespace kFactors;
+// using namespace lhapdf;
+
+#include "Pythia.h"
+using namespace Pythia8;
+
+//////////////////////////////////////////////////////////
+// to compile this code, run "source compile.sh theory" //
+//////////////////////////////////////////////////////////
 
 
 void findpair(vector<int>* index, Event& evt, int& ia, int& ib)
@@ -27,16 +55,39 @@ void findpair(vector<int>* index, Event& evt, int& ia, int& ib)
 	ib = -1;
 }
 
+inline double gVE6(unsigned int id, double thetaE6)
+{
+	double gV = 0.;
+	
+	if     (id==12 || id==14 || id==16) gV =1./6.*(sqrt(10.)*cos(thetaE6)-3.*sqrt(6.)*sin(thetaE6))*sqrt(sw2); // neutrinos
+	else if(id==11 || id==13 || id==15) gV = -4./sqrt(6.)*sin(thetaE6)*sqrt(sw2); // charged leptons
+	else if(id==2  || id==4  || id==6)  gV = 0.; // up-type  quarks
+	else if(id==1  || id==3  || id==5)  gV = +4./sqrt(6.)*sin(thetaE6)*sqrt(sw2); // down-type  quarks
+	else _FATAL("id="+_s(id)+" is unknown");
+	return gV;
+}
+
+inline double gAE6(unsigned int id, double thetaE6)
+{
+	double gA = 0.;
+	if     (id==12 || id==14 || id==16) gA = 1./6.*(sqrt(10.)*cos(thetaE6)-3.*sqrt(6.)*sin(thetaE6))*sqrt(sw2);
+	else if(id==11 || id==13 || id==15) gA = 1./3.*(sqrt(10.)*cos(thetaE6)-sqrt(6.)*sin(thetaE6))*sqrt(sw2);
+	else if(id==2  || id==4  || id==6)  gA = 1./3.*(sqrt(10.)*cos(thetaE6)+sqrt(6.)*sin(thetaE6))*sqrt(sw2);
+	else if(id==1  || id==3  || id==5)  gA = 1./3.*(sqrt(10.)*cos(thetaE6)-sqrt(6.)*sin(thetaE6))*sqrt(sw2);
+	else _FATAL("id="+_s(id)+" is unknown");
+	return gA;
+}
+
 int main(int argc, char *argv[])
 {
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//// usage: ./theory  model[DY/ZP/KK]  channel[mumu/ee]  mBSM[in GeV]  nEvents[integer>0]  minPhaseSpace[in GeV]  maxPhaseSpace[in GeV] ////
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//// usage: ./theory  model[DY/ZP/KK]  submodel[psi/chi/eta/I]  channel[mumu/ee]  mBSM[in GeV]  nEvents[integer>0]  minPhaseSpace[in GeV]  maxPhaseSpace[in GeV] ////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	cout << "argc = " << argc << endl; 
 	for(int i=0; i < argc; i++) cout << "argv[" << i << "] = " << argv[i] << endl; 
 
-	if(argc!=7)
+	if(argc!=8)
 	{
 		_ERROR("argc!=7, exitting now");
 		_ERROR("usage: ./theory  model[DY/ZP/KK]  channel[mumu/ee]  mBSM[in GeV]  nEvents[integer>0]  minPhaseSpace[in GeV]  maxPhaseSpace[in GeV]");
@@ -44,20 +95,21 @@ int main(int argc, char *argv[])
 	}
 	
 	// variables...
-	double mZ0     = 91.18760;
-	string model   = argv[1];
-	string channel = argv[2];
-	double mBSM    = validate_double(argv[3]);
-	string smBSM   = argv[3];
-	int nEvents    = validate_int(argv[4]);
-	double minPhaseSpace = validate_double(argv[5]);
-	double maxPhaseSpace = validate_double(argv[6]);
+	double mZ0      = 91.18760;
+	string model    = argv[1];
+	string submodel = argv[2];
+	string channel  = argv[3];
+	double mBSM     = validate_double(argv[4]);
+	string smBSM    = argv[4];
+	int nEvents     = validate_int(argv[5]);
+	double minPhaseSpace = validate_double(argv[6]);
+	double maxPhaseSpace = validate_double(argv[7]);
 	double mKK1st = sqrt(mBSM*mBSM+mZ0*mZ0);
 	
 	string sNewLowBound  = _s(minPhaseSpace);
 	string sNewHighBound = _s(maxPhaseSpace);
-	string sIDout        = (channel=="mumu")?"13":"11";
-	int    iIDout        = (channel=="mumu")?13:11;
+	string sIDout        = (channel=="mumu") ? "13" : "11";
+	int    iIDout        = (channel=="mumu") ?  13  :  11;
 	string sNewMass      = _s(mBSM);
 
 	// Generator.
@@ -113,6 +165,35 @@ int main(int argc, char *argv[])
 	
 		cout << "Z' mass is: " << mBSM << endl;
 
+		if(submodel=="ssm") _INFO("running with SSM");
+		else
+		{
+			_INFO("running with E6 model: "+submodel);
+			
+			double thetaE6 = 0.;
+			if     (submodel=="psi") thetaE6 = 0.;
+			else if(submodel=="chi") thetaE6 = -pi/2.;
+			else if(submodel=="eta") thetaE6 = atan(-sqrt(5./3.))+pi/2.; //+asin(sqrt(3./8.));
+			else if(submodel=="I")   thetaE6 = -asin(sqrt(5./8.));
+			
+			string gVnu = _s(gVE6(12,thetaE6));
+			string gVe  = _s(gVE6(11,thetaE6));
+			string gVu  = _s(gVE6(2,thetaE6));
+			string gVd  = _s(gVE6(1,thetaE6));
+			string gAnu = _s(gAE6(12,thetaE6));
+			string gAe  = _s(gAE6(11,thetaE6));
+			string gAu  = _s(gAE6(2,thetaE6));
+			string gAd  = _s(gAE6(1,thetaE6));
+			pythia.readString("Zprime:vd   = "+gVd);
+			pythia.readString("Zprime:ad   = "+gAd);
+			pythia.readString("Zprime:vu   = "+gVu);
+			pythia.readString("Zprime:au   = "+gAu);
+			pythia.readString("Zprime:ve   = "+gVe);
+			pythia.readString("Zprime:ae   = "+gAe);
+			pythia.readString("Zprime:vnue = "+gVnu);
+			pythia.readString("Zprime:anue = "+gAnu);
+		}
+		
 		pythia.readString("32:m0 = " + sNewMass);
 		//pythia.readString("32:mWidth = " + sNewWidth);
 		// pythia.readString("32:mMin = " + sNewLowBound);
@@ -151,8 +232,10 @@ int main(int argc, char *argv[])
 	//ROOT
 	TLorentzVector* pa = new TLorentzVector();
 	TLorentzVector* pb = new TLorentzVector();
-	string sDir   = "/data/hod/2011/pythia8_ntuples/";
-	string sTitle = model + "_mBSM" + sNewMass + "_" + channel + "_" + sNewLowBound + "M" + sNewHighBound;
+	string sDir   = "/storage/t3_data/hod/2011/pythia8_ntuples_2012/";
+	string sTitle = "";
+	if(model=="ZP") sTitle = model + "_" + submodel + "_mBSM" + sNewMass + "_" + channel + "_" + sNewLowBound + "M" + sNewHighBound;
+	if(model=="KK") sTitle = model + "_mBSM" + sNewMass + "_" + channel + "_" + sNewLowBound + "M" + sNewHighBound;
 	if(model=="DY") sTitle = model + "_" + channel + "_" + sNewLowBound + "M" + sNewHighBound;
 	string sFileName = sDir + sTitle + ".root";
 	TFile *file = TFile::Open(sFileName.c_str(),"recreate");

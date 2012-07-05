@@ -564,6 +564,15 @@ void plotTheory(TString name)
 	h1Map["hMass"+name]->Draw("SAMES");
 	saveas(cnv_mass,"plots/"+name+"_mass_withTheory");
 	
+	TCanvas* cnv_mass_ratio = new TCanvas("cnv_mass_ratio","cnv_mass_ratio",600,400);
+	cnv_mass_ratio->SetTicks(1,1);
+	cnv_mass_ratio->SetLogx();
+	cnv_mass_ratio->cd();
+	cnv_mass_ratio->Draw();
+	hmassTheory->Divide(h1Map["hMass"+name]);
+	hmassTheory->Draw();
+	saveas(cnv_mass_ratio,"plots/"+name+"_mass_ratio_withTheory");
+	
 	TCanvas* cnv_afb = new TCanvas("cnv_afb","cnv_afb",600,400);
 	cnv_afb->SetTicks(1,1);
 	cnv_afb->SetLogx();

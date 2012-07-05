@@ -10,9 +10,9 @@ include FileUtils
 
 
 # quit unless our script gets two command line arguments
-unless ARGV.length==6
+unless ARGV.length==7
         puts "Dude, not the right number of arguments."
-        puts "Usage: ruby parallel_pythia8.rb  model[=KK/ZP/DY]  submodel[null/ssm/psi/chi/eta/I] channel[=ee/mumu]  mass[=BSM mass in GeV]  maxevts[=any number > 0]  queue[N/HEP/S]\n"
+        puts "Usage: ruby parallel_pythia8.rb  model[=KK/ZP/DY]  submodel[null/ssm/psi/chi/eta/I] channel[=ee/mumu]  mass[=BSM mass in GeV]  maxevts[=any number > 0]  queue[N/HEP/S]  run[any int]\n"
         exit
 end
 
@@ -22,6 +22,7 @@ channel=ARGV[2]
 mass=ARGV[3]
 maxevts=Integer(ARGV[4])
 queue=ARGV[5]
+run=ARGV[6]
 
 targetdir="/storage/t3_data/hod/2011/pythia8_ntuples_2012/"
 thisdir = Dir.getwd();
@@ -47,11 +48,10 @@ if(queue!="N" and queue!="HEP" and queue!="S")
 end
 
 massbins  = Array.new
-massbins  = ["50 250"   ,"250 500"  ,"500 750"  ,"750 1000",
-	     "1000 1250","1250 1500","1500 1750","1750 2000",
-	     "2000 2250","2250 2500","2500 2750","2750 3000",
-	     "3000 3250","3250 3500","3500 3750","3750 4000",
-	     "4000 4250","4250 4500","4500 4750","4750 5000"]
+massbins  = ["50 150",   "150 250",  "250 400",  "400 600" , "600 800",
+	     "800 1000", "1000 1250","1250 1500","1500 1750","1750 2000",
+	     "2000 2250","2250 2500","2500 2750","2750 3000","3000 3250",
+	     "3250 3500","3500 3750","3750 4000","4000 4400","4400 5000"]
 
 massbins.each { |bin|
 	binname = bin.gsub(" ","M")
@@ -74,7 +74,7 @@ massbins.each { |bin|
 		f.puts "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LHAPDF/lib"
 		f.puts "export LHAPATH=$LHAPDF/share/lhapdf/"
 		f.puts "cd #{thisdir}"
-                f.puts "./theory  #{model}  #{submodel}  #{channel}  #{mass}  #{maxevts}  #{bin}"
+                f.puts "./theory  #{model}  #{submodel}  #{channel}  #{mass}  #{maxevts}  #{bin}  #{run}"
 		f.puts "cd -"
         }
 

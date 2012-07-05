@@ -9,18 +9,6 @@
 #include "../include/histos.h"
 #include "../include/fkinematics.h"
 #include "../include/units.h"
-// #include "../include/couplings.h"
-// #include "../include/width.h"
-// #include "../include/helicity.h"
-// #include "../include/kFactors.h"
-// #include "../include/integrals.h"
-// #include "../include/lhapdf.h"
-
-// using namespace couplings;
-// using namespace width;
-// using namespace helicity;
-// using namespace kFactors;
-// using namespace lhapdf;
 
 #include "Pythia.h"
 using namespace Pythia8;
@@ -60,9 +48,9 @@ inline double gVE6(unsigned int id, double thetaE6)
 	double gV = 0.;
 	
 	if     (id==12 || id==14 || id==16) gV =1./6.*(sqrt(10.)*cos(thetaE6)-3.*sqrt(6.)*sin(thetaE6))*sqrt(sw2); // neutrinos
-	else if(id==11 || id==13 || id==15) gV = -4./sqrt(6.)*sin(thetaE6)*sqrt(sw2); // charged leptons
-	else if(id==2  || id==4  || id==6)  gV = 0.; // up-type  quarks
-	else if(id==1  || id==3  || id==5)  gV = +4./sqrt(6.)*sin(thetaE6)*sqrt(sw2); // down-type  quarks
+	else if(id==11 || id==13 || id==15) gV = -4./sqrt(6.)*sin(thetaE6)*sqrt(sw2);                              // charged leptons
+	else if(id==2  || id==4  || id==6)  gV = 0.;                                                               // up-type  quarks
+	else if(id==1  || id==3  || id==5)  gV = +4./sqrt(6.)*sin(thetaE6)*sqrt(sw2);                              // down-type  quarks
 	else _FATAL("id="+_s(id)+" is unknown");
 	return gV;
 }
@@ -70,10 +58,10 @@ inline double gVE6(unsigned int id, double thetaE6)
 inline double gAE6(unsigned int id, double thetaE6)
 {
 	double gA = 0.;
-	if     (id==12 || id==14 || id==16) gA = 1./6.*(sqrt(10.)*cos(thetaE6)-3.*sqrt(6.)*sin(thetaE6))*sqrt(sw2);
-	else if(id==11 || id==13 || id==15) gA = 1./3.*(sqrt(10.)*cos(thetaE6)-sqrt(6.)*sin(thetaE6))*sqrt(sw2);
-	else if(id==2  || id==4  || id==6)  gA = 1./3.*(sqrt(10.)*cos(thetaE6)+sqrt(6.)*sin(thetaE6))*sqrt(sw2);
-	else if(id==1  || id==3  || id==5)  gA = 1./3.*(sqrt(10.)*cos(thetaE6)-sqrt(6.)*sin(thetaE6))*sqrt(sw2);
+	if     (id==12 || id==14 || id==16) gA = 1./6.*(sqrt(10.)*cos(thetaE6)-3.*sqrt(6.)*sin(thetaE6))*sqrt(sw2); // neutrinos
+	else if(id==11 || id==13 || id==15) gA = 1./3.*(sqrt(10.)*cos(thetaE6)-sqrt(6.)*sin(thetaE6))*sqrt(sw2);    // charged leptons
+	else if(id==2  || id==4  || id==6)  gA = 1./3.*(sqrt(10.)*cos(thetaE6)+sqrt(6.)*sin(thetaE6))*sqrt(sw2);    // up-type  quarks
+	else if(id==1  || id==3  || id==5)  gA = 1./3.*(sqrt(10.)*cos(thetaE6)-sqrt(6.)*sin(thetaE6))*sqrt(sw2);    // down-type  quarks
 	else _FATAL("id="+_s(id)+" is unknown");
 	return gA;
 }
@@ -87,10 +75,10 @@ int main(int argc, char *argv[])
 	cout << "argc = " << argc << endl; 
 	for(int i=0; i < argc; i++) cout << "argv[" << i << "] = " << argv[i] << endl; 
 
-	if(argc!=8)
+	if(argc!=9)
 	{
 		_ERROR("argc!=7, exitting now");
-		_ERROR("usage: ./theory  model[DY/ZP/KK]  channel[mumu/ee]  mBSM[in GeV]  nEvents[integer>0]  minPhaseSpace[in GeV]  maxPhaseSpace[in GeV]");
+		_ERROR("usage: ./theory  model[DY/ZP/KK]  channel[mumu/ee]  mBSM[in GeV]  nEvents[integer>0]  minPhaseSpace[in GeV]  maxPhaseSpace[in GeV]  runNumber[integer]");
 		exit(-1);
 	}
 	
@@ -104,6 +92,8 @@ int main(int argc, char *argv[])
 	int nEvents     = validate_int(argv[5]);
 	double minPhaseSpace = validate_double(argv[6]);
 	double maxPhaseSpace = validate_double(argv[7]);
+	int    runNumber = validate_int(argv[8]);
+	string sRun = "_" + _s(runNumber);
 	double mKK1st = sqrt(mBSM*mBSM+mZ0*mZ0);
 	
 	string sNewLowBound  = _s(minPhaseSpace);
@@ -237,7 +227,7 @@ int main(int argc, char *argv[])
 	if(model=="ZP") sTitle = model + "_" + submodel + "_mBSM" + sNewMass + "_" + channel + "_" + sNewLowBound + "M" + sNewHighBound;
 	if(model=="KK") sTitle = model + "_mBSM" + sNewMass + "_" + channel + "_" + sNewLowBound + "M" + sNewHighBound;
 	if(model=="DY") sTitle = model + "_" + channel + "_" + sNewLowBound + "M" + sNewHighBound;
-	string sFileName = sDir + sTitle + ".root";
+	string sFileName = sDir + sTitle + sRun + ".root";
 	TFile *file = TFile::Open(sFileName.c_str(),"recreate");
 	TDirectory* tDir = file->mkdir("truth");
 	tDir->cd();
@@ -278,13 +268,28 @@ int main(int argc, char *argv[])
 	vector<int>*   truth_all_mc_pdgId = new vector<int>;
 	vector<double>* truth_all_mc_charge = new vector<double>;
 	
+	vector<int>*    truth_hardprocess_pdgId = new vector<int>;
+	vector<double>* truth_hardprocess_charge = new vector<double>;
+	vector<double>* truth_hardprocess_px = new vector<double>;
+	vector<double>* truth_hardprocess_py = new vector<double>;
+	vector<double>* truth_hardprocess_pz = new vector<double>;
+	vector<double>* truth_hardprocess_e = new vector<double>;
+	vector<double>* truth_hardprocess_pt = new vector<double>;
+	vector<double>* truth_hardprocess_m = new vector<double>;
+	vector<double>* truth_hardprocess_eta = new vector<double>;
+	vector<double>* truth_hardprocess_phi = new vector<double>;
+	
+	vector<double>* truth_all_partons_mc_px = new vector<double>;
+	vector<double>* truth_all_partons_mc_py = new vector<double>;
+	vector<double>* truth_all_partons_mc_pz = new vector<double>;
+	vector<double>* truth_all_partons_mc_e = new vector<double>;
 	vector<double>* truth_all_partons_mc_pt = new vector<double>;
 	vector<double>* truth_all_partons_mc_m = new vector<double>;
 	vector<double>* truth_all_partons_mc_eta = new vector<double>;
 	vector<double>* truth_all_partons_mc_phi = new vector<double>;
-	vector<int>*   truth_all_partons_mc_status = new vector<int>;
-	vector<int>*   truth_all_partons_mc_barcode = new vector<int>;
-	vector<int>*   truth_all_partons_mc_pdgId = new vector<int>;
+	vector<int>*    truth_all_partons_mc_status = new vector<int>;
+	vector<int>*    truth_all_partons_mc_barcode = new vector<int>;
+	vector<int>*    truth_all_partons_mc_pdgId = new vector<int>;
 	vector<double>* truth_all_partons_mc_charge = new vector<double>;
 	
 	tree->Branch( "truth_all_isValid", &truth_all_isValid );
@@ -321,6 +326,21 @@ int main(int argc, char *argv[])
 	tree->Branch( "truth_all_mc_pdgId", &truth_all_mc_pdgId );
 	tree->Branch( "truth_all_mc_charge", &truth_all_mc_charge );
 	
+	tree->Branch( "truth_hardprocess_pdgId",  &truth_hardprocess_pdgId);
+	tree->Branch( "truth_hardprocess_charge", &truth_hardprocess_charge);
+	tree->Branch( "truth_hardprocess_px",  &truth_hardprocess_px);
+	tree->Branch( "truth_hardprocess_py",  &truth_hardprocess_py);
+	tree->Branch( "truth_hardprocess_pz",  &truth_hardprocess_pz);
+	tree->Branch( "truth_hardprocess_e",   &truth_hardprocess_e);
+	tree->Branch( "truth_hardprocess_pt",  &truth_hardprocess_pt);
+	tree->Branch( "truth_hardprocess_m",   &truth_hardprocess_m);
+	tree->Branch( "truth_hardprocess_eta", &truth_hardprocess_eta);
+	tree->Branch( "truth_hardprocess_phi", &truth_hardprocess_phi);
+	
+	tree->Branch( "truth_all_partons_mc_px", &truth_all_partons_mc_px);
+	tree->Branch( "truth_all_partons_mc_py", &truth_all_partons_mc_py);
+	tree->Branch( "truth_all_partons_mc_pz", &truth_all_partons_mc_pz);
+	tree->Branch( "truth_all_partons_mc_e", &truth_all_partons_mc_e);
 	tree->Branch( "truth_all_partons_mc_pt", &truth_all_partons_mc_pt);
 	tree->Branch( "truth_all_partons_mc_m", &truth_all_partons_mc_m);
 	tree->Branch( "truth_all_partons_mc_eta", &truth_all_partons_mc_eta);
@@ -389,6 +409,21 @@ int main(int argc, char *argv[])
 		truth_all_mc_pdgId->clear();
 		truth_all_mc_charge->clear();
 		
+		truth_hardprocess_pdgId->clear();
+		truth_hardprocess_charge->clear();
+		truth_hardprocess_px->clear();
+		truth_hardprocess_py->clear();
+		truth_hardprocess_pz->clear();
+		truth_hardprocess_e->clear();
+		truth_hardprocess_pt->clear();
+		truth_hardprocess_m->clear();
+		truth_hardprocess_eta->clear();
+		truth_hardprocess_phi->clear();
+		
+		truth_all_partons_mc_px->clear();
+		truth_all_partons_mc_py->clear();
+		truth_all_partons_mc_pz->clear();
+		truth_all_partons_mc_e->clear();
 		truth_all_partons_mc_pt->clear();
 		truth_all_partons_mc_m->clear();
 		truth_all_partons_mc_eta->clear();
@@ -398,35 +433,56 @@ int main(int argc, char *argv[])
 		truth_all_partons_mc_pdgId->clear();
 		truth_all_partons_mc_charge->clear();
 		
-		int iZ = 0;
-		for (int i=20 ; i>=0 ; --i)
+		
+		////////////////////////////////////////////////////////////
+		for(int q=3 ; q<=5 ; q++)
 		{
-			if(pythia.event[i].id()==5000023 || pythia.event[i].id()==23 || pythia.event[i].id()==32)
-			{
-				iZ = i;
-				
-				int momA = pythia.event[i].mother1();
-				int momB = pythia.event[i].mother2();
-				
-				if(momA==momB) continue;
-				
-				truth_all_partons_mc_pdgId->push_back(pythia.event[momA].id());
-				truth_all_partons_mc_charge->push_back(pythia.event[momA].charge());
-				truth_all_partons_mc_m->push_back(pythia.event[momA].m());
-				truth_all_partons_mc_pt->push_back(pythia.event[momA].pT());
-				truth_all_partons_mc_eta->push_back(pythia.event[momA].eta());
-				truth_all_partons_mc_phi->push_back(pythia.event[momA].phi());
-				
-				truth_all_partons_mc_pdgId->push_back(pythia.event[momB].id());
-				truth_all_partons_mc_charge->push_back(pythia.event[momB].charge());
-				truth_all_partons_mc_m->push_back(pythia.event[momB].m());
-				truth_all_partons_mc_pt->push_back(pythia.event[momB].pT());
-				truth_all_partons_mc_eta->push_back(pythia.event[momB].eta());
-				truth_all_partons_mc_phi->push_back(pythia.event[momB].phi());
-				
-				break;
-			}
+			truth_hardprocess_pdgId->push_back(pythia.event[q].id());
+			truth_hardprocess_charge->push_back(pythia.event[q].charge());
+			truth_hardprocess_m->push_back(pythia.event[q].m());
+			truth_hardprocess_px->push_back(pythia.event[q].px());
+			truth_hardprocess_py->push_back(pythia.event[q].py());
+			truth_hardprocess_pz->push_back(pythia.event[q].pz());
+			truth_hardprocess_e->push_back(pythia.event[q].e());
+			truth_hardprocess_pt->push_back(pythia.event[q].pT());
+			truth_hardprocess_eta->push_back(pythia.event[q].eta());
+			truth_hardprocess_phi->push_back(pythia.event[q].phi());
 		}
+		
+		int iZ = 5;
+		int q1 = 3;
+		int q1TopCopyId = pythia.event.iTopCopyId(3);
+		q1 = q1TopCopyId;
+		
+		int q2 = 4;
+		int q2TopCopyId = pythia.event.iTopCopyId(4);
+		q2 = q2TopCopyId;
+
+		
+		truth_all_partons_mc_pdgId->push_back(pythia.event[q1].id());
+		truth_all_partons_mc_charge->push_back(pythia.event[q1].charge());
+		truth_all_partons_mc_m->push_back(pythia.event[q1].m());
+		truth_all_partons_mc_px->push_back(pythia.event[q1].px());
+		truth_all_partons_mc_py->push_back(pythia.event[q1].py());
+		truth_all_partons_mc_pz->push_back(pythia.event[q1].pz());
+		truth_all_partons_mc_e->push_back(pythia.event[q1].e());
+		truth_all_partons_mc_pt->push_back(pythia.event[q1].pT());
+		truth_all_partons_mc_eta->push_back(pythia.event[q1].eta());
+		truth_all_partons_mc_phi->push_back(pythia.event[q1].phi());
+		
+		truth_all_partons_mc_pdgId->push_back(pythia.event[q2].id());
+		truth_all_partons_mc_charge->push_back(pythia.event[q2].charge());
+		truth_all_partons_mc_m->push_back(pythia.event[q2].m());
+		truth_all_partons_mc_px->push_back(pythia.event[q2].px());
+		truth_all_partons_mc_py->push_back(pythia.event[q2].py());
+		truth_all_partons_mc_pz->push_back(pythia.event[q2].pz());
+		truth_all_partons_mc_e->push_back(pythia.event[q2].e());
+		truth_all_partons_mc_pt->push_back(pythia.event[q2].pT());
+		truth_all_partons_mc_eta->push_back(pythia.event[q2].eta());
+		truth_all_partons_mc_phi->push_back(pythia.event[q2].phi());
+		/////////////// NEW ///////////////////////////////////////////////////////////////////////////
+		
+		
 		
 		// loop on the particles in the event
 		// find the Z and its final fermion decay products
@@ -436,7 +492,10 @@ int main(int argc, char *argv[])
 			int isfinal = pythia.event[i].isFinal();
 			int status  = pythia.event[i].status();
 			int idf     = pythia.event[i].id();
-			
+
+			if(idf*idf!=iIDout*iIDout) continue;
+			if(!isfinal) continue;
+	
 			// Particle::status() = 21 - 29 : particles of the hardest subprocess
 			// Particle::status() = 31 - 39 : particles of subsequent subprocesses
 			// Particle::status() = 41 - 49 : particles produced by initial-state-showers
@@ -447,14 +506,12 @@ int main(int argc, char *argv[])
 									(status>=41 && status<=49)  ||
 									(status>=51 && status<=59)
 								   );
-									
+			if(!isHardProcsess) continue;						
 			
 			bool isZ = pythia.event.isAncestor(i,iZ);
+			if(!isZ) continue;
 			
-			if(isfinal  &&  isHardProcsess  &&  idf*idf==iIDout*iIDout  &&  isZ)
-			{
-				index->push_back(i);
-			}
+			index->push_back(i);
 		}
 		
 		if(index->size()>1)

@@ -8,22 +8,33 @@
 #include "../include/fkinematics.h"
 #include "../include/units.h"
 #include "../include/enums.h"
+#include "../src/AtlasStyle.C"
 
 using namespace fkinematics;
+
+
+void atlstyle()
+{
+	gROOT->Reset();
+	gROOT->ForceStyle();
+	gROOT->LoadMacro("../src/AtlasStyle.C");
+	SetAtlasStyle();
+}
+
 
 string dir = "/data/hod/2011/pythia8_ntuples_2012/";
 
 Int_t printmod = 1000;
 
 const unsigned int nMCs = 20; // 20;
-const char* vcMassBins[] = {"50M250",   "250M500",  "500M750",  "750M1000" , "1000M1250",
-							"1250M1500", "1500M1750","1750M2000","2000M2250","2250M2500",
-							"2500M2750","2750M3000","3000M3250","3250M3500","3500M3750",
-							"3750M4000","4000M4250","4250M4500","4500M4750","4750M5000"};
-// const char* vcMassBins[] = {"50M150",   "150M250",  "250M400",  "400M600" , "600M800",
-							// "800M1000",	"1000M1250","1250M1500","1500M1750","1750M2000",
-							// "2000M2250","2250M2500","2500M2750","2750M3000","3000M3250",
-							// "3250M3500","3500M3750","3750M4000","4000M4400","4400M5000"};
+// const char* vcMassBins[] = {"50M250",   "250M500",  "500M750",  "750M1000" , "1000M1250",
+							// "1250M1500", "1500M1750","1750M2000","2000M2250","2250M2500",
+							// "2500M2750","2750M3000","3000M3250","3250M3500","3500M3750",
+							// "3750M4000","4000M4250","4250M4500","4500M4750","4750M5000"};
+const char* vcMassBins[] = {"50M150",   "150M250",  "250M400",  "400M600" , "600M800",
+							"800M1000",	"1000M1250","1250M1500","1500M1750","1750M2000",
+							"2000M2250","2250M2500","2500M2750","2750M3000","3000M3250",
+							"3250M3500","3500M3750","3750M4000","4000M4400","4400M5000"};
 vector<TString> vsMassBins(vcMassBins,vcMassBins+nMCs);
 
 TString mcname   = "";
@@ -347,6 +358,7 @@ void hbook(TString name)
 	setLogBins(nlogtheoryimassbins, logtheoryimassmin, logtheoryimassmax, logtheoryimassbins);
 	setLogBins(nlogtheoryAFBimassbins, logtheoryAFBimassmin, logtheoryAFBimassmax, logtheoryAFBimassbins);
 	h1Map.insert( make_pair("hMass"+name, new TH1D("hMass"+name, name+";m_{"+chlabel+"} GeV;Events", nlogtheoryimassbins,logtheoryimassbins)) );
+	h1Map.insert( make_pair("hMassLinear"+name, new TH1D("hMassLinear"+name, name+";m_{"+chlabel+"} GeV;Events", 120,200.,1600)) );
 	h1Map.insert( make_pair("hMassForwardHE"+name, new TH1D("hMassForwardHE"+name, name+";m_{"+chlabel+"} GeV;Forward Events", nlogtheoryAFBimassbins,logtheoryAFBimassbins)) );
 	h1Map.insert( make_pair("hMassBackwardHE"+name, new TH1D("hMassBackwardHE"+name, name+";m_{"+chlabel+"} GeV;Backward Events", nlogtheoryAFBimassbins,logtheoryAFBimassbins)) );
 	h1Map.insert( make_pair("hMassForwardCS"+name, new TH1D("hMassForwardCS"+name, name+";m_{"+chlabel+"} GeV;Forward Events", nlogtheoryAFBimassbins,logtheoryAFBimassbins)) );
@@ -407,6 +419,7 @@ void hfill(TString name, double wgt)
 	double qt          = QT(tlvmua,tlvmub);
 	
 	h1Map["hMass"+name]->Fill(mHat,wgt);
+	h1Map["hMassLinear"+name]->Fill(mHat,wgt);
 	h1Map["hQT"+name]->Fill(qt,wgt);
 	h1Map["hyQ"+name]->Fill(ysystem,wgt);
 	h1Map["hEtaSystem"+name]->Fill(etasystem,wgt);
@@ -452,7 +465,7 @@ void postanalysis(TString name)
 			Afb = (Nf-Nb)/N;
 			dAfb = sqrt((1.-Afb*Afb)/N);
 			h1Map["hMassAFB_HE"+name]->SetBinContent(bin,Afb);
-			// h1Map["hMassAFB_HE"+name]->SetBinError(bin,dAfb);
+			h1Map["hMassAFB_HE"+name]->SetBinError(bin,dAfb);
 		}
 		
 		Nf = h1Map["hMassForwardCS"+name]->GetBinContent(bin);
@@ -463,7 +476,7 @@ void postanalysis(TString name)
 			Afb = (Nf-Nb)/N;
 			dAfb = sqrt((1.-Afb*Afb)/N);
 			h1Map["hMassAFB_CS"+name]->SetBinContent(bin,Afb);
-			// h1Map["hMassAFB_CS"+name]->SetBinError(bin,dAfb);
+			h1Map["hMassAFB_CS"+name]->SetBinError(bin,dAfb);
 		}
 		
 		Nf = h1Map["hMassForwardQRK"+name]->GetBinContent(bin);
@@ -474,7 +487,7 @@ void postanalysis(TString name)
 			Afb = (Nf-Nb)/N;
 			dAfb = sqrt((1.-Afb*Afb)/N);
 			h1Map["hMassAFB_QRK"+name]->SetBinContent(bin,Afb);
-			// h1Map["hMassAFB_QRK"+name]->SetBinError(bin,dAfb);
+			h1Map["hMassAFB_QRK"+name]->SetBinError(bin,dAfb);
 		}
 	}
 }
@@ -517,14 +530,14 @@ void writeout(TString name)
 {
 	_DEBUG("void writeout(TString name)");
 
-	TFile* outfile = new TFile("plots/"+name+".root","RECREATE");
+	TFile* outfile = new TFile("plots/"+name+sRunNum+".root","RECREATE");
 	
 	for(TMapTSP2TH1::iterator it=h1Map.begin() ; it!=h1Map.end() ; ++it)
 	{
 		outfile->cd();
 		it->second->Write();
 		TString hname = it->first;
-		saveas(it->second, "plots/"+hname, dolog(hname,1), dolog(hname,2), dolog(hname,3));
+		saveas(it->second, "plots/"+hname+sRunNum, dolog(hname,1), dolog(hname,2), dolog(hname,3));
 	}
 	
 	for(TMapTSP2TH2::iterator it=h2Map.begin() ; it!=h2Map.end() ; ++it)
@@ -532,7 +545,7 @@ void writeout(TString name)
 		outfile->cd();
 		it->second->Write();
 		TString hname = it->first;
-		saveas(it->second, "plots/"+hname, dolog(hname,1), dolog(hname,2), dolog(hname,3));
+		saveas(it->second, "plots/"+hname+sRunNum, dolog(hname,1), dolog(hname,2), dolog(hname,3));
 	}
 	
 	outfile->Write();
@@ -546,43 +559,36 @@ void plotTheory(TString name)
 	
 	TFile* fTheory = new TFile("/srv01/tau/hod/z0analysis-tests/z0analysis-r170/run/plots/theory_mass1000GeV_withpdf_histos.root","READ");
 	
-	TH1D* hmassTheory = (TH1D*)fTheory->Get("h1SumqZP")->Clone("hmassTheory");
-	TH1D* hAfbTheory  = (TH1D*)fTheory->Get("h1AfbSumqZP")->Clone("hAfbTheory");
+	TH1D* hmassTheory = NULL;
+	TH1D* hAfbTheory  = NULL;
+
+	TString model = "";
+	if     (name.Contains("DY"))     model = "DY";
+	else if(name.Contains("ZP_ssm")) model = "ZP";
+	else if(name.Contains("ZP_psi")) model = "E6_psi";
+	else if(name.Contains("ZP_chi")) model = "E6_chi";
+	else if(name.Contains("ZP_eta")) model = "E6_eta";
+	else if(name.Contains("KK"))     model = "KK";
 	
-	TCanvas* cnv_mass = new TCanvas("cnv_mass","cnv_mass",600,400);
-	cnv_mass->SetTicks(1,1);
-	cnv_mass->SetLogx();
-	cnv_mass->SetLogy();
-	cnv_mass->cd();
-	cnv_mass->Draw();
-	Double_t max = 0.;
-	max = (hmassTheory->GetMaximum()>max)         ? hmassTheory->GetMaximum()         : max;
-	max = (h1Map["hMass"+name]->GetMaximum()>max) ? h1Map["hMass"+name]->GetMaximum() : max;
-	max *= 2.;
-	hmassTheory->SetMaximum(max);
-	hmassTheory->Draw();
-	h1Map["hMass"+name]->Draw("SAMES");
-	saveas(cnv_mass,"plots/"+name+"_mass_withTheory");
+	hmassTheory = (TH1D*)fTheory->Get("h1Sumq"+model)->Clone("hmassTheory");
+	hAfbTheory  = (TH1D*)fTheory->Get("h1AfbSumq"+model)->Clone("hAfbTheory");
 	
-	TCanvas* cnv_mass_ratio = new TCanvas("cnv_mass_ratio","cnv_mass_ratio",600,400);
-	cnv_mass_ratio->SetTicks(1,1);
-	cnv_mass_ratio->SetLogx();
-	cnv_mass_ratio->cd();
-	cnv_mass_ratio->Draw();
-	hmassTheory->Divide(h1Map["hMass"+name]);
-	hmassTheory->Draw();
-	saveas(cnv_mass_ratio,"plots/"+name+"_mass_ratio_withTheory");
+	hmassTheory->SetLineColor(kOrange+2);
+	// for(Int_t b=1 ; b<=hmassTheory->GetNbinsX() ; b++) hmassTheory->SetBinContent(b, hmassTheory->GetBinContent(b)*hmassTheory->GetBinCenter(b));
+	TCanvas* cnv_mass_ratio = hratio("cnv_mass_ratio", hmassTheory, h1Map["hMass"+name], NULL,"Ratio", true,true);
+	saveas(cnv_mass_ratio,"plots/"+name+"_mass_ratio_withTheory"+sRunNum);
 	
 	TCanvas* cnv_afb = new TCanvas("cnv_afb","cnv_afb",600,400);
 	cnv_afb->SetTicks(1,1);
 	cnv_afb->SetLogx();
 	cnv_afb->cd();
 	cnv_afb->Draw();
+	hAfbTheory->SetLineColor(kOrange+2);
 	hAfbTheory->SetMinimum(-1.);
 	hAfbTheory->SetMaximum(+1.);
 	hAfbTheory->Draw();
 	h1Map["hMassAFB_QRK"+name]->Draw("SAMES");
-	saveas(cnv_afb,"plots/"+name+"_Afb_withTheory");
+	saveas(cnv_afb,"plots/"+name+"_Afb_withTheory"+sRunNum);
 }
 
 void monitor(TString name, Int_t entry, Int_t N)
@@ -639,6 +645,10 @@ void analysis(TString mc, TString ch, Double_t mbsm, Int_t runnum)
 	msglvl[FAT] = VISUAL;
 
 	_DEBUG("void analysis(TString mc, TString ch)");
+	
+	atlstyle();
+	// style();
+	
 	
 	//////////////////////////////////////////////
 	mcname   = mc+"_"; ///////////////////////////

@@ -43,7 +43,7 @@
 	TString sLine = "\""+mcname+"\",\""+channel+"\","+massbsm+","+runnumb;
 	cout << "Arguments: " << sLine << endl;
 	
-	gROOT->ProcessLine(".L theory_analysis.C++");
-	cout << "HERE " << endl;
+	// gROOT->ProcessLine(".L theory_analysis.C++");
+	gROOT->ProcessLine(".L theory_analysis_C.so");
 	gROOT->ProcessLine("analysis("+sLine+")");
 }

@@ -62,7 +62,7 @@ void hdraw()
 	bool doKK   = false;
 	bool doLogx = (htype.Contains("Mass") || htype.Contains("AFB") || htype.Contains("pT")) ? true : false;
 	bool doLogy = (htype.Contains("Mass") || htype.Contains("pT") || htype.Contains("QT")) ? true : false;
-	doLogy = (htype.Contains("AFB")) ? false : doLogy;
+	doLogy      = (htype.Contains("AFB")  || htype.Contains("CosTheta")) ? false : doLogy;
 	
 	_DEBUG("");
 	
@@ -140,7 +140,7 @@ void hdraw()
 		}
 		if(vNames[n].Contains("DY"))
 		{
-			if(!htype.Contains("AFB"))    vHists[n]->SetFillColor(vColors[n]);
+			if(!htype.Contains("AFB")) vHists[n]->SetFillColor(vColors[n]);
 			// if(htype.Contains("AFB_QRK")) vHists[n]->SetFillColor(vColors[n]);
 		}
 		if(htype=="Mass")
@@ -156,8 +156,8 @@ void hdraw()
 	
 	Double_t legxmin = 0.69;
 	Double_t legxmax = 0.79;
-	Double_t legymin = (!htype.Contains("AFB_QRK")) ? 0.70 : 0.20;
-	Double_t legymax = (!htype.Contains("AFB_QRK")) ? 0.94 : 0.44;
+	Double_t legymin = (!htype.Contains("AFB")) ? 0.70 : 0.20;
+	Double_t legymax = (!htype.Contains("AFB")) ? 0.94 : 0.44;
 	TLegend* leg = new TLegend(legxmin,legymin,legxmax,legymax);
 	leg->SetFillStyle(4000); //will be transparent
 	leg->SetFillColor(0);
@@ -195,13 +195,18 @@ void hdraw()
 	TString generator = "#scale[1.17]{P}#scale[1]{YTHIA8} #scale[0.9]{(+MRSTMCal)}";
 	TString ppcme     = "#it{pp} collisions at #sqrt{s}=7 TeV";
 	TString lumilabel = "Luminosity(truth) ~ "+(TString)_s(5)+" fb^{-1}";
+	TString afblabel  = "";
+	if(htype.Contains("AFB_QRK")) afblabel = "A_{fb} of proper cos#theta*";
+	if(htype.Contains("AFB_HE"))  afblabel = "Uncorrected A_{fb} of cos#theta_{#beta}*";
+	if(htype.Contains("AFB_CS"))  afblabel = "Uncorrected A_{fb} of Collins-Soper";
 	t->DrawLatex(0.20,0.36,generator);
 	t->DrawLatex(0.20,0.30,ppcme);
-	if(!htype.Contains("AFB")) t->DrawLatex(0.20,0.24,lumilabel);
+	if(htype.Contains("AFB")) t->DrawLatex(0.20,0.24,afblabel);
+	else                      t->DrawLatex(0.20,0.24,lumilabel);
 	
 	c->Update();
 	
-	if(htype.Contains("AFB_QRK"))
+	if(htype.Contains("AFB"))
 	{
 		TLine* line = new TLine(vHists[0]->GetXaxis()->GetXmax(),0.,vHists[0]->GetXaxis()->GetXmin(),0.);
 		line->Draw("SAMES");

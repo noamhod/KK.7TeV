@@ -14,12 +14,13 @@
 	TString channel = "";
 	TString massbsm = "";
 	TString runnumb = "";
+	TString compile = "";
 
 	for(int i=0 ; i<gApplication->Argc() ; i++)
 	{
 		printf("Arg  %d:  %s\n",i,gApplication->Argv(i));
 	}
-	if(gApplication->Argc()>13 || gApplication->Argc()<5)
+	if(gApplication->Argc()>14 || gApplication->Argc()<5)
 	{
 		cout << "gApplication->Argc()=" << gApplication->Argc() << endl;
 		exit(-1);
@@ -33,17 +34,19 @@
 		if(arg.Contains("--channel=")) channel = arg.ReplaceAll("--channel=","");
 		if(arg.Contains("--mBSM="))    massbsm = arg.ReplaceAll("--mBSM=","");
 		if(arg.Contains("--runNum="))  runnumb = arg.ReplaceAll("--runNum=","");
+		if(arg.Contains("--compile=")) compile = arg.ReplaceAll("--compile=","");
 	}
 	
 	cout << "running with mcname  = " << mcname << endl;
 	cout << "running with channel = " << channel << endl;
 	cout << "running with mBSM    = " << massbsm << endl;
 	cout << "running with runnumb = " << runnumb << endl;
+	cout << "running with compile = " << compile << endl;
 
 	TString sLine = "\""+mcname+"\",\""+channel+"\","+massbsm+","+runnumb;
 	cout << "Arguments: " << sLine << endl;
 	
-	// gROOT->ProcessLine(".L theory_analysis.C++");
-	gROOT->ProcessLine(".L theory_analysis_C.so");
+	if(compile=="yes") gROOT->ProcessLine(".L theory_analysis.C++");
+	else               gROOT->ProcessLine(".L theory_analysis_C.so");
 	gROOT->ProcessLine("analysis("+sLine+")");
 }

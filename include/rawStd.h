@@ -24,6 +24,7 @@
 #include <time.h>
 #include <pthread.h>
 #include <iomanip>
+#include <assert.h>
 
 using namespace std;
 

@@ -13,12 +13,21 @@
 #include "../include/kFactors.h"
 #include "../include/integrals.h"
 #include "../include/lhapdf.h"
+#include "../src/AtlasStyle.C"
 
 using namespace couplings;
 using namespace width;
 using namespace helicity;
 using namespace kFactors;
 using namespace lhapdf;
+
+void atlstyle()
+{
+	gROOT->Reset();
+	gROOT->ForceStyle();
+	gROOT->LoadMacro("../src/AtlasStyle.C");
+	SetAtlasStyle();
+}
 
 const unsigned int fstQrk = PDTDWN;
 const unsigned int lstQrk = PDTTOP;
@@ -30,6 +39,21 @@ unsigned int qstate(unsigned int qrk)
 	return 1;
 }
 
+/* void *handle(void *ptr)
+{
+	long nr = (long) ptr;
+
+	// for (int i = 0; i < 10; i++)
+	// {
+		// TThread::Printf("Here I am loop index: %d , thread: %ld", i, nr);
+		// gSystem->Sleep(1000);
+	// }
+	
+	TThread::Printf("Here I am loop index: %d , thread: %ld", i, nr);
+	
+	return 0;
+} */
+
 void simpleplot_withpdfs(double Xmass, TString chan="mm", double gRe=1., double gIm=0.)
 {
 	msglvl[DBG] = SILENT;
@@ -38,7 +62,10 @@ void simpleplot_withpdfs(double Xmass, TString chan="mm", double gRe=1., double 
 	msglvl[ERR] = VISUAL;
 	msglvl[FAT] = VISUAL;
 
-	style();
+	TString styletype="atlas";
+	if(styletype=="atlas") atlstyle();
+	else                   style(); // noam's style
+	
 	bool dologx = true;//false;
 	bool dology = true;
 	bool dologz = true;
@@ -51,17 +78,18 @@ void simpleplot_withpdfs(double Xmass, TString chan="mm", double gRe=1., double 
 	vE6models.push_back("psi");
 	vE6models.push_back("chi");
 	vE6models.push_back("eta");
-	vE6models.push_back("I");
+	// vE6models.push_back("I");
 	
 	vector<Int_t> vE6modelsLines;
 	vE6modelsLines.push_back(1);
-	vE6modelsLines.push_back(7);
-	vE6modelsLines.push_back(5);
+	vE6modelsLines.push_back(2);
 	vE6modelsLines.push_back(3);
+	// vE6modelsLines.push_back(3);
 	
 	////////////////////////////
 	setFermions(); /////////////
-	setFixedWidth(false); //////
+	setFixedWidth(false); ////// !!! should be false
+	setTTbarWidth(true); /////// !!! should be true
 	setGZKKmode(BOTHGZ); ///////
 	setThetaE6(E6model); ///////
 	////////////////////////////
@@ -86,14 +114,32 @@ void simpleplot_withpdfs(double Xmass, TString chan="mm", double gRe=1., double 
 	setLogBins(nlogofficialimassbins,logofficialimassmin,logofficialimassmax,logofficialimassbins);
 	setLogBins(nlogofficiallongimassbins,logofficiallongimassmin,logofficiallongimassmax,logofficiallongimassbins);
 	setLinBins(nlinmassbins,linmassmin,linmassmax,linmassbins);
+	setLogBins(nlogtheoryAFBimassbins, logtheoryAFBimassmin, logtheoryAFBimassmax, logtheoryAFBimassbins);
+	setLogBins(nlogtheoryimassbins, logtheoryimassmin, logtheoryimassmax, logtheoryimassbins);
+	
+	
+	_INFO("Width SSM = "+_s(wTotZP()/Xmass));
+	setThetaE6("psi");
+	_INFO("Width psi = "+_s(wTotE6()/Xmass));
+	setThetaE6("chi");
+	_INFO("Width chi = "+_s(wTotE6()/Xmass));
+	setThetaE6("eta");
+	_INFO("Width eta = "+_s(wTotE6()/Xmass));
+	setThetaE6("I");
+	_INFO("Width I   = "+_s(wTotE6()/Xmass));
 	
 	vector<TH1D*> h1Tmp;
 	vector<TH2D*> h2Tmp;
 	
-	TLegend* leg_sigma = new TLegend(0.55,0.63,0.8,0.85,NULL,"brNDC");
+	TLegend* leg_sigma = new TLegend(0.6459732,0.6612903,0.8959732,0.8817204,NULL,"brNDC");
 	leg_sigma->SetFillStyle(4000); //will be transparent
 	leg_sigma->SetFillColor(0);
 	leg_sigma->SetTextFont(42);
+	
+	TLegend* leg_afb = new TLegend(0.6459732,0.2231183,0.8959732,0.4435484,NULL,"brNDC");
+	leg_afb->SetFillStyle(4000); //will be transparent
+	leg_afb->SetFillColor(0);
+	leg_afb->SetTextFont(42);
 	
 	TLegend* leg_quarks = new TLegend(0.6627517,0.60,0.7919463,0.87,NULL,"brNDC");
 	leg_quarks->SetFillStyle(4000); //will be transparent
@@ -101,108 +147,116 @@ void simpleplot_withpdfs(double Xmass, TString chan="mm", double gRe=1., double 
 	leg_quarks->SetTextFont(42);
 	
 	//////////////////////// 
-	TH1D* h1SumqDY = new TH1D("h1SumqDY",";m_{"+channel+"} GeV;d#sigma/dm_{"+channel+"} fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/  );
+	TH1D* h1SumqDY = new TH1D("h1SumqDY",";m_{"+channel+"} GeV;#frac{d#sigma}{dm_{"+channel+"}} in arbitrary scale", nlogtheoryimassbins,logtheoryimassbins /* nlogofficiallongimassbins,logofficiallongimassbins */  /*nlogofficialimassbins,logofficialimassbins*/  /* nlinmassbins,linmassbins */  );
 	if(dologx) h1SumqDY->GetXaxis()->SetMoreLogLabels();
 	if(dologx) h1SumqDY->GetXaxis()->SetNoExponent();
-	h1SumqDY->SetLineColor(kBlack);
+	h1SumqDY->SetLineColor(kAzure-9); // kBlack
 	h1SumqDY->SetFillColor(kAzure-9);
 	leg_sigma->AddEntry(h1SumqDY,"DY","f");
 	
-	TH1D* h1SumqZP = new TH1D("h1SumqZP",";m_{"+channel+"} GeV;d#sigma/dm_{"+channel+"} fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/ );
+	TH1D* h1SumqZP = new TH1D("h1SumqZP",";m_{"+channel+"} GeV;#frac{d#sigma}{dm_{"+channel+"}} in arbitrary scale", nlogtheoryimassbins,logtheoryimassbins /* nlogofficiallongimassbins,logofficiallongimassbins */  /*nlogofficialimassbins,logofficialimassbins*/  /* nlinmassbins,linmassbins */ );
 	if(dologx) h1SumqZP->GetXaxis()->SetMoreLogLabels();
 	if(dologx) h1SumqZP->GetXaxis()->SetNoExponent();
 	h1SumqZP->SetLineColor(kRed+2);
-	h1SumqZP->SetLineWidth(2);
-	leg_sigma->AddEntry(h1SumqZP,"Z'_{SSM} at "+sXmass+" GeV","F");
+	h1SumqZP->SetLineWidth(1);
+	leg_sigma->AddEntry(h1SumqZP,"Z'_{SSM} ("+sXmass+" GeV)","F");
 	
 	
 	vector<TH1D*> h1SumqE6;
 	for(unsigned int iE6=0 ; iE6<vE6models.size() ; iE6++)
 	{
-		h1SumqE6.push_back( new TH1D("h1SumqE6_"+vE6models[iE6],";m_{"+channel+"} GeV;d#sigma/dm_{"+channel+"} fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/ ));
+		h1SumqE6.push_back( new TH1D("h1SumqE6_"+vE6models[iE6],";m_{"+channel+"} GeV;#frac{d#sigma}{dm_{"+channel+"}} in arbitrary scale", nlogtheoryimassbins,logtheoryimassbins /* nlogofficiallongimassbins,logofficiallongimassbins */  /*nlogofficialimassbins,logofficialimassbins*/  /* nlinmassbins,linmassbins */ ));
 		if(dologx) h1SumqE6[iE6]->GetXaxis()->SetMoreLogLabels();
 		if(dologx) h1SumqE6[iE6]->GetXaxis()->SetNoExponent();
 		h1SumqE6[iE6]->SetLineColor(kOrange+2);
-		h1SumqE6[iE6]->SetLineWidth(2);
+		h1SumqE6[iE6]->SetLineWidth(1);
 		h1SumqE6[iE6]->SetLineStyle(vE6modelsLines[iE6]);
-		leg_sigma->AddEntry(h1SumqE6[iE6],"Z'_{#"+vE6models[iE6]+"} at "+sXmass+" GeV","F");
+		TString name = "Z'_{#"+vE6models[iE6]+"} ("+sXmass+" GeV)";
+		if(vE6models[iE6]=="I") name = "Z'_{"+vE6models[iE6]+"} ("+sXmass+" GeV)";
+		leg_sigma->AddEntry(h1SumqE6[iE6],name,"F");
 	}
 	
-	TH1D* h1SumqKK = new TH1D("h1SumqKK",";m_{"+channel+"} GeV;d#sigma/dm_{"+channel+"} fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/ );
+	TH1D* h1SumqKK = new TH1D("h1SumqKK",";m_{"+channel+"} GeV;#frac{d#sigma}{dm_{"+channel+"}} in arbitrary scale", nlogtheoryimassbins,logtheoryimassbins /* nlogofficiallongimassbins,logofficiallongimassbins */  /*nlogofficialimassbins,logofficialimassbins*/  /* nlinmassbins,linmassbins */ );
 	if(dologx) h1SumqKK->GetXaxis()->SetMoreLogLabels();
 	if(dologx) h1SumqKK->GetXaxis()->SetNoExponent();
 	h1SumqKK->SetLineColor(kGreen+2);
-	h1SumqKK->SetLineWidth(2);
-	leg_sigma->AddEntry(h1SumqKK,"KK at "+sXmass+" GeV","F");
+	h1SumqKK->SetLineWidth(1);
+	leg_sigma->AddEntry(h1SumqKK,"KK ("+sXmass+" GeV)","F");
 	////////////////////////
 	
 	
 	////////////////////////
-	TH1D* h1fSumqDY = new TH1D("h1fSumqDY",";m_{"+channel+"} GeV;A_{fb}", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/  );
-	TH1D* h1fSumqZP = new TH1D("h1fSumqZP",";m_{"+channel+"} GeV;A_{fb}", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/ );
-	TH1D* h1fSumqKK = new TH1D("h1fSumqKK",";m_{"+channel+"} GeV;A_{fb}", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/ );
+	TH1D* h1fSumqDY = new TH1D("h1fSumqDY",";m_{"+channel+"} GeV;A_{fb}", nlogtheoryAFBimassbins,logtheoryAFBimassbins );
+	TH1D* h1fSumqZP = new TH1D("h1fSumqZP",";m_{"+channel+"} GeV;A_{fb}", nlogtheoryAFBimassbins,logtheoryAFBimassbins );
+	TH1D* h1fSumqKK = new TH1D("h1fSumqKK",";m_{"+channel+"} GeV;A_{fb}", nlogtheoryAFBimassbins,logtheoryAFBimassbins );
 	
-	TH1D* h1bSumqDY = new TH1D("h1bSumqDY",";m_{"+channel+"} GeV;A_{fb}", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/  );
-	TH1D* h1bSumqZP = new TH1D("h1bSumqZP",";m_{"+channel+"} GeV;A_{fb}", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/ );
-	TH1D* h1bSumqKK = new TH1D("h1bSumqKK",";m_{"+channel+"} GeV;A_{fb}", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/ );
+	TH1D* h1bSumqDY = new TH1D("h1bSumqDY",";m_{"+channel+"} GeV;A_{fb}", nlogtheoryAFBimassbins,logtheoryAFBimassbins );
+	TH1D* h1bSumqZP = new TH1D("h1bSumqZP",";m_{"+channel+"} GeV;A_{fb}", nlogtheoryAFBimassbins,logtheoryAFBimassbins );
+	TH1D* h1bSumqKK = new TH1D("h1bSumqKK",";m_{"+channel+"} GeV;A_{fb}", nlogtheoryAFBimassbins,logtheoryAFBimassbins );
 	
 	vector<TH1D*> h1fSumqE6;
 	vector<TH1D*> h1bSumqE6;
 	for(unsigned int iE6=0 ; iE6<vE6models.size() ; iE6++)
 	{
-		h1fSumqE6.push_back( new TH1D("h1fSumqE6_"+vE6models[iE6],";m_{"+channel+"} GeV;A_{fb}", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/ ));
-		h1bSumqE6.push_back( new TH1D("h1bSumqE6_"+vE6models[iE6],";m_{"+channel+"} GeV;A_{fb}", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/ ));
+		h1fSumqE6.push_back( new TH1D("h1fSumqE6_"+vE6models[iE6],";m_{"+channel+"} GeV;A_{fb}", nlogtheoryAFBimassbins,logtheoryAFBimassbins ));
+		h1bSumqE6.push_back( new TH1D("h1bSumqE6_"+vE6models[iE6],";m_{"+channel+"} GeV;A_{fb}", nlogtheoryAFBimassbins,logtheoryAFBimassbins ));
 	}
 	
-	TH1D* h1AfbSumqDY = new TH1D("h1AfbSumqDY",";m_{"+channel+"} GeV;A_{fb}", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/  );
+	TH1D* h1AfbSumqDY = new TH1D("h1AfbSumqDY",";m_{"+channel+"} GeV;A_{fb}", nlogtheoryAFBimassbins,logtheoryAFBimassbins  );
 	if(dologx) h1AfbSumqDY->GetXaxis()->SetMoreLogLabels();
 	if(dologx) h1AfbSumqDY->GetXaxis()->SetNoExponent();
 	h1AfbSumqDY->SetLineColor(kAzure-9);
-	h1AfbSumqDY->SetLineWidth(2);
+	h1AfbSumqDY->SetLineWidth(1);
+	leg_afb->AddEntry(h1AfbSumqDY,"DY","f");
 	
-	TH1D* h1AfbSumqZP = new TH1D("h1AfbSumqZP",";m_{"+channel+"} GeV;A_{fb}", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/ );
+	TH1D* h1AfbSumqZP = new TH1D("h1AfbSumqZP",";m_{"+channel+"} GeV;A_{fb}", nlogtheoryAFBimassbins,logtheoryAFBimassbins );
 	if(dologx) h1AfbSumqZP->GetXaxis()->SetMoreLogLabels();
 	if(dologx) h1AfbSumqZP->GetXaxis()->SetNoExponent();
 	h1AfbSumqZP->SetLineColor(kRed+2);
-	h1AfbSumqZP->SetLineWidth(2);
+	h1AfbSumqZP->SetLineWidth(1);
+	leg_afb->AddEntry(h1AfbSumqZP,"Z'_{SSM} ("+sXmass+" GeV)","F");
 	
 	vector<TH1D*> h1AfbSumqE6;
 	for(unsigned int iE6=0 ; iE6<vE6models.size() ; iE6++)
 	{
-		h1AfbSumqE6.push_back( new TH1D("h1AfbSumqE6_"+vE6models[iE6],";m_{"+channel+"} GeV;A_{fb}", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/ ));
+		h1AfbSumqE6.push_back( new TH1D("h1AfbSumqE6_"+vE6models[iE6],";m_{"+channel+"} GeV;A_{fb}", nlogtheoryAFBimassbins,logtheoryAFBimassbins ));
 		if(dologx) h1AfbSumqE6[iE6]->GetXaxis()->SetMoreLogLabels();
 		if(dologx) h1AfbSumqE6[iE6]->GetXaxis()->SetNoExponent();
 		h1AfbSumqE6[iE6]->SetLineColor(kOrange+2);
-		h1AfbSumqE6[iE6]->SetLineWidth(2);
+		h1AfbSumqE6[iE6]->SetLineWidth(1);
 		h1AfbSumqE6[iE6]->SetLineStyle(vE6modelsLines[iE6]);
+		TString name = "Z'_{#"+vE6models[iE6]+"} ("+sXmass+" GeV)";
+		if(vE6models[iE6]=="I") name = "Z'_{"+vE6models[iE6]+"} ("+sXmass+" GeV)";
+		leg_afb->AddEntry(h1AfbSumqE6[iE6],name,"F");
 	}
 	
-	TH1D* h1AfbSumqKK = new TH1D("h1AfbSumqKK",";m_{"+channel+"} GeV;A_{fb}", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/ );
+	TH1D* h1AfbSumqKK = new TH1D("h1AfbSumqKK",";m_{"+channel+"} GeV;A_{fb}", nlogtheoryAFBimassbins,logtheoryAFBimassbins );
 	if(dologx) h1AfbSumqKK->GetXaxis()->SetMoreLogLabels();
 	if(dologx) h1AfbSumqKK->GetXaxis()->SetNoExponent();
 	h1AfbSumqKK->SetLineColor(kGreen+2);
-	h1AfbSumqKK->SetLineWidth(2);
+	h1AfbSumqKK->SetLineWidth(1);
+	//leg_afb->AddEntry(h1AfbSumqKK,"KK ("+sXmass+" GeV)","F");
 	////////////////////////
 	
 	
 	////////////////////////
-	TH2D* h2SumqDY = new TH2D("h2SumqDY",";m_{"+channel+"} GeV;cos#theta*;d#sigma/dm_{"+channel+"} fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/,nFullCosThetaBins,minFullCosTheta,maxFullCosTheta );
+	TH2D* h2SumqDY = new TH2D("h2SumqDY",";m_{"+channel+"} GeV;cos#theta*;#frac{d#sigma}{dm_{"+channel+"}} in arbitrary scale", nlogtheoryimassbins,logtheoryimassbins /* nlogofficiallongimassbins,logofficiallongimassbins */  /*nlogofficialimassbins,logofficialimassbins*/  /* nlinmassbins,linmassbins */,nFullCosThetaBins,minFullCosTheta,maxFullCosTheta );
 	if(dologx) h2SumqDY->GetXaxis()->SetMoreLogLabels();
 	if(dologx) h2SumqDY->GetXaxis()->SetNoExponent();
 	
-	TH2D* h2SumqZP = new TH2D("h2SumqZP",";m_{"+channel+"} GeV;cos#theta*;d#sigma/dm_{"+channel+"} fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/,nFullCosThetaBins,minFullCosTheta,maxFullCosTheta );
+	TH2D* h2SumqZP = new TH2D("h2SumqZP",";m_{"+channel+"} GeV;cos#theta*;#frac{d#sigma}{dm_{"+channel+"}} in arbitrary scale", nlogtheoryimassbins,logtheoryimassbins /* nlogofficiallongimassbins,logofficiallongimassbins */  /*nlogofficialimassbins,logofficialimassbins*/  /* nlinmassbins,linmassbins */,nFullCosThetaBins,minFullCosTheta,maxFullCosTheta );
 	if(dologx) h2SumqZP->GetXaxis()->SetMoreLogLabels();
 	if(dologx) h2SumqZP->GetXaxis()->SetNoExponent();
 	
 	vector<TH2D*> h2SumqE6;
 	for(unsigned int iE6=0 ; iE6<vE6models.size() ; iE6++)
 	{
-		h2SumqE6.push_back( new TH2D("h2SumqE6_"+vE6models[iE6],";m_{"+channel+"} GeV;cos#theta*;d#sigma/dm_{"+channel+"} fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/,nFullCosThetaBins,minFullCosTheta,maxFullCosTheta ));
+		h2SumqE6.push_back( new TH2D("h2SumqE6_"+vE6models[iE6],";m_{"+channel+"} GeV;cos#theta*;#frac{d#sigma}{dm_{"+channel+"}} in arbitrary scale", nlogtheoryimassbins,logtheoryimassbins /* nlogofficiallongimassbins,logofficiallongimassbins */  /*nlogofficialimassbins,logofficialimassbins*/  /* nlinmassbins,linmassbins */,nFullCosThetaBins,minFullCosTheta,maxFullCosTheta ));
 		if(dologx) h2SumqE6[iE6]->GetXaxis()->SetMoreLogLabels();
 		if(dologx) h2SumqE6[iE6]->GetXaxis()->SetNoExponent();
 	}
 	
-	TH2D* h2SumqKK = new TH2D("h2SumqKK",";m_{"+channel+"} GeV;cos#theta*;d#sigma/dm_{"+channel+"} fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/,nFullCosThetaBins,minFullCosTheta,maxFullCosTheta );
+	TH2D* h2SumqKK = new TH2D("h2SumqKK",";m_{"+channel+"} GeV;cos#theta*;#frac{d#sigma}{dm_{"+channel+"}} in arbitrary scale", nlogtheoryimassbins,logtheoryimassbins /* nlogofficiallongimassbins,logofficiallongimassbins */  /*nlogofficialimassbins,logofficialimassbins*/  /* nlinmassbins,linmassbins */,nFullCosThetaBins,minFullCosTheta,maxFullCosTheta );
 	if(dologx) h2SumqKK->GetXaxis()->SetMoreLogLabels();
 	if(dologx) h2SumqKK->GetXaxis()->SetNoExponent();
 	
@@ -241,51 +295,55 @@ void simpleplot_withpdfs(double Xmass, TString chan="mm", double gRe=1., double 
 	{
 		TString quark = qname(q+1);
 		
-		h1DY.push_back( new TH1D("h1DY_"+quark,"DY with pdf;m_{#mu#mu} GeV;fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/  ) );
+		//// invariant mass plots
+		h1DY.push_back( new TH1D("h1DY_"+quark,"DY with pdf;m_{#mu#mu} GeV;fb/GeV", nlogtheoryimassbins,logtheoryimassbins /* nlogofficiallongimassbins,logofficiallongimassbins */  /*nlogofficialimassbins,logofficialimassbins*/  /* nlinmassbins,linmassbins */  ) );
 		h1DY[q]->SetLineColor(kBlack+q);
 		leg_quarks->AddEntry(h1DY[q],"DY "+quark,"l");
-		
-		h1ZP.push_back( new TH1D("h1ZP_"+quark,"ZP with pdf;m_{#mu#mu} GeV;fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/  ) );
+		h1ZP.push_back( new TH1D("h1ZP_"+quark,"ZP with pdf;m_{#mu#mu} GeV;fb/GeV", nlogtheoryimassbins,logtheoryimassbins /* nlogofficiallongimassbins,logofficiallongimassbins */  /*nlogofficialimassbins,logofficialimassbins*/  /* nlinmassbins,linmassbins */  ) );
 		h1ZP[q]->SetLineColor(kBlack+q+6);
 		leg_quarks->AddEntry(h1ZP[q],"Z' "+quark,"l");
-		
 		for(unsigned int iE6=0 ; iE6<vE6models.size() ; iE6++)
 		{
-			h1E6[iE6].push_back( new TH1D("h1E6_"+vE6models[iE6]+"_"+quark,"E6 with pdf;m_{#mu#mu} GeV;fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/  ) );
+			h1E6[iE6].push_back( new TH1D("h1E6_"+vE6models[iE6]+"_"+quark,"E6 with pdf;m_{#mu#mu} GeV;fb/GeV", nlogtheoryimassbins,logtheoryimassbins /* nlogofficiallongimassbins,logofficiallongimassbins */  /*nlogofficialimassbins,logofficialimassbins*/  /* nlinmassbins,linmassbins */  ) );
 			h1E6[iE6][q]->SetLineColor(kBlack+q+6);
 			leg_quarks->AddEntry(h1E6[iE6][q],"Z'_{#"+vE6models[iE6]+"} "+quark,"l");
 		}
-		
-		h1KK.push_back( new TH1D("h1KK_"+quark,"KK with pdf;m_{#mu#mu} GeV;fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/  ) );
+		h1KK.push_back( new TH1D("h1KK_"+quark,"KK with pdf;m_{#mu#mu} GeV;fb/GeV", nlogtheoryimassbins,logtheoryimassbins /* nlogofficiallongimassbins,logofficiallongimassbins */  /*nlogofficialimassbins,logofficialimassbins*/  /* nlinmassbins,linmassbins */  ) );
 		h1KK[q]->SetLineColor(kBlack+q+12);
 		leg_quarks->AddEntry(h1KK[q],"KK "+quark,"l");
 		
 		
-		h1fDY.push_back( new TH1D("h1fDY_"+quark,"DY with pdf;m_{#mu#mu} GeV;fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/  ) );
-		h1fZP.push_back( new TH1D("h1fZP_"+quark,"ZP with pdf;m_{#mu#mu} GeV;fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/  ) );
+		//// for Afb plots
+		h1fDY.push_back( new TH1D("h1fDY_"+quark,"DY with pdf;m_{#mu#mu} GeV;fb/GeV", nlogtheoryAFBimassbins,logtheoryAFBimassbins  ) );
+		h1fZP.push_back( new TH1D("h1fZP_"+quark,"ZP with pdf;m_{#mu#mu} GeV;fb/GeV", nlogtheoryAFBimassbins,logtheoryAFBimassbins  ) );
 		for(unsigned int iE6=0 ; iE6<vE6models.size() ; iE6++)
 		{
-			h1fE6[iE6].push_back( new TH1D("h1fE6_"+vE6models[iE6]+"_"+quark,"E6 with pdf;m_{#mu#mu} GeV;fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/  ) );
+			h1fE6[iE6].push_back( new TH1D("h1fE6_"+vE6models[iE6]+"_"+quark,"E6 with pdf;m_{#mu#mu} GeV;fb/GeV", nlogtheoryAFBimassbins,logtheoryAFBimassbins  ) );
 		}
-		h1fKK.push_back( new TH1D("h1fKK_"+quark,"KK with pdf;m_{#mu#mu} GeV;fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/  ) );
+		h1fKK.push_back( new TH1D("h1fKK_"+quark,"KK with pdf;m_{#mu#mu} GeV;fb/GeV", nlogtheoryAFBimassbins,logtheoryAFBimassbins  ) );
 		
-		h1bDY.push_back( new TH1D("h1bDY_"+quark,"DY with pdf;m_{#mu#mu} GeV;fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/  ) );
-		h1bZP.push_back( new TH1D("h1bZP_"+quark,"ZP with pdf;m_{#mu#mu} GeV;fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/  ) );
+		h1bDY.push_back( new TH1D("h1bDY_"+quark,"DY with pdf;m_{#mu#mu} GeV;fb/GeV", nlogtheoryAFBimassbins,logtheoryAFBimassbins  ) );
+		h1bZP.push_back( new TH1D("h1bZP_"+quark,"ZP with pdf;m_{#mu#mu} GeV;fb/GeV", nlogtheoryAFBimassbins,logtheoryAFBimassbins  ) );
 		for(unsigned int iE6=0 ; iE6<vE6models.size() ; iE6++)
 		{
-			h1bE6[iE6].push_back( new TH1D("h1bE6_"+vE6models[iE6]+"_"+quark,"E6 with pdf;m_{#mu#mu} GeV;fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/  ) );
+			h1bE6[iE6].push_back( new TH1D("h1bE6_"+vE6models[iE6]+"_"+quark,"E6 with pdf;m_{#mu#mu} GeV;fb/GeV", nlogtheoryAFBimassbins,logtheoryAFBimassbins  ) );
 		}
-		h1bKK.push_back( new TH1D("h1bKK_"+quark,"KK with pdf;m_{#mu#mu} GeV;fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/  ) );
+		h1bKK.push_back( new TH1D("h1bKK_"+quark,"KK with pdf;m_{#mu#mu} GeV;fb/GeV", nlogtheoryAFBimassbins,logtheoryAFBimassbins  ) );
 
 		
-		h2DY.push_back( new TH2D("h2DY_"+quark,"DY with pdf;m_{#mu#mu} GeV;cos#theta*;fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/,nFullCosThetaBins,minFullCosTheta,maxFullCosTheta  ) );
-		h2ZP.push_back( new TH2D("h2ZP_"+quark,"ZP with pdf;m_{#mu#mu} GeV;cos#theta*;fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/,nFullCosThetaBins,minFullCosTheta,maxFullCosTheta  ) );
+		//// 2d plots
+		h2DY.push_back( new TH2D("h2DY_"+quark,"DY with pdf;m_{#mu#mu} GeV;cos#theta*;fb/GeV", nlogtheoryimassbins,logtheoryimassbins /* nlogofficiallongimassbins,logofficiallongimassbins */  /*nlogofficialimassbins,logofficialimassbins*/  /* nlinmassbins,linmassbins */,nFullCosThetaBins,minFullCosTheta,maxFullCosTheta  ) );
+		h2ZP.push_back( new TH2D("h2ZP_"+quark,"ZP with pdf;m_{#mu#mu} GeV;cos#theta*;fb/GeV", nlogtheoryimassbins,logtheoryimassbins /* nlogofficiallongimassbins,logofficiallongimassbins */  /*nlogofficialimassbins,logofficialimassbins*/  /* nlinmassbins,linmassbins */,nFullCosThetaBins,minFullCosTheta,maxFullCosTheta  ) );
 		for(unsigned int iE6=0 ; iE6<vE6models.size() ; iE6++)
 		{
-			h2E6[iE6].push_back( new TH2D("h2E6_"+vE6models[iE6]+"_"+quark,"E6 with pdf;m_{#mu#mu} GeV;cos#theta*;fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/,nFullCosThetaBins,minFullCosTheta,maxFullCosTheta  ) );
+			h2E6[iE6].push_back( new TH2D("h2E6_"+vE6models[iE6]+"_"+quark,"E6 with pdf;m_{#mu#mu} GeV;cos#theta*;fb/GeV", nlogtheoryimassbins,logtheoryimassbins /* nlogofficiallongimassbins,logofficiallongimassbins */  /*nlogofficialimassbins,logofficialimassbins*/  /* nlinmassbins,linmassbins */,nFullCosThetaBins,minFullCosTheta,maxFullCosTheta  ) );
 		}
-		h2KK.push_back( new TH2D("h2KK_"+quark,"KK with pdf;m_{#mu#mu} GeV;cos#theta*;fb/GeV", nlogofficiallongimassbins,logofficiallongimassbins /*nlogofficialimassbins,logofficialimassbins*/ /*nlinmassbins,linmassbins*/,nFullCosThetaBins,minFullCosTheta,maxFullCosTheta  ) );
+		h2KK.push_back( new TH2D("h2KK_"+quark,"KK with pdf;m_{#mu#mu} GeV;cos#theta*;fb/GeV", nlogtheoryimassbins,logtheoryimassbins /* nlogofficiallongimassbins,logofficiallongimassbins */  /*nlogofficialimassbins,logofficialimassbins*/  /* nlinmassbins,linmassbins */,nFullCosThetaBins,minFullCosTheta,maxFullCosTheta  ) );
 		
+		
+		
+		
+		//// FILL
 		for(Int_t bin=1 ; bin<=h1SumqDY->GetNbinsX() ; bin++)
 		{
 			double m  = h1SumqDY->GetBinCenter(bin);
@@ -446,7 +504,7 @@ void simpleplot_withpdfs(double Xmass, TString chan="mm", double gRe=1., double 
 				h2KK[q]->SetBinContent(bin,ybin,fullA2KK);
 			}
 			//------------------------------------------------------------------
-			cout << "m=" << m << "\r" << flush;
+			cout << "q=" << idIn << ", m=" << m << "\r" << flush;
 		}
 	}
 	
@@ -524,20 +582,39 @@ void simpleplot_withpdfs(double Xmass, TString chan="mm", double gRe=1., double 
 	h2SumqKK->Write();
 	//-----------------------------------------------------
 	
+	
+	
+	
+	
+	
+	
+	//-------------------- invariant mass 1d histo --------------------------------------
+	Double_t max = 0.;
+	max = (h1SumqDY->GetMaximum()>max) ? h1SumqDY->GetMaximum() : max;
+	max = (h1SumqZP->GetMaximum()>max) ? h1SumqZP->GetMaximum() : max;
+	max = (h1SumqKK->GetMaximum()>max) ? h1SumqKK->GetMaximum() : max;
+	for(unsigned int iE6=0 ; iE6<vE6models.size() ; iE6++)
+	{
+		max = (h1SumqE6[iE6]->GetMaximum()>max) ? h1SumqE6[iE6]->GetMaximum() : max;
+	}
+	max *= 2.;
 	TCanvas* cnv_mass = new TCanvas("cnv_mass","cnv_mass",600,400);
 	cnv_mass->SetTicks(1,1);
-	cnv_mass->SetLogx();
-	cnv_mass->SetLogy();
+	if(dologx) cnv_mass->SetLogx();
+	if(dology) cnv_mass->SetLogy();
 	cnv_mass->cd();
 	cnv_mass->Draw();
+	h1SumqDY->SetMaximum(max);
 	h1SumqDY->Draw();
 	h1SumqZP->Draw("SAMES");
 	for(unsigned int iE6=0 ; iE6<vE6models.size() ; iE6++) h1SumqE6[iE6]->Draw("SAMES");
 	h1SumqKK->Draw("SAMES");
 	leg_sigma->Draw("SAMES");
 	saveas(cnv_mass,"plots/theory_mass"+sXmass+"GeV_withpdf_mass");
+	//-----------------------------------------------------------------------------------
 	
 	
+	//-------------------- Afb 1d histo -------------------------------------------------
 	TCanvas* cnv_afb = new TCanvas("cnv_afb","cnv_afb",600,400);
 	cnv_afb->SetTicks(1,1);
 	cnv_afb->SetLogx();
@@ -548,10 +625,10 @@ void simpleplot_withpdfs(double Xmass, TString chan="mm", double gRe=1., double 
 	h1AfbSumqDY->Draw();
 	h1AfbSumqZP->Draw("SAMES");
 	for(unsigned int iE6=0 ; iE6<vE6models.size() ; iE6++) h1AfbSumqE6[iE6]->Draw("SAMES");
-	h1AfbSumqKK->Draw("SAMES");
-	leg_sigma->Draw("SAMES");
+	// h1AfbSumqKK->Draw("SAMES");
+	leg_afb->Draw("SAMES");
 	saveas(cnv_afb,"plots/theory_mass"+sXmass+"GeV_withpdf_afb");
-	
+	//-----------------------------------------------------------------------------------
 	
 	
 	//////////////////////////////////

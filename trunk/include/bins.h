@@ -110,9 +110,9 @@ static const Double_t logmassmin   = 120.;
 static const Double_t logmassmax   = 1500.;
 static Double_t logmassbins[nlogmassbins+1];
 
-static const Int_t    nlinmassbins = 1000;
-static const Double_t linmassmin   = 5.;
-static const Double_t linmassmax   = 5005.;
+static const Int_t    nlinmassbins = 495;//1000;  //120;
+static const Double_t linmassmin   = 55.;   //1000.;
+static const Double_t linmassmax   = 5005.; //2200.;
 static Double_t linmassbins[nlinmassbins+1];
 
 static const Int_t    nlogimassbins = 50;
@@ -138,14 +138,14 @@ static const Int_t    nlinfullimassbins = 250;
 static const Double_t linfullimassmin   = 70.;
 static const Double_t linfullimassmax   = 2000.;
 
-static const Int_t    nlogtheoryimassbins = 76;
-static const Double_t logtheoryimassmin   = 75.;
-static const Double_t logtheoryimassmax   = 4000.;
+static const Int_t    nlogtheoryimassbins = 150;
+static const Double_t logtheoryimassmin   = 50.;
+static const Double_t logtheoryimassmax   = 5000.;
 static Double_t logtheoryimassbins[nlogtheoryimassbins+1];
 
-static const Int_t    nlogtheoryAFBimassbins = 22;
-static const Double_t logtheoryAFBimassmin   = 75.;
-static const Double_t logtheoryAFBimassmax   = 4000.;
+static const Int_t    nlogtheoryAFBimassbins = 150;
+static const Double_t logtheoryAFBimassmin   = 50.;
+static const Double_t logtheoryAFBimassmax   = 5000.;
 static Double_t logtheoryAFBimassbins[nlogtheoryAFBimassbins+1];
 
 
@@ -155,9 +155,9 @@ static const Double_t logofficialimassmin   = 70.;
 static const Double_t logofficialimassmax   = 3000.;
 static Double_t logofficialimassbins[nlogofficialimassbins+1];
 
-static const Int_t    nlogofficiallongimassbins = 400;
-static const Double_t logofficiallongimassmin   = 55.;
-static const Double_t logofficiallongimassmax   = 5005.;
+static const Int_t    nlogofficiallongimassbins = 495;//200;//400;
+static const Double_t logofficiallongimassmin   = 50.;
+static const Double_t logofficiallongimassmax   = 5000;//5005.;
 static Double_t logofficiallongimassbins[nlogofficiallongimassbins+1];
 
 static const Int_t    nlogisoimassbins = 20;
@@ -308,7 +308,7 @@ const Double_t dymassbins[ndymassbins+1] =
 {
 	75,120,250,400,600,800,1000,1250,1500,1750,2000,2200
 };
-TH1* hDYbins = new TH1("hDYbins","hDYbins",ndymassbins,dymassbins);				
+// TH1* hDYbins = new TH1("hDYbins","hDYbins",ndymassbins,dymassbins);				
 
 static const Double_t etax    = 1.05;
 static const Double_t ystarlow  = 0.6;

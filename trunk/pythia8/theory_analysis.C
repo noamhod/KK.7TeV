@@ -60,6 +60,7 @@ TMapdi        pTtoIndexMapTruth;
 TLorentzVector* p3 = new TLorentzVector();
 TLorentzVector* p4 = new TLorentzVector();
 TLorentzVector* p5 = new TLorentzVector();
+TVector3* qrkvec   = new TVector3;
 TVector3*       tv3qa = new TVector3;
 TLorentzVector* tlvqa = new TLorentzVector;
 TLorentzVector* tlvqb = new TLorentzVector;
@@ -376,6 +377,13 @@ void hbook(TString name)
 	h1Map.insert( make_pair("hpTSubLeading"+name, new TH1D("hpTSubLeading"+name, name+";p_{T}^{SubLeading} GeV;Events", nlogptbins,logptbins)) );
 	h1Map.insert( make_pair("hEtaLeading"+name, new TH1D("hEatLeading"+name, name+";#eta^{Leading};Events", nEtabins,Etamin,Etamax)) );
 	h1Map.insert( make_pair("hEtaSubLeading"+name, new TH1D("hEtaSubLeading"+name, name+";#eta^{SubLeading};Events", nEtabins,Etamin,Etamax)) );
+	h1Map.insert( make_pair("hBoostQRK_ALL"+name, new TH1D("hBoostQRK_ALL"+name, name+";y_{#mu#mu};Events", 100,-4.,+4.)) );
+	h1Map.insert( make_pair("hBoostQRK_FLIP"+name, new TH1D("hBoostQRK_FLIP"+name, name+";y_{#mu#mu};Events", 100,-4.,+4.)) );
+	h1Map.insert( make_pair("hBoostQRK"+name, new TH1D("hBoostQRK"+name, name+";y_{#mu#mu};P(y_{#mu#mu})", 100,-4.,+4.)) );
+	
+	h2Map.insert( make_pair("hMassCosThetaQRK"+name, new TH2D("hMassCosThetaQRK"+name, name+";m_{"+chlabel+"} GeV;cos#theta*;Events", nlogtheoryAFBimassbins,logtheoryAFBimassbins, nFullCosThetaBins,minFullCosTheta,maxFullCosTheta)) );
+	h2Map.insert( make_pair("hMassCosThetaHE"+name, new TH2D("hMassCosThetaHE"+name, name+";m_{"+chlabel+"} GeV;cos#theta*;Events", nlogtheoryAFBimassbins,logtheoryAFBimassbins, nFullCosThetaBins,minFullCosTheta,maxFullCosTheta)) );
+	h2Map.insert( make_pair("hMassCosThetaCS"+name, new TH2D("hMassCosThetaCS"+name, name+";m_{"+chlabel+"} GeV;cos#theta*;Events", nlogtheoryAFBimassbins,logtheoryAFBimassbins, nFullCosThetaBins,minFullCosTheta,maxFullCosTheta)) );
 }
 
 void hfill(TString name, double wgt)
@@ -405,6 +413,7 @@ void hfill(TString name, double wgt)
 	// the quarks
 	tlvqa->SetPxPyPzE( partons_px->at(quark),  partons_py->at(quark),  partons_pz->at(quark),  partons_e->at(quark) );
 	tlvqb->SetPxPyPzE( partons_px->at(aquark), partons_py->at(aquark), partons_pz->at(aquark), partons_e->at(aquark) );
+	qrkvec->SetXYZ(partons_px->at(quark),  partons_py->at(quark),  partons_pz->at(quark));
 	tlvqBoosted = Boost(tlvqa,tlvqb,tlvqa);
 	tv3qa->SetXYZ(tlvqBoosted->Px(),tlvqBoosted->Py(),tlvqBoosted->Pz());
 	
@@ -417,6 +426,8 @@ void hfill(TString name, double wgt)
 	double ysystem     = ySystem(tlvmua,tlvmub);
 	double etasystem   = etaSystem(tlvmua,tlvmub);
 	double qt          = QT(tlvmua,tlvmub);
+	TVector3 boost     = (TVector3)systemBoostVector(tlvmua,tlvmub);
+	double boostDotQrk = qrkvec->Dot(boost);
 	
 	h1Map["hMass"+name]->Fill(mHat,wgt);
 	h1Map["hMassLinear"+name]->Fill(mHat,wgt);
@@ -427,6 +438,12 @@ void hfill(TString name, double wgt)
 	h1Map["hpTSubLeading"+name]->Fill(leptons_pt->at(alepton),wgt);
 	h1Map["hEtaLeading"+name]->Fill(leptons_eta->at(lepton),wgt);
 	h1Map["hEtaSubLeading"+name]->Fill(leptons_eta->at(alepton),wgt);
+	if(boostDotQrk<=0.) h1Map["hBoostQRK_FLIP"+name]->Fill(ysystem,wgt);
+	h1Map["hBoostQRK_ALL"+name]->Fill(ysystem,wgt);
+	
+	h2Map["hMassCosThetaQRK"+name]->Fill(mHat,cosThetaQRK,wgt);
+	h2Map["hMassCosThetaHE"+name]->Fill(mHat,cosThetaHE,wgt);
+	h2Map["hMassCosThetaCS"+name]->Fill(mHat,cosThetaCS,wgt);
 	
 	if(cosThetaHE<=0.)  h1Map["hMassBackwardHE"+name]->Fill(mHat,wgt);
 	if(cosThetaHE>0.)   h1Map["hMassForwardHE"+name]->Fill(mHat,wgt);
@@ -490,6 +507,8 @@ void postanalysis(TString name)
 			h1Map["hMassAFB_QRK"+name]->SetBinError(bin,dAfb);
 		}
 	}
+	
+	h1Map["hBoostQRK"+name]->Divide(h1Map["hBoostQRK_FLIP"+name],h1Map["hBoostQRK_ALL"+name],1.,1.);
 }
 
 bool dolog(TString hname, int axs)
@@ -504,7 +523,10 @@ bool dolog(TString hname, int axs)
 	if(hname.Contains("QT") && axs==2) return true;
 	
 	if(hname.Contains("Mass") && axs==1) return true;
-	if(hname.Contains("Mass") && !hname.Contains("AFB") && axs==2) return true;
+	if(hname.Contains("Mass") && axs==2)
+	{
+		if(!hname.Contains("AFB") && !hname.Contains("CosTheta")) return true;
+	}
 	if(hname.Contains("Mass") && axs==3) return true;
 	
 	return false;
@@ -537,6 +559,11 @@ void writeout(TString name)
 		outfile->cd();
 		it->second->Write();
 		TString hname = it->first;
+		if(dolog(hname,1))
+		{
+			it->second->GetXaxis()->SetMoreLogLabels();
+			it->second->GetXaxis()->SetNoExponent();
+		}
 		saveas(it->second, "plots/"+hname+sRunNum, dolog(hname,1), dolog(hname,2), dolog(hname,3));
 	}
 	
@@ -545,7 +572,15 @@ void writeout(TString name)
 		outfile->cd();
 		it->second->Write();
 		TString hname = it->first;
-		saveas(it->second, "plots/"+hname+sRunNum, dolog(hname,1), dolog(hname,2), dolog(hname,3));
+		if(dolog(hname,1))
+		{
+			it->second->GetXaxis()->SetMoreLogLabels();
+			it->second->GetXaxis()->SetNoExponent();
+			it->second->GetXaxis()->SetTitleOffset(1.);
+			it->second->GetYaxis()->SetTitleOffset(1.);
+			it->second->GetZaxis()->SetTitleOffset(1.);
+		}
+		saveas(it->second, "plots/"+hname+sRunNum, dolog(hname,1), dolog(hname,2), dolog(hname,3), false, "COLZ");
 	}
 	
 	outfile->Write();

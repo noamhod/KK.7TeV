@@ -125,15 +125,22 @@ inline double wE62ttbar(unsigned int id)
 	
 	double m2 = mass*mass;
 	double mf2 = mf(id)*mf(id);
-	double gV = gVE6(id);
-	double gV2 = gV*gV;
-	double gA = gAE6(id);
-	double gA2 = gA*gA;
-	
 	if((1.-4.*mf2/m2)<0.) return 0.;
 	
-	// Z'E6->ttbar
-	double w = Ncf(id)*(alphaEM/(12.*cw2))*mass*(gV2+gA2);
+	// double gV = gVE6(id);
+	// double gV2 = gV*gV;
+	// double gA = gAE6(id);
+	// double gA2 = gA*gA;
+	/// Z'E6->ttbar
+	// double w = Ncf(id)*(alphaEM/(12.*cw2))*mass*(gV2+gA2);
+	
+	double gL = gLE6(id);
+	double gL2 = gL*gL;
+	double gR = gRE6(id);
+	double gR2 = gR*gR;
+	/// Z'E6->ttbar
+	double w = Ncf(id)*(alphaEM/6.)*mass*(gL2+gR2);
+	
 	return w; // no scale factor included here
 }
 
@@ -161,14 +168,23 @@ inline double wE62ffbar(unsigned int id)
 	
 	double m2 = mass*mass;
 	double mf2 = mf(id)*mf(id);
-	double gV = gVE6(id);
-	double gV2 = gV*gV;
-	double gA = gAE6(id);
-	double gA2 = gA*gA;
-
+	
+	// double gV = gVE6(id);
+	// double gV2 = gV*gV;
+	// double gA = gAE6(id);
+	// double gA2 = gA*gA;
 	// Z'E6->ffbar
+	// if(id==PDTTOP && doTTbarWidth) w = wE62ttbar(PDTTOP); // ttbar
+	// else                           w = Ncf(id)*(alphaEM/(12.*cw2))*mass*(gV2+gA2);
+
+	double gL = gLE6(id);
+	double gL2 = gL*gL;
+	double gR = gRE6(id);
+	double gR2 = gR*gR;
+	/// Z'E6->ffbar
 	if(id==PDTTOP && doTTbarWidth) w = wE62ttbar(PDTTOP); // ttbar
-	else                           w = Ncf(id)*(alphaEM/(12.*cw2))*mass*(gV2+gA2);
+	else                           w = Ncf(id)*(alphaEM/6.)*mass*(gL2+gR2);
+	
 	return w;
 }
 

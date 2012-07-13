@@ -215,6 +215,23 @@ double getYmin(TH1* h)
 	return min;
 }
 
+double getYmax(TH1* h)
+{
+	if(h==NULL)
+	{
+		_ERROR("Histogram is null, getYmax(TH1* h) returning -1");
+		return -1.;
+	}
+	double max    = 0.;
+	double binval = 0.;
+	for(int b=1 ; b<=h->GetNbinsX() ; b++)
+	{
+		binval = h->GetBinContent(b);
+		max = (binval>max) ? binval : max;
+	}
+	return max;
+}
+
 double getXYmin(TH2* h)
 {
 	double min = 1.e20;
@@ -370,7 +387,7 @@ void saveas(TCanvas* c, TString name, Bool_t savesource=false)
 	if(savesource) c->SaveAs(name+".C");
 }
 
-void saveas(TObject* obj, TString name, Bool_t logx=false, Bool_t logy=false, Bool_t logz=false, Bool_t savesource=false)
+void saveas(TObject* obj, TString name, Bool_t logx=false, Bool_t logy=false, Bool_t logz=false, Bool_t savesource=false, TString drwopt="")
 {
 	TCanvas* c = new TCanvas("","",600,400);
 	c->cd();
@@ -379,7 +396,14 @@ void saveas(TObject* obj, TString name, Bool_t logx=false, Bool_t logy=false, Bo
 	if(logy) c->SetLogy();
 	if(logz) c->SetLogz();
 	c->SetTicks(1,1);
-	obj->Draw();
+	obj->Draw(drwopt);
+	if(drwopt=="COLZ" || drwopt=="CONTZ")
+	{
+		c->SetTopMargin(0.035);
+		c->SetBottomMargin(0.1);
+		c->SetLeftMargin(0.1);
+		c->SetRightMargin(0.14);
+	}
 	c->RedrawAxis();
 	c->Update();
 	c->SaveAs(name+".png");
@@ -665,6 +689,82 @@ TCanvas* stackratio(TString name,
 	gaNumerator->Draw("psame");
 	if(pvtxt_atlas!=NULL) pvtxt_atlas->Draw("SAMES");
 	if(leg!=NULL)         leg->Draw("SAMES");
+	tvp_hists->Update();
+	tvp_hists->RedrawAxis();
+
+	tvp_ratio->cd();
+	tvp_ratio->SetGridy();
+	hr->Draw("epx0");
+	line->Draw("SAMES");
+	tvp_ratio->Update();
+	tvp_ratio->RedrawAxis();
+	
+	cnv->Update();
+	
+	return cnv;
+}
+
+
+TCanvas* hratio(TString name, TH1* hNumerator, TH1* hDenominator,
+				TLegend* leg=NULL, TString ratioLabel="Ratio",
+				Bool_t logx=false, Bool_t logy=false)
+{	
+	TCanvas* cnv = new TCanvas(name,name,600,550);
+	cnv->Divide(1,2);
+	TVirtualPad* tvp_hists = cnv->cd(1);
+	TVirtualPad* tvp_ratio = cnv->cd(2);
+	
+	if(logx) tvp_ratio->SetLogx();
+	if(logx) tvp_hists->SetLogx();
+	if(logy) tvp_hists->SetLogy();
+	
+	tvp_hists->SetPad(0.00, 0.35, 1.00, 1.00);
+	tvp_ratio->SetPad(0.00, 0.00, 1.00, 0.355);
+
+	tvp_hists->SetBottomMargin(0.012);
+	tvp_ratio->SetBottomMargin(0.20);
+	tvp_ratio->SetTopMargin(0.012);
+	
+	tvp_hists->SetTicks(1,1);
+	tvp_ratio->SetTicks(1,1);
+	
+	TString cloneName_n = hNumerator->GetName();
+	TString cloneName_d = hDenominator->GetName();
+	TH1D* th1n_tmp = (TH1D*)hNumerator->Clone(cloneName_n+"_th1n_tmp");
+	TH1D* th1d_tmp = (TH1D*)hDenominator->Clone(cloneName_d+"_th1d_tmp");
+	th1n_tmp->Sumw2();
+	th1d_tmp->Sumw2();
+
+	TH1D* hr = (TH1D*)hNumerator->Clone(); // Clone(name)
+	TString sXtitle = (TString)hNumerator->GetXaxis()->GetTitle();
+	TString sTitle = ";"+sXtitle+";"+ratioLabel;
+	hr->SetTitle(sTitle);
+	hr->Divide(th1n_tmp,th1d_tmp,1.,1.);
+	hr->SetMarkerStyle(20);
+	hr->SetMarkerSize(0.6);
+	Double_t xLabelSize = hNumerator->GetXaxis()->GetLabelSize()*1.5;
+	Double_t yLabelSize = hNumerator->GetYaxis()->GetLabelSize()*1.5;
+	Double_t xTitleSize = hNumerator->GetXaxis()->GetTitleSize()*1.5;
+	Double_t yTitleSize = hNumerator->GetYaxis()->GetTitleSize()*1.5;
+	Double_t titleSize = hNumerator->GetTitleSize()*1.5;
+	hr->GetXaxis()->SetLabelSize(xLabelSize);
+	hr->GetYaxis()->SetLabelSize(yLabelSize);
+	hr->GetXaxis()->SetTitleSize(xTitleSize);
+	hr->GetYaxis()->SetTitleSize(yTitleSize);
+	hr->SetTitleSize(titleSize);
+	hr->GetYaxis()->SetTitleOffset(0.5);
+	hr->SetMinimum(getYmin(hr)*0.2);
+	hr->SetMaximum(getYmax(hr)*1.2);
+	
+	if(logx) setlogx(hr);
+	
+	TLine* line = new TLine(hr->GetXaxis()->GetXmin(),1.,hr->GetXaxis()->GetXmax(),1.);
+
+	tvp_hists->cd();
+	setMinMax(th1d_tmp, th1n_tmp, true);
+	th1d_tmp->Draw("hist");
+	th1n_tmp->Draw("hist SAMES");
+	if(leg!=NULL) leg->Draw("SAMES");
 	tvp_hists->Update();
 	tvp_hists->RedrawAxis();
 

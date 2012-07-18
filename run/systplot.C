@@ -344,7 +344,8 @@ void systplot(unsigned int uiXmass, TString model="KK", TString gN="g4", bool do
 	}
 	gdata->Draw("psame");  // "esame" or "psame" (p for Poisson)
 	leg->Draw("SAMES");
-	TString approval = "#font[72]{ATLAS} For Approval";
+	//TString approval = "#font[72]{ATLAS} For Approval";
+	TString approval = "#font[72]{ATLAS}";
 	TString ppCME = "#sqrt{s} = 7 TeV";
 	TString lumin = "#int L dt = "+(TString)_s(luminosity,0)+" fb^{-1}";
 	// text
@@ -356,7 +357,7 @@ void systplot(unsigned int uiXmass, TString model="KK", TString gN="g4", bool do
 	TString atlas2 = approval;
 	TString atlas3 = ppCME;
 	TString atlas4 = lumin;
-//	t->DrawLatex(0.325,0.925,atlas2);
+	t->DrawLatex(0.325,0.925,atlas2);
 	t->DrawLatex(0.325,0.860,atlas3);
 	t->DrawLatex(0.325,0.775,atlas4);
 	cMass->RedrawAxis();

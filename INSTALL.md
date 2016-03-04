@@ -1,0 +1,73 @@
+# Introduction #
+Install
+
+
+# Details #
+
+Add your content here.  Format your content with:
+  * Text in **bold** or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
+
+Analysis D3PD in ROOT
+Preparation
+Download the analysis code from: ???
+Download some D3PD data sets
+MakeClass for one of the D3PDs, name it “physics”:
+> TFile f("some.D3PD.file.root");
+> physics->MakeClass("physics");
+Now you have 2 new files: “physics.h” and “physics.C”
+Make a flat list of the the data set D3PD .root files:
+First edit the first line of the makeList.sh script to fit your data set - replace the common string in the file with a string that is common to all the files name in your data set, e.g.,		commonstring='group10.phys-sm.data10\_7TeV'
+Then execute the script:
+> source makeList.sh
+Now you have a new flat list of all the .root files of the D3PD set, the list file is called “dataset.list”. This file will be loaded by the analysis control to make the desired TChain, composed of all the D3PDs that were found in the directory you work in.
+CHECK YOUR LIST (“dataset.list”) TO SEE THAT ALL THE ENTRIES ARE VALID !!!
+Make this directly from dq2 ???:
+dq2-ls group10.phys-sm.data10\_7TeV\*physics\_MuonswBeam\*WZphys**.D3PD > list
+Bla Bla**
+
+
+Compile & Run (manual, not full description)
+root
+gROOT->ProcessLine(".include GoodRunsLists-XX-YY-ZZ/");
+gROOT->ProcessLine(".include GoodRunsLists-XX-YY-ZZ/GoodRunsLists/");
+gROOT->ProcessLine(".L GoodRunsLists-XX-YY-ZZ/StandAlone/libGoodRunsLists.so");
+.L analysisControl.C++
+(ignore warnings)
+analysisControl ac
+(ignore errors of missing root files)
+ac.loop(Long64\_t startEvent, Long64\_t events2process); //if events2process=0 do all
+(ignore warnings / errors of missing branches)
+watch the histograms
+To clean, run: source makeClean.sh
+To backup all your code, run: source makeCopy.sh
+
+
+Modify the code and add new analysis objects
+In analysis.C...
+Create a new particle from particleBase.h (see: muon\_staco.h, muon\_muid.h)...
+Create new selection criteria...
+
+
+Compile & run  (partially manual, full description)
+go to the analysis folder
+cd /path/to/analysis
+compile the GRL lib:
+check the latest tag in https://svnweb.cern.ch/cern/wsvn/atlasoff/DataQuality/GoodRunsLists/tags/
+cheout the latest tag svn co svn+ssh://svn.cern.ch/reps/atlasoff/DataQuality/GoodRunsLists/tags/GoodRunsLists-XX-XX-XX
+cd GoodRunsLists-XX-XX-XX/cmt
+make -f Makefile.Standalonethe GRL lib is in GoodRunsLists-XX-XX-XX/StandAlone/libGoodRunsLists.so
+make the list (dataset.list)
+**ONLY WHEN A NEW DATA SET IS TO BE DEFINED AND USED. OTHERWISE, SKIP THIS POINT**
+cp makeList.sh /path/to/datasets/
+cd /path/to/datasets/source makeList.shcd -cp  /path/to/datasets/dataset.list .
+make the chain and the corresponding class (physics.h, physics.C):
+**ONLY WHEN A NEW DATA SET IS TO BE DEFINED AND USED. OTHERWISE, SKIP THIS POINT**
+root
+.L MakeClassFromChain.C++MakeClassFromChain fcncmakeChain(true, “dataset.list”, “/path/to/datasets/”);chain2list();
+recompile everything and run, with the new “physics” class
+root
+.L main.CcompileAll(“XX-YY-ZZ”); // the argument is the tag of the GoodRunList xmlloop(0,0); // loop(startEvent, events2process) ===> if events2process=0 do all
+bla
+

@@ -79,8 +79,8 @@ class fermion
 			this->mass = Mass;
 			this->charge = Charge;
 			this->I3 = WeakI3;
-			if(fabs(this->charge)<1.) this->Nc = 3;
-			else                      this->Nc = 1;
+			if(fabs(this->id)<10) this->Nc = 3;
+			else                  this->Nc = 1;
 		}
 		~fermion();
 
